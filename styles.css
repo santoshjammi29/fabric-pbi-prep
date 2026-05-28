@@ -285,6 +285,10 @@ body {
   scale: 1.05;
 }
 
+.mobile-top-bar {
+  display: none;
+}
+
 /* Main Content Area */
 .main-content {
   padding: 2rem 3rem;
@@ -1199,8 +1203,56 @@ body {
 
   .main-content {
     padding: 1.5rem;
+    padding-top: calc(60px + 1.5rem);
     padding-bottom: 90px;
     height: 100vh;
+  }
+
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    backdrop-filter: blur(var(--blur-radius));
+    -webkit-backdrop-filter: blur(var(--blur-radius));
+    padding: 0 1.25rem;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .mobile-brand-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .mobile-brand-text h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .mobile-brand-text span {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: block;
+    margin: 0;
   }
 
   .dashboard-grid {
