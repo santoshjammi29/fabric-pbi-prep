@@ -181,6 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
         DOM.btnScrollToTop.classList.add('hidden');
       }
     });
+
+    // Set initial view and place footer in active container at startup
+    switchView('view-dashboard');
   }
 
   // Load and apply progress from localStorage
@@ -294,6 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (targetViewId !== 'view-practice') {
       DOM.activePracticeScreen.classList.add('hidden');
       DOM.nicheSelectionScreen.classList.remove('hidden');
+      
+      const prHeader = document.getElementById('practice-header');
+      const prScrollbar = document.getElementById('practice-topics-scrollbar');
+      if (prHeader) prHeader.classList.remove('hidden');
+      if (prScrollbar) prScrollbar.classList.remove('hidden');
     }
     
     // Switch active states of nav buttons
@@ -310,6 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (view.id === targetViewId) {
         view.classList.remove('hidden');
         view.removeAttribute('hidden');
+        
+        // Dynamically move the global footer to the bottom of the active page view
+        const footer = document.getElementById('global-footer');
+        if (footer) {
+          view.appendChild(footer);
+        }
       } else {
         view.classList.add('hidden');
         view.setAttribute('hidden', 'true');
@@ -583,6 +597,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     DOM.nicheSelectionScreen.classList.add('hidden');
     DOM.activePracticeScreen.classList.remove('hidden');
+    
+    // Hide practice page header and filter scrollbar during active practice to save vertical space
+    const prHeader = document.getElementById('practice-header');
+    const prScrollbar = document.getElementById('practice-topics-scrollbar');
+    if (prHeader) prHeader.classList.add('hidden');
+    if (prScrollbar) prScrollbar.classList.add('hidden');
     
     DOM.activeNicheTitle.textContent = nicheName;
     
@@ -939,6 +959,13 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.btnPracticeBack.addEventListener('click', () => {
       DOM.activePracticeScreen.classList.add('hidden');
       DOM.nicheSelectionScreen.classList.remove('hidden');
+      
+      // Restore practice page header and filter scrollbar
+      const prHeader = document.getElementById('practice-header');
+      const prScrollbar = document.getElementById('practice-topics-scrollbar');
+      if (prHeader) prHeader.classList.remove('hidden');
+      if (prScrollbar) prScrollbar.classList.remove('hidden');
+      
       renderNicheSelection();
     });
 
