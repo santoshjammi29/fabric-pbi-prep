@@ -1,0 +1,16 @@
+{
+  "name": "fabric-pbi-interview-prep",
+  "version": "1.0.0",
+  "description": "Interactive interview preparation app for Microsoft Fabric, Power BI, ADF, SQL Server, Data Lake, and Apache Spark",
+  "private": true,
+  "scripts": {
+    "build": "python3 scripts/compile_db.py",
+    "test": "node tests/test_ui.js && node tests/test_dom.js && node tests/test_portal.js && node tests/test_explainer.js",
+    "deploy": "npx vercel --prod",
+    "deploy:preview": "npx vercel"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "puppeteer": "^25.1.0"
+  }
+}

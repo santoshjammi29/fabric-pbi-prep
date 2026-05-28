@@ -1,0 +1,802 @@
+[
+  {
+    "id": "onelake-1",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does OneLake resolve atomic write conflicts when multiple workspaces attempt to update identical logical tables concurrently through cross-workspace shortcuts?",
+    "answer": "OneLake shortcuts are virtual metadata pointers to underlying physical storage paths. When multiple workspaces attempt to update the same logical table via shortcuts, they are executing writes against the same physical Delta table. OneLake delegates concurrency resolution to the Delta Lake storage protocol. Delta Lake uses Optimistic Concurrency Control (OCC). Every write attempt reads the current table version from the `_delta_log` folder (e.g., `000000.json`), performs the write operation, and attempts to commit by writing the next transaction file (e.g., `000001.json`). If another workspace commits first, the second write detects a version conflict and throws a `ConcurrentAppendException` or `ConcurrentDeleteException`. The second writer must then retry by reading the updated state, checking for schema or partition conflicts, and attempting to commit again. OneLake does not maintain a custom middle-tier locking service; transaction isolation remains bound to the physical storage layer's atomic write guarantees.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-2",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain the low-level metadata translation process that occurs when a Fabric SQL Endpoint queries an AWS S3 shortcut using IAM role delegation.",
+    "answer": "When a query hits the Fabric SQL Endpoint, the Polaris distributed query engine processes the query plan. Polaris detects that the table points to an AWS S3 shortcut. The metadata translation process is as follows: 1) Polaris requests read credentials from the Fabric Shortcut Service. 2) The Shortcut Service retrieves the configured AWS IAM role details. 3) Fabric uses OpenID Connect (OIDC) federation: it sends an internal Fabric OIDC identity token to the AWS Security Token Service (STS) via the `AssumeRoleWithWebIdentity` API call. 4) AWS STS validates the token and returns temporary credentials (Access Key, Secret Key, and Session Token) with permissions scoped to the target S3 bucket. 5) The Shortcut Service returns these credentials to the Polaris executor nodes. 6) Polaris translates the logical Delta parquet paths into AWS S3 API GET requests (using S3 object keys) and fetches the column data directly from the S3 endpoint, bypassing local storage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-3",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the performance implications and network hops introduced when chaining shortcuts across three tiers of distinct Fabric workspaces and external ADLS Gen2 accounts?",
+    "answer": "Chaining shortcuts (e.g., Workspace C points to Workspace B, which points to Workspace A, which points to an external ADLS Gen2 account) introduces metadata resolution overhead and physical network latency. Each shortcut hop requires resolving logical paths to physical paths via the Fabric Shortcut Directory Service. This lookup adds 10-50ms per metadata resolution. When Spark or SQL queries are executed, the final execution engine resolves the path recursively to the physical root. The actual data payload does not hop through the intermediate workspaces; it flows directly from the physical ADLS Gen2 storage account to the compute nodes running the query. However, performance is impacted if compute and storage are in different regions, introducing cross-region egress charges and latency. Additionally, concurrent requests can quickly saturate the ADLS Gen2 storage account's IOPS/throughput limits, resulting in HTTP 429 throttling.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-4",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How do you programmatically detect and mitigate internal cache invalidation latency when external Delta tables mapped via shortcuts undergo log compaction (VACUUM) outside of Fabric?",
+    "answer": "When an external Delta table is modified outside of Fabric (e.g., via Databricks running VACUUM), the local Fabric Spark catalog or SQL Endpoint may experience cache invalidation latency. To programmatically detect this: 1) Run `DESCRIBE HISTORY <table_name>` inside Fabric Spark to check if the latest version in Fabric matches the external Delta log. 2) Query the SQL Endpoint system views or check for mismatching file references in the transaction log. To mitigate latency: 1) Execute `REFRESH TABLE <table_name>` or `spark.catalog.refreshTable('<table_name>')` in Spark notebooks to force-refresh the metadata cache. 2) For the SQL Endpoint, invoke the system stored procedure `sp_refresh_metadata` or run a dummy select on the table to trigger the background metadata sync. 3) Configure external processes to call the Fabric REST API to trigger a manual refresh after log compaction is complete.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-5",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Fabric handle ACL inheritance boundaries when a user has Read access to a workspace containing a shortcut, but lacks IAM/RBAC permissions on the underlying physical Azure storage account?",
+    "answer": "Fabric uses a delegated access model. When a user queries a shortcut in a workspace where they have Read access, their requests are authenticated at the workspace level. The user does not need direct IAM/RBAC permissions on the underlying storage. Fabric resolves the shortcut using the connection credentials configured when the shortcut was created (e.g., an Organizational Account, Service Principal, or Shared Access Signature). However, if the shortcut is configured to use 'User Identity' delegation (where supported), or if the user bypasses the workspace UI and queries the raw storage endpoint directly, the query will fail. In the workspace, Fabric enforces its own item-level permissions (Read, ReadAll) and SQL/Spark role-based access control, effectively acting as an authorization gateway to the underlying storage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-6",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What specific conditions cause a cross-tenant OneLake shortcut to drop its semantic link and fallback to cold metadata polling?",
+    "answer": "A cross-tenant OneLake shortcut drops its warm semantic link and falls back to cold metadata polling under the following conditions: 1) Tenant-level cross-tenant sharing settings are disabled or modified in either tenant's admin portal. 2) The source workspace is moved to a capacity in a different region, causing a region-boundary mismatch. 3) The source workspace or target item is deleted or renamed, breaking the specific GUID link. 4) The Service Principal or token used to authenticate cross-tenant access expires or is revoked. 5) Azure AD Conditional Access policies in the source tenant enforce MFA or IP restrictions that the consuming tenant's background services cannot satisfy, preventing token renewal.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-7",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain the internal mechanics of how Fabric manages the _delta_log directory state synchronization when a shortcut points to an ADLS Gen2 path that uses lifecycle management policies to archive historical Parquet files.",
+    "answer": "When a shortcut points to an ADLS Gen2 path under Azure Storage lifecycle management, historical parquet files may be archived (e.g., moved to Cool or Archive tier). The `_delta_log` directory remains active. However, when Delta queries are executed, the Delta engine reads the transaction logs to resolve the files needed for a query. If the query requires scanning historical files that have been archived, ADLS Gen2 returns an error (since archived blobs are offline and cannot be read without dehydration). Fabric does not automatically monitor ADLS lifecycle policies. The `_delta_log` remains technically synchronized, but queries fail at runtime when trying to read archived Parquet files. To prevent this, the ADLS lifecycle policy must exclude the current active versions, or the table must be compacted (VACUUMed) regularly to delete historical file references before they are archived.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-8",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How do you architect a multi-region disaster recovery strategy for OneLake, considering that Fabric items are bound to a capacities-specific Azure region?",
+    "answer": "To architect a multi-region DR strategy: 1) Establish a secondary Fabric workspace in a separate Azure region mapped to a different Fabric capacity. 2) Implement data replication at the storage level. Since OneLake does not support automatic geo-replication across capacities, you must use Azure Data Factory pipelines or Spark notebooks to replicate Delta tables from the primary OneLake workspace to the secondary workspace. 3) For shortcuts targeting external ADLS Gen2, leverage GRS (Geo-Redundant Storage) or RA-GRS. Configure the secondary workspace shortcuts to target the secondary read-only endpoint of the GRS storage. 4) Maintain metadata sync: deploy Lakehouse and Warehouse schemas to the secondary region using CI/CD pipelines (Git integration) and redeploy semantic models pointing to the secondary endpoints.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-9",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Under what exact conditions does a OneLake file system API call experience an HTTP 429 throttling exception versus a Fabric capacity-level throttling limit?",
+    "answer": "A OneLake file system API call experiences an HTTP 429 throttling exception when it exceeds the physical storage layer limits, which are based on standard Azure Blob Storage limits (20,000 requests per second per storage account). This happens when Spark clusters perform highly parallel read/writes on thousands of small files. Conversely, a Fabric capacity-level throttling limit (which doesn't return 429 directly on storage but blocks compute or returns capacity exceptions) occurs when the cumulative Capacity Unit (CU) consumption of your workspace exceeds the smoothing threshold of your Fabric F-Sku capacity (e.g., carry-forward debt exceeds 24 hours). The HTTP 429 is an I/O rate throttle, while capacity throttling is a CPU/compute capacity exhaust throttle.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-10",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Detail the physical storage layout differences in OneLake between a standard Delta table generated by Spark Runtime 3.4/4.0 versus an external Delta table mapped via a shortcut.",
+    "answer": "A standard Delta table generated in a Fabric Lakehouse is physically stored inside the OneLake account at `Tables/<table_name>/`. The data Parquet files and the `_delta_log/` transaction files reside in the managed Azure storage assigned to the workspace capacity. Running OPTIMIZE applies Fabric's proprietary V-Order sorting to the physical Parquet page layout. An external Delta table mapped via a shortcut is stored at `Tables/<table_name>/` as a virtual directory. The physical Parquet files and the `_delta_log` directory remain in the source external storage (e.g., AWS S3 or external ADLS Gen2). OneLake only stores metadata files pointing to the target storage. When queries are executed, Fabric reads the external `_delta_log` directly, and writes are routed to write files directly to the external target storage.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-11",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How can you programmatically override the automatic discovery mechanism of the OneLake internal catalog to prevent corrupted schema evolution from breaking downstream shortcuts?",
+    "answer": "OneLake automatically discovers Delta table metadata and populates the Lakehouse catalog. If an upstream schema change (e.g., data type changes or additions) corrupts schema evolution, you can override it by: 1) Disabling automatic schema merging in Spark configurations by setting `spark.microsoft.delta.schema.autoMerge.enabled` to `false`. 2) Enforcing strict schema validation at the table level using the Delta property `delta.compatibility.symlinkFormatManifest.enabled`. 3) Programmatically defining target schemas during writes using `df.write.format('delta').option('schema', schemaDefinition).mode('overwrite')`. 4) Managing schemas manually via external Hive Metastore mapping, or creating custom views on the SQL Endpoint that cast attributes to stable schemas, protecting downstream shortcuts from raw schema drift.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-12",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain how OneLake prevents circular reference deadlocks when setting up mutual shortcuts between a Data Warehouse item and a Lakehouse item across different domains.",
+    "answer": "OneLake prevents circular reference deadlocks during query execution through a path resolution depth-limit checker. When resolving a shortcut path, the Fabric storage engine tracks resolved paths in a call stack. If the depth exceeds a hard limit (typically 5 hops) or if the same storage location (GUID pair) appears twice in the resolution chain, OneLake aborts resolution and throws a `CircularShortcutReferenceException`. At the database schema level, the Polaris engine detects cycles during compilation of T-SQL queries involving mutual shortcuts (e.g., DW views querying Lakehouse tables that shortcut back to DW tables) and raises a query compilation error, preventing run-time deadlock conditions in the distributed locks.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-13",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the impact of Azure Storage Firewalls and Private Endpoints on the resolution of cross-tenant shortcuts within a multi-tenant enterprise Fabric setup?",
+    "answer": "Azure Storage Firewalls and Private Endpoints restrict public access to storage accounts. When resolving a cross-tenant shortcut, if the target storage has firewalls enabled, Fabric's multi-tenant infrastructure cannot connect via the public internet. To resolve this: 1) You must configure trust settings to allow 'trusted Microsoft services' to bypass the firewall. 2) Alternatively, configure a Fabric Managed Private Endpoint from the Fabric workspace capacity to the target storage account. This routes the shortcut resolution traffic over Microsoft's private backbone network. In a cross-tenant setup, the target tenant must also approve the private endpoint request, establishing a secure, private transit path across tenant boundaries.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-14",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does OneLake translate POSIX-like file permissions defined at the Lakehouse file level into ABAC/RBAC rules when accessed via the TDS endpoint?",
+    "answer": "OneLake files and folders support POSIX-like access control lists (ACLs) for Spark access. When accessed via the TDS (Tabular Data Stream) endpoint (which is the SQL Endpoint/Data Warehouse interface), POSIX ACLs are not evaluated directly. Instead, the TDS gateway translates these permissions into SQL RBAC (Role-Based Access Control) rules. The TDS endpoint evaluates workspace-level roles (Admin, Member, Contributor, Viewer) and SQL permissions (GRANT, DENY, REVOKE) defined on the tables/views. If a user only has POSIX Read access to a file in the Lakehouse, but lacks SELECT permissions in the SQL Endpoint catalog, the TDS connection blocks access. Fabric maps the user's Entra ID token to the SQL catalog permissions rather than executing file-level ACL checks at the storage driver.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-15",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain how OneLake internal transaction logs interact with external cloud providers (e.g., Google Cloud Storage shortcuts) during a long-running, multi-gigabyte Spark append operation.",
+    "answer": "During a long-running Spark append to a GCS shortcut: 1) The Spark driver coordinates the transaction. 2) Worker nodes write temporary Parquet files directly to the GCS bucket over the Google Cloud storage API using OAuth 2.0 credentials managed by the Fabric credential service. 3) These temporary files are written to GCS with unique transaction GUIDs. 4) The Spark driver monitors worker tasks. Once all tasks complete, the driver creates a Delta transaction log entry (e.g., `00000X.json`). 5) This transaction file is written to the GCS `_delta_log/` path. GCS ensures strong global consistency, so the commit becomes immediately visible. If the GCS write fails mid-way, the transaction is abandoned; the written Parquet files are ignored because they are not referenced in the `_delta_log` json file, ensuring ACID properties.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-16",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What precise metrics in the Azure Log Analytics workspace indicate a metadata out-of-sync error between OneLake and the local Spark metastore?",
+    "answer": "In Azure Log Analytics, look at the `FabricDiagnostics` or `SparkSessionEvents` tables. 1) Search for log entries where the category is `SparkMetastore` or `OneLakeSync`. 2) Look for error codes containing `MetastoreOutOfSyncException` or `DeltaLogVersionMismatch`. 3) Analyze `DurationMs` and `Status` of metadata sync calls. 4) Monitor `OneLakeCatalogSyncFailure` events, which specify the table GUID and the schema mismatch error details. A key indicator is when the query execution log shows `FileReadException` stating a file path no longer exists, which occurs because the metastore points to older physical Parquet files deleted by an external VACUUM or write.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-17",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How do you handle deep schema drift inside a Gold-layer Lakehouse when an upstream shortcut source changes an ancestral data type from INT to DECIMAL without rewriting old Parquet files?",
+    "answer": "Delta Lake allows schema evolution but changing an active column data type from INT to DECIMAL is a breaking change because physical Parquet files contain INT types that cannot be read as DECIMAL directly without casting. To resolve this without rewriting historical files: 1) Enable Delta Column Mapping (ID or Name mode). 2) Create a view in the Lakehouse SQL Endpoint that wraps the table and explicitly casts the column: `SELECT CAST(col AS DECIMAL(18,2)) FROM table`. 3) Alternatively, use Spark to rewrite the table schema using a schema enforcement override: `spark.read.option('mergeSchema', 'true').table('tbl')`. However, for physical queries, Spark will fail on older Parquet files unless you execute an `OPTIMIZE` or rewrite older partitions to format the data into the new type.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-18",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the strict limitations of using OneLake shortcuts inside a Fabric Notebook when executing distributed machine learning training via deep learning frameworks like Horovod or PyTorch Distributed?",
+    "answer": "Distributed ML frameworks like Horovod/PyTorch rely on high-throughput, low-latency random file access and posix-like local file lock features. OneLake shortcuts: 1) Do not support standard local filesystem POSIX locks. 2) Introduce network latency because files are fetched over HTTP/HTTPS APIs. 3) Do not support random-seek write operations (you cannot modify middle bytes of a Parquet/binary file). 4) Cause high worker-node overhead if every worker node repeatedly queries the same OneLake shortcut files, causing throttling. To train distributed models, you must download the training data from OneLake to the Spark executor nodes' local NVMe-backed SSD storage (e.g., `/tmp` or local workspace drive) before initiating training.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-19",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Detail the exact failure mode of a OneLake shortcut when the underlying external table relies on Delta Lake Column Mapping features like id or name mode.",
+    "answer": "Delta Column Mapping decouples logical column names in the schema from physical column names inside Parquet files. When a OneLake shortcut points to a table with Column Mapping enabled in 'id' or 'name' mode, the SQL Analytics Endpoint or Power BI Direct Lake engine may fail to read the columns if they do not support Column Mapping. The failure mode manifests as: 1) A `NullPointerException` or `AttributeError` when reading the table. 2) The SQL Endpoint returns incorrect data (nulls) because it looks for the logical name in the Parquet metadata instead of the physical map name (e.g., `col-a23d-4cba...`). To resolve this, ensure the consuming workspaces use a Fabric Spark runtime (3.4/4.0) and SQL engine version that fully supports Delta Lake protocol features matching the column mapping mode.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-20",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How do you bypass the physical deletion restriction of a shortcut's target path without inadvertently executing a cascading delete on the underlying storage layer?",
+    "answer": "To delete a shortcut without deleting the underlying physical target files: 1) Never use a file system deletion client (like ADLS explorer or Spark `dbutils.fs.rm`) directly on the target path resolved by the shortcut. 2) Delete the shortcut via the Fabric Portal UI or using the Fabric REST API (by deleting the shortcut item metadata link). 3) In Spark, use `spark.sql('DROP TABLE <shortcut_table>')` which drops the metadata table definition from the metastore. Ensure the table is configured as an 'EXTERNAL' table; dropping an external table only deletes the metadata reference, leaving the physical files in place. If it is configured as a managed table, dropping it would trigger a cascading delete of the target directory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-21",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain the architectural trade-offs between using a OneLake Shortcut versus creating a mirrored database via the Fabric Mirroring engine for high-throughput operational data.",
+    "answer": "A OneLake Shortcut has zero data duplication and zero latency because it queries the source data in place. The trade-offs are: 1) Higher query latency (compute nodes must fetch data across networks/tenants). 2) Source system impact (queries hit the source storage directly). Mirroring, on the other hand, replicates data in near-real-time to OneLake in Delta format. The trade-offs are: 1) Data duplication and cost. 2) High performance: data is stored locally in OneLake, optimized with V-Order. 3) Isolation: queries do not hit the operational source database. Mirroring is preferred for high-throughput analytical workloads to protect operational sources; Shortcuts are ideal for ad-hoc integration of external data warehouse zones.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-22",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the OneLake abstraction layer manage localized data caching for multi-node Spark clusters operating across distinct virtual networks?",
+    "answer": "OneLake uses an internal caching and proxy routing layer. When a multi-node Spark cluster queries OneLake: 1) Compute nodes contact the OneLake DFS endpoint. 2) The query driver requests file locations. 3) The worker nodes fetch Parquet file blocks. 4) Spark executors cache frequently accessed blocks on their local NVMe SSDs using the Spark local directory cache. 5) If the cluster operates in a virtual network, Fabric uses managed Private Links to route block data securely. OneLake's backend handles directory listing caches globally, but data blocks are cached directly on worker nodes to reduce network latency during iterative queries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-23",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What underlying storage engine constraints dictate that a shortcut cannot be created directly targeting a specific transactional partition sub-directory of a Delta table?",
+    "answer": "A Delta table's transactional state is defined by the logs in its root `_delta_log/` directory. If you create a shortcut targeting only a sub-directory (a specific partition path, e.g., `Year=2024/`), the shortcut folder will contain only the physical Parquet files for that partition, without the `_delta_log` metadata. The Delta storage engine requires the transaction log to determine which files are active, handle schema mapping, and maintain ACID compliance. Without the `_delta_log`, the folder is seen as a folder of disconnected Parquet files, not a Delta table. To query it as Delta, you must shortcut the root of the Delta table, and apply query filters to prune partitions at compile time.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-24",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How do you configure a cross-workspace shortcut while ensuring that row-level security (RLS) defined in the source workspace is strictly enforced for the consuming workspace?",
+    "answer": "Shortcuts bypass source item RLS at the physical storage level because they resolve to raw Parquet files. If you share a shortcut, the consuming user reads the raw files using the shortcut's credentials. To enforce RLS across workspaces: 1) Do not create a direct table shortcut. 2) Instead, build a view in the SQL Analytics Endpoint or a Power BI Semantic Model in the source workspace with RLS applied. 3) Grant the consuming workspace users access to the SQL Endpoint view or the semantic model rather than direct Lakehouse files access. The consuming queries will run against the SQL engine, which dynamically filters the rows based on the user's identity.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-25",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Describe how the OneLake file abstraction handles high-concurrency read operations during a massive Power BI Direct Lake model refresh while simultaneously executing a Spark OPTIMIZE job.",
+    "answer": "During concurrent Direct Lake refresh and Spark OPTIMIZE: 1) Direct Lake queries read the latest committed version in the `_delta_log` and pins those Parquet files in VertiPaq memory. 2) Simultaneously, Spark OPTIMIZE runs. It rewrites multiple small Parquet files into larger V-Ordered files. 3) Spark commits a new transaction (e.g., version `X+1`) to the `_delta_log`. The log marks the old small files as deleted and references the new large files. 4) The active Direct Lake session continues to read the old Parquet files (version `X`) without failure because OneLake keeps 'deleted' files active for a retention period (governed by the Delta log retention setting, default 7 days). Once the Direct Lake model refreshes, it reads version `X+1` and maps the new files, ensuring lock-free concurrency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-1",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain how Microsoft Fabric's proprietary V-Order encryption/sorting algorithm modifies the standard Apache Parquet page headers and dictionary encoding layout.",
+    "answer": "Fabric's V-Order is a proprietary sorting and layout optimization applied to Apache Parquet files. It does not encrypt files, but it modifies the internal Parquet structure to speed up reading by Power BI VertiPaq and the SQL engine. V-Order reorders the row groups and data pages inside the Parquet file. Specifically: 1) It sorts data columns to maximize compression and dictionary encoding efficiency. 2) It organizes Parquet page headers to align with CPU cache lines. 3) It groups dictionary-encoded values so that the VertiPaq engine can directly read the dictionary page into memory without decoding the data page first. This layout is fully compliant with the open Parquet specification, but the sorting and structure are optimized specifically for Microsoft's analytical engines.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-2",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Why does a native open-source Apache Spark engine experience significant performance degradation when reading a V-Order optimized Parquet file without the Fabric execution context?",
+    "answer": "A native open-source Spark engine does not experience severe degradation because of compatibility (V-Order files are fully Parquet-compliant), but it loses the performance benefit. The performance gap occurs because: 1) Native Spark does not have the native vectorization readers that understand V-Order page layout. 2) Fabric Spark uses a native C++ reading engine that maps V-Order columns directly to memory blocks, skipping JVM serialization. 3) Open-source Spark parses the files page-by-page using standard Java parquet readers, which incurs object allocation and JVM GC overhead. The optimization is specifically designed to leverage the Fabric Spark runtime's optimized native execution engine.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-3",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How do you programmatically fine-tune the spark.sql.iceberg.planning or Delta log caching configurations inside a Fabric environment to optimize a multi-way merge join on a 100-TB dataset?",
+    "answer": "To optimize a 100-TB merge join in Fabric: 1) Set `spark.sql.adaptive.enabled` to `true` to let AQE handle join strategies dynamically. 2) Set `spark.databricks.delta.properties.defaults.checkpointInterval` to a larger value to reduce log file reading overhead. 3) Increase Delta log cache size by configuring `spark.sql.delta.logStore.cache.size`. 4) For Iceberg compatibility, adjust `spark.sql.iceberg.planning.split-size` to match partition sizes. 5) Enable Delta Lake's bloom filters on join keys using `spark.dx.bloomFilter.enabled = true`. 6) Repartition both tables on the join keys before the merge join to prevent executor data skew and eliminate cross-node shuffles during join execution.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-4",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What are the specific memory allocations (spark.executor.memoryOverhead, spark.memory.fraction) that must be overridden in a custom Fabric Spark environment to prevent OOM: GC overhead limit exceeded during high-cardinality string manipulations?",
+    "answer": "High-cardinality string manipulations cause massive Java heap allocation and GC thrashing. To prevent OOM: 1) Set `spark.executor.memoryOverhead` to at least 25% of executor memory (e.g., `4g` to `8g`) to provide space for off-heap allocations. 2) Decrease `spark.memory.fraction` to `0.4` or `0.5` to allocate more heap space for user object storage and GC. 3) Set `spark.memory.storageFraction` to `0.2` to prevent cached datasets from taking up execution memory. 4) Use JVM options in the Spark environment: `-XX:+UseG1GC` and `-XX:InitiatingHeapOccupancyPercent=35` to trigger garbage collection earlier and avoid stop-the-world pauses.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-5",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain the exact mechanism by which Fabric Spark Runtime 2.x handles high-concurrency transaction rollbacks when an execution node fails mid-way through a multi-table Z-ORDERBY operation.",
+    "answer": "When a node fails mid-way through a Z-ORDER operation: 1) The active transaction is registered in the Delta `_commit_tracker` of the driver node. 2) The driver detects the executor loss. Since the transaction did not write the final commit `.json` file to the `_delta_log`, the write is incomplete. 3) The partially written Parquet files exist in OneLake storage but are uncommitted. 4) During rollback, the Delta driver discards the write task state. The next operation reads the log and ignores these orphaned files. 5) To clean up these orphaned files, Fabric Spark runs a background task, or the user can run `VACUUM <table_name>` to physically delete files that are older than the retention threshold and not referenced in any transaction commit.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-6",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How does Fabric Spark’s native integration with the SQL Analytics Endpoint metadata layer ensure transaction isolation level SERIALIZABLE when mixing Spark Scala scripts and T-SQL updates?",
+    "answer": "Fabric uses a shared metadata controller. When a Spark job writes to a Lakehouse table: 1) It commits to the Delta `_delta_log` which guarantees SERIALIZABLE isolation at the storage level. 2) Once committed, a background metadata sync service picks up the new transaction log version. 3) The SQL Analytics Endpoint reads the new transaction log and updates its system catalog. 4) When mixing Scala and T-SQL updates, if a T-SQL write and a Spark write occur concurrently, the Delta transactional protocol enforces order. The SQL engine uses Snapshot Isolation to read committed states. Thus, the SQL engine compiles queries based on the last committed transaction log version, preventing dirty reads and enforcing SERIALIZABLE order.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-7",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What are the performance hazards of mixing df.coalesce() and df.repartition() within a Fabric Spark notebook when dealing with skewed partition keys across large corporate entities?",
+    "answer": "Mixing these operations can degrade performance. `df.coalesce(N)` reduces partition count without a full shuffle by collapsing adjacent partitions, which is efficient but can exacerbate data skew if one partition has 90% of the records. `df.repartition(N, 'key')` forces a full shuffle across all executor nodes based on a hash of the partition key. If you run `df.repartition()` to distribute data and then follow it with `df.coalesce()` immediately after, you undo the distribution, forcing all data back to a single node and causing executor OOM errors. On skewed data, you should use `repartition` with a salted key instead of `coalesce` to balance load.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-8",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Detail the internal interactions between Fabric Spark’s Adaptive Query Execution (AQE) and the automatic generation of column statistics for the SQL Analytics Endpoint.",
+    "answer": "When Fabric Spark executes a job, AQE dynamically optimizes the physical plan during runtime. 1) Spark collects partition size and record count statistics after shuffle stages. 2) These statistics are written to the Delta transaction log as part of the commit metadata. 3) The SQL Analytics Endpoint's metadata sync daemon polls the Delta log, extracts these column statistics (min, max, null count, row count), and writes them directly into the SQL system catalog. 4) This allows the Polaris query engine to use the updated column stats for query planning and partition pruning without needing to manually run `ANALYZE TABLE` in T-SQL.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-9",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How do you debug a phantom schema evolution error where Fabric Spark insists a column is nullable, but the underlying Delta metadata log marks it as NOT NULL?",
+    "answer": "This happens when Spark's catalog gets out of sync with the physical Delta log due to cached session state. To debug: 1) Run `DESCRIBE DETAIL <table_name>` to see the active metadata settings. 2) Check the latest JSON log in the `_delta_log/` directory. Look at the `metaData` schema definition. 3) To fix this, run `CLEAR CACHE` in the notebook to dump the local memory cache. 4) Run `spark.catalog.refreshTable('<table_name>')` to force Spark to read the Delta transaction log from scratch and rebuild the schema definition. 5) Check for column mapping properties, as mapping can sometimes mask physical schema nullability flags.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-10",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What is the impact of Spark's High Concurrency Mode in Fabric on the execution isolation of distinct user sessions utilizing the same shared pool clusters?",
+    "answer": "High Concurrency Mode executes multiple user sessions (notebooks) within the same Spark context on a single shared cluster. This improves start times but introduces isolation considerations: 1) User sessions share JVM memory, meaning memory-heavy operations in one session can cause an OOM that crashes the entire JVM, impacting other sessions. 2) Thread scheduling is shared, though Spark uses fair scheduling to allocate resources. 3) File system connections (ADLS, OneLake tokens) are isolated per user session token, preventing cross-session credential leakage. 4) Global temp views are shared across sessions, while local temp views are isolated to individual sessions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-11",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain how to implement a fully custom open-source Python library compilation within a Fabric Spark environment without triggering cold-start cluster provisioning overhead for subsequent pipeline runs.",
+    "answer": "To implement custom Python libraries without cold starts: 1) Do not use `%pip install` in the notebook, as it runs at startup and adds overhead. 2) Go to workspace settings -> Library Management -> upload the custom library as a `.whl` or `.tar.gz` file. 3) Add this library to a custom 'Fabric Spark Environment'. 4) Associate the environment with the workspace or target notebook/pipeline. Fabric pre-packages and caches these libraries during cluster pool warming. When a pipeline runs, it assigns a pre-warmed Spark instance that already has the custom libraries loaded in the Python path, resulting in near-instant execution.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-12",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How does the Fabric Spark engine handle checkpoint cleanup during structured streaming operations when writing to a Lakehouse that has automated retention policies enabled?",
+    "answer": "Fabric Spark uses the structured streaming checkpoint directory to track state. If automated retention policies (like Azure lifecycle policies or Delta log cleanup) are enabled, they might archive older transaction logs or checkpoints. 1) The Spark engine manages the checkpoint directory by writing new state files and committing transactions. 2) If a policy deletes older checkpoint files that Spark needs for recovery, the streaming job will fail to restart, throwing a `MetadataLogOutOfSyncException`. 3) To prevent this, configure the workspace retention policy to ignore the path `_checkpoint/` and `_delta_log/` directories, or set `spark.sql.streaming.minBatchesToRetain` to a higher number to keep enough history in active storage.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-13",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What are the precise low-level configuration properties required to force Fabric Spark to utilize a specific storage account's hierarchical namespace capabilities over the default OneLake layout?",
+    "answer": "To bypass OneLake and connect directly to an ADLS Gen2 storage account using its hierarchical namespace (HNS): 1) Set `spark.hadoop.fs.azure.account.auth.type.<account>.dfs.core.windows.net` to `OAuth`. 2) Set `spark.hadoop.fs.azure.account.oauth.provider.type.<account>.dfs.core.windows.net` to `org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider`. 3) Provide the credentials (client ID, secret, tenant ID) via Spark configurations. 4) Use the `abfss://` protocol scheme in file paths: `abfss://<container>@<account>.dfs.core.windows.net/<path>`. This configures Spark to use the native Azure Blob File System (ABFS) driver, leveraging HNS directory metadata features (like atomic directory renames) directly.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-14",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain the physical storage and log representation changes that occur when you convert a Fabric Spark table from a shallow clone to a deep clone across separate workspaces.",
+    "answer": "In a shallow clone: 1) The target table's `_delta_log` contains a commit transaction referencing the physical Parquet file paths of the source table. 2) No data files are copied; the target table acts as a metadata pointer. In a deep clone: 1) Fabric reads the source table schema and files. 2) It writes copy commands to transfer all active Parquet files to the target workspace's OneLake storage path. 3) The target `_delta_log` commits a new version pointing to these local Parquet files. After the conversion, the deep clone is a self-contained copy with its own independent transaction logs and physical data storage, meaning changes to the source table have no effect on the target table.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-15",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How does the V-Order optimization interact with Delta Lake’s Change Data Feed (CDF)? Does running OPTIMIZE modify or duplicate the historical change log records?",
+    "answer": "When Change Data Feed (CDF) is enabled on a table, the Delta engine writes change data files (e.g., inserts, pre-image, post-image deletes) to the `_change_data/` folder. Running `OPTIMIZE` applies V-Order optimization. 1) OPTIMIZE rewrites active data Parquet files into V-Ordered files. 2) OPTIMIZE does not modify or duplicate the historical change log records in the `ChangeData` directory. 3) The historical CDF logs remain unchanged to preserve the change history. However, any subsequent write operations that generate change data will write those change records as V-Ordered Parquet files, ensuring format consistency for future reads.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-16",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What is the exact sequence of events when a Fabric Spark job executes a VACUUM statement on a table that is simultaneously being queried by a Power BI semantic model running in Direct Lake mode?",
+    "answer": "The sequence of events is as follows: 1) Spark VACUUM command executes, checking for files that are marked as deleted in the `_delta_log` and older than the retention threshold (default 7 days). 2) If the threshold is satisfied, Spark issues physical delete calls to OneLake storage for those Parquet files. 3) Simultaneously, the Power BI Direct Lake model queries the table. If VertiPaq is reading those specific files, the query fails with a `FileNotFoundException` because the files are deleted. 4) If the files are already resident in the VertiPaq memory cache, the visual renders successfully. 5) To prevent this, Fabric enforces a safety margin: running VACUUM with `delta.deletedFileRetentionDuration` set to a safe interval (e.g., 2 hours) ensures files are not deleted while active queries are referencing them.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-17",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How do you handle file-skipping degradation in Fabric Spark when queries rely heavily on non-string, high-precision floating-point attributes?",
+    "answer": "High-precision floating-point attributes (like DOUBLE) can lead to file-skipping degradation due to rounding issues and lack of exact min/max bounds in Parquet metadata. To mitigate this: 1) Convert high-precision floats to DECIMAL types during ingestion to ensure exact precision boundaries. 2) Store data sorted by these columns (using `Z-ORDER BY` or Liquid Clustering) so that min/max statistics in the `_delta_log` do not overlap, enabling the query engine to skip irrelevant Parquet files. 3) Configure `spark.databricks.io.skipping.stringPrefixLength` and related properties if mixed types exist to optimize metadata extraction.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-18",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Describe how the Fabric Spark engine distributes partition processing when reading from an external Hive metastore through a secured Gateway link.",
+    "answer": "When querying an external Hive metastore via an On-Premises Data Gateway: 1) The Spark driver node contacts the Gateway to fetch partition metadata (locations, file lists). 2) The Gateway queries the Hive Metastore and returns the file metadata to the Spark driver. 3) The Spark driver compiles the query plan, groups the physical file paths into tasks, and schedules them across the worker nodes. 4) The worker nodes then connect directly to the source storage (e.g., ADLS or S3) to fetch the actual Parquet files. The Gateway only handles the metadata handshake, not the data transit, ensuring that data processing remains distributed across the Spark cluster.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-19",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How does Fabric manage the serialization and deserialization overhead of complex nested types (e.g., deep JSON arrays stored inside binary columns) during distributed Spark transforms?",
+    "answer": "Fabric Spark manages nested JSON arrays by using: 1) Spark SQL's native parser expressions (`from_json`, `get_json_object`). 2) The Vectorized Parquet Reader, which decompresses nested schemas without fully materializing intermediate Java objects. 3) If stored inside binary columns, Spark must deserialize the binary payload to a string first, which adds CPU overhead. To optimize: 1) Flatten nested schemas during ingestion. 2) Store data using Parquet Struct/Array types rather than strings/binary to allow the reader to scan specific nested sub-fields without reading the entire row.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-20",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What are the memory and CPU utilization trade-offs when enabling native Liquid Clustering instead of traditional partitioning inside a Fabric Delta table?",
+    "answer": "Liquid Clustering replaces static partitioning (e.g., `PARTITIONED BY (Date)`) with a dynamic clustering key. The trade-offs are: 1) Memory: Liquid Clustering reduces the risk of OOM from 'too many small files' and partition explosion because it groups data dynamically. 2) CPU: Writes are slightly more CPU-intensive as Spark runs clustering tasks, but reads are faster because of efficient file skipping. 3) Maintenance: You run `OPTIMIZE` to keep clusters compact. Liquid Clustering is preferred for tables with high-cardinality keys, where traditional partitioning would create thousands of small files.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-21",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain how you would isolate and fix a silent data corruption bug caused by a mismatch between the local Python interpreter environment version and the remote worker nodes' Scala runtime environment in a custom Fabric configuration.",
+    "answer": "To isolate PySpark serialization mismatches: 1) Check Spark executor logs for `Py4JJavaError` or `pickle` serialization mismatch errors. 2) Run `python --version` and check JVM system properties in a notebook cell to verify version parity. 3) Fix this by configuring the workspace Spark environment properties, explicitly aligning the environment's Python version (e.g., Python 3.10) and Spark version with the cluster's base image. 4) Avoid using custom PySpark libraries that require native C extensions compiled for a different OS/architecture than the Spark cluster runtime nodes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-22",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What specific Spark configurations control the threshold for automatic broadcast joins when working with multi-tenant databases inside a single Fabric workspace?",
+    "answer": "Automatic broadcast joins are controlled by `spark.sql.autoBroadcastJoinThreshold`. 1) By default, it is set to `10MB` (`10485760` bytes). 2) If a tenant's dimension table is smaller than this threshold, Spark broadcasts it to all executors, avoiding a shuffle. 3) To optimize, you can increase this to `50MB` or `100MB` if executors have sufficient memory: `spark.conf.set('spark.sql.autoBroadcastJoinThreshold', 52428800)`. 4) Be cautious with multi-tenant databases: if multiple queries run concurrently, setting this too high can exhaust executor memory, causing JVM GC timeouts and crashing the pool.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-23",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How do you track down and measure the exact executor wait time caused by OneLake throttling during a heavy-write Spark Job Definition execution?",
+    "answer": "To measure OneLake throttling wait time: 1) Access the Spark UI for the job run. 2) Check the 'Executors' tab and inspect JVM GC time vs task run time. 3) Look at the Event Timeline under 'Stages' for high 'Task Deserialization' or 'Result Serialization' times. 4) Use Azure Log Analytics to query `FabricDiagnostics` and search for OneLake throttling events (HTTP 429). 5) In the notebook, query Spark metrics using `spark.sparkContext.getExecutorMemoryStatus` to check for I/O block time, which indicates workers are waiting on the storage driver to write data blocks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-24",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain the internal caching differences between df.persist() to memory-only versus the native Fabric Spark caching mechanism designed for NVMe-backed node types.",
+    "answer": "1) `df.persist(StorageLevel.MEMORY_ONLY)` stores serialized or deserialized Spark Dataframe objects inside the JVM heap. This uses memory that could otherwise be used for active query execution. 2) The native Fabric Spark cache uses local NVMe SSD drives attached to the compute node. When you query a table, Fabric writes the Parquet blocks directly to the SSD. 3) Subsequent reads scan the SSD rather than OneLake, leaving the JVM heap free for execution. The NVMe cache is persistent across sessions within the same pool, whereas `df.persist()` is cleared when the Spark session ends.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-25",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How do you programmatically configure Fabric Spark to write data that maintains backward compatibility with legacy Databricks runtimes (e.g., Spark 3.2 or lower) while still utilizing OneLake storage?",
+    "answer": "Legacy runtimes do not support newer Delta features like V-Order, Column Mapping, or Liquid Clustering. To maintain compatibility: 1) Disable V-Order writing: `spark.conf.set('spark.microsoft.delta.vorder.enabled', 'false')`. 2) Disable Delta column mapping: set `delta.columnMapping.mode` to `none`. 3) Keep the Delta protocol versions low: write tables with reader version `1` and writer version `2` (e.g., `spark.sql('ALTER TABLE tbl SET TBLPROPERTIES (delta.minReaderVersion = 1, delta.minWriterVersion = 2)')`). This ensures that legacy Databricks clusters can read the Parquet files and transaction logs without throwing protocol errors.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-1",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Explain the architectural division of labor between the SQL Analytics Endpoint control plane and the distributed Polaris query engine when executing a multi-million row cross-database join.",
+    "answer": "When executing a cross-database join via the SQL Endpoint: 1) The Control Plane authenticates the user, parses the T-SQL query, checks catalog permissions, and generates a logical query plan. 2) The Logical Plan is passed to the Polaris engine. 3) Polaris compiles the logical plan into a distributed physical execution plan consisting of parallelized tasks. 4) Polaris coordinates worker nodes to read the Delta Parquet files directly from OneLake. 5) Compute nodes execute the physical joins, aggregations, and shuffles in parallel. The Control Plane only handles orchestration, security handshake, and returning the final result set, while Polaris handles the compute-intensive distributed execution.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-2",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Why are DDL operations prohibited inside a Fabric Lakehouse's SQL Analytics Endpoint, and how does the backend synchronize changes initiated via the Lakehouse's Spark engine without a global schema lock?",
+    "answer": "The SQL Analytics Endpoint is a read-only view of Lakehouse tables. Prohibiting DDL operations (like `CREATE TABLE` or `ALTER TABLE`) ensures that metadata is managed solely by the Spark catalog and Delta transaction log. To sync changes without a global schema lock: 1) A background metadata synchronization daemon polls the Delta logs of the Lakehouse tables. 2) When Spark commits a schema change, the daemon reads the updated Delta metadata and updates the SQL Endpoint's internal system catalog. 3) Queries executing on the SQL Endpoint use snapshot isolation: they compile against the active metadata state. The sync is lock-free because it updates table definitions in the catalog using transaction versioning, allowing concurrent reads to run on the old version until the catalog update commits.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-3",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What are the exact conditions under which the Fabric Data Warehouse engine falls back to row-by-row transaction processing instead of leveraging metadata-driven bulk operations?",
+    "answer": "The Warehouse engine falls back to slower row-by-row processing under these conditions: 1) The insert statement uses `VALUES` with a small number of rows, bypassing the bulk copy (BCP) path. 2) The table has active triggers (which require row-by-row evaluation). 3) The query involves explicit row-level operations like cursor loops or recursive CTEs. 4) Row-level locks are escalated due to lock saturation. 5) Writing data that violates schema integrity constraints, causing individual row validation checks. For high throughput, use `INSERT INTO ... SELECT` or COPY commands, which leverage metadata-driven bulk operations.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-4",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How do you optimize a query on a Fabric Synapse Data Warehouse that experiences severe data skew due to hash distribution patterns across virtual compute nodes?",
+    "answer": "Polaris handles data distribution. If a query experiences data skew: 1) Identify the join/aggregation keys. If they contain many nulls or high-frequency values, data aggregates on a single compute node. 2) Rewrite the query to separate the high-frequency values from the rest of the dataset. 3) Apply 'salting' to the join key: append a random number to the key to distribute the rows across nodes. 4) Adjust partition sizes before querying. 5) Use Query Hints if available to force the optimizer to choose broadcast joins instead of hash shuffles, preventing skewed data from saturating a single worker node.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-5",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Describe the specific memory structures utilized by the SQL Analytics Endpoint to cache Parquet file footers, and how high-frequency micro-batches degrade this cache's performance.",
+    "answer": "The SQL Endpoint caches Parquet file footers (which contain schema and row-group metadata) in an in-memory cache on the compute nodes. This cache avoids reading the metadata from OneLake during queries. When high-frequency micro-batches write new data: 1) Each write creates new Parquet files and commits a new transaction. 2) The metadata sync service invalidates the cached footers for that table because the file structure has changed. 3) Subsequent queries must fetch the new footers from OneLake, degrading query compile and execution times. This makes micro-batches highly inefficient; batching writes to at least 15-minute intervals is recommended.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-6",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How do you resolve a transaction deadlock between an automated Spark pipeline writing to a Gold table and an executive Power BI report executing an ad-hoc DirectQL query via the SQL Analytics Endpoint?",
+    "answer": "To resolve deadlocks: 1) Understand that Spark writes commit to the Delta log, while DirectQL queries the SQL Endpoint metadata. 2) DirectQL/SQL Endpoint reads are read-only and use snapshot isolation, so they do not block Spark writes. 3) However, if the SQL Endpoint metadata sync process is blocked by long-running queries, it can cause a timeout. 4) Use `SET TRANSACTION ISOLATION LEVEL SNAPSHOT` in the SQL connection. 5) Schedule Spark pipeline maintenance (like OPTIMIZE) outside peak reporting hours to minimize metadata sync conflict. 6) Use Direct Lake mode instead of DirectQL where possible, as it reads Delta logs directly, avoiding the SQL Endpoint metadata sync layer.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-7",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What are the performance and concurrency implications of using cross-workspace T-SQL queries when both workspaces reside on different Fabric capacities with distinct sizing metrics (e.g., F32 vs. F256)?",
+    "answer": "Cross-workspace T-SQL queries are executed in the context of the workspace hosting the query. 1) If an F32 workspace queries tables in an F256 workspace, the query is bound by the compute limitations of the F32 capacity. 2) Data is scanned and shuffled using F32 compute nodes, which can lead to throttling. 3) Conversely, if the F256 workspace initiates the query, it leverages its larger compute nodes to read the F32 data. The F32 workspace storage is read, which incurs minimal I/O cost, but the compute workload is borne by the initiating capacity. For optimal performance, execute complex cross-workspace queries on the larger capacity.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-8",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Explain how the Fabric Data Warehouse implements column-level security (CLS) and row-level security (RLS) at the storage level, given that the underlying data resides in raw Delta Parquet files.",
+    "answer": "The Fabric Warehouse does not apply CLS/RLS to the raw Parquet files in OneLake. If a user has direct storage access, they can read all columns and rows. 1) CLS/RLS is implemented in the SQL Engine control plane. 2) When a user queries a table via the SQL Endpoint, the engine rewrites the query plan: for RLS, it injects the security filter predicate; for CLS, it blocks access to unauthorized columns. 3) The Polaris engine compiles a plan that only scans the authorized data blocks. 4) Access to raw OneLake files is prevented by restricting workspace permissions (giving users Viewer roles instead of Contributor, so they cannot read raw files using Spark).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-9",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What low-level DMV (Dynamic Management View) metrics must you monitor to isolate query performance degradation caused specifically by cold-start node allocation within the SQL pool?",
+    "answer": "Monitor performance via DMVs: 1) Query `sys.dm_exec_requests` to check active requests and their status. 2) Use `sys.dm_pdw_exec_requests` to see distributed execution state. 3) Look for wait type `BACKEND_STARTUP` or `COMPUTE_NODE_ALLOCATION` in `sys.dm_pdw_waits`. 4) If `wait_time` is high and query execution starts only after 10-30 seconds, it indicates the capacity was paused or idle, and Polaris is cold-starting compute nodes. 5) Track `sys.dm_pdw_request_steps` to pinpoint which query step was delayed by node allocation.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "warehouse-10",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How does the PREDICT function execute machine learning models inside the Fabric T-SQL engine? Describe the data serialization pathway between the SQL pool and the ONNX runtime.",
+    "answer": "The `PREDICT` function enables native scoring: 1) The user registers an ONNX model in the database. 2) T-SQL compile phase: the query parser flags the `PREDICT` function call. 3) During execution, the SQL compute nodes retrieve the ONNX model bytes and load them into an in-process ONNX Runtime environment running alongside the SQL engine. 4) Data from the source table is fetched into memory as vectorized columns. 5) These columns are mapped directly to the ONNX model's input tensors. 6) The ONNX Runtime executes inference and returns output tensors, which are joined with the query stream. This avoids sending data to external ML endpoints, ensuring low-latency scoring.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-11",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What specific T-SQL syntax constraints or query hints are required to force the Fabric Warehouse query optimizer to choose a hash join over a nested loop join when handling highly un-indexed Delta tables?",
+    "answer": "Fabric SQL engine uses Polaris, which optimizes queries automatically. However, to force a join type: 1) Use join hints: `OPTION (HASH JOIN)` or specifying `INNER HASH JOIN` in the query syntax. 2) Note that Fabric SQL has limitations on standard SQL Server query hints; hints must be placed at the end of the query in the `OPTION` clause. 3) To optimize without hints, update statistics manually: `CREATE STATISTICS` on the join columns, which helps the optimizer identify table sizes and select the hash join strategy automatically.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-12",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How do you programmatically force a metadata refresh of the SQL Analytics Endpoint when automated ingestion pipelines complete their load but the endpoint exhibits a 15-minute synchronization lag?",
+    "answer": "Metadata sync is automatic, but to force a refresh programmatically: 1) Connect to the SQL Endpoint database via a client tool or pipeline script. 2) Execute the system stored procedure `sys.sp_refresh_metadata` on the specific table: `EXEC sys.sp_refresh_metadata @table_name = 'Sales'`. 3) This procedure forces the metadata synchronization daemon to scan the Delta transaction log of the table, update the SQL schema catalog, and align the version instantly, bypassing the default polling intervals.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-13",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Explain the internal mechanism of how the Fabric Data Warehouse manages its internal transaction log (sys.pdw_loader_backup_runs) to allow point-in-time recovery without traditional SQL .bak files.",
+    "answer": "The Fabric Data Warehouse uses Delta Lake under the hood. 1) Writes to the Warehouse generate Delta transaction log files (`_delta_log/`). 2) The Warehouse tracks operations in system views like `sys.pdw_loader_backup_runs`. 3) Point-in-time recovery (PITR) leverages Delta Lake's 'Time Travel' capability. 4) The Warehouse engine keeps transaction logs for a defined retention period (default 30 days). 5) When you execute a PITR restore, the engine restores the table schemas and points the system catalog to a specific historical transaction ID or timestamp in the Delta log, without restoring backup files.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-14",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What are the structural differences between how a Fabric Data Warehouse processes a CREATE TABLE AS SELECT (CTAS) statement versus an INSERT INTO ... SELECT statement from a performance and logging perspective?",
+    "answer": "1) `CTAS` is a metadata-driven operation that creates a new Delta table. The engine writes new Parquet files in parallel across compute nodes and registers the schema. It has minimal transactional overhead, making it fast. 2) `INSERT INTO ... SELECT` appends to an existing table. The engine must validate schema compatibility, check constraints, write new files, and append to the active Delta log. This requires more transaction log coordination to prevent conflicts with concurrent readers/writers, making it slower than CTAS on large datasets.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-15",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How does the SQL Analytics Endpoint handle complex subqueries containing non-deterministic functions (e.g., NEWID() or GETDATE()) when pushing down predicates to the underlying Delta files?",
+    "answer": "When the SQL Endpoint detects non-deterministic functions in a subquery: 1) The optimizer cannot push down the predicates to the Parquet reader level. 2) The engine must scan the table and evaluate the non-deterministic function in memory for every row. 3) This degrades performance, as file skipping is disabled. To optimize, materialize the non-deterministic value in a variable before running the query: `DECLARE @Date DATETIME = GETDATE(); SELECT * FROM tbl WHERE Col = @Date;` which allows the optimizer to treat the value as a constant and push down the filter.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-16",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Explain why queries hitting a Fabric Data Warehouse might fail with an \"Out of memory\" error even when the overall capacity utilization (CU) of the Fabric F-sku is below 20%.",
+    "answer": "This happens due to query memory-grant limits. 1) Fabric capacities have a maximum memory allocation per user query based on the active F-Sku size (e.g., F2 has a very small memory limit). 2) A query doing complex hash joins or sorting on large datasets might exceed this query memory grant, causing the query to fail with OOM. 3) This failure is independent of overall capacity utilization: even if the capacity is 80% idle, an individual query cannot exceed its allocated memory slice to protect system stability. To fix, partition the query or scale the capacity.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-17",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What is the impact of explicit T-SQL transactions (BEGIN TRAN...COMMIT) on the performance of a Fabric Data Warehouse compared to traditional SMP SQL Server environments?",
+    "answer": "In traditional SMP SQL Server, explicit transactions hold locks in the transaction log (`ldf`), which can cause blocking. In Fabric: 1) Explicit transactions are translated into commits in the underlying Delta log. 2) Since Delta Lake is append-only, readers do not block writers. 3) However, long-running explicit transactions increase commit latency: the engine holds temporary metadata locks in the Warehouse control plane, which can delay metadata synchronization. Keep transactions short to minimize synchronization overhead.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "warehouse-18",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How do you design an optimal indexing strategy for a Fabric Data Warehouse, considering that traditional clustered columnstore indexes are replaced by Delta Lake Parquet indexing structures?",
+    "answer": "Traditional SQL indexes (like clustered columnstore or B-Trees) do not exist in Fabric Warehouse. Instead: 1) Optimize data sorting: sort data on frequently queried columns during load using `ORDER BY` or `Z-ORDER BY`. 2) This groups similar values into the same Parquet files, allowing Delta's min/max file-skipping metadata to prune files. 3) Split high-cardinality keys. 4) Ensure stats are generated on columns used in filters. 5) Use partition columns effectively in queries to limit the physical file scan range.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-19",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Explain how the Polaris engine translates an incoming T-SQL query into localized file-skipping parameters when evaluating complex WHERE clauses with nested OR conditions.",
+    "answer": "Polaris parses WHERE clauses with nested OR conditions by: 1) Converting the expression to Disjunctive Normal Form (DNF). 2) For each OR branch, extracting the constant literals and matching them against the min/max statistics in the Parquet file metadata. 3) If any file's min/max range overlaps with the criteria in the OR branch, that file is included in the scan list. 4) If nested OR conditions are complex (e.g., `(A=1 AND B=2) OR (C=3)`), Polaris evaluates min/max bounds for each clause. If the columns are not sorted together, this can result in scanning all files, degrading performance. Sort columns used in complex filters to improve pruning efficiency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-20",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What happens to active user queries on a SQL Analytics Endpoint when the underlying workspace is migrated from an F-64 capacity to an F-512 capacity mid-execution?",
+    "answer": "When migrating a workspace to a different capacity mid-execution: 1) Active user queries fail with an error like `Connection reset` or `Query execution aborted`. 2) This happens because the SQL Endpoint connection is tied to the F-64 compute pool. 3) The migration spins down the F-64 pool and spins up the F-512 pool. 4) All active TCP connections are dropped, requiring client tools (like Power BI or SSMS) to reconnect. 5) Subsequent queries compile and execute on the new F-512 compute nodes, benefiting from the increased CPU and memory resources.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-21",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How do you resolve collation conflict errors when writing cross-database T-SQL queries between a Fabric Warehouse and a mirrored SQL database inside the same workspace?",
+    "answer": "Collation conflicts occur when columns in different databases have different collation settings (e.g., Case-Sensitive vs Case-Insensitive). To resolve this: 1) Explicitly cast collation in the query join or comparison using the `COLLATE` clause: `SELECT * FROM Warehouse.dbo.TableA A JOIN MirroredDB.dbo.TableB B ON A.Key COLLATE Latin1_General_100_CI_AS_KS_WS = B.Key COLLATE Latin1_General_100_CI_AS_KS_WS`. 2) Align database collations during setup if possible, or use views in the Warehouse that cast the mirrored columns to a standard collation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-22",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Detail the memory allocation limitations of the Fabric SQL engine when executing high-concurrency parallel hash aggregations on columns containing Max-length data types (VARCHAR(MAX)).",
+    "answer": "VARCHAR(MAX) columns are treated differently by the SQL Engine query memory manager. 1) The optimizer allocates a fixed, large memory size (often 8KB per row) for VARCHAR(MAX) columns, regardless of the actual string size. 2) In high-concurrency environments, running parallel hash aggregations on these columns rapidly consumes the query memory grant. 3) This leads to memory spills to disk, degrading query performance, or query failures with memory exhaustion errors. To fix, avoid VARCHAR(MAX) for aggregation or grouping columns; define appropriate maximum lengths (e.g., VARCHAR(256)) to allow the engine to allocate memory accurately.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-23",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How does the Fabric Warehouse engine handle automatic statistics creation? Under what exact scenarios will the automated engine fail to generate precise histograms, requiring manual intervention?",
+    "answer": "The Fabric SQL engine generates statistics automatically during query compilation. However, automatic generation can fail or be inaccurate when: 1) The table is small during compilation but grows rapidly (stale stats). 2) The query involves complex joins with expressions (e.g., `ON A.Id + 1 = B.Id`). 3) The filter criteria use table-valued functions or non-deterministic variables. 4) High concurrency limits background stats compilation. Under these scenarios, the optimizer chooses suboptimal join strategies. To resolve, manually create or update statistics: `CREATE STATISTICS StatName ON TableName(ColumnName) WITH FULLSCAN`.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-24",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Explain the difference in execution plans between querying a native Fabric Warehouse table and querying a OneLake Shortcut table mapped from an external ADLS Gen2 account via the same SQL Endpoint.",
+    "answer": "1) For native Warehouse tables: the plan reads V-Ordered Parquet files from managed local storage. The query plan features direct file scans and optimized metadata reads. 2) For Shortcut tables: the plan includes a remote scan node. Polaris must authenticate using the configured credentials and fetch data blocks over HTTP/HTTPS from the external ADLS Gen2 account. 3) The query plan optimizer allocates higher cost to the remote scan and may limit parallel threads to prevent throttling the external account. 4) The execution plan for shortcuts will show a delay in the initial scan phase as it waits for remote connections to open.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "warehouse-25",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "What are the specific performance bottlenecks encountered when executing recursive Common Table Expressions (CTEs) inside the Fabric T-SQL distributed query engine?",
+    "answer": "Recursive CTEs are processed as iterative loops. 1) The Polaris query engine executes each recursion level as a separate query step. 2) Since Polaris is a distributed engine, each iteration step requires coordinating worker nodes, which adds latency. 3) If data is shuffled across nodes in each recursion step, the shuffle overhead degrades performance. 4) Recursive CTEs bypass distributed parallelization, executing on a single coordinator node, which can cause CPU and memory bottlenecks on large datasets. To optimize, rewrite recursive CTEs as iterative loops using temporary tables or materialized hierarchies.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-1",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain the algorithmic differences between how the Microsoft Fabric Capacity Metrics app calculates \"Background Operations\" versus \"Interactive Operations\" during a peak scale event.",
+    "answer": "Background and Interactive operations are smoothed over different time windows. 1) Interactive operations (e.g., Power BI report interactions, SQL queries) are smoothed over a 5-minute sliding window to handle bursty workloads. 2) Background operations (e.g., Spark jobs, Data Factory pipelines, model refreshes) are smoothed over a 24-hour sliding window. 3) During a peak event, the Metrics app calculates the Capacity Unit (CU) consumption for both. If a background Spark job consumes 100 CUs for 10 minutes, the cost is spread over 24 hours (0.69 CUs/hour). Interactive queries are evaluated against the capacity's immediate limit: if they exceed the 5-minute threshold, they cause immediate capacity saturation.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-2",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How does the 24-hour smoothing algorithm handle a sudden, massive spike in Fabric Spark compute that consumes 800% of the allocated Capacity Units (CUs) within a 10-minute window?",
+    "answer": "When a Spark job spikes to 800% of allocated CUs within a 10-minute window: 1) The background smoothing engine spreads this total CU cost over 24 hours. 2) The immediate capacity limit is not breached; the workload executes without interruption. 3) The smoothed consumption is added to the capacity's 'Carry-Forward' debt. 4) If the total accumulated Carry-Forward debt across all background jobs exceeds the capacity's total daily limit, the capacity enters a throttling state. 5) While in Carry-Forward debt, subsequent background jobs will start with a delay, or the capacity will refuse new requests if the debt threshold is exceeded.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-3",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What is the precise cascading sequence of service degradations that an organization experiences when their Fabric capacity enters a \"Throttling\" state due to Carry-forward accumulation?",
+    "answer": "When carry-forward debt exceeds thresholds, the capacity applies throttling in three stages: 1) Stage 1 - Background Throttling: occurs when carry-forward debt exceeds a limit. Background jobs (Spark, Data Factory) experience delays during startup, while interactive queries remain unaffected. 2) Stage 2 - Interactive Throttling: occurs when debt continues to accumulate. Interactive operations (Power BI visuals, SQL Endpoint queries) experience delays of up to 10-20 seconds before executing. 3) Stage 3 - Complete Rejection: occurs when debt exceeds the maximum limit (e.g., 24 hours of capacity). The capacity rejects all new interactive and background requests, throwing 'Capacity limit exceeded' errors until the debt is smoothed down below the threshold.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-4",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How do you programmatically configure Azure Alerts to trigger an automated scaling up of an F-sku capacity before the capacity enters the rejection phase for interactive Power BI queries?",
+    "answer": "To configure automated scaling: 1) Navigate to the Azure Monitor service. 2) Create an Alert Rule targeting the Fabric Capacity resource. 3) Set the signal metric to `CapacityUnitUtilization`. 4) Configure the condition: trigger if the metric exceeds `90%` for a sustained period (e.g., 15 minutes). 5) Define an Action Group that triggers an Azure Automation Runbook or an Azure Function. 6) The Runbook calls the Azure Resource Manager (ARM) API to scale the capacity F-sku (e.g., from F32 to F64): `PATCH https://management.azure.com/subscriptions/{subId}/resourceGroups/{rg}/providers/Microsoft.Fabric/capacities/{capacityName}?api-version=2023-11-01` with the new SKU name, which executes in minutes without dropping storage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-5",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain the concept of \"Burstable Capacity\" in Fabric, and detail how an F-2 SKU can legally execute a workload that technically requires an F-64 level of instantaneous compute power.",
+    "answer": "Burstable capacity leverages Fabric's dynamic resource pooling. 1) An F-2 capacity provides 2 Capacity Units (CUs) of continuous compute. 2) When a user triggers an operation (e.g., a Power BI report page load) that requires 64 CUs of compute, the system runs the query at F-64 speed using the capacity's burst buffer. 3) The 64 CUs consumed over 2 seconds (128 CU-seconds) are calculated. 4) The smoothing algorithm assigns this cost: 128 CU-seconds is equal to 64 seconds of F-2 capacity. The query completes instantly, and the capacity goes into debt for 64 seconds, during which it smooths the utilization. This allows small SKUs to execute heavy workloads if they are run infrequently.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-6",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What are the cost and performance implications of using a Fabric Capacity reservation model versus a Pay-as-you-go model when dealing with erratic, seasonal data engineering workloads?",
+    "answer": "1) Pay-as-you-go model: you pay by the second for active capacity. This is cost-effective for erratic workloads because you can pause the capacity when idle (e.g., pause at night). However, pausing clears the VertiPaq memory cache, causing subsequent queries to experience cold-start latency. 2) Reservation model: you commit to a 1 or 3-year term for a discount (often 30-40%). This is cost-effective for stable workloads but results in higher costs if the capacity is idle for long periods. For seasonal workloads, a hybrid approach works: run a base capacity on reservation, and spin up pay-as-you-go capacities during peak seasons.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-7",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How do you isolate which specific user, notebook, or pipeline activity caused a sudden spike in \"Reject\" events using the Fabric Capacity Metrics underlying Eventhouse data?",
+    "answer": "To isolate the cause: 1) Open the Fabric Capacity Metrics app and check the 'Rejection' tab. 2) For detailed logs, query the Log Analytics workspace linked to the capacity. 3) Query the `FabricCapacityMetrics` table using KQL: `FabricCapacityMetrics | where OperationName == 'Reject' or Status == 'Rejected' | summarize count() by UserEmail, OperationName, ItemName, WorkspaceName`. 4) Join this with `FabricDiagnostics` to match transaction IDs. This KQL query reveals the user, workspace, and item (notebook or pipeline) that triggered the query that pushed the capacity over the rejection threshold.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-8",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Detail the impact of high-frequency Power BI report cross-filtering on interactive CU consumption when the underlying semantic model is built on an un-optimized Direct Lake foundation.",
+    "answer": "When a report has multiple visuals and users apply cross-filtering: 1) Each filter action sends queries to the VertiPaq engine. 2) If the semantic model is un-optimized (lacks relationships, or has high-cardinality columns), VertiPaq cannot resolve the queries in cache. 3) The engine falls back to DirectQuery mode, issuing T-SQL queries to the SQL Endpoint. 4) This triggers remote scans and joins on Polaris compute nodes. 5) Each T-SQL query consumes interactive CUs. High-frequency filtering by multiple users can saturate the capacity in minutes, leading to interactive throttling. Optimize the model (use correct relationships, pre-aggregate data) to ensure queries are resolved in-memory.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-9",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How does Fabric allocate and bill for storage capacity when multiple workspaces on different capacities create shortcuts to the exact same physical blob within OneLake?",
+    "answer": "Storage billing in Fabric is decoupled from workspace capacity SKUs. 1) Storage is billed at standard ADLS Gen2 rates based on the actual physical data stored. 2) When Workspaces B and C create shortcuts to a table in Workspace A, the physical data resides in Workspace A's storage. 3) The owner of Workspace A is billed for the storage. 4) Workspaces B and C pay $0 for storage for these shortcuts, as they only store metadata. 5) When Workspaces B or C query the shortcut, they pay for the compute (CUs) consumed during the query from their own capacities, preventing double-billing.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "capacity-10",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain the concept of \"Autoscale\" for Fabric capacities. What are the technical limitations and maximum scaling steps allowed within a single billing cycle?",
+    "answer": "Autoscale dynamically scales your Fabric capacity up or down. 1) It triggers when capacity utilization exceeds 100% for a period. 2) Autoscale scales the SKU up by one step (e.g., F32 to F64). 3) Technical limitations: Autoscale requires an active Azure subscription linked to the capacity. 4) Maximum scaling steps: you can define a maximum limit (e.g., do not scale beyond F128) in the capacity settings. 5) Autoscale scales down automatically when utilization falls below the threshold for a period (often 24 hours), preventing run-away billing. However, rapid scaling up and down within a single billing cycle can result in charges for the highest SKU used during each hourly billing window.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-11",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How do you debug a scenario where the Fabric Capacity Metrics report shows 0% utilization for a workspace, yet users are blocked from executing queries due to a capacity-wide lock?",
+    "answer": "This happens when the capacity is locked at the tenant or capacity level due to carry-forward debt. 1) A single workspace on the capacity may have executed a heavy Spark job that consumed all available daily CUs, putting the entire capacity into Stage 3 Throttling (Complete Rejection). 2) The workspace you are debugging shows 0% utilization because users cannot run queries (requests are rejected immediately before consuming CUs). 3) To debug, open the Capacity Metrics app, select the entire capacity (not a single workspace), and check the Carry-Forward debt chart. You will find that another workspace on the same shared capacity has exhausted the resources.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-12",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What is the exact relationship between Spark \"vCores\" allocated via workspace cluster pools and the \"Capacity Units\" (CUs) deducted from the underlying F-sku or P-sku license?",
+    "answer": "Spark vCores are mapped to Capacity Units (CUs). 1) In Fabric, 1 Capacity Unit (CU) corresponds to a fraction of a Spark vCore. 2) Specifically, 1 vCore in a Spark pool is equivalent to roughly 2 CUs. 3) When a notebook executes on a cluster with 4 nodes (each with 8 vCores, total 32 vCores), it consumes 64 CUs per second of execution. 4) This consumption is billed against the F-sku capacity. 5) If you run this workload on an F-64 capacity, it uses 100% of the capacity. If run on an F-8 capacity, it consumes 800% of the capacity, and the excess cost is smoothed over 24 hours.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-13",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How can you programmatically kill a long-running, runaway Fabric Data Warehouse query that is aggressively consuming background CUs and inflating the carry-forward debt?",
+    "answer": "To terminate a runaway Warehouse query: 1) Query the active requests DMV: `SELECT request_id, session_id, command FROM sys.dm_exec_requests WHERE status = 'Running'`. 2) Identify the query ID that is consuming high CPU or running for too long. 3) Execute the T-SQL command to kill the session: `KILL 'session_id'`. 4) Note that if the query is executing on Polaris compute nodes, it may take a few seconds to abort the distributed tasks. 5) Alternatively, use the Fabric REST API to cancel the notebook or pipeline execution that triggered the SQL query.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-14",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain how Fabric handles the allocation of temporary compute resources when executing Dataflows Gen2 queries that leverage the internal staging Lakehouse.",
+    "answer": "Dataflows Gen2 uses staging storage and compute: 1) During execution, the dataflow engine writes raw partition files to a hidden staging Lakehouse in OneLake. 2) The engine then spins up a dedicated Spark-like compute container to execute the Power Query M transformations. 3) If staging is enabled, the data is loaded into the SQL Endpoint of the staging Lakehouse, and the transformations are executed in the SQL engine using Polaris. 4) Once the query completes, the final result set is copied to the destination table. The CU cost for this staging compute is billed as background operations against the capacity workspace where the Dataflow is registered.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-15",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What specific patterns of pipeline loops (ForEach activities running in parallel) cause the fastest exhaustion of available interactive CUs in smaller Fabric capacities (e.g., F-4 or F-8)?",
+    "answer": "In smaller capacities (F-4 or F-8): 1) Running a ForEach activity in Data Factory with 'Sequential' set to `false` and 'Batch Count' set to `50` triggers 50 parallel execution tasks. 2) If each task calls a Web Activity or SQL Query, it counts as an interactive operation. 3) 50 parallel requests hit the capacity within a few seconds. 4) The interactive smoothing engine tries to smooth these over 5 minutes, but the cumulative CU demand exceeds the F-4 capacity limit. 5) This causes immediate interactive throttling. To prevent this, set 'Sequential' to `true` or limit 'Batch Count' to `2` or `4` in smaller capacities.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-16",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How does the Fabric pricing model calculate cost for cross-region data egress when a notebook in a US-East capacity reads data via a shortcut from an ADLS Gen2 account in Europe-West?",
+    "answer": "Data egress cost is charged by Azure Storage: 1) The ADLS Gen2 account in Europe-West charges for data egress to the US-East region (typically $0.02 to $0.08 per GB). 2) Fabric OneLake does not charge for ingress in the US-East capacity. 3) However, the compute nodes in US-East spend more CUs (CPU cycles) waiting for the remote data packets to transit the network, increasing query cost. To optimize cost, locate the Fabric capacity and the external storage accounts in the same Azure region, which eliminates cross-region egress charges and reduces latency.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-17",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Detail the internal logic used by Fabric to prioritize query execution when a capacity is at 99% utilization and both an interactive executive dashboard and a background ETL pipeline submit requests at the exact same millisecond.",
+    "answer": "Fabric uses a request scheduler that prioritizes interactive operations over background operations: 1) Interactive queries (e.g., Power BI visual load) are assigned to the high-priority queue. 2) Background queries (e.g., Spark write, Dataflow execution) are assigned to the standard queue. 3) When capacity utilization is at 99%, the scheduler allocates available CPU cycles to the interactive query. 4) The background query is delayed or throttled: the scheduler holds the task state, and execution begins only after utilization drops below the threshold. This ensures executive dashboards remain responsive during ETL runs.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "capacity-18",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How do you design an enterprise-wide \"Capacity Sharding\" architecture to ensure that the finance department's critical reporting window is never impacted by the data science team’s LLM training workloads?",
+    "answer": "To design a Capacity Sharding architecture: 1) Create separate workspaces for the Finance and Data Science teams. 2) Provision two distinct Fabric capacities (e.g., Capacity A F-64 for Finance, Capacity B F-64 for Data Science). 3) Assign the Finance workspace to Capacity A and the Data Science workspace to Capacity B. 4) In this setup, the Data Science team's Spark or LLM training jobs can saturate Capacity B without impacting the reporting performance on Capacity A. 5) Use cross-workspace shortcuts to share clean datasets from the Data Science Lakehouse to the Finance Lakehouse without duplicating storage, while maintaining separate compute boundaries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-19",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What specific metrics inside the FabricCapacityMetrics log analytics table track the exact transition point from \"Interactive Smoothing\" to \"Hard Throttling\"?",
+    "answer": "Track the transition point using metrics: 1) Monitor the `ThrottlingState` column: it transitions from `0` (normal) to `1` (interactive smoothing active) to `2` (hard throttling). 2) Monitor the `CarryForwardRemainingCUs` column: when this value exceeds the capacity's maximum allowed debt (calculated as: Capacity Limit * 24 hours of CUs), throttling starts. 3) Track `RejectedRequestsCount` and `ThrottledOperations`: when these show values > 0, the capacity has entered hard throttling and is actively rejecting/delaying requests.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-20",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How do you optimize a Fabric environment to minimize the billing footprint of idle High Concurrency Spark clusters that are kept alive by pipeline schedules?",
+    "answer": "To minimize the billing footprint: 1) Adjust the cluster pool's auto-pause setting: set the timeout to the minimum allowed value (usually 2 or 5 minutes) so the cluster shuts down quickly after a pipeline run. 2) Use a single shared 'High Concurrency' pool for all pipelines. This allows multiple pipeline tasks to execute on the same cluster instances, maximizing resource utilization and avoiding spinning up separate clusters. 3) Schedule pipelines in batches: run pipelines sequentially or in tight clusters to keep the Spark instances active for a shorter total window, reducing the idle time bill.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-21",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain the differences in capacity consumption behavior when running an OPTIMIZE command via a native Fabric notebook versus running it via the automated Lakehouse Maintenance pipeline activity.",
+    "answer": "1) Running `OPTIMIZE` in a Spark notebook runs in your active Spark session. It consumes background CUs and is smoothed over 24 hours. The cost is calculated based on the executor size and run duration. 2) The automated Lakehouse Maintenance pipeline executes outside your notebook Spark context using Fabric's internal maintenance pool. The maintenance activity is optimized to run at a lower priority, and the CU consumption is billed at a discount rate compared to active Spark sessions, making the automated maintenance path more cost-effective for regular log compaction.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-22",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What is the maximum threshold of accumulated carry-forward debt (in hours) before a Fabric capacity automatically suspends all non-admin interactive operations?",
+    "answer": "The maximum threshold is 24 hours of Carry-Forward debt. If the cumulative CU debt of background operations exceeds the capacity's total CU capacity for a 24-hour period, Fabric locks the capacity. At this point, the system suspends all non-admin interactive operations (visual loads, SQL Endpoint queries) and returns capacity-limit errors. The capacity remains locked until the debt is cleared by the passage of time or by scaling up the capacity SKU in the Azure Portal, which increases the CU capacity and resolves the debt ratio.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-23",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How do you calculate the exact ROI and break-even point for migrating an enterprise workload from a dedicated Azure Synapse Spark pool to a shared Fabric F-64 capacity?",
+    "answer": "To calculate the ROI: 1) Determine the annual cost of the Synapse Spark pool based on average cluster runtime and node count. 2) Determine the cost of an F-64 capacity (approx. $8,400/month pay-as-you-go, or $5,400/month on reservation). 3) Compare compute performance: Fabric Spark utilizes pre-warmed pools that eliminate cold-start times (saving 3-5 minutes per run). 4) Calculate data replication savings: Fabric uses OneLake, eliminating the need to copy data across Azure Synapse storage layers. The break-even point occurs when the savings from reduced cluster runtime and eliminated data replication exceed the capacity migration and engineering costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-24",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain how Fabric capacity management handles tenant-level setting overrides when a capacity admin attempts to restrict maximum memory consumption per Spark job.",
+    "answer": "Tenant settings are managed by Tenant Admins. 1) If the Tenant Admin enables a restriction (e.g., max Spark cores = 100), this restriction applies across all capacities. 2) A Capacity Admin cannot override this limit in their capacity settings. 3) However, the Capacity Admin can define workspace-level limits that are more restrictive (e.g., limit a workspace to 16 cores). 4) The system evaluates the hierarchy: Workspace limit -> Capacity limit -> Tenant limit. The most restrictive limit wins. If a Capacity Admin tries to scale a workspace Spark configuration beyond the tenant-defined core limits, the write operation is blocked by the policy engine.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "capacity-25",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "What is the underlying architectural reason why Power BI Premium capacities (P-skus) behave differently regarding CU smoothing compared to the newer native Azure Fabric F-skus?",
+    "answer": "P-skus are legacy Power BI capacities that run on the Power BI Gen2 architecture, which manages memory and CPU specifically for VertiPaq import models and paginated reports. CU smoothing on P-skus is optimized for report refresh and query interactions, with background operations managed via specific scheduling windows. 1) F-skus are built on Azure's modern resource manager. 2) F-skus support multi-engine workloads (Spark, SQL, Real-Time Intelligence, Power BI) and use a unified 24-hour background and 5-minute interactive smoothing algorithm. 3) F-skus can be paused and scaled dynamically in the Azure Portal, whereas P-skus are fixed-term license boundaries.",
+    "difficulty": "HARD"
+  }
+]

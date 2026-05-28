@@ -1,0 +1,1378 @@
+[
+  {
+    "id": "directlake-1",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Detail the step-by-step memory transduction process that occurs when a Power BI visual triggers a Direct Lake query that finds its required columns are not currently resident in the VertiPaq memory cache.",
+    "answer": "When a Direct Lake query requests cold data: 1) The VertiPaq engine receives the DAX query and identifies the columns needed. 2) It checks its in-memory metadata cache and finds the columns are not resident. 3) VertiPaq bypasses the SQL Endpoint and connects directly to OneLake. 4) It reads the target Delta table's `_delta_log` to identify the active Parquet file paths. 5) VertiPaq fetches the physical Parquet data blocks for those columns from OneLake. 6) The engine reads the Parquet page dictionary, decodes the V-Ordered compression layout, and loads the values directly into VertiPaq column memory structures. 7) Once in memory, VertiPaq runs the query on the columns and returns the result, keeping the columns cached for future queries.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-2",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What exact structural changes or operations within an underlying Delta table will force a Direct Lake semantic model to silently drop back to DirectQuery mode?",
+    "answer": "A Direct Lake model falls back to DirectQuery mode under these conditions: 1) The table schema changes, such as modifying a column's data type. 2) The model size exceeds the memory limits of the capacity SKU. 3) The table has Delta features enabled that VertiPaq cannot parse (like column mapping in id/name mode or deletion vectors). 4) The table is modified with a non-standard transaction that corrupts the `_delta_log`. 5) The relationship between tables crosses storage regions, preventing the engine from performing in-memory joins. In these cases, the engine falls back to DirectQuery, routing queries through the SQL Endpoint.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-3",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you implement advanced row-level security (RLS) within a Direct Lake semantic model without triggering a fallback to DirectQuery mode for unauthorized users?",
+    "answer": "To implement RLS in Direct Lake mode without fallback: 1) Define RLS roles using standard DAX rules in the semantic model (e.g., using `USERPRINCIPALNAME()`). 2) Ensure the RLS rules reference columns that exist in the Direct Lake tables. 3) Do not use complex RLS calculations that require joining tables with many-to-many relationships or calculated columns. 4) Keep RLS filters simple (single-column filtering). 5) Assign users to roles in the Power BI service. VertiPaq applies these security filters dynamically in-memory, filtering the rows during query execution without needing to fall back to DirectQuery.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-4",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain how the VertiPaq engine manages memory paging when multiple large Direct Lake semantic models compete for the limited RAM allocation of a mid-tier Fabric capacity (e.g., F-64).",
+    "answer": "VertiPaq uses a Least Recently Used (LRU) eviction algorithm to manage memory. 1) Each capacity SKU has a maximum RAM limit for semantic models. 2) When multiple models are queried, VertiPaq loads the requested columns into memory. 3) If the cumulative memory demand of active columns across all models approaches the capacity's limit, the engine scans for inactive column segments (columns that haven't been queried recently). 4) VertiPaq evicts these inactive segments from memory, freeing up RAM for the new columns. If the active columns exceed the RAM limit, the queries fail with an out-of-memory error.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-5",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What are the performance consequences of using complex DAX calculated columns inside a Direct Lake semantic model, and what is the recommended architectural alternative?",
+    "answer": "Calculated columns in Direct Lake cannot be resolved in-memory during loading because VertiPaq reads Parquet files directly, and calculated columns do not exist in the Parquet files. 1) Using calculated columns forces VertiPaq to fall back to DirectQuery mode to calculate the column values using the SQL Endpoint during queries. 2) This degrades performance. The recommended alternative is to calculate the columns upstream: compute them in a Spark notebook or a Dataflow, and write them as physical columns in the Delta table, allowing VertiPaq to load them directly.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-6",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you programmatically configure the Framing property of a Direct Lake semantic model using TOM (Tabular Object Model) or TMSL to control metadata synchronization behaviors?",
+    "answer": "The Framing property defines how the model synchronizes with OneLake. 1) To configure Framing, connect to the XMLA endpoint of the workspace using TOM in C# or PowerShell. 2) Access the database and the table's `DirectLakeOptions` object. 3) Set the `Framing` property to one of the values: `Auto` (automatically syncs to the latest version), `Highest` (syncs to the highest committed version), or `None` (syncs to a specific version). 4) Set the `FramingVersion` to lock the model to a specific version. 5) Save changes: `model.Database.Update(UpdateOptions.ExpandFull)` to apply the configuration.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-7",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain the internal behavior of the VertiPaq engine when a Direct Lake model attempts to query a Delta table column that has undergone schema evolution from an INT to a STRING data type.",
+    "answer": "When a schema change occurs, VertiPaq reads the updated Delta log. 1) The engine detects the data type change. 2) If the column is referenced in the model as an INT, but the latest Parquet files store the values as STRING, VertiPaq cannot perform in-memory casting. 3) The query fails with a metadata mismatch error, or the model falls back to DirectQuery mode. 4) To resolve this, you must open the semantic model metadata and update the column's data type to match the new schema, then trigger a model refresh to reload the column.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-8",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What specific Delta Lake optimization parameters (maxFileSize, optimize.zorder) directly impact the column-segmentation and compression ratio achieved by VertiPaq when loading data via Direct Lake?",
+    "answer": "1) `delta.targetFileSize` (or `maxFileSize` in older versions): controls the size of written Parquet files. Setting this to `128MB` or `256MB` ensures VertiPaq loads data in optimal block sizes. 2) `Z-ORDER BY`: sorts the data by key columns during optimization. Sorting groups similar values together, which improves Parquet's dictionary encoding and run-length encoding. 3) When VertiPaq loads these sorted columns, the compression ratio is maximized, reducing the memory footprint of the column segments in the capacity RAM.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-9",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you troubleshoot a scenario where a Direct Lake semantic model refresh succeeds instantly, but users see stale data due to SQL Analytics Endpoint metadata caching lag?",
+    "answer": "This happens when the model is configured to read data through the SQL Endpoint view instead of directly from the Lakehouse table. 1) The model refresh commits instantly because it updates the metadata. 2) However, if the SQL Endpoint metadata sync is lagging, the view returns stale data. 3) To troubleshoot, check if the model tables are mapped to SQL views rather than physical Lakehouse tables. 4) Force a metadata refresh on the SQL Endpoint: `EXEC sys.sp_refresh_metadata`. 5) For Direct Lake, map model tables directly to the Lakehouse physical tables, bypassing the SQL view layer to eliminate synchronization lag.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "directlake-10",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain the differences in memory foot-printing and query performance between a Direct Lake semantic model connected to a Lakehouse table versus one connected to a Data Warehouse view.",
+    "answer": "1) Connected to Lakehouse physical tables: the model runs in pure Direct Lake mode. VertiPaq reads Parquet files directly, maximizing compression and query performance, and minimizing memory footprint. 2) Connected to a Data Warehouse view: views are not stored as physical files, so VertiPaq cannot read them directly. 3) The model falls back to DirectQuery mode. 4) Queries are translated into T-SQL and executed on the SQL engine, which increases memory overhead on the SQL compute nodes and results in slower query performance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-11",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you implement a robust multi-language translation architecture within a Direct Lake model using Tabular Editor 3 while maintaining native performance over OneLake?",
+    "answer": "To implement translations: 1) Open the model in Tabular Editor 3 via the XMLA endpoint. 2) Select the Translations collection and add the target language culture code (e.g., `de-DE`). 3) Translate the table, column, and measure names in Tabular Editor. 4) Do not modify the underlying table column mappings. 5) Save changes to the model. VertiPaq stores these translations in the metadata. When a user queries the report, the client application requests the translated metadata, and VertiPaq resolves the names without affecting the data scan path, maintaining native performance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-12",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What specific DAX functions or patterns are guaranteed to break query pushdown in Direct Lake mode, thereby forcing the engine to instantiate heavy DirectQuery T-SQL connections to the SQL endpoint?",
+    "answer": "Queries break pushdown and fall back to DirectQuery under these patterns: 1) Using calculated tables or calculated columns defined in DAX. 2) Using DAX features that are not supported by the VertiPaq storage engine, such as complex parent-child hierarchy functions (`PATH`). 3) Writing DAX queries that involve relationships built on columns with mismatched data types (which requires casting). 4) Referencing external tables that reside in different workspaces. Keep the model schema clean and perform all calculations upstream to ensure pure Direct Lake execution.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-13",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Detail how the VertiPaq engine handles the distinct count calculation (DISTINCTCOUNT in DAX) over a 5-billion-row column in Direct Lake mode versus traditional Import mode.",
+    "answer": "1) In Import mode: VertiPaq loads the entire column into memory during refresh and builds a hash index of distinct values. This requires high memory during refresh. 2) In Direct Lake: VertiPaq fetches the column data blocks from OneLake on-demand. 3) For `DISTINCTCOUNT`, VertiPaq scans the column's dictionary pages. 4) Since the Parquet files are V-Ordered and sorted, the dictionary contains the distinct values. 5) VertiPaq aggregates the dictionary values across the file segments in-memory, avoiding the need to load the raw data values, which speeds up the calculation.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-14",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you automate the eviction of inactive column segments from the VertiPaq memory cache in a Fabric capacity to ensure high availability for concurrent report users?",
+    "answer": "Eviction is handled automatically by the VertiPaq engine's LRU manager. However, to automate this or force eviction: 1) Connect to the XMLA endpoint using a PowerShell script. 2) Run an XMLA command to refresh the database with the `ClearValues` option: `<Refresh xmlns=\"...\"><Type>ClearValues</Type><Object><DatabaseID>...</DatabaseID></Object></Refresh>`. 3) This command evicts all data values from memory, keeping only the model metadata. The columns will be reloaded on-demand when users open reports, ensuring memory is available during peak times.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-15",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain how Direct Lake mode handles relationships between tables that cross different Fabric workspaces or are stored in separate OneLake logical databases.",
+    "answer": "Direct Lake does not support relationships that cross workspace boundaries. 1) If you define a relationship between Table A in Workspace 1 and Table B in Workspace 2, the engine cannot resolve the join in memory. 2) The model falls back to DirectQuery mode, routing queries through the SQL Endpoint. 3) To resolve this, create a shortcut of Table B in Workspace 1's Lakehouse. This brings both tables into the same logical database and workspace context, allowing VertiPaq to resolve the relationship in Direct Lake mode.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-16",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What is the impact of Delta table log compaction (VACUUM) on the internal GUID identifiers used by the VertiPaq engine to map data segments in Direct Lake mode?",
+    "answer": "1) VertiPaq maps column segments using the physical Parquet file names (which contain GUIDs). 2) Running `VACUUM` deletes physical Parquet files that are no longer active in the Delta log. 3) If VertiPaq attempts to query a segment mapped to a deleted file, it fails. 4) To prevent this, the model must be refreshed after running VACUUM to read the updated Delta log and update the file mapping. 5) Fabric handles this by executing an automatic metadata refresh on the semantic model after table write operations, which updates the file mapping before queries are executed.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-17",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you configure a Direct Lake semantic model to leverage Incremental Refresh policies without duplicating data files inside OneLake?",
+    "answer": "To configure Incremental Refresh without data duplication: 1) Configure the incremental refresh policy in the model settings, defining parameters `RangeStart` and `RangeEnd`. 2) During refresh, instead of creating new tables, the policy creates separate partitions in the model corresponding to date ranges. 3) Each partition maps to specific file paths in the Delta log. 4) Since Delta Lake partitions data physically (e.g., by `Date`), VertiPaq maps model partitions to the existing Delta partition directories in OneLake, avoiding the need to copy or duplicate files.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-18",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Describe the internal network and memory pipeline when a user accesses a Direct Lake report via a mobile device using a Power BI embedded application.",
+    "answer": "1) The mobile app requests the report visual from the Power BI Service. 2) The service assigns the query to the VertiPaq engine running on the capacity. 3) If the columns are not in memory, VertiPaq fetches them from OneLake and caches them in the capacity RAM. 4) VertiPaq processes the query and returns the results to the Power BI Service. 5) The service renders the visual as HTML5/CSS and streams it over HTTPS to the mobile device. 6) The mobile device only receives the rendered graphic, not the raw data, minimizing network traffic and processing load on the mobile device.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "directlake-19",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What specific server-side settings inside a Fabric Premium capacity control the maximum size of a single column segment that can be loaded into memory via Direct Lake?",
+    "answer": "The maximum segment size is controlled by the capacity SKU memory limit and the `MaxSegmentSize` setting in the database properties. 1) F-SKU limits range from 3GB (F2) to hundreds of GBs (F512). 2) The maximum size of a single column segment cannot exceed the RAM allocation of the capacity. 3) You can adjust `MaxSegmentSize` via Tabular Editor to split large tables into smaller segments (default is 8 million rows per segment), allowing VertiPaq to load and evict data in smaller, more manageable blocks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "directlake-20",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you resolve a \"Direct Lake model size exceeds capacity limits\" error without upgrading the underlying Azure F-sku capacity?",
+    "answer": "To resolve the size error without upgrading: 1) Remove unused columns from the semantic model (especially high-cardinality columns like IDs or timestamps). 2) Optimize column compression: sort the data by key columns before loading using `Z-ORDER BY` in Spark. 3) Split tables: split wide tables into dimension and fact tables. 4) Configure the model to use incremental refresh to load only the latest partitions. 5) Adjust the segment size in Tabular Editor to load data in smaller blocks, reducing the peak memory footprint.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "directlake-21",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain the architectural trade-offs of using Bi-directional relationships inside a Direct Lake model when querying massive fact tables containing hundreds of millions of records.",
+    "answer": "1) Bi-directional relationships allow filters to propagate in both directions. 2) The trade-off is performance: to resolve queries, VertiPaq must perform complex in-memory joins and scans across tables. 3) In massive tables, this increases CPU and memory consumption on the capacity. 4) It also increases the risk of circular paths, leading to unexpected results or query failures. Use single-direction relationships and resolve complex filtering needs in the DAX measures or upstream in the data warehouse.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "directlake-22",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How do you programmatically monitor the memory footprint of individual columns inside a Direct Lake model using Python or XMLA endpoints?",
+    "answer": "To monitor column memory: 1) Connect to the model's XMLA endpoint using Python with the `pyodbc` or `adodbapi` library, or run a DMV query in SSMS. 2) Query the DMV `$SYSTEM.DISCOVER_OBJECT_MEMORY_USAGE`: `SELECT * FROM $SYSTEM.DISCOVER_OBJECT_MEMORY_USAGE WHERE OBJECT_TYPE = 'COLUMN'`. 3) This query returns the size of each column segment, showing the memory footprint of the dictionary, data pages, and indexes in bytes, allowing you to identify columns that consume excessive RAM.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "directlake-23",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What are the specific performance implications when a Direct Lake semantic model references a Delta table that relies heavily on native Liquid Clustering instead of static partitions?",
+    "answer": "Liquid Clustering dynamically groups data by keys, creating more balanced files. 1) For Direct Lake, this improves query performance because files are sorted, which maximizes dictionary encoding and compression. 2) The engine can skip files more efficiently during scans. 3) However, if you run OPTIMIZE frequently, the file structure changes. 4) The model must be refreshed after each OPTIMIZE run to update the segment file mapping, which can cause transient query delays during sync.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "directlake-24",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How does the Fabric Web Modeling experience handle conflict resolution when multiple architects are concurrently editing the same Direct Lake semantic model metadata?",
+    "answer": "The Web Modeling tool does not support real-time collaborative editing. 1) If multiple users open the model, the system locks the metadata. 2) The first architect to save changes commits their updates to the model database. 3) The second architect trying to save receives a 'conflict' or 'out-of-date' error. 4) To prevent this, use Tabular Editor with Git integration to branch the model metadata, develop changes in isolated environments, and merge them via PRs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "directlake-25",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain how the USERELATIONSHIP DAX function interacts with the VertiPaq engine's internal indexes when executing over a Direct Lake model with inactive role-playing dimensions.",
+    "answer": "1) `USERELATIONSHIP` activates an inactive relationship in a DAX measure. 2) During execution, VertiPaq overrides the default relationship path and uses the inactive relationship's index. 3) The engine performs the join in memory using the active relationship's column dictionary. 4) If the relationship columns are already resident in cache, the join is resolved instantly. 5) If they are cold, the engine fetches them from OneLake. This is highly efficient and avoids the need to duplicate tables in the model, maintaining Direct Lake performance.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-1",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you design a zero-trust network architecture for Microsoft Fabric that enforces Azure Private Endpoints while still allowing cross-tenant OneLake data sharing and external Power BI gateway access?",
+    "answer": "To design a zero-trust architecture: 1) Enable Private Link in the Fabric tenant settings. This routes workspace traffic over private virtual networks. 2) Configure Azure Private Endpoints from your on-premises network to the Fabric capacity. 3) Block public internet access. 4) For cross-tenant data sharing, configure tenant-level trust policies in Microsoft Entra ID and use Fabric Managed Private Endpoints to connect capacities. 5) Install and configure the On-Premises Data Gateway on secure VMs in your network to allow Power BI to query local data sources privately, ensuring all access is authenticated, authorized, and encrypted.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-2",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Explain how Microsoft Purview sensitivity labels propagate down to the individual column level when raw data is ingested into a Lakehouse, transformed via Spark, exposed through a Warehouse view, and consumed in Power BI.",
+    "answer": "1) When raw data is ingested, Microsoft Purview applies sensitivity labels (e.g., 'Confidential') to the files in OneLake. 2) During Spark transformation, the engine reads the labeled data. 3) The output Delta table inherits the label via Fabric's automatic lineage propagation. 4) When exposed via a Warehouse view, the view inherits the table's label. 5) Finally, when Power BI queries the view, the semantic model and the resulting reports inherit the label. Purview enforces the label's encryption and access policies at each hop, ensuring data protection from ingestion to visualization.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-3",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What are the exact structural changes that occur within OneLake metadata folders when a Workspace is assigned to a specific business Domain with restricted administrative inheritance?",
+    "answer": "Assigning a workspace to a business Domain with restricted administrative inheritance: 1) Updates the tenant metadata catalog. 2) The workspace is mapped to the Domain GUID in the Fabric system registry. 3) In OneLake, the workspace's root folder inherits a domain-specific policy file (`.domain_policy.json`). 4) This file overrides tenant-level defaults: it restricts workspace admins from sharing items outside the domain or enabling cross-tenant access. 5) It locks the workspace's physical path to specific regional capacities, preventing users from moving the workspace to unauthorized capacities.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-4",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you implement automated row-level and column-level security (RLS/CLS) across a decentralized Data Mesh architecture in Fabric, ensuring that data consumers cannot bypass restrictions via Spark notebooks?",
+    "answer": "To enforce RLS/CLS in a Data Mesh without bypass: 1) Do not grant data consumers direct storage access (Viewer or Contributor roles on the Lakehouse). 2) Instead, implement RLS/CLS in the SQL Endpoint or a Power BI semantic model. 3) Share the SQL Endpoint tables/views using the SQL permissions gateway, or share the semantic model. 4) When consumers query via Spark, configure Spark to connect via the SQL Endpoint JDBC driver rather than reading the raw OneLake files, ensuring the SQL engine filters rows/columns based on the user's identity.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-5",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Detail the configuration steps and potential failure points when setting up Customer-Managed Keys (CMK) for data encryption at rest within a multi-capacity Fabric tenant.",
+    "answer": "1) Setup CMK: Create an Azure Key Vault in your subscription. 2) Generate an encryption key (RSA 2048/4098). 3) In the Fabric Admin Portal, configure CMK settings and provide the Key Vault URI. 4) Grant the Fabric Enterprise Service Principal access to the Key Vault. 5) Associate the Fabric capacities with the CMK. Failure points: 1) Revoking permissions in Key Vault instantly pauses all capacities, causing queries to fail. 2) Key Vault firewall blocking Fabric services. 3) Key expiration: if the key expires and is not rotated, the capacity is suspended.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-6",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you programmatically extract full end-to-end data lineage from the Fabric REST API when a pipeline orchestrates external activities in Azure Databricks and on-premises SQL Servers?",
+    "answer": "1) Use the Fabric REST API endpoint `GET /v1/workspaces/{workspaceId}/items/{itemId}/lineage` to fetch item lineage. 2) Since Fabric API only tracks internal lineage, you must integrate external lineage. 3) For Azure Databricks and on-premises SQL: configure Databricks to export lineage to Microsoft Purview. 4) Use Purview's REST API to ingest custom lineage relationships: define external activities as Purview lineage entities. 5) Combine the Fabric lineage JSON and the Purview lineage graph to visualize the end-to-end flow.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-7",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What specific Azure RBAC roles, Fabric tenant settings, and Workspace roles must interact to allow a Data Auditor to view data definitions but strictly prevent them from reading physical OneLake files?",
+    "answer": "Configure permissions as follows: 1) In the Fabric Admin Portal: enable the setting 'Auditors can view metadata'. 2) Workspace Role: assign the user to the 'Viewer' role. This allows them to view the workspace items and definitions, but prevents them from executing Spark notebooks or reading files directly. 3) Azure RBAC: do not assign the user to any Azure storage roles (like Storage Blob Data Reader). 4) SQL Permissions: GRANT `VIEW DEFINITION` but DENY `SELECT` in the SQL Endpoint.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-8",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Explain how Fabric handles Managed Identities (MSI) when executing a web activity within a Data Pipeline to authenticate against an external Azure Key Vault that has public access disabled.",
+    "answer": "1) Create a Workspace Managed Identity in the Fabric workspace settings. 2) In the external Azure Key Vault, configure access policies or Azure RBAC to grant the Workspace Identity 'Secret Reader' permissions. 3) Since public access is disabled, configure a Managed Private Endpoint from the Fabric capacity to the Key Vault. 4) In the Data Pipeline Web Activity, select 'Workspace Managed Identity' as the authentication method and target the Key Vault's private URI, allowing secure, private authentication.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-9",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you prevent corporate data exfiltration through Fabric Notebooks where data scientists have access to external pip repositories and outbound internet connections?",
+    "answer": "To prevent exfiltration: 1) In the Tenant Admin Portal: disable the setting 'Notebooks can connect to the public internet'. 2) Configure a private Spark runtime environment. 3) Block direct pip installation in notebooks. 4) Upload approved libraries to a private workspace repository. 5) Use private Azure Container Registries with network firewalls for custom Spark base images. 6) Monitor notebook egress via Azure Log Analytics to detect unauthorized connections, ensuring all libraries are scanned and approved before use.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "security-10",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What is the precise security boundary between a \"Share\" operation on a single Fabric Lakehouse item versus granting a user the \"Viewer\" role on the entire containing Workspace?",
+    "answer": "1) Sharing a single Lakehouse item: grants the recipient Read access to that specific Lakehouse only. They cannot see other items in the workspace or access the workspace UI. They query the shared Lakehouse via the SQL Endpoint or Power BI. 2) Granting the 'Viewer' role: allows the user to see all items in the workspace. They can view the schemas of all Lakehouses, Warehouses, and Pipelines in the workspace. They have read-only access to the entire workspace catalog, making the Viewer role a much broader security boundary.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-11",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you debug a scenario where a Microsoft Purview automated scan fails to catalogue metadata from a Fabric Data Warehouse due to service principal credential restrictions?",
+    "answer": "1) Check the scan logs in the Microsoft Purview portal. 2) Verify that the Service Principal has been granted 'Reader' permissions on the Fabric capacity resource group in Azure. 3) In the Fabric Admin Portal, verify that the Service Principal is allowed to call the Fabric metadata APIs (the setting 'Allow service principals to use read-only admin APIs' must be enabled). 4) Verify that the Service Principal has been granted the 'Viewer' role on the target workspaces, which is required to scan the database catalogs.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-12",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Explain how Fabric tenant-level settings for \"Export to Excel\" and \"Download report\" interact with localized workspace admin permissions and Azure Information Protection (AIP) policies.",
+    "answer": "1) If the Tenant Admin disables 'Export to Excel', no user in the tenant can export data, regardless of workspace permissions. 2) If enabled, a Workspace Admin can still disable it for a specific report in the report settings. 3) AIP policies override these settings: if a report has a sensitivity label that restricts data export, the 'Export' buttons are disabled in the UI for all users who do not have export permissions under that specific AIP policy label, ensuring compliance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-13",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What are the structural and audit-logging differences when data is deleted via a Spark DELETE statement versus an explicit OneLake File System API deletion call?",
+    "answer": "1) Spark DELETE: is a transaction. It updates the Delta log (`_delta_log/`) to mark rows as deleted. The physical Parquet files are kept until VACUUM runs. The operation generates a `SparkTableWrite` audit log. 2) OneLake API deletion: physically deletes files or folders from storage. This bypasses the Delta log. The operation generates a `StorageFileDelete` audit log. Bypassing the Delta log corrupts the table state, causing subsequent queries to fail, making OneLake API deletes risky for managed tables.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-14",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you configure network security rules to allow a local on-premises SSAS instance to securely query a Fabric Semantic Model via an On-Premises Data Gateway?",
+    "answer": "1) Install the On-Premises Data Gateway on a local server. 2) In the local network firewall: allow outbound traffic on TCP ports 443, 5671, and 5672 from the Gateway server to Azure Service Bus endpoints. 3) In the Fabric service: register the Gateway and create a data source connection pointing to the local SSAS instance. 4) Use Service Principal authentication for the connection. The Gateway encrypts all query traffic and routes it through a secure Azure Service Bus connection, preventing inbound ports from being opened.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-15",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Detail the security implications of enabling the \"Users can create Fabric items in workspaces outside their own tenant\" setting. How do you govern this at scale?",
+    "answer": "1) Enabling this allows users to create items in external partner tenants. This introduces risk of data exfiltration, as users can copy company data to external OneLake storages. 2) To govern this at scale: disable this setting globally in the Tenant Admin Portal. 3) Create a security group for approved users who require external collaboration, and enable the setting only for that group. 4) Set up Azure AD cross-tenant access policies to restrict collaborations to trusted partner domains only.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-16",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How does the Fabric workspace-level \"Contributor\" role differ from the \"Member\" role specifically regarding the management of Git Integration configurations and pipeline executions?",
+    "answer": "1) Contributor: can edit code, run pipelines, and commit changes to Git. They cannot connect the workspace to a Git repository, modify repository settings, or disconnect Git. 2) Member: has all Contributor permissions plus the ability to configure Git Integration, manage credentials, define deployment pipelines, and promote changes across workspaces. The Member role is required to manage the CI/CD pipeline infrastructure.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-17",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Explain how to design a secure multi-tenant SaaS application architecture using Fabric, ensuring absolute performance and data isolation between competing corporate clients.",
+    "answer": "To design a secure multi-tenant architecture: 1) Create a separate workspace for each client. 2) Assign workspaces to dedicated capacities if performance isolation is critical, or use workspace-level resource limits. 3) Store data in client-specific Lakehouses. 4) Implement RLS in the shared semantic models to filter data by client ID. 5) Use Service Principals with workspace-scoped permissions to embed reports in the SaaS UI, ensuring clients cannot see each other's workspaces or metadata.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-18",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What specific auditing logs are generated within the Microsoft 365 Compliance Center when a user accesses data in a Lakehouse via the SQL Analytics Endpoint versus a Spark SQL query?",
+    "answer": "1) Access via SQL Analytics Endpoint: generates a `QueryResult` audit log with the operation name `ExecutedSqlStatement`. The log contains the user's email, timestamp, database name, and the SQL query string. 2) Access via Spark: generates a `SparkJobRun` or `FileRead` audit log. The log contains the notebook name, Spark session ID, and the physical OneLake paths accessed, but does not capture individual Python/Scala code lines, making SQL auditing more granular.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "security-19",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you enforce strict data retention and compliance policies (e.g., GDPR right to be forgotten) inside a Fabric Lakehouse where data is deeply compressed and immutable in historical Delta logs?",
+    "answer": "To enforce GDPR compliance: 1) Do not rely on Spark delete transactions alone, as historical files remain in the transaction history. 2) Execute the `DELETE` statement to remove the user's data. 3) Immediately run `VACUUM <table_name> RETAIN 0 HOURS` to physically delete all historical Parquet files containing the deleted data. 4) Note that you must set `spark.sql.files.ignoreMissingFiles` to `true` if users are querying during this time. This process purges the data from storage and history, ensuring compliance.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-20",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What are the operational risks and security configurations required when granting a third-party vendor access to a specific Fabric item via OneLake Data Sharing?",
+    "answer": "Risks: data leakage, unauthorized data modifications, and capacity abuse. Security configurations: 1) Share the item using the 'Specific Users' option. 2) Do not grant the vendor workspace access. 3) Configure the share with read-only permissions and disable the 'Reshare' permission. 4) Monitor vendor access via the tenant audit logs. 5) Define an expiration date for the share link to ensure access is automatically revoked when the vendor's contract ends.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-21",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you isolate network traffic for a High Concurrency Spark Pool to ensure it never routes over the public internet when interacting with a secured Azure SQL Managed Instance?",
+    "answer": "1) Configure a Private Endpoint for the Azure SQL Managed Instance in your virtual network. 2) In the Fabric workspace settings, configure a Managed Private Endpoint pointing to the SQL Managed Instance. 3) In the Spark pool settings: enable 'Private network access only'. 4) In the notebook connection string, use the private DNS name of the SQL instance. This ensures all Spark traffic routes over Microsoft's private network, bypassing the public internet.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-22",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Explain how Fabric manages token lifetime and expiration when a long-running Data Factory pipeline uses an OAuth2 connection to ingest data from a SaaS application.",
+    "answer": "1) When the pipeline starts, the Data Factory service requests an OAuth2 access token using the configured credentials. 2) The token typically has a lifetime of 1 hour. 3) If the pipeline ingestion takes longer than 1 hour, Data Factory automatically uses the refresh token to request a new access token from the SaaS identity provider in the background. 4) If the refresh token expires or is revoked (e.g., due to password change), the pipeline fails with an 'Authentication failed' error.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-23",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you programmatically audit all active OneLake Shortcuts across an entire corporate tenant to identify unauthorized connections to non-approved Azure storage accounts?",
+    "answer": "1) Call the Fabric Admin REST API endpoint `GET /v1/admin/workspaces` to retrieve all workspaces. 2) Loop through the workspaces and call `GET /v1/admin/workspaces/{id}/items` to fetch all Lakehouse items. 3) For each Lakehouse, call `GET /v1/admin/items/{id}/shortcuts` to get the list of shortcuts. 4) Extract the target storage account URL from the response. 5) Compare the target URLs against an approved list of storage accounts. Flag any shortcuts pointing to non-approved locations for remediation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-24",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "What is the impact of enabling \"Conditional Access Policies\" in Azure Active Directory on the programmatic execution of Fabric REST APIs via automated service principals?",
+    "answer": "1) If a Conditional Access (CA) policy enforces MFA or IP restrictions on the Fabric cloud service, automated service principal calls may fail. 2) Service principals cannot perform MFA, leading to connection failures. 3) To prevent this, exclude the Service Principal from the MFA policies in Entra ID. 4) Restrict the Service Principal's access by IP address range instead: configure the CA policy to allow requests only from the IP ranges of the automation servers (e.g., Azure DevOps agents).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "security-25",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you construct a custom monitoring dashboard that combines Azure Resource Manager logs and Fabric Capacity Metrics to track unauthorized workspace provisioning?",
+    "answer": "1) Configure Fabric to export audit logs to an Azure Log Analytics workspace. 2) Configure the Azure subscription to export ARM activity logs to the same Log Analytics workspace. 3) In Log Analytics, write a KQL query that joins `AzureActivity` (workspace creation events) with the `FabricWorkspace` inventory tables. 4) Pin the query results to an Azure Dashboard. This dashboard shows workspace creation events, the user who created them, and the capacity they are assigned to, allowing security teams to audit workspace provisioning.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-1",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Explain the underlying compute architecture differences between Dataflows Gen2 and Dataflows Gen1, specifically detailing how the SQL staging compute speeds up large transformations.",
+    "answer": "Dataflows Gen1 executes all transformations in-memory on the Power Query mashup engine container, which can cause bottlenecks on large datasets. Dataflows Gen2 introduces an internal staging Lakehouse. 1) When a Dataflow runs, the raw partition data is loaded into OneLake staging storage. 2) The SQL Endpoint of this staging Lakehouse acts as a staging compute engine. 3) The Power Query M expressions are translated into T-SQL queries. 4) The Polaris distributed SQL engine executes these queries to perform joins, aggregates, and transforms in parallel. This leverages the distributed database capacity instead of a single JVM container, speeding up transformations by up to 10x.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-2",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you design a complete CI/CD deployment pipeline for Fabric using Azure DevOps, ensuring that Lakehouse schemas, Notebooks, and Semantic Models are safely deployed across Dev, Test, and Prod environments without manual reconfiguration?",
+    "answer": "To design a CI/CD pipeline: 1) Enable Git Integration in the Dev workspace to link workspace items to an Azure DevOps Git repository. 2) Set up a release pipeline in Azure DevOps. 3) When code is merged to the main branch, trigger a build artifact. 4) Use Fabric Deployment Pipelines to promote items from the Dev workspace to Test and Prod. 5) Use deployment rules in the pipeline to dynamically rewrite connection strings and parameters (e.g., change the target Lakehouse path from Dev to Test/Prod). 6) Automate the trigger of the Deployment Pipelines using DevOps REST API calls, ensuring zero manual intervention.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-3",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What are the strict limitations of Fabric's native Git Integration when dealing with workspaces that contain a mix of Lakehouses, Warehouses, and Real-Time Intelligence items?",
+    "answer": "Fabric's native Git Integration has limitations: 1) Not all items are supported; some items (like Real-Time Intelligence Eventstreams or certain mirrored databases) cannot be synced to Git. 2) If a workspace contains a mix of supported and unsupported items, only the supported items (Notebooks, Reports, Lakehouse schemas) are written to Git. 3) Restoring a workspace from Git will not recover unsupported items; they must be deployed manually or via REST APIs. 4) Lakehouse schemas are synced, but physical files and data are not written to Git, requiring separate data replication pipelines.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-4",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you resolve a deployment merge conflict when two developers modify the same Fabric Data Pipeline concurrently, resulting in corrupted JSON definitions within the Git repository?",
+    "answer": "1) Pull the Git branch locally. 2) Open the pipeline directory. The pipeline is represented by a JSON definition file (`item.config.json` or `pipeline.json`). 3) Open the file in a text editor to locate the Git merge conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`). 4) Resolve the JSON structure manually, ensuring brackets align. 5) Do not edit the `item.metadata.json` ID fields. 6) Commit the resolved file and push to DevOps. 7) In the Fabric Portal, click 'Sync from Git' to reload the pipeline into the workspace.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-5",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Detail how you would implement a highly resilient, metadata-driven execution framework in Fabric Data Factory that orchestrates over 500 parallel ingestion tasks while handling transient network failures gracefully.",
+    "answer": "To implement a metadata framework: 1) Store task definitions (source, destination, status) in a SQL control table. 2) Create a parent Pipeline that reads the active tasks. 3) Use a ForEach activity to run tasks in parallel (limit concurrency to 20-30 to prevent capacity exhaustion). 4) Inside the ForEach, call a child Pipeline using parameters. 5) Implement retry logic in the Pipeline activities (e.g., Retry = 3, Interval = 30 seconds). 6) Log results (success, failure, rows copied) back to a logging table, and send alerts via Teams or Email for sustained failures.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-6",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What specific Fabric REST API endpoints are required to programmatically create a new Workspace, assign it to a dedicated Capacity, and deploy a set of standard notebooks from an Azure DevOps repository?",
+    "answer": "1) Create Workspace: `POST /v1/workspaces` providing the workspace name. 2) Assign to Capacity: `POST /v1/workspaces/{id}/assignToCapacity` providing the capacity ID. 3) Deploy Notebooks: first export the notebooks as `.ipynb` files from DevOps. 4) Call the import API: `POST /v1/workspaces/{id}/items` with type `Notebook` and provide the file bytes in the multi-part request body. 5) Update connections: call `POST /v1/workspaces/{id}/items/{itemId}/updateConnection` to bind the notebooks to the workspace Lakehouse.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-7",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How does Dataflows Gen2 manage transaction rollbacks within the internal staging Lakehouse if a multi-step transformation query fails at step 9 out of 10?",
+    "answer": "Dataflows Gen2 uses transactional schemas in the staging Lakehouse: 1) When the dataflow starts, it opens a transaction session in the staging SQL database. 2) Each transformation step writes to temporary staging tables. 3) If step 9 fails (e.g., due to type mismatch), the dataflow engine aborts execution. 4) The staging SQL engine rolls back the active transaction. 5) All temporary staging tables created during the run are dropped. 6) The final destination table is not updated, keeping the destination data in its last consistent state, ensuring transactional integrity.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-8",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What are the performance and cost implications of using the Data Pipeline \"Copy Activity\" versus executing a PySpark script inside a Notebook for moving 10 TB of uncompressed CSV files into OneLake?",
+    "answer": "1) Copy Activity: uses Azure's optimized data movement containers. It is fast for simple transfers, but lacks schema transformation flexibility. The cost is based on Data Integration Unit (DIU) runtime, which is cheap for pure transfer. 2) PySpark Notebook: spins up a Spark cluster. It is highly flexible (can partition, sort, and write V-Ordered Delta tables). However, Spark executor startup time and JVM overhead make it more expensive. 3) Recommendation: use Copy Activity to move the raw CSV files to a Lakehouse 'Files' folder, and then run a Spark Notebook to convert and write the files to 'Tables' in Delta format.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-9",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you pass complex, dynamic parameters and encrypted secrets from a central Azure Key Vault down to a Fabric Notebook activity running inside a secured pipeline container?",
+    "answer": "1) In the Data Pipeline: create a Web Activity that calls the Key Vault API to retrieve the secret token. 2) Configure the Web Activity to use 'Workspace Managed Identity' for authentication. 3) Set 'Secure Output' to `true` on the Web Activity to prevent the secret from showing in the pipeline logs. 4) Pass the secret as a parameter to the Notebook activity: `pipeline().parameters.secret`. 5) In the Notebook: retrieve the parameter in a cell marked with the 'parameters' tag, and use it in your Spark script.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "orchestration-10",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Explain how the Fabric deployment pipelines feature handles the re-binding of OneLake Shortcuts when migrating a Lakehouse item from the Test workspace to the Production workspace.",
+    "answer": "1) During promotion, the Deployment Pipeline copies the Lakehouse metadata (including shortcut definitions) to the Prod workspace. 2) The shortcuts initially point to the Test sources. 3) To fix this, you must define 'Deployment Rules' for the target stage (Production) in the pipeline settings. 4) Create a Shortcut Rule: specify that if a shortcut targets a Lakehouse in Test, it must be rewritten to target the corresponding Lakehouse in Production. The pipeline automatically applies this rule, re-binding the shortcut targets.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-11",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What specific webhooks or event-driven architecture can you implement to automatically trigger a Fabric Data Pipeline the exact second a new file lands in an external SFTP server?",
+    "answer": "To implement event-driven triggers: 1) Create a Logic App or Power Automate flow. 2) Configure the trigger: 'When a file is added or modified' on the SFTP server. 3) In the flow, call the Fabric REST API to trigger the pipeline run: `POST https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/pipelines/{pipelineId}/jobs/instances?jobType=Pipeline`. 4) Use Service Principal authentication for the API call. This triggers execution immediately, avoiding the cost of polling schedules.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-12",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you debug a Dataflows Gen2 execution failure when the error log simply states \"Internal Error: Mashup Evaluation Failed\" without any further stack trace?",
+    "answer": "To debug this error: 1) Open the Dataflow in editor mode. 2) Run the query steps one-by-one to identify which step triggers the error. 3) If it fails only during pipeline execution, check the Staging Lakehouse data. 4) Use Power Query 'Diagnostics' to export the detailed mashup trace logs. 5) Look for data type conversion failures: often, the query works on sample data but fails on the full dataset during run due to nulls or formatting issues.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-13",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Describe how you would implement a blue-green deployment strategy for a massive Fabric Semantic Model using deployment pipelines and XMLA endpoint scripting.",
+    "answer": "To implement blue-green deployment: 1) Create two identical semantic models: Model-Blue and Model-Green. 2) Configure the Power BI reports to connect to a shared Alias/Proxy database. 3) Deploy the new model version (Green) via the XMLA endpoint and run a full refresh. 4) Verify the Green model's data. 5) Once verified, update the report Alias connection string to point to the Green model. 6) Keep the Blue model active as a fallback. On the next release, deploy to Blue, verify, and switch the Alias back, ensuring zero downtime.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-14",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What are the scale and concurrency boundaries of the Fabric pipeline orchestration engine regarding the maximum number of nested loops and concurrent activity executions?",
+    "answer": "The orchestration engine limits are: 1) Maximum nested loops: 1 level (you cannot nest a ForEach inside another ForEach activity directly; you must call a child pipeline containing the second loop). 2) Maximum concurrent activities per pipeline run: 40. 3) Maximum parallel loops in a ForEach: 50. 4) Maximum duration of a pipeline run: 7 days. If these limits are exceeded, the pipeline fails with a resource limit or loop depth error.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-15",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you programmatically track and visualize the execution duration and cost metrics of every individual activity across all Fabric pipelines using a centralized Log Analytics workspace?",
+    "answer": "1) Enable diagnostics logging in the Fabric Admin Portal and select Log Analytics as the destination. 2) In Log Analytics, query the `FabricPipelineRuns` and `FabricActivityRuns` tables. 3) Use KQL to calculate metrics: `FabricActivityRuns | summarize sum(CapacityUnitsConsumed) by PipelineName, ActivityName, bin(TimeGenerated, 1d)`. 4) Connect Power BI to the Log Analytics workspace and build visual dashboards tracking run times and CU consumption.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-16",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Explain why a Dataflows Gen2 query might run significantly faster during manual authoring in the Power Query editor than during an automated scheduled pipeline execution.",
+    "answer": "1) During authoring: the editor runs on a small sample dataset (usually 1,000 rows) and caches the results in-memory. The transformations appear instant. 2) During scheduled execution: the engine runs the query on the full dataset, which can contain millions of rows. 3) The staging Lakehouse load and SQL Endpoint transformation tasks are executed, which adds network and database processing time, resulting in longer execution durations.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-17",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you handle schema drift dynamically inside a Fabric Data Pipeline Copy Activity when the source system randomly appends or deletes columns from the operational transaction log?",
+    "answer": "1) In the Copy Activity settings: set 'Map schemas' to `false` and enable 'Allow schema drift'. 2) If the source appends a column, it is automatically written to the destination Delta table. 3) If a column is deleted, it writes nulls. 4) In the destination Delta table properties, enable auto-merge: `spark.conf.set('spark.microsoft.delta.schema.autoMerge.enabled', 'true')` to allow the table schema to evolve automatically without manual adjustments.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-18",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What are the specific authentication constraints when using a Service Principal to execute Fabric REST APIs for extracting workspace inventory metadata?",
+    "answer": "1) The Service Principal must be registered in Microsoft Entra ID. 2) In the Fabric Admin Portal: enable the setting 'Allow service principals to use read-only admin APIs'. 3) The Service Principal must be added to a security group that is authorized to call these APIs. 4) The Service Principal does not need a Fabric license, but it cannot access workspace data unless it is granted specific workspace viewer permissions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "orchestration-19",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you design an automated regression testing framework for Fabric Notebooks that executes before any pull request is merged into the master deployment branch?",
+    "answer": "1) Write test scripts using a Python testing library (like `pytest`) inside a test notebook. 2) In Azure DevOps: create a build pipeline that triggers on PR creation. 3) The pipeline calls the Fabric REST API to trigger the execution of the test notebook in the Dev workspace. 4) The notebook runs the test cases and writes the results to a log file. 5) The pipeline reads the log file: if any test fails, it fails the build, blocking the merge.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-20",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Detail the internal mechanics of how Fabric syncs an item's state with Git. What physical file structures (item.metadata.json, item.config.json) represent a Fabric Lakehouse in a git repo?",
+    "answer": "When syncing a Lakehouse with Git, Fabric creates a folder representing the item: 1) `item.metadata.json`: contains the item ID, name, type, and logical schema version. 2) `item.config.json`: contains workspace-specific configuration parameters (like connection IDs). 3) `schema.json`: contains the table schema definitions (column names, types, nullability). The Git sync only commits metadata; physical data files (Parquet logs) are never written to Git, maintaining repository size.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-21",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you optimize a long-running Dataflows Gen2 entity that performs heavy string merging and regex parsing over a 100-million-row customer database?",
+    "answer": "Power Query M regex execution is single-threaded. To optimize: 1) Do not perform regex in the Dataflow editor steps. 2) Load the raw columns to the staging Lakehouse. 3) Create a Spark Notebook activity in the pipeline that runs after the Dataflow. 4) In Spark, use PySpark's vectorized regex functions (`regexp_replace`) to parse the strings. 5) Write the parsed columns back to the Lakehouse. This leverages Spark's parallel architecture, reducing runtime from hours to minutes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-22",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "What happens to a running Fabric Data Pipeline if the underlying capacity is paused or scaled down mid-execution? Describe the state-recovery behavior.",
+    "answer": "1) If paused: the active activity fails immediately. The pipeline execution is aborted, and the run status is marked as 'Failed'. The state of intermediate writes remains uncommitted if Spark was running. 2) If scaled down: the running activities continue to execute, but they are throttled to match the new capacity limit. 3) On restart after a pause: you must manually rerun the pipeline or configure the pipeline to start from the failed activity using the 'Rerun from failed' option.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-23",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you configure a Fabric Data Pipeline to execute a notebook located in a completely different workspace and on a separate Fabric capacity?",
+    "answer": "1) In the Pipeline editor: add a Notebook activity. 2) In the activity settings: set the Workspace to the target workspace ID. 3) Select the target Notebook from the dropdown list. 4) Ensure that the pipeline's service identity (or the user executing the pipeline) has 'Contributor' or 'Member' permissions in the target workspace, which is required to execute the notebook and utilize its capacity compute.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-24",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Explain the architectural advantages of using Spark Job Definitions (SJD) over standard Fabric Notebooks within an enterprise orchestration workflow.",
+    "answer": "SJDs offer several advantages: 1) SJDs allow you to reference compiled Jar or Wheel files directly. 2) SJDs start faster because they bypass the interactive notebook UI and cell parsing layer. 3) SJDs support advanced Spark arguments (like `--class` or `--jars`). 4) SJDs run on dedicated non-interactive Spark pools, reducing the risk of JVM resource contention, making them ideal for production batch processing.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "orchestration-25",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you handle dependency management and library conflicts when a master pipeline triggers multiple child notebooks that require different versions of the same Python wheel file?",
+    "answer": "To resolve conflicts: 1) Do not install the libraries at the workspace level. 2) Create separate 'Fabric Spark Environments' for each notebook. 3) Upload the specific library version to the respective environment. 4) Associate each child notebook with its corresponding environment. When the master pipeline triggers the notebooks, Fabric spins them up in separate Spark contexts with isolated library paths, preventing conflicts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-1",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Explain the low-level data ingestion pathway of Fabric Eventstreams when processing high-throughput IoT telemetry data at 50,000 events per second from Azure IoT Hub into a KQL Database.",
+    "answer": "The low-level ingestion pathway is as follows: 1) IoT devices send payloads to Azure IoT Hub. 2) Fabric Eventstreams connects to the IoT Hub partition endpoints using an AMQP/Event Hubs protocol reader. 3) The Eventstream ingestion engine parses the incoming byte stream into internal JSON records. 4) The records are buffered in a managed Kafka-like message queue inside the Fabric broker. 5) The KQL Database connector pulls blocks from this queue in micro-batches (e.g., every 500ms). 6) KQL processes the batches and writes them to the target table's write-ahead log (WAL) in hot storage. 7) The data is instantly index-compressed and made queryable, maintaining latency under 1 second.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-2",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you optimize a KQL query that aggregates billions of real-time streaming records over a sliding time window to prevent high CPU utilization and query timeouts?",
+    "answer": "To optimize the query: 1) Use the `summarize` operator with a specific time bucket: `summarize count() by bin(Timestamp, 5m)`. 2) Restrict the time range immediately using a `where` clause at the very beginning of the query: `where Timestamp > ago(1d)`. 3) Use materialized views for pre-calculated aggregates, and query the view instead of the raw table. 4) Avoid using regular expressions (`matches regex`) for string comparisons; use faster operators like `has` or `contains` which leverage KQL's full-text search indexes.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-3",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Describe the architectural integration between Fabric Eventstreams and Data Activator. How does Data Activator maintain state-tracking to prevent duplicate alerts for the same continuous anomaly event?",
+    "answer": "1) Fabric Eventstreams routes filtered events directly to the Data Activator ingestion endpoint. 2) Data Activator parses the events and maps them to defined 'Objects' (e.g., specific machines based on `DeviceId`). 3) To track state and prevent duplicates, Data Activator maintains a state engine: when an anomaly is detected, it sets a state flag (e.g., `AlertActive = true`) and triggers the alert action. 4) The state engine evaluates subsequent incoming events against this state: if the anomaly persists and `AlertActive` is true, the alert is suppressed. 5) The alert is re-armed only after a 'Clear' event resets the state flag.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-4",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What are the specific performance implications of configuring a Fabric Eventstream to output data to both a KQL Database table and a Lakehouse Delta table simultaneously?",
+    "answer": "Configuring dual outputs splits the data flow: 1) Output to KQL Database: utilizes low-latency stream ingestion. Data is indexed and queryable in seconds. 2) Output to Lakehouse: requires the Eventstream engine to batch events, format them into Parquet files, and write them to OneLake. This write path is slower. 3) Performance implication: writing to Delta Lake can cause backpressure in the Eventstream queue if the Lakehouse write throughput is limited. 4) To prevent this, the Eventstream engine buffers the data separately, but the overall capacity consumption (CUs) increases as two different ingestion workloads are run.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-5",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you handle late-arriving and out-of-order data streams within a Fabric KQL Database without causing massive recalculation overhead or data duplication?",
+    "answer": "KQL handles late-arriving data through its partitioning column. 1) Do not partition the database on the event timestamp alone; partition on the ingestion time (which is sequential). 2) When late-arriving data is ingested, KQL writes it to new hot storage shards. 3) KQL query engine resolves time-window aggregations dynamically by scanning only the shards that contain data for the target range. 4) For duplicates, use the `arg_max()` or `arg_min()` aggregation functions in queries to retrieve only the latest update for each record key, avoiding physical deduplication tasks.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-6",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Explain the differences in indexing and storage retention logic between hot storage cache and cold storage layout within a Fabric KQL Database.",
+    "answer": "1) Hot Storage (Cache): stores data in compressed, un-archived shards on SSD-backed nodes. Data is fully indexed, allowing sub-second KQL query execution. The size is limited by the cache policy (e.g., keep last 30 days). 2) Cold Storage (Archive): stores data in highly compressed blob storage. Data is archived and index data is reduced to save costs. Queries scanning cold storage take longer because the engine must decompress the blocks. The retention policy (e.g., keep last 365 days) deletes data physically.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-7",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you programmatically update a Data Activator rule trigger condition using automated deployment scripts or REST APIs across multiple environments?",
+    "answer": "1) Export the Data Activator item definition as a JSON template from the development environment. 2) Use the Fabric REST API to create or update the Data Activator item in the target environment: `PATCH /v1/workspaces/{workspaceId}/items/{itemId}`. 3) Provide the updated rules configuration (trigger thresholds, time windows) in the JSON payload body, allowing you to automate promotions across Dev/Test/Prod environments.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-8",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What specific KQL commands or functions are used to perform complex geospatial analytics and real-time clustering over millions of moving vehicle GPS coordinates?",
+    "answer": "1) `geo_point_to_geohash()`: converts GPS coordinates (latitude, longitude) into a Geohash string representation. 2) `geo_geohash_to_central_point()`: resolves hashes back to coordinate centroids. 3) To cluster vehicle points: `summarize count() by geohash = geo_point_to_geohash(Longitude, Latitude, 5)` (where 5 is the resolution level). 4) Use `geo_distance_2points()` to calculate distances between moving vehicles and defined geospatial geofence boundaries in real-time.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-9",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you architect a high-availability disaster recovery solution for a Fabric Real-Time Intelligence architecture when the primary Azure region goes offline completely?",
+    "answer": "To architect DR for real-time: 1) Deploy duplicate Eventstream and KQL Database instances in two different regional workspaces. 2) Configure the source IoT Hub or Event Hub to route data to both Eventstream endpoints simultaneously (dual-write). 3) In the consumer applications (dashboards, alerts), implement a failover client that switches to the secondary KQL Database endpoint if the primary region goes offline. 4) Keep the hot cache policy aligned in both databases to ensure the last 7 days of data are immediately queryable.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "realtime-10",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Detail the security configurations required to restrict access to sensitive streaming columns inside a KQL Database using Row-Level Security (RLS) policies based on user AAD attributes.",
+    "answer": "1) Define a function in the KQL Database that filters rows based on the calling user's principal: `.create-or-alter function RlsFilter() { TableName | where Region == current_principal_details().UserRegion }`. 2) Apply the function as an RLS policy to the target table: `.alter table TableName policy row_level_security enable \"RlsFilter\"`. 3) When users query the table, KQL automatically runs the filter function in the background, restricting rows based on their Microsoft Entra ID attributes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-11",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Explain the concept of \"Derived Streams\" within Fabric Eventstreams. How do you implement inline aggregations and schema filtering before data reaches its destination sink?",
+    "answer": "Derived Streams are sub-streams created by applying transformations to the parent Eventstream. 1) In the Eventstream canvas: add a 'Derived Stream' node. 2) Define transformations inside the node: select columns to keep (filtering schema), define calculated columns, or apply window aggregations (e.g., calculate average temperature over a 1-minute tumbling window). 3) Connect the Derived Stream output to the destination sink. This filters and aggregates data in-flight, reducing the storage and processing load on the target database.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-12",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What are the memory and CPU scaling limitations of a Fabric Eventhouse when handling concurrent real-time query dashboards built with KQL dashboards or Power BI Real-Time reports?",
+    "answer": "An Eventhouse aggregates KQL Databases. 1) Scaling is bound by the capacity SKU size (F-Sku CUs). 2) If multiple dashboards query the KQL Database concurrently: the queries consume CPU cycles for index searches. 3) If queries require scanning massive ranges of un-cached data, it forces disk reads, consuming memory. 4) To prevent timeouts, the KQL engine limits query memory to 10% of node capacity. 5) Use cache policies effectively and set dashboard auto-refresh intervals to reasonable levels (e.g., 30s instead of 1s) to prevent CU saturation.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-13",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you troubleshoot a scenario where a Fabric Eventstream exhibits a massive data ingestion lag, and what metrics indicate whether the bottleneck is at the source or the internal Fabric broker?",
+    "answer": "1) Check the Eventstream monitoring dashboard: look at the `IncomingMessages` vs `OutgoingMessages` chart. 2) If incoming messages are low but source Lag is high, the bottleneck is at the source (e.g., IoT Hub partition throttling). 3) If incoming messages are high but outgoing messages are low, the bottleneck is in the Eventstream broker or the destination connector (backpressure). 4) Check the capacity utilization metrics to see if the KQL Database or Lakehouse capacity is throttled, delaying writes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-14",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Describe how a KQL Database handles schema evolution when an external IoT device suddenly updates its JSON payload to include nested sub-arrays and new attribute fields.",
+    "answer": "KQL table schemas can be dynamic: 1) Store the raw JSON payload in a column defined with the `dynamic` data type. 2) When the device adds new nested sub-arrays or fields, the JSON writes to the column without schema validation errors. 3) To query the new fields: use KQL's dynamic path selectors: `TableName | extend NewVal = Payload.NewField.SubArray[0]`. 4) If you want to promote these to typed columns, update the update policy function to parse the new path and write to a structured table.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-15",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What specific configurations control the minimum batch size and ingestion block time when streaming data from Eventstreams into a Gold-layer Lakehouse table?",
+    "answer": "Ingestion into Lakehouse Delta tables is controlled by write properties: 1) Set the target flush interval: `delta.logRetentionDuration` and the Spark streaming configuration `spark.sql.streaming.minBatchesToRetain`. 2) In the Eventstream Lakehouse destination settings, adjust the Batching policy: configure the minimum size threshold (e.g., 10MB) and maximum latency threshold (e.g., 60 seconds). 3) This forces the connector to hold events in memory and write Parquet blocks only when either threshold is met, preventing the creation of too many small files.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-16",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you optimize a cross-analytics query that joins historical cold data stored in a Fabric Warehouse with real-time hot data streaming inside a KQL Database?",
+    "answer": "To optimize the cross-engine query: 1) Run the query from the KQL Database using the `sql_request()` plugin or shortcut link to the Warehouse. 2) Filter the historical data in the SQL query *before* joining: `sql_request('ConnectionString', 'SELECT Id, Val FROM WarehouseTable WHERE Date > 20240101')`. 3) Keep the join column indexed in KQL. 4) Use KQL's `lookup` operator instead of `join` if the historical lookup dataset is small, as `lookup` is optimized for joining static reference data with streaming events.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-17",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Explain how Data Activator manages its internal state engine when evaluating complex, stateful patterns like \"trigger an alert only if the temperature increases by 10% three times within 5 minutes.\"",
+    "answer": "Data Activator evaluates stateful patterns using a time-series sliding window: 1) It maintains an in-memory state buffer for each device. 2) When a temperature event arrives, it updates the buffer and calculates the percentage change against the previous reading. 3) The state engine evaluates the count of events where change > 10% inside a 5-minute sliding window. 4) The state transition is tracked: when the counter reaches 3, the engine triggers the alert. 5) It holds this state until the window slides and the count drops, preventing duplicate fires.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-18",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What are the specific limitations of using the Fabric Eventstream custom app connector when ingesting data from on-premises Apache Kafka clusters secured via SASL/SCRAM?",
+    "answer": "1) The custom app connector requires a public HTTPS or AMQP endpoint. On-premises Kafka clusters inside private networks cannot connect directly. 2) To bypass this, you must deploy an On-Premises Data Gateway or set up a secure Azure VPN Gateway. 3) The connector has limited support for custom SASL/SCRAM credentials; it is optimized for Entra ID or SAS Key authentication. You may need to deploy a local Kafka Bridge or Event Hubs Kafka adapter to translate the authentication headers.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "realtime-19",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you monitor the exact Capacity Unit (CU) consumption allocated specifically to real-time background ingestion versus real-time interactive KQL queries?",
+    "answer": "1) Open the Fabric Capacity Metrics app. 2) Filter the item type to `KQL Database` or `Eventhouse`. 3) Look at the operations table: background operations (like stream ingestion tasks, data indexing) are listed as `Ingestion` or `BackgroundSync`. 4) Interactive operations (KQL queries run by users, dashboard refreshes) are listed as `Query` or `InteractiveQuery`. 5) The app shows the CUs consumed by each operation type, allowing you to balance ingestion and query costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-20",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Explain how a Fabric KQL Database executes materialized views. What is the processing and storage overhead when creating a materialized view over a high-velocity streaming table?",
+    "answer": "Materialized views pre-calculate query results: 1) When data is ingested into the source table, a background task reads the new records. 2) The task applies the view's query expression (e.g., `summarize count() by Key`) and writes the results to the materialized view's storage. 3) Querying the view reads this pre-calculated table, which is fast. Overhead: 1) Ingestion processing: increases CPU utilization as the view query runs on every batch. 2) Storage: duplicates data in hot and cold storage, which increases capacity storage costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-21",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you design a secure data access model for external clients to query a specific subset of data in a Fabric Eventhouse without exposing the entire database infrastructure?",
+    "answer": "To secure external client access: 1) Create a separate follower database in the client's workspace. 2) Configure the follower to replicate only specific tables from the master KQL Database. 3) Apply RLS policies to the follower tables. 4) Grant the external client access only to the follower database using Azure AD guest accounts or service principals, ensuring they can query their specific data without seeing the master database or workspace.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-22",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What happens to the internal message queue of a Fabric Eventstream if the downstream destination (e.g., a Lakehouse table) becomes unavailable due to a capacity suspension?",
+    "answer": "1) If the destination is unavailable, the Eventstream connector experiences write failures. 2) The connector retries the write operation. 3) The internal message queue buffers the incoming events. 4) The queue has a default retention period (typically 24 hours). 5) If the destination remains offline beyond this retention window, the queue overflows, and older uncommitted events are deleted, resulting in data loss. 6) The Eventstream status changes to 'Error' in the portal, prompting admin action.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-23",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you optimize the performance of the evaluate operator inside a Fabric KQL query when running complex machine learning plugins like series_decompose_anomalies?",
+    "answer": "1) Restrict the dataset: filter the records by time and entity ID *before* calling the plugin: `where Timestamp > ago(7d) | where DeviceId == 'D01'`. 2) Keep the time-series step size (`series_make()`) reasonable: small step sizes (e.g., 1s over 30 days) generate millions of elements, causing high memory utilization. 3) Run the evaluation on pre-aggregated data from materialized views instead of raw tables to speed up computation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-24",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "Detail the synchronization process between the Fabric Real-Time Hub and Azure Purview for auto-discovering and cataloging streaming data assets across the enterprise.",
+    "answer": "1) When a stream is created in the Real-Time Hub, the hub registers the stream metadata. 2) A tenant-level background scanner polls the Real-Time Hub registry. 3) The scanner sends stream schemas and connector details to Azure Purview. 4) Purview registers the stream as an asset and maps it in the data catalog. 5) Lineage information (e.g., from IoT Hub -> Eventstream -> KQL Table) is updated automatically, allowing data governance teams to track streaming assets.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "realtime-25",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How do you implement a robust multi-tenant partitioning strategy inside a single Fabric KQL Database table to ensure fast query isolation for over 1,000 distinct client organizations?",
+    "answer": "To implement multi-tenant partitioning: 1) Add a `TenantId` column to the table. 2) Define a KQL partitioning policy on the table, setting `TenantId` as the primary partition key: `.alter table TableName policy partitioning '{\"PartitionKeys\":[{\"ColumnName\":\"TenantId\",\"Kind\":\"Hash\",\"Properties\":{\"Function\":\"hash\",\"MaxPartitions\":1024}}]}'`. 3) This forces KQL to write data for each tenant into separate physical shards. 4) When a client queries the table and filters by `TenantId`, the engine scans only the shards for that tenant, preventing data cross-read and maximizing query speed.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "medium-fabric-11",
+    "category": "FABRIC",
+    "niche": "Security and Governance",
+    "difficulty": "EASY",
+    "question": "What is Object-Level Security (OLS) in Microsoft Fabric, and how does it differ from RLS?",
+    "answer": "While Row-Level Security (RLS) restricts access to specific rows of data based on user identity, Object-Level Security (OLS) completely hides entire tables or columns from users who do not have permission. If a user queries a table protected by OLS, they receive an error stating the object does not exist, whereas RLS simply returns an empty or filtered result set."
+  },
+  {
+    "id": "medium-fabric-12",
+    "category": "FABRIC",
+    "niche": "Security and Governance",
+    "difficulty": "MEDIUM",
+    "question": "Explain how Workspace Identity works in Fabric.",
+    "answer": "A Workspace Identity is a managed identity automatically created for a Fabric Workspace. It allows items within the workspace (like Data Pipelines or Notebooks) to securely authenticate to external Azure resources (like Azure Key Vault or ADLS Gen2) without using hardcoded service principals or SAS tokens, adhering to the principle of least privilege."
+  },
+  {
+    "id": "medium-fabric-13",
+    "category": "FABRIC",
+    "niche": "Real-Time Analytics",
+    "difficulty": "EASY",
+    "question": "What is a KQL Database in Microsoft Fabric?",
+    "answer": "A KQL Database (Kusto Query Language) is optimized for highly interactive analytics over massive streams of telemetric, log, and time-series data. It is the core engine behind Fabric's Real-Time Analytics experience. Data ingested here is automatically indexed and partitioned by time, allowing sub-second querying over billions of records using KQL."
+  },
+  {
+    "id": "medium-fabric-14",
+    "category": "FABRIC",
+    "niche": "Real-Time Analytics",
+    "difficulty": "MEDIUM",
+    "question": "How do Eventstreams integrate with KQL Databases?",
+    "answer": "Fabric Eventstreams act as the ingestion layer that captures real-time data from sources like Azure Event Hubs or IoT Hubs. You can route an Eventstream directly into a KQL Database, where the data is immediately appended to a table and becomes available for near-real-time querying and dashboarding without any complex ETL logic."
+  },
+  {
+    "id": "medium-fabric-15",
+    "category": "FABRIC",
+    "niche": "Data Science",
+    "difficulty": "EASY",
+    "question": "What is the role of MLflow in Microsoft Fabric?",
+    "answer": "Fabric natively integrates with MLflow to manage the end-to-end machine learning lifecycle. It provides experiment tracking (logging parameters, metrics, and models during training) and a Model Registry (versioning and managing approved models). Data Scientists use the `mlflow` Python library within Fabric Notebooks to track their experiments automatically."
+  },
+  {
+    "id": "medium-fabric-16",
+    "category": "FABRIC",
+    "niche": "Data Science",
+    "difficulty": "EASY",
+    "question": "How do you deploy a trained machine learning model for batch scoring in Fabric?",
+    "answer": "After registering a model in the MLflow Model Registry, you use the `PREDICT` function in Fabric. This function applies the registered model directly to a Spark DataFrame or a SQL query in a Lakehouse/Warehouse, enabling massive-scale batch inferencing without needing to deploy the model as an external REST API endpoint."
+  },
+  {
+    "id": "medium-fabric-17",
+    "category": "FABRIC",
+    "niche": "Git Integration",
+    "difficulty": "EASY",
+    "question": "Explain how Fabric Workspaces integrate with Azure DevOps Git.",
+    "answer": "Fabric allows you to connect a Workspace directly to a Git repository in Azure DevOps. All supported Fabric items (like Notebooks, Reports, Semantic Models) are serialized into code (JSON/YAML) and synced to the repository. This enables developers to use standard Git branching, pull requests, and CI/CD pipelines to promote code between workspaces."
+  },
+  {
+    "id": "medium-fabric-18",
+    "category": "FABRIC",
+    "niche": "Git Integration",
+    "difficulty": "MEDIUM",
+    "question": "What happens if you modify a Fabric item in the Workspace while someone else modifies it in Git?",
+    "answer": "Fabric tracks the sync status of the workspace against the Git branch. If concurrent edits occur, Fabric will detect a conflict and mark the item as 'Unsynced'. To resolve it, the developer must either pull the changes from Git (overwriting the workspace changes) or commit their workspace changes to Git (overwriting the repo changes). Fabric does not currently support auto-merging complex item JSON."
+  },
+  {
+    "id": "medium-fabric-19",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "EASY",
+    "question": "What is the OneLake file explorer?",
+    "answer": "The OneLake file explorer is a Windows application that seamlessly integrates OneLake into Windows File Explorer, similar to OneDrive. It allows data engineers and business users to browse workspaces, navigate Lakehouses, and view Delta/Parquet files exactly as if they were local files on their PC, enabling easy drag-and-drop uploads."
+  },
+  {
+    "id": "medium-fabric-20",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "EASY",
+    "question": "Can external applications read data from OneLake using standard APIs?",
+    "answer": "Yes, OneLake fully supports the ADLS Gen2 (Azure Data Lake Storage Gen2) APIs. Any external tool, application, or script (like Databricks, Snowflake, or a Python script) that supports reading from ADLS Gen2 can read data directly from OneLake by using the `abfss://` protocol and the OneLake DFS endpoint, provided they authenticate with Azure AD."
+  },
+  {
+    "id": "medium-fabric-6",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "EASY",
+    "question": "What is the OneLake Data Hub in Microsoft Fabric?",
+    "answer": "The OneLake Data Hub is a centralized portal within Fabric that allows users to discover, manage, and reuse all data items (Lakehouses, Warehouses, Datasets, Datamarts) across all workspaces they have access to. It acts as a catalog, showing endorsements (Promoted/Certified), data lineage, and allowing users to easily connect these items to new Power BI reports or notebooks."
+  },
+  {
+    "id": "medium-fabric-7",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "MEDIUM",
+    "question": "How does the 'Direct Lake' mode in Power BI differ from 'DirectQuery'?",
+    "answer": "DirectQuery translates DAX queries into SQL and pushes them to the underlying database (slow for massive data). Direct Lake mode allows the Power BI engine to read Delta Parquet files directly from OneLake into its VertiPaq memory engine on the fly, without importing or duplicating the data. It provides the performance of 'Import' mode with the real-time freshness of 'DirectQuery'."
+  },
+  {
+    "id": "medium-fabric-8",
+    "category": "FABRIC",
+    "niche": "Fabric Compute",
+    "difficulty": "EASY",
+    "question": "What are Fabric Capacity Units (CUs)?",
+    "answer": "Fabric Capacity Units (CUs) are the standardized measure of compute power in Microsoft Fabric. Instead of provisioning separate clusters for Data Factory, Spark, SQL, and Power BI, a tenant purchases a pool of CUs (e.g., F64 capacity). All Fabric workloads draw from this shared, serverless pool dynamically, simplifying cost management and resource scaling."
+  },
+  {
+    "id": "medium-fabric-9",
+    "category": "FABRIC",
+    "niche": "Fabric Compute",
+    "difficulty": "MEDIUM",
+    "question": "Explain 'Smoothing' in Microsoft Fabric capacity management.",
+    "answer": "Smoothing is a background process that averages out sudden spikes in compute usage (e.g., a massive Spark job or high-concurrency Power BI refresh) over a longer period (usually 24 hours). This prevents jobs from failing during temporary CPU spikes, allowing workloads to briefly consume more CUs than the purchased capacity, provided the average usage remains within the limit."
+  },
+  {
+    "id": "medium-fabric-10",
+    "category": "FABRIC",
+    "niche": "Fabric SQL",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Fabric Warehouse and a Fabric Lakehouse SQL Endpoint?",
+    "answer": "A Fabric Warehouse has full Read/Write capabilities via T-SQL; you use SQL statements to ingest, modify, and query data. A Lakehouse SQL Endpoint is strictly Read-Only via T-SQL; it automatically exposes the Delta tables created by Spark/Notebooks in the Lakehouse, allowing BI analysts to query the lake using familiar SQL without managing the underlying compute."
+  },
+  {
+    "id": "medium-fabric-51",
+    "category": "FABRIC",
+    "niche": "Security",
+    "difficulty": "EASY",
+    "question": "What is the OneSecurity architecture in Fabric?",
+    "answer": "OneSecurity is Fabric's unified security model. Instead of configuring security policies redundantly in Power BI, SQL endpoints, and Spark, you define Row-Level Security (RLS), Column-Level Security (CLS), and Dynamic Data Masking (DDM) once in the underlying OneLake layer. These policies are then universally enforced regardless of which Fabric engine (Spark, SQL, or BI) is used to access the data."
+  },
+  {
+    "id": "medium-fabric-52",
+    "category": "FABRIC",
+    "niche": "Security",
+    "difficulty": "MEDIUM",
+    "question": "How are sensitivity labels applied in Fabric?",
+    "answer": "Fabric leverages Microsoft Purview Information Protection. You can apply sensitivity labels (e.g., 'Highly Confidential') to Workspaces or specific items like Lakehouses or Reports. If a user exports data from a labeled report to Excel, the sensitivity label and its associated encryption policies travel with the file, protecting data even after it leaves Fabric."
+  },
+  {
+    "id": "medium-fabric-53",
+    "category": "FABRIC",
+    "niche": "CI/CD",
+    "difficulty": "EASY",
+    "question": "How do you deploy Fabric items across environments without Git?",
+    "answer": "If you don't use Git integration, you can use Fabric Deployment Pipelines. This is a built-in ALM UI where you assign Workspaces to Development, Test, and Production stages. You visually compare content between stages and click 'Deploy' to move items (like pipelines or models) forward, applying configured deployment rules to change data connections along the way."
+  },
+  {
+    "id": "medium-fabric-54",
+    "category": "FABRIC",
+    "niche": "CI/CD",
+    "difficulty": "MEDIUM",
+    "question": "Can you use standard CI/CD tools like GitHub Actions with Fabric?",
+    "answer": "Yes. If your workspace is connected to a Git repository, you can trigger external CI/CD pipelines (GitHub Actions, Azure DevOps Pipelines) whenever a commit is pushed. These pipelines can utilize the Power BI/Fabric REST APIs to automatically trigger workspace updates, run automated tests, and orchestrate complex deployments across multiple domains."
+  },
+  {
+    "id": "medium-fabric-55",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "MEDIUM",
+    "question": "What is the difference between a Lakehouse and a Data Warehouse in Fabric?",
+    "answer": "A Lakehouse is fundamentally based on Spark; it excels at handling unstructured data, streaming, and data science workloads using notebooks, though it provides a read-only SQL endpoint. A Warehouse is fundamentally based on the SQL engine; it provides full read/write T-SQL capabilities for structured data, catering to traditional data warehousing professionals."
+  },
+  {
+    "id": "medium-fabric-41",
+    "category": "FABRIC",
+    "niche": "Copilot",
+    "difficulty": "EASY",
+    "question": "How can Copilot in Fabric assist with Power BI report creation?",
+    "answer": "Copilot in Power BI (within Fabric) can generate entire report pages automatically based on natural language prompts (e.g., 'Create a report showing sales by region and product over time'). It analyzes the underlying Semantic Model and suggests relevant visuals, layouts, and DAX measures. It can also generate narrative summaries of the data displayed on the page."
+  },
+  {
+    "id": "medium-fabric-42",
+    "category": "FABRIC",
+    "niche": "Copilot",
+    "difficulty": "MEDIUM",
+    "question": "What is a prerequisite for using Copilot in Microsoft Fabric?",
+    "answer": "Copilot requires a Fabric capacity of F64 or larger (or a Power BI Premium P1 capacity or larger). Additionally, a tenant administrator must explicitly enable the Copilot tenant switch in the Fabric Admin portal, and data may be processed outside of your geographic region depending on Azure OpenAI availability."
+  },
+  {
+    "id": "medium-fabric-43",
+    "category": "FABRIC",
+    "niche": "Workspace Management",
+    "difficulty": "EASY",
+    "question": "What is the 'Viewer' role in a Fabric Workspace?",
+    "answer": "The Viewer role provides read-only access to a workspace. A Viewer can view reports and dashboards, and execute SQL queries against a Lakehouse/Warehouse SQL endpoint if granted specific data access. Crucially, they cannot create, edit, or delete any items (like pipelines or notebooks) in the workspace."
+  },
+  {
+    "id": "medium-fabric-44",
+    "category": "FABRIC",
+    "niche": "Workspace Management",
+    "difficulty": "MEDIUM",
+    "question": "What is the difference between a 'Contributor' and a 'Member' in a Fabric Workspace?",
+    "answer": "Both roles can create, edit, and delete content in the workspace (like building pipelines or reports). The key difference is administrative power: a Member can add or remove users with Viewer or Contributor roles, publish apps, and update workspace settings, whereas a Contributor cannot manage user access or publish apps."
+  },
+  {
+    "id": "medium-fabric-45",
+    "category": "FABRIC",
+    "niche": "Networking",
+    "difficulty": "EASY",
+    "question": "How do you securely connect Fabric to an on-premises database without exposing it to the internet?",
+    "answer": "You use an On-premises Data Gateway. It is installed on a server within your corporate network. It establishes an outbound, encrypted connection to the Azure Service Bus, allowing Fabric (Data Pipelines, Dataflows, or Power BI) to securely query the on-premises database without requiring inbound ports to be opened on your firewall."
+  },
+  {
+    "id": "medium-fabric-46",
+    "category": "FABRIC",
+    "niche": "Networking",
+    "difficulty": "MEDIUM",
+    "question": "What are Managed Private Endpoints in Fabric?",
+    "answer": "Managed Private Endpoints allow Fabric Workspaces (specifically Spark Notebooks and Data Pipelines) to securely connect to Azure PaaS resources (like an Azure SQL Database or external Key Vault) over the Microsoft backbone network, bypassing the public internet entirely. They are managed by Fabric, eliminating the need to set up complex VNets."
+  },
+  {
+    "id": "medium-fabric-47",
+    "category": "FABRIC",
+    "niche": "Data Integration",
+    "difficulty": "EASY",
+    "question": "What is the purpose of 'Shortcuts' to Amazon S3 in OneLake?",
+    "answer": "S3 Shortcuts allow Fabric to virtually map a folder in an AWS S3 bucket directly into a OneLake Lakehouse. The data remains physically stored in AWS, but Fabric Spark and SQL engines can query the data instantly as if it were local. This eliminates the massive egress costs and time delays associated with physically copying data from AWS to Azure."
+  },
+  {
+    "id": "medium-fabric-48",
+    "category": "FABRIC",
+    "niche": "Data Integration",
+    "difficulty": "EASY",
+    "question": "How does Fabric handle metadata synchronization for OneLake Shortcuts?",
+    "answer": "For internal OneLake shortcuts (between Fabric workspaces), metadata is synchronized synchronously. For external shortcuts (like ADLS Gen2 or S3), Fabric caches the metadata and periodically polls the external source to check for changes (e.g., new files added), maintaining a localized view to ensure fast query performance."
+  },
+  {
+    "id": "medium-fabric-49",
+    "category": "FABRIC",
+    "niche": "Cost Management",
+    "difficulty": "EASY",
+    "question": "How does pausing a Fabric Capacity affect your environment?",
+    "answer": "When an F-SKU capacity is paused via the Azure Portal, all compute billing stops immediately. However, all workloads assigned to that capacity (Pipelines, Spark jobs, Power BI reports) will fail to run or load. You continue to be billed separately for the OneLake storage consumed, regardless of whether the compute capacity is paused or running."
+  },
+  {
+    "id": "medium-fabric-50",
+    "category": "FABRIC",
+    "niche": "Data Warehouse",
+    "difficulty": "EASY",
+    "question": "How do you ingest massive amounts of data efficiently into a Fabric Warehouse using T-SQL?",
+    "answer": "You should use the `COPY INTO` statement. It is a highly optimized T-SQL command that parallelizes the ingestion of data from Parquet or CSV files stored in OneLake (or external storage) directly into Warehouse tables. It is vastly faster than traditional INSERT statements."
+  },
+  {
+    "id": "medium-fabric-61",
+    "category": "FABRIC",
+    "niche": "Power BI Integration",
+    "difficulty": "EASY",
+    "question": "What is the primary difference between DirectQuery and Direct Lake in Fabric?",
+    "answer": "DirectQuery sends a SQL query to the database engine, forcing the database to compute the result before sending it back, which can be slow. Direct Lake bypasses the SQL engine entirely. Power BI's internal engine reads the raw Parquet/Delta files directly from OneLake into memory on the fly. It offers the massive performance of Import mode without the need to actually duplicate/import the data."
+  },
+  {
+    "id": "medium-fabric-62",
+    "category": "FABRIC",
+    "niche": "Power BI Integration",
+    "difficulty": "EASY",
+    "question": "When does Direct Lake 'fallback' to DirectQuery?",
+    "answer": "Direct Lake will silently fallback to standard DirectQuery if a query exceeds capacity limits, if the Delta table has certain unoptimized features (like external shortcuts that lose metadata sync), or if complex Row-Level Security (RLS) is defined directly in the SQL Endpoint rather than natively within Power BI."
+  },
+  {
+    "id": "medium-fabric-63",
+    "category": "FABRIC",
+    "niche": "Data Integration",
+    "difficulty": "MEDIUM",
+    "question": "How do you migrate an existing Azure Data Factory (ADF) pipeline to Fabric?",
+    "answer": "Currently, there is no one-click migration tool. You must recreate the pipelines in Fabric Data Factory. However, because the underlying JSON definition schema for Copy Activities and Data Flows is nearly identical between Azure and Fabric, you can often copy/paste the JSON payload from the ADF authoring UI directly into the Fabric pipeline JSON editor, needing only to update the Linked Services."
+  },
+  {
+    "id": "medium-fabric-64",
+    "category": "FABRIC",
+    "niche": "Data Integration",
+    "difficulty": "HARD",
+    "question": "What is the 'Web Activity' in Fabric Pipelines?",
+    "answer": "The Web Activity allows a pipeline to make standard REST API calls (GET, POST, PUT, DELETE) to any external web service. It is commonly used to trigger third-party jobs, authenticate and fetch temporary access tokens, or post status messages to Microsoft Teams or Slack channels upon pipeline completion."
+  },
+  {
+    "id": "medium-fabric-31",
+    "category": "FABRIC",
+    "niche": "Power BI Integration",
+    "difficulty": "MEDIUM",
+    "question": "What is the Default Semantic Model in Microsoft Fabric?",
+    "answer": "When you create a Lakehouse or Warehouse in Fabric, a Default Semantic Model is automatically generated and kept in sync with the underlying tables. It allows business users to instantly build Power BI reports on top of the data using Direct Lake mode without having to manually build, model, or refresh a dataset."
+  },
+  {
+    "id": "medium-fabric-32",
+    "category": "FABRIC",
+    "niche": "Power BI Integration",
+    "difficulty": "HARD",
+    "question": "How do you manage relationships in a Fabric Default Semantic Model?",
+    "answer": "You manage relationships directly within the Lakehouse or Warehouse web UI using the 'Model Layout' view. Dragging and dropping lines between tables defines the relationships (1-to-many, etc.). These relationships are automatically saved to the Default Semantic Model and applied when users build Power BI reports."
+  },
+  {
+    "id": "medium-fabric-33",
+    "category": "FABRIC",
+    "niche": "Data Engineering",
+    "difficulty": "EASY",
+    "question": "What is the Fabric Data Engineering Experience?",
+    "answer": "The Data Engineering experience in Fabric brings together Spark Notebooks, Lakehouses, and Spark Job Definitions into a single workspace tailored for code-first data engineers. It focuses on transforming massive amounts of unstructured and structured data using Python, Scala, and SQL, storing the output in Delta Parquet format within OneLake."
+  },
+  {
+    "id": "medium-fabric-34",
+    "category": "FABRIC",
+    "niche": "Data Engineering",
+    "difficulty": "MEDIUM",
+    "question": "Explain how to mount external Azure Storage to a Fabric Notebook.",
+    "answer": "While OneLake is the default storage, you can mount external Azure Data Lake Storage (ADLS Gen2) containers directly within a Fabric Notebook using `mssparkutils.fs.mount()`. This requires providing the storage account name, container name, and authentication (typically a SAS token or Account Key stored in Azure Key Vault)."
+  },
+  {
+    "id": "medium-fabric-35",
+    "category": "FABRIC",
+    "niche": "Data Engineering",
+    "difficulty": "HARD",
+    "question": "What is a Spark Job Definition in Fabric?",
+    "answer": "A Spark Job Definition allows you to submit batch or streaming Spark applications written in Java, Scala, or Python (often compiled `.jar` or `.py` files) directly to the Fabric Spark compute pool. This is useful for migrating existing complex Apache Spark workloads into Fabric without rewriting them into interactive Notebooks."
+  },
+  {
+    "id": "medium-fabric-36",
+    "category": "FABRIC",
+    "niche": "Data Activator",
+    "difficulty": "EASY",
+    "question": "What is Microsoft Fabric Data Activator?",
+    "answer": "Data Activator is a no-code experience in Fabric that monitors data in real-time (from Eventstreams or Power BI datasets) and automatically triggers actions when specific conditions are met. For example, it can monitor a Power BI dataset for dropping inventory levels and automatically send an email or trigger a Power Automate flow to reorder stock."
+  },
+  {
+    "id": "medium-fabric-37",
+    "category": "FABRIC",
+    "niche": "Data Activator",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of 'Triggers' and 'Actions' in Data Activator.",
+    "answer": "A 'Trigger' defines the condition being monitored (e.g., 'Temperature > 100 over a 5-minute window'). An 'Action' defines what happens when the trigger fires. Actions can range from sending a simple Teams message or email alert, to kicking off complex downstream business processes via Custom APIs or Power Automate."
+  },
+  {
+    "id": "medium-fabric-38",
+    "category": "FABRIC",
+    "niche": "Data Science",
+    "difficulty": "MEDIUM",
+    "question": "How does SynapseML integrate with Microsoft Fabric?",
+    "answer": "SynapseML is an open-source library that simplifies the creation of massively scalable machine learning pipelines. In Fabric Notebooks, it is pre-installed. It allows data scientists to easily call Azure AI Services (like Computer Vision, Text Analytics, or OpenAI models) directly on massive Spark DataFrames using a few lines of PySpark code."
+  },
+  {
+    "id": "medium-fabric-39",
+    "category": "FABRIC",
+    "niche": "Data Science",
+    "difficulty": "HARD",
+    "question": "What is Semantic Link in Microsoft Fabric?",
+    "answer": "Semantic Link bridges the gap between Data Science and Business Intelligence. It is a Python library (`sempy`) used in Fabric Notebooks that allows Data Scientists to directly read data, relationships, and execute DAX queries against Power BI Semantic Models, pulling BI data into pandas or Spark DataFrames for machine learning."
+  },
+  {
+    "id": "medium-fabric-40",
+    "category": "FABRIC",
+    "niche": "Copilot",
+    "difficulty": "HARD",
+    "question": "How does Copilot assist Data Engineers in Fabric Notebooks?",
+    "answer": "Copilot in Fabric Notebooks acts as an AI pair programmer. By typing natural language prompts in a cell (e.g., '%%chat Write PySpark code to load this CSV and drop rows with nulls'), Copilot generates the corresponding Python or Spark SQL code. It can also explain complex existing code or troubleshoot error messages."
+  },
+  {
+    "id": "medium-fabric-56",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "HARD",
+    "question": "How does Fabric handle data redundancy for OneLake?",
+    "answer": "OneLake is built on top of Azure Data Lake Storage Gen2. By default, it inherits Azure's Zone-Redundant Storage (ZRS) or Locally-Redundant Storage (LRS) depending on the region's capabilities. This ensures data durability against hardware failures without any explicit configuration required by the user."
+  },
+  {
+    "id": "medium-fabric-57",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture",
+    "difficulty": "HARD",
+    "question": "What is the 'Global Namespace' in OneLake?",
+    "answer": "The Global Namespace allows all data across all workspaces and domains in a Fabric tenant to be addressed using a single, unified URI scheme (`onelake://`). This means a notebook in Workspace A can directly query a Lakehouse in Workspace B simply by referencing its path in the global namespace, without setting up complex linked services."
+  },
+  {
+    "id": "medium-fabric-58",
+    "category": "FABRIC",
+    "niche": "Eventstreams",
+    "difficulty": "EASY",
+    "question": "Can Fabric Eventstreams perform data transformation?",
+    "answer": "Yes. While their primary role is routing real-time data, Eventstreams include an inline 'Event Processor'. You can visually configure operators to filter events, manage columns (add, drop, rename), and perform simple aggregations or windowing over the streaming data before it lands in a KQL database or Lakehouse."
+  },
+  {
+    "id": "medium-fabric-59",
+    "category": "FABRIC",
+    "niche": "Eventstreams",
+    "difficulty": "MEDIUM",
+    "question": "What happens if a destination system in an Eventstream goes down?",
+    "answer": "Fabric Eventstreams are backed by Kafka/Event Hubs architecture. If a destination (like a KQL database) goes down, the Eventstream automatically buffers the incoming data. Once the destination comes back online, the Eventstream resumes sending data from where it left off, ensuring no data loss during the outage."
+  },
+  {
+    "id": "medium-fabric-60",
+    "category": "FABRIC",
+    "niche": "Spark Optimization",
+    "difficulty": "EASY",
+    "question": "What is 'High Concurrency Mode' for Fabric Notebooks?",
+    "answer": "High Concurrency Mode allows multiple users to attach to and share the same Spark compute session simultaneously. This drastically reduces the 'cold start' time for running notebooks, as users don't have to wait for individual clusters to spin up, and it maximizes the utilization of the underlying Fabric capacity CUs."
+  },
+  {
+    "id": "medium-fabric-21",
+    "category": "FABRIC",
+    "niche": "Data Pipelines",
+    "difficulty": "EASY",
+    "question": "How do Data Pipelines in Microsoft Fabric differ from Azure Data Factory (ADF)?",
+    "answer": "Fabric Data Pipelines are the evolution of ADF. They share the same core engine and activities but are deeply integrated into the SaaS Fabric environment. Fabric pipelines don't require managing Integration Runtimes or VNets manually in the same way ADF does. They also seamlessly integrate with OneLake, allowing you to use Lakehouses and Warehouses as sources and destinations without configuring linked services for them."
+  },
+  {
+    "id": "medium-fabric-22",
+    "category": "FABRIC",
+    "niche": "Data Pipelines",
+    "difficulty": "MEDIUM",
+    "question": "What is the primary use case for the 'Copy Data' activity in a Fabric Pipeline?",
+    "answer": "The Copy Data activity is designed for high-throughput, bulk data movement. It is optimized for moving data from on-premises or cloud sources directly into OneLake (Lakehouse or Warehouse) at petabyte scale, utilizing distributed parallel processing under the hood without the user needing to write any Spark or SQL code."
+  },
+  {
+    "id": "medium-fabric-23",
+    "category": "FABRIC",
+    "niche": "Data Pipelines",
+    "difficulty": "HARD",
+    "question": "How can you parameterize a Data Pipeline in Fabric?",
+    "answer": "You can define Pipeline Parameters at the pipeline level. These parameters can then be referenced dynamically within activities using the `@pipeline().parameters.ParameterName` syntax. This allows a single pipeline to be reused for different tables, dates, or environments by simply passing different parameter values at runtime."
+  },
+  {
+    "id": "medium-fabric-24",
+    "category": "FABRIC",
+    "niche": "Notebooks",
+    "difficulty": "EASY",
+    "question": "What languages are natively supported in Microsoft Fabric Notebooks?",
+    "answer": "Fabric Notebooks natively support PySpark (Python), Spark SQL, Scala, and SparkR. You can switch between these languages within the same notebook using cell magic commands (e.g., `%%sql` to run a SQL cell in a predominantly Python notebook)."
+  },
+  {
+    "id": "medium-fabric-25",
+    "category": "FABRIC",
+    "niche": "Notebooks",
+    "difficulty": "MEDIUM",
+    "question": "How do you schedule a Notebook to run automatically in Fabric?",
+    "answer": "You can schedule a Notebook in two ways: 1) Using the built-in 'Schedule' button on the notebook itself, which allows setting up a recurring time-based trigger. 2) Adding the Notebook activity to a Data Pipeline and using the pipeline's robust scheduling and dependency management capabilities."
+  },
+  {
+    "id": "medium-fabric-26",
+    "category": "FABRIC",
+    "niche": "Notebooks",
+    "difficulty": "HARD",
+    "question": "What is the 'mssparkutils' library in Fabric?",
+    "answer": "`mssparkutils` is a Microsoft-provided utility package built into Fabric Spark environments. It simplifies common tasks such as working with the OneLake file system (e.g., `mssparkutils.fs.ls()`), securely retrieving credentials from Azure Key Vault, and passing parameters or exit values between notebooks."
+  },
+  {
+    "id": "medium-fabric-27",
+    "category": "FABRIC",
+    "niche": "Dataflow Gen2",
+    "difficulty": "EASY",
+    "question": "What is Dataflow Gen2 in Microsoft Fabric?",
+    "answer": "Dataflow Gen2 is the next generation of Power Query Dataflows. Unlike Gen1 which primarily loaded data into Power BI or Dataverse, Gen2 allows you to connect to hundreds of data sources, transform data visually using Power Query, and then define a 'Data Destination' to load the transformed data directly into a Fabric Lakehouse, Warehouse, KQL Database, or Azure SQL DB."
+  },
+  {
+    "id": "medium-fabric-28",
+    "category": "FABRIC",
+    "niche": "Dataflow Gen2",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of 'Staging' in Dataflow Gen2.",
+    "answer": "When 'Staging' is enabled, Dataflow Gen2 temporarily writes intermediate query results to a hidden Lakehouse in OneLake before loading it to the final destination. This drastically improves performance for complex transformations (like merges or appends) because the heavy lifting is offloaded to the powerful Fabric SQL engine rather than relying solely on the Power Query mashup engine."
+  },
+  {
+    "id": "medium-fabric-29",
+    "category": "FABRIC",
+    "niche": "Administration",
+    "difficulty": "EASY",
+    "question": "What is a Fabric Domain?",
+    "answer": "A Domain is a logical grouping of Workspaces in Fabric, typically aligned to a business department (e.g., 'Finance', 'HR', 'Marketing'). It allows for decentralized administration, where a 'Domain Admin' can manage settings, data certification, and usage monitoring for their specific set of workspaces without needing Tenant Admin privileges."
+  },
+  {
+    "id": "medium-fabric-30",
+    "category": "FABRIC",
+    "niche": "Administration",
+    "difficulty": "MEDIUM",
+    "question": "How do you monitor capacity consumption in Microsoft Fabric?",
+    "answer": "You use the 'Microsoft Fabric Capacity Metrics' app. It provides detailed dashboards showing CU (Capacity Unit) consumption over time, highlighting specific items (reports, pipelines, spark jobs) that are consuming the most resources, and showing when 'Smoothing' or 'Throttling' is occurring."
+  },
+  {
+    "id": "medium-fabric-onelake-1",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "difficulty": "EASY",
+    "question": "How do OneLake shortcuts enable cross-workspace data sharing without duplicating physical storage?",
+    "answer": "OneLake shortcuts are virtual references (symlinks) to underlying storage locations. Instead of copying data across workspaces, a shortcut stores only the metadata path (e.g., ADLS Gen2 path or internal Fabric workspace URI). When a query engine like Polaris or Spark accesses the shortcut, the OneLake directory service resolves the virtual path to the physical physical location in real-time. This ensures a single source of truth, zero data movement, and eliminates storage redundancy."
+  },
+  {
+    "id": "medium-fabric-onelake-2",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "difficulty": "EASY",
+    "question": "What are the prerequisites for setting up an AWS S3 shortcut in Microsoft Fabric using IAM role delegation?",
+    "answer": "To set up an AWS S3 shortcut via IAM role delegation, you need: 1) An AWS S3 bucket with the target data. 2) An AWS IAM Role configured with a Trust Policy that allows identity federation via OpenID Connect (OIDC) from the specific Microsoft Fabric tenant. 3) The `sts:AssumeRoleWithWebIdentity` permission on the IAM role. 4) A Fabric workspace where you create the shortcut, providing the S3 bucket URL and the ARN of the IAM role. This avoids the need to store long-lived static AWS access keys inside Fabric."
+  },
+  {
+    "id": "medium-fabric-onelake-3",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "difficulty": "MEDIUM",
+    "question": "How does network latency affect query performance when chaining shortcuts across multiple distinct workspaces?",
+    "answer": "Chaining shortcuts (e.g., Workspace A -> Workspace B -> Workspace C) adds a metadata resolution hop for each link in the chain. Each hop introduces 10-50ms of latency during the metadata lookup phase before query execution begins. However, the actual data transfer does not route through the intermediate workspaces; the compute engine streams the Parquet/Delta files directly from the terminal physical storage location. Therefore, while query compilation/planning is slightly delayed by chaining, raw data throughput remains unaffected."
+  },
+  {
+    "id": "medium-fabric-onelake-4",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "difficulty": "MEDIUM",
+    "question": "What happens when an external Delta table mapped via a shortcut undergoes a log compaction (VACUUM) operation outside Fabric?",
+    "answer": "When a `VACUUM` operation runs externally (e.g., via Databricks), it permanently deletes historical Parquet files no longer referenced by the active Delta transaction log. If a Fabric compute engine (like Spark or SQL) has cached the old Delta log state and attempts to read the table, it may request physical files that no longer exist, throwing a `FileNotFoundException`. To fix this, you must force a metadata refresh in Fabric (e.g., using `sp_refresh_metadata` in the SQL endpoint or `REFRESH TABLE` in Spark) to sync the local cache with the external Delta log."
+  },
+  {
+    "id": "medium-fabric-onelake-5",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "difficulty": "HARD",
+    "question": "How are workspace-level permissions inherited when a user has Read access to a Lakehouse containing an external shortcut?",
+    "answer": "In Microsoft Fabric, security is managed at the workspace or item level, not inherently at the storage level for internal users. If a user is granted Viewer or Read access to a Lakehouse, they automatically gain read access to all shortcuts within that Lakehouse. Fabric abstracts the underlying connection credentials (e.g., the ADLS SAS token or AWS IAM role used to create the shortcut). The user queries the Lakehouse, and Fabric uses the shortcut owner's delegated identity to fetch the external data on their behalf."
+  },
+  {
+    "id": "fabric-new-1",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How does Fabric handle capacity smoothing for background operations compared to interactive operations when a temporary capacity overload occurs?",
+    "answer": "Fabric classifies operations into interactive (e.g., executing a SQL query, running a report visual) and background (e.g., scheduled data warehouse refreshes, data factory pipelines). Interactive operations are smoothed over a short window (typically 10 minutes), while background operations are smoothed over a rolling 24-hour window. If your capacity consumes more than 100% of its allocation, Fabric buffers the excess usage. If interactive capacity usage stays over 100% after smoothing, interactive requests are rejected with a HTTP 429 throttling error. Background operations are not rejected immediately but are delayed or queued for execution until capacity drops below the threshold.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "fabric-new-2",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What is the physical mechanism of 'fallback' in a Power BI Direct Lake semantic model, and what conditions trigger it?",
+    "answer": "Direct Lake mode allows Power BI to read Delta Parquet files directly from OneLake without importing data or converting it. However, if a query uses DAX functions or data source features that Direct Lake cannot resolve (such as row-level security defined via complex SQL views, or exceeding memory thresholds), the model 'falls back' to DirectQuery mode. When fallback occurs, the query engine dynamically translates the DAX query into SQL and executes it against the Synapse SQL Analytics Endpoint. This introduces high query latency because the data must be read via the SQL compute engine rather than loading Parquet columns directly into memory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fabric-new-3",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What is Microsoft Fabric V-Order, and how does it optimize read performance for the Power BI VertiPaq engine?",
+    "answer": "V-Order is a proprietary write optimization applied to Delta Parquet files created in Microsoft Fabric. It rearranges the sorting, encoding, and dictionary layout within the Parquet files to align with the sorting algorithms used by the Power BI VertiPaq engine. When Power BI accesses V-Ordered Delta Parquet files in Direct Lake mode, it can map the compressed column segments directly into its memory space without decompression or conversion, reducing query times and network overhead to near-zero.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "fabric-new-4",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How do ADLS Gen2 shortcuts in OneLake preserve data residency and security compliance boundaries across regions?",
+    "answer": "Shortcuts in OneLake function as pointer metadata records. When you create an ADLS Gen2 shortcut, the physical data remains in the source storage account and region. OneLake handles metadata resolution, but the compute engine (like Fabric Spark or Synapse SQL) reads the files directly from the source region. To preserve residency compliance, you must configure Fabric workspaces in the same regional capacity as the source ADLS Gen2 account. Security is enforced through delegated connection credentials (SAS tokens or Service Principals) stored in OneLake, ensuring access control policies are applied at the source storage layer.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fabric-new-5",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How does the Synapse SQL Analytics Endpoint distribute query execution across nodes in Microsoft Fabric?",
+    "answer": "The SQL Analytics Endpoint in Fabric uses a serverless, distributed query engine. When a SQL query is submitted, the coordinator node compiles the query and builds a distributed execution plan. It divides the work into tasks (queries on specific Delta Parquet files in OneLake) and assigns them to worker nodes. The worker nodes read the Parquet data from OneLake, perform aggregations or joins, and stream the results back to the coordinator node. The coordinator node aggregates the final results and returns them to the client. This allows the endpoint to scale compute dynamically based on query complexity without requiring manual cluster resizing.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "fabric-new-6",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you automate workspace and capacity assignment inside Microsoft Fabric using the Fabric REST API?",
+    "answer": "To automate workspace provisioning and capacity assignment, you use the Fabric REST API with a Service Principal or Delegated Token. First, call `POST /v1/workspaces` passing the workspace name and details in the request body. Once created, you obtain the workspace ID from the response. Next, call `POST /v1/workspaces/{workspaceId}/assignToCapacity` passing the target `capacityId` in the body. This links the workspace to the selected capacity, allowing you to deploy items and configure compute limits programmatically.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fabric-new-7",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How does Microsoft Fabric Real-Time Intelligence handle data ingestion latencies when streaming via Eventstreams to a KQL Database?",
+    "answer": "Fabric Eventstreams captures streaming data from sources (like IoT hubs or Azure Event Hubs) and routes it to destinations in near real-time. When streaming to a KQL Database, the ingestion engine uses 'ingestion batching' to group streaming records in memory (based on size or time thresholds, typically 10 seconds or 1GB) before committing them to the KQL table's columnstore. This balances the need for low latency with database write performance. If sub-second latency is required, you can enable 'streaming ingestion' on the KQL table, which bypasses the batching queue and writes data directly to a rowstore cache, making it immediately queryable at the cost of higher CPU utilization.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fabric-new-8",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do Fabric Private Endpoints prevent exfiltration of sensitive data from a secure corporate network?",
+    "answer": "Fabric Private Endpoints allow secure inbound connectivity to Fabric workspaces and OneLake from an Azure Virtual Network (VNet). When configured, connections to Fabric resolve to private IP addresses within your VNet, bypassing the public internet. To prevent data exfiltration, you must combine Private Endpoints with Network Security Group (NSG) rules and Azure Firewall policies. This restricts outgoing connections from the VNet to only approved destinations (like specific Azure storage accounts or databases), ensuring that users cannot copy data from OneLake and send it to public endpoints outside the corporate boundary.",
+    "difficulty": "HARD"
+  }
+]

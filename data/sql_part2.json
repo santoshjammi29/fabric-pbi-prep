@@ -1,0 +1,1522 @@
+[
+  {
+    "id": "sql-ha-1",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Describe the exact physical process of Database Recovery (Analysis, Redo, and Undo phases). What are the LSN (Log Sequence Number) milestones tracked in the boot page during this lifecycle?",
+    "answer": "1. Analysis Phase: Scans the transaction log forward from the oldest active transaction's LSN (MinLSN) identified in the checkpoint boot page. Rebuilds the Active Transaction Table (ATT) and Dirty Page Table (DPT) in memory.\n\n2. Redo Phase: Rolls forward all logged changes (committed or uncommitted) from the oldest dirty page's LSN (RedoStartLSN) forward to the end of the log, loading pages to buffer cache to reapply physical writes.\n\n3. Undo Phase: Rolls back all uncommitted transactions identified in the ATT, scanning backward from the end of the log to restore the database to a transactionally consistent state. Boot page tracks checkpoint LSN, RedoStartLSN, and MinLSN milestones.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-2",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the architecture of AlwaysOn Availability Groups Log Transport. Walk through the transition of a log record from the primary replica's log buffer to the secondary replica's hardening on disk.",
+    "answer": "1. Capture: On the primary replica, transaction log records are written to the log buffer in memory. The Log Writer thread flushes the buffer to the primary's local `.ldf` file.\n\n2. Transport: Simultaneously, the Log Capture thread reads records from the log buffer or disk and sends them over the network (TCP 5022) to the secondary replica via the HADR sender queue.\n\n3. Hardening: On the secondary, the HADR receiver queue catches the packet. The Log Harden thread writes the log records to the secondary's local disk. Once hardened, an acknowledgment is sent back to the primary (synchronous mode).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-3",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What is the internal difference between Synchronous and Asynchronous commit modes in Availability Groups? Detail the network packet acknowledgments and wait states (HADR_SYNC_COMMIT).",
+    "answer": "1. Synchronous Commit: The primary replica writes to the log buffer and waits to send commit confirmation to the client until it receives a network acknowledgment from the secondary indicating that the log block has been written (hardened) to the secondary's disk. Client thread enters `HADR_SYNC_COMMIT` wait state.\n\n2. Asynchronous Commit: The primary replica commits the transaction locally and sends transaction completion confirmation to the client immediately, sending log transport packets in background threads without blocking client queries.\n\n3. Comparison: Synchronous guarantees zero data loss (RPO = 0) at the cost of network write latency. Asynchronous minimizes transaction latency but risks data loss during failover.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-4",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the Redo Thread Pool Architecture on an AlwaysOn Secondary Replica. What causes a Redo Thread Block, and how does it impact read-only routing performance?",
+    "answer": "1. Redo Thread Pool: The secondary replica spawns helper worker threads (Redo threads) to read log records from disk and reapply pages to the local buffer pool in parallel.\n\n2. Thread Block: Can occur if a reporting user on a read-only secondary replica holds a schema stability lock (Sch-S) on a table that the redo thread is trying to update (which requires a short Sch-M lock to apply changes or rebuild statistics).\n\n3. Impact: Redo blocks halt log application, causing the redo queue to grow, delaying data freshness (read-only routing displays stale data) and delaying failover recovery times.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-5",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Describe the internal mechanisms of Accelerated Database Recovery (ADR). How does it leverage the Logical Revert function to complete the Undo phase almost instantaneously?",
+    "answer": "1. ADR Components: Uses a Persistent Version Store (PVS) inside the user database, a Logical Revert engine, and an In-Memory SLog to track metadata allocations.\n\n2. Logical Revert: During recovery, instead of scanning the log backward to undo uncommitted changes row-by-row, the recovery engine marks transactions as logically rolled back. The database is brought online instantly.\n\n3. Version Access: If a query reads a row modified by an uncommitted transaction, it retrieves the previous committed state directly from the PVS. A background cleaner thread purges the PVS versions asynchronously, reducing Undo phase duration from hours to sub-seconds.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-6",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the Quorum Architecture in a Windows Server Failover Cluster (WSFC) hosting SQL Server. What are the mechanics of Node Majority, Disk Witness, and Cloud Witness configurations?",
+    "answer": "1. WSFC Quorum: The voting mechanism that dictates whether the cluster remains online and avoids 'split-brain' states. It requires a majority of active votes (>50%).\n\n2. Node Majority: Used for odd node counts. Each server VM holds 1 vote.\n\n3. Witnesses (Even node counts): Adds a tie-breaker vote. (a) Disk Witness: A shared cluster disk folder storing cluster configuration. (b) Cloud Witness: An Azure blob storage container holding a 1-vote checkpoint file. If half of the nodes drop connection, the remaining nodes must connect to the witness to maintain quorum.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-7",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "How does Log Shipping track synchronization states? Explain the precise role of metadata tables in the msdb database and the interaction of the backup, copy, and restore agents with the transaction log chain.",
+    "answer": "1. Log Shipping Agents: (a) Backup: Runs on primary, backups log, updates `msdb.dbo.log_shipping_primary_databases`. (b) Copy: Runs on secondary, copies files, updates `msdb.dbo.log_shipping_secondary_databases`. (c) Restore: Runs on secondary, restores log.\n\n2. Metadata tables: Track `last_copied_file`, `last_restored_file`, and latency threshhold settings in `msdb` system tables.\n\n3. Alerts: A separate monitor server reads the metadata values; if the gap between primary backup and secondary restore LSNs exceeds the threshold, it triggers alerts, indicating sync chain failures.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-8",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the Log Flush architecture. What is the relation between a user transaction COMMIT, the Log Writer thread, the physical sector size, and the sys.dm_os_wait_stats wait type WRITELOG?",
+    "answer": "1. Log Flush: When a user transaction commits, the SQLOS engine must write the transaction's log records from the log buffer in RAM to disk.\n\n2. Log Writer: The single background thread that handles asynchronous disk writes for log blocks. It aligns block writes to the physical disk sector boundary (512 bytes or 4KB).\n\n3. Wait Type: The user thread requesting the commit yields and enters the `WRITELOG` wait state until the Log Writer thread receives confirmation from the disk controller that the bytes are written, guaranteeing transaction durability.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-ha-9",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Describe the internal structure of an LSN (Log Sequence Number). What do the individual segments (VLF Sequence, Log Block Offset, Slot Number) mean physically?",
+    "answer": "1. LSN Structure: A 10-byte binary identifier divided into three segments: `[VLF Sequence Number (4 bytes)] : [Log Block Offset (4 bytes)] : [Slot Number (2 bytes)]`.\n\n2. VLF Sequence: The sequential index of the Virtual Log File inside the `.ldf` file.\n\n3. Log Block Offset: The physical byte offset position of the starting log block inside the target VLF.\n\n4. Slot Number: The specific logical transaction record entry index inside the log block, locating the exact log instruction on disk.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-10",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "How does Database Mirroring handle split-brain scenarios? Detail the handshake protocols executed between the Principal, Mirror, and Witness servers when network partitioning occurs.",
+    "answer": "1. Handshake Protocol: Mirroring uses periodic heartbeats between the Principal, Mirror, and Witness servers.\n\n2. Network Partition: If Principal and Mirror lose connection, they contact the Witness. (a) Principal can see Witness: It retains the Principal role but enters a disconnected state, caching log writes. (b) Mirror can see Witness: They form a quorum. The Witness instructs the Mirror to failover and open as the new Principal.\n\n3. Split-Brain Avoidance: If the old Principal loses connection to both Mirror and Witness, it immediately takes itself offline, preventing split-brain writes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-11",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What is the Tearing of Log Blocks? How does SQL Server detect and recover from partially written log blocks on disk during an ungraceful shutdown?",
+    "answer": "1. Torn Log Block: Occurs if the server crashes mid-write, writing only a portion of a 60KB log block to disk.\n\n2. Detection: Similar to page checksums, the engine writes an sector-level parity pattern or checksum to the log block header. During database startup, the recovery engine verifies log block headers.\n\n3. Recovery: If a block fails validation, the engine stops scanning at the torn LSN boundary. It rolls back active transactions, using the next-to-last valid LSN checkpoint, ensuring no corrupted instructions are executed.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-12",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the Read-Only Routing internal mechanism in Availability Groups. How does the routing list evaluate load balancing configurations across multiple secondary replicas?",
+    "answer": "1. Routing list: Defined in the AG properties. Maps the primary connection URL to a prioritized list of secondary read-only URLs.\n\n2. Evaluator: When a client connects specifying `ApplicationIntent = ReadOnly`, the AG listener intercepts the request. It parses the routing list and routes the connection to the first active secondary.\n\n3. Load Balancing: In SQL Server 2016+, you can group URLs inside parentheses: `(Replica2, Replica3), Replica4`. This directs connections to be load-balanced randomly across the grouped replicas, scaling read operations.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-13",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What are Distributed Availability Groups? Detail the architectural abstraction, the role of forwarders, and how log truncation functions differently across the routing topologies.",
+    "answer": "1. Abstraction: A 'cluster of clusters' linking two separate Availability Groups (e.g., local AG to remote DR AG) using separate listeners.\n\n2. Forwarder: The secondary replica in the primary AG that acts as the forwarder, capturing log streams from the primary and sending them to the remote primary replica in the second AG.\n\n3. Log Truncation: The primary log cannot truncate until all log blocks are hardened on both local replicas and the remote forwarder, extending recovery boundaries across clusters.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-14",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain Point-in-Time Recovery mechanics. How does the engine parse the transaction log up to a specific target LSN or transaction mark, and what happens to transactions that were active at that exact millisecond?",
+    "answer": "1. Point-in-Time: Restores full backup, intermediate differential backups, and transaction logs in sequence using the `STOPAT = 'time'` option.\n\n2. Log Parsing: The engine reads log records sequentially during the Redo phase, applying changes. When it hits the LSN closest to the stop target, it halts the Redo process.\n\n3. Active Transactions: Any transaction that was open or uncommitted at that exact millisecond target is marked as uncommitted and is rolled back in the Undo phase, preserving data consistency.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-15",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Describe the operational architecture of Change Data Capture (CDC). How does the log reader agent capture transactions from the log file without affecting active transactions, and how does it handle schema evolutions?",
+    "answer": "1. CDC Agent: Runs as a SQL Server Agent job utilizing the Log Reader API. It reads the transaction log asynchronously, looking for insert/update/delete operations on tables marked for CDC.\n\n2. Isolation: Reads the local log file directly, bypassing active transaction locks, avoiding operational latency.\n\n3. Schema Evolution: CDC maps changes to system tracking tables (`cdc.fn_cdc_get_all_changes_...`). If the source schema changes, CDC can maintain two capture instances simultaneously to prevent breaking downstream pipelines.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-ha-16",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain Transaction Log Truncation. What are the exact structural factors (e.g., Replication, CDC, Mirroring, Active Transactions, Checkpoints) that can block log space reuse as tracked in sys.databases.log_reuse_wait_desc?",
+    "answer": "1. Truncation: Releases inactive virtual log files (VLFs) for overwrite reuse during a log backup (Full/Bulk-Logged recovery models) or checkpoint (Simple model).\n\n2. Blocking Factors: Tracked in `sys.databases.log_reuse_wait_desc`. (a) `ACTIVE_TRANSACTION`: Long open transactions block truncation. (b) `REPLICATION`/`CDC`: Unprocessed log records cannot be truncated. (c) `DATABASE_MIRRORING`/`AVAILABILITY_GROUP`: Log blocks not hardened on the secondary replicas block truncation, causing log exhaustion.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-ha-17",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What is the internal architecture of Transactional Replication Log Reader Agent? How does it interface with the transaction log to read commands marked for replication, and how does it interact with the distribution database?",
+    "answer": "1. Log Reader Agent: A background job that calls the system function `sp_replcmds` to read transactions marked for replication from the transaction log.\n\n2. Ingestion: Converts log changes into equivalent SQL insert/update/delete commands.\n\n3. Distribution: Writes these commands to the Distribution database tables (`MSrepl_commands` and `MSrepl_transactions`), where the Distribution Agent reads and applies them to the subscribers.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-ha-18",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Describe the function of the MinLSN. Why is it the foundational metric for determining what log data must remain active, and how does it move during an active backup operation?",
+    "answer": "1. MinLSN: The oldest active log sequence number required for database recovery (the starting point of the active log).\n\n2. Boundary Metric: Defined by the minimum of: oldest active transaction LSN, oldest un-checkpointed dirty page LSN, or oldest replication/mirroring LSN.\n\n3. Backup Interaction: Active backups capture the MinLSN at backup start. The log backup must include all log records up to the maximum LSN written during the backup, updating the boot page MinLSN on completion.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-ha-19",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain Seeding in Availability Groups (Automatic vs. Manual). Detail the VDI (Virtual Device Interface) stream architecture and allocation mechanics used during automatic seeding over the network.",
+    "answer": "1. Automatic Seeding: Power BI/SQL Server creates a hidden VDI stream directly between the replicas over the network.\n\n2. Execution: The primary reads the database files, streams them via TCP to the secondary's VDI interface. The secondary receives the stream, allocates file structures, and writes pages directly, bypassing standard backup/restore media paths.\n\n3. Manual: Requires the administrator to manually execute `BACKUP DATABASE`, copy files, and run `RESTORE DATABASE ... WITH NORECOVERY` before joining the AG.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-ha-20",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "How does SQL Server handle Cluster Quorum Loss? What are the internal safety commands required to force a database online (ALTER DATABASE ... SET HADR FORCE_CLUSTER_ALLOW_DATA_LOSS) and what are the structural risks involved?",
+    "answer": "1. Quorum Loss: If the WSFC cluster loses its witness and voting nodes, it goes offline, forcing the SQL Server AG listener offline.\n\n2. Force Command: Run `ALTER DATABASE [DB] SET HADR FORCE_CLUSTER_ALLOW_DATA_LOSS` on the remaining replica.\n\n3. Risks: Forces the replica to take ownership despite missing split-brain updates. If a partition of data was written to the old principal but not hardened, it is permanently deleted, risking database inconsistencies.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-memoltp-1",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the architectural design of In-Memory OLTP (Hekaton). How does it achieve lock-free and latch-free operations using MVCC (Multi-Version Concurrency Control) at the memory layer?",
+    "answer": "1. Lock-free Design: In-Memory OLTP does not use traditional page structures, buffer pools, or lock managers. Records are stored as data rows allocated directly in physical memory, linked by index pointers.\n\n2. MVCC Mechanics: Rows are immutable. Updates are split into a logical delete (setting End-XID) and a physical insert (setting Begin-XID). Multiple versions of a row exist simultaneously.\n\n3. Latch-free Indexes: Uses lock-free index structures (Bw-Trees and Hash indexes) that coordinate updates using atomic CPU compare-and-swap (CAS) instructions, avoiding latch delays.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-2",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain the structural implementation of Memory-Optimized Indexes (Hash Indexes vs. Non-Clustered Indexes). How do bucket counts affect hash collisions, and how do delta-tree pointers function?",
+    "answer": "1. Hash Indexes: Optimized for point lookups. Consists of a bucket array. Each bucket holds a pointer to a row chain. (2) Bucket Count tuning: Must set bucket count to 1x-2x the number of unique index keys. If set too low, hash collisions occur (multiple keys in one bucket), forcing long chains and slow scans.\n\n3. Non-Clustered Indexes (Bw-Trees): Optimized for range scans. Uses a latch-free Bw-Tree that updates nodes by appending delta pages, linking node page offsets via a mapping table updated using CAS instructions.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-3",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the compile lifecycle of a Natively Compiled Stored Procedure. What happens when it is translated into C code and compiled into a DLL? How does it interface with the SQL Server engine?",
+    "answer": "1. Native compilation: When you create a natively compiled procedure, the engine translates the T-SQL logic into C code.\n\n2. DLL Compilation: The C code is compiled into a machine-code DLL using the local C compiler. The DLL is loaded into the SQL Server process space.\n\n3. Execution: When called, the DLL runs directly on the CPU, executing query statements without query optimizer or interpreter overhead, achieving sub-microsecond execution speeds.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-4",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain the internal structure of Row Storage in Memory-Optimized Tables. How are the Begin-XID and End-XID timestamps used to validate row visibility without locks?",
+    "answer": "1. Row Header: Contains 8-byte Begin-XID (transaction ID or timestamp when created) and 8-byte End-XID (transaction ID when deleted or infinity).\n\n2. Row Visibility: When transaction T reads, it compares its own start timestamp ($T_{start}$) against the row header: a row is visible if `Begin-XID <= T_start` AND `End-XID > T_start`.\n\n3. Concurrency: Multiple transactions read different versions of the row based on this logic, bypassing lock managers entirely.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-5",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "What is a Validation Phase Failure in In-Memory OLTP transactions? Detail the conflicts that cause error 41302 (Write-Write conflict) and error 41301 (Serializable validation conflict).",
+    "answer": "1. Validation Phase: In-Memory OLTP uses optimistic concurrency. Transactions execute without locks, and validate conflicts at commit time.\n\n2. Write-Write Conflict (Error 41302): Occurs if transaction A updates a row that was already updated by transaction B after A started, forcing A to abort.\n\n3. Serializable Validation Conflict (Error 41301): Under serializable isolation, validation checks if rows read during execution were modified by concurrent transactions. If yes, it aborts to prevent phantom reads.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-6",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain the architecture of Storage for Memory-Optimized Tables. How do Checkpoint and Delta file pairs (CFPs) log data to disk asynchronously, and how does the merge agent consolidate them?",
+    "answer": "1. CFP Architecture: In-Memory OLTP logs data to disk using Checkpoint File Pairs (Data and Delta files).\n\n2. Data File: Stores inserted rows sequentially. (3) Delta File: Stores deleted row IDs.\n\n4. Execution: Written asynchronously by background checkpoint threads. The Merge Agent consolidates older CFP files, removing rows marked deleted in delta files and merging active data into new CFP files to optimize disk storage space.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-7",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the internal structure of a Clustered Columnstore Index (CCI). Detail the components: Rowgroups (Compressed vs. Delta Store), Column Segments, Dictionary Storage, and Deleted Rows Bitmaps.",
+    "answer": "1. CCI Structure: Splits tables into horizontal rowgroups (up to 1,048,576 rows) and vertical column segments.\n\n2. Rowgroups: (a) Compressed: Primary read-optimized data segments. (b) Delta Store: A temporary B-Tree heap that caches incoming rows before compression.\n\n3. Column Segments: Individual files containing compressed data for a single column.\n\n4. Metadata: Uses a Dictionary to store repeating strings, and a Deleted Rows Bitmap to logically delete rows from compressed segments.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-8",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "How does Columnstore Segment Elimination work at query execution time? Explain how the metadata layer tracks minimum and maximum values for each segment to bypass scanning.",
+    "answer": "1. Segment Elimination: When a query scans a columnstore index, it checks segment metadata.\n\n2. Metadata boundaries: The engine records the `Min` and `Max` values of data stored inside each column segment.\n\n3. Scan pruning: If the query predicate (e.g., `WHERE year = 2024`) does not overlap with the segment's Min/Max range (e.g., Min: 2018, Max: 2022), the engine prunes the segment, skipping page reads entirely, maximizing query speeds.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-memoltp-9",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "What is the function of the Tuple Mover process in Columnstore indexes? What are the exact conditions (e.g., row count thresholds, closed states) that cause a delta store to transition into a compressed rowgroup?",
+    "answer": "1. Tuple Mover: A background thread that checks for delta store rowgroups ready for compression.\n\n2. Triggers: (a) Row count reaches 1,048,576. (b) The delta store is marked as CLOSED (cannot accept new inserts). (c) Or the administrator runs `ALTER INDEX ... REBUILD`.\n\n3. Transition: The Tuple Mover reads the closed delta store, applies VertiPaq compression algorithms, creates column segments, and drops the B-Tree delta store, transferring data to compressed rowgroups.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-10",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain Batch Mode Execution over Columnstore Indexes. How does processing data in vectors of 900-1024 rows alter CPU L1/L2 cache utilization compared to standard row-by-row iteration?",
+    "answer": "1. Vectorized Execution: Batch mode processes blocks of data (vectors of 900 to 1024 rows) in a single CPU instruction instead of row-by-row.\n\n2. Cache Utilization: Vectorization stores data arrays directly in the CPU L1/L2 data cache lines, bypassing memory buses. This minimizes CPU instruction cycle waits and improves aggregation speeds by up to 10x-100x compared to Row Mode.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-11",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the internal layout of a Columnstore Delta Store. Why is it structured as a traditional B-Tree heap combination, and how does it handle high-velocity singleton inserts?",
+    "answer": "1. Delta Store Structure: Structured as a clustered B-Tree index. This allows it to handle single-row insert operations (singleton inserts) using traditional locks and page splits.\n\n2. High-velocity inserts: Incoming single inserts write to the delta store. Once it accumulates enough rows, it closes and is compressed. This isolates high-frequency write latency from the read-optimized compressed column segments.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-12",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "What happens during a Delete and Update Operation on a Columnstore Index? Explain why deletes are logical operations (via a delete bitmap) and updates are split into a delete plus an insert.",
+    "answer": "1. Deletes: Deleting rows in compressed segments is a logical operation. The engine records the row ID inside a hidden B-Tree table called the Deleted Rows Bitmap. Scans check this bitmap to exclude rows.\n\n2. Updates: Updates are split: (a) The engine inserts a delete record to the Deleted Rows Bitmap for the old row version. (b) It inserts the updated row as a new record into the delta store, optimizing write speeds.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-13",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain the internal memory governance for Columnstore Compression. What calculations determine the memory grant required to compress a 1,048,576-row group using VertiPaq compression?",
+    "answer": "1. Memory Grant Calculation: The engine estimates memory based on column count, average column width, and dictionary sizes. (2) Limit check: The grant must accommodate sorting row data and building dictionaries for all columns in the rowgroup. If the memory grant is constrained by the resource governor, SQL Server will compress a smaller rowgroup size (e.g., 200K rows), reducing compression density.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-14",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "How does In-Memory OLTP handle Garbage Collection of old row versions? Detail how the system tracks the oldest active transaction timestamp to reclaim memory without blocking active workers.",
+    "answer": "1. Active Transaction Epoch: SQL Server tracks the oldest active transaction start timestamp.\n\n2. GC Sweep: As transactions commit, they generate old row versions. The garbage collection thread monitors rows where the End-XID is older than the oldest active transaction timestamp.\n\n3. Reclaiming: The GC thread detaches these obsolete row versions from indexes and deallocates the memory slots, preventing memory bloat without blocking active worker threads.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-15",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the synchronization mechanics between In-Memory tables and an AlwaysOn Availability Group Secondary. How are log records from a memory-optimized system streamlined over the wire?",
+    "answer": "1. Log Optimization: In-Memory tables do not log page structures; they log transaction commands (insert/delete values).\n\n2. Synchronization: The primary streams these optimized transaction log records to the secondary. The secondary's redo thread reads the commands and updates its in-memory tables directly. Redo threads run concurrently without lock conflicts, maintaining low synchronization lag.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-memoltp-16",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "What is Non-Durable Table configuration (DURABILITY = SCHEMA_ONLY) in Hekaton? Explain the complete bypass of the transaction log and disk subsystems and how recovery operates post-restart.",
+    "answer": "1. SCHEMA_ONLY Durability: Configures the table structure to persist, but data is completely transient.\n\n2. Log Bypass: Inserting or modifying rows does not write to the transaction log, and CFP files are never written to disk, achieving extreme insert speeds.\n\n3. Recovery: During database startup, SQL Server recreates the table schema in memory. The table is brought online as empty (zero rows), bypassing crash recovery loops entirely.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-memoltp-17",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "How does the Query Optimizer evaluate Hybrids of Disk-Based and Memory-Optimized tables within a single execution plan? Explain the serialization boundaries and transaction bridges.",
+    "answer": "1. Hybrid Querying: The query optimizer builds a plan containing both disk-based operators (B-Tree index seek) and memory-optimized operators.\n\n2. Transaction Bridge: Interfaced via the execution engine. Data from memory tables is serialized and streamed to standard query operators. The optimizer must align isolation levels (e.g., mapping SNAPSHOT to Read Committed) using transaction bridges.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-memoltp-18",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain Columnstore Trickle Insert Optimization. How does the engine route rows into multiple delta stores simultaneously to avoid allocation locks?",
+    "answer": "1. Trickle Inserts: Singleton inserts route to the active delta store rowgroup.\n\n2. Contention lock: If many threads insert simultaneously, a lock bottleneck occurs on the delta store B-Tree.\n\n3. Optimization: The engine automatically provisions multiple open delta stores (up to 10). It distributes incoming inserts randomly across these delta stores, eliminating allocation contention locks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-memoltp-19",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "What is the physical structural difference between Global Dictionaries and Local Dictionaries inside a compressed columnstore segment? How does data cardinality control this distribution?",
+    "answer": "1. Local Dictionary: Built per column segment (rowgroup scope). Stores unique values present in that segment, saving dictionary space.\n\n2. Global Dictionary: Built per table column (cross-segment scope). Stores unique values shared across all rowgroups. (3) Cardinality Control: The engine analyzes cardinality during compression: low cardinality attributes use local dictionaries; high dispersion attributes use global dictionaries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-memoltp-20",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Detail the limitations of Schema Updates on Memory-Optimized Tables. Why does changing a data type require a structural reallocation of the entire table in memory, and how is this executed internally?",
+    "answer": "1. Type Modification: Memory tables are stored as contiguous memory segments mapped to C-struct pointers. Changing a type alters structure sizing.\n\n2. Execution: SQL Server allocates a new table structure in memory. It scans the old table, copy-converting row structures to the new memory segment. It rebuilds all index pointers and updates metadata, requiring significant RAM capacity during execution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-tsql-1",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the internal execution mechanics of a Recursive Common Table Expression (CTE). How does SQL Server use worktables in TempDB to track the anchor and recursive members, and what causes a query to fail with maximum recursion limits?",
+    "answer": "1. CTE Execution: SQL Server executes the anchor member first, writing the resultset to a TempDB worktable.\n\n2. Recursive Loop: The engine iterates, reading rows from the worktable as input to the recursive member, writing new matches back. It continues until the query returns no rows or hits limits.\n\n3. Failure: If the loop runs beyond the maximum recursion limit (configured using `MAXRECURSION`), the engine cancels the query and rolls back the transaction to prevent infinite loops and TempDB disk exhaustion.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-2",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Describe the optimizer optimization known as Window Spool. How does the engine maintain state for window functions (ROW_NUMBER(), LEAD(), LAG()) in memory, and under what conditions will it write data to a TempDB worktable?",
+    "answer": "1. Window Spool: A temporary buffer operator that caches rows matching a window partition (`PARTITION BY`).\n\n2. State Maintenance: If the window function only reads contiguous records (e.g., `ROW_NUMBER()`), the spool remains in memory. (3) TempDB Spill: If the window partition is large or functions require random access (e.g., `LEAD`/`LAG` accessing distant rows), the engine spools rows to a TempDB worktable, adding write latency.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-3",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the performance and execution plan differences between CROSS APPLY / OUTER APPLY and traditional Inner/Left Joins. How does the optimizer utilize correlated evaluations to optimize apply operators?",
+    "answer": "1. Joins vs Apply: Traditional joins merge static tables. `CROSS APPLY` evaluates a table-valued function or subquery for each row of the outer table.\n\n2. Correlated Evaluation: The optimizer can push parameters from the outer table into the inner query (nested loops). If the inner query is indexed, this results in seeks, which is highly efficient. In contrast, standard joins may force full scans before filtering.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-4",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Detail how SQL Server implements Graph Database Architectures (Node and Edge tables). What are the internal hidden columns generated ($node_id, $edge_id, $from_id, $to_id), and how are the indexes built on them structured?",
+    "answer": "1. Node Table: Generates a hidden column `$node_id` containing a JSON string identifying the node. A unique index is automatically built on `$node_id`.\n\n2. Edge Table: Generates hidden columns `$edge_id`, `$from_id` (source node ID), and `$to_id` (destination node ID).\n\n3. Indexes: Built as unique clustered indexes on `$edge_id` and non-clustered indexes on `$from_id` and `$to_id` to speed up path traversal queries.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-5",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the execution engine architecture behind the MATCH Clause in graph queries. How does the optimizer transform edge connections into relational join trees?",
+    "answer": "1. MATCH Clause: Translates graph path syntax (e.g., `Node1 -(Edge)-> Node2`) into relational SQL.\n\n2. Join Trees: The optimizer converts node and edge connections into standard table joins: `Node1 JOIN Edge ON Node1.$node_id = Edge.$from_id JOIN Node2 ON Edge.$to_id = Node2.$node_id`. It cost-evaluates join orders using hash or merge joins, optimizing traversing paths.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-6",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "What is the internal operational difference between INSTEAD OF Triggers and AFTER Triggers? How do the virtual Inserted and Deleted tables map to memory or transaction log structures in each case?",
+    "answer": "1. INSTEAD OF Triggers: Executes *before* the DML instruction. The actual insert/update is bypassed. The `inserted`/`deleted` tables are built as memory worktables from the execution context. (2) AFTER Triggers: Executes *after* the DML commits to the database page buffers. The `inserted`/`deleted` tables read directly from the transaction log buffers and database cache, tracking physical page changes.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-7",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the Output Clause Performance Anomaly. Why can using an OUTPUT clause into a table variable or permanent table restrict parallel execution zones, and how does it interact with identity keys?",
+    "answer": "1. Output Anomaly: The `OUTPUT` clause streams modified rows. If outputting to a table variable, SQL Server cannot compile a parallel execution plan for the DML statement.\n\n2. Serial Execution: The engine forces serial plan execution (MAXDOP 1) to ensure transactional ordering of records, which can cause significant latency on large parallel inserts that utilize identity keys.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-8",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Describe the performance overhead of Scalar User-Defined Functions (UDFs) before SQL Server 2019. Detail the exact mechanics of iterative execution contexts, context switching, and row-by-row optimization barriers.",
+    "answer": "1. UDF Overhead: Pre-2019, scalar UDFs executed row-by-row. (2) Context Switching: For every row, the execution engine switches from the SQL query context to the UDF runtime environment, saturating CPU registers.\n\n3. Optimization Barrier: The optimizer treats UDFs as black boxes, preventing index seeks and query parallelisms, causing slow executions. SQL Server 2019+ resolves this by inlining UDFs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-tsql-9",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the implementation of Temporal Tables (SYSTEM_VERSIONING). How does the engine ensure transactional consistency when splitting writes between the current table and the history table?",
+    "answer": "1. Temporal Tables: Maintain a current table and a history table. (2) Consistent Write: When a row is updated or deleted, the engine automatically copies the old version to the history table in a single transaction. (3) Timestamp alignment: The engine sets the `SysStartTime` and `SysEndTime` columns using the active transaction's start timestamp, ensuring audit consistency.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-10",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Describe the inner workings of Dynamic Data Masking (DDM). How does the engine apply masking functions to the output stream during query execution, and why is DDM not a secure solution for underlying data encryption?",
+    "answer": "1. DDM Mechanics: Applies masks (e.g., hiding credit card numbers) to column values during the final query output phase.\n\n2. Data Security: The underlying database pages store data in plain text. (3) Security Risk: Masking only affects presentation. Users with query access can construct search queries (e.g., `WHERE salary > 50000`) and deduce values by analyzing query response counts, making DDM bypassable.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-11",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "What is the structural representation of JSON and XML Data Types inside SQL Server? Contrast the text-based storage of JSON (stored as NVARCHAR) with the tokenized parsing of native XML data types.",
+    "answer": "1. JSON Storage: SQL Server stores JSON as standard text strings (`NVARCHAR`). The database engine parses JSON at runtime using helper functions (`JSON_VALUE`, `OPENJSON`).\n\n2. XML Storage: Stores XML as a tokenized binary blob in database files. The engine pre-parses XML structures, allowing faster queries using XML indexes and XPath queries, but consumes more storage space.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-12",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the optimization of MERGE statements. What are the historical execution plan traps, concurrency bugs, and unique locking mechanisms associated with a multi-branch MERGE operator?",
+    "answer": "1. MERGE Operator: Combines insert, update, and delete branches into a single statement.\n\n2. Execution Traps: Generates complex plans with multiple join and filter operators. Prone to concurrency bugs (e.g., primary key violations if multiple threads match the same key).\n\n3. Locking: Acquires strict locks on both target and source tables. Always use the `HOLDLOCK` hint to prevent isolation leakage.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-13",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "How does SQL Server process Distributed Transactions via MSDTC? Explain the two-phase commit protocol (Prepare Phase and Commit/Abort Phase) and the tracking mechanisms used.",
+    "answer": "1. Prepare Phase: The coordinator (MSDTC) queries all participating database nodes. Each node writes a prepare log record and locks resources, replying with success confirmation.\n\n2. Commit Phase: Once all nodes report ready, the coordinator writes a commit log record and instructs all nodes to commit changes. This guarantees atomicity but blocks resources if communication fails.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-14",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Describe the physical execution differences between UNION and UNION ALL. How does the presence of duplicates affect the memory allocation for sort operators or distinct hash matches?",
+    "answer": "1. UNION: Combines datasets and eliminates duplicates. It requires allocating a Sort or Hash Match (Distinct) operator in memory to identify unique rows.\n\n2. UNION ALL: Combines datasets directly without checking for duplicates. Bypasses sorting and hashing entirely, executing with zero memory overhead and maximum data streaming throughput.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-15",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain the implementation of Row-Level Security (RLS). How does the engine inject security predicate functions into user queries, and what is the impact on plan reuse and index optimization?",
+    "answer": "1. Predicate Injection: RLS uses security policies to inject filter predicates (inline table-valued functions) into user queries at compile time.\n\n2. Index Optimization: Injected filters behave as standard `WHERE` clauses, utilizing indexes.\n\n3. Plan Reuse: Can reduce plan reuse because separate users compile different query plans based on their security roles and parameters.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-tsql-16",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Describe the compilation and caching behavior of Table-Valued Parameters (TVPs). How do statistics track variations in row count when a TVP is passed down through nested procedure calls?",
+    "answer": "1. TVP Caching: TVPs behave as table variables. They do not have statistics. (2) Cardinality: SQL Server assumes a cardinality of 1 row during compilation. If a TVP contains thousands of rows, this leads to bad memory grants and execution bottlenecks. Resolve by compiling procedures using `WITH RECOMPILE` to capture actual row counts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-tsql-17",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "What is the internal execution mechanism of Partitioned Views? How does the engine use CHECK constraints on underlying tables to implement compile-time startup filters?",
+    "answer": "1. Partitioned View: Combines multiple tables via `UNION ALL`.\n\n2. CHECK Constraints: Each table must have a CHECK constraint defining the key range (e.g., `CHECK (Year = 2024)`).\n\n3. Startup Filters: During compilation, the optimizer analyzes the check constraints. If a query requests data for a specific year, the engine prunes the other tables, skipping execution completely.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-tsql-18",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Explain how SQL Server optimizes CASE WHEN expressions. Under what specific conditions will the engine evaluate short-circuiting, and when does it fail, causing runtime errors like division-by-zero despite preventive predicates?",
+    "answer": "1. Short-circuiting: The optimizer compiles CASE WHEN expressions to evaluate sequentially, skipping later branches once a match is found.\n\n2. Failure: If the optimizer reorganizes the physical execution tree (e.g., pushing arithmetic checks to the scan layer), it can evaluate expressions before verifying CASE conditions, causing division-by-zero errors.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-tsql-19",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Detail how the FOR XML PATH string aggregation trick operates at the engine level compared to the modern STRING_AGG function. Contrast their memory consumption and sorting behaviors.",
+    "answer": "1. FOR XML PATH: Uses the XML serialization engine to concatenate strings. Heavy memory overhead due to XML tokenization and character escaping.\n\n2. STRING_AGG (Optimal): A built-in aggregate function. Evaluates string concatenation in-memory using simple array builders, utilizing sort operators directly, reducing memory usage and CPU cycles by up to 5x.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-tsql-20",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "Describe how SQL Server manages the state machine for Server Cursors (Static, Dynamic, Keyset, Forward-Only). How do keyset cursors construct their temporary membership keys in TempDB?",
+    "answer": "1. Keyset Cursors: Build a keyset (unique identifiers) of all rows matching the query, storing it in a TempDB worktable. (2) Dynamic Cursors: Do not build keysets; they read pages dynamically based on current index positions. Keyset cursors ensure row updates are visible but consume substantial TempDB resources.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-sec-1",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain the cryptographic hierarchy of Transparent Data Encryption (TDE). Detail the chain from the Windows Data Protection API (DPAPI), through the Master Key, Certificate, and Database Encryption Key (DEK). What are the physical encryption steps taken on a page prior to disk I/O?",
+    "answer": "1. Cryptographic Chain: The OS DPAPI protects the Service Master Key (SMK). SMK protects the Database Master Key (DMK). DMK protects the TDE Certificate. The Certificate encrypts the Database Encryption Key (DEK) stored in the database boot page.\n\n2. Physical Encryption: When a page is flushed from the buffer pool to disk, the I/O thread encrypts the page bytes using the DEK. During page reads, the engine decrypts the page before placing it in the buffer cache.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-2",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Describe the architecture of Always Encrypted (Deterministic vs. Randomized). How does the client driver coordinate with the key store (e.g., Azure Key Vault) to parse parameter values before transmitting them to the SQL Server instance?",
+    "answer": "1. Client Driver: Always Encrypted encryption/decryption occurs inside the client driver (e.g., ADO.NET). The database engine never sees plain text. (2) Key Store: Driver contacts Azure Key Vault to retrieve the Column Encryption Key (CEK).\n\n3. Deterministic vs Randomized: Deterministic always produces the same encrypted value for a key, allowing index seeks. Randomized produces different values, enhancing security but blocking indexing.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-3",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "What is the internal operational difference between Database Auditing and Extended Events (XEvents) tracking? Compare their performance overhead and lock duration metrics on active worker threads.",
+    "answer": "1. Database Auditing: Relies on the database audit engine to record actions. Evaluates rules synchronously, adding minor locking overhead to worker threads.\n\n2. XEvents: Uses the SQLOS events engine. Evaluates events asynchronously. Worker threads write events to a memory buffer and resume execution immediately, minimizing thread locking and operational overhead.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-4",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain SQL Server Service Broker (SSB) routing and delivery internals. How does the transmission queue in msdb safely stage messages, and how are endpoints secured via asymmetric encryption certificates?",
+    "answer": "1. Transmission Queue: SSB stages outbound messages in the `msdb.sys.sysxmitqueue` table. Message delivery is transactional. (2) Endpoints: SSB endpoints listen on custom ports. Connection handshakes use asymmetric certificates to encrypt messages, validating identities before routing commands to service queues.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-5",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Detail how to identify and diagnose SOS_SCHEDULER_YIELD waits. What is the exact internal lifecycle of a worker thread yielding its quantum slice on a SQLOS scheduler?",
+    "answer": "1. Quantum: A SQLOS thread runs on a scheduler for up to 4ms (quantum).\n\n2. Yielding: If the thread does not yield for I/O but finishes its 4ms slice, it yields voluntarly. The worker transitions from RUNNING to RUNNABLE, entering the runnable queue.\n\n3. Diagnostic: Track `SOS_SCHEDULER_YIELD` waits in `sys.dm_os_wait_stats`. High waits indicate CPU pressure and long runnable queues.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-6",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain the operational mechanics of the Query Store Plan Forcing Architecture. What system tables or memory regions track plan compatibility, and how does the engine alert a failure to force via execution events?",
+    "answer": "1. Plan Forcing: Compares query hash values in Query Store tables (`sys.query_store_plan`).\n\n2. Metadata: Stores forced plan XML. During compilation, the engine attempts to apply this XML.\n\n3. Failure: If the forced plan cannot compile, the optimizer falls back to full compilation and logs warning event `ForcedPlanFailed` in Extended Events.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-7",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Describe the difference between sys.dm_exec_query_stats, sys.dm_exec_procedure_stats, and sys.dm_exec_trigger_stats. How does the engine track metrics for individual statement plans inside a multi-statement stored procedure?",
+    "answer": "1. Query Stats: Tracks execution metrics (CPU, duration, reads) for individual statement query plans.\n\n2. Procedure/Trigger Stats: Tracks execution metrics at the object level (entire procedure or trigger execution).\n\n3. Statement tracking: SQL Server uses offset pointers (statement start and end offsets) to link individual statement query plans inside stored procedures to their stats records.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-sec-8",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "How does SQL Server handle Metadata Corruptions inside system tables? What are the diagnostic steps to safely locate structural defects using DBCC CHECKCATALOG?",
+    "answer": "1. Metadata Corruption: Occurs if system catalog tables (e.g., `sys.sysschobjs`) have mismatched records. (2) Diagnostic: Run `DBCC CHECKCATALOG` to verify consistency. If errors are found, restore the database from a clean backup, as manual updates to system catalog tables are blocked by the engine.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-9",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain the implementation of Extensible Key Management (EKM). How does the SQL Server crypto-subsystem hand off cryptographic operations to hardware security modules (HSM) without introducing processor thread hangs?",
+    "answer": "1. EKM: Integrates SQL Server encryption with external HSMs. (2) Hand-off: Uses the Cryptographic Provider API. The crypto-subsystem delegates encryption/decryption keys to the HSM driver. The driver executes key validation on the HSM appliance. SQLOS manages async worker threads to prevent provider delays from hanging engine schedulers.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-10",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "What is the exact execution footprint of a Heavy Profiler Trace versus an Equivalent Extended Events Session? Explain why the synchronous architecture of Profiler causes thread pool exhaustion under heavy transaction loads.",
+    "answer": "1. Profiler: Runs synchronously. When an event fires, the worker thread must write to the profiler buffer and wait for the tracer to process it, causing thread bottlenecks.\n\n2. Extended Events: Runs asynchronously. Worker threads write events to a ring buffer in milliseconds and continue execution, preventing thread exhaustion under heavy workloads.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-11",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Describe the memory tracking of Row-Level Security (RLS) Filter Predicates. How do security context switches interact with execution context caching?",
+    "answer": "1. Security Context: RLS evaluates security functions under the user's execution context. (2) Cache interaction: Security context switches can cause plan cache fragmentation, as different user identities generate separate filter paths. To optimize, use session parameters inside security functions to maintain a single compiled plan.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-12",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain the internal telemetry behind Intelligent Query Processing (IQP). How does the engine store feedback metrics (Memory Grant Feedback, Cardinality Estimation Feedback) inside the Query Store?",
+    "answer": "1. IQP Feedback: The execution engine tracks memory grant efficiency. If a query spills or over-allocates, the engine records feedback.\n\n2. Query Store: Stores feedback metrics (CE Feedback, Grant Feedback) in system tables. During re-compilation, the optimizer reads this feedback, adjusting memory allocation and plan choices dynamically.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-13",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "What are Spinlock Collisions on LOCK_HASH? What diagnostic flags or DMVs do you analyze to pinpoint hash slot distribution problems in the lock manager?",
+    "answer": "1. LOCK_HASH Spinlock: Lock manager uses hash slots to track lock resources. Under high parallel concurrency, multiple threads compete for the same hash slot spinlock.\n\n2. Diagnostic: Query `sys.dm_os_spinlock_stats` for `LOCK_HASH` collisions. High collisions indicate hash bucket contention, remediated by trace flags or partitioning tables.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-14",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Describe the architectural workflow of Contained Databases. How does user authentication bypass instance-level logins, and what are the security risks associated with collation mismatches against tempdb?",
+    "answer": "1. Contained Database: Stores database settings and user passwords directly in the database file metadata, bypassing instance logins.\n\n2. Security risks: Resolving database names dynamically can fail if the database collation differs from TempDB's default collation, causing temp table join errors during user execution.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-sec-15",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain how SQL Server processes Asymmetric Keys and Digital Signatures on stored procedures. How does code signing eliminate the requirement to grant direct SELECT/INSERT permissions to underlying base schemas?",
+    "answer": "1. Code Signing: Sign the stored procedure using an Asymmetric Key or Certificate. Create a user mapped to that key, granting it permissions on the base tables.\n\n2. Execution: When a user calls the signed procedure, the engine validates the signature, executing database operations under the key-user's credentials, securing data access without direct table grants.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-sec-16",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "What is the function of the Dedicated Administrator Connection (DAC) scheduler? Explain how SQLOS reserves memory and scheduler capacity to allow administrative access when standard worker threads are completely exhausted.",
+    "answer": "1. DAC: A dedicated connection port for administrators. (2) Resource reservation: SQLOS assigns a dedicated scheduler thread and pre-allocates memory for the DAC session. When standard schedulers are blocked, the DAC scheduler remains active, allowing administrators to kill buggy SPIDs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-sec-17",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Describe the internal layout of Extended Events (XEvents) Ring Buffer Targets. Why can massive event volumes cause truncation or packet dropping, and how do you configure memory buffers to mitigate this?",
+    "answer": "1. Ring Buffer: A memory-resident XML target. Under high volumes, the buffer fills up. If the buffer is full, newer events overwrite old ones (truncation) or are discarded.\n\n2. Mitigation: Configure the `MAX_MEMORY` allocation and use file targets (`.xel`) to stream events directly to disk, avoiding memory constraints.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-sec-18",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Explain System Page Latching Contention on the Metadata Catalog. What happens to query execution structures when hundreds of parallel queries concurrently attempt to parse metadata for a single database object?",
+    "answer": "1. Metadata Contention: Multiple queries compiling simultaneously latch system catalog pages (e.g., `sys.sysschobjs`).\n\n2. Latch block: Threads wait under `PAGELATCH_SH` or `PAGELATCH_EX` waits. Resolve by enabling plan caching and avoiding frequent schema modifications or temporary table compilations under concurrency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-sec-19",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "Describe the internal structural flags analyzed by DBCC PAGE. What are the security risks of allowing non-sysadmin users access to raw database pages via this diagnostic tool?",
+    "answer": "1. DBCC PAGE: Analyzes page structures (headers, slots, values). (2) Flags: Track page allocations and record byte offsets. (3) Security Risk: Raw page reads bypass RLS, OLS, and column-level encryption, exposing sensitive data to unauthorized users. DAC or sysadmin permissions are strictly required.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-sec-20",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "How does SQL Server track Deadlocks via the system_health Extended Event session? What are the limits on history retention, and how does the engine write the graph payload into memory targets?",
+    "answer": "1. system_health: A default Extended Event session running in the background. (2) Deadlock Capture: Captures the XML deadlock graph payload dynamically when a deadlock occurs.\n\n3. Retention: Retains events in a ring buffer and roll files (max 20MB). The XML graph details victim SPIDs, blocking queries, and lock resource descriptors.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-scale-1",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Describe the architectural limits of Partitioning in SQL Server. What happens to the query compiler when a query crosses thousands of partitioned boundaries, and how does the engine optimize partition alignment during parallel joins?",
+    "answer": "1. Partitioning limits: SQL Server supports up to 15,000 partitions per table. (2) Compiler impact: Querying many partitions forces the optimizer to evaluate metadata for each partition, causing compile time memory spikes.\n\n3. Parallel joins (Colocated joins): If two partitioned tables are joined on the partition key, the engine aligns partitions, executing joins in parallel across partition segments (colocated joins), bypassing massive shuffles.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-2",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain the performance and architectural differences between Distributed Queries using Linked Servers (OLEDB) and PolyBase Data Virtualization. How does PolyBase coordinate scale-out data movement across heterogeneous data sources?",
+    "answer": "1. Linked Servers: Execute queries sequentially via OLEDB. All remote records are downloaded locally before processing, saturating memory. (2) PolyBase: Coordinates scale-out queries. Pushes query logic to remote clusters (Hadoop/Synapse) using distributed query engines. It aggregates remote partitions, returning only the final summary, optimizing WAN bandwidth.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-3",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Detail the internal mechanics of a Distributed Transaction Coordinator (DTC) Timeout. What happens to an \"In-Doubt Transaction\" inside the SQL Server engine, and how do you manually resolve its state?",
+    "answer": "1. DTC Timeout: Occurs if a node fails to reply during a distributed commit. The transaction enters an 'in-doubt' state.\n\n2. Internal behavior: SQL Server locks the affected data pages, keeping resources blocked.\n\n3. Resolution: Monitor using `sys.dm_tran_active_transactions`. Resolve manually by executing `KILL [TransactionID] WITH COMMIT` or `ROLLBACK` to release page locks.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-4",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain how Service Broker Conversations scale across independent SQL Server instances. What are the internal queue locking protocols used when multiple activation threads read from the same service queue?",
+    "answer": "1. Conversation Group: SSB uses conversation group locks. When a thread reads a queue, it locks the conversation group ID.\n\n2. Queue Locking: Multiple activation threads can read the same queue in parallel, but the engine locks messages sharing a group ID to a single thread, preventing concurrency conflicts and maintaining sequence order.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-5",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Describe the operational architecture of Stretched Databases. How does the remote data migration engine stream cold tables to Azure SQL Database without compromising transactional query consistency on local hot tables?",
+    "answer": "1. Stretched DB: Splits tables into local hot data and remote cold data in Azure. (2) Execution: A background migration thread copies cold rows to Azure. When a user queries, the engine translates the query into a local scan and a remote query, combining results in-memory, ensuring transactional consistency.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-6",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain the internal implementation of Change Tracking (CT). How does it differ from Change Data Capture (CDC) regarding its transactional log footprint, internal tracking tables, and sync table cleanup routines?",
+    "answer": "1. Change Tracking (CT): Lightweight. Tracks *only* that a row changed, storing primary keys. Incur minimal log footprint. Uses internal tracking tables updated synchronously with transactions. (2) CDC: Heavy log footprint. Stores actual changed data values. Cleanup is asynchronous via agent history jobs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-7",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "What is the Max Degree of Parallelism (MAXDOP) Skew anomaly? Explain how uneven data distributions across parallel threads can cause a query to become throttled by a single slow thread, and detail the wait types involved.",
+    "answer": "1. Parallel Skew: Occurs if data is unevenly distributed across threads (e.g., Thread 1 gets 10 rows, Thread 2 gets 10M rows).\n\n2. Throttling: The query duration matches the slowest thread. (3) Wait types: Parallel threads wait under `CXPACKET` or `CXCONSUMER` wait types. Monitor `sys.dm_os_waiting_tasks` to identify thread data distribution skew.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-scale-8",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Describe the internal behavior of Bulked Inserts over an Encrypted Table Schema. How does column-level encryption affect the data throughput of bulk copy program (BCP) applications?",
+    "answer": "1. Encrypted Bulk Insert: If columns are encrypted using Always Encrypted, BCP cannot decrypt them. The source application must encrypt data columns before executing BCP.\n\n2. Throughput: Since data is already encrypted, SQL Server performs direct page writes. However, the client-side encryption step increases CPU cycles, reducing overall BCP load rates.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-9",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain the implementation of Replication Merge Agents. How do they resolve schema modifications, constraint violations, and conflicting synchronization loops across multi-master topologies?",
+    "answer": "1. Merge Agent: Coordinates changes in multi-master replication. (2) Conflicts: Uses priority-based rules or custom resolvers (defined in metadata). (3) Synchronization: Tracks changes using rowguid columns. Triggers update tracking tables, preventing loops by validating originator IDs before writing updates.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-10",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "What is the Thread Pool Exhaustion crisis (THREADPOOL wait type)? Calculate the default worker thread maximums for modern architectures, and describe the precise cascade effect on client network connection requests.",
+    "answer": "1. Threadpool wait: Occurs if all worker threads are allocated. Threads wait under `THREADPOOL` waits.\n\n2. Thread count calculation: Default max workers = `512 + ((CPUs - 4) * 16)` for 64-bit systems. (3) Cascade: New connection requests are queued at the network port. If queues fill up, connections timeout, locking out administrators (remediated by using the DAC).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-11",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain how Soft-NUMA divides physical CPUs into logical schedulers. What are the internal memory and thread allocation benefits of configuring Soft-NUMA on large multi-core physical servers?",
+    "answer": "1. Soft-NUMA: Automatically divides physical CPUs into logical nodes at startup. (2) Schedulers: SQL Server maps schedulers to these logical nodes. (3) Benefits: Reduces the count of CPU cores sharing a single I/O thread pool, minimizing thread migration latency and optimizer lock contentions on large core servers.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-12",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Describe the performance traps of using Linked Servers with OpenQuery vs. Four-Part Naming Conventions. How does query execution planning differ when evaluating remote predicates?",
+    "answer": "1. Four-Part (e.g., `Server.Db.Schema.Table`): The optimizer compiles query steps locally, downloading remote tables before applying filters, causing slow execution. (2) OpenQuery (Optimal): Forces the query string to execute entirely on the remote server, sending only the filtered results back, saving network bandwidth.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-13",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain Parallelism Deadlocks (Intra-Query Deadlocks). How can a single query thread deadlock itself across different exchange operators, and what traces pinpoint this issue?",
+    "answer": "1. Intra-Query Deadlock: A parallel query deadlock where threads wait in loops. (2) Exchange deadlocks: Thread A holds a consumer buffer waiting for Thread B, which is blocked waiting for Thread A to release a resource grant. (3) Pinpointing: Analyze the XML deadlock graph looking for duplicate SPID nodes connected by exchange operators.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-14",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Describe the data synchronization framework of Peer-to-Peer Transactional Replication. How does the conflict detection agent utilize originator IDs to trace and drop loopback transactions?",
+    "answer": "1. Originator ID: Every transaction node has an ID. When a change writes, the ID is appended. (2) Loopback Check: When the transaction propagates back to the source node, the replication agent reads the originator ID. Since it matches the local node ID, the agent drops the transaction, preventing loops.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-scale-15",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain the internal memory allocation mechanics when parsing Massive JSON Payloads (e.g., payloads over 100MB) using OPENJSON inside a highly concurrent batch application.",
+    "answer": "1. JSON Parsing: `OPENJSON` parses text string JSON arrays in-memory. (2) Allocation: The engine must allocate contiguous workspace memory. Under concurrency, parsing massive JSON payloads causes memory grant exhaustion, triggering `RESOURCE_SEMAPHORE` waits and plan cache bottlenecks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-scale-16",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Detail how SQL Server coordinates with the Windows Volume Shadow Copy Service (VSS) during a snapshot backup. What are the internal freeze and thaw phase transitions of database transactions?",
+    "answer": "1. Freeze Phase: The SQL Writer service instructs SQL Server to freeze database writes. All active transactions are paused, and dirty pages are temporarily cached in memory. (2) Snapshot: The storage array takes a disk snapshot. (3) Thaw Phase: The writer thaw the database. Transactions resume page updates, completing the snapshot backup without database downtime.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-scale-17",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain the function of Async Network I/O waits. What is happening within the network stack, client driver buffers, and SQLOS schedulers when this wait type spikes?",
+    "answer": "1. Async Network I/O: Occurs when SQL Server is ready to send data but the client application is not reading it fast enough. (2) Mechanism: The network buffer fills up. The SQLOS thread yields, waiting under `ASYNC_NETWORK_IO` waits. Resolve by optimizing client processing loops or fetching smaller data chunks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-scale-18",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Describe the impact of Collation Transformations on distributed queries. Why can joining two tables across databases with different collations completely invalidate index seeks and trigger huge sort spills?",
+    "answer": "1. Collation conflict: Joining columns with different collations forces the engine to run runtime type conversions. (2) Conversion penalty: This invalidates index seeks, forcing full table scans. The engine must allocate sort operators in memory to align collation patterns, causing TempDB sort spills.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-scale-19",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "What is the internal architecture of Query Store Runtime Statistics Generation? How are execution metrics aggregated in memory buckets before being written to disk, and how does this affect instance stability under ultra-high-throughput ad-hoc workloads?",
+    "answer": "1. Statistics Buckets: Query Store caches execution statistics in memory buckets (15-minute intervals). (2) Flush: Background threads flush stats to system tables. (3) Stability: Under heavy ad-hoc workloads, compiling millions of unique queries causes bucket memory bloat, leading to database lock blocks during flushes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-scale-20",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain how the Query Optimizer implements Parameter Embedding Optimization via option hints. What are the internal risks to compilation times, plan cache growth, and CPU utilization under enterprise-scale processing conditions?",
+    "answer": "1. Parameter Embedding: Hints like `OPTION (RECOMPILE)` instruct the optimizer to inline parameters during compilation, building custom plans. (2) Risks: Substantially increases compile time and CPU usage. It disables plan cache reuse, causing plan cache bloat and saturating compilation threads under enterprise workloads.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "medium-sql-1",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Querying",
+    "difficulty": "EASY",
+    "question": "What is a Common Table Expression (CTE) and how does it differ from a temporary table?",
+    "answer": "A CTE (defined using the `WITH` clause) is a temporary named result set that exists only during the execution scope of a single SELECT, INSERT, UPDATE, or DELETE statement. Unlike temporary tables (`#table`), CTEs are not physically stored in tempdb, do not support indexing, and are generally used to simplify complex joins, improve readability, or write recursive queries."
+  },
+  {
+    "id": "medium-sql-2",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Querying",
+    "difficulty": "EASY",
+    "question": "Explain the difference between ROW_NUMBER(), RANK(), and DENSE_RANK().",
+    "answer": "All are window functions used to rank rows. `ROW_NUMBER()` assigns a unique sequential integer to each row regardless of duplicates. `RANK()` gives the same rank to identical values but leaves a gap in the sequence for the next rank (e.g., 1, 2, 2, 4). `DENSE_RANK()` gives the same rank to identical values without leaving gaps (e.g., 1, 2, 2, 3)."
+  },
+  {
+    "id": "medium-sql-3",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Querying",
+    "difficulty": "MEDIUM",
+    "question": "How do CROSS APPLY and OUTER APPLY differ from INNER JOIN and LEFT JOIN?",
+    "answer": "While JOINs combine two physical tables, `APPLY` operators invoke a table-valued function or subquery for each row of the outer table. `CROSS APPLY` acts like an INNER JOIN (removes outer rows if the function returns empty), while `OUTER APPLY` acts like a LEFT JOIN (keeps outer rows with NULLs if the function returns empty). They are essential when the subquery logic depends on columns from the outer table."
+  },
+  {
+    "id": "medium-sql-4",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Querying",
+    "difficulty": "MEDIUM",
+    "question": "What is the purpose of the PIVOT relational operator in SQL Server?",
+    "answer": "The `PIVOT` operator transforms rows into columns, turning unique values from one column in the input table into multiple output columns, while performing an aggregation (e.g., SUM or MAX) on another column. It is commonly used for generating cross-tabular reports."
+  },
+  {
+    "id": "medium-sql-5",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Querying",
+    "difficulty": "HARD",
+    "question": "Explain how the MERGE statement works in T-SQL.",
+    "answer": "The `MERGE` statement performs INSERT, UPDATE, or DELETE operations on a target table based on the results of a join with a source table. It allows you to synchronize two tables in a single statement using `WHEN MATCHED` (to update/delete) and `WHEN NOT MATCHED` (to insert) clauses."
+  },
+  {
+    "id": "medium-sql-6",
+    "category": "SQL SERVER",
+    "niche": "Indexing and Performance",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Clustered and a Non-Clustered index?",
+    "answer": "A Clustered Index determines the physical sorting order of the data pages in the table; therefore, a table can only have one clustered index (usually the primary key). A Non-Clustered Index contains a sorted list of index keys with pointers back to the physical data rows (or the clustered index key), meaning you can have multiple non-clustered indexes on a single table."
+  },
+  {
+    "id": "medium-sql-7",
+    "category": "SQL SERVER",
+    "niche": "Indexing and Performance",
+    "difficulty": "EASY",
+    "question": "What is a Covering Index?",
+    "answer": "A Covering Index is a non-clustered index that includes all the columns required by a specific query (in the SELECT, JOIN, and WHERE clauses). Because all necessary data is in the index structure, the SQL engine does not need to perform a costly 'Key Lookup' to the underlying clustered index/table data, significantly speeding up query execution."
+  },
+  {
+    "id": "medium-sql-8",
+    "category": "SQL SERVER",
+    "niche": "Indexing and Performance",
+    "difficulty": "MEDIUM",
+    "question": "Explain Index Fragmentation and how to resolve it.",
+    "answer": "Fragmentation occurs when the logical order of pages in an index doesn't match the physical order on disk, or when pages have excessive free space due to frequent INSERT/UPDATE/DELETE operations. It degrades read performance. It is resolved by performing an `ALTER INDEX REORGANIZE` (for light fragmentation, usually <30%) or `ALTER INDEX REBUILD` (for heavy fragmentation, >30%)."
+  },
+  {
+    "id": "medium-sql-9",
+    "category": "SQL SERVER",
+    "niche": "Indexing and Performance",
+    "difficulty": "MEDIUM",
+    "question": "What are Execution Plans, and how do you use them?",
+    "answer": "An Execution Plan is a graphical or XML representation of the steps the SQL Server Query Optimizer chose to execute a query. It shows operations like Index Seeks, Table Scans, and Hash Matches, along with cost percentages. DBAs use them to identify bottlenecks, such as missing indexes, implicit conversions, or suboptimal join strategies."
+  },
+  {
+    "id": "medium-sql-10",
+    "category": "SQL SERVER",
+    "niche": "Indexing and Performance",
+    "difficulty": "HARD",
+    "question": "What is the difference between an Index Seek and an Index Scan?",
+    "answer": "An Index Seek is highly efficient; the engine traverses the B-tree structure to find a specific starting point and retrieves only the matching rows. An Index Scan means the engine reads every row in the index (or table) from beginning to end to evaluate the query conditions. Scans typically indicate missing indexes or non-sargable query predicates."
+  },
+  {
+    "id": "medium-sql-11",
+    "category": "SQL SERVER",
+    "niche": "Transactions and Concurrency",
+    "difficulty": "EASY",
+    "question": "What is the ACID property in SQL transactions?",
+    "answer": "ACID stands for Atomicity (all parts of the transaction succeed or fail together), Consistency (data remains in a valid state), Isolation (concurrent transactions do not interfere with each other), and Durability (committed transactions survive system crashes). These guarantee reliable database processing."
+  },
+  {
+    "id": "medium-sql-12",
+    "category": "SQL SERVER",
+    "niche": "Transactions and Concurrency",
+    "difficulty": "EASY",
+    "question": "Explain the difference between Read Committed and Read Uncommitted isolation levels.",
+    "answer": "`Read Committed` (the default) ensures that a query only reads data that has been fully committed, preventing dirty reads. `Read Uncommitted` allows queries to read data that is currently being modified by an uncommitted transaction (using `NOLOCK`). While this avoids locking delays, it risks returning dirty, inaccurate data."
+  },
+  {
+    "id": "medium-sql-13",
+    "category": "SQL SERVER",
+    "niche": "Transactions and Concurrency",
+    "difficulty": "MEDIUM",
+    "question": "What is a Deadlock in SQL Server, and how can it be prevented?",
+    "answer": "A deadlock occurs when two concurrent transactions hold locks that the other needs, resulting in a circular dependency where neither can proceed. SQL Server resolves this by choosing a deadlock victim and rolling it back. Prevention strategies include accessing tables in the same consistent order across all procedures, keeping transactions short, and using appropriate isolation levels like SNAPSHOT."
+  },
+  {
+    "id": "medium-sql-14",
+    "category": "SQL SERVER",
+    "niche": "Transactions and Concurrency",
+    "difficulty": "MEDIUM",
+    "question": "What is the purpose of the TRY...CATCH block in T-SQL?",
+    "answer": "The `TRY...CATCH` block enables structured error handling. Statements inside the `TRY` block execute normally. If an error occurs (severity greater than 10), execution jumps to the `CATCH` block, where you can log error details (using `ERROR_MESSAGE()`, `ERROR_LINE()`) and safely issue a `ROLLBACK TRANSACTION`."
+  },
+  {
+    "id": "medium-sql-15",
+    "category": "SQL SERVER",
+    "niche": "Transactions and Concurrency",
+    "difficulty": "HARD",
+    "question": "What is Snapshot Isolation?",
+    "answer": "Snapshot isolation uses row versioning in `tempdb` to provide a transactionally consistent view of the database. When a transaction reads data, it sees the version of the data that existed at the start of the transaction, without placing shared locks. This prevents readers from blocking writers and vice versa, at the cost of higher tempdb usage."
+  },
+  {
+    "id": "medium-sql-16",
+    "category": "SQL SERVER",
+    "niche": "Architecture and Administration",
+    "difficulty": "EASY",
+    "question": "Explain the difference between a View and a Stored Procedure.",
+    "answer": "A View is a virtual table representing a saved SELECT query; it can be joined like a table but generally cannot accept parameters natively. A Stored Procedure is a compiled set of T-SQL statements that can accept input parameters, execute complex logic (IF/WHILE, variable assignment), perform DML (INSERT/UPDATE/DELETE), and return multiple result sets."
+  },
+  {
+    "id": "medium-sql-17",
+    "category": "SQL SERVER",
+    "niche": "Architecture and Administration",
+    "difficulty": "EASY",
+    "question": "What is TempDB, and what is it used for?",
+    "answer": "TempDB is a global system database in SQL Server used as a scratchpad for temporary objects (like `#temp` tables), row versioning (Snapshot Isolation), internal sorting operations (for GROUP BY, ORDER BY, index rebuilds), and cursors. It is recreated every time the SQL Server service restarts."
+  },
+  {
+    "id": "medium-sql-18",
+    "category": "SQL SERVER",
+    "niche": "Architecture and Administration",
+    "difficulty": "MEDIUM",
+    "question": "What is the difference between a Truncate and a Delete operation?",
+    "answer": "`DELETE` is a logged operation that removes rows one by one, firing triggers and consuming significant transaction log space. It can be rolled back. `TRUNCATE` is a faster, minimally logged operation that deallocates entire data pages. It resets identity columns and cannot be used if a foreign key references the table. It also cannot fire AFTER triggers."
+  },
+  {
+    "id": "medium-sql-19",
+    "category": "SQL SERVER",
+    "niche": "Architecture and Administration",
+    "difficulty": "MEDIUM",
+    "question": "What are Linked Servers?",
+    "answer": "Linked Servers are configurations in SQL Server that allow the database engine to execute distributed queries against OLE DB data sources residing on different servers (e.g., Oracle, Excel, or another SQL Server). They enable querying external data using standard T-SQL via four-part naming (`Server.Database.Schema.Table`)."
+  },
+  {
+    "id": "medium-sql-20",
+    "category": "SQL SERVER",
+    "niche": "Architecture and Administration",
+    "difficulty": "HARD",
+    "question": "How do you handle NULL values effectively in SQL queries?",
+    "answer": "NULL represents an unknown value, not a zero or blank string. Therefore, `WHERE column = NULL` fails; you must use `IS NULL` or `IS NOT NULL`. To provide fallback values, use functions like `ISNULL(column, 'Default')` or `COALESCE(col1, col2, 'Default')`. Aggregate functions (like SUM, AVG) ignore NULLs, which can skew expected results."
+  },
+  {
+    "id": "medium-sql-26",
+    "category": "SQL SERVER",
+    "niche": "Security",
+    "difficulty": "EASY",
+    "question": "What is Dynamic Data Masking (DDM) in Azure SQL?",
+    "answer": "Dynamic Data Masking limits sensitive data exposure by masking it to non-privileged users on the fly. You define rules on specific columns (e.g., masking a credit card column to show only 'XXXX-XXXX-XXXX-1234'). The data in the database remains unencrypted and unchanged, but the SQL engine intercepts the query results and applies the mask before returning data to the user."
+  },
+  {
+    "id": "medium-sql-27",
+    "category": "SQL SERVER",
+    "niche": "Security",
+    "difficulty": "EASY",
+    "question": "Explain Always Encrypted in Azure SQL Database.",
+    "answer": "Always Encrypted ensures that sensitive data (like SSNs) remains encrypted at rest, in transit, and even in memory during execution. The encryption keys are managed outside the database (e.g., in Azure Key Vault). The client application encrypts the data before sending it to SQL Server, meaning DBAs with full `sysadmin` access to the database cannot read the plaintext data."
+  },
+  {
+    "id": "medium-sql-21",
+    "category": "SQL SERVER",
+    "niche": "Advanced Functions",
+    "difficulty": "EASY",
+    "question": "How does the STRING_AGG function work in SQL Server?",
+    "answer": "STRING_AGG is an aggregate function that concatenates the values of string expressions and places a separator (like a comma) between them. It replaces the old, complex `FOR XML PATH` workaround. It is often used with a `GROUP BY` clause to combine multiple child rows into a single string column per parent row."
+  },
+  {
+    "id": "medium-sql-22",
+    "category": "SQL SERVER",
+    "niche": "Advanced Functions",
+    "difficulty": "EASY",
+    "question": "Explain the difference between ISNULL and COALESCE.",
+    "answer": "Both replace NULL with a specified replacement value. However, `ISNULL` is T-SQL specific, evaluates exactly two arguments, and the data type of the result is determined by the first argument. `COALESCE` is ANSI SQL standard, accepts multiple arguments (returning the first non-NULL value), and the data type is determined by the highest precedence among all arguments."
+  },
+  {
+    "id": "medium-sql-23",
+    "category": "SQL SERVER",
+    "niche": "Advanced Functions",
+    "difficulty": "MEDIUM",
+    "question": "What is the purpose of the OFFSET-FETCH clause?",
+    "answer": "The OFFSET-FETCH clause is used in conjunction with the ORDER BY clause to provide pagination. `OFFSET X ROWS` skips the first X rows of the sorted result set, and `FETCH NEXT Y ROWS ONLY` returns the next Y rows. This is highly efficient for returning data in pages to a web application UI."
+  },
+  {
+    "id": "medium-sql-24",
+    "category": "SQL SERVER",
+    "niche": "Advanced Functions",
+    "difficulty": "MEDIUM",
+    "question": "How does the TRY_CONVERT function differ from CONVERT?",
+    "answer": "`CONVERT` attempts to cast a value to a specified data type, but if the conversion fails (e.g., converting 'ABC' to an INT), the entire query throws an error and aborts. `TRY_CONVERT` safely attempts the cast; if it fails, it simply returns a NULL value instead of crashing the query, making it excellent for cleansing dirty data."
+  },
+  {
+    "id": "medium-sql-25",
+    "category": "SQL SERVER",
+    "niche": "Advanced Functions",
+    "difficulty": "HARD",
+    "question": "What is a Table-Valued Parameter (TVP)?",
+    "answer": "A TVP allows you to pass multiple rows of data (a table) as a single parameter to a stored procedure or user-defined function. You first create a User-Defined Table Type, declare a variable of that type, populate it, and pass it to the procedure. This is vastly more efficient for bulk inserts/updates than calling a stored procedure repeatedly in a loop from an application."
+  },
+  {
+    "id": "medium-sql-58",
+    "category": "SQL SERVER",
+    "niche": "Security",
+    "difficulty": "MEDIUM",
+    "question": "What is Row-Level Security (RLS) in SQL Server?",
+    "answer": "RLS enables you to restrict data access at the row level based on the user executing the query. You create a security predicate (an inline table-valued function) that returns '1' if the user is authorized to see the row, and bind it to the table using a Security Policy. The filtering happens transparently at the database engine level, so applications don't need to append complex `WHERE` clauses."
+  },
+  {
+    "id": "medium-sql-59",
+    "category": "SQL SERVER",
+    "niche": "Security",
+    "difficulty": "HARD",
+    "question": "Explain the Principle of Least Privilege in SQL Server.",
+    "answer": "The Principle of Least Privilege dictates that users or applications should be granted only the minimum permissions necessary to perform their required tasks. Instead of granting `db_owner` or `db_datareader` to everything, you create custom Roles, grant `EXECUTE` permissions only on specific stored procedures, and deny direct `SELECT/UPDATE` access to the underlying tables."
+  },
+  {
+    "id": "medium-sql-60",
+    "category": "SQL SERVER",
+    "niche": "Administration",
+    "difficulty": "EASY",
+    "question": "What is the difference between Simple and Full Recovery Models?",
+    "answer": "In the Simple Recovery Model, transaction logs are automatically truncated after checkpoints, meaning you cannot restore the database to a specific point in time (only to the last full backup). The Full Recovery Model retains all transaction logs until a Log Backup is performed, allowing you to restore the database to any specific second before a disaster occurred."
+  },
+  {
+    "id": "medium-sql-61",
+    "category": "SQL SERVER",
+    "niche": "Administration",
+    "difficulty": "EASY",
+    "question": "Why would you rebuild or reorganize an index?",
+    "answer": "Over time, as data is inserted/updated/deleted, index pages become fragmented (data is scattered across the disk out of logical order). If fragmentation is low (e.g., 10-30%), you 'Reorganize' the index (a lightweight defragmentation). If it is high (>30%), you 'Rebuild' the index, which drops the old index and creates a perfectly contiguous new one, restoring query performance."
+  },
+  {
+    "id": "medium-sql-62",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Advanced",
+    "difficulty": "EASY",
+    "question": "What is the PIVOT operator?",
+    "answer": "The `PIVOT` operator transforms rows into columns. For example, if you have Sales data with a 'Month' column and a 'SalesAmount' column across many rows, `PIVOT` can rotate the data so that 'Jan', 'Feb', and 'Mar' become distinct columns, and the SalesAmount is aggregated underneath them, producing a wide cross-tab report format."
+  },
+  {
+    "id": "medium-sql-63",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Advanced",
+    "difficulty": "MEDIUM",
+    "question": "How does UNPIVOT work?",
+    "answer": "The `UNPIVOT` operator does the reverse of PIVOT; it transforms columns into rows. If a poorly designed source table has columns for `Q1_Sales`, `Q2_Sales`, `Q3_Sales`, `UNPIVOT` normalizes the data into two columns: one containing the column name (e.g., 'Q1_Sales') and another containing the actual numerical value."
+  },
+  {
+    "id": "medium-sql-64",
+    "category": "SQL SERVER",
+    "niche": "T-SQL Advanced",
+    "difficulty": "HARD",
+    "question": "What is the MERGE statement?",
+    "answer": "The `MERGE` statement (often called an UPSERT) synchronizes a target table with a source table based on a join condition. Within a single statement, you can define logic to perform an `UPDATE` if a row matches, an `INSERT` if a row exists in the source but not the target, and a `DELETE` if a row exists in the target but not the source."
+  },
+  {
+    "id": "medium-sql-65",
+    "category": "SQL SERVER",
+    "niche": "Functions",
+    "difficulty": "EASY",
+    "question": "What is a CROSS APPLY vs OUTER APPLY?",
+    "answer": "`APPLY` allows you to join a table to a Table-Valued Function (TVF) and pass a column from the outer table into the TVF as a parameter. `CROSS APPLY` acts like an `INNER JOIN`; if the TVF returns no rows, the outer row is dropped. `OUTER APPLY` acts like a `LEFT JOIN`; if the TVF returns no rows, the outer row is kept and NULLs are returned for the TVF columns."
+  },
+  {
+    "id": "medium-sql-48",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "EASY",
+    "question": "What is an Index Seek vs an Index Scan?",
+    "answer": "An Index Scan reads every row in the index (similar to a table scan, but reading the index structure instead), which is highly inefficient for large tables. An Index Seek traverses the B-tree structure of the index to jump directly to the specific rows that match a `WHERE` clause, making it extremely fast. You want to see Seeks, not Scans, in your execution plans."
+  },
+  {
+    "id": "medium-sql-49",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "EASY",
+    "question": "What causes a 'Key Lookup' in an execution plan?",
+    "answer": "A Key Lookup occurs when a Non-Clustered Index is used to find rows (an Index Seek), but the index does *not* contain all the columns requested in the `SELECT` clause (it is not a Covering Index). The engine must take the row pointers from the non-clustered index and perform expensive, row-by-row lookups back into the Clustered Index to retrieve the missing columns."
+  },
+  {
+    "id": "medium-sql-50",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "EASY",
+    "question": "How can you resolve a Key Lookup issue?",
+    "answer": "You resolve a Key Lookup by modifying the Non-Clustered Index to include the missing columns. You can either add them to the main index key (if they are used for filtering/sorting) or use the `INCLUDE` clause to simply attach the data to the leaf level of the index. This turns it into a Covering Index and eliminates the Key Lookup operation."
+  },
+  {
+    "id": "medium-sql-51",
+    "category": "SQL SERVER",
+    "niche": "Views",
+    "difficulty": "EASY",
+    "question": "What is an Indexed View (Materialized View) in SQL Server?",
+    "answer": "A standard View is just a saved query; it executes every time you call it. An Indexed View has a unique clustered index created on it, which forces SQL Server to physically store the result set of the view on disk. When the underlying base tables are updated, SQL Server automatically maintains the data in the indexed view. This drastically speeds up complex aggregations at the cost of slower inserts/updates on the base tables."
+  },
+  {
+    "id": "medium-sql-52",
+    "category": "SQL SERVER",
+    "niche": "Views",
+    "difficulty": "MEDIUM",
+    "question": "What does SCHEMABINDING do when creating a View?",
+    "answer": "`WITH SCHEMABINDING` prevents structural changes to the underlying base tables that would break the view. For example, if a view uses `TableA.ColumnX`, a DBA cannot drop or rename `ColumnX` without first dropping the view. It is also a mandatory requirement if you want to create an Indexed View."
+  },
+  {
+    "id": "medium-sql-53",
+    "category": "SQL SERVER",
+    "niche": "JSON and XML",
+    "difficulty": "EASY",
+    "question": "How do you parse a JSON string in T-SQL?",
+    "answer": "You use the `OPENJSON()` table-valued function. It parses JSON text and returns objects and properties as rows and columns. You can define a `WITH` clause to strictly map JSON properties to specific SQL data types. To extract a single scalar value from a JSON string, you use the `JSON_VALUE()` function."
+  },
+  {
+    "id": "medium-sql-54",
+    "category": "SQL SERVER",
+    "niche": "JSON and XML",
+    "difficulty": "MEDIUM",
+    "question": "How do you format a SQL query result as a JSON array?",
+    "answer": "You append the `FOR JSON PATH` (or `FOR JSON AUTO`) clause to the end of your `SELECT` statement. SQL Server will automatically format the result set into a JSON array of objects, handling data type conversions. You can control the nested hierarchy of the JSON by using dot notation in your column aliases (e.g., `SELECT ID AS 'Employee.ID'`)."
+  },
+  {
+    "id": "medium-sql-55",
+    "category": "SQL SERVER",
+    "niche": "Administration",
+    "difficulty": "MEDIUM",
+    "question": "What are Dynamic Management Views (DMVs)?",
+    "answer": "DMVs are system views and functions built into SQL Server that return server state information that can be used to monitor the health of a server instance, diagnose problems, and tune performance. Examples include `sys.dm_exec_query_stats` (finding slow queries) or `sys.dm_os_wait_stats` (finding what processes are waiting on)."
+  },
+  {
+    "id": "medium-sql-56",
+    "category": "SQL SERVER",
+    "niche": "Administration",
+    "difficulty": "MEDIUM",
+    "question": "Explain the difference between TRUNCATE and DELETE.",
+    "answer": "`DELETE` is a DML command that removes rows one by one, recording each deletion in the transaction log (which is slow and uses lots of log space), and it fires triggers. `TRUNCATE` is a DDL command that deallocates entire data pages instantly, using minimal transaction logging, and it does not fire triggers. `TRUNCATE` is vastly faster for emptying a table."
+  },
+  {
+    "id": "medium-sql-57",
+    "category": "SQL SERVER",
+    "niche": "Administration",
+    "difficulty": "HARD",
+    "question": "What is TempDB used for in SQL Server?",
+    "answer": "TempDB is a global system database used to hold temporary user objects (like `#TempTables`), internal objects created by the SQL engine during complex processing (like large sorts, hash joins, or spooling), and row versions for isolation levels. It is recreated every time the SQL Server service restarts, so data in TempDB is strictly ephemeral."
+  },
+  {
+    "id": "medium-sql-76",
+    "category": "SQL SERVER",
+    "niche": "Indexes",
+    "difficulty": "EASY",
+    "question": "What is a Filtered Index?",
+    "answer": "A Filtered Index is a non-clustered index that includes a `WHERE` clause. It only indexes a subset of rows in the table. For example, `CREATE INDEX idx_Active ON Users (LastName) WHERE IsActive = 1`. This creates a much smaller, highly optimized index that saves disk space and maintenance overhead, perfect for queries that constantly filter for active/unprocessed records."
+  },
+  {
+    "id": "medium-sql-77",
+    "category": "SQL SERVER",
+    "niche": "Indexes",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of a Columnstore Index.",
+    "answer": "Unlike traditional row-store indexes that store data row-by-row on a page, a Columnstore index stores data column-by-column. It heavily compresses the data, making it exceptionally fast for analytical (OLAP) queries where you need to aggregate massive amounts of data from a few specific columns (e.g., SUM of Sales). It performs poorly for singleton lookups or frequent updates."
+  },
+  {
+    "id": "medium-sql-78",
+    "category": "SQL SERVER",
+    "niche": "Transactions",
+    "difficulty": "EASY",
+    "question": "What is an Implicit vs Explicit Transaction?",
+    "answer": "By default, SQL Server runs in Autocommit mode; every individual DML statement (INSERT, UPDATE) is an Implicit Transaction that is automatically committed upon success or rolled back on failure. An Explicit Transaction requires you to explicitly write `BEGIN TRAN`. All subsequent statements are grouped together, and nothing is finalized until you explicitly execute `COMMIT TRAN` or `ROLLBACK TRAN`."
+  },
+  {
+    "id": "medium-sql-79",
+    "category": "SQL SERVER",
+    "niche": "Transactions",
+    "difficulty": "EASY",
+    "question": "What is XACT_ABORT?",
+    "answer": "When `SET XACT_ABORT ON` is executed at the top of a stored procedure, it alters error handling. If any severe run-time error occurs during an explicit transaction, SQL Server will immediately terminate the execution and automatically roll back the entire transaction. If it is OFF, the transaction might be left open (orphaned), causing massive blocking issues."
+  },
+  {
+    "id": "medium-sql-80",
+    "category": "SQL SERVER",
+    "niche": "Isolation Levels",
+    "difficulty": "EASY",
+    "question": "What is the Read Uncommitted isolation level, and what is its main risk?",
+    "answer": "Read Uncommitted (often invoked via `WITH (NOLOCK)`) allows a query to read data that is currently being modified by another transaction but has not yet been committed. The main risk is a 'Dirty Read'; you might read data that the other transaction eventually rolls back, meaning your report is based on data that technically never existed in the database."
+  },
+  {
+    "id": "medium-sql-81",
+    "category": "SQL SERVER",
+    "niche": "Isolation Levels",
+    "difficulty": "MEDIUM",
+    "question": "How does Snapshot Isolation solve blocking?",
+    "answer": "When Snapshot Isolation is enabled, SQL Server uses row-versioning in TempDB. When Transaction A updates a row, it stores the old version in TempDB. If Transaction B wants to read that row before A commits, it doesn't get blocked (as it would in Read Committed). Instead, it reads the old, pre-update version from TempDB, ensuring viewers never block writers and writers never block viewers."
+  },
+  {
+    "id": "medium-sql-82",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "MEDIUM",
+    "question": "What is Parameter Sniffing?",
+    "answer": "When a stored procedure is executed for the first time, SQL Server 'sniffs' the parameter values passed and creates an execution plan optimized specifically for those values, caching it for reuse. Parameter sniffing becomes a severe problem if the first execution used an atypical value (e.g., retrieving 1 row) and created a plan that performs terribly for typical values (e.g., retrieving 1 million rows)."
+  },
+  {
+    "id": "medium-sql-83",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "MEDIUM",
+    "question": "How do you fix Parameter Sniffing issues?",
+    "answer": "You can append `OPTION (RECOMPILE)` to the query, forcing SQL Server to generate a new plan every single time based on the current parameters. Alternatively, you can use local variables inside the stored procedure, assigning the parameter value to the variable, which masks the value from the optimizer and forces it to create a generalized 'average' plan."
+  },
+  {
+    "id": "medium-sql-38",
+    "category": "SQL SERVER",
+    "niche": "Stored Procedures",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Stored Procedure and a User-Defined Function (UDF)?",
+    "answer": "A Stored Procedure can execute complex business logic, perform INSERT/UPDATE/DELETE (DML) operations, and return multiple result sets or output parameters. A UDF is designed strictly to return a single value or a table, cannot perform DML operations (it must be deterministic and read-only), and can be used directly inline within a `SELECT` statement or `WHERE` clause."
+  },
+  {
+    "id": "medium-sql-39",
+    "category": "SQL SERVER",
+    "niche": "Stored Procedures",
+    "difficulty": "MEDIUM",
+    "question": "Explain the use of OUTPUT parameters in stored procedures.",
+    "answer": "While a stored procedure can return a tabular result set, OUTPUT parameters allow it to return scalar values (like a newly generated ID or a success status integer) back to the calling application or parent script. You declare them with the `OUTPUT` keyword in the procedure definition and pass a variable to capture the value during execution."
+  },
+  {
+    "id": "medium-sql-40",
+    "category": "SQL SERVER",
+    "niche": "Stored Procedures",
+    "difficulty": "HARD",
+    "question": "What does SET NOCOUNT ON do in a stored procedure?",
+    "answer": "`SET NOCOUNT ON` stops the server from returning messages indicating the number of rows affected by T-SQL statements (e.g., '10 rows affected'). In highly active stored procedures with many loops or updates, turning this on drastically reduces network traffic between SQL Server and the application, improving performance."
+  },
+  {
+    "id": "medium-sql-41",
+    "category": "SQL SERVER",
+    "niche": "Error Handling",
+    "difficulty": "EASY",
+    "question": "How do you handle errors gracefully in T-SQL?",
+    "answer": "You use the `BEGIN TRY...END TRY` and `BEGIN CATCH...END CATCH` constructs. If an error occurs inside the TRY block, execution immediately jumps to the CATCH block. Inside the CATCH block, you can use functions like `ERROR_MESSAGE()` and `ERROR_NUMBER()` to log the failure to an audit table and optionally issue a `ROLLBACK TRANSACTION`."
+  },
+  {
+    "id": "medium-sql-42",
+    "category": "SQL SERVER",
+    "niche": "Error Handling",
+    "difficulty": "MEDIUM",
+    "question": "What is the THROW statement?",
+    "answer": "The `THROW` statement is the modern replacement for `RAISERROR`. It raises an exception and immediately transfers execution to a CATCH block (or aborts the batch). It can be used without parameters inside a CATCH block to re-throw the exact error that was caught back to the calling application."
+  },
+  {
+    "id": "medium-sql-43",
+    "category": "SQL SERVER",
+    "niche": "Table Design",
+    "difficulty": "EASY",
+    "question": "What is a Temporal Table (System-Versioned Table) in SQL Server?",
+    "answer": "A Temporal Table automatically keeps a full history of data changes. It consists of the main current table and a hidden history table. When you UPDATE or DELETE a row in the main table, SQL Server automatically moves the old version to the history table with timestamping. You can then query data 'as it existed' at any specific point in time using `FOR SYSTEM_TIME AS OF`."
+  },
+  {
+    "id": "medium-sql-44",
+    "category": "SQL SERVER",
+    "niche": "Table Design",
+    "difficulty": "MEDIUM",
+    "question": "Explain the difference between a Primary Key and a Unique Constraint.",
+    "answer": "Both enforce uniqueness in a column. A Primary Key uniquely identifies the row; a table can only have one PK, and it absolutely cannot contain NULL values. It usually creates the Clustered Index by default. A Unique Constraint enforces uniqueness on alternative columns (e.g., an Email address); a table can have many unique constraints, and it allows exactly one NULL value."
+  },
+  {
+    "id": "medium-sql-45",
+    "category": "SQL SERVER",
+    "niche": "Table Design",
+    "difficulty": "HARD",
+    "question": "What are Computed Columns?",
+    "answer": "A computed column is a virtual column whose value is derived from an expression using other columns in the same row (e.g., `TotalCost AS (Quantity * UnitPrice)`). By default, it is not stored physically (calculated on the fly), but it can be marked as `PERSISTED` to store the result physically on disk, which allows it to be indexed."
+  },
+  {
+    "id": "medium-sql-46",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "HARD",
+    "question": "Why is using 'SELECT *' considered bad practice in production code?",
+    "answer": "`SELECT *` retrieves all columns from the table, generating unnecessary disk I/O and network traffic if the application only needs a few columns. Furthermore, it prevents the SQL optimizer from using Covering Indexes. Finally, if the underlying table schema changes (columns added or removed), it can break applications expecting a specific column order."
+  },
+  {
+    "id": "medium-sql-47",
+    "category": "SQL SERVER",
+    "niche": "Query Optimization",
+    "difficulty": "HARD",
+    "question": "What is an Execution Plan, and how do you view it?",
+    "answer": "An Execution Plan is a visual or textual representation of the exact physical operations the SQL Server Query Optimizer has chosen to retrieve the data (e.g., Index Seeks, Hash Matches, Nested Loops). In SSMS, you can view the 'Estimated Execution Plan' before running the query, or enable 'Include Actual Execution Plan' to see exactly where performance bottlenecks occurred."
+  },
+  {
+    "id": "medium-sql-66",
+    "category": "SQL SERVER",
+    "niche": "Advanced Queries",
+    "difficulty": "EASY",
+    "question": "What is the difference between UNION and UNION ALL?",
+    "answer": "`UNION` combines the results of two SELECT statements and performs an expensive sort operation to remove all duplicate rows. `UNION ALL` simply appends the results together, keeping duplicates. `UNION ALL` is significantly faster and should always be used unless you explicitly need duplicate removal."
+  },
+  {
+    "id": "medium-sql-67",
+    "category": "SQL SERVER",
+    "niche": "Advanced Queries",
+    "difficulty": "MEDIUM",
+    "question": "Explain the EXCEPT and INTERSECT operators.",
+    "answer": "`INTERSECT` returns only the distinct rows that appear in the result sets of *both* SELECT statements. `EXCEPT` returns the distinct rows from the first SELECT statement that do *not* appear in the second SELECT statement. Both require the queries to have the same number of columns with compatible data types."
+  },
+  {
+    "id": "medium-sql-68",
+    "category": "SQL SERVER",
+    "niche": "Functions",
+    "difficulty": "MEDIUM",
+    "question": "What is a scalar User-Defined Function (UDF), and why can it cause performance issues?",
+    "answer": "A scalar UDF takes parameters and returns a single value. When used in a SELECT list or WHERE clause against a large table, the SQL Server engine executes the function row-by-row (RBAR), preventing parallel execution and destroying query performance. (Note: SQL Server 2019+ introduced Scalar UDF Inlining to mitigate this, but complex UDFs still suffer)."
+  },
+  {
+    "id": "medium-sql-69",
+    "category": "SQL SERVER",
+    "niche": "Functions",
+    "difficulty": "HARD",
+    "question": "What is an Inline Table-Valued Function (iTVF)?",
+    "answer": "An iTVF returns a table data type and consists of a single `RETURN (SELECT ...)` statement. Unlike Multi-Statement TVFs, iTVFs perform exceptionally well because the SQL optimizer treats them like parameterized views; it expands the underlying SELECT statement directly into the main query's execution plan."
+  },
+  {
+    "id": "medium-sql-70",
+    "category": "SQL SERVER",
+    "niche": "Data Types",
+    "difficulty": "EASY",
+    "question": "What is the difference between VARCHAR and NVARCHAR?",
+    "answer": "`VARCHAR` stores non-Unicode characters (1 byte per character), typically used for standard English text. `NVARCHAR` stores Unicode characters (2 bytes per character), allowing the storage of international characters (like Japanese or Arabic) and emojis. Because `NVARCHAR` takes twice the space, it should only be used when internationalization is required."
+  },
+  {
+    "id": "medium-sql-71",
+    "category": "SQL SERVER",
+    "niche": "Data Types",
+    "difficulty": "MEDIUM",
+    "question": "When should you use the UNIQUEIDENTIFIER data type?",
+    "answer": "`UNIQUEIDENTIFIER` stores a 16-byte GUID (Globally Unique Identifier). It is useful for replication, disconnected client apps generating their own IDs, or masking sequential IDs. However, it is terrible for Clustered Indexes because GUIDs are generated randomly. Inserting random values causes massive page splits and index fragmentation."
+  },
+  {
+    "id": "medium-sql-72",
+    "category": "SQL SERVER",
+    "niche": "Triggers",
+    "difficulty": "EASY",
+    "question": "What is the difference between an AFTER trigger and an INSTEAD OF trigger?",
+    "answer": "An `AFTER` trigger fires immediately after an INSERT, UPDATE, or DELETE operation has successfully completed on a table. An `INSTEAD OF` trigger intercepts the DML operation; the original operation is cancelled, and the code inside the trigger executes *instead*. `INSTEAD OF` triggers are commonly used to make complex views updatable."
+  },
+  {
+    "id": "medium-sql-73",
+    "category": "SQL SERVER",
+    "niche": "Triggers",
+    "difficulty": "MEDIUM",
+    "question": "What are the 'inserted' and 'deleted' tables in a Trigger?",
+    "answer": "These are special, temporary tables available only within a trigger's scope. During an `INSERT`, the `inserted` table holds the new rows. During a `DELETE`, the `deleted` table holds the removed rows. During an `UPDATE`, the `deleted` table holds the old version of the rows, and the `inserted` table holds the new version."
+  },
+  {
+    "id": "medium-sql-74",
+    "category": "SQL SERVER",
+    "niche": "Locking and Blocking",
+    "difficulty": "EASY",
+    "question": "What is a Deadlock in SQL Server?",
+    "answer": "A deadlock occurs when two concurrent transactions are each holding locks on resources that the other transaction needs to complete. Neither can proceed, creating a circular dependency. The SQL Server engine detects this, chooses one transaction as the 'victim' (usually the one easiest to rollback), kills it, and throws an error to the application."
+  },
+  {
+    "id": "medium-sql-75",
+    "category": "SQL SERVER",
+    "niche": "Locking and Blocking",
+    "difficulty": "MEDIUM",
+    "question": "How does Lock Escalation work?",
+    "answer": "To save memory, SQL Server escalates locks. If a query requires thousands of individual row locks or page locks within the same table, the engine converts them into a single, exclusive Table Lock. While this saves RAM, it drastically reduces concurrency because no other users can access the table until the transaction finishes."
+  },
+  {
+    "id": "medium-sql-28",
+    "category": "SQL SERVER",
+    "niche": "Window Functions",
+    "difficulty": "EASY",
+    "question": "What is the difference between ROW_NUMBER() and RANK()?",
+    "answer": "`ROW_NUMBER()` assigns a unique, sequential integer to every row within a partition, even if values are identical. `RANK()` assigns the same rank to identical values, but creates a gap in the sequence afterward (e.g., 1, 2, 2, 4). If you want identical values to share a rank without leaving a gap (e.g., 1, 2, 2, 3), you use `DENSE_RANK()`."
+  },
+  {
+    "id": "medium-sql-29",
+    "category": "SQL SERVER",
+    "niche": "Window Functions",
+    "difficulty": "MEDIUM",
+    "question": "How do you calculate a running total using Window Functions?",
+    "answer": "You use the `SUM()` aggregate function combined with an `OVER` clause that specifies an `ORDER BY`. For example: `SUM(SalesAmount) OVER (ORDER BY OrderDate)`. By default, this creates a window framing from the unbounded preceding row up to the current row, calculating the cumulative sum."
+  },
+  {
+    "id": "medium-sql-30",
+    "category": "SQL SERVER",
+    "niche": "Window Functions",
+    "difficulty": "HARD",
+    "question": "Explain the LEAD() and LAG() functions.",
+    "answer": "`LEAD()` allows you to access data from a subsequent row in the same result set without using a self-join, while `LAG()` accesses data from a previous row. They are heavily used for calculating year-over-year differences or analyzing sequential events (e.g., finding the time difference between login events)."
+  },
+  {
+    "id": "medium-sql-31",
+    "category": "SQL SERVER",
+    "niche": "Common Table Expressions (CTEs)",
+    "difficulty": "EASY",
+    "question": "What is a CTE and why is it preferred over a derived table (subquery in the FROM clause)?",
+    "answer": "A CTE (`WITH CteName AS (...)`) creates a temporary named result set valid only for the duration of a single SELECT, INSERT, UPDATE, or DELETE statement. It is preferred over derived tables because it makes complex queries vastly more readable, allows the result set to be referenced multiple times in the same query, and enables recursive querying."
+  },
+  {
+    "id": "medium-sql-32",
+    "category": "SQL SERVER",
+    "niche": "Common Table Expressions (CTEs)",
+    "difficulty": "MEDIUM",
+    "question": "How does a Recursive CTE work?",
+    "answer": "A Recursive CTE is used to query hierarchical data (like an organizational chart or bill of materials). It consists of two parts combined with a `UNION ALL`: the 'Anchor member' which returns the base level of the hierarchy, and the 'Recursive member' which joins back to the CTE itself to find the children of the previous level. It loops until the recursive member returns no rows."
+  },
+  {
+    "id": "medium-sql-33",
+    "category": "SQL SERVER",
+    "niche": "Indexing",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Clustered Index and a Non-Clustered Index?",
+    "answer": "A Clustered Index dictates the physical sorting order of the data pages on disk; therefore, a table can only have one clustered index (usually the Primary Key). A Non-Clustered Index is a separate structure (like an index in the back of a book) that contains pointers back to the physical data rows; a table can have many non-clustered indexes."
+  },
+  {
+    "id": "medium-sql-35",
+    "category": "SQL SERVER",
+    "niche": "Transactions",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of ACID properties in SQL Server.",
+    "answer": "ACID guarantees reliable processing of database transactions. Atomicity (all parts of a transaction succeed or fail together), Consistency (the transaction leaves the database in a valid state respecting constraints), Isolation (concurrent transactions do not interfere with each other), and Durability (once committed, changes are permanent even in a power failure)."
+  },
+  {
+    "id": "medium-sql-36",
+    "category": "SQL SERVER",
+    "niche": "Transactions",
+    "difficulty": "HARD",
+    "question": "What is the default isolation level in SQL Server, and what read phenomena does it prevent?",
+    "answer": "The default isolation level is `READ COMMITTED`. It prevents 'Dirty Reads' (reading uncommitted data from another transaction) because it requires a shared lock to read data. However, it does not prevent 'Non-Repeatable Reads' (data changing if you read it twice in the same transaction) or 'Phantom Reads' (new rows appearing if you run the same query twice)."
+  },
+  {
+    "id": "sql-new-1",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Under what conditions does Columnstore Segment Elimination fail for string and non-numeric columns, and how do you resolve it?",
+    "answer": "Segment Elimination relies on min/max metadata tracked for each rowgroup. For string columns (`VARCHAR`/`NVARCHAR`), segment elimination is highly limited because the engine only tracks the first few characters in metadata. If values are highly dispersed or contain prefixes, min/max ranges overlap across all rowgroups, causing the engine to scan every segment. To resolve this: 1) Convert string categories to integer keys (surrogate keys) in dimension tables. 2) Apply a custom sorting order (using `ZORDER BY` or clustering keys) to the data before compressing, which clusters similar values into the same rowgroups, maximizing elimination.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-2",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "How do you calculate the optimal bucket count for an In-Memory OLTP Hash Index, and what are the performance costs of over-provisioning versus under-provisioning?",
+    "answer": "The optimal bucket count is between 1x and 2x the number of unique index keys. If you under-provision (bucket count is too low), multiple keys will hash to the same bucket. This creates long row chains within the bucket, forcing the engine to scan the chain sequentially during point lookups, destroying performance. If you over-provision (bucket count is too high), the index consumes unnecessary memory (each bucket is 8 bytes in memory), but query performance remains fast. Therefore, over-provisioning is always preferred if RAM is available.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-3",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What is the physical process of replication synchronization between replicas in an AlwaysOn Availability Group configured for asynchronous commit?",
+    "answer": "Under asynchronous commit, when a transaction commits on the primary replica, the Log Writer writes the records to the local `.ldf` file and immediately sends transaction completion confirmation to the client. In the background, the Log Capture thread reads the log records from the log buffer or disk and sends them over the TCP network (port 5022) to the secondary replica. The secondary receives the records, hardens them to its local disk, and the redo thread reapplies the changes to the database pages asynchronously. This avoids client latency but introduces a recovery point objective (RPO) gap.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-4",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What structural factors block the Persistent Version Store (PVS) cleaning process in Accelerated Database Recovery (ADR), and how do you resolve it?",
+    "answer": "The ADR persistent version store (PVS) cleaner thread runs in the background to purge row versions that are no longer needed. However, it can be blocked by: 1) Long-running active transactions that began before the versions were created. 2) Active snapshot isolation reads. 3) Unsynchronized AlwaysOn secondary replicas (which need the versions to resolve queries). To resolve this, you must query `sys.dm_tran_database_transactions` to find the oldest active SPID, terminate it, and ensure AlwaysOn replicas are in a healthy sync state, allowing the cleaner to reclaim database storage space.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-5",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "What does the SOS_RESERVEDMEMBLOCK wait type indicate, and how do you troubleshoot memory grant queues?",
+    "answer": "The `SOS_RESERVEDMEMBLOCK` wait type occurs when a query is queued waiting for a large contiguous memory block allocation (typically for a sort or hash join workspace grant) and cannot start execution. To troubleshoot, query `sys.dm_exec_query_memory_grants` to identify SPIDs in the 'Pending' queue, check `requested_memory_kb` and `resource_semaphore_id`. You can optimize by: 1) Creating indexes to support the query's sort order, bypassing sort memory requirements. 2) Reducing the query's parallelism (MAXDOP) to split the memory grant request into smaller chunks. 3) Updating statistics to ensure the cardinality estimator is not over-estimating row counts.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "sql-new-6",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "How do you handle schema migrations on a System-Versioned Temporal Table without losing historical version data?",
+    "answer": "To perform schema changes on a temporal table, you must disable system versioning first. Run: `ALTER TABLE [MainTable] SET (SYSTEM_VERSIONING = OFF)`. Next, apply the schema changes (e.g., adding or altering columns) to both the current table and the history table using standard `ALTER TABLE` statements. The schemas of both tables must match exactly. Once the modifications are complete, re-enable versioning: `ALTER TABLE [MainTable] SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.HistoryTable, DATA_CONSISTENCY_CHECK = ON))`. This preserves all historical records and links them to the new schema definition.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-7",
+    "category": "SQL SERVER",
+    "niche": "Advanced T-SQL, Graph Databases & Programmability",
+    "question": "How does the Query Optimizer optimize join orders in graph database MATCH queries?",
+    "answer": "The optimizer translates graph `MATCH` predicates into standard relational inner joins. To choose the most efficient join order, it relies on statistics built on the node and edge tables. It evaluates: 1) The cardinality of the node tables (e.g., how many nodes match the filter). 2) The density of the edge pointers (`$from_id` and `$to_id`). The optimizer will typically join the most selective node table first, and then traverse edge indexes using Nested Loops or Hash Joins, trying to minimize the size of intermediate tables.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-8",
+    "category": "SQL SERVER",
+    "niche": "Security, Encryption, Metadata & Engine Diagnostics",
+    "question": "How do Service Broker endpoints negotiate and execute connection handshakes using asymmetric certificates?",
+    "answer": "Service Broker endpoints communicate over TCP. To secure connections, endpoints require authentication. Asymmetric certificates are generated on both servers. Each server exports its certificate and imports the other's certificate into its database. During the connection handshake, the sending endpoint encrypts a challenge token using the target's public certificate key. The target decrypts the token using its private key and returns the response, proving its identity. This establishes a secure, encrypted tunnel (TLS-like) for passing message blocks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-new-9",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "What specific SQL Server bulk loading operations minimize transaction logging, and what database recovery settings are required?",
+    "answer": "Operations that can be minimally logged include: `SELECT INTO`, `INSERT INTO ... SELECT` (on a heap or empty index), and index rebuilds. To trigger minimal logging: 1) The database must be in the `BULK_LOGGED` or `SIMPLE` recovery model. 2) The target table must meet specific conditions (like having no active replication or triggers). 3) You must specify the `TABLOCK` hint on the insert statement. In this mode, the engine only logs page allocations rather than individual row insertions, saving log I/O overhead.",
+    "difficulty": "EASY"
+  }
+]

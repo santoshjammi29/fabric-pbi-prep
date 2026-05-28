@@ -1,0 +1,1106 @@
+[
+  {
+    "id": "spark-stream-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain the internal execution differences between the Micro-Batch Processing Engine and the Continuous Processing Engine in Structured Streaming.",
+    "answer": "1. Micro-Batch Engine: Processes data streams as a continuous sequence of small batch queries. It updates offsets, executes standard Catalyst plans, commits to StateStore, and writes checkpoint logs. Latency: 10ms - 100ms.\n\n2. Continuous Processing Engine: Bypasses micro-batching. Worker tasks run continuously, polling records from sources and writing directly to sinks. Epoch markers are injected into the data stream to coordinate checkpoints. Latency: sub-millisecond, at the expense of limited support for stateful operations (like outer joins or aggregations).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-stream-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "How does the StateStore architecture work under the hood? Contrast the memory consumption and operational profiles of the HDFSBackedStateStore Provider versus the RocksDBStateStore Provider.",
+    "answer": "1. HDFSBackedStateStore: Stores state records in-memory in JVM Java Map structures on the executors. Commits write changes to HDFS/S3 as delta logs. Memory: High JVM heap consumption, vulnerable to OOMs and large GC pauses when states grow to millions of keys.\n\n2. RocksDBStateStore: Stores state in a local, native RocksDB instance on the executor's local SSD. Bypasses the JVM heap completely, caching state off-heap. Memory: Extremely stable JVM heap footprint. Out-of-memory errors are prevented for large-scale states (e.g., TB-scale), though point-lookups incur minor JNI overhead.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-stream-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Walk through the exact recovery protocol of a stateful streaming query when it reads from a multi-partition Kafka topic using a write-ahead log (WAL) and metadata checkpoints.",
+    "answer": "1. Checkpoint Read: On restart, Spark reads the `metadata` and `offsets` directories in the checkpoint path to identify the target batch ID and starting Kafka partition offsets.\n\n2. State Reload: The StateStore coordinator reloads the corresponding state files from the checkpoint directory, mapping the RocksDB/HDFS state back to the exact transaction boundary.\n\n3. Re-execution: Spark queries Kafka starting from the committed offsets. The stream re-runs the micro-batch, merges inputs with the reloaded states, commits changes to the offset WAL, and writes a commit marker, guaranteeing exactly-once transactional state recovery.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-stream-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Detail the internal mechanics of Watermarking. How does Spark calculate the global watermark across multiple concurrent event-time streams with lagging partitions?",
+    "answer": "1. Metric Tracking: During task execution, Spark monitors the maximum event time observed across all partitions of the stream.\n\n2. Global Calculation: At the end of each micro-batch, executors report their local maximum event times to the driver. The driver computes the global maximum and subtracts the watermark delay: `Watermark = Max(EventTime) - DelayThreshold`.\n\n3. Pruning: The driver broadcasts this watermark to the next micro-batch. All rows with event time < watermark are pruned from state storage, keeping state sizes bounded.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-stream-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain the execution flow, memory tracking, and serialization/deserialization cycles of flatMapGroupsWithState and mapGroupsWithState in a production environment.",
+    "answer": "1. Execution Flow: Spark groups rows by key. The `StateStore` retrieves the existing state. The engine runs the user-defined function passing the key, active values iterator, and the state handle.\n\n2. Serialization: State values are serialized using `ExpressionEncoder` to fit in the StateStore. When the function accesses state, it deserializes the byte arrays into Java objects. Changes are serialized back. memory tracking is critical: holding intermediate states in large JVM object pools during iteration causes heap bloat.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-stream-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What happens internally when a stateful streaming query experiences \"Watermark Delay Inversion\" due to an upstream clock skew across global regions?",
+    "answer": "1. Inversion cause: Clock skew on IoT devices causes a region to emit timestamps far in the future. (2) Consequence: The future timestamp inflates the driver's calculated `Max(EventTime)`. The global watermark rises prematurely. (3) Data Loss: Normal data arriving from other regions falls below the inflated watermark and is discarded as late data, causing silent data loss.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-stream-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain how the OffsetLog and CommitLog maintain exactly-once processing guarantees in Structured Streaming sinks.",
+    "answer": "1. OffsetLog: Driver writes the start offsets of batch $N$ to the WAL before execution begins. (2) Execution: Spark processes the batch. (3) CommitLog: Once the sink confirms the batch write is committed, the driver writes a commit marker for batch $N$ to the CommitLog. (4) Recovery: If a failure occurs before commit, Spark re-runs batch $N$, checking the logs to prevent duplicate writes in idempotent sinks.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-stream-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "How does Spark handle late-arriving data in an Append output mode versus an Update output mode at the physical execution layer?",
+    "answer": "1. Append Mode: Rows are only outputted when they fall below the watermark (meaning they can never change again). Retains all states until watermark expiration, delaying output. (2) Update Mode: Outputs modified keys immediately on every micro-batch. State is updated, but only expired keys are pruned, reducing output latency for downstream consumers.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-stream-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What causes a StateStoreOOMException, and what low-level configurations do you adjust inside RocksDB (e.g., block cache size, arena block size) to prevent it?",
+    "answer": "1. Cause: Exhausting off-heap memory allocations due to RocksDB caching too many state files. (2) Tuning: Configure RocksDB parameters via Spark properties: (a) Set `spark.sql.streaming.stateStore.rocksdb.blockCacheSizeMB` to a lower value (e.g., 64MB) to restrict caching. (b) Decrease write buffer size and configure compaction threads to free direct memory allocations.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-stream-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Detail the physical plan transformations that occur when performing a Stream-Stream Join. How does Spark manage the dual state lifecycles for both sides of the join?",
+    "answer": "1. Physical Plan: The planner inserts a `SymmetricHashJoinExec` node. (2) Dual States: Spark maintains two separate state stores (one for Left, one for Right). (3) Lifecycle: When a row arrives, it is appended to its side's state. The engine queries the opposing side's state to match keys. Rows are retained in states until event-time watermarks expire, cleaning both stores concurrently.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-stream-11",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain the internal threading architecture of the KafkaSourceProvider. How does it map Kafka consumer threads to Spark execution tasks?",
+    "answer": "1. Thread Mapping: Spark tasks run parallel executors. Each task maps to a set of Kafka partitions. (2) Consumer Pool: Instead of creating a new consumer thread per task, Spark maintains a cached pool of `KafkaConsumer` instances per executor. Tasks retrieve consumers from the pool, fetch offset ranges sequentially, and process them in task threads, minimizing thread context switches.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-stream-12",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "How do you perform a safe zero-downtime schema evolution or state transformation migration on a production state store checkpoint without losing historical state data?",
+    "answer": "1. State Migrator: Write a offline Spark job using the State Reader API. Read the checkpoint state files directly. (2) Schema Translation: Map old columns to the new schema format. (3) Writeout: Write the translated state records back as a new checkpoint version, allowing the streaming application to restart from the new path without state loss.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-stream-13",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What is the impact of setting a very low spark.sql.streaming.forceDeleteTempCheckpointLocation threshold on cloud storage API rate limits?",
+    "answer": "1. Low Threshold: Forces Spark to delete temp directories immediately on batch commit. (2) API Storm: Under 10s trigger intervals, millions of DELETE calls are sent to S3/ADLS. This exhausts object storage API rate limits (SlowDown errors), degrading overall pipeline health.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-stream-14",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain how the IncrementalExecution class plans the execution of a streaming micro-batch, and how it tracks state variation across batch IDs.",
+    "answer": "1. Planning: `IncrementalExecution` subclasses `QueryExecution`. It injects state-planning strategies into the Catalyst pipeline. (2) Tracking: Appends state info (batch ID, transaction state) to the physical plan operators. This ensures that physical stateful readers fetch files matching the current micro-batch epoch.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-stream-15",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "How does a streaming query handle self-joins? What are the precise constraints and state-tracking mechanisms involved?",
+    "answer": "1. Constraints: Both join sides must define event-time column attributes and watermarks. (2) State Tracking: Spark maintains two separate state mappings for the same table. It tracks matches across both instances, using watermark offsets to prevent infinite state growth on self-join matches.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-delta-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Explain the exact anatomical structure and parsing sequence of the Delta Lake Transaction Log (_delta_log). How does Delta guarantee ACID transactions over Amazon S3 or ADLS Gen2?",
+    "answer": "1. Log Anatomy: Stored under `_delta_log/` as sequential JSON commit files (`000000.json`, `000001.json`). Contains table metadata, file add/remove actions, and transaction markers.\n\n2. ACID guarantees: Delta uses optimistic concurrency. When writing, it prepares changes, writes the JSON file, and registers the version in the catalog. On S3 (which lacks put-if-absent), Delta uses an external lock manager or DynamoDB log store to guarantee atomic, sequential commits, preventing write overrides.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-delta-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Walk through the internal conflict resolution matrix of Delta Lake when a concurrent UPDATE and a concurrent OPTIMIZE operation commit exactly at the same millisecond.",
+    "answer": "1. Conflict check: Delta uses Optimistic Concurrency Control (OCC). (2) Evaluation: The `UPDATE` transaction adds and removes files containing modified rows. The `OPTIMIZE` transaction merges small files into larger ones. (3) Resolution: Since `OPTIMIZE` does not change data logically, Delta merges the commits. It updates the `UPDATE` file list to point to the newly compacted files instead of the old small files, resolving the conflict dynamically without failures.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-delta-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "How does Delta Lake's Log Reconstruction work? Explain the role of checkpoint .checkpoint.parquet files and how the driver reads them to construct the current state of a table.",
+    "answer": "1. Reconstruction: To find the active file list at version $N$, the driver locates the last checkpoint file (e.g., `000010.checkpoint.parquet`).\n\n2. Parsing: It reads the checkpoint file to get the base file state. Then, it reads subsequent JSON logs (e.g., 11 to $N$) and applies add/remove file details sequentially, reconstructing the table state quickly without parsing millions of older JSON logs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-delta-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Detail the structural and storage difference between Z-Ordering (Space-Filling Curves) and Liquid Clustering at the file and metadata block layers.",
+    "answer": "1. Z-Ordering: Arranges data in multidimensional space along a Morton curve. Physically rewrite Parquet files to group similar attributes. Bounded to 3-4 columns. (2) Liquid Clustering: Decouples physical partitions. Uses dynamic clustering keys written to file metadata headers. Spark clusters data dynamically at write-time, allowing online changes to clustering keys without rewriting older partitions.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-delta-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "How does Delta Lake's Column Propagation and Data Skipping? What exact statistical metadata is collected per file, and how does the file-skipping algorithm interact with the Catalyst optimizer?",
+    "answer": "1. Statistics: Delta collects min, max, and null counts for the first 32 columns of each Parquet file, saving them in the JSON log. (2) Skipping: During query compilation, the Catalyst optimizer evaluates the filter (e.g., `id = 5`) against these min/max stats. It drops files whose ranges do not contain the key, pruning files before execution.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-delta-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Explain the internal mechanics of the Delta VACUUM command. How does it safely distinguish between uncommitted stale files and active reader files within the retention period?",
+    "answer": "1. VACUUM execution: Scans the physical directory and compares files against active transaction log files. (2) Safety check: Keeps files younger than the retention threshold (default 168 hours). Files that are not registered in the log and exceed the threshold are deleted, protecting concurrent queries from `FileNotFoundExceptions`.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-delta-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is the performance penalty and internal metadata overhead of a \"Delta Merge\" operation? Explain the difference between the 1-pass and 2-pass merge algorithms under the hood.",
+    "answer": "1. 2-Pass Merge (Standard): Pass 1 locates the target files containing rows matching the merge condition. Pass 2 joins the target files with the source data and rewrites the modified files. High write-amplification. (2) 1-Pass Merge: Optimizes by performing the join and write operations in a single stage using dynamic bucketing, reducing I/O but consuming more cluster memory.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-delta-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "How does Delta Lake handle schema enforcement versus schema evolution at the transaction log level? Trace the validation code paths.",
+    "answer": "1. Enforcement: Spark writes data. Delta validates schema against the log metadata. If columns differ, it throws an `AnalysisException`. (2) Evolution: If `mergeSchema` is enabled, Delta updates the table schema in the JSON commit log, appending new field types to the metadata state and allowing subsequent writes to proceed.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-delta-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Detail how Delta Lake's CDF (Change Data Feed) captures and stores pre-image, post-image, and row-deleted metadata on disk.",
+    "answer": "1. CDF Storage: Enabled via table properties. (2) Capture: During updates/deletes, Delta writes the changes to a separate `_change_data` directory. It outputs files containing the `before` state (pre-image), `after` state (post-image), and `delete` attributes, allowing consumers to query incremental changes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-delta-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What are the metadata and storage implications of running an OPTIMIZE command with a target file size that contradicts the underlying storage tier block size?",
+    "answer": "1. Size Mismatch: If `OPTIMIZE` compiles files to 1GB, but the cloud storage bucket performs best with 128MB blocks, query engines must execute fragmented range-requests. This triggers S3 rate limits and spikes tail latency due to high network socket reads.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-delta-11",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "How does Delta Lake implement Idempotent Writes for streaming sinks using application IDs and epoch tracking?",
+    "answer": "1. Idempotency: The streaming sink registers the Spark App ID and batch epoch ID in the Delta transaction log during commit. (2) Check: If the app retries a batch, Delta checks the log. If the application ID and batch epoch match an existing commit, it skips the write, preventing duplicates.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-delta-12",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Explain the architectural difference between shallow clones and deep clones in Delta Lake from an operational file-pointer perspective.",
+    "answer": "1. Shallow Clone: Creates a new table referencing the physical Parquet paths of the source table in the metadata log. Fast and low storage cost. (2) Deep Clone: Copies both the metadata logs and the physical Parquet data files to the target path, creating a completely independent copy of the dataset.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-delta-13",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "How do you optimize a Delta table experiencing \"De-serialization/Metadata Bottleneck\" where reading the transaction log takes longer than processing the actual data payload?",
+    "answer": "1. Optimization: (a) Run `OPTIMIZE` to reduce file counts. (b) Adjust checkpoint frequencies (`delta.checkpointInterval`). (c) Enable metadata caching on the query coordinator, and run `VACUUM` to purge old transaction logs, keeping the log tree slim.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-delta-14",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is the impact of configuring delta.logRetentionDuration and delta.deletedFileRetentionDuration on the performance of short-lived point-in-time time-travel queries?",
+    "answer": "1. Retention impact: Shortening retention duration (e.g., to 1 day) cleans transaction logs and physical files fast, reducing storage costs. (2) Time-travel loss: Prevents querying snapshots older than the duration, as the metadata files and physical blocks are deleted, causing time-travel requests to fail.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-delta-15",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "How does Delta Lake interface with the hive metastore or Unity Catalog to synchronize catalog schemas without inducing race conditions?",
+    "answer": "1. Synchronization: Delta writes metadata to the transaction log first. (2) Catalog sync: After commit, the writer triggers an API call updating the Unity Catalog or Hive Metastore pointer. The catalog remains a wrapper pointing to Delta's log, preventing race conditions since the log is the single source of truth.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-photon-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "Explain the fundamental structural difference between the JVM execution layer of standard Spark and the C++ native execution layer of the Photon Engine.",
+    "answer": "1. Standard Spark: Executes Java bytecode inside the JVM heap. Subject to JVM garbage collection, object header overhead, and memory virtualization.\n\n2. Photon Engine: A C++ native engine that executes query plans outside the JVM. It communicates via JNI, allocating off-heap buffers and executing SIMD operations directly on hardware, bypassing JVM overhead and GC pauses completely.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-photon-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "How does Photon handle memory management? Explain how the Photon memory manager operates outside the JVM heap and how it negotiates resource sharing with the host OS.",
+    "answer": "1. Off-Heap Management: Photon allocates memory directly from the OS using custom C++ allocators. (2) Resource Negotiation: It communicates with Spark's `TaskMemoryManager` via JNI. Photon requests memory pages, tracks allocations, and yields memory back to the JVM if heap tasks demand space, preventing host OS OOM kills.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-photon-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "In what explicit scenarios (operators, data types, or expressions) will Photon silently deactivate and delegate execution back to the classic Spark JVM engine?",
+    "answer": "1. Silently Deactivate: Photon falls back to Spark JVM if: (a) The plan contains complex User-Defined Functions (UDFs) that cannot compile to native code. (b) The schema contains unsupported data types (like nested Maps or custom objects). (c) The query uses advanced XML/JSON parsing functions not ported to C++.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-photon-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "How does Photon optimize vectorized execution? Detail how it structures CPU registers and memory alignments to process columnar batches via JNI.",
+    "answer": "1. Columnar Batches: Photon aligns column values in contiguous memory pages (vectors). (2) JNI transfer: Passes memory addresses to C++ loops. (3) Vectorization: The C++ loops load vectors into CPU registers, executing math or filter operations in parallel using SIMD instructions, maximizing CPU cache efficiency.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-photon-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "Explain how the Databricks I/O cache (formerly Delta Cache) differs from native Spark execution memory storage, specifically regarding NVMe acceleration and page-level eviction.",
+    "answer": "1. Spark Storage Memory: Caches data as deserialized JVM objects or serialized blocks in RAM. (2) Databricks I/O Cache: Caches raw Parquet columns directly on local NVMe SSDs in uncompressed format. It uses page-level LRU eviction and memory-mapped files, bypassing heap memory and speeding up scans.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-photon-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "What are the internal architectural implications of running PySpark UDFs on a Databricks cluster where the execution core is fully vectorized via Photon?",
+    "answer": "1. Vectorization break: PySpark UDFs require data to be serialized and sent to Python workers. (2) Photon penalty: Photon must stop native execution, convert native vectors back to JVM rows, serialize them for Python, collect outputs, and rebuild vectors, creating severe JNI bottlenecks.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-photon-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "How does the Photon engine accelerate complex aggregation operations containing high cardinality grouping sets?",
+    "answer": "1. Native Hash Map: Photon uses a C++ native hash table that optimizes key-value layouts in memory cache lines. (2) Speed: Key lookups are executed using hardware-level comparison loops, bypassing object creation and sorting loops typical of JVM aggregates.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-photon-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "Describe the performance profile of Photon when handling string-heavy manipulation operations using SIMD instruction sets.",
+    "answer": "1. String Vectorization: Photon stores strings in flat contiguous character buffers. (2) SIMD scans: Uses instruction sets (e.g., AVX2) to search, compare, or parse multiple character offsets simultaneously, speeding up regex and substring operations by up to 5x over Java String loops.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-photon-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "How do you analyze a Photon execution plan from the Spark UI? Detail the specific metrics (photonTime, photonRowModifiers) that validate CPU efficiency.",
+    "answer": "1. Plan view: In the Spark UI DAG, look for gold-colored nodes named `PhotonGroupingAgg` or `PhotonProject`. (2) Metrics: `photonTime` shows the percentage of time spent in native C++ execution. High `photonTime` and low `photonRowModifiers` indicate optimal native processing without JNI serialization overhead.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-photon-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Photon Engine & Architecture Optimization",
+    "question": "What is the interplay between Photon execution and Databricks Serverless Compute architectures regarding initialization cold-starts and resource scaling?",
+    "answer": "1. Serverless: Photon's pre-compiled C++ library is packaged in the serverless container image. (2) Initialization: Cold-starts are minimal because it bypasses JVM classloader warmups. During scaling, Photon worker nodes start executing native streams instantly, optimizing pay-per-second costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-py-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "Detail the complete architecture of the PySpark execution model. Trace the communication loop across the Py4J gateway, the JVM Spark Context, and the Python Worker daemon processes via pipes.",
+    "answer": "1. Driver Phase: PySpark driver uses `Py4J` to instantiate JVM objects. (2) Worker Spawning: The JVM executor spawns a Python Worker daemon on each machine. (3) Data Loop: During execution, the JVM executor streams partition data to the Python worker via Unix pipes. The Python worker processes the records (e.g., running UDFs) and writes results back to the JVM executor over the pipe.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-py-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "Explain how Apache Arrow vectorization (spark.sql.execution.arrow.pyspark.enabled) dramatically reduces serialization costs compared to standard Pickle serialization.",
+    "answer": "1. Pickle Serialization: PySpark serializes objects row-by-row into Python bytes. Extremely CPU-heavy. (2) Arrow Vectorization: Arrow shares memory layouts between JVM and Python workers. It serializes column batches into contiguous memory buffers, reducing JNI overhead and serialization costs to near zero.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-py-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "Walk through the internal execution flow of a PySpark pandas_udf (Vectorized UDF). How is data batched, chunked, and moved across the JVM/Python memory boundaries?",
+    "answer": "1. Chunking: Spark splits input partitions into Arrow record batches. (2) Stream: The JVM streams these batches to the Python worker. (3) Pandas conversion: PyArrow converts the buffers directly into Pandas Series/DataFrames. The UDF runs, outputs Pandas arrays, and PyArrow serializes them back to the JVM, maintaining vectorization.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-py-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "What happens when a Python worker process crashes due to a segmentation fault or out-of-memory error? How does the parent JVM task manager intercept the failure and report metrics?",
+    "answer": "1. Interception: The JVM executor monitors the OS pipe. If the Python worker process crashes, the pipe throws a `BrokenPipeException` or exit code. (2) Task fail: The executor catches this, marks the task as failed, increments the fail count, and reports the traceback to the driver, triggering task retries.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-py-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "Explain the performance difference between a PySpark SQL built-in function, a Hive UDF, a Python native UDF, and a Scala/Java UDF registered in PySpark.",
+    "answer": "1. SQL Built-in (Fastest): Runs natively in the JVM (often vectorized/Photon). (2) Scala/Java UDF: Runs inside the JVM, fast but lacks Catalyst optimizations. (3) Python native UDF (Slowest): Forces data to pipe to Python workers row-by-row, incurring high serialization latency. (4) Hive UDF: Runs in JVM, moderate speed.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-py-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "How do you programmatically configure a heap dump on OOM for distributed executors and capture it to a cloud object store for post-mortem analysis?",
+    "answer": "1. JVM Flags: Set executor JVM options: `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/`. (2) Script upload: Configure an entry point or JVM script trigger: `-XX:OnOutOfMemoryError=\"/opt/upload_dump.sh\"`. The script uploads the generated dump file to S3/ADLS for developer analysis.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-py-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "Detail the serialization overheads associated with transferring complex broadcast variables from the Python driver process down to the distributed Python executor workers.",
+    "answer": "1. Driver Serialization: The Python driver serializes the variable using Pickle. (2) JVM broadcast: Py4J sends the bytes to the JVM SparkContext, which broadcasts them. (3) Worker Deserialization: Every Python worker deserializes the variable, consuming memory and CPU. To optimize, use smaller broadcast variables.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-py-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "What are the specific memory limits and thread-safety constraints when using Python multithreading inside a mapPartitions call in PySpark?",
+    "answer": "1. GIL limit: Python's Global Interpreter Lock (GIL) prevents executing multiple threads concurrently on CPU-bound tasks. (2) Memory bounds: Memory allocated by Python threads runs outside the JVM heap, competing for the container's overhead memory limits, risking OOM kills if threads allocate large buffers.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-py-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "How does spark.python.worker.reuse modify the OS process lifecycle on individual executor machines under high task concurrency?",
+    "answer": "1. Reuse disabled: Spawns a new Python process for every task. High OS fork/exec overhead. (2) Reuse enabled (Default): Keeps Python worker processes alive after task completion. Subsequent tasks reuse the active process, minimizing startup latency and resource usage.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-py-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "PySpark Internals, Serialization & JNI Bridges",
+    "question": "Explain how the PickleSerializer handles Python closures, and what structural components of a DataFrame reference can trigger a NotSerializableException in PySpark.",
+    "answer": "1. Pickle Closures: Pickle serializes functions along with their referenced variables. (2) Exception: If the closure references a non-serializable object (like a database connection, thread, or the `SparkSession` context itself), Pickle throws a `NotSerializableException`, failing task serialization.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-rdd-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "Explain the mathematical and logical difference between repartition() and coalesce(). Trace their respective physical plans down to exchange operators and shuffle dependencies.",
+    "answer": "1. repartition() (Wide): Full shuffle. Inserts a `ShuffleExchangeExec` node. Redistributes data uniformly across the specified partition count, creating wide dependencies.\n\n2. coalesce() (Narrow): Avoids shuffles by merging adjacent partitions on the same executor. Inserts a `CoalesceExec` node. (3) Partition reduction: It can only reduce partition counts. Because it uses narrow dependencies, it is fast but can cause partition data skew if records are not uniformly distributed.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-rdd-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "Describe the difference between a ShuffleDependency (Wide Dependency) and a NarrowDependency (e.g., OneToOneDependency, RangeDependency). How do they dictate stage boundaries?",
+    "answer": "1. Narrow Dependency: Each partition of the child RDD depends on at most one partition of the parent RDD. Maps directly within the same executor. (2) Wide Dependency: Child partitions depend on multiple parent partitions. Requires a shuffle. (3) Stage boundary: Spark's DAGScheduler breaks the lineage graph at every wide dependency, generating separate execution stages.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-rdd-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "How does Spark construct the execution DAG (Directed Acyclic Graph)? Walk through how the DAGScheduler translates an RDD lineage into physical Stage and TaskSet structures.",
+    "answer": "1. Lineage building: Spark tracks RDD transformations. (2) Stage grouping: On action call, `DAGScheduler` reviews the lineage. It splits the graph at shuffle boundaries into ShuffleMapStages and ResultStages. (3) TaskSets: Group tasks for each stage partition into a `TaskSet`, submitting it to the `TaskScheduler` for cluster dispatch.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-rdd-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "What is the explicit behavioral consequence of a \"Broken Lineage Graph\" caused by un-persisted iterative loops (e.g., in machine learning or graph algorithms like PageRank)?",
+    "answer": "1. Lineage Bloat: Every iteration appends transformations to the lineage. (2) Consequence: The DAG grows recursively. The driver spends more time parsing plans, eventually throwing a `StackOverflowError` or consuming driver heap. Resolve by calling `.persist()` or checkpointing intermediates to break the lineage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-rdd-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "Explain how CoGroupedRDD manages partitioning internally when joining three or more disparate RDDs with different partitioners.",
+    "answer": "1. CoGroupedRDD: Groups values for the same key across multiple input RDDs. (2) Partitioning: It checks the partitioners. If inputs have matching partitioners, it reads partitions directly (narrow). Otherwise, it inserts shuffles to align keys into a common partitioner, merging records into key-aligned arrays.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-rdd-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "How does the TaskScheduler allocate tasks to individual executors based on locality preferences (PROCESS_LOCAL, NODE_LOCAL, RACK_LOCAL, ANY)?",
+    "answer": "1. Locality check: `TaskScheduler` checks where target data blocks reside. (2) Delay scheduling: It attempts to schedule tasks on executors holding the block (`PROCESS_LOCAL`). If busy, it waits (configured delay, e.g., 3s) before falling back to `NODE_LOCAL`, `RACK_LOCAL`, and finally `ANY`, balancing network costs.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-rdd-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "Explain the internal mechanics of Speculative Execution (spark.speculation). How does Spark calculate the performance threshold of a slow task before spawning a speculative copy?",
+    "answer": "1. Speculation Check: Evaluates tasks in a stage. If a task runs slower than the median task duration by a factor (e.g., `spark.speculation.multiplier=1.5`), and stage is 75% complete, Spark marks it as slow. (2) Double run: Spawns a duplicate task on another executor to compete with the slow task.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-rdd-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "What happens at the block manager and driver communication layer when a speculative task finishes micro-seconds before the original task? How is data corruption prevented?",
+    "answer": "1. Race resolution: The finishing task sends a success message to the driver. (2) Task kill: The driver registers the success, accepts the output, and issues a kill RPC command to terminate the slower task. (3) Double-commit prevention: The output directory structure ignores commits from the killed task, protecting output integrity.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-rdd-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "Describe the internal data structures of StorageLevel. Explain the exact performance, memory, and CPU trade-offs of MEMORY_AND_DISK_SER_2 vs. MEMORY_ONLY.",
+    "answer": "1. MEMORY_ONLY: Caches raw objects in JVM memory. Fast access, high memory use, low CPU load. (2) MEMORY_AND_DISK_SER_2: Serializes objects into byte arrays, replicates to 2 nodes, spills to disk if memory is full. Low memory use, high CPU serialization load, high network replication costs, but highly resilient.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-rdd-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Core Partitioning, RDD Lineage & Graph DAG Mechanics",
+    "question": "How do you implement a highly optimized custom Partitioner that ensures zero data skew for a key distribution that follows a Pareto power-law distribution?",
+    "answer": "1. Custom Partitioner: Inherit from `Partitioner`. Override `getPartition(key)`. (2) Implementation: Map the top high-frequency keys (the Pareto head) to their own dedicated partition IDs using a hash lookup map. Hash the remaining low-frequency keys normally, distributing skewed keys uniformly across partitions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-cloud-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "Explain the internal structural layout of an Apache Parquet file (File Metadata, Row Groups, Column Chunks, Pages, Dictionaries, Bloom Filters). How does Spark exploit this layout for predicate pushdown?",
+    "answer": "1. Parquet Layout: Built with: (a) Header. (b) Row Groups (contain Column Chunks). (c) Pages (data, dictionary, index). (d) File Metadata in the footer.\n\n2. Predicate Pushdown: The reader parses the footer metadata first to check column min/max ranges and Bloom filters. It skips reading entire row groups or pages whose key ranges do not match the query filters, bypassing I/O reads of non-matching blocks.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-cloud-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "What is the \"Schema Evolution\" mapping mechanism inside the Parquet Reader, and what are the precise edge cases that cause runtime structural alignment mismatches?",
+    "answer": "1. Schema Mapping: Maps Parquet physical columns to target DataFrame schema. (2) Edge Cases: If type widening is incompatible (e.g., float promoted to decimal without casting), or if columns are renamed and reader uses physical index positions, mapping fails with runtime alignment errors, mismatching columns.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-cloud-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "Detail the performance impact of the \"Small File Problem\" on cloud object storage (e.g., S3/ADLS). How does file listing latency map to Spark driver memory consumption and query planning overhead?",
+    "answer": "1. Planning Overhead: Ingesting millions of small files requires the driver to perform exhaustive `listStatus` API calls. (2) Driver Bloat: The metadata (paths, sizes) must be kept in driver heap. This bloats memory, triggers GC overhead, and query planning takes longer than actual execution. Compact files to 128MB+ to resolve this.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-cloud-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "Explain how Spark SQL's file source scan handles \"Directory Partition Pruning\". How does it discover partitions without executing exhaustive cloud storage file listing APIs?",
+    "answer": "1. Partition discovery: Reads the catalog table partition list instead of scanning S3. (2) Pruning: Compares the query filters against the catalog metadata. It generates scan tasks only for directories matching the filter, skipping S3 list operations for pruned partition paths.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-cloud-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "What is the explicit operational difference between Hive Metastore synchronization and Unity Catalog governance from a metadata caching and planning perspective?",
+    "answer": "1. HMS: Relies on manual `MSCK REPAIR TABLE` to sync. Cache is stale until reload. (2) Unity Catalog: Evaluates authorization and path mapping via a central REST API. Caches metadata with TTL. Query planners fetch fresh metadata dynamically, ensuring secure and synchronized schemas across regions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-cloud-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "Explain how spark.sql.files.maxPartitionBytes governs the ingestion phase split-generation algorithm. How does it balance task distribution across raw text files vs. compressed splittable files?",
+    "answer": "1. Max Partition Bytes: Sets maximum size of a single partition task (default 128MB). (2) Split calculation: For splittable files (like Parquet or bzip2 text), Spark groups files into 128MB chunks. For non-splittable (like gzip), it assigns the entire file to a task, balancing thread load.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-cloud-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "How does the internal ParquetRecordReader perform vectorized column decoding? Explain how it populates Tungsten off-heap columns directly from disk streams.",
+    "answer": "1. Vectorized Decoding: Reads compressed column pages directly into off-heap columnar memory batches (`WritableColumnVector`). (2) Tungsten population: Bypasses row-by-row Java object creation. The reader writes values directly to off-heap memory addresses, maximizing CPU data cache locality.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-cloud-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "What causes a FileNotFoundException during a long-running batch or streaming job over cloud storage, and how do you configure Spark's read consistency to handle it?",
+    "answer": "1. Cause: An upstream process or compaction job overwrites/purges Parquet files while the running Spark task is querying them. (2) Resolution: Configure table formats (Iceberg/Delta) which maintain MVCC isolation. Set read consistency retry flags or point directories to static snapshots to prevent crashes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-cloud-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "Explain the metadata collection process of the Analyze Table command. How does Spark save and pull column-level statistics to drive CBO paths?",
+    "answer": "1. Statistics gathering: `ANALYZE TABLE COMPUTE STATISTICS FOR COLUMNS` runs aggregation scans to calculate distinct counts, null counts, min, max, and histograms. (2) Save: Saves metadata to the Metastore. The Catalyst CBO reads these stats during join planning to calculate optimal plans.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-cloud-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cloud Storage Ingestion, Formats (Parquet/Orc) & Catalogs",
+    "question": "Detail how Spark handles file serialization formats that are fundamentally non-splittable (e.g., gzip-compressed JSON or XML) during the physical scan stage.",
+    "answer": "1. Non-splittable scan: Spark cannot partition the file. A single executor task must download and scan the entire file sequentially. (2) CPU Bottleneck: Causes task skew, where one task runs for hours while others are idle. Mitigate by re-compressing files using splittable codecs (like bzip2 or ZSTD).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-diag-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "A cluster with 50 executors suddenly hangs at the very end of a stage with 1 task remaining active for hours. Walk through your step-by-step diagnostic procedure using metrics, thread dumps, and environmental stats to pinpoint the exact root cause.",
+    "answer": "1. Task Check: Open Spark UI. Identify the active task ID and the host executor node.\n\n2. Skew check: Look at the task's 'Shuffle Read Size' and 'Shuffle Write Size'. If the task processed gigabytes of data compared to megabytes on others, a data skew is present.\n\n3. Thread Dump: Take a thread dump of the target executor. Locate the active thread. If it is stuck in `ExternalAppendOnlyUnsafeRowArray.add` or GC collection, the JVM is struggling with memory allocation during sorting.\n\n4. Environment check: Check host CPU/IO usage. If CPU is at 100% and disk write-wait is high, the executor is experiencing heavy memory page spilling, causing the hang. Enable speculation to mitigate.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-diag-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "During a large production migration, a query that ran in 10 minutes on a 10-node cluster takes 3 hours on a 100-node cluster. Detail the explicit distributed systems pathologies (e.g., scheduling overhead, connection pool collapse, metadata storms) that could cause this behavior.",
+    "answer": "1. Scheduler Bottleneck: For high partition counts, scaling to 100 nodes increases the number of parallel tasks. The driver JVM gets overloaded scheduling tasks, causing latency.\n\n2. Connection Pool Collapse: 100 nodes concurrently querying the Hive Metastore or catalog database exhaust connection pools, causing task timeouts.\n\n3. Metadata Storms: Thousands of tasks executing S3 list operations concurrently trigger S3 API rate limit throttling, inflating task runtimes and slowing down queries.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-diag-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "Analyze a scenario where Spark UI reports a massive discrepancy between \"Task Deserialization Time\" and \"Executor Computing Time\". What are the low-level causes, and how do you fix them?",
+    "answer": "1. Cause: High deserialization time indicates: (a) The broadcast variables are too large, and task workers spend time deserializing them. (b) The user code contains large non-serializable objects. (c) The partition count is very high, and task metadata sizes exceed actual data sizes. (2) Resolution: Reduce broadcast sizes, use Kryo serializer, and coalesce partitions to reduce task counts.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-diag-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "You notice that your streaming job experiences periodic spikes in micro-batch processing time every exactly 4 hours. How do you isolate whether this is due to cloud storage throttling, JVM token renewals, or underlying infrastructure maintenance?",
+    "answer": "1. Isolation steps: (a) Correlate timestamps with CloudTrail logs. If 503 SlowDown errors spike at that time, it is storage throttling. (b) Inspect executor JVM security logs. If spikes align with Kerberos ticket renewals (typically 4 hours), it is auth latency. (c) Check host VM logs (dmesg) to identify underlying hypervisor maintenance cycles.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-diag-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "Explain how you diagnose a silent data corruption error where an optimized query returns incorrect row counts, but running the query with spark.sql.optimizer.excludedRules returns the correct results.",
+    "answer": "1. Diagnosis: Isolate the optimizer rule causing the error by excluding rules one-by-one: `spark.sql.optimizer.excludedRules=RuleName`. (2) Plan Compare: Compare physical plans before and after rule exclusion. Check for incorrect predicate pushdowns or incorrect projection folding on nullable columns, identifying the buggy optimization rule.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-diag-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "A high-concurrency production system reports frequent RpcTimeoutException and HeartbeatReceiver failures. Detail how you configure the Akka/Netty timeouts and bufferframes to handle this extreme state without cluster termination.",
+    "answer": "1. Cause: The driver node is blocked by GC pauses or network overload, failing to respond to heartbeat RPCs in time. (2) Resolution: Increase `spark.network.timeout` to 300s and `spark.executor.heartbeatInterval` to 30s. Tune driver GC limits (using ZGC) to keep pause times under 10ms, preventing RPC timeouts.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-diag-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "How do you trace and debug a memory leak originating from a custom native C++ library loaded via JNI inside a high-throughput Spark DataFrame map operation?",
+    "answer": "1. Tracing: Since native leaks occur outside the JVM heap, Java profile tools fail. (2) Profiler: Run `valgrind` or `jemalloc` on the executor host VMs. (3) Isolation: Profile memory allocations inside the worker nodes. Check for un-freed JNI pointers and missing native destructions inside the map loops, resolving off-heap memory growth.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-diag-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "Explain how you profile a driver-level memory bottleneck caused by collecting large amounts of task metrics across a job containing over 1 million individual tasks.",
+    "answer": "1. Bottleneck Cause: The driver collects metrics (task duration, shuffle sizes) from all tasks. For 1M tasks, this exhausts the driver heap. (2) Profiling: Take a heap dump of the driver using `jmap`. (3) Resolution: Disable task-level metrics aggregation, decrease partition count by coalescing, and increase driver JVM heap size to hold metadata.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-diag-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "What are the diagnostic steps to resolve a Container killed by YARN for exceeding memory limits error when the executor memory parameters appear to have plenty of headroom?",
+    "answer": "1. Diagnosis: (a) Check YARN NodeManager logs. Identify memory usage. (b) If JVM heap is within limits, off-heap allocations (Netty buffers, PySpark processes) are exceeding YARN overhead. (2) Resolution: Increase `spark.executor.memoryOverhead` (e.g., to 20% of executor heap) to allocate more headroom for OS-level allocations, preventing container kills.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-diag-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Real-World Production Diagnostics & Root Cause Analysis",
+    "question": "Detail how you design and implement a comprehensive end-to-end telemetry pipeline using Prometheus, Grafana, and Custom OpenTelemetry Spark Listeners to capture and alert on real-time shuffle spill inflation.",
+    "answer": "1. Telemetry Design: (a) Write a custom `SparkListener` that captures `onTaskEnd` metrics. (b) Export `taskMetrics.diskBytesSpilled` and `shuffleWriteMetrics` to an OpenTelemetry collector. (c) Configure Prometheus to scrape the collector. (d) Build a Grafana dashboard with alert thresholds on disk spills, sending instant alerts to Slack/PagerDuty.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "medium-spark-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Core Concepts",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Spark Transformation and a Spark Action?",
+    "answer": "A Transformation (e.g., `map()`, `filter()`, `join()`) creates a new DataFrame/RDD from an existing one but does not compute the result immediately due to lazy evaluation. An Action (e.g., `count()`, `show()`, `write()`) triggers the actual execution of the entire transformation lineage across the cluster to return a result to the driver or write data to storage."
+  },
+  {
+    "id": "medium-spark-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Core Concepts",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of Lazy Evaluation in Apache Spark.",
+    "answer": "Lazy evaluation means Spark delays the execution of transformations until an action is called. Instead of processing data step-by-step, Spark builds a Directed Acyclic Graph (DAG) of the logical execution plan. When an action is triggered, the Catalyst Optimizer analyzes the entire DAG to execute the most efficient physical plan (e.g., combining filters and pushing them down to the data source)."
+  },
+  {
+    "id": "medium-spark-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Core Concepts",
+    "difficulty": "HARD",
+    "question": "What is the difference between narrow and wide transformations in Spark?",
+    "answer": "Narrow transformations (e.g., `map()`, `filter()`) compute results using data from a single partition, requiring no data movement across the network. Wide transformations (e.g., `groupBy()`, `join()`, `orderBy()`) require data from multiple partitions to compute results. This forces a 'shuffle', where data is heavily moved across the network between executor nodes, which is an expensive operation."
+  },
+  {
+    "id": "medium-spark-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Architecture",
+    "difficulty": "EASY",
+    "question": "What are the roles of the Driver and the Executors in a Spark Cluster?",
+    "answer": "The Driver is the master node that runs the `main()` function of the application, maintains the SparkContext, translates user code into a DAG, and schedules tasks. The Executors are worker nodes that receive tasks from the driver, execute the data processing on their assigned partitions, cache data in memory, and return the status and results to the driver."
+  },
+  {
+    "id": "medium-spark-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Architecture",
+    "difficulty": "MEDIUM",
+    "question": "What is the purpose of the Cluster Manager in Spark (e.g., YARN, Kubernetes)?",
+    "answer": "The Cluster Manager sits between the Spark application and the underlying physical infrastructure. Its role is to allocate hardware resources (CPU cores and memory) to the Spark Driver and Executors based on the application's configuration requests, ensuring fair sharing of cluster resources among multiple concurrent applications."
+  },
+  {
+    "id": "medium-spark-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Performance Optimization",
+    "difficulty": "EASY",
+    "question": "Explain the difference between repartition() and coalesce().",
+    "answer": "Both alter the number of partitions in a DataFrame. `repartition()` can increase or decrease partitions and causes a full network shuffle to distribute data evenly. `coalesce()` is optimized for decreasing partitions; it avoids a full shuffle by safely merging existing partitions on the same node. You should prefer `coalesce()` when reducing file counts."
+  },
+  {
+    "id": "medium-spark-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Performance Optimization",
+    "difficulty": "EASY",
+    "question": "What is Data Skew in Spark, and what problems does it cause?",
+    "answer": "Data Skew occurs when data is unevenly distributed across partitions based on a key (e.g., joining on a 'Country' column where 90% of rows are 'USA'). This causes a few executor tasks to process massive amounts of data while others finish instantly and sit idle. It leads to severe bottlenecks, OOM (Out of Memory) errors, and incredibly slow pipeline execution."
+  },
+  {
+    "id": "medium-spark-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Performance Optimization",
+    "difficulty": "MEDIUM",
+    "question": "How can you mitigate Data Skew during a Spark join?",
+    "answer": "You can mitigate data skew using 'Salting'. This involves appending a random number (the salt) to the highly skewed join key in the large table, and replicating the rows of the smaller table for every possible salt value. This artificially breaks up the large partition into smaller, evenly distributed chunks across the cluster before the join."
+  },
+  {
+    "id": "medium-spark-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Performance Optimization",
+    "difficulty": "MEDIUM",
+    "question": "What is the Spark Catalyst Optimizer?",
+    "answer": "The Catalyst Optimizer is the core engine of Spark SQL. It takes the logical plan (your code), applies rule-based and cost-based optimizations (like predicate pushdown, constant folding, and optimal join selection), and generates a highly optimized physical execution plan in Java bytecode using Tungsten."
+  },
+  {
+    "id": "medium-spark-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks & Delta Lake",
+    "difficulty": "EASY",
+    "question": "What is Delta Lake, and what problems does it solve for Data Lakes?",
+    "answer": "Delta Lake is an open-source storage layer that brings ACID transactions, scalable metadata handling, and time travel to Apache Spark workloads. It solves the unreliability of traditional data lakes by ensuring that concurrent reads and writes do not result in corrupt or partial data, and it tracks a transaction log alongside Parquet files to enforce schema and provide version control."
+  },
+  {
+    "id": "medium-spark-11",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks & Delta Lake",
+    "difficulty": "EASY",
+    "question": "How does Time Travel work in Delta Lake?",
+    "answer": "Because Delta Lake never overwrites or deletes old Parquet files immediately (until a `VACUUM` is run), and maintains a sequential JSON transaction log detailing every insert, update, and delete, you can query older versions of a table. You do this using syntax like `SELECT * FROM table TIMESTAMP AS OF '2023-01-01'` or `VERSION AS OF 5`, allowing you to easily recover from accidental bad writes."
+  },
+  {
+    "id": "medium-spark-12",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks & Delta Lake",
+    "difficulty": "MEDIUM",
+    "question": "What does the OPTIMIZE command do in Databricks Delta Lake?",
+    "answer": "The `OPTIMIZE` command compacts small files into larger, more efficient Parquet files (bin-packing) to improve read performance. It can also be combined with `ZORDER BY (column_name)`, which co-locates related information in the same set of files based on that column, drastically reducing the amount of data Spark has to scan during analytical queries."
+  },
+  {
+    "id": "medium-spark-13",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks & Delta Lake",
+    "difficulty": "MEDIUM",
+    "question": "Explain the purpose of the VACUUM command in Delta Lake.",
+    "answer": "The `VACUUM` command permanently deletes data files from storage that are no longer referenced by the active Delta transaction log and are older than a specific retention threshold (default is 7 days). It is essential for managing storage costs, as UPDATEs and DELETEs in Delta Lake create new files rather than modifying existing ones."
+  },
+  {
+    "id": "medium-spark-14",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks & Delta Lake",
+    "difficulty": "HARD",
+    "question": "What is Databricks Auto Loader?",
+    "answer": "Auto Loader is a Databricks feature that incrementally and efficiently processes new data files as they arrive in cloud storage (ADLS, S3). It automatically tracks which files have been processed using a RocksDB state store, removing the need to manage complex file-state tracking logic or use Event Grid triggers, and handles schema evolution gracefully."
+  },
+  {
+    "id": "medium-spark-15",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Streaming and Structured Streaming",
+    "difficulty": "EASY",
+    "question": "What is Structured Streaming in Apache Spark?",
+    "answer": "Structured Streaming is a scalable and fault-tolerant stream processing engine built on the Spark SQL engine. It allows developers to express streaming computations using the exact same DataFrame/Dataset API used for batch processing. Spark treats the incoming data stream as an continuously appending, unbounded table."
+  },
+  {
+    "id": "medium-spark-16",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Streaming and Structured Streaming",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of Checkpointing in Spark Structured Streaming.",
+    "answer": "Checkpointing saves the progress of a streaming query (offsets, state information, and metadata) to reliable cloud storage (like ADLS). If the Spark cluster crashes or the job is restarted, the streaming engine reads the checkpoint directory to resume processing exactly where it left off, ensuring exactly-once fault tolerance guarantees."
+  },
+  {
+    "id": "medium-spark-17",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Streaming and Structured Streaming",
+    "difficulty": "HARD",
+    "question": "What is Watermarking in Spark Streaming, and why is it necessary?",
+    "answer": "Watermarking defines a time threshold indicating how long the system should wait for late-arriving data before finalizing aggregations for a time window and dropping state. Without a watermark, Spark would have to keep the state for all historical time windows in memory indefinitely, eventually causing an Out of Memory crash."
+  },
+  {
+    "id": "medium-spark-18",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Workspaces",
+    "difficulty": "EASY",
+    "question": "What is the difference between an All-Purpose Cluster and a Job Cluster in Databricks?",
+    "answer": "An All-Purpose Cluster is created manually, shared among multiple users, and optimized for interactive notebook development and ad-hoc querying. A Job Cluster is spun up dynamically by the Databricks job scheduler solely to run a specific automated workload, and it terminates immediately after completion, making it highly cost-effective for production pipelines."
+  },
+  {
+    "id": "medium-spark-19",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Workspaces",
+    "difficulty": "EASY",
+    "question": "How do you securely access an Azure SQL Database from a Databricks notebook?",
+    "answer": "You should use Databricks Secret Scopes backed by Azure Key Vault. The database username and password are stored in Key Vault. In the notebook, you use `dbutils.secrets.get(scope='my_scope', key='sql_password')` to retrieve the credentials at runtime without exposing them in the notebook's source code."
+  },
+  {
+    "id": "medium-spark-20",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Workspaces",
+    "difficulty": "MEDIUM",
+    "question": "What is Unity Catalog in Databricks?",
+    "answer": "Unity Catalog is the unified governance solution for data and AI assets across all Databricks workspaces. It provides a centralized metadata layer, unified access control (using standard SQL GRANT/REVOKE commands), automated data lineage tracking, and auditing, moving away from fragmented, workspace-local Hive metastores."
+  },
+  {
+    "id": "medium-spark-21",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Context",
+    "difficulty": "EASY",
+    "question": "What is the difference between SparkContext and SparkSession?",
+    "answer": "In older versions (Spark 1.x), `SparkContext` was the entry point for RDDs, while `SQLContext` and `HiveContext` were used for DataFrames. Since Spark 2.0, `SparkSession` is the unified entry point. It internally encapsulates the `SparkContext`, `SQLContext`, and `HiveContext`, providing a cleaner API for working with DataFrames, Datasets, and Spark SQL."
+  },
+  {
+    "id": "medium-spark-36",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Streaming",
+    "difficulty": "EASY",
+    "question": "What is trigger(availableNow=True) in Spark Structured Streaming?",
+    "answer": "Traditionally, streaming implies continuous 24/7 processing. `trigger(availableNow=True)` is used for incremental batch processing. When the job runs, it processes all unread data available in the source (e.g., Kafka or Auto Loader) in multiple micro-batches, updates its checkpoint, and then completely shuts down the cluster. This provides the tracking benefits of streaming with the massive cost savings of batch."
+  },
+  {
+    "id": "medium-spark-37",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Streaming",
+    "difficulty": "MEDIUM",
+    "question": "What happens if a Structured Streaming job fails?",
+    "answer": "Structured Streaming relies on Checkpointing and Write-Ahead Logs (WAL). If the job fails, upon restart, it reads the checkpoint directory from cloud storage to determine exactly which offsets were processed last. It then replays any uncommitted data, ensuring exactly-once processing guarantees without data duplication."
+  },
+  {
+    "id": "medium-spark-38",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Workflows",
+    "difficulty": "EASY",
+    "question": "What is a Databricks Workflow (Jobs)?",
+    "answer": "Databricks Workflows is the fully managed orchestration service built into Databricks. It allows you to link together Notebooks, Python scripts, JARs, and DLT pipelines into complex DAGs (Directed Acyclic Graphs). You can schedule them, define dependencies, and route output data or parameters between tasks, replacing the need for external tools like Apache Airflow in many cases."
+  },
+  {
+    "id": "medium-spark-39",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cluster Configuration",
+    "difficulty": "EASY",
+    "question": "What are Spot Instances in Databricks clusters?",
+    "answer": "Spot instances utilize excess, unused compute capacity in Azure/AWS at a massively discounted rate (up to 80% off). The catch is that the cloud provider can reclaim (terminate) these nodes at any time with a 2-minute warning. Databricks handles this gracefully by rescheduling failed tasks. They are ideal for worker nodes in fault-tolerant batch jobs to save money."
+  },
+  {
+    "id": "medium-spark-40",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Cluster Configuration",
+    "difficulty": "MEDIUM",
+    "question": "Why should you separate Driver nodes and Worker nodes when using Spot instances?",
+    "answer": "The Driver node manages the entire Spark application state. If the Driver node is running on a Spot instance and gets terminated by the cloud provider, the entire Spark job fails instantly. You should configure the cluster to use a reliable, On-Demand instance for the Driver, and cheap Spot instances for the Workers, so you only lose temporary tasks during a reclamation."
+  },
+  {
+    "id": "medium-spark-31",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Delta",
+    "difficulty": "EASY",
+    "question": "What is Delta Live Tables (DLT)?",
+    "answer": "DLT is a declarative framework in Databricks for building reliable data pipelines. Instead of writing complex imperative Spark code to manage data dependencies, state, and error handling, you simply declare the target Delta tables using SQL or Python (e.g., `CREATE LIVE TABLE...`). DLT automatically orchestrates the DAG, manages infrastructure, handles retries, and enforces data quality expectations."
+  },
+  {
+    "id": "medium-spark-32",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Delta",
+    "difficulty": "MEDIUM",
+    "question": "How do you handle bad data in Delta Live Tables?",
+    "answer": "You define 'Expectations' (data quality constraints). You can configure three behaviors for violations: `expect` (allow the bad record but record the failure in metrics), `expect_or_drop` (silently drop the bad record and continue), or `expect_or_fail` (halt the entire pipeline execution immediately if a bad record is encountered)."
+  },
+  {
+    "id": "medium-spark-33",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks SQL",
+    "difficulty": "EASY",
+    "question": "What is Databricks SQL (DBSQL)?",
+    "answer": "DBSQL is a serverless data warehouse service within Databricks. It provides an optimized SQL endpoint (using the Photon C++ execution engine) designed specifically for BI tools like Power BI or Tableau to query the Delta Lake. It replaces the need for data analysts to use interactive Spark Notebooks, offering a traditional SQL editor, dashboards, and alerting."
+  },
+  {
+    "id": "medium-spark-34",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks SQL",
+    "difficulty": "MEDIUM",
+    "question": "What is the Photon engine in Databricks?",
+    "answer": "Photon is a next-generation, native vectorized query engine written in C++ that integrates directly with Spark. It bypasses the JVM for intensive data operations, optimizing execution for modern CPU architectures. It dramatically accelerates performance for SQL workloads (like Joins and Aggregations) on Delta Lake without requiring any changes to user code."
+  },
+  {
+    "id": "medium-spark-35",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Security",
+    "difficulty": "EASY",
+    "question": "How do you implement Row-Level Security in Databricks?",
+    "answer": "Historically RLS required complex view logic, but with Databricks Unity Catalog, you can now define RLS natively using SQL. You create a SQL function that returns a boolean based on the `current_user()`, and apply that function to a table using the `ALTER TABLE ... WITH ROW FILTER` syntax, ensuring secure access regardless of which Databricks cluster is querying it."
+  },
+  {
+    "id": "medium-spark-46",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced DataFrames",
+    "difficulty": "EASY",
+    "question": "What is the DataFrame API's window() function vs the SQL Window function?",
+    "answer": "In PySpark, `pyspark.sql.functions.window` is specifically used for streaming aggregations. It groups timestamps into fixed intervals (e.g., tumbling or sliding windows) to count events over time. This is completely different from the SQL `pyspark.sql.Window` class, which is used for analytical ranking functions like `row_number()` or `lead()` over a partitioned set of rows."
+  },
+  {
+    "id": "medium-spark-47",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced DataFrames",
+    "difficulty": "EASY",
+    "question": "How do you define a UDF that returns a complex struct (Object) in PySpark?",
+    "answer": "When defining a UDF, you must explicitly declare its return type using PySpark SQL Data Types. To return an object, you define a `StructType` containing multiple `StructField` definitions. You then pass this schema definition as the second argument to the `udf(my_func, returnType=schema)` registration function."
+  },
+  {
+    "id": "medium-spark-48",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Connect",
+    "difficulty": "EASY",
+    "question": "What is Databricks Connect?",
+    "answer": "Databricks Connect is a client library that allows developers to write PySpark, Scala, or R code in their local IDE (like VS Code or PyCharm) and execute that code directly on a remote Databricks cluster in the cloud. It sends the execution plan to the cluster, preventing the need to mock data locally, while allowing full local debugging and CI/CD integration."
+  },
+  {
+    "id": "medium-spark-49",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Data Science",
+    "difficulty": "EASY",
+    "question": "What is MLflow in Databricks?",
+    "answer": "MLflow is an open-source platform managed natively within Databricks for managing the end-to-end machine learning lifecycle. It tracks experiments (logging parameters, metrics, and models), packages code into reproducible runs, and provides a central Model Registry to manage the transition of models from Staging to Production APIs."
+  },
+  {
+    "id": "medium-spark-50",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Data Science",
+    "difficulty": "MEDIUM",
+    "question": "How do you distribute deep learning training across a Databricks cluster?",
+    "answer": "Standard deep learning libraries (like TensorFlow or PyTorch) are designed to run on a single machine. In Databricks, you use libraries like HorovodRunner or spark-dl. These libraries take your single-machine deep learning code and automatically distribute the training payload (data and gradients) across all the worker nodes/GPUs in the Spark cluster."
+  },
+  {
+    "id": "medium-spark-27",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Spark API",
+    "difficulty": "EASY",
+    "question": "What is a UDF (User Defined Function) in Spark, and why should it be avoided in Python?",
+    "answer": "A UDF allows you to apply custom logic to a DataFrame column. In PySpark, standard Python UDFs should be avoided because Spark must serialize the data, send it from the JVM executor to a Python worker process row-by-row, execute the Python code, and serialize it back. This massive overhead destroys performance. You should use native Spark SQL functions whenever possible."
+  },
+  {
+    "id": "medium-spark-28",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Spark API",
+    "difficulty": "MEDIUM",
+    "question": "If you absolutely must use a Python UDF, how do you optimize it?",
+    "answer": "You should use Pandas UDFs (Vectorized UDFs). Instead of passing data row-by-row to the Python worker, Pandas UDFs use Apache Arrow to transfer data in massive in-memory batches (chunks) directly into Pandas DataFrames or Series. This vectorization speeds up custom Python execution by 10x to 100x compared to standard Python UDFs."
+  },
+  {
+    "id": "medium-spark-29",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark UI & Debugging",
+    "difficulty": "EASY",
+    "question": "How can you identify a Shuffle problem in the Spark UI?",
+    "answer": "In the Spark UI 'Stages' tab, you look at the 'Shuffle Read' and 'Shuffle Write' metrics. If a specific stage (often associated with a GroupBy or Join) is taking an unusually long time and shows gigabytes or terabytes of Shuffle Read/Write data moving across the network, you have a shuffle bottleneck that requires optimization (like broadcasting or changing partitioning)."
+  },
+  {
+    "id": "medium-spark-30",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark UI & Debugging",
+    "difficulty": "MEDIUM",
+    "question": "What does a GC (Garbage Collection) Time metric in the Spark UI indicate?",
+    "answer": "If an executor spends a high percentage of its time in Garbage Collection (GC Time is highlighted in red in the Spark UI), it means the JVM memory is nearly full. The system is struggling to clear old objects to make room for new ones. This usually indicates data skew, processing partitions that are too large, or caching too much data, often leading to an Out of Memory error."
+  },
+  {
+    "id": "medium-spark-41",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Context",
+    "difficulty": "MEDIUM",
+    "question": "What happens when you call `.collect()` on a Spark DataFrame?",
+    "answer": "The `collect()` action forces the Spark Executors to send all the processed data back across the network to the single Driver node, where it is converted into a local array or list. This is highly dangerous for large datasets, as it will easily exceed the Driver's RAM and cause a fatal Out of Memory (OOM) error."
+  },
+  {
+    "id": "medium-spark-42",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark Context",
+    "difficulty": "HARD",
+    "question": "Explain the difference between .show() and .take(n).",
+    "answer": "`show()` prints a tabular representation of the first 20 rows to the console for human viewing. `take(n)` returns the first `n` rows back to the Driver program as an array of Row objects, allowing you to iterate over them programmatically in your Python/Scala script."
+  },
+  {
+    "id": "medium-spark-43",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced DataFrames",
+    "difficulty": "MEDIUM",
+    "question": "How do you handle NULL values in a Spark DataFrame?",
+    "answer": "You use the `.na` sub-module. You can use `df.na.drop()` to remove any rows containing nulls, `df.na.fill(value)` to replace nulls with a specific default value (like 0 or 'Unknown'), or use `coalesce()` or `when(col.isNull(), ...)` in specific column expressions."
+  },
+  {
+    "id": "medium-spark-44",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced DataFrames",
+    "difficulty": "HARD",
+    "question": "What is the purpose of the explode() function in Spark SQL?",
+    "answer": "If a DataFrame column contains an array or a map (list of items), `explode()` takes that array and creates a new row for every element within it, duplicating the data from the other columns for each new row. It essentially flattens nested array structures."
+  },
+  {
+    "id": "medium-spark-45",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Workspace",
+    "difficulty": "EASY",
+    "question": "What are Databricks Widgets?",
+    "answer": "Widgets are interactive UI elements (like dropdowns, text boxes, or date pickers) that you can define at the top of a Databricks Notebook. They allow users to input parameters dynamically. In your Python or SQL code, you retrieve the widget's value using `dbutils.widgets.get(\"parameter_name\")` and use it to filter data or alter logic."
+  },
+  {
+    "id": "medium-spark-22",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark SQL",
+    "difficulty": "EASY",
+    "question": "How does Spark handle JSON data with varying schemas?",
+    "answer": "Spark's DataFrameReader can infer schemas from JSON files by scanning a sample of the data. If schemas vary across files, Spark can automatically merge them by finding the superset of all columns. However, inferring schemas on massive datasets requires a costly full-table scan, so in production, providing an explicit DDL schema string is recommended."
+  },
+  {
+    "id": "medium-spark-23",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Spark SQL",
+    "difficulty": "MEDIUM",
+    "question": "What is Predicate Pushdown in Spark?",
+    "answer": "Predicate Pushdown is an optimization where Spark pushes filtering logic (the `WHERE` clause, or 'predicate') down to the underlying storage system (like Parquet or a SQL database) before the data is loaded into memory. This drastically reduces network traffic and memory usage because only the required rows are retrieved by the Spark executors."
+  },
+  {
+    "id": "medium-spark-24",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Performance Optimization",
+    "difficulty": "HARD",
+    "question": "What is Adaptive Query Execution (AQE) in Spark 3.0+?",
+    "answer": "Before AQE, Spark optimized execution plans statically before the job ran. AQE allows Spark to re-optimize the physical execution plan *during* runtime based on actual runtime statistics. It dynamically coalesces shuffle partitions, switches join strategies (e.g., from Sort-Merge Join to Broadcast Join if a table is smaller than expected after filtering), and handles skewed joins."
+  },
+  {
+    "id": "medium-spark-25",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Performance Optimization",
+    "difficulty": "HARD",
+    "question": "Explain the difference between Cache() and Persist() in Spark.",
+    "answer": "Both keep a DataFrame in memory across multiple actions to avoid recomputation. `cache()` is a shortcut that always uses the default storage level (`MEMORY_AND_DISK` for DataFrames). `persist()` allows you to explicitly specify the storage level, such as storing data only on disk, storing it in memory serialized to save space, or replicating it across multiple nodes for high availability."
+  },
+  {
+    "id": "medium-spark-26",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Delta",
+    "difficulty": "HARD",
+    "question": "How do you implement a Type 2 Slowly Changing Dimension (SCD2) in Databricks?",
+    "answer": "You use the `MERGE INTO` command in Delta Lake. You join the incoming source data with the target Delta table. If a match is found and attributes have changed, you UPDATE the existing row to close its validity window (set `IsActive = false` and update the `EndDate`), and then INSERT a new row for the updated attributes with `IsActive = true`."
+  },
+  {
+    "id": "spark-new-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "How does Spark's Project Tungsten utilize off-heap memory to bypass Java Virtual Machine (JVM) garbage collection overhead?",
+    "answer": "Project Tungsten manages memory allocations explicitly by writing data structures (like arrays and hash tables for joins and sorts) to off-heap memory using Java's `sun.misc.Unsafe` API. This stores data as raw bytes in contiguous memory blocks, bypassing the JVM heap. Since these memory regions are managed directly by Spark, they are not scanned by the JVM GC thread. This eliminates GC pause latency and memory overhead on large executor nodes with hundreds of gigabytes of RAM.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-new-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "What is the physical mechanism of Shuffle Reader retries under transient network drops in a Spark cluster?",
+    "answer": "During a shuffle, executors fetch partition files from other executors over the network via block transfer service. If a fetch fails due to network drops, the Shuffle Reader retries the fetch (controlled by `spark.port.maxRetries` and `spark.shuffle.io.maxRetries`). If all retries fail, Spark throws a `MetadataFetchFailedException` or `FetchFailedException`. The driver intercepts this exception, invalidates the map status of the failing executor, and resubmits the parent map stage to recreate the shuffle files, ensuring cluster fault tolerance.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-new-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "How do you inject a custom optimization rule into the Spark Catalyst Optimizer at runtime?",
+    "answer": "To inject custom rules, you must extend the `Rule[LogicalPlan]` class and implement your optimization logic. Next, register the rule with the SparkSession using the extensions API: `spark.experimental.extraOptimizations` or by building a `SparkSessionExtensions` provider. The custom rule is executed during the 'Optimization' phase of compilation, allowing you to rewrite logical plans (e.g., adding custom filter pushdowns or index mappings) dynamically.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-new-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "What specific metrics and thresholds does Adaptive Query Execution (AQE) use to dynamically convert a Sort-Merge Join to a Broadcast Hash Join?",
+    "answer": "AQE checks partition size metrics on shuffle map stage completion. During query planning, if the estimated size of a join input exceeds the broadcast limit, Spark plans a Sort-Merge Join. During runtime, after the map stage finishes, AQE reads the actual size of the partitions written. If the total size of one of the join inputs falls below `spark.sql.adaptive.advisoryPartitionSizeInBytes` (typically 64MB) and the broadcast threshold, AQE rebuilds the plan, broadcasts the small partition, and switches to a Broadcast Hash Join.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-new-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "Explain how Dynamic Partition Pruning (DPP) works in Spark SQL when joining a large Fact table with a small Dimension table.",
+    "answer": "Dynamic Partition Pruning occurs when a query joins a partitioned fact table with a filtered dimension table. During query planning, Spark builds an execution plan where the filter on the dimension table is evaluated first. It compiles a subquery that extracts the matching partition keys from the dimension table. This list of keys is injected as a dynamic filter on the fact table scan, allowing Spark to prune partitions of the fact table at the storage layer before reading data, cutting I/O time.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-new-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What G1GC JVM parameters should you tune for Spark executors running high-memory heaps (e.g., >64GB) to minimize GC pauses?",
+    "answer": "For large heaps, you should use the G1 Garbage Collector. Key tuning parameters include: 1) `-XX:G1ReservePercent=15` (allocates a larger buffer to prevent promotion failures). 2) `-XX:InitiatingHeapOccupancyPercent=35` (starts GC cycles earlier to prevent marking phase OOMs). 3) `-XX:MaxGCPauseMillis=200` (sets a target GC pause limit). 4) Increasing `-XX:G1HeapRegionSize` (e.g., to 32m) to handle large object allocations (humongous allocations) without fragmentation.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-new-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "How do you implement arbitrary stateful processing in Spark Structured Streaming using the flatMapGroupsWithState API?",
+    "answer": "To implement arbitrary stateful processing: 1) Define a state class (e.g., session state) and output class. 2) Call `groupByKey()` on the streaming DataFrame. 3) Invoke `flatMapGroupsWithState()`, passing the state timeout configuration, output mode, and a mapping function. 4) The mapping function receives the group key, an iterator of rows, and a `GroupState[StateClass]` object. The function reads the state, updates it based on incoming rows, and updates the state timer. It returns an iterator of output rows.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-new-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Databricks Workspaces",
+    "question": "How does Databricks Unity Catalog cache metadata to optimize access control checks during query compilation?",
+    "answer": "Unity Catalog runs as a centralized service. To avoid network latency during compilation access control checks (grant checks), Databricks workspaces maintain an in-memory metadata cache. When a query compiles, the catalog helper checks the local cache. If the policy is cached and valid, it authorizes the query. Cache validation is maintained via a background pub-sub channel that invalidates cache entries when `GRANT` or `REVOKE` commands are run in Unity Catalog.",
+    "difficulty": "HARD"
+  }
+]

@@ -1,0 +1,1298 @@
+[
+  {
+    "id": "adf-cicd-1",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain the exact mechanics of the adf_apps or adf-publish branch. Why should developers never merge changes directly into the adf-publish branch manually?",
+    "answer": "1. The Publish Branch: The `adf-publish` (or `adf_apps`) branch is managed by the ADF service. It stores the generated ARM templates containing the physical definitions of the factory resources (pipelines, datasets, triggers).\n\n2. Automation: When a developer clicks 'Publish' in the ADF UI while connected to the collaboration branch (e.g., `main`), the ADF service reads the JSON code, validates it, and generates the corresponding ARM templates. It writes these files directly to the `adf-publish` branch.\n\n3. Why avoid manual merges: Manual merges to this branch will cause Git desynchronization. The ADF UI expects the publish branch to be in a specific format mapped to the UI state. A manual merge introduces untracked JSON changes that the ADF service cannot validate, corrupting deployments and preventing the UI from loading.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-2",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you configure an automated Azure DevOps release pipeline to deploy ADF across Dev, QA, and Prod environments using the automated NPM package method instead of exporting ARM templates from the UI?",
+    "answer": "To automate ADF deployment using the modern NPM package method:\n\n1. Build step: In your Azure DevOps Build pipeline, install the ADF utilities NPM package: `npm install @microsoft/azure-data-factory-utilities`.\n\n2. Run Validation: Execute the validation script: `node node_modules/@microsoft/azure-data-factory-utilities/lib/index.js validate <source_folder> <factory_id>`. This checks JSON files for syntax errors.\n\n3. Export Templates: Run the export command: `node node_modules/@microsoft/azure-data-factory-utilities/lib/index.js export <source_folder> <factory_id> <export_folder>`. This generates ARM templates dynamically. Publish the export folder as an artifact.\n\n4. Release step: In the Release pipeline, deploy the ARM templates using the standard Azure Resource Group Deployment task, replacing environment parameters dynamically, bypassing the need for manual publishing from the UI.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-3",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you parameterize Linked Service properties (such as base URLs or database names) that are not exposed by default in the standard ADF ARM template parameter configuration file?",
+    "answer": "1. Custom Parameterization file: Create a custom parameterization configuration file named `arm-template-parameters-definition.json` in the root of your ADF repository.\n\n2. Defining properties: Inside this file, specify rules to expose the target properties. For example, to expose the connection string and base URL of HTTP linked services:\n`\"Microsoft.DataFactory/factories/linkedservices\": { \"properties\": { \"typeProperties\": { \"baseUrl\": \"=-\", \"connectionString\": \"=-\" } } }`.\n\n3. Code Generation: During ARM template export, the ADF compiler parses this file and automatically adds these parameters to the ARM parameters file, allowing you to override them in your CI/CD release variables.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-4",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain how to create a custom arm-template-parameters-definition.json file to enforce custom parameterization rules for all datasets and linked services across an enterprise.",
+    "answer": "1. File Placement: Place `arm-template-parameters-definition.json` in the root of the ADF Git repository collaboration branch.\n\n2. Syntax: The JSON structure maps Azure resource types to parameter definitions. Use `=` to indicate that a parameter should be generated, and `-` to define default names based on resource attributes.\n\n3. Standardization: Define rules for all resources: `\"Microsoft.DataFactory/factories/datasets\": { \"*\": { \"properties\": { \"location\": { \"*\": \"=-\" } } } }` to parameterize all storage folder paths. This enforces consistent parameterization across the enterprise, preventing developers from manually overriding configurations.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-5",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you handle a merge conflict in the Git repository of an ADF instance when two developers modify the same pipeline concurrently? Detail the recovery process.",
+    "answer": "1. Conflict Cause: ADF stores pipelines as individual JSON files. If two developers edit the same pipeline, Git cannot merge changes automatically, resulting in merge conflicts on pull requests.\n\n2. Recovery Process:\n- Clone the repository locally and check out the feature branch.\n- Open the conflicting pipeline JSON file in a text editor (like VS Code).\n- Resolve the standard Git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) manually, keeping the valid JSON syntax.\n- Commit the resolved JSON file and push it back to the branch.\n- In the ADF portal, refresh the Git connection. The UI will reload the resolved pipeline, allowing you to proceed with publishing.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-6",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "What happens to active pipeline triggers when you deploy an updated ARM template into a production Data Factory? How do you gracefully stop and restart triggers during deployment?",
+    "answer": "1. Deployment Failure: If you attempt to redeploy or modify an active trigger using an ARM template, the deployment will fail because Azure Resource Manager cannot update resources that are locked in an active state.\n\n2. Graceful stop: Before executing the ARM deployment task in your release pipeline, run a pre-deployment PowerShell script to query and stop all active triggers in the target factory: `Stop-AzDataFactoryV2Trigger -ResourceGroupName $rg -DataFactoryName $df -Name $triggerName`.\n\n3. Post-Deployment: After the ARM deployment completes successfully, run a post-deployment script to restart the triggers: `Start-AzDataFactoryV2Trigger` to resume schedules, preventing deployment failures and ensuring consistent execution states.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-7",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you design a post-deployment script in Bash or PowerShell to clean up deleted activities or orphaned components that remain in target environments after an incremental ARM deployment?",
+    "answer": "1. The issue: Incremental ARM deployments only add or update resources; they do not delete resources that were removed in the source branch, leaving orphaned pipelines in production.\n\n2. Cleanup Script: Write a PowerShell script that executes post-deployment:\n- Fetch all resources in the target factory using `Get-AzDataFactoryV2Pipeline -ResourceGroupName $rg -DataFactoryName $df`.\n- Fetch the current list of pipelines in the Git repository main branch.\n- Compare the lists to identify orphaned pipelines.\n- Loop through and delete orphaned resources: `Remove-AzDataFactoryV2Pipeline -ResourceGroupName $rg -DataFactoryName $df -Name $orphanedName -Force`, keeping target environments clean and synchronized with Git.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-8",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you resolve the \"Resource deployment loop or circular dependency\" error during an ADF ARM template deployment in Azure DevOps?",
+    "answer": "1. Root Cause: This error occurs when resource definitions contain dependencies that loop back on themselves (e.g., Linked Service A references Key Vault B, which references secret credentials that rely on a connection from LS A).\n\n2. Resolution: (a) Identify the circular dependency loop in the ARM template's `dependsOn` section. (b) Decouple the resources: remove the direct dependency references between linked services and configure Key Vault access policies separately from database configurations. (c) Group resources into logical parent-child hierarchies to ensure dependencies only flow one way during ARM deployment.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-9",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain how to manage Global Parameters during a CI/CD deployment. How do you ensure that environment-specific global parameters are overwritten correctly across environments?",
+    "answer": "1. Global Parameters inclusion: Ensure that 'Include global parameters in ARM template' is enabled in the ADF management portal. This adds global parameters to the output ARM template JSON.\n\n2. Environment parameters: In your Azure DevOps release pipeline, the global parameters are exposed as standard parameters in the template deployment task.\n\n3. Overwriting: Define environment-specific variables in your release configuration (e.g., `prodUrl` for production). Map these variables to the global parameter overrides in the ARM deployment task settings, ensuring parameters update dynamically when moving from QA to Production.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-10",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you manage Git integration when working with a multi-factory architecture (e.g., separate development factories for individual feature teams) feeding into a single production factory?",
+    "answer": "To manage a multi-factory Git architecture:\n\n1. Repository Layout: Configure a single Git repository containing separate folders for each development factory (or use separate branches if team isolation is required).\n\n2. Merging path: Developers commit changes to their respective development factory branches. Pull requests merge these changes into a single consolidated collaboration branch (e.g., `main`).\n\n3. Compilation & Deploy: The CI/CD pipeline compiles the folder matching the feature team's changes, and deploys it to the corresponding target factory in QA and Production, maintaining a unified deployment flow across separate developer environments.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cicd-11",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "What is the exact security impact of using Git Live mode vs. Data Factory mode in the ADF user interface?",
+    "answer": "1. Git Live Mode: The UI displays the code directly from the active Git branch. Changes are saved as commits and are not applied to the actual running Data Factory engine until published. This is safe for developers as work-in-progress code does not affect schedules.\n\n2. Data Factory Mode: The UI displays the active published state running in the cloud. Changes made here are saved directly to the cloud service. This affects active schedules instantly, representing a security risk if developers make untested modifications directly in production.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-12",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you configure automated unit testing or automated validation for ADF pipeline JSON definitions before they are allowed to be merged into the main branch?",
+    "answer": "1. Build Pipeline: Create an Azure DevOps Pull Request validation pipeline that triggers on target branch changes.\n\n2. Linting & Validation: Use a Node.js script to run the `@microsoft/azure-data-factory-utilities` validation package on the modified files.\n\n3. Custom Tests: Write python/shell scripts to parse the JSON files and enforce corporate guidelines (e.g., check that all Linked Services use Key Vault, check naming conventions). The PR is blocked from merging if validation fails, enforcing code standards automatically.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-13",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you manage secret extraction in your ARM templates to ensure that no plain-text database credentials or connection keys are accidentally committed to the enterprise repository?",
+    "answer": "1. Parameter Exclude: Ensure the custom parameters definition file excludes sensitive values (like passwords or tokens) from standard parameters.\n\n2. Key Vault references: Enforce the use of Azure Key Vault secret references in all Linked Services connections. The template stores Key Vault secret names (which are not secret), not the actual keys.\n\n3. Security Scan: Configure secret scanners (like GitHub Advanced Security or Azure DevOps Credential Scanner) to scan commits, blocking any push that contains raw passwords.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-14",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain how to fix a disconnected Git state where the ADF UI displays an error stating that the factory configuration in the repository does not match the published factory state.",
+    "answer": "1. Disconnected State: Occurs if the factory has had direct modifications made in Data Factory mode that are not present in the Git repository, or vice versa.\n\n2. Fix: Re-import or overwrite the Git branch. In the Git settings, select 'Overwrite Data Factory' (which pushes the Git state to the factory) or 'Import from Data Factory' (which pulls the factory state to Git), aligning both configurations and resolving the conflict error.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-15",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you handle the deployment of a Tumbling Window Trigger that has backfill dependencies on an upstream pipeline that does not exist yet in the target environment?",
+    "answer": "1. Deploy Order: You cannot deploy a trigger referencing a non-existent pipeline. Configure your CI/CD pipeline to deploy the upstream pipeline first, followed by the downstream pipeline.\n\n2. Trigger State: Keep the Tumbling Window Trigger disabled (`activated = false`) in the deployment templates. Once all pipelines are deployed, run a script to activate the trigger, preventing scheduling errors during the deployment window.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-16",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you restrict specific junior developers from publishing changes directly to the factory while allowing them to save their work to individual feature branches?",
+    "answer": "1. Branch Protection: Enforce branch protection rules on the collaboration branch (e.g., `main`). Require pull request reviews and block direct pushes.\n\n2. Role Permissions: Assign junior developers the 'Reader' or 'Collaborator' role in Git, and remove the 'Data Factory Contributor' role in Azure RBAC. This allows them to commit changes to feature branches but prevents them from executing the publish command in the ADF UI, which requires contributor permissions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-17",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "What is the structural limitation of the 256-KB size ceiling for ARM templates when deploying massive factories containing hundreds of pipelines, and how do you implement linked ARM templates as a workaround?",
+    "answer": "1. ARM limit: Azure Resource Manager limits a single template file to 256KB. A factory with hundreds of pipelines will easily exceed this limit.\n\n2. Linked Templates: Configure the ADF deployment to generate Linked ARM templates (this is enabled by default for large factories during UI publish). The main template references secondary templates hosted in an Azure Storage Account. During deployment, Azure resolves and deploys the secondary templates sequentially, bypassing the 256KB file ceiling.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-18",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you automate the validation of ADF code against corporate naming conventions and design standards using custom static analysis tools during a pull request?",
+    "answer": "1. Static Analysis: Write a python script that runs inside your PR validation pipeline.\n\n2. JSON Parsing: The script parses the pipeline JSON files (e.g., checking if activity names contain spaces, or ensuring all copy activities have logging enabled).\n\n3. PR Comments: Use DevOps API calls to post comments on the PR highlighting rule violations and fail the build step if naming conventions are not met, automating code review checks.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-19",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain how to parameterize the existing resource references in Bicep when deploying an ADF instance alongside pre-existing network infrastructure.",
+    "answer": "1. Bicep parameters: In your Bicep file, define parameters for the network details (VNet ID, subnet name) as inputs: `param vnetId string`.\n\n2. Target Reference: Use the `existing` keyword to reference pre-existing resources without redeploying them:\n`resource hubVnet 'Microsoft.Network/virtualNetworks@2023-05-01' existing = { name: vnetName }`.\n\n3. Integration: Reference this existing resource's properties when creating the ADF Managed VNet Integration Runtime, ensuring correct routing configurations in Bicep.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-20",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you ensure that a pipeline execution currently running in Production is not abruptly killed or corrupted when a new automated CI/CD deployment goes live?",
+    "answer": "1. No aborts: In-flight runs are not aborted by default during ARM deployments unless you modify or delete the specific pipeline resource currently executing.\n\n2. Deployment Window: Schedule deployments during low-activity windows. If you must deploy hotfixes, check active pipeline runs via the ADF REST API, and postpone the deployment until critical tasks complete.\n\n3. Safe deployments: Ensure the ARM deployment task does not include delete script steps for active executing resources, preserving execution threads.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cicd-21",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you design a rollback mechanism in Azure DevOps to quickly revert a production ADF deployment to the previous stable state in under 2 minutes?",
+    "answer": "1. Git Rollback: In Git, identify the previous stable commit tag. Revert the collaboration branch to this tag and push the changes.\n\n2. Automated Release: Run the Azure DevOps release pipeline targeting this reverted commit. The release pipeline will redeploy the stable version of the ARM templates to the target factory, overwriting the buggy changes instantly.\n\n3. Backup: Keep a copy of the previously compiled templates in a storage container, allowing you to run a deployment task that directly redeploys those files, bypassing code compilation latency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-22",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain the role of the publish_config.json file inside an ADF repository and how it influences the generation of the ARM template output.",
+    "answer": "1. Publish configuration: The `publish_config.json` file is generated by the ADF UI in your repository. It stores parameters and settings configuration (like the target publish branch name and path).\n\n2. Build control: It tells the ADF service and automated utilities how to export resources, control folder mappings, and rename output templates, guiding the automated compilation process.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-23",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you handle a scenario where a deployment fails because a target Linked Service reference to a Key Vault secret points to a secret version that has been deprecated or deleted?",
+    "answer": "1. Versionless Secrets: Do not include the secret version GUID in the Key Vault URI connection string (e.g., use `https://myvault.vault.azure.net/secrets/mysecret` instead of `.../secrets/mysecret/version_id`).\n\n2. Auto-rotation: This instructs Key Vault to always return the latest active version of the secret. If a version is deprecated, uploading a new secret version resolves connectivity without redeploying the ADF linked service.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-24",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "What is the mechanism for migrating an ADF instance from an Azure DevOps Git repository to a GitHub Enterprise repository without losing the factory's historical commit logs?",
+    "answer": "1. Git Repository Clone: Clone the DevOps Git repository locally using the `--mirror` flag: `git clone --mirror <DevOps_URL>`.\n\n2. Remote Mirroring: Set the target remote to the new GitHub Enterprise repo: `git remote set-url origin <GitHub_URL>`.\n\n3. Push Logs: Push all branches and commit history to the new repo: `git push --mirror`. In the ADF Git settings, disconnect the old DevOps path and link the new GitHub repository, preserving all commits and logs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-25",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you configure automated branch policies to prevent the deletion of the collaboration branch (main) or the publication branch in an enterprise ADF environment?",
+    "answer": "1. Branch Protection: In Azure DevOps/GitHub settings, open the repository policies. Select the `main` and `adf-publish` branches.\n\n2. Rules: Enable 'Prevent force push', 'Prevent deletion', and require pull requests with approvals. This blocks any user from deleting critical branches and ensures only validated code is deployed.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-26",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "Explain how to parameterize the Self-Hosted Integration Runtime reference in an ARM template so that the QA pipeline routes through the QA SHIR and the Prod pipeline routes through the Prod SHIR.",
+    "answer": "1. IR Parameter definition: In `arm-template-parameters-definition.json`, add a rule to parameterize the integration runtime name for all linked services: `\"Microsoft.DataFactory/factories/linkedservices\": { \"properties\": { \"connectVia\": { \"referenceName\": \"=-\" } } }`.\n\n2. Release mapping: The IR reference name is exposed in your release variables. Map QA variables to the QA SHIR name, and Prod variables to the Prod SHIR name during deployment.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-27",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you troubleshoot an ARM deployment error stating: Resource Cannot Be Updated Because It Inherits Properties From An Active Trigger?",
+    "answer": "1. Root Cause: Occurs if the ARM template contains updates to a pipeline that is referenced by an active trigger. The trigger locks the pipeline configuration.\n\n2. Fix: Run a pre-deployment PowerShell script to stop the active trigger. Once stopped, execute the ARM deployment. Run a post-deployment script to restart the trigger, resolving the update conflict.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-28",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you design a zero-downtime hotfix process for a critical bug in a production environment without bypassing the standard Git pull request workflow?",
+    "answer": "1. Hotfix branch: Create a hotfix branch from the current production tag (`main`).\n\n2. Local test: Fix the bug and create a PR to merge the hotfix branch back to `main`.\n\n3. DevOps deployment: The merge triggers the automated validation and release pipeline. The release pipeline deploys the updated templates to QA and Production sequentially, utilizing automated tests to verify the fix, maintaining governance without downtime.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-29",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "What is the impact of changing a pipeline's name on its historical execution logs and monitoring telemetry inside Azure Log Analytics after a new deployment?",
+    "answer": "1. Historical Split: Telemetry logs in Log Analytics are linked to the pipeline name. Changing the name creates a new resource path in the logs.\n\n2. Query Mapping: Historical logs for the old name remain under that name, while new logs write under the new name. You must write SQL/KQL queries that combine both names using search terms to see complete history.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cicd-30",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "How do you use the ADF REST API programmatically inside a deployment pipeline to verify the status of all triggers post-deployment?",
+    "answer": "1. Trigger verify: Add an inline Bash/PowerShell task after the deployment step. The script sends GET requests to the ADF Trigger List API.\n\n2. Status check: Loop through the triggers and check if `properties.runtimeState` equals 'Started'. If any trigger is 'Stopped' (except manual triggers), fail the deployment pipeline or send an alert to notify operations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-monitor-1",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you construct a custom Kusto Query Language (KQL) query in Azure Log Analytics to find the exact root cause of an activity failure inside a nested child pipeline that ran 14 days ago?",
+    "answer": "To find the root cause of an activity failure in a child pipeline using KQL:\n\n1. Target Table: Query the `ADFActivityRun` table in Log Analytics.\n\n2. KQL Query:\n```kql\nADFActivityRun\n| where TimeGenerated >= ago(14d)\n| where Status == 'Failed'\n| project TimeGenerated, PipelineName, ActivityName, ActivityType, ErrorMessage = parse_json(Error).message, ErrorCode = parse_json(Error).errorCode, PipelineRunId\n| order by TimeGenerated desc\n```\nThis extracts the exact error message, error code, and activity name from the `Error` JSON payload, allowing you to trace the failed step inside the nested run.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-2",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "Explain how to stream ADF diagnostic logs (ADFPipelineRunActivityErrors, ADFTriggerEvents) into an external Azure Event Hub for real-time security operations center (SOC) ingestion.",
+    "answer": "1. Diagnostic Settings: In the ADF instance portal, go to 'Diagnostic Settings'. Click 'Add diagnostic setting'.\n\n2. Log Selection: Check the tables: `PipelineRuns`, `ActivityRuns`, `TriggerRuns`, and `SandboxActivityRuns` (if running container custom tasks).\n\n3. Destination: Select 'Stream to an event hub'. Choose your Azure Event Hub namespace and hub name.\n\n4. SOC Consumption: The SOC team routes the Event Hub stream to their SIEM tool (e.g., Azure Sentinel, Splunk) for real-time threat detection and anomaly auditing.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-3",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you design a real-time custom alert dashboard in Azure Monitor that triggers an SMS/Email notification only if a specific high-priority pipeline fails three times consecutively within a rolling 30-minute window?",
+    "answer": "To set up the consecutive failure alert:\n\n1. Query definition: Write a KQL query in Log Analytics to count failures:\n```kql\nADFPipelineRun\n| where PipelineName == 'HighPriorityPipeline'\n| where Status == 'Failed'\n| summarize FailureCount = count() by bin(TimeGenerated, 30m)\n```\n2. Alert rule: In Azure Monitor, create an Alert Rule based on this query. Set the threshold check to 'Greater than or equal to 3'. Configure the evaluation frequency to 5 minutes, targeting an Action Group that sends SMS and Email notifications to the operations team.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-4",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "What is the exact schema structure of the ADFActivityRun table in Log Analytics, and how do you extract the custom properties outputted by an execution?",
+    "answer": "1. Schema: The `ADFActivityRun` table contains system fields: `TimeGenerated`, `ResourceId`, `PipelineName`, `ActivityName`, `ActivityType`, `Status`, `ExecutionDetails`, and `UserProperties`.\n\n2. Custom Properties: Custom properties defined on the activity are written inside the `UserProperties` column. Use the KQL `bag_unpack` or `parse_json` functions to extract them: `| extend customVal = parse_json(UserProperties).MyCustomKey`, allowing analysis of custom logging fields.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-5",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you troubleshoot a pipeline that intermittently fails with a UserErrorJsonParsingFailed error when reading metadata from an upstream Web activity?",
+    "answer": "1. Validation: This error occurs when the upstream Web activity response is not a valid JSON structure (e.g., returns HTML error pages or empty strings).\n\n2. Fix: (a) Add check logic: in your downstream expression, check if the output is empty or if it contains JSON characters before parsing: `@if(startsWith(activity('WebTask').output, '{'), json(activity('WebTask').output), json('{}'))`.\n\n3. Debug: Inspect the input Web activity parameters to verify the endpoint is active and handling request credentials correctly.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-6",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "Explain how to handle a scenario where an ADF pipeline execution hangs indefinitely in an \"In Progress\" state without failing or generating an error message.",
+    "answer": "1. Root cause: Usually caused by the integration runtime waiting for a response from a blocked target system (e.g., SQL server lock, API gateway socket hang) without a configured timeout.\n\n2. Resolution: (a) Configure explicit timeouts on all individual activities (e.g., set to 15 minutes). (b) Check for deadlocks in target databases. (c) Restart the SHIR services on nodes if connection pools are saturated and nodes cannot respond to heartbeat polls.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-7",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you programmatically extract the error message details from an enterprise pipeline run using the Azure SDK for Python or .NET?",
+    "answer": "1. SDK Client: Initialize the `DataFactoryManagementClient` using Entra ID credentials.\n\n2. Query Runs: Execute the query command: `client.activity_runs.query_by_pipeline_run(rg_name, factory_name, pipeline_name, run_id, filter_parameters)`.\n\n3. Message Extract: Loop through the returned activity runs. If status is 'Failed', extract the error details from the nested `error` attribute: `run.error['message']`, saving logs to your custom database.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-monitor-8",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "What are the specific metrics you must monitor in Azure Monitor to detect when an Integration Runtime is nearing its concurrent execution threshold?",
+    "answer": "1. Key Metrics: In Azure Monitor, query the `Integration Runtime Node` metrics.\n\n2. Target Counters: Monitor `IntegrationRuntimeNodeCpuPercentage`, `IntegrationRuntimeNodeMemoryPercentage`, and `IntegrationRuntimeNodeConcurrentJobsLimitReached`. Set alerts to trigger if CPU/Memory exceeds 85% or if the limit reached counter registers a value greater than 0, indicating queue states.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-9",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you set up custom annotations and user properties on an activity, and how can you leverage these fields to filter execution logs inside the native ADF monitoring portal?",
+    "answer": "1. Configuration: In the activity settings properties tab, click 'User properties'. Add key-value pairs (e.g., `Department: Finance`).\n\n2. Query: In the ADF Monitoring UI, you can filter by these user properties. In Log Analytics, query the `UserProperties` field in `ADFActivityRun` to build dashboards segmented by business departments, simplifying log discovery.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-10",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "Explain how to trace an end-to-end data lineage path starting from an ADF Copy Activity all the way into Microsoft Purview automatically.",
+    "answer": "1. Purview Link: Register and connect your Microsoft Purview account to the Azure Data Factory instance.\n\n2. Lineage capture: When a Copy activity executes, ADF automatically streams lineage metadata (source table columns, connection details, sink destination) to Purview.\n\n3. Catalog mapping: Purview parses this telemetry and builds visual data maps showing how data moves, enabling compliance tracking and search discovery.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-11",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you debug an intermittent authorization error (Status Code 403) occurring when a pipeline runs on a scheduled trigger but works perfectly when run manually via the \"Debug\" button?",
+    "answer": "1. Credential Scope: 'Debug' runs execute under the developer's Entra ID user context. Scheduled triggers execute under the ADF Managed Service Identity (MSI) context.\n\n2. Resolution: Verify that the ADF MSI has been granted appropriate access permissions (e.g., RBAC Storage Blob Data Reader, database login permissions) on the target source resources, as it lacks the developer's AD rights.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-12",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you configure automated alerts to detect if a specific pipeline has not started by its designated SLA execution time (e.g., 6:00 AM daily)?",
+    "answer": "1. Logic Apps polling: Create a Logic App scheduled to run at 6:05 AM.\n\n2. Status check: The Logic App queries the ADF REST API for pipeline runs matching the last 12 hours: `client.pipeline_runs.query_by_factory(...)`.\n\n3. Alert trigger: If the return list is empty (no runs started), trigger an email or PagerDuty incident to alert the on-call engineer of the SLA breach.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-13",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "Explain how to capture and inspect the exact execution logs of a Mapping Data Flow's underlying Spark driver node when the ADF monitor only displays a generic Internal Server Error.",
+    "answer": "1. Spark Diagnostic: Navigate to the Data Flow execution monitoring tab. Click on the Spark log link (redirects to the Databricks cluster diagnostics page).\n\n2. Log analysis: Download the `stdout` and `stderr` files from the driver node logs. Look for Java stack traces (OOM exceptions, serialization errors) that are hidden by the high-level ADF portal generic errors.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-14",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you design a custom framework to parse the executionDetails object from a Copy Activity run to audit network transit times vs. compute engine processing latency?",
+    "answer": "1. Metrics Parse: Use a Stored Procedure activity following the Copy Activity. Pass the Copy Activity output: `@activity('CopyTask').output`.\n\n2. SQL extraction: In SQL Server, use `JSON_VALUE` to parse variables: `JSON_VALUE(payload, '$.executionDetails[0].detailedDurations.queuingDuration')` to capture connection latency vs. active write times, storing stats to audit networks.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-monitor-15",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "What is the impact of storage account throttling on the reliability of pipeline execution history data stored within the ADF internal monitoring database?",
+    "answer": "1. History Delay: Throttling does not delete history data, but delays metadata sync between the execution engine and the monitoring database. Logs may take up to an hour to populate in the monitoring portal, which can trigger false SLA alerts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-monitor-16",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you clear or purge historical pipeline execution run data from a factory instance to satisfy strict compliance or privacy requirements?",
+    "answer": "1. No Manual Purge: ADF does not support purging individual execution logs manually. Data is automatically deleted after 45 days by the platform database.\n\n2. Archive Control: If diagnostic streaming is enabled, write retention policies in Azure Log Analytics to delete data matching compliance rules (e.g., delete logs after 14 days).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-monitor-17",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you troubleshoot an error where a Storage Event Trigger stops firing entirely after a new folder creation pattern is introduced to the source data lake?",
+    "answer": "1. Folder match: Storage triggers evaluate file paths. If a new folder structure changes the depth (e.g., `year/month/day/file.csv` instead of `month/file.csv`), the trigger wildcard pattern (e.g., `uploads/{name}`) will fail to match.\n\n2. Update rule: Modify the Blob Path Begin/End parameters to match the new root folder layout, and reactivate the trigger.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-monitor-18",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "Explain how to write a KQL query to find the top 10 most expensive pipelines based on DIU consumption and execution duration over the past 30 days.",
+    "answer": "1. KQL Query:\n```kql\nADFActivityRun\n| where TimeGenerated >= ago(30d)\n| extend diuUsed = toint(parse_json(ExecutionDetails).effectiveIntegrationRuntimeProperties[0].dataIntegrationUnits)\n| extend durationSec = toint(parse_json(ExecutionDetails).duration)\n| summarize TotalDIUHours = sum(diuUsed * (durationSec / 3600)) by PipelineName\n| top 10 by TotalDIUHours desc\n```\nThis calculates DIU-Hours, allowing cost estimation per pipeline run.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-monitor-19",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you resolve a localized SHIR error: System.IO.IOException: The disk is full when processing exceptionally large compressed zip files that need extraction?",
+    "answer": "1. Temp Folder space: By default, the SHIR extracts zip archives to the system temp folder (usually `C:\\Windows\\Temp`).\n\n2. Resolution: Change the system environment variables `TEMP` and `TMP` to point to a secondary SSD drive with sufficient disk capacity (e.g., `D:\\Temp`), and restart the Integration Runtime host service.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-monitor-20",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you identify a deadlocked pipeline run caused by recursive Execute Pipeline loops or overlapping resource locks?",
+    "answer": "1. Monitoring check: In the monitoring UI, search for parent pipelines running longer than 12 hours. Look for recursive Execute Pipeline calls.\n\n2. Avoid loops: Do not allow pipelines to invoke themselves without a defined counter exit limit. Use target lock DMVs to find if database tables have open locks from other pipeline runs, causing halts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cost-1",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "How do you mathematically calculate the cost differences between executing an orchestration task using an Azure Logic App vs. an ADF Web Activity invoking an Azure Function?",
+    "answer": "1. Cost Comparison:\n- Azure Logic App: Billed per action execution (e.g., $0.000025 per standard connector action). A complex logic app with 10 steps costs $0.00025 per run.\n- ADF Web Activity: Billed based on orchestrator run duration ($0.002 per activity run). Executing a Web activity costs $0.002.\n- Azure Function: Billed per execution count ($0.20 per million) and execution duration. Invoking a 1-second function costs $0.000016.\n\n2. Recommendation: For simple API calls, ADF Web Activity invoking Azure Function is cheaper for high frequency runs than running complex nested Logic Apps.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cost-2",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "Explain how to implement strict cost governance policies using Azure Tags to track and allocate ADF spend down to individual line-of-business cost centers.",
+    "answer": "1. Tag Assignment: Apply Azure Tags (e.g., `CostCenter: Finance`, `Environment: Production`) to the ADF resource group or factory level.\n\n2. Cost Management: In Azure Cost Management, set up Cost Allocation rules. You can filter and export monthly cost sheets grouped by these tags, mapping resources back to department budgets.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cost-3",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "How do you bypass the 1,000-activity limit per pipeline run execution when building massive dynamically generated metadata loops?",
+    "answer": "1. The limit: A single pipeline run execution is capped at 1,000 activity steps (including all iterations inside a ForEach loop).\n\n2. Bypass: Split metadata loops. Instead of looping all tables in one ForEach, split the metadata array into chunks of 500 (e.g., using page indexing) and invoke a child pipeline for each chunk, restarting the activity count limits.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cost-4",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "Explain the precise architectural steps, security changes, and metadata transformation patterns required to migrate a large enterprise estate of 500 ADF pipelines into Microsoft Fabric Data Factories.",
+    "answer": "To migrate 500 ADF pipelines to Fabric:\n\n1. Tenant prep: Enable Microsoft Fabric in your tenant. Create target workspaces.\n\n2. Git Export: Connect the ADF factory to Git. Export the pipeline JSON files.\n\n3. Import: Import pipeline JSON files into Fabric Data Factories (using Fabric's Git integration or APIs).\n\n4. Linked Services conversion: Convert legacy Azure Linked Services to Fabric Connection definitions. Update authentication to use Fabric's built-in OAuth/MSI, mapping connection strings to OneLake endpoints.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-cost-5",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "How do you orchestrate a unified data platform where an ADF pipeline in a core Azure tenant controls and executes Synapse Notebooks and Fabric pipelines located in completely disparate workspaces and tenants?",
+    "answer": "1. Service Principal access: In the target Fabric tenant, register a Service Principal. Grant it access to the Fabric workspaces and Synapse notebooks.\n\n2. API Invocation: In the core ADF tenant, use a Web Activity. Authenticate via the Service Principal to request token access for the target tenant.\n\n3. Execution: Send POST requests to the Fabric API to trigger pipelines: `https://api.fabric.microsoft.com/v1/workspaces/{id}/pipelines/{id}/jobs`.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cost-6",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "What is the economic and operational impact of leaving a Mapping Data Flow's Time-To-Live (TTL) cluster constantly running throughout a 24-hour window vs. spinning it up on-demand for hourly batches?",
+    "answer": "1. Constant TTL: High cost. You pay for the running Spark VMs even when idle. Operational advantage: zero startup latency for pipelines.\n\n2. On-demand: Zero idle cost. But adds 3-5 minutes execution delay to each hourly run.\n\n3. Recommendation: Set TTL to a short window (e.g., 10 minutes) that covers parallel runs. Disable it for nightly batches, balancing costs vs. latency.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cost-7",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "How do you use the ADF REST API to dynamically adjust the core count allocation of a Mapping Data Flow Integration Runtime based on the volume of incoming files detected at runtime?",
+    "answer": "1. File Count: Use a Get Metadata activity to count incoming files. If file count exceeds 1,000:\n\n2. Scale Out: Execute a Web activity that sends a PATCH request to the ADF Integration Runtime REST API to update `properties.typeProperties.computeProperties.coreCount` (e.g., scale from 8 to 32 cores).\n\n3. Processing: Wait 5 minutes for the IR to recycle, then execute the Mapping Data Flow at scale, adjusting costs dynamically.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-cost-8",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "Explain the data residency and governance implications when an ADF instance in the East US region orchestrates a Copy Activity moving data between a source in West Europe and a sink in Southeast Asia.",
+    "answer": "1. Data Transit: If using the default Azure IR, the copy compute runs in East US. Data will hop from West Europe to East US, then to Southeast Asia, causing network latency and violating GDPR regulations.\n\n2. Compliance: Use an Integration Runtime located in West Europe to perform the read, staging data locally before transferring to the sink, ensuring data residency compliance.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cost-9",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "How do you overcome the limitation where ADF cannot natively read or write to private Git repositories that require strict multi-factor authentication (MFA) or SAML single sign-on (SSO)?",
+    "answer": "1. Personal Access Token (PAT): Create a service account in your Git provider. Generate a PAT with repository read/write access. Configure ADF Git integration to use the PAT for authentication, bypassing MFA prompts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-cost-10",
+    "category": "ADF",
+    "niche": "Cost Governance, API Workarounds, & Modern Fabric/Synapse Coexistence",
+    "question": "Detail how to design a multi-tenant data factory architecture where individual external clients can trigger custom pipelines within your factory without ever gaining access to view or modify your underlying processing logic or linked connections.",
+    "answer": "1. Trigger API: Create custom Azure Logic Apps or REST endpoints. Grant client tenants permission to call these specific endpoints.\n\n2. Pipeline Execution: The Logic App calls the ADF Run Pipeline API, passing parameters (e.g., customer ID). The ADF pipeline executes dynamically using these parameters, while connection secrets remain secure in Key Vault, hiding pipeline logic from clients.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "medium-adf-11",
+    "category": "ADF",
+    "niche": "Data Flows and Transformations",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Derived Column transformation and an Aggregate transformation in a Mapping Data Flow?",
+    "answer": "A Derived Column transformation modifies or creates new columns on a row-by-row basis without changing the total number of rows. An Aggregate transformation calculates aggregates (like SUM, AVG, MIN, MAX) over a defined grouping of rows, which generally reduces the total number of rows output by the transformation."
+  },
+  {
+    "id": "medium-adf-12",
+    "category": "ADF",
+    "niche": "Data Flows and Transformations",
+    "difficulty": "EASY",
+    "question": "How does the Surrogate Key transformation work in ADF?",
+    "answer": "The Surrogate Key transformation adds an incrementing, non-business integer key to each row of data in the data flow. It is heavily used in building Data Warehouses to generate unique primary keys for Dimension tables (Type 1 and Type 2 SCDs). You can specify a starting value or use a custom step."
+  },
+  {
+    "id": "medium-adf-13",
+    "category": "ADF",
+    "niche": "Data Flows and Transformations",
+    "difficulty": "MEDIUM",
+    "question": "Explain the use of the Exists transformation.",
+    "answer": "The Exists transformation is used to filter a data stream by checking whether records exist (or do not exist) in another data stream, similar to a SQL `EXISTS` or `NOT EXISTS` clause. Unlike a Join, it does not duplicate rows from the left stream if there are multiple matches in the right stream, and it does not append columns from the right stream."
+  },
+  {
+    "id": "medium-adf-14",
+    "category": "ADF",
+    "niche": "Data Flows and Transformations",
+    "difficulty": "MEDIUM",
+    "question": "What is Schema Drift in ADF, and how is it handled?",
+    "answer": "Schema Drift occurs when your sources change metadata frequently (columns are added, removed, or data types change). ADF Mapping Data Flows handle this via 'Allow Schema Drift' settings on Source and Sink transformations. When enabled, ADF automatically flows all incoming columns through the pipeline to the destination, even if they aren't explicitly defined in the dataset schema."
+  },
+  {
+    "id": "medium-adf-15",
+    "category": "ADF",
+    "niche": "Data Flows and Transformations",
+    "difficulty": "HARD",
+    "question": "How can you optimize a Mapping Data Flow that performs a join between a massive Fact table and a tiny Dimension table?",
+    "answer": "You should use 'Broadcast' optimization for the Join transformation. By broadcasting the tiny dimension table, ADF sends a full copy of that small table to every Spark worker node executing the data flow. This prevents the costly shuffling of the massive Fact table across the network, significantly speeding up the join operation."
+  },
+  {
+    "id": "medium-adf-16",
+    "category": "ADF",
+    "niche": "Triggers and Scheduling",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Schedule Trigger and a Tumbling Window Trigger?",
+    "answer": "A Schedule Trigger fires a pipeline based on a wall-clock schedule (e.g., every Monday at 8 AM) and does not care about past states if the pipeline was paused. A Tumbling Window Trigger fires at periodic, non-overlapping time intervals (e.g., every hour). It maintains state, allows for backfilling historical windows if the pipeline was paused, and allows configuring dependencies between different tumbling windows."
+  },
+  {
+    "id": "medium-adf-17",
+    "category": "ADF",
+    "niche": "Triggers and Scheduling",
+    "difficulty": "MEDIUM",
+    "question": "How does a Storage Event Trigger work?",
+    "answer": "A Storage Event Trigger executes a pipeline in response to an event in an Azure Storage account, specifically when a blob is created or deleted. It uses Azure Event Grid under the hood to capture the event. You can configure filters such as `blobPathBeginsWith` or `blobPathEndsWith` to only trigger pipelines for specific files."
+  },
+  {
+    "id": "medium-adf-18",
+    "category": "ADF",
+    "niche": "Monitoring and Error Handling",
+    "difficulty": "EASY",
+    "question": "How can you implement custom alerting in ADF when a pipeline fails?",
+    "answer": "You can configure Alerts & Metrics in the ADF Monitor tab using Azure Monitor to send emails/SMS based on pipeline failure metrics. Alternatively, within the pipeline itself, you can add a Web Activity connected to the 'On Failure' path of your main activities. The Web Activity can call an Azure Logic App via an HTTP webhook, passing error details to send a highly customized Slack message or Email."
+  },
+  {
+    "id": "medium-adf-19",
+    "category": "ADF",
+    "niche": "Monitoring and Error Handling",
+    "difficulty": "EASY",
+    "question": "What is the purpose of Log Analytics workspace integration with Azure Data Factory?",
+    "answer": "By routing ADF diagnostic logs (PipelineRuns, ActivityRuns, TriggerRuns) to an Azure Log Analytics workspace, you can retain pipeline execution history beyond ADF's default 45-day retention limit. It allows you to write complex Kusto Query Language (KQL) queries to analyze historical performance trends, track long-running activities, and build custom dashboards in Azure Monitor."
+  },
+  {
+    "id": "medium-adf-20",
+    "category": "ADF",
+    "niche": "Monitoring and Error Handling",
+    "difficulty": "MEDIUM",
+    "question": "Explain how the 'Retry' policy works on an ADF Activity.",
+    "answer": "The Retry policy allows an activity to automatically attempt re-execution if it fails due to a transient error (like a temporary network glitch or source database timeout). You can configure the 'Retry count' (number of attempts) and 'Retry interval in seconds' (delay between attempts). If the activity still fails after all retries, the pipeline execution proceeds down the 'On Failure' path."
+  },
+  {
+    "id": "medium-adf-21",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "EASY",
+    "question": "What is the maximum limit for activities within a single ADF pipeline, and how do you overcome it?",
+    "answer": "A single ADF pipeline is limited to a maximum of 40 activities. To overcome this limitation, you must modularize your logic by splitting the workflow into multiple smaller pipelines and using the 'Execute Pipeline' activity to call these child pipelines from a master orchestrator pipeline."
+  },
+  {
+    "id": "medium-adf-22",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "EASY",
+    "question": "How do you handle pagination when using the REST or HTTP connector in a Copy Activity?",
+    "answer": "The REST connector natively supports pagination rules. In the source settings, you can define 'Pagination rules' that tell ADF how to find the next page of data. You can map it to an absolute URL returned in the response body (e.g., `['next_page_link']`), a relative URL in the headers, or an incrementing offset query parameter, allowing ADF to automatically loop through all pages until the API returns no more data."
+  },
+  {
+    "id": "medium-adf-23",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "EASY",
+    "question": "What is the Set Variable activity, and what are its limitations?",
+    "answer": "The Set Variable activity assigns a value to a user-defined pipeline variable. However, its major limitation is that it does not support self-referencing (e.g., you cannot do `Counter = Counter + 1` in a single Set Variable activity). To increment a variable, you typically need to use two variables or rely on the Append Variable activity if you are building an array."
+  },
+  {
+    "id": "medium-adf-24",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "MEDIUM",
+    "question": "Explain the difference between the Web Activity and the Webhook Activity in ADF.",
+    "answer": "The Web Activity makes a synchronous HTTP request to an external endpoint and immediately proceeds to the next activity once a response (like HTTP 200) is received. The Webhook Activity makes an HTTP request but then pauses the pipeline. It waits for the external system to make a callback request to a specific URL (provided by ADF in the payload) before the pipeline resumes."
+  },
+  {
+    "id": "medium-adf-25",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "MEDIUM",
+    "question": "How do you implement a dynamic schema mapping in a Copy Activity?",
+    "answer": "Instead of hardcoding column mappings in the Copy Activity's UI, you can pass a JSON object containing the schema mapping rules dynamically at runtime. You build this JSON object using dynamic content (often constructed via a Lookup activity reading from a control table) and assign it to the 'Mapping' property of the Copy Activity in the JSON code view."
+  },
+  {
+    "id": "medium-adf-26",
+    "category": "ADF",
+    "niche": "Security and Networking",
+    "difficulty": "EASY",
+    "question": "What is a Managed Virtual Network (VNet) in Azure Data Factory?",
+    "answer": "A Managed VNet isolates the Azure Integration Runtime within a secure network managed by Microsoft. This ensures that data movement between ADF and Azure PaaS data stores (like Azure SQL or ADLS) does not traverse the public internet. Instead, it uses Azure Private Endpoints to securely connect to those resources."
+  },
+  {
+    "id": "medium-adf-27",
+    "category": "ADF",
+    "niche": "Security and Networking",
+    "difficulty": "EASY",
+    "question": "How do you connect an ADF Managed VNet Integration Runtime to an Azure SQL Database?",
+    "answer": "You must create a 'Managed Private Endpoint' in the ADF portal targeting the Azure SQL Database. Once created, the endpoint is in a 'Pending' state. A database administrator must then log into the Azure Portal for the SQL Server and 'Approve' the private endpoint connection. After approval, ADF can securely access the database."
+  },
+  {
+    "id": "medium-adf-28",
+    "category": "ADF",
+    "niche": "Security and Networking",
+    "difficulty": "MEDIUM",
+    "question": "What happens if a Copy Activity uses a Self-Hosted IR for the source and an Azure IR for the sink?",
+    "answer": "ADF requires both the source and sink of a Copy Activity to use the same Integration Runtime environment. If the linked services dictate different IRs, ADF defaults to using the Self-Hosted IR to perform the data movement, as it assumes the Azure IR cannot reach the on-premises source."
+  },
+  {
+    "id": "medium-adf-29",
+    "category": "ADF",
+    "niche": "Security and Networking",
+    "difficulty": "MEDIUM",
+    "question": "Explain Role-Based Access Control (RBAC) in the context of ADF.",
+    "answer": "RBAC controls who can view, edit, or execute pipelines within an ADF instance. The primary built-in roles are 'Data Factory Contributor' (can create/edit pipelines, datasets, and triggers but cannot grant access to others) and 'Reader' (can only view pipelines and monitor runs). Custom roles can be created for more granular permissions."
+  },
+  {
+    "id": "medium-adf-30",
+    "category": "ADF",
+    "niche": "Security and Networking",
+    "difficulty": "HARD",
+    "question": "Why is CI/CD using ARM templates important for Azure Data Factory deployments?",
+    "answer": "ADF uses ARM templates to represent its entire configuration (pipelines, datasets, linked services) as code. Integrating with Git and using CI/CD pipelines (via Azure DevOps or GitHub Actions) allows teams to version control their ETL code, review pull requests, and promote changes consistently across Dev, Test, and Prod environments without manually recreating workflows."
+  },
+  {
+    "id": "medium-adf-1",
+    "category": "ADF",
+    "niche": "Orchestration and Activities",
+    "difficulty": "EASY",
+    "question": "What is the difference between a Copy Activity and a Mapping Data Flow in Azure Data Factory?",
+    "answer": "A Copy Activity is a high-performance orchestration tool used to move raw data from a source to a sink as quickly as possible without transforming the contents. A Mapping Data Flow provides a visual, code-free interface for complex data transformations (joins, aggregations, pivoting) which executes on a managed Apache Spark cluster behind the scenes."
+  },
+  {
+    "id": "medium-adf-2",
+    "category": "ADF",
+    "niche": "Orchestration and Activities",
+    "difficulty": "EASY",
+    "question": "Explain the purpose of the Lookup Activity.",
+    "answer": "The Lookup Activity reads and returns the contents of a dataset (a table row, a JSON file, or a query result). It is primarily used to fetch configuration metadata—such as a list of table names or high-watermark dates—which is then passed into subsequent activities (like a ForEach loop) via the `@activity('LookupName').output.value` expression."
+  },
+  {
+    "id": "medium-adf-3",
+    "category": "ADF",
+    "niche": "Orchestration and Activities",
+    "difficulty": "MEDIUM",
+    "question": "How does the ForEach activity handle concurrency?",
+    "answer": "By default, the ForEach activity executes its inner activities concurrently (in parallel) up to a limit of 20 concurrent batches (configurable up to 50). You can check the 'Sequential' box in the activity settings to force it to iterate through the items one at a time, which is necessary if the inner activities update a shared state or if the sink database cannot handle concurrent loads."
+  },
+  {
+    "id": "medium-adf-4",
+    "category": "ADF",
+    "niche": "Orchestration and Activities",
+    "difficulty": "MEDIUM",
+    "question": "What is the Get Metadata Activity and what information can it extract?",
+    "answer": "The Get Metadata Activity extracts metadata from files or folders in storage. Depending on the dataset type, it can return attributes such as `childItems` (a list of files in a folder), `exists` (to check if a file is present), `size`, `lastModified`, and `columnCount`. This is often used to validate file arrivals before triggering a pipeline."
+  },
+  {
+    "id": "medium-adf-5",
+    "category": "ADF",
+    "niche": "Orchestration and Activities",
+    "difficulty": "HARD",
+    "question": "Explain the role of the Execute Pipeline activity.",
+    "answer": "The Execute Pipeline activity allows one pipeline (the parent) to invoke another pipeline (the child). This promotes modularity and code reuse. You can pass parameters from the parent to the child and choose whether the parent should 'Wait on completion' of the child pipeline before proceeding to its next step."
+  },
+  {
+    "id": "medium-adf-6",
+    "category": "ADF",
+    "niche": "Integration Runtimes",
+    "difficulty": "EASY",
+    "question": "What is an Integration Runtime (IR) in Azure Data Factory?",
+    "answer": "The Integration Runtime is the compute infrastructure used by ADF to execute data integration capabilities. It dictates *where* the activity runs. It bridges the gap between ADF orchestration and the actual data sources."
+  },
+  {
+    "id": "medium-adf-7",
+    "category": "ADF",
+    "niche": "Integration Runtimes",
+    "difficulty": "EASY",
+    "question": "What is the difference between an Azure IR and a Self-Hosted IR?",
+    "answer": "An Azure IR is a fully managed, serverless compute infrastructure provided by Microsoft, used to connect to cloud-based data stores with public endpoints. A Self-Hosted IR is installed on a local machine or private virtual machine. It securely connects ADF to on-premises data sources or private cloud resources behind a corporate firewall without exposing public inbound ports."
+  },
+  {
+    "id": "medium-adf-8",
+    "category": "ADF",
+    "niche": "Integration Runtimes",
+    "difficulty": "MEDIUM",
+    "question": "How do you achieve High Availability for a Self-Hosted Integration Runtime?",
+    "answer": "High Availability is achieved by associating the same logical Self-Hosted IR in ADF with multiple physical on-premises nodes (up to 4 machines). ADF automatically distributes the load and provides failover redundancy if one of the physical nodes goes offline."
+  },
+  {
+    "id": "medium-adf-9",
+    "category": "ADF",
+    "niche": "Security and Parameters",
+    "difficulty": "EASY",
+    "question": "How do you securely manage database passwords and API keys in ADF?",
+    "answer": "Secrets should never be hardcoded in ADF Linked Services. Instead, ADF should use Managed Identity to authenticate to an Azure Key Vault. The Linked Service should be configured to fetch the secret from the Key Vault at runtime using the secret's name, ensuring that sensitive credentials are never exposed in the ADF JSON definitions."
+  },
+  {
+    "id": "medium-adf-10",
+    "category": "ADF",
+    "niche": "Security and Parameters",
+    "difficulty": "MEDIUM",
+    "question": "What is the difference between Pipeline Parameters and Global Parameters?",
+    "answer": "Pipeline Parameters are specific to a single pipeline and must be provided at the time of pipeline execution (via a trigger or parent pipeline). Global Parameters are constant values defined at the Data Factory level. They are accessible across all pipelines in the factory, making them ideal for storing environment-specific configuration (like an API URL) during CI/CD deployments."
+  },
+  {
+    "id": "medium-adf-33",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "EASY",
+    "question": "Explain the 'Window' transformation in a Mapping Data Flow.",
+    "answer": "The Window transformation performs calculations over a specific window (range) of rows related to the current row, similar to SQL window functions. You define a 'Partition By' clause (to group rows), a 'Sort' clause (to order rows within the partition), and the 'Window Range' (e.g., rows between unbounded preceding and current row) to calculate running totals, moving averages, or rank rows."
+  },
+  {
+    "id": "medium-adf-34",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "EASY",
+    "question": "What is the purpose of the 'Alter Row' transformation?",
+    "answer": "The Alter Row transformation sets policies (Insert, Update, Delete, Upsert) on rows based on specific conditions. It is used exclusively when writing to a database sink. For example, you can write an expression like `Upsert if: isNotNull(EmployeeID)` to instruct the sink database to perform a SQL MERGE/UPSERT operation instead of a standard INSERT."
+  },
+  {
+    "id": "medium-adf-35",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "EASY",
+    "question": "How do you flatten complex JSON data in ADF?",
+    "answer": "You use the 'Flatten' transformation in a Mapping Data Flow. It takes an array structure within a JSON hierarchy and 'unrolls' it, creating a new flat row for every item in the array, while duplicating the parent node's data across each new row. This is essential for converting nested JSON documents into relational tables."
+  },
+  {
+    "id": "medium-adf-36",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "EASY",
+    "question": "What is the 'Until' activity in ADF, and when would you use it?",
+    "answer": "The 'Until' activity acts as a Do-While loop. It repeatedly executes its inner activities until a specified boolean condition evaluates to true. It is commonly used for polling external asynchronous APIs (e.g., triggering a long-running REST API job and looping an HTTP status check every 30 seconds until the API returns 'Completed')."
+  },
+  {
+    "id": "medium-adf-37",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "EASY",
+    "question": "How do you pass the output of a Web Activity to a subsequent Set Variable activity?",
+    "answer": "You use ADF's dynamic expression language. If the Web Activity is named 'CallAPI', you access its JSON response body in the Set Variable activity using the expression `@activity('CallAPI').output.ResponseProperty`, replacing 'ResponseProperty' with the actual JSON key returned by the API."
+  },
+  {
+    "id": "medium-adf-31",
+    "category": "ADF",
+    "niche": "Error Handling",
+    "difficulty": "EASY",
+    "question": "How do you implement a 'Try-Catch' logic flow in an ADF Pipeline?",
+    "answer": "ADF doesn't have a native Try-Catch activity block. Instead, you simulate it using Activity Dependency paths. You connect the main activity (Try) to an error-handling activity (Catch) using the red 'On Failure' dependency arrow. If the main activity fails, the Catch activity executes (e.g., logging to a database). You can also use the 'On Completion' (blue) and 'On Success' (green) paths."
+  },
+  {
+    "id": "medium-adf-32",
+    "category": "ADF",
+    "niche": "Error Handling",
+    "difficulty": "EASY",
+    "question": "What happens to a pipeline's status if an activity fails, but you catch the error with an 'On Failure' path?",
+    "answer": "If an activity fails, but you have routed the failure to a subsequent activity via an 'On Failure' path, the overall pipeline run status will still report as 'Failed' by default. To make the pipeline report 'Success' (handling the error gracefully), you must add a dummy activity (like a Set Variable) at the end of the error path and configure it to override the failure state, or ensure no downstream activities depend on the failed one."
+  },
+  {
+    "id": "medium-adf-68",
+    "category": "ADF",
+    "niche": "Data Integration Units",
+    "difficulty": "EASY",
+    "question": "What are Data Integration Units (DIUs) in ADF?",
+    "answer": "A DIU is a measure of compute power (CPU, memory, network allocation) assigned to a Copy Activity in Azure Data Factory. By default, ADF dynamically determines the appropriate DIU, but for massive data loads, you can manually increase the DIU setting to allocate more raw power and significantly speed up the data transfer, at a higher cost."
+  },
+  {
+    "id": "medium-adf-69",
+    "category": "ADF",
+    "niche": "Performance Optimization",
+    "difficulty": "EASY",
+    "question": "How do you optimize a Copy Activity reading from an Oracle database to ADLS?",
+    "answer": "You should enable 'Partition Option' on the source settings. Instead of reading the entire Oracle table through a single thread, you configure it to partition by a specific column (e.g., ID or Date). ADF will automatically spawn multiple parallel connections to the Oracle database, reading different slices of the data simultaneously, maximizing throughput."
+  },
+  {
+    "id": "medium-adf-70",
+    "category": "ADF",
+    "niche": "Performance Optimization",
+    "difficulty": "MEDIUM",
+    "question": "What is the 'Degree of Copy Parallelism' setting?",
+    "answer": "This setting dictates the maximum number of concurrent threads a single Copy Activity can use to write data to the sink. If you are copying a folder containing thousands of small files to Azure Blob Storage, increasing this value allows ADF to write multiple files simultaneously rather than sequentially."
+  },
+  {
+    "id": "medium-adf-71",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "EASY",
+    "question": "Explain the difference between a Sequential and Parallel ForEach loop.",
+    "answer": "By default, the ForEach activity in ADF runs its iterations in parallel (up to 50 concurrent batches). This is fast but risky if iterations depend on each other or write to the same file. You can check the 'Sequential' box in the settings, forcing ADF to complete one iteration entirely before starting the next, ensuring strict execution order."
+  },
+  {
+    "id": "medium-adf-72",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "MEDIUM",
+    "question": "What is the limitation of the ForEach activity regarding nested loops?",
+    "answer": "ADF does not allow placing a ForEach activity directly inside another ForEach activity. To achieve nested looping (e.g., looping through databases, and then looping through tables in each database), the inner loop must be encapsulated inside a separate child pipeline, and the outer loop calls that child pipeline using the Execute Pipeline activity."
+  },
+  {
+    "id": "medium-adf-73",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "EASY",
+    "question": "How do you use parameters in a Mapping Data Flow?",
+    "answer": "You define parameters within the Data Flow canvas. When you add the Data Flow activity to an ADF pipeline, the pipeline passes values to these parameters. Inside the Data Flow, you reference them in expressions using the `$parameter_name` syntax (e.g., to dynamically filter rows based on a date passed from the pipeline)."
+  },
+  {
+    "id": "medium-adf-74",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "MEDIUM",
+    "question": "What is Schema Drift handling in Data Flows?",
+    "answer": "Schema Drift handling allows Data Flows to process files or tables even if new columns are added or data types change unexpectedly. By enabling 'Allow Schema Drift' on the source and sink, ADF dynamically discovers the schema at runtime and flows all columns through without requiring you to hardcode the column mappings."
+  },
+  {
+    "id": "medium-adf-75",
+    "category": "ADF",
+    "niche": "Administration",
+    "difficulty": "EASY",
+    "question": "How do you share an Integration Runtime across multiple Data Factories?",
+    "answer": "You can share a Self-Hosted Integration Runtime (SHIR). You install the SHIR in a 'Primary' Data Factory. Then, in the Azure Portal, you grant RBAC permissions to other Data Factories to access the primary SHIR. In the secondary factories, you create a new IR and select 'Linked Self-Hosted', pointing it to the primary one, avoiding the need to install multiple SHIR VMs."
+  },
+  {
+    "id": "medium-adf-58",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "MEDIUM",
+    "question": "What is the 'Select' transformation used for?",
+    "answer": "The Select transformation is primarily used to rename columns, drop unnecessary columns, and reorder columns in the data stream. It is a best practice to place a Select transformation early in your Data Flow to remove unused columns, reducing the amount of data processed in memory by downstream transformations."
+  },
+  {
+    "id": "medium-adf-59",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "MEDIUM",
+    "question": "How does the 'Lookup' transformation differ from the 'Join' transformation?",
+    "answer": "The Lookup transformation is specifically optimized for retrieving reference data from a dimension table. Unlike a standard Join, Lookup allows you to return only the 'first matching row' or 'any matching row' if there are multiple matches, preventing the accidental row duplication (Cartesian explosion) that can occur with poorly configured Left Outer Joins."
+  },
+  {
+    "id": "medium-adf-60",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "HARD",
+    "question": "What is a 'Cached Sink' in ADF Data Flows?",
+    "answer": "A Cached Sink allows you to write the output of a data stream into Spark's fast in-memory cache rather than writing it to physical disk (like ADLS or SQL). Downstream transformations or even dynamic expressions within the same data flow can then perform ultra-fast lookups against this cached data, which is highly useful for small, frequently accessed dimension tables."
+  },
+  {
+    "id": "medium-adf-61",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "MEDIUM",
+    "question": "How can you trigger an ADF pipeline from an external application?",
+    "answer": "You can trigger a pipeline programmatically via the Azure Data Factory REST API, PowerShell, or Azure SDKs (Python/C#). The external application authenticates using a Service Principal via Azure AD and sends an HTTP POST request to the `CreateRun` endpoint of the specific pipeline, optionally passing JSON payload for pipeline parameters."
+  },
+  {
+    "id": "medium-adf-62",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "MEDIUM",
+    "question": "What happens if a tumbling window trigger fails?",
+    "answer": "If a tumbling window trigger fails, it enters a 'Failed' state for that specific time window. Unlike a schedule trigger which simply moves on to the next scheduled time, you can configure the tumbling window trigger to automatically retry the failed window a specified number of times. If it still fails, the window remains in failure until a data engineer manually reruns it."
+  },
+  {
+    "id": "medium-adf-63",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "HARD",
+    "question": "Can one tumbling window trigger depend on another?",
+    "answer": "Yes. A powerful feature of tumbling window triggers is 'Trigger Dependencies'. You can configure Trigger A (e.g., daily aggregation) to only execute its window if Trigger B (e.g., hourly ingestion) has successfully completed all 24 of its corresponding hourly windows for that same day. This ensures strict data completeness before downstream processing."
+  },
+  {
+    "id": "medium-adf-64",
+    "category": "ADF",
+    "niche": "Monitoring",
+    "difficulty": "EASY",
+    "question": "How long does ADF retain pipeline execution history?",
+    "answer": "By default, ADF only retains pipeline run, activity run, and trigger run history for exactly 45 days in the user interface. After 45 days, it is permanently deleted. To retain history for longer compliance or auditing purposes, you must route Diagnostic Settings to a Log Analytics Workspace or Azure Storage Account."
+  },
+  {
+    "id": "medium-adf-65",
+    "category": "ADF",
+    "niche": "Monitoring",
+    "difficulty": "MEDIUM",
+    "question": "What is the purpose of User Properties in an ADF Activity?",
+    "answer": "User Properties allow you to attach custom key-value pairs to an activity run. For example, you can capture a dynamic source file name or a specific parameter value. These properties are then surfaced directly in the ADF Monitoring UI list view, allowing operators to easily search and filter historical runs based on business-specific context without clicking into the raw JSON payload."
+  },
+  {
+    "id": "medium-adf-66",
+    "category": "ADF",
+    "niche": "Security and Authentication",
+    "difficulty": "EASY",
+    "question": "What is a Customer-Managed Key (CMK) in ADF?",
+    "answer": "By default, Microsoft encrypts the ADF environment (credentials, configurations) using Microsoft-managed keys. For high-security environments, you can implement a CMK. You store your own encryption key in Azure Key Vault and configure ADF to use it. This gives you complete control; if you revoke access to the key in Key Vault, the entire ADF instance becomes instantly inaccessible."
+  },
+  {
+    "id": "medium-adf-67",
+    "category": "ADF",
+    "niche": "Security and Authentication",
+    "difficulty": "EASY",
+    "question": "How do you securely pass a connection string to a Databricks activity in ADF?",
+    "answer": "You should never hardcode connection strings. Instead, store the Databricks Personal Access Token (PAT) in Azure Key Vault. Create an ADF Linked Service for Key Vault using Managed Identity. Then, create the Databricks Linked Service and reference the Key Vault secret. ADF will securely fetch the token and authenticate with Databricks at runtime."
+  },
+  {
+    "id": "medium-adf-86",
+    "category": "ADF",
+    "niche": "Error Handling",
+    "difficulty": "MEDIUM",
+    "question": "How do you implement a 'Try-Catch' logic in ADF pipelines?",
+    "answer": "ADF does not have a literal Try-Catch activity. Instead, you use activity dependency paths. You connect an activity to a subsequent 'Catch' activity (like an Email Alert or a Stored Procedure logging the error) using the red 'Upon Failure' path. You connect it to the next step of the pipeline using the green 'Upon Success' path."
+  },
+  {
+    "id": "medium-adf-87",
+    "category": "ADF",
+    "niche": "Error Handling",
+    "difficulty": "HARD",
+    "question": "What happens to a pipeline if an activity fails, but it has an 'Upon Failure' path defined?",
+    "answer": "By default, if Activity A fails but triggers Activity B via an 'Upon Failure' path, and Activity B succeeds, ADF marks the entire Pipeline run as 'Succeeded' because the error was 'handled'. If you want the pipeline status to correctly reflect a failure, you must add a 'Fail Activity' at the very end of your error-handling path to explicitly terminate the pipeline with an error status."
+  },
+  {
+    "id": "medium-adf-88",
+    "category": "ADF",
+    "niche": "Expression Language",
+    "difficulty": "EASY",
+    "question": "How do you concatenate strings dynamically in ADF?",
+    "answer": "You use the `@concat()` function in the dynamic content editor. For example, to generate a dynamic file path based on a pipeline parameter and the current date: `@concat(pipeline().parameters.FolderPath, '/', formatDateTime(utcnow(), 'yyyy-MM-dd'), '/data.csv')`."
+  },
+  {
+    "id": "medium-adf-89",
+    "category": "ADF",
+    "niche": "Expression Language",
+    "difficulty": "MEDIUM",
+    "question": "What is the difference between utcnow() and adddays() functions?",
+    "answer": "`@utcnow()` returns the current system timestamp in UTC format. `@adddays(timestamp, amount)` is used to add or subtract days from a given date. For example, to get yesterday's date, you would use `@adddays(utcnow(), -1)`."
+  },
+  {
+    "id": "medium-adf-90",
+    "category": "ADF",
+    "niche": "Linked Services",
+    "difficulty": "EASY",
+    "question": "What is the purpose of Parameterizing a Linked Service?",
+    "answer": "Parameterization allows a single Linked Service to connect to multiple different databases or storage accounts dynamically at runtime. Instead of hardcoding the Database Name in the Linked Service, you define a parameter. When the pipeline runs, it passes the desired Database Name into the Linked Service. This reduces clutter by preventing the need to create 50 identical linked services for 50 databases."
+  },
+  {
+    "id": "medium-adf-91",
+    "category": "ADF",
+    "niche": "Datasets",
+    "difficulty": "EASY",
+    "question": "What is an 'Inline Dataset' in ADF Data Flows?",
+    "answer": "Traditionally, you must create a Dataset artifact in the ADF UI and link it to your Data Flow source. An Inline Dataset allows you to define the source/sink properties (Linked Service, file path, format) directly inside the Data Flow canvas without creating a separate Dataset artifact in the repository. This keeps the workspace cleaner when dealing with hundreds of unique source files."
+  },
+  {
+    "id": "medium-adf-92",
+    "category": "ADF",
+    "niche": "Triggers",
+    "difficulty": "EASY",
+    "question": "What is an Event-based Trigger in ADF?",
+    "answer": "Unlike a schedule trigger which runs at a specific time, an Event-based Trigger monitors an Azure Storage Account. It fires a pipeline run immediately when a specific event occurs, such as a new file (blob) being created or an existing file being deleted within a designated container. It relies on Azure Event Grid under the hood."
+  },
+  {
+    "id": "medium-adf-93",
+    "category": "ADF",
+    "niche": "Triggers",
+    "difficulty": "MEDIUM",
+    "question": "What is a Custom Event Trigger?",
+    "answer": "A Custom Event Trigger allows ADF to subscribe to custom topics in Azure Event Grid. Instead of just reacting to Azure Storage file creations, external applications can publish a completely custom JSON event payload to Event Grid (e.g., 'Customer Onboarded'). ADF will instantly intercept that custom event and trigger a pipeline, passing the JSON payload into pipeline parameters."
+  },
+  {
+    "id": "medium-adf-48",
+    "category": "ADF",
+    "niche": "Security and Authentication",
+    "difficulty": "MEDIUM",
+    "question": "How does ADF authenticate with an Azure SQL Database using a Managed Identity?",
+    "answer": "When you create an ADF instance, Azure automatically creates a System-Assigned Managed Identity for it in Entra ID (Azure AD). To authenticate, you must log into the Azure SQL Database as an admin and create a SQL user mapped to the ADF's Managed Identity name, granting it `db_datareader` or `db_datawriter` roles. The Linked Service in ADF is then configured to use 'Managed Identity' authentication."
+  },
+  {
+    "id": "medium-adf-49",
+    "category": "ADF",
+    "niche": "Security and Authentication",
+    "difficulty": "MEDIUM",
+    "question": "What is the purpose of Azure Key Vault integration in ADF?",
+    "answer": "ADF integrates with Azure Key Vault to securely store and retrieve secrets, connection strings, and passwords at runtime. Instead of saving a database password in the Linked Service definition (where it might be exposed in source control), the Linked Service points to a specific Secret Name in Key Vault. ADF uses its Managed Identity to fetch the secret securely just before execution."
+  },
+  {
+    "id": "medium-adf-50",
+    "category": "ADF",
+    "niche": "Security and Authentication",
+    "difficulty": "HARD",
+    "question": "Can you access an on-premises database securely without opening firewall ports?",
+    "answer": "Yes, by installing an ADF Self-Hosted Integration Runtime (SHIR) on an on-premises Windows machine. The SHIR establishes an outbound, encrypted connection to the Azure Data Factory service over port 443. This completely eliminates the need to open inbound firewall ports on the corporate network."
+  },
+  {
+    "id": "medium-adf-51",
+    "category": "ADF",
+    "niche": "Advanced Data Flows",
+    "difficulty": "EASY",
+    "question": "What is 'Stringify' and 'Parse' in ADF Mapping Data Flows?",
+    "answer": "The `Stringify` transformation converts complex data types (like an Array or Struct) into a single string representation (usually JSON formatted). The `Parse` transformation does the exact opposite; it takes a string column containing JSON text and parses it back into hierarchical arrays and structs so you can extract individual nested elements."
+  },
+  {
+    "id": "medium-adf-52",
+    "category": "ADF",
+    "niche": "Advanced Data Flows",
+    "difficulty": "MEDIUM",
+    "question": "How do you handle late-arriving data in ADF?",
+    "answer": "Handling late-arriving data requires a robust pipeline design. Typically, you implement a 'Watermark' architecture. The pipeline tracks a `LastProcessedDate` watermark in a control table. When it runs, it queries the source for any rows modified *after* the watermark. This ensures that even if data arrives days late, the next pipeline run will pick it up based on its modified timestamp."
+  },
+  {
+    "id": "medium-adf-53",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "MEDIUM",
+    "question": "Explain the concept of 'Concurrency' limits on ADF pipelines and activities.",
+    "answer": "Concurrency limits restrict how many instances of a pipeline or a specific activity (like a ForEach loop) can run simultaneously. If you trigger a pipeline 100 times but set its concurrency limit to 5, ADF queues the triggers and only runs 5 at a time. Inside a ForEach loop, lowering the 'Batch count' concurrency prevents overwhelming the destination database with too many parallel connections."
+  },
+  {
+    "id": "medium-adf-54",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "difficulty": "HARD",
+    "question": "What is the 'Validation' activity in ADF?",
+    "answer": "The Validation activity pauses pipeline execution and waits until a specific condition is met, usually checking if a file or folder exists in storage before proceeding. It evaluates the condition at a specified polling interval and has a timeout setting. It ensures downstream copy activities don't fail because the source file hasn't arrived yet."
+  },
+  {
+    "id": "medium-adf-55",
+    "category": "ADF",
+    "niche": "Custom Activities",
+    "difficulty": "EASY",
+    "question": "When and how do you use the 'Custom Activity' in ADF?",
+    "answer": "The Custom Activity is used when built-in activities (like Copy, Databricks, or Data Flow) cannot fulfill your complex transformation requirements. It executes custom code (like Python, R, or C#) by running a batch job on Azure Batch. You provide the executable file and a linked service to the Azure Batch pool."
+  },
+  {
+    "id": "medium-adf-56",
+    "category": "ADF",
+    "niche": "Custom Activities",
+    "difficulty": "MEDIUM",
+    "question": "What is the 'Azure Function' activity?",
+    "answer": "The Azure Function activity allows an ADF pipeline to trigger an external Azure Function via an HTTP request. This is incredibly powerful for executing lightweight, custom C# or Python scripts (e.g., custom cryptography, complex API pagination, or sending Teams alerts) serverlessly without the heavy overhead of Azure Batch or Databricks."
+  },
+  {
+    "id": "medium-adf-57",
+    "category": "ADF",
+    "niche": "Cost Management",
+    "difficulty": "EASY",
+    "question": "How are ADF Mapping Data Flows billed?",
+    "answer": "Data Flows are billed per vCore-hour based on the compute type (General Purpose vs Memory Optimized) and the Time To Live (TTL) settings. Because it spins up a Spark cluster in the background, you are charged for the cluster startup time, execution time, and any TTL period where the cluster remains idle waiting for subsequent jobs."
+  },
+  {
+    "id": "medium-adf-76",
+    "category": "ADF",
+    "niche": "Data Flow Optimizations",
+    "difficulty": "EASY",
+    "question": "What is the purpose of 'Partitioning' in a Data Flow Sink?",
+    "answer": "When writing data to a Sink (like ADLS), ADF defaults to the number of Spark partitions currently in memory. You can manually set the partition option to 'Key' (to group data into files based on a column) or 'Round Robin' (to evenly distribute data). This ensures you write optimally sized files rather than thousands of tiny files."
+  },
+  {
+    "id": "medium-adf-77",
+    "category": "ADF",
+    "niche": "Data Flow Optimizations",
+    "difficulty": "MEDIUM",
+    "question": "How do you optimize an Aggregate transformation?",
+    "answer": "Aggregations require shuffling data across the Spark cluster based on the 'Group By' columns. To optimize, ensure you filter the data stream *before* the Aggregate transformation to reduce the data volume. If the data is highly skewed by the group key, consider salting."
+  },
+  {
+    "id": "medium-adf-78",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "HARD",
+    "question": "What does the 'Assert' transformation do?",
+    "answer": "The Assert transformation applies data quality rules within the data stream. You define boolean expectations (e.g., 'Age must be > 0'). If a row fails the assertion, you can configure the data flow to either flag the row with an error column, route it to a different sink, or immediately fail the entire data flow."
+  },
+  {
+    "id": "medium-adf-79",
+    "category": "ADF",
+    "niche": "Mapping Data Flows",
+    "difficulty": "HARD",
+    "question": "How do you create a slowly changing dimension (SCD Type 1) using Data Flows?",
+    "answer": "SCD Type 1 overwrites old data with new data. You use an 'Alter Row' transformation and set the policy to `Upsert if: true()`. In the Sink settings, you select the database, enable 'Allow upsert', and specify the Key columns. ADF will automatically generate SQL MERGE statements to update existing rows and insert new ones."
+  },
+  {
+    "id": "medium-adf-80",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "HARD",
+    "question": "What is the 'Get Metadata' activity?",
+    "answer": "The Get Metadata activity retrieves metadata from a data source. It is most commonly used to check if a specific file exists, retrieve the Last Modified date of a file, or get a list of all child item names (files/folders) within a directory, which is then passed to a ForEach activity for iterative processing."
+  },
+  {
+    "id": "medium-adf-81",
+    "category": "ADF",
+    "niche": "Orchestration",
+    "difficulty": "HARD",
+    "question": "How do you handle a pipeline that should only run if the previous run succeeded?",
+    "answer": "You can configure a Tumbling Window Trigger with a 'Self-Dependency'. This means the trigger for the current window (e.g., Hour 2) will not fire until the pipeline run for the previous window (Hour 1) completes successfully, ensuring strict sequential processing."
+  },
+  {
+    "id": "medium-adf-82",
+    "category": "ADF",
+    "niche": "Security",
+    "difficulty": "EASY",
+    "question": "How does ADF handle encryption in transit?",
+    "answer": "All data transfers between ADF and Azure PaaS resources (like Azure SQL or Blob Storage) are encrypted in transit using HTTPS/TLS 1.2 by default. For on-premises data using a Self-Hosted Integration Runtime, data is also encrypted via TLS 1.2 over port 443 before leaving the corporate network."
+  },
+  {
+    "id": "medium-adf-83",
+    "category": "ADF",
+    "niche": "Security",
+    "difficulty": "MEDIUM",
+    "question": "What is 'Managed Virtual Network (VNet) Data Exfiltration Protection'?",
+    "answer": "When creating an ADF Managed VNet, you can enable data exfiltration protection. This ensures that the Integration Runtime can *only* communicate with Azure resources that have approved Managed Private Endpoints. It blocks any outbound traffic to the public internet, preventing malicious actors from copying sensitive data to an unauthorized external storage account."
+  },
+  {
+    "id": "medium-adf-84",
+    "category": "ADF",
+    "niche": "Migration",
+    "difficulty": "EASY",
+    "question": "How do you migrate SSIS packages to ADF?",
+    "answer": "You provision an Azure-SSIS Integration Runtime. Then, you can deploy your `.dtsx` packages to the SSIS Catalog (SSISDB) hosted on an Azure SQL Database or Managed Instance. Finally, you use the 'Execute SSIS Package' activity in an ADF pipeline to trigger the package execution natively in the cloud."
+  },
+  {
+    "id": "medium-adf-85",
+    "category": "ADF",
+    "niche": "Global Parameters",
+    "difficulty": "EASY",
+    "question": "What are Global Parameters in ADF?",
+    "answer": "Global Parameters are constants defined at the Data Factory level rather than the pipeline level. They can be consumed by any pipeline in the factory. They are typically used to store environment-specific information (like a Key Vault URL or an Environment Name: 'DEV' or 'PROD') that needs to change when the ADF ARM template is deployed to a different environment via CI/CD."
+  },
+  {
+    "id": "medium-adf-38",
+    "category": "ADF",
+    "niche": "Control Flow Activities",
+    "difficulty": "EASY",
+    "question": "What is the purpose of the Filter activity?",
+    "answer": "The Filter activity takes an input array (e.g., the output from a Get Metadata or Lookup activity) and evaluates a boolean expression against each item. It returns a new array containing only the items that evaluated to true, which can then be passed to a ForEach loop for targeted processing."
+  },
+  {
+    "id": "medium-adf-39",
+    "category": "ADF",
+    "niche": "Control Flow Activities",
+    "difficulty": "MEDIUM",
+    "question": "How do you implement conditional logic in an ADF Pipeline?",
+    "answer": "You use the 'If Condition' activity. You provide a boolean expression (e.g., `@equals(activity('GetStatus').output.status, 'Ready')`). If true, the pipeline executes the sequence of activities defined in the 'True' branch; otherwise, it executes the activities in the 'False' branch."
+  },
+  {
+    "id": "medium-adf-40",
+    "category": "ADF",
+    "niche": "Control Flow Activities",
+    "difficulty": "HARD",
+    "question": "What is the limitation of nested activities in ADF?",
+    "answer": "ADF heavily restricts the nesting of complex activities. For example, you cannot put an 'If Condition' inside a 'ForEach' loop, nor can you put a 'ForEach' loop inside an 'Until' loop. To bypass this, the inner activity must be placed in a separate child pipeline, which is then called using the 'Execute Pipeline' activity from within the loop."
+  },
+  {
+    "id": "medium-adf-41",
+    "category": "ADF",
+    "niche": "Variables and Parameters",
+    "difficulty": "EASY",
+    "question": "Explain the difference between a Pipeline Parameter and a Pipeline Variable.",
+    "answer": "A Pipeline Parameter is a static value passed into the pipeline at runtime from an external trigger or caller; it cannot be changed during the pipeline's execution. A Pipeline Variable is declared within the pipeline and its value can be initialized, updated (Set Variable), or appended to (Append Variable) dynamically as the pipeline runs."
+  },
+  {
+    "id": "medium-adf-42",
+    "category": "ADF",
+    "niche": "Variables and Parameters",
+    "difficulty": "MEDIUM",
+    "question": "What is the Append Variable activity used for?",
+    "answer": "The Append Variable activity is used to add a new element to an Array-type pipeline variable. It is highly useful inside a ForEach loop to collect the results, filenames, or status messages of each iteration into a single list for later processing or logging."
+  },
+  {
+    "id": "medium-adf-43",
+    "category": "ADF",
+    "niche": "Datasets and Linked Services",
+    "difficulty": "EASY",
+    "question": "How can you parameterize a Linked Service in ADF?",
+    "answer": "You can add parameters directly to the Linked Service configuration. For example, instead of hardcoding an Azure SQL Server name, you define a parameter `ServerName`. In the connection string, you use `@linkedService().ServerName`. This allows a single Linked Service to connect to Dev, Test, or Prod environments by passing the correct server name dynamically from the dataset or pipeline."
+  },
+  {
+    "id": "medium-adf-44",
+    "category": "ADF",
+    "niche": "Datasets and Linked Services",
+    "difficulty": "MEDIUM",
+    "question": "What is the benefit of using parameterized Datasets?",
+    "answer": "Parameterized Datasets drastically reduce the number of objects you have to manage. Instead of creating 100 datasets for 100 different tables, you create a single 'Generic SQL Table' dataset. You add a parameter for `TableName` and map it to the dataset properties. When a Copy Activity uses this dataset, it passes the specific table name it wants to read or write."
+  },
+  {
+    "id": "medium-adf-45",
+    "category": "ADF",
+    "niche": "Integration Runtimes",
+    "difficulty": "MEDIUM",
+    "question": "What is the Auto-resolve Integration Runtime?",
+    "answer": "The Auto-resolve IR is the default Azure Integration Runtime provided by ADF. It automatically provisions compute resources in the Azure region that is closest to the sink data store or the ADF instance itself to minimize network latency during data movement."
+  },
+  {
+    "id": "medium-adf-46",
+    "category": "ADF",
+    "niche": "Integration Runtimes",
+    "difficulty": "HARD",
+    "question": "When would you use an Azure-SSIS Integration Runtime?",
+    "answer": "You use the Azure-SSIS IR when you are migrating legacy on-premises SQL Server Integration Services (SSIS) packages to the cloud. It provisions a cluster of Azure VMs dedicated to executing standard `.dtsx` packages natively within Azure Data Factory without requiring you to rewrite the ETL logic."
+  },
+  {
+    "id": "medium-adf-47",
+    "category": "ADF",
+    "niche": "Monitoring",
+    "difficulty": "HARD",
+    "question": "How can you debug a Mapping Data Flow without running an entire pipeline?",
+    "answer": "You can turn on 'Data Flow Debug' mode in the ADF Studio UI. This spins up an interactive Spark cluster in the background (which takes a few minutes). Once active, you can click on any transformation step and view a 'Data Preview' of the rows at that exact stage, allowing for rapid testing and troubleshooting of transformations."
+  },
+  {
+    "id": "adf-new-1",
+    "category": "ADF",
+    "niche": "Security and Networking",
+    "question": "How does Managed Private Endpoint failover operate when ADF connects to a geo-replicated Azure SQL Database?",
+    "answer": "When an Azure SQL Database is geo-replicated, it has a primary database and a secondary replica in another region, linked via a Failover Group. In ADF, your Managed Private Endpoint must connect to the Failover Group Listener endpoint rather than the individual server endpoints. If a database failover occurs, the listener automatically redirects the connection to the new primary. ADF's Managed Private Endpoint routes data via the private network connection seamlessly without requiring you to approve new private endpoints or modify Linked Service parameters.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-2",
+    "category": "ADF",
+    "niche": "Orchestration and Activities",
+    "question": "How do you perform complex string manipulations and array mappings inside a pipeline loop using the ADF Expression Language?",
+    "answer": "To perform complex string and array operations inside an ADF pipeline (e.g., inside a ForEach loop), you combine expression functions. For example, to map an array of file paths to only filenames, you can pass the array into a Set Variable activity using: `@map(variables('filePaths'), x => last(split(x, '/')))`. To join strings with custom conditions, you use `@concat(variables('prefix'), first(split(item().name, '_')), '.csv')`. This allows you to construct dynamic paths and configuration parameters without running external scripts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-3",
+    "category": "ADF",
+    "niche": "Data Flows and Transformations",
+    "question": "What is the physical mechanism behind Fuzzy Join tuning in ADF Mapping Data Flows, and how do you optimize it for performance?",
+    "answer": "Fuzzy Joins in Mapping Data Flows use Jaccard similarity or Levenshtein distance algorithms executed on the Spark cluster. It compares string values character-by-character to find matches within a similarity threshold (e.g., 0.8). Because this is computationally expensive (O(N*M) complexity), it can cause memory overflow and long runtimes. To optimize, you should: 1) Broadcast the smaller table if possible. 2) Filter and clean the join keys (e.g., lowercasing, removing whitespaces) using a Derived Column transformation before the join. 3) Select the 'Fuzzy Join' option only for columns that genuinely require similarity matching, keeping key columns as exact matches.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-4",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "question": "How do ADF Custom Activities execute on an Azure Batch pool, and how are files transferred between them?",
+    "answer": "An ADF Custom Activity allows you to run custom code (like a Python or C# script) that is not natively supported. When the Custom Activity runs, ADF connects to an Azure Batch pool. It uploads the files/scripts from your Linked Storage Account to the Batch node, spins up a command line, and executes your script. The script reads files from the node's local storage, processes them, and writes outputs back to the node. ADF then captures the output files from the node and uploads them back to the Azure storage container before terminating the Batch task.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-5",
+    "category": "ADF",
+    "niche": "Advanced Orchestration",
+    "question": "How do you implement a dynamic schema mapping in ADF Copy Activity to load files with varying column structures into a SQL table?",
+    "answer": "To load files with varying structures dynamically, you must bypass the standard column mapping UI in the Copy Activity. Instead, write a JSON schema mapping in the activity's code view. Define the mappings as a parameter: `@json(pipeline().parameters.columnMapping)`. Before the Copy Activity, use a Lookup Activity to query a database metadata table that holds the mapping JSON for each file type. Pass this JSON object to the Copy Activity parameter at runtime. The copy engine reads the schema mapping dynamically and aligns the source columns to target columns accordingly.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-6",
+    "category": "ADF",
+    "niche": "Integration Runtimes",
+    "question": "What is the performance and network latency difference between using an Auto-Resolve Integration Runtime and a Region-Specific Integration Runtime in ADF?",
+    "answer": "An Auto-Resolve IR attempts to detect the region of the source/sink data stores and spins up compute resources in the closest available Azure region. However, this metadata lookup can introduce 50-200ms of startup latency. A Region-Specific IR (e.g., East US IR) runs compute strictly in that defined region. If your data stores are in the same region, using a region-specific IR eliminates the region detection phase, provides predictable network routing, and ensures compliance with regional data processing policies.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-7",
+    "category": "ADF",
+    "niche": "Triggers and Scheduling",
+    "question": "How does trigger concurrency and queuing behavior work in Azure Data Factory when a pipeline run takes longer than the trigger interval?",
+    "answer": "If a pipeline is triggered (e.g., every 5 minutes) but the previous run is still executing, the trigger's behavior depends on its configuration. By default, pipelines have no concurrency limits and will run in parallel. However, if you configure a pipeline-level concurrency limit (e.g., 1), ADF will queue the new run. The trigger registers the run, but it stays in a 'Queued' state. If the queue length exceeds the system limit (typically 100), ADF drops subsequent runs, causing trigger failures.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-8",
+    "category": "ADF",
+    "niche": "Monitoring and Error Handling",
+    "question": "How do you design error handling and rollback patterns in complex master-child pipelines in ADF?",
+    "answer": "To handle errors in master-child pipelines, you configure dependencies. In the parent pipeline, connect the 'Execute Pipeline' activity (which runs the child) to subsequent activities using the 'On Failure' path. If the child fails, the parent catches the error. You can then run a rollback pipeline (e.g., deleting half-loaded data in the database) and log the error to a monitoring table. To pass error messages from the child to the parent, the child must write its error details to a pipeline return value, which the parent reads using `@activity('ExecuteChild').output.pipelineReturnValue`.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-new-9",
+    "category": "ADF",
+    "niche": "Security and Parameters",
+    "question": "How do Global Parameters in ADF behave during CI/CD deployments across environments?",
+    "answer": "Global Parameters are constant values accessible across all pipelines in a Data Factory. During CI/CD, the Git integration compiles your ADF resource definitions into an ARM template. By default, Global Parameters are exported in the `ARMTemplateForFactory.json` file. To change their values for different environments (e.g., setting a Dev API URL vs. a Prod API URL), you must enable the option 'Include global parameters in the ARM template' in the Git settings. This exposes the parameters in the ARM deployment parameter file, allowing release pipelines (like Azure DevOps) to override them during deployment.",
+    "difficulty": "HARD"
+  }
+]
