@@ -1030,6 +1030,45 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // --- HYDERABAD GCC DIRECTORY INTERACTION ---
+    const gccSearchInput = document.getElementById('gcc-search-input');
+    const gccChips = document.querySelectorAll('.gcc-chip');
+    const gccRows = document.querySelectorAll('#gcc-directory-table tbody tr');
+
+    if (gccSearchInput && gccChips.length > 0 && gccRows.length > 0) {
+      const filterGccTable = () => {
+        const searchText = gccSearchInput.value.toLowerCase().trim();
+        const activeChip = document.querySelector('.gcc-chip.active');
+        const filterValue = activeChip ? activeChip.getAttribute('data-filter') : 'all';
+
+        gccRows.forEach(row => {
+          const risk = row.getAttribute('data-risk');
+          const name = row.querySelector('.company-name').textContent.toLowerCase();
+          const sector = row.cells[2].textContent.toLowerCase();
+          const justification = row.querySelector('.justification').textContent.toLowerCase();
+
+          const matchesRisk = (filterValue === 'all' || risk === filterValue);
+          const matchesSearch = (!searchText || name.includes(searchText) || sector.includes(searchText) || justification.includes(searchText));
+
+          if (matchesRisk && matchesSearch) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      };
+
+      gccSearchInput.addEventListener('input', filterGccTable);
+
+      gccChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          gccChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          filterGccTable();
+        });
+      });
+    }
+
     // Scroll to Top Scroll trigger
     DOM.btnScrollToTop.addEventListener('click', () => {
       document.querySelector('.main-content').scrollTo({

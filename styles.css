@@ -1804,3 +1804,337 @@ code {
     display: none; /* hide pills on mobile bottom nav layout */
   }
 }
+
+/* --- HYDERABAD GCC DIRECTORY STYLES --- */
+
+.gcc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+/* Risk Tier Definitions Cards Grid */
+.gcc-risk-definitions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.gcc-def-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  backdrop-filter: blur(var(--blur-radius));
+  -webkit-backdrop-filter: blur(var(--blur-radius));
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.gcc-def-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.def-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.def-header h4 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.gcc-def-card p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Controls Bar (Search + Filter Tabs) */
+.gcc-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.gcc-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 290px;
+  max-width: 480px;
+}
+
+.gcc-search-box input {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.gcc-search-box input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.gcc-search-box .search-icon {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.gcc-filter-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gcc-chip {
+  padding: 0.5rem 1.15rem;
+  border-radius: 9999px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-family: var(--font-family);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gcc-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.gcc-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+}
+
+/* Risk Pill Badges */
+.badge-risk {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.badge-risk-low {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.theme-light .badge-risk-low {
+  background: rgba(16, 185, 129, 0.1);
+  color: hsl(160, 85%, 35%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-risk-med {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+
+.theme-light .badge-risk-med {
+  background: rgba(245, 158, 11, 0.1);
+  color: hsl(35, 90%, 45%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-risk-high {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+}
+
+.theme-light .badge-risk-high {
+  background: rgba(239, 68, 68, 0.1);
+  color: hsl(0, 75%, 50%);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Master Table Wrapper & Table */
+.gcc-table-wrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--blur-radius));
+  -webkit-backdrop-filter: blur(var(--blur-radius));
+}
+
+.gcc-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.gcc-table th {
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--card-border);
+  background: var(--item-bg);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.gcc-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-secondary);
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.gcc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.gcc-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.gcc-table tbody tr:hover {
+  background-color: var(--item-bg);
+}
+
+.gcc-table .company-name {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.gcc-table .salary-range {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.gcc-table .justification {
+  min-width: 250px;
+  max-width: 420px;
+}
+
+.gcc-table .portal-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.78rem;
+  transition: all 0.2s ease;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(108, 92, 231, 0.08);
+  border: 1px solid rgba(108, 92, 231, 0.12);
+  white-space: nowrap;
+}
+
+.gcc-table .portal-link:hover {
+  color: var(--primary-hover);
+  background: rgba(108, 92, 231, 0.15);
+  border-color: rgba(108, 92, 231, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Tip Callout Card */
+.gcc-tip-card {
+  background: rgba(108, 92, 231, 0.04);
+  border: 1px solid rgba(108, 92, 231, 0.15);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  backdrop-filter: blur(var(--blur-radius));
+  -webkit-backdrop-filter: blur(var(--blur-radius));
+  box-shadow: var(--glass-shadow);
+}
+
+.gcc-tip-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gcc-tip-header h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.gcc-tip-card p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Responsive Overrides */
+@media (max-width: 900px) {
+  .gcc-risk-definitions {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .gcc-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .gcc-search-box {
+    max-width: 100%;
+  }
+  
+  .gcc-filter-chips {
+    justify-content: flex-start;
+  }
+
+  .gcc-table th, .gcc-table td {
+    padding: 0.85rem 1rem;
+  }
+}
+
