@@ -3403,24 +3403,33 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sim-stat-shuffled').textContent = details.shuffled;
             document.getElementById('sim-stat-tasks').textContent = details.tasks;
             
+            // Update stages stat
+            const stagesEl = document.getElementById('sim-stat-stages');
+            if (stagesEl) {
+                if (flowType === 'narrow') stagesEl.textContent = '0 Stages';
+                else if (flowType === 'wide-shuffle') stagesEl.textContent = '2 Stages';
+                else if (flowType === 'broadcast') stagesEl.textContent = '1 Stage';
+                else stagesEl.textContent = '2 Stages';
+            }
+            
             // Highlight relevant interface configurations based on selected flow type
             const label1 = document.getElementById('sim-out-1-desc');
             const label2 = document.getElementById('sim-out-2-desc');
             if (flowType === 'narrow') {
                 label1.textContent = "Ready (Map-Side)";
                 label2.textContent = "Ready (Map-Side)";
-                label1.className = "block text-[9px] text-emerald-400 font-mono";
-                label2.className = "block text-[9px] text-emerald-400 font-mono";
+                label1.style.color = '#22c55e';
+                label2.style.color = '#22c55e';
             } else if (flowType === 'wide-shuffle') {
                 label1.textContent = "Merged & Sorted";
                 label2.textContent = "Merged & Sorted";
-                label1.className = "block text-[9px] text-[#ffa600] font-mono";
-                label2.className = "block text-[9px] text-[#ffa600] font-mono";
+                label1.style.color = '#FFB347';
+                label2.style.color = '#FFB347';
             } else {
                 label1.textContent = "Complete";
                 label2.textContent = "Complete";
-                label1.className = "block text-[9px] text-teal-400 font-mono";
-                label2.className = "block text-[9px] text-teal-400 font-mono";
+                label1.style.color = '#22c55e';
+                label2.style.color = '#22c55e';
             }
         }
 
@@ -3446,10 +3455,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const colors = ['#ffa600', '#bc5090', '#ef5675'];
 
             // Temporary set executor status indicators
-            document.getElementById('sim-exec-1-status').textContent = "Processing task...";
-            document.getElementById('sim-exec-1-status').className = "block text-[8px] text-amber-300 font-bold animate-pulse";
-            document.getElementById('sim-exec-2-status').textContent = "Processing task...";
-            document.getElementById('sim-exec-2-status').className = "block text-[8px] text-amber-300 font-bold animate-pulse";
+            const exec1Status = document.getElementById('sim-exec-1-status');
+            const exec2Status = document.getElementById('sim-exec-2-status');
+            const exec1Node = document.getElementById('sim-exec-1');
+            const exec2Node = document.getElementById('sim-exec-2');
+            exec1Status.textContent = "Processing task...";
+            exec1Status.style.color = '#FFB347';
+            exec2Status.textContent = "Processing task...";
+            exec2Status.style.color = '#FFB347';
+            exec1Node.classList.add('active');
+            exec2Node.classList.add('active');
+            
+            // Mark inputs as processing
+            inputElements.forEach(el => el.classList.add('processing'));
 
             // Helper to get coordinates
             function getRelativeCoords(fromEl, toEl) {
@@ -3536,10 +3554,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Clean up status indications
             setTimeout(() => {
-                document.getElementById('sim-exec-1-status').textContent = "Active / Finished";
-                document.getElementById('sim-exec-1-status').className = "block text-[8px] text-green-400 font-bold";
-                document.getElementById('sim-exec-2-status').textContent = "Active / Finished";
-                document.getElementById('sim-exec-2-status').className = "block text-[8px] text-green-400 font-bold";
+                exec1Status.textContent = "✓ Finished";
+                exec1Status.style.color = '#22c55e';
+                exec2Status.textContent = "✓ Finished";
+                exec2Status.style.color = '#22c55e';
+                exec1Node.classList.remove('active');
+                exec2Node.classList.remove('active');
+                inputElements.forEach(el => el.classList.remove('processing'));
+                outputElements.forEach(el => el.classList.add('done'));
+                setTimeout(() => outputElements.forEach(el => el.classList.remove('done')), 2000);
             }, 2200);
         }
 
@@ -3588,6 +3611,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `${(valueMB / 1024).toFixed(2)} GB`;
             }
             return `${Math.round(valueMB)} MB`;
+        }
+
+        // ---- Lexicon Filter Functions ----
+        let currentLexiconCategory = 'all';
+
+        function filterLexicon() {
+            const query = (document.getElementById('lexicon-search')?.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('#lexicon-grid .lexicon-card');
+            cards.forEach(card => {
+                const category = card.dataset.category || '';
+                const keywords = (card.dataset.keywords || '').toLowerCase();
+                const term = (card.querySelector('.spark-lexicon-term')?.textContent || '').toLowerCase();
+                const def = (card.querySelector('.spark-lexicon-def')?.textContent || '').toLowerCase();
+
+                const matchesCategory = currentLexiconCategory === 'all' || category === currentLexiconCategory;
+                const matchesQuery = !query || term.includes(query) || def.includes(query) || keywords.includes(query);
+
+                card.style.display = (matchesCategory && matchesQuery) ? '' : 'none';
+            });
+        }
+
+        function filterLexiconCategory(category) {
+            currentLexiconCategory = category;
+            // Update button states
+            document.querySelectorAll('.spark-filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`cat-btn-${category}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            filterLexicon();
+        }
+
+        // ---- Language Tab Switcher ----
+        function switchLanguageTab(lang) {
+            const panels = ['pyspark', 'scala', 'sql', 'java'];
+            panels.forEach(l => {
+                const panel = document.getElementById(`lang-panel-${l}`);
+                const btn = document.getElementById(`lang-btn-${l}`);
+                if (panel) panel.classList.toggle('hidden', l !== lang);
+                if (btn) {
+                    btn.style.borderBottomColor = l === lang ? '#FF6B35' : 'transparent';
+                    btn.style.color = l === lang ? '#FF6B35' : 'var(--text-secondary)';
+                }
+            });
+        }
+
+        // ---- Sandbox Tab Switcher ----
+        function switchSandboxTab(tab) {
+            const tabs = ['optimizer', 'simulator', 'drafter'];
+            tabs.forEach(t => {
+                const panel = document.getElementById(`panel-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (panel) panel.classList.toggle('hidden', t !== tab);
+                if (btn) {
+                    btn.style.borderBottomColor = t === tab ? 'var(--accent)' : 'transparent';
+                    btn.style.color = t === tab ? 'var(--accent)' : 'var(--text-secondary)';
+                }
+            });
         }
 
         // Start default structures on page launch

@@ -571,509 +571,504 @@
         <div class="spark-hub-content-container">
           <!-- 1. Spark Guide (Engine Architecture) Subview -->
           <div id="view-spark" class="spark-hub-subview">
-            <div class="pyspark-header-meta" style="margin-top: -1rem; margin-bottom: 1.5rem;">
-              <span class="pyspark-version-badge">Original Core Engine Team Perspective</span>
+
+            <!-- ═══ HERO BANNER ═══ -->
+            <div class="spark-hero-banner">
+              <div class="spark-hero-eyebrow">⚡ Apache Spark · Engine Architecture</div>
+              <h1 class="spark-hero-title">How <span>Spark</span> Actually Works</h1>
+              <p class="spark-hero-subtitle">
+                Deep internals of the world's fastest distributed processing engine — covering memory management, execution planning, shuffle mechanics, and ecosystem integrations from the core engineering perspective.
+              </p>
+              <div class="spark-hero-stats">
+                <span class="spark-hero-stat-pill"><span class="stat-dot" style="background:#FF6B35"></span>3 Core Milestones</span>
+                <span class="spark-hero-stat-pill"><span class="stat-dot" style="background:#4f9cf9"></span>Interactive Simulator</span>
+                <span class="spark-hero-stat-pill"><span class="stat-dot" style="background:#FFB347"></span>Live Memory Mapper</span>
+                <span class="spark-hero-stat-pill"><span class="stat-dot" style="background:#22c55e"></span>30+ Lexicon Terms</span>
+                <span class="spark-hero-stat-pill"><span class="stat-dot" style="background:#bc5090"></span>4 Language APIs</span>
+              </div>
+              <div class="spark-hero-icon-cluster" aria-hidden="true">⚡🔥</div>
             </div>
-            
 
-        <div class="container mx-auto max-w-7xl">
-
-        <!-- Core Architectural Milestones -->
-        <section class="mb-12">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] text-[var(--text-primary)]">
-                    <div class="text-sm font-semibold text-[var(--danger)] uppercase tracking-wider">Unification Breakthrough</div>
-                    <h3 class="text-2xl font-medium text-[var(--text-primary)] mt-1">Unified Data Plane</h3>
-                    <p class="text-[var(--text-secondary)] mt-2 text-sm leading-relaxed">
-                        By integrating streaming, interactive SQL, graph structures, and iterative machine learning directly into a single unified engine, we eliminated the expensive system-to-system serialization bottlenecks that plagued multi-framework legacy pipelines.
-                    </p>
-                </div>
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] text-[var(--text-primary)]">
-                    <div class="text-sm font-semibold text-[#bc5090] uppercase tracking-wider">Memory Paradigm Shift</div>
-                    <h3 class="text-2xl font-medium text-[var(--text-primary)] mt-1">Lineage vs Replication</h3>
-                    <p class="text-[var(--text-secondary)] mt-2 text-sm leading-relaxed">
-                        Rather than writing intermediate states to physical disk (like MapReduce), we designed the **Resilient Distributed Dataset (RDD)** to store deterministic lineage graphs. If a partition fails, it is computed on-the-fly, reducing the network replication penalty.
-                    </p>
-                </div>
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] text-[var(--text-primary)]">
-                    <div class="text-sm font-semibold text-[var(--warning)] uppercase tracking-wider">Optimized Compilation</div>
-                    <h3 class="text-2xl font-medium text-[var(--text-primary)] mt-1">Declarative Optimization</h3>
-                    <p class="text-[var(--text-secondary)] mt-2 text-sm leading-relaxed">
-                        We shifted execution from low-level imperative code to high-level declarative DataFrames. This allowed the <strong>Catalyst Optimizer</strong> and <strong>Tungsten Engine</strong> to rewrite queries and compile custom bytecode dynamically at runtime.
-                    </p>
-                </div>
+            <!-- ═══ CORE ARCHITECTURAL MILESTONES ═══ -->
+            <div class="spark-milestone-grid">
+              <!-- Milestone 1 -->
+              <div class="spark-milestone-card color-red">
+                <div class="spark-milestone-icon-wrap bg-red">🔗</div>
+                <div class="spark-milestone-label text-red">Unification Breakthrough</div>
+                <div class="spark-milestone-name">Unified Data Plane</div>
+                <p class="spark-milestone-desc">
+                  By integrating streaming, interactive SQL, graph structures, and iterative machine learning directly into a single unified engine, we eliminated the expensive system-to-system serialization bottlenecks that plagued multi-framework legacy pipelines.
+                </p>
+              </div>
+              <!-- Milestone 2 -->
+              <div class="spark-milestone-card color-purple">
+                <div class="spark-milestone-icon-wrap bg-purple">🧬</div>
+                <div class="spark-milestone-label text-purple">Memory Paradigm Shift</div>
+                <div class="spark-milestone-name">Lineage vs Replication</div>
+                <p class="spark-milestone-desc">
+                  Rather than writing intermediate states to physical disk (like MapReduce), we designed the <strong>Resilient Distributed Dataset (RDD)</strong> to store deterministic lineage graphs. If a partition fails, it is computed on-the-fly, reducing the network replication penalty.
+                </p>
+              </div>
+              <!-- Milestone 3 -->
+              <div class="spark-milestone-card color-amber">
+                <div class="spark-milestone-icon-wrap bg-amber">🧠</div>
+                <div class="spark-milestone-label text-amber">Optimized Compilation</div>
+                <div class="spark-milestone-name">Declarative Optimization</div>
+                <p class="spark-milestone-desc">
+                  We shifted execution from low-level imperative code to high-level declarative DataFrames. This allowed the <strong>Catalyst Optimizer</strong> and <strong>Tungsten Engine</strong> to rewrite queries and compile custom bytecode dynamically at runtime.
+                </p>
+              </div>
             </div>
-        </section>
 
-        <!-- Interactive Engine Visual Simulator -->
-        <section class="bg-[var(--card-bg)] rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] p-6 md:p-8 mb-12 text-[var(--text-primary)]">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+            <!-- ═══ INTERACTIVE ENGINE SIMULATOR ═══ -->
+            <div class="spark-section-card">
+              <div class="spark-section-header">
                 <div>
-                    <h2 class="text-2xl font-medium text-[var(--text-primary)]">Interactive Engine Simulator: Watch Spark in Action</h2>
-                    <p class="text-[var(--text-secondary)] text-sm mt-1">A real-time physical simulation demonstrating partition flows, network shuffles, and dynamic task scheduling.</p>
+                  <div class="spark-section-eyebrow">▶ Live Simulation</div>
+                  <div class="spark-section-title">Interactive Engine Simulator</div>
+                  <p class="spark-section-desc">A real-time physical simulation demonstrating partition flows, network shuffles, and dynamic task scheduling across executor nodes.</p>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <select id="simulator-flow-type" onchange="changeSimulatorFlow()" class="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg px-3 py-2 text-xs font-semibold focus:border-[var(--accent)] focus:ring-1 focus:ring-[#7a5195] outline-none text-[var(--text-primary)]">
-                        <option value="narrow">Narrow Dependency (Map / Filter)</option>
-                        <option value="wide-shuffle">Wide Dependency (Sort-Merge Shuffle Join)</option>
-                        <option value="broadcast">Map-Side Join (Broadcast Hash Join)</option>
-                        <option value="aggregation">Aggregation GroupBy (reduceByKey vs groupByKey)</option>
-                    </select>
-                    <button onclick="triggerSimulatorAnimation()" class="bg-[var(--accent)] hover:bg-[#5e3b75] text-white px-4 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 shadow-xs">
-                        ▶ Run Execution Plan
-                    </button>
-                </div>
-            </div>
+              </div>
 
-            <!-- Simulator Workspace Visual Area -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                <div class="lg:col-span-8 flex flex-col justify-between border border-[var(--card-border)] rounded-xl p-6 bg-[var(--bg-gradient)] relative overflow-hidden min-h-[400px]">
-                    
-                    <!-- Nodes Layer -->
-                    <div class="grid grid-cols-3 h-full items-center justify-between relative z-10 text-center text-[var(--text-primary)] text-xs">
-                        <!-- Step 1: Input partitions -->
-                        <div class="space-y-6" id="sim-col-input">
-                            <span class="text-[10px] font-medium text-[var(--warning)] uppercase block tracking-wider">Input Slices (HDFS/S3)</span>
-                            <div class="p-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg relative overflow-hidden text-[var(--text-primary)]" id="sim-input-1">
-                                Partition A0 <span class="block text-[9px] text-[var(--text-secondary)]">Data Block 1</span>
-                            </div>
-                            <div class="p-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg relative overflow-hidden text-[var(--text-primary)]" id="sim-input-2">
-                                Partition A1 <span class="block text-[9px] text-[var(--text-secondary)]">Data Block 2</span>
-                            </div>
-                            <div class="p-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg relative overflow-hidden text-[var(--text-primary)]" id="sim-input-3">
-                                Partition B0 (Join key) <span class="block text-[9px] text-[var(--text-secondary)]">Data Block 3</span>
-                            </div>
-                        </div>
+              <!-- Controls Row -->
+              <div class="spark-sim-controls">
+                <select id="simulator-flow-type" onchange="changeSimulatorFlow()" class="spark-sim-select">
+                  <option value="narrow">Narrow Dependency (Map / Filter)</option>
+                  <option value="wide-shuffle">Wide Dependency (Sort-Merge Shuffle Join)</option>
+                  <option value="broadcast">Map-Side Join (Broadcast Hash Join)</option>
+                  <option value="aggregation">Aggregation GroupBy (reduceByKey vs groupByKey)</option>
+                </select>
+                <button onclick="triggerSimulatorAnimation()" class="spark-sim-run-btn">
+                  ▶ Run Execution Plan
+                </button>
+              </div>
 
-                        <!-- Step 2: Executor Tasks -->
-                        <div class="space-y-6 flex flex-col items-center justify-center relative" id="sim-col-executors">
-                            <span class="text-[10px] font-medium text-[#bc5090] uppercase block tracking-wider">Executor Thread Nodes</span>
-                            <div class="w-4/5 p-4 bg-[var(--card-bg)] border-2 border-[var(--accent)] rounded-xl relative overflow-hidden text-[var(--text-primary)]" id="sim-exec-1">
-                                <div class="font-medium text-[#bc5090]">Executor Core 1</div>
-                                <span class="block text-[8px] text-[var(--text-secondary)] mt-1" id="sim-exec-1-status">Idle</span>
-                            </div>
-                            <div class="w-4/5 p-4 bg-[var(--card-bg)] border-2 border-[#bc5090] rounded-xl relative overflow-hidden text-[var(--text-primary)]" id="sim-exec-2">
-                                <div class="font-medium text-[#bc5090]">Executor Core 2</div>
-                                <span class="block text-[8px] text-[var(--text-secondary)] mt-1" id="sim-exec-2-status">Idle</span>
-                            </div>
-                        </div>
+              <!-- Simulator Area + Log Panel -->
+              <div style="display:grid; grid-template-columns: 1fr; gap: 1rem;">
+                <div style="display:grid; grid-template-columns: 1fr; gap: 1rem;" id="sim-layout-grid">
 
-                        <!-- Step 3: Output Targets -->
-                        <div class="space-y-6" id="sim-col-output">
-                            <span class="text-[10px] font-medium text-[var(--danger)] uppercase block tracking-wider">Tungsten Memory / Target</span>
-                            <div class="p-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg relative overflow-hidden text-[var(--text-primary)]" id="sim-output-1">
-                                Partition Out 0 <span class="block text-[9px] text-emerald-400 font-mono" id="sim-out-1-desc">Ready</span>
-                            </div>
-                            <div class="p-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg relative overflow-hidden text-[var(--text-primary)]" id="sim-output-2">
-                                Partition Out 1 <span class="block text-[9px] text-emerald-400 font-mono" id="sim-out-2-desc">Ready</span>
-                            </div>
+                  <!-- Dark Terminal Panel -->
+                  <div class="spark-sim-panel">
+                    <!-- Mac-style title bar -->
+                    <div class="spark-sim-header">
+                      <div class="spark-sim-dot-row">
+                        <div class="spark-sim-dot red"></div>
+                        <div class="spark-sim-dot yellow"></div>
+                        <div class="spark-sim-dot green"></div>
+                      </div>
+                      <div class="spark-sim-title-bar">spark-executor-simulation.scala</div>
+                      <div style="font-size:0.65rem; color:rgba(255,255,255,0.3); font-family:monospace;">LIVE</div>
+                    </div>
+
+                    <!-- 3-Column Nodes Grid -->
+                    <div class="spark-sim-grid" style="position:relative; z-index:1;">
+                      <!-- Input Partitions -->
+                      <div class="spark-sim-column" id="sim-col-input">
+                        <div class="spark-sim-col-label input-label">Input Slices (HDFS/S3)</div>
+                        <div class="spark-partition-node" id="sim-input-1">
+                          Partition A0 <small>Data Block 1</small>
                         </div>
+                        <div class="spark-partition-node" id="sim-input-2">
+                          Partition A1 <small>Data Block 2</small>
+                        </div>
+                        <div class="spark-partition-node" id="sim-input-3">
+                          Partition B0 <small>Join Key Block</small>
+                        </div>
+                      </div>
+
+                      <!-- Executor Cores -->
+                      <div class="spark-sim-column" id="sim-col-executors" style="align-items:center;">
+                        <div class="spark-sim-col-label exec-label">Executor Thread Nodes</div>
+                        <div class="spark-executor-node" id="sim-exec-1" style="width:85%;">
+                          ⚡ Executor Core 1
+                          <span class="spark-executor-status" id="sim-exec-1-status">Idle</span>
+                        </div>
+                        <div class="spark-executor-node" id="sim-exec-2" style="width:85%;">
+                          ⚡ Executor Core 2
+                          <span class="spark-executor-status" id="sim-exec-2-status">Idle</span>
+                        </div>
+                      </div>
+
+                      <!-- Output Targets -->
+                      <div class="spark-sim-column" id="sim-col-output">
+                        <div class="spark-sim-col-label output-label">Tungsten Memory / Target</div>
+                        <div class="spark-output-node" id="sim-output-1">
+                          Partition Out 0 <span class="spark-output-ready" id="sim-out-1-desc">Ready</span>
+                        </div>
+                        <div class="spark-output-node" id="sim-output-2">
+                          Partition Out 1 <span class="spark-output-ready" id="sim-out-2-desc">Ready</span>
+                        </div>
+                      </div>
                     </div>
 
                     <!-- Animation Particles Layer -->
-                    <div class="absolute inset-0 z-0 pointer-events-none" id="sim-particles-container"></div>
-                </div>
+                    <div class="absolute inset-0 z-0 pointer-events-none" id="sim-particles-container" style="position:absolute; inset:0; pointer-events:none;"></div>
+                  </div>
 
-                <!-- Simulation Architecture Walkthrough -->
-                <div class="lg:col-span-4 bg-[var(--primary)] text-white p-6 rounded-xl flex flex-col justify-between">
+                  <!-- Log Panel -->
+                  <div class="spark-sim-log-panel">
                     <div>
-                        <span class="text-xs font-medium text-[var(--warning)] uppercase tracking-wider">Physical Execution Logs</span>
-                        <h3 class="text-xl font-medium mt-1 mb-4" id="sim-explain-title">Narrow Dependency (Map)</h3>
-                        
-                        <div class="space-y-4 text-xs text-blue-100 leading-relaxed" id="sim-explain-text">
-                            <p><strong>Mechanics:</strong> Under a narrow transform pattern, the operations are entirely independent. Tasks run in-place without needing network interfaces or moving data across nodes.</p>
-                            <div class="p-3 bg-blue-950/40 rounded border border-blue-900">
-                                <span class="font-medium text-amber-300">Architect's Benefit:</span> Low serialization complexity. There are no stage boundaries, and the driver JVM is spared network tracking overhead.
-                            </div>
+                      <div class="spark-log-eyebrow">Physical Execution Logs</div>
+                      <div class="spark-log-title" id="sim-explain-title">Narrow Dependency (Map)</div>
+                      <div class="spark-log-text" id="sim-explain-text">
+                        <p><strong style="color:#ffffff;">Mechanics:</strong> Under a narrow transform pattern, the operations are entirely independent. Tasks run in-place without needing network interfaces or moving data across nodes.</p>
+                        <div class="spark-log-insight">
+                          <strong>Architect's Benefit:</strong> Low serialization complexity. There are no stage boundaries, and the driver JVM is spared network tracking overhead.
                         </div>
+                      </div>
                     </div>
-                    
-                    <div class="border-t border-blue-900 pt-4 mt-6">
-                        <div class="text-xs text-[var(--danger)] font-semibold uppercase">Catalyst Optimization Metrics</div>
-                        <div class="flex justify-between items-center mt-2 text-xs">
-                            <span>Network Shuffled Bytes:</span>
-                            <span class="font-medium font-mono text-amber-300" id="sim-stat-shuffled">0 Bytes</span>
-                        </div>
-                        <div class="flex justify-between items-center mt-1 text-xs">
-                            <span>Target Task Count:</span>
-                            <span class="font-medium font-mono text-amber-300" id="sim-stat-tasks">2 Tasks</span>
-                        </div>
+                    <div class="spark-log-stats">
+                      <div style="font-size:0.62rem; color:#FF6B35; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Catalyst Optimization Metrics</div>
+                      <div class="spark-log-stat-row">
+                        <span>Network Shuffled Bytes:</span>
+                        <span class="spark-log-stat-value" id="sim-stat-shuffled">0 Bytes</span>
+                      </div>
+                      <div class="spark-log-stat-row">
+                        <span>Target Task Count:</span>
+                        <span class="spark-log-stat-value" id="sim-stat-tasks">2 Tasks</span>
+                      </div>
+                      <div class="spark-log-stat-row">
+                        <span>Stage Boundaries:</span>
+                        <span class="spark-log-stat-value" id="sim-stat-stages">0 Stages</span>
+                      </div>
                     </div>
+                  </div>
+
                 </div>
+              </div>
             </div>
-        </section>
 
-        <!-- Interactive Memory Allocation Mapping Explorer -->
-        <section class="bg-[var(--card-bg)] rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] p-6 md:p-8 mb-12 text-[var(--text-primary)]">
-            <h2 class="text-2xl font-medium text-[var(--text-primary)] mb-2">Tungsten & JVM Unified Memory Allocator</h2>
-            <p class="text-[var(--text-secondary)] text-sm mb-6 max-w-3xl">
-                Spark uses a Unified Memory Manager. While fractions are configured below, Execution and Storage pools dynamically evict each other when under pressure, favoring Execution stability to prevent task failures. Adjust the core parameters below to see how changes dynamically re-divide resource margins in real time.
-            </p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <!-- Memory Inputs Sliders -->
-                <div class="lg:col-span-5 space-y-6">
-                    <div class="bg-[var(--item-bg)] p-4 rounded-xl border border-[var(--card-border)]">
-                        <label class="block text-xs font-medium text-[var(--text-primary)] uppercase tracking-wider mb-2">Executor Heap Memory (GB)</label>
-                        <div class="flex items-center gap-4">
-                            <input type="range" id="mem-heap-size" min="4" max="64" value="16" oninput="updateMemoryMapper()" class="w-full accent-[#7a5195]">
-                            <span class="font-medium font-mono text-[var(--text-primary)] text-sm min-w-[50px] text-right"><span id="lbl-heap-size">16</span> GB</span>
-                        </div>
-                        <span class="text-[10px] text-[var(--text-secondary)] block mt-1">Configures total size allocated per Executor instance (`--executor-memory`).</span>
-                    </div>
-
-                    <div class="bg-[var(--item-bg)] p-4 rounded-xl border border-[var(--card-border)]">
-                        <label class="block text-xs font-medium text-[var(--text-primary)] uppercase tracking-wider mb-2">Unified Pool Fraction (spark.memory.fraction)</label>
-                        <div class="flex items-center gap-4">
-                            <input type="range" id="mem-fraction" min="20" max="95" value="60" oninput="updateMemoryMapper()" class="w-full accent-[#bc5090]">
-                            <span class="font-medium font-mono text-[var(--text-primary)] text-sm min-w-[50px] text-right"><span id="lbl-fraction">0.6</span></span>
-                        </div>
-                        <span class="text-[10px] text-[var(--text-secondary)] block mt-1">Determines the split between Spark internal execution pools and user space logic.</span>
-                    </div>
-
-                    <div class="bg-[var(--item-bg)] p-4 rounded-xl border border-[var(--card-border)]">
-                        <label class="block text-xs font-medium text-[var(--text-primary)] uppercase tracking-wider mb-2">Storage Fraction (spark.memory.storageFraction)</label>
-                        <div class="flex items-center gap-4">
-                            <input type="range" id="mem-storage" min="10" max="90" value="50" oninput="updateMemoryMapper()" class="w-full accent-[#ffa600]">
-                            <span class="font-medium font-mono text-[var(--text-primary)] text-sm min-w-[50px] text-right"><span id="lbl-storage">0.5</span></span>
-                        </div>
-                        <span class="text-[10px] text-[var(--text-secondary)] block mt-1">Protects active cache storage from execution eviction policies.</span>
-                    </div>
+            <!-- ═══ TUNGSTEN MEMORY ALLOCATOR ═══ -->
+            <div class="spark-section-card">
+              <div class="spark-section-header">
+                <div>
+                  <div class="spark-section-eyebrow">🧮 Live Memory Mapper</div>
+                  <div class="spark-section-title">Tungsten & JVM Unified Memory Allocator</div>
+                  <p class="spark-section-desc">
+                    Spark uses a Unified Memory Manager. Execution and Storage pools dynamically evict each other when under pressure. Adjust parameters below to see how changes re-divide resource margins in real time.
+                  </p>
                 </div>
+              </div>
 
-                <!-- Live Allocation Stack Output Bar -->
-                <div class="lg:col-span-7 flex flex-col justify-center">
-                    <span class="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-2 block">JVM Executor Heap Allocation Map</span>
-                    
-                    <div class="h-10 w-full rounded-xl overflow-hidden flex shadow-xs border border-[var(--card-border)]">
-                        <div id="bar-reserved" class="bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center transition-all" style="width: 10%;">Res. (300M)</div>
-                        <div id="bar-execution" class="bg-[var(--accent)] text-white text-[10px] font-medium flex items-center justify-center transition-all" style="width: 35%;">Execution</div>
-                        <div id="bar-storage" class="bg-[var(--warning)] text-[var(--text-primary)] text-[10px] font-medium flex items-center justify-center transition-all" style="width: 35%;">Storage</div>
-                        <div id="bar-user" class="bg-teal-500 text-white text-[10px] font-medium flex items-center justify-center transition-all" style="width: 20%;">User Space</div>
+              <div style="display:grid; grid-template-columns: 1fr; gap: 2rem;">
+                <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+
+                  <!-- Sliders -->
+                  <div style="display:grid; grid-template-columns:1fr; gap:0.75rem;">
+                    <div class="spark-slider-group">
+                      <div class="spark-slider-label">
+                        Executor Heap Memory
+                        <span class="spark-slider-value"><span id="lbl-heap-size">16</span> GB</span>
+                      </div>
+                      <input type="range" id="mem-heap-size" min="4" max="64" value="16" oninput="updateMemoryMapper()" style="width:100%; accent-color:#FF6B35;">
+                      <div class="spark-slider-hint">Configures total size allocated per Executor instance (--executor-memory).</div>
                     </div>
 
-                    <!-- Explanatory Breakdown Grid -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                        <div class="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--card-border)] shadow-xs text-[var(--text-primary)]">
-                            <div class="flex items-center gap-1.5">
-                                <div class="w-3 h-3 bg-rose-500 rounded-xs"></div>
-                                <span class="text-[10px] font-medium text-[var(--text-secondary)] uppercase">Reserved</span>
-                            </div>
-                            <div class="font-mono font-medium text-sm text-rose-600 mt-1" id="lbl-val-reserved">300 MB</div>
-                            <span class="text-[9px] text-[var(--text-secondary)]">Fixed overhead for internal engine trackers.</span>
-                        </div>
-
-                        <div class="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--card-border)] shadow-xs text-[var(--text-primary)]">
-                            <div class="flex items-center gap-1.5">
-                                <div class="w-3 h-3 bg-[var(--accent)] rounded-xs"></div>
-                                <span class="text-[10px] font-medium text-[var(--text-secondary)] uppercase">Execution</span>
-                            </div>
-                            <div class="font-mono font-medium text-sm text-[var(--accent)] mt-1" id="lbl-val-execution">4.71 GB</div>
-                            <span class="text-[9px] text-[var(--text-secondary)]">Used for active task data, shuffles, joins, and aggregates.</span>
-                        </div>
-
-                        <div class="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--card-border)] shadow-xs text-[var(--text-primary)]">
-                            <div class="flex items-center gap-1.5">
-                                <div class="w-3 h-3 bg-[var(--warning)] rounded-xs"></div>
-                                <span class="text-[10px] font-medium text-[var(--text-secondary)] uppercase">Storage</span>
-                            </div>
-                            <div class="font-mono font-medium text-sm text-[var(--warning)] mt-1" id="lbl-val-storage">4.71 GB</div>
-                            <span class="text-[9px] text-[var(--text-secondary)]">Used for RDD cache partitions, broadcasts, and broadcast tables.</span>
-                        </div>
-
-                        <div class="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--card-border)] shadow-xs text-[var(--text-primary)]">
-                            <div class="flex items-center gap-1.5">
-                                <div class="w-3 h-3 bg-teal-500 rounded-xs"></div>
-                                <span class="text-[10px] font-medium text-[var(--text-secondary)] uppercase">User Space</span>
-                            </div>
-                            <div class="font-mono font-medium text-sm text-teal-600 mt-1" id="lbl-val-user">6.28 GB</div>
-                            <span class="text-[9px] text-[var(--text-secondary)]">Used for user metadata, customized datasets, and UDF dependencies.</span>
-                        </div>
+                    <div class="spark-slider-group">
+                      <div class="spark-slider-label">
+                        Unified Pool Fraction <code style="font-size:0.65rem; color:var(--text-secondary);">spark.memory.fraction</code>
+                        <span class="spark-slider-value"><span id="lbl-fraction">0.6</span></span>
+                      </div>
+                      <input type="range" id="mem-fraction" min="20" max="95" value="60" oninput="updateMemoryMapper()" style="width:100%; accent-color:#bc5090;">
+                      <div class="spark-slider-hint">Determines the split between Spark internal execution pools and user space logic.</div>
                     </div>
+
+                    <div class="spark-slider-group">
+                      <div class="spark-slider-label">
+                        Storage Fraction <code style="font-size:0.65rem; color:var(--text-secondary);">spark.memory.storageFraction</code>
+                        <span class="spark-slider-value"><span id="lbl-storage">0.5</span></span>
+                      </div>
+                      <input type="range" id="mem-storage" min="10" max="90" value="50" oninput="updateMemoryMapper()" style="width:100%; accent-color:#d97706;">
+                      <div class="spark-slider-hint">Protects active cache storage from execution eviction policies.</div>
+                    </div>
+                  </div>
+
+                  <!-- Memory Bar + Legend -->
+                  <div>
+                    <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:0.75rem;">JVM Executor Heap Allocation Map</div>
+                    <div class="spark-memory-bar-wrap">
+                      <div id="bar-reserved" class="spark-mem-bar-seg spark-mem-seg-reserved" style="width:10%;">Res.</div>
+                      <div id="bar-execution" class="spark-mem-bar-seg spark-mem-seg-execution" style="width:35%;">Execution</div>
+                      <div id="bar-storage" class="spark-mem-bar-seg spark-mem-seg-storage" style="width:35%;">Storage</div>
+                      <div id="bar-user" class="spark-mem-bar-seg spark-mem-seg-user" style="width:20%;">User</div>
+                    </div>
+
+                    <div class="spark-mem-legend">
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#ef4444;"></div>
+                          <div class="spark-mem-legend-label">Reserved</div>
+                        </div>
+                        <div class="spark-mem-legend-value" id="lbl-val-reserved" style="color:#ef4444;">300 MB</div>
+                        <div class="spark-mem-legend-hint">Fixed overhead for internal engine trackers.</div>
+                      </div>
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#7c3aed;"></div>
+                          <div class="spark-mem-legend-label">Execution</div>
+                        </div>
+                        <div class="spark-mem-legend-value" id="lbl-val-execution" style="color:#7c3aed;">4.71 GB</div>
+                        <div class="spark-mem-legend-hint">Used for active task data, shuffles, joins, and aggregates.</div>
+                      </div>
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#d97706;"></div>
+                          <div class="spark-mem-legend-label">Storage</div>
+                        </div>
+                        <div class="spark-mem-legend-value" id="lbl-val-storage" style="color:#d97706;">4.71 GB</div>
+                        <div class="spark-mem-legend-hint">Used for RDD cache partitions, broadcasts, and broadcast tables.</div>
+                      </div>
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#0d9488;"></div>
+                          <div class="spark-mem-legend-label">User Space</div>
+                        </div>
+                        <div class="spark-mem-legend-value" id="lbl-val-user" style="color:#0d9488;">6.28 GB</div>
+                        <div class="spark-mem-legend-hint">Used for user metadata, customized datasets, and UDF dependencies.</div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
+              </div>
             </div>
-        </section>
 
-        <!-- Dynamic AI Sandbox Playground -->
-        <section class="bg-[var(--card-bg)] rounded-xl shadow-lg border border-[var(--card-border)] overflow-hidden mb-12 text-[var(--text-primary)]">
-            <div class="bg-gradient-to-r from-[#003f5c] to-[#7a5195] p-6 text-white">
-                <span class="bg-[var(--warning)] text-white text-[var(--text-primary)] text-[10px] font-medium px-2.5 py-1 rounded uppercase tracking-wider">Dynamic Interactive Interface</span>
-                <h2 class="text-2xl font-medium mt-2 flex items-center gap-2">
-                    🧠 Interactive Architectural Sandbox
+            <!-- ═══ AI SANDBOX ═══ -->
+            <div class="spark-section-card" style="padding:0; overflow:hidden;">
+              <div style="background:linear-gradient(135deg, #003f5c 0%, #7a5195 100%); padding:1.5rem 2rem; color:white;">
+                <span style="background:rgba(255,179,71,0.25); color:#FFB347; border:1px solid rgba(255,179,71,0.4); font-size:0.65rem; font-weight:700; padding:0.25rem 0.65rem; border-radius:50px; text-transform:uppercase; letter-spacing:0.08em;">Dynamic Interactive Interface</span>
+                <h2 style="font-size:1.35rem; font-weight:600; margin-top:0.6rem; color:#ffffff; display:flex; align-items:center; gap:0.5rem;">
+                  🧠 Interactive Architectural Sandbox
                 </h2>
-                <p class="text-blue-100 text-sm mt-1">
-                    Powered by `gemini-3.1-flash-preview`. Test Spark configurations, write code transformations, and generate drafts for your tech blog or upcoming book.
+                <p style="font-size:0.8rem; color:rgba(255,255,255,0.65); margin-top:0.25rem;">
+                  Powered by gemini-2.5-flash. Test Spark configurations, write code transformations, and generate drafts for your tech blog or upcoming book.
                 </p>
-            </div>
-            
-            <div class="flex flex-wrap border-b border-[var(--card-border)] bg-[var(--item-bg)]">
-                <button id="tab-btn-optimizer" onclick="switchSandboxTab('optimizer')" class="flex-1 py-3 px-4 text-center font-semibold text-sm border-b-2 border-[var(--accent)] text-[var(--accent)] focus:outline-none transition-all">
-                    Code Optimizer
-                </button>
-                <button id="tab-btn-simulator" onclick="switchSandboxTab('simulator')" class="flex-1 py-3 px-4 text-center font-semibold text-sm border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--accent)] focus:outline-none transition-all">
-                    Runtime Incident Simulator
-                </button>
-                <button id="tab-btn-drafter" onclick="switchSandboxTab('drafter')" class="flex-1 py-3 px-4 text-center font-semibold text-sm border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--accent)] focus:outline-none transition-all">
-                    Educational Content Writer
-                </button>
-            </div>
+              </div>
 
-            <div class="p-6">
+              <div style="display:flex; border-bottom:1px solid var(--card-border); background:var(--item-bg);">
+                <button id="tab-btn-optimizer" onclick="switchSandboxTab('optimizer')" style="flex:1; padding:0.85rem 1rem; font-weight:600; font-size:0.8rem; border:none; border-bottom:2px solid var(--accent); color:var(--accent); background:transparent; cursor:pointer; transition:all 0.2s;">Code Optimizer</button>
+                <button id="tab-btn-simulator" onclick="switchSandboxTab('simulator')" style="flex:1; padding:0.85rem 1rem; font-weight:600; font-size:0.8rem; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer; transition:all 0.2s;">Runtime Incident Simulator</button>
+                <button id="tab-btn-drafter" onclick="switchSandboxTab('drafter')" style="flex:1; padding:0.85rem 1rem; font-weight:600; font-size:0.8rem; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer; transition:all 0.2s;">Educational Content Writer</button>
+              </div>
+
+              <div style="padding:1.5rem 2rem;">
                 <!-- Optimizer Tab -->
                 <div id="panel-optimizer" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                        <label class="block text-sm font-semibold text-[var(--text-secondary)]">Optimize a common pipeline bottleneck:</label>
-                        <select id="optimizer-preset" onchange="applyOptimizerPreset()" class="col-span-2 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg px-3 py-2 text-sm focus:border-[var(--accent)] focus:ring-1 focus:ring-[#7a5195] outline-none text-[var(--text-primary)]">
-                            <option value="">-- Choose a Preset Bottleneck --</option>
-                            <option value="pyspark-join">Standard Hash Join (Triggers Massive Shuffle)</option>
-                            <option value="rdd-groupby">Raw groupByKey (Heavy In-Memory Serialization)</option>
-                            <option value="uncached-actions">Uncached Multiple Actions (Triggers Re-evaluation of DAG)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-[var(--text-secondary)] mb-1">Raw Pipeline Code:</label>
-                        <textarea id="optimizer-code-input" rows="6" class="w-full font-mono text-sm bg-gray-900 text-emerald-400 p-4 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="// Paste your unoptimized transformations here..."></textarea>
-                    </div>
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <span class="text-xs text-[var(--text-secondary)]">Evaluates Catalyst query tree representations</span>
-                        <button onclick="runCodeOptimization()" class="bg-[var(--danger)] hover:bg-[#d0465c] text-white font-medium py-2.5 px-6 rounded-lg text-sm transition-all flex items-center gap-2 shadow-md">
-                            ✨ Optimize Spark Code
-                        </button>
-                    </div>
+                  <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
+                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Optimize a common pipeline bottleneck:</label>
+                    <select id="optimizer-preset" onchange="applyOptimizerPreset()" style="width:100%; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:0.5rem 0.85rem; font-size:0.82rem; color:var(--text-primary); outline:none;">
+                      <option value="">-- Choose a Preset Bottleneck --</option>
+                      <option value="pyspark-join">Standard Hash Join (Triggers Massive Shuffle)</option>
+                      <option value="rdd-groupby">Raw groupByKey (Heavy In-Memory Serialization)</option>
+                      <option value="uncached-actions">Uncached Multiple Actions (Triggers Re-evaluation of DAG)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Raw Pipeline Code:</label>
+                    <textarea id="optimizer-code-input" rows="6" style="width:100%; font-family:monospace; font-size:0.8rem; background:#0d1117; color:#86efac; padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.08); outline:none; resize:vertical;" placeholder="// Paste your unoptimized transformations here..."></textarea>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">Evaluates Catalyst query tree representations</span>
+                    <button onclick="runCodeOptimization()" style="background:var(--danger); color:white; font-weight:600; padding:0.6rem 1.25rem; border-radius:10px; font-size:0.82rem; border:none; cursor:pointer; display:flex; align-items:center; gap:0.4rem;">✨ Optimize Spark Code</button>
+                  </div>
                 </div>
 
                 <!-- Simulator Tab -->
                 <div id="panel-simulator" class="space-y-4 hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                        <label class="block text-sm font-semibold text-[var(--text-secondary)]">Select Production Failure Scenario:</label>
-                        <select id="simulator-preset" onchange="applySimulatorPreset()" class="col-span-2 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg px-3 py-2 text-sm focus:border-[var(--accent)] focus:ring-1 focus:ring-[#7a5195] outline-none text-[var(--text-primary)]">
-                            <option value="">-- Select Outage Scenario --</option>
-                            <option value="oom">OutOfMemory Error: GC overhead limit exceeded on worker node</option>
-                            <option value="skew">Data Skew: Shuffle stage hangs on a single long-running task</option>
-                            <option value="streaming">Kafka backpressure: Structured Streaming source latency spike</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-[var(--text-secondary)] mb-1">Provide Custom System/Deployment Constraints:</label>
-                        <textarea id="simulator-input" rows="4" class="w-full text-sm border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] p-3 rounded-lg focus:border-[var(--accent)] focus:ring-1 focus:ring-[#7a5195] outline-none" placeholder="Provide system constraints (heap size, dynamic allocations, data volumes) to generate custom configuration values..."></textarea>
-                    </div>
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <span class="text-xs text-[var(--text-secondary)]">Outputs explicit engine config values (spark.sql.shuffle.partitions)</span>
-                        <button onclick="runScenarioSimulation()" class="bg-[#bc5090] hover:bg-[#9e3a75] text-white font-medium py-2.5 px-6 rounded-lg text-sm transition-all flex items-center gap-2 shadow-md">
-                            ✨ Troubleshoot Incident
-                        </button>
-                    </div>
+                  <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
+                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Select Production Failure Scenario:</label>
+                    <select id="simulator-preset" onchange="applySimulatorPreset()" style="width:100%; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:0.5rem 0.85rem; font-size:0.82rem; color:var(--text-primary); outline:none;">
+                      <option value="">-- Select Outage Scenario --</option>
+                      <option value="oom">OutOfMemory Error: GC overhead limit exceeded on worker node</option>
+                      <option value="skew">Data Skew: Shuffle stage hangs on a single long-running task</option>
+                      <option value="streaming">Kafka backpressure: Structured Streaming source latency spike</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Provide Custom System/Deployment Constraints:</label>
+                    <textarea id="simulator-input" rows="4" style="width:100%; font-size:0.82rem; background:var(--card-bg); color:var(--text-primary); padding:0.85rem; border-radius:10px; border:1px solid var(--card-border); outline:none; resize:vertical;" placeholder="Provide system constraints (heap size, dynamic allocations, data volumes)..."></textarea>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">Outputs explicit engine config values (spark.sql.shuffle.partitions)</span>
+                    <button onclick="runScenarioSimulation()" style="background:#bc5090; color:white; font-weight:600; padding:0.6rem 1.25rem; border-radius:10px; font-size:0.82rem; border:none; cursor:pointer;">✨ Troubleshoot Incident</button>
+                  </div>
                 </div>
 
                 <!-- Drafter Tab -->
                 <div id="panel-drafter" class="space-y-4 hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                        <label class="block text-sm font-semibold text-[var(--text-secondary)]">Choose Topic for Book/Blog Draft:</label>
-                        <select id="drafter-preset" onchange="applyDrafterPreset()" class="col-span-2 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg px-3 py-2 text-sm focus:border-[var(--accent)] focus:ring-1 focus:ring-[#7a5195] outline-none text-[var(--text-primary)]">
-                            <option value="">-- Choose Technical Deep-Dive --</option>
-                            <option value="tungsten">Deep-dive: Tungsten CodeGen vs. JVM Object Memory Overhead</option>
-                            <option value="aqe">Deep-dive: How AQE Dynamic Coalescing prevents small-file fragmentation</option>
-                            <option value="dpp">Deep-dive: Dynamic Partition Pruning (DPP) in Star-Schema Joins</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-[var(--text-secondary)] mb-1">Define Target Audience, Style, or Specific Directives:</label>
-                        <input id="drafter-custom" type="text" class="w-full text-sm border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] p-3 rounded-lg focus:border-[var(--accent)] focus:ring-1 focus:ring-[#7a5195] outline-none" placeholder="E.g., Target: Intermediate Spark users, Tone: Analytical, Focus on explaining shuffle map exchanges...">
-                    </div>
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <span class="text-xs text-[var(--text-secondary)]">Generates comprehensive chapters with Scala, Python, and SQL examples</span>
-                        <button onclick="runContentDrafting()" class="bg-[var(--accent)] hover:bg-[#5e3b75] text-white font-medium py-2.5 px-6 rounded-lg text-sm transition-all flex items-center gap-2 shadow-md">
-                            ✨ Draft Educational Lesson
-                        </button>
-                    </div>
+                  <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
+                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Choose Topic for Book/Blog Draft:</label>
+                    <select id="drafter-preset" onchange="applyDrafterPreset()" style="width:100%; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:0.5rem 0.85rem; font-size:0.82rem; color:var(--text-primary); outline:none;">
+                      <option value="">-- Choose Technical Deep-Dive --</option>
+                      <option value="tungsten">Deep-dive: Tungsten CodeGen vs. JVM Object Memory Overhead</option>
+                      <option value="aqe">Deep-dive: How AQE Dynamic Coalescing prevents small-file fragmentation</option>
+                      <option value="dpp">Deep-dive: Dynamic Partition Pruning (DPP) in Star-Schema Joins</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Define Target Audience, Style, or Specific Directives:</label>
+                    <input id="drafter-custom" type="text" style="width:100%; font-size:0.82rem; background:var(--card-bg); color:var(--text-primary); padding:0.85rem; border-radius:10px; border:1px solid var(--card-border); outline:none;" placeholder="E.g., Target: Intermediate Spark users, Tone: Analytical...">
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">Generates comprehensive chapters with Scala, Python, and SQL examples</span>
+                    <button onclick="runContentDrafting()" style="background:var(--accent); color:white; font-weight:600; padding:0.6rem 1.25rem; border-radius:10px; font-size:0.82rem; border:none; cursor:pointer;">✨ Draft Educational Lesson</button>
+                  </div>
                 </div>
 
                 <!-- Sandbox Output -->
-                <div id="sandbox-output-container" class="mt-8 border-t border-[var(--card-border)] pt-6 hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
-                            <span class="animate-pulse flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Workspace Intelligence Output
-                        </h4>
-                        <button onclick="copyOutputContent()" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-all flex items-center gap-1">
-                            📋 Copy to Clipboard
-                        </button>
-                    </div>
-                    <div id="sandbox-loading" class="flex flex-col items-center justify-center py-12 space-y-3">
-                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--accent)]"></div>
-                        <p id="sandbox-loading-status" class="text-xs text-[var(--text-secondary)] animate-pulse">Consulting Core Engine Architectural plans...</p>
-                    </div>
-                    <div id="sandbox-result" class="prose max-w-none text-[var(--text-primary)] space-y-4 bg-[var(--item-bg)] p-6 rounded-xl border border-[var(--card-border)] overflow-x-auto text-sm leading-relaxed">
-                        <!-- Content gets populated programmatically and rendered with Markdown tags -->
-                    </div>
+                <div id="sandbox-output-container" class="mt-8 border-t border-[var(--card-border)] pt-6 hidden" style="margin-top:1.5rem; border-top:1px solid var(--card-border); padding-top:1.25rem;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                    <h4 style="font-size:0.85rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:0.5rem;">
+                      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.5s infinite;"></span> Workspace Intelligence Output
+                    </h4>
+                    <button onclick="copyOutputContent()" style="font-size:0.72rem; font-weight:600; color:#4f9cf9; background:none; border:none; cursor:pointer;">📋 Copy to Clipboard</button>
+                  </div>
+                  <div id="sandbox-loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 1rem; gap:0.75rem;">
+                    <div style="width:36px; height:36px; border-radius:50%; border:2px solid transparent; border-bottom-color:var(--accent); animation:spin 0.8s linear infinite;"></div>
+                    <p id="sandbox-loading-status" style="font-size:0.75rem; color:var(--text-secondary);">Consulting Core Engine Architectural plans...</p>
+                  </div>
+                  <div id="sandbox-result" style="font-size:0.82rem; line-height:1.7; color:var(--text-primary); background:var(--item-bg); padding:1.25rem; border-radius:12px; border:1px solid var(--card-border); overflow-x:auto;"></div>
                 </div>
+              </div>
             </div>
-        </section>
 
-        <!-- Searchable Interactive Dictionary -->
-        <section class="bg-[var(--card-bg)] rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] p-6 md:p-8 mb-12 text-[var(--text-primary)]">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <!-- ═══ ARCHITECT'S LEXICON ═══ -->
+            <div class="spark-section-card">
+              <div class="spark-section-header">
                 <div>
-                    <h2 class="text-2xl font-medium text-[var(--text-primary)]">The Architect's Core Lexicon</h2>
-                    <p class="text-[var(--text-secondary)] text-sm mt-1">An extensive, searchable encyclopedia containing critical execution, optimization, and memory terms.</p>
+                  <div class="spark-section-eyebrow">📖 Core Concepts</div>
+                  <div class="spark-section-title">The Architect's Core Lexicon</div>
+                  <p class="spark-section-desc">An extensive, searchable encyclopedia of critical execution, optimization, and memory terms.</p>
                 </div>
-                <div class="w-full md:w-80">
-                    <input type="text" id="lexicon-search" oninput="filterLexicon()" placeholder="Search terms (e.g. Shuffle, AQE)..." class="w-full px-4 py-2 border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] rounded-lg focus:ring-1 focus:ring-[#7a5195] focus:border-[var(--accent)] text-sm outline-none">
+                <div style="width:100%; max-width:280px;">
+                  <input type="text" id="lexicon-search" oninput="filterLexicon()" placeholder="Search terms (e.g. Shuffle, AQE)..." style="width:100%; padding:0.6rem 1rem; border:1px solid var(--card-border); background:var(--item-bg); color:var(--text-primary); border-radius:10px; font-size:0.8rem; outline:none; transition:border-color 0.2s;">
                 </div>
-            </div>
+              </div>
 
-            <!-- Categories Toggle -->
-            <div class="flex flex-wrap gap-2 mb-6 border-b border-[var(--card-border)] pb-4">
-                <button onclick="filterLexiconCategory('all')" id="cat-btn-all" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--primary)] text-white transition-all">All Terms</button>
-                <button onclick="filterLexiconCategory('engine')" id="cat-btn-engine" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--item-bg)] transition-all text-[var(--text-primary)]">Core Engine</button>
-                <button onclick="filterLexiconCategory('optimization')" id="cat-btn-optimization" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--item-bg)] transition-all text-[var(--text-primary)]">Optimization</button>
-                <button onclick="filterLexiconCategory('memory')" id="cat-btn-memory" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--item-bg)] transition-all text-[var(--text-primary)]">Memory & Storage</button>
-                <button onclick="filterLexiconCategory('streaming')" id="cat-btn-streaming" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--item-bg)] transition-all text-[var(--text-primary)]">Streaming & Storage</button>
-            </div>
+              <!-- Category Filter Pills -->
+              <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--card-border);">
+                <button onclick="filterLexiconCategory('all')" id="cat-btn-all" class="spark-filter-btn active">All Terms</button>
+                <button onclick="filterLexiconCategory('engine')" id="cat-btn-engine" class="spark-filter-btn">⚙️ Core Engine</button>
+                <button onclick="filterLexiconCategory('optimization')" id="cat-btn-optimization" class="spark-filter-btn">🚀 Optimization</button>
+                <button onclick="filterLexiconCategory('memory')" id="cat-btn-memory" class="spark-filter-btn">🧠 Memory &amp; Storage</button>
+                <button onclick="filterLexiconCategory('streaming')" id="cat-btn-streaming" class="spark-filter-btn">📡 Streaming</button>
+              </div>
 
-            <!-- Glossary Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="lexicon-grid">
+              <!-- Glossary Grid -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:0.85rem;" id="lexicon-grid">
+
                 <!-- Term 1 -->
-                <div class="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex flex-col justify-between transition-all hover:border-blue-400 lexicon-card" data-category="engine" data-keywords="shuffle partition wide dependency exchange">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-medium text-[var(--accent)] uppercase tracking-wider">Core Engine</span>
-                            <span class="bg-[var(--primary)] text-white text-[9px] px-1.5 py-0.5 rounded font-mono">Stage Split</span>
-                        </div>
-                        <h4 class="text-base font-medium text-[var(--text-primary)] mt-2">Shuffle Operations</h4>
-                        <p class="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                            The critical physical barrier where partition data is sorted and distributed across executors over the network. Driven by wide dependencies such as `groupBy` or `join`. Shuffles split lineage into separate **Stages**.
-                        </p>
-                    </div>
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="shuffle partition wide dependency exchange">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Stage Split</span>
+                  </div>
+                  <div class="spark-lexicon-term">Shuffle Operations</div>
+                  <p class="spark-lexicon-def">The critical physical barrier where partition data is sorted and distributed across executors over the network. Driven by wide dependencies such as groupBy or join. Shuffles split lineage into separate Stages.</p>
                 </div>
+
                 <!-- Term 2 -->
-                <div class="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex flex-col justify-between transition-all hover:border-blue-400 lexicon-card" data-category="optimization" data-keywords="aqe adaptive query execution coalition join skew">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-medium text-[#bc5090] uppercase tracking-wider">Optimization</span>
-                            <span class="bg-emerald-600 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">Dynamic</span>
-                        </div>
-                        <h4 class="text-base font-medium text-[var(--text-primary)] mt-2">Adaptive Query Execution (AQE)</h4>
-                        <p class="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                            Optimizes runtime performance by re-planning execution mid-flight. AQE uses runtime statistics collected from completed shuffle maps to dynamically coalesce small partitions, optimize join strategies, and isolate skew.
-                        </p>
-                    </div>
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="aqe adaptive query execution coalition join skew">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Dynamic</span>
+                  </div>
+                  <div class="spark-lexicon-term">Adaptive Query Execution (AQE)</div>
+                  <p class="spark-lexicon-def">Optimizes runtime performance by re-planning execution mid-flight. AQE uses runtime statistics collected from completed shuffle maps to dynamically coalesce small partitions, optimize join strategies, and isolate skew.</p>
                 </div>
+
                 <!-- Term 3 -->
-                <div class="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex flex-col justify-between transition-all hover:border-blue-400 lexicon-card" data-category="optimization" data-keywords="tungsten code generation off-heap heap codegen jvm">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-medium text-[#bc5090] uppercase tracking-wider">Optimization</span>
-                            <span class="bg-[var(--bg-gradient)]mber-600 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">Bytecode</span>
-                        </div>
-                        <h4 class="text-base font-medium text-[var(--text-primary)] mt-2">Tungsten Execution Engine</h4>
-                        <p class="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                            Bypasses JVM memory and GC overheads. Tungsten features raw **Off-Heap Memory Allocations** using the binary row format and compiles complex operations down to raw JVM bytecode using **Whole-Stage Code Generation**.
-                        </p>
-                    </div>
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="tungsten code generation off-heap heap codegen jvm">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Bytecode</span>
+                  </div>
+                  <div class="spark-lexicon-term">Tungsten Execution Engine</div>
+                  <p class="spark-lexicon-def">Bypasses JVM memory and GC overheads. Tungsten features raw Off-Heap Memory Allocations using the binary row format and compiles complex operations down to raw JVM bytecode using Whole-Stage Code Generation.</p>
                 </div>
+
                 <!-- Term 4 -->
-                <div class="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex flex-col justify-between transition-all hover:border-blue-400 lexicon-card" data-category="memory" data-keywords="kryo serialization binary serializer performance">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-medium text-[var(--warning)] uppercase tracking-wider">Memory & Storage</span>
-                            <span class="bg-indigo-600 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">SerDe</span>
-                        </div>
-                        <h4 class="text-base font-medium text-[var(--text-primary)] mt-2">Kryo Serialization</h4>
-                        <p class="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                            A highly optimized, compact binary serialization protocol that outperforms default Java serialization. Recommended for shuffle data exchanges and persistent RDD cache levels to reduce raw network payload sizes.
-                        </p>
-                    </div>
+                <div class="spark-lexicon-card lexicon-card" data-category="memory" data-keywords="kryo serialization binary serializer performance">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#d97706;">🧠 Memory &amp; Storage</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(99,102,241,0.12); color:#818cf8;">SerDe</span>
+                  </div>
+                  <div class="spark-lexicon-term">Kryo Serialization</div>
+                  <p class="spark-lexicon-def">A highly optimized, compact binary serialization protocol that outperforms default Java serialization. Recommended for shuffle data exchanges and persistent RDD cache levels to reduce raw network payload sizes.</p>
                 </div>
+
                 <!-- Term 5 -->
-                <div class="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex flex-col justify-between transition-all hover:border-blue-400 lexicon-card" data-category="streaming" data-keywords="watermark state store rocksdb structured streaming stateful">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-medium text-[var(--danger)] uppercase tracking-wider">Streaming & State</span>
-                            <span class="bg-rose-600 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">Real-Time</span>
-                        </div>
-                        <h4 class="text-base font-medium text-[var(--text-primary)] mt-2">RocksDB State Store</h4>
-                        <p class="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                            An out-of-core, high-performance transactional state store used in Structured Streaming. It stores data on local SSDs, preventing Java GC limits from capping state retention during large-scale operations.
-                        </p>
-                    </div>
+                <div class="spark-lexicon-card lexicon-card" data-category="streaming" data-keywords="watermark state store rocksdb structured streaming stateful">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#f87171;">📡 Streaming &amp; State</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(239,68,68,0.12); color:#f87171;">Real-Time</span>
+                  </div>
+                  <div class="spark-lexicon-term">RocksDB State Store</div>
+                  <p class="spark-lexicon-def">An out-of-core, high-performance transactional state store used in Structured Streaming. It stores data on local SSDs, preventing Java GC limits from capping state retention during large-scale operations.</p>
                 </div>
+
                 <!-- Term 6 -->
-                <div class="p-4 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] flex flex-col justify-between transition-all hover:border-blue-400 lexicon-card" data-category="engine" data-keywords="lineage DAG directed acyclic graph logical physical fault tolerance">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-medium text-[var(--accent)] uppercase tracking-wider">Core Engine</span>
-                            <span class="bg-[var(--primary)] text-white text-[9px] px-1.5 py-0.5 rounded font-mono">Logical Lineage</span>
-                        </div>
-                        <h4 class="text-base font-medium text-[var(--text-primary)] mt-2">DAG (Directed Acyclic Graph)</h4>
-                        <p class="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
-                            The logical representation of transformations applied to your source dataset. Spark uses the DAG to rebuild lost partitions and compute physical runtime execution branches efficiently.
-                        </p>
-                    </div>
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="lineage DAG directed acyclic graph logical physical fault tolerance">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Logical Lineage</span>
+                  </div>
+                  <div class="spark-lexicon-term">DAG (Directed Acyclic Graph)</div>
+                  <p class="spark-lexicon-def">The logical representation of transformations applied to your source dataset. Spark uses the DAG to rebuild lost partitions and compute physical runtime execution branches efficiently.</p>
                 </div>
-            </div>
-        </section>
 
-        <!-- Deep Polyglot Engine Mechanics -->
-        <section class="bg-[var(--card-bg)] rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] p-6 md:p-8 mb-12 text-[var(--text-primary)]">
-            <h2 class="text-2xl font-medium text-[var(--text-primary)]">The Polyglot Communication Matrix</h2>
-            <p class="text-[var(--text-secondary)] text-sm mb-6 max-w-3xl">
-                Spark is built on Scala and runs inside a JVM, but it supports several major language APIs. Each API has a different execution path and performance profile.
-            </p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
-                <div class="lg:col-span-7">
-                    <div class="chart-container">
-                        <canvas id="languageApiChartExtended"></canvas>
-                    </div>
-                </div>
-                
-                <div class="lg:col-span-5 space-y-4">
-                    <div class="p-4 rounded-lg bg-indigo-50 border border-indigo-100">
-                        <h4 class="font-medium text-indigo-900 text-sm flex items-center gap-2">
-                            <span>☕ Scala & Java (Direct JVM Execution)</span>
-                        </h4>
-                        <p class="text-xs text-indigo-700 mt-1 leading-relaxed">
-                            The native execution context. Compiled code runs directly inside worker JVM containers with zero cross-process serialization overhead. This provides immediate access to low-level APIs and custom cluster plugins.
-                        </p>
-                    </div>
-                    
-                    <div class="p-4 rounded-lg bg-[var(--bg-gradient)]mber-50 border border-amber-100">
-                        <h4 class="font-medium text-amber-900 text-sm flex items-center gap-2">
-                            <span>🐍 PySpark with Py4J and Apache Arrow</span>
-                        </h4>
-                        <p class="text-xs text-amber-700 mt-1 leading-relaxed">
-                            Historically bottlenecked by Py4J TCP loop socket pathways. Modern Spark uses **Apache Arrow Vectorized Exchange** to stream columnar datasets directly between PySpark workers and the JVM, preventing high SerDe penalties.
-                        </p>
-                    </div>
-
-                    <div class="p-4 rounded-lg bg-emerald-50 border border-emerald-100">
-                        <h4 class="font-medium text-emerald-900 text-sm flex items-center gap-2">
-                            <span>📊 Spark SQL Engine Optimization</span>
-                        </h4>
-                        <p class="text-xs text-emerald-700 mt-1 leading-relaxed">
-                            Using the Spark SQL interface decouples raw user code from physical compilation targets. Code written in SQL, PySpark, or Scala resolves to the same optimized Catalyst execution tree.
-                        </p>
-                    </div>
-                </div>
+              </div>
             </div>
 
-            <!-- Code Comparison Tabs -->
-            <div class="border border-[var(--card-border)] rounded-lg overflow-hidden">
-                <div class="flex flex-wrap bg-[var(--item-bg)] border-b border-[var(--card-border)]">
-                    <button onclick="switchLanguageTab('pyspark')" id="lang-btn-pyspark" class="px-4 py-2 text-xs font-semibold border-b-2 border-[var(--accent)] text-[var(--accent)] focus:outline-none">PySpark</button>
-                    <button onclick="switchLanguageTab('scala')" id="lang-btn-scala" class="px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--accent)] focus:outline-none">Scala</button>
-                    <button onclick="switchLanguageTab('sql')" id="lang-btn-sql" class="px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--accent)] focus:outline-none">Spark SQL</button>
-                    <button onclick="switchLanguageTab('java')" id="lang-btn-java" class="px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--accent)] focus:outline-none">Java</button>
+            <!-- ═══ POLYGLOT COMMUNICATION MATRIX ═══ -->
+            <div class="spark-section-card">
+              <div class="spark-section-header">
+                <div>
+                  <div class="spark-section-eyebrow">🔤 Language APIs</div>
+                  <div class="spark-section-title">The Polyglot Communication Matrix</div>
+                  <p class="spark-section-desc">Spark is built on Scala and runs inside a JVM, but it supports several major language APIs. Each API has a different execution path and performance profile.</p>
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+                <!-- Chart -->
+                <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+                  <div style="height:220px; position:relative;">
+                    <canvas id="languageApiChartExtended"></canvas>
+                  </div>
+
+                  <!-- Language Panels (dark-mode safe) -->
+                  <div style="display:grid; grid-template-columns:1fr; gap:0.75rem;">
+                    <div class="spark-polyglot-panel" style="border-left:3px solid #6366f1;">
+                      <div class="spark-polyglot-lang-title">☕ Scala &amp; Java — Direct JVM Execution</div>
+                      <p class="spark-polyglot-lang-desc">The native execution context. Compiled code runs directly inside worker JVM containers with zero cross-process serialization overhead. This provides immediate access to low-level APIs and custom cluster plugins.</p>
+                    </div>
+                    <div class="spark-polyglot-panel" style="border-left:3px solid #FFB347;">
+                      <div class="spark-polyglot-lang-title">🐍 PySpark with Py4J and Apache Arrow</div>
+                      <p class="spark-polyglot-lang-desc">Historically bottlenecked by Py4J TCP loop socket pathways. Modern Spark uses Apache Arrow Vectorized Exchange to stream columnar datasets directly between PySpark workers and the JVM, preventing high SerDe penalties.</p>
+                    </div>
+                    <div class="spark-polyglot-panel" style="border-left:3px solid #22c55e;">
+                      <div class="spark-polyglot-lang-title">📊 Spark SQL Engine Optimization</div>
+                      <p class="spark-polyglot-lang-desc">Using the Spark SQL interface decouples raw user code from physical compilation targets. Code written in SQL, PySpark, or Scala resolves to the same optimized Catalyst execution tree.</p>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="p-4 bg-[#0d1117] text-slate-100 rounded-b-lg">
-                    <!-- PySpark Tab -->
+                <!-- Code Comparison Tabs -->
+                <div style="border:1px solid var(--card-border); border-radius:12px; overflow:hidden;">
+                  <div style="display:flex; flex-wrap:wrap; background:var(--item-bg); border-bottom:1px solid var(--card-border);">
+                    <button onclick="switchLanguageTab('pyspark')" id="lang-btn-pyspark" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid #FF6B35; color:#FF6B35; background:transparent; cursor:pointer;">PySpark</button>
+                    <button onclick="switchLanguageTab('scala')" id="lang-btn-scala" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer;">Scala</button>
+                    <button onclick="switchLanguageTab('sql')" id="lang-btn-sql" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer;">Spark SQL</button>
+                    <button onclick="switchLanguageTab('java')" id="lang-btn-java" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer;">Java</button>
+                  </div>
+                  <div style="padding:1rem; background:#0d1117; border-radius:0 0 12px 12px;">
                     <div id="lang-panel-pyspark" class="space-y-2">
-                        <div class="flex justify-between items-center text-xs text-[var(--text-secondary)]">
-                            <span>Standard PySpark DataFrame Window Specification</span>
-                            <span class="text-amber-400 font-mono">Uses Apache Arrow if Enabled</span>
-                        </div>
-                        <pre class="terminal-block">from pyspark.sql import SparkSession
+                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                        <span>Standard PySpark DataFrame Window Specification</span>
+                        <span style="color:#FFB347; font-family:monospace;">Uses Apache Arrow if Enabled</span>
+                      </div>
+                      <pre class="terminal-block">from pyspark.sql import SparkSession
 from pyspark.sql.window import Window
 import pyspark.sql.functions as F
 
@@ -1085,14 +1080,12 @@ df_ranked = spark.read.parquet("hdfs:///data/employees") \
     .withColumn("rank", F.rank().over(windowSpec)) \
     .filter(F.col("rank") <= 3)</pre>
                     </div>
-
-                    <!-- Scala Tab -->
                     <div id="lang-panel-scala" class="space-y-2 hidden">
-                        <div class="flex justify-between items-center text-xs text-[var(--text-secondary)]">
-                            <span>Type-Safe Dataset Compilation Context</span>
-                            <span class="text-blue-400 font-mono">Zero Overhead Type Safe API</span>
-                        </div>
-                        <pre class="terminal-block">import org.apache.spark.sql.SparkSession
+                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                        <span>Type-Safe Dataset Compilation Context</span>
+                        <span style="color:#4f9cf9; font-family:monospace;">Zero Overhead Type Safe API</span>
+                      </div>
+                      <pre class="terminal-block">import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 
@@ -1101,19 +1094,16 @@ import spark.implicits._
 
 case class Employee(employee_name: String, department_id: Long, salary: Double)
 
-// Highly optimized type-safe native JVM pipeline representation
 val windowSpec = Window.partitionBy("department_id").orderBy(col("salary").desc)
 val dataset = spark.read.parquet("hdfs:///data/employees").as[Employee]
 val result = dataset.withColumn("rank", rank().over(windowSpec)).filter($"rank" <= 3)</pre>
                     </div>
-
-                    <!-- SQL Tab -->
                     <div id="lang-panel-sql" class="space-y-2 hidden">
-                        <div class="flex justify-between items-center text-xs text-[var(--text-secondary)]">
-                            <span>Standard SQL execution parsed via Spark Catalyst Parser</span>
-                            <span class="text-emerald-400 font-mono">100% Native Tungsten Execution</span>
-                        </div>
-                        <pre class="terminal-block">-- Catalyst automatically transforms this subquery into an optimized 
+                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                        <span>Standard SQL execution parsed via Spark Catalyst Parser</span>
+                        <span style="color:#22c55e; font-family:monospace;">100% Native Tungsten Execution</span>
+                      </div>
+                      <pre class="terminal-block">-- Catalyst automatically transforms this subquery into an optimized 
 -- RankLimit physical instruction, avoiding a costly global sort.
 SELECT employee_name, department_id, salary
 FROM (
@@ -1122,14 +1112,12 @@ FROM (
   FROM employees
 ) WHERE rank <= 3;</pre>
                     </div>
-
-                    <!-- Java Tab -->
                     <div id="lang-panel-java" class="space-y-2 hidden">
-                        <div class="flex justify-between items-center text-xs text-[var(--text-secondary)]">
-                            <span>Explicit compilation structures with Java API</span>
-                            <span class="text-indigo-400 font-mono">Classic Enterprise Deployment</span>
-                        </div>
-                        <pre class="terminal-block">import org.apache.spark.sql.SparkSession;
+                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                        <span>Explicit compilation structures with Java API</span>
+                        <span style="color:#818cf8; font-family:monospace;">Classic Enterprise Deployment</span>
+                      </div>
+                      <pre class="terminal-block">import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.expressions.Window;
@@ -1137,166 +1125,183 @@ import org.apache.spark.sql.expressions.WindowSpec;
 import static org.apache.spark.sql.functions.*;
 
 SparkSession spark = SparkSession.builder().appName("JavaArchitectMatrix").getOrCreate();
-
 WindowSpec windowSpec = Window.partitionBy("department_id").orderBy(col("salary").desc());
 Dataset&lt;Row&gt; df = spark.read().parquet("hdfs:///data/employees");
 Dataset&lt;Row&gt; result = df.withColumn("rank", rank().over(windowSpec)).filter(col("rank").leq(3));</pre>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
-        </section>
 
-        <!-- Ecosystem Library Catalog Deep-Dive -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-medium text-[var(--text-primary)] mb-6">The Unified Spark Ecosystem</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- ═══ UNIFIED ECOSYSTEM ═══ -->
+            <div style="margin-bottom:2rem;">
+              <div class="spark-section-eyebrow" style="margin-bottom:0.25rem;">🌐 Component Libraries</div>
+              <div class="spark-section-title" style="margin-bottom:1.25rem;">The Unified Spark Ecosystem</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.25rem;">
+
                 <!-- Spark SQL -->
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl border border-[var(--card-border)] shadow-[var(--glass-shadow)] text-[var(--text-primary)]">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-[var(--text-primary)]">Spark SQL & Catalytic Execution</h3>
-                        <span class="text-xs bg-indigo-50 text-[var(--accent)] font-semibold px-2 py-1 rounded">Structured</span>
-                    </div>
-                    <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                        Spark SQL sits at the center of the engine. It handles schema extraction, acts as the optimizer for other libraries, and supports the **DataFrames** and **Datasets** APIs. 
-                    </p>
-                    <div class="chart-container h-48">
-                        <canvas id="ecosystemSqlChart"></canvas>
-                    </div>
+                <div class="spark-ecosystem-card eco-sql">
+                  <div class="spark-ecosystem-header">
+                    <div class="spark-eco-icon sql-icon">🗃️</div>
+                    <span class="spark-eco-badge structured">Structured</span>
+                  </div>
+                  <div class="spark-ecosystem-name">Spark SQL &amp; Catalytic Execution</div>
+                  <p class="spark-ecosystem-desc">Spark SQL sits at the center of the engine. It handles schema extraction, acts as the optimizer for other libraries, and supports the DataFrames and Datasets APIs.</p>
+                  <div style="height:160px;">
+                    <canvas id="ecosystemSqlChart"></canvas>
+                  </div>
                 </div>
 
                 <!-- Structured Streaming -->
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl border border-[var(--card-border)] shadow-[var(--glass-shadow)] text-[var(--text-primary)]">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-[var(--text-primary)]">Structured Streaming Engines</h3>
-                        <span class="text-xs bg-rose-50 text-[var(--danger)] font-semibold px-2 py-1 rounded">Incremental</span>
-                    </div>
-                    <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                        Structured Streaming is a high-level, fault-tolerant engine. It models streams as an **unbounded table** that dynamically appends new records in real time.
-                    </p>
-                    <div class="chart-container h-48">
-                        <canvas id="ecosystemStreamingChart"></canvas>
-                    </div>
+                <div class="spark-ecosystem-card eco-streaming">
+                  <div class="spark-ecosystem-header">
+                    <div class="spark-eco-icon stream-icon">📡</div>
+                    <span class="spark-eco-badge incremental">Incremental</span>
+                  </div>
+                  <div class="spark-ecosystem-name">Structured Streaming Engines</div>
+                  <p class="spark-ecosystem-desc">A high-level, fault-tolerant engine. It models streams as an unbounded table that dynamically appends new records in real time.</p>
+                  <div style="height:160px;">
+                    <canvas id="ecosystemStreamingChart"></canvas>
+                  </div>
                 </div>
 
                 <!-- MLlib -->
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl border border-[var(--card-border)] shadow-[var(--glass-shadow)] text-[var(--text-primary)]">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-[var(--text-primary)]">MLlib (Distributed Machine Learning)</h3>
-                        <span class="text-xs bg-[var(--bg-gradient)]mber-50 text-[var(--warning)] font-semibold px-2 py-1 rounded">Iterative</span>
-                    </div>
-                    <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                        MLlib provides scalable machine learning algorithms. By leveraging Spark's native pipeline framework, models can run in-memory across thousands of CPU cores.
-                    </p>
-                    <div class="chart-container h-48">
-                        <canvas id="ecosystemMlChart"></canvas>
-                    </div>
+                <div class="spark-ecosystem-card eco-mllib">
+                  <div class="spark-ecosystem-header">
+                    <div class="spark-eco-icon ml-icon">🤖</div>
+                    <span class="spark-eco-badge iterative">Iterative</span>
+                  </div>
+                  <div class="spark-ecosystem-name">MLlib (Distributed Machine Learning)</div>
+                  <p class="spark-ecosystem-desc">Provides scalable machine learning algorithms. By leveraging Spark's native pipeline framework, models can run in-memory across thousands of CPU cores.</p>
+                  <div style="height:160px;">
+                    <canvas id="ecosystemMlChart"></canvas>
+                  </div>
                 </div>
 
                 <!-- GraphX -->
-                <div class="bg-[var(--card-bg)] p-6 rounded-xl border border-[var(--card-border)] shadow-[var(--glass-shadow)] text-[var(--text-primary)]">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-[var(--text-primary)]">GraphX & GraphFrames Foundations</h3>
-                        <span class="text-xs bg-emerald-50 text-emerald-600 font-semibold px-2 py-1 rounded">Topology</span>
-                    </div>
-                    <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                        GraphX combines RDDs with custom graph indices. It uses the **Pregel API** to build highly optimized graphs that model relationships at scale.
-                    </p>
-                    <div class="chart-container h-48">
-                        <canvas id="ecosystemGraphChart"></canvas>
-                    </div>
+                <div class="spark-ecosystem-card eco-graphx">
+                  <div class="spark-ecosystem-header">
+                    <div class="spark-eco-icon graph-icon">🕸️</div>
+                    <span class="spark-eco-badge topology">Topology</span>
+                  </div>
+                  <div class="spark-ecosystem-name">GraphX &amp; GraphFrames Foundations</div>
+                  <p class="spark-ecosystem-desc">Combines RDDs with custom graph indices. It uses the Pregel API to build highly optimized graphs that model relationships at scale.</p>
+                  <div style="height:160px;">
+                    <canvas id="ecosystemGraphChart"></canvas>
+                  </div>
                 </div>
-            </div>
-        </section>
 
-        
-    <!-- Modern Spark 3.x+ Architecture -->
-    <section class="mb-12">
-        <h2 class="text-2xl font-medium text-[var(--text-primary)] mb-6">Modern Engine Enhancements (Spark 3.x+)</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-[var(--card-bg)] p-6 rounded-xl border border-[var(--card-border)] shadow-[var(--glass-shadow)] text-[var(--text-primary)]" style="backdrop-filter: blur(12px);">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-[var(--text-primary)]">Adaptive Query Execution (AQE)</h3>
-                    <span class="text-xs bg-[var(--accent)] bg-opacity-20 text-[var(--accent)] font-medium px-2 py-1 rounded">Runtime</span>
-                </div>
-                <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                    Unlike static Catalyst optimization, AQE monitors execution statistics during runtime and dynamically updates the physical plan. It coalesces post-shuffle partitions, converts sort-merge joins to broadcast joins on the fly, and optimally handles skewed data partitions to prevent OOM errors.
-                </p>
-                <div class="p-3 border border-[var(--card-border)] rounded-lg text-xs font-mono text-[var(--text-primary)] opacity-80">
+              </div>
+            </div>
+
+            <!-- ═══ MODERN ENGINE ENHANCEMENTS ═══ -->
+            <div style="margin-bottom:2rem;">
+              <div class="spark-section-eyebrow" style="margin-bottom:0.25rem;">🆕 Spark 3.x+</div>
+              <div class="spark-section-title" style="margin-bottom:1.25rem;">Modern Engine Enhancements</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.25rem;">
+
+                <div class="spark-enhancement-card">
+                  <div class="spark-enhancement-header">
+                    <div class="spark-enhancement-title">Adaptive Query Execution (AQE)</div>
+                    <span class="spark-enhancement-badge spark-badge-runtime">Runtime</span>
+                  </div>
+                  <p class="spark-enhancement-desc">Unlike static Catalyst optimization, AQE monitors execution statistics during runtime and dynamically updates the physical plan. It coalesces post-shuffle partitions, converts sort-merge joins to broadcast joins on the fly, and optimally handles skewed data partitions to prevent OOM errors.</p>
+                  <div class="spark-code-pill">
                     spark.sql.adaptive.enabled = true<br>
                     spark.sql.adaptive.coalescePartitions.enabled = true
+                  </div>
                 </div>
-            </div>
-            
-            <div class="bg-[var(--card-bg)] p-6 rounded-xl border border-[var(--card-border)] shadow-[var(--glass-shadow)] text-[var(--text-primary)]" style="backdrop-filter: blur(12px);">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-[var(--text-primary)]">Dynamic Partition Pruning (DPP)</h3>
-                    <span class="text-xs bg-[var(--primary)] bg-opacity-20 text-[var(--primary)] font-medium px-2 py-1 rounded">Lakehouse</span>
-                </div>
-                <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                    When joining a large fact table with a filtered dimension table, DPP dynamically extracts the filter results from the dimension and injects them into the fact table scan. This entirely bypasses scanning irrelevant partitions in Delta/Iceberg tables, radically cutting I/O.
-                </p>
-                <div class="p-3 border border-[var(--card-border)] rounded-lg text-xs font-mono text-[var(--text-primary)] opacity-80">
+
+                <div class="spark-enhancement-card">
+                  <div class="spark-enhancement-header">
+                    <div class="spark-enhancement-title">Dynamic Partition Pruning (DPP)</div>
+                    <span class="spark-enhancement-badge spark-badge-lakehouse">Lakehouse</span>
+                  </div>
+                  <p class="spark-enhancement-desc">When joining a large fact table with a filtered dimension table, DPP dynamically extracts the filter results from the dimension and injects them into the fact table scan. This entirely bypasses scanning irrelevant partitions in Delta/Iceberg tables, radically cutting I/O.</p>
+                  <div class="spark-code-pill">
                     spark.sql.optimizer.dynamicPartitionPruning.enabled = true
+                  </div>
                 </div>
+
+              </div>
             </div>
-        </div>
-    </section>
-    
-<!-- Architectural Transformation Best Practices -->
-        <section class="bg-[var(--card-bg)] rounded-xl shadow-[var(--glass-shadow)] border border-[var(--card-border)] p-6 md:p-8 mb-12 text-[var(--text-primary)]">
-            <h2 class="text-2xl font-medium text-[var(--text-primary)] mb-2">Architectural Best Practices</h2>
-            <p class="text-[var(--text-secondary)] text-sm mb-6 max-w-3xl">
-                A set of rules for designing robust production pipelines, compiled by Spark's core optimization engineers.
-            </p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="best-practice-card border-t-4 border-[var(--primary)]">
-                    <h4 class="font-medium text-base text-[var(--text-primary)]">Eliminate Shuffle Map Spills</h4>
-                    <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        Spills occur when execution memory cannot fit in-flight shuffle structures. Avoid this by sizing your partitions properly ($100 	ext{ MB} - 200 	ext{ MB}$). Keep your memory fractions balanced using:
-                        $$	ext{spark.memory.fraction} = 0.6$$
-                    </p>
+
+            <!-- ═══ BEST PRACTICES ═══ -->
+            <div class="spark-section-card">
+              <div class="spark-section-header">
+                <div>
+                  <div class="spark-section-eyebrow">✅ Production Rules</div>
+                  <div class="spark-section-title">Architectural Best Practices</div>
+                  <p class="spark-section-desc">Rules for designing robust production pipelines, compiled by Spark's core optimization engineers.</p>
+                </div>
+              </div>
+
+              <div class="spark-bp-grid">
+
+                <div class="spark-bp-card bp-1">
+                  <div class="spark-bp-top">
+                    <div class="spark-bp-icon">🌊</div>
+                    <div class="spark-bp-num">01</div>
+                  </div>
+                  <div class="spark-bp-title">Eliminate Shuffle Map Spills</div>
+                  <p class="spark-bp-desc">Spills occur when execution memory cannot fit in-flight shuffle structures. Avoid this by sizing your partitions properly (100–200 MB). Keep memory fractions balanced: <code>spark.memory.fraction = 0.6</code></p>
                 </div>
 
-                <div class="best-practice-card border-t-4 border-[var(--accent)]">
-                    <h4 class="font-medium text-base text-[var(--text-primary)]">Optimize Small-File joins</h4>
-                    <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        Avoid sort-merge joins when joining a large dataset with a smaller lookup table ($< 10	ext{ MB}$). Explicitly broadcast the smaller dataset to enable a map-side join and prevent a full-stage shuffle exchange.
-                    </p>
+                <div class="spark-bp-card bp-2">
+                  <div class="spark-bp-top">
+                    <div class="spark-bp-icon">📡</div>
+                    <div class="spark-bp-num">02</div>
+                  </div>
+                  <div class="spark-bp-title">Optimize Small-File Joins</div>
+                  <p class="spark-bp-desc">Avoid sort-merge joins when joining a large dataset with a smaller lookup table (&lt;10 MB). Explicitly broadcast the smaller dataset to enable a map-side join and prevent a full-stage shuffle exchange.</p>
                 </div>
 
-                <div class="best-practice-card border-t-4 border-[#bc5090]">
-                    <h4 class="font-medium text-base text-[var(--text-primary)]">Avoid Row-by-Row UDFs</h4>
-                    <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        Python or Scala user-defined functions bypass the Catalyst query optimizer and force row-by-row execution. Instead, use native Spark SQL expressions or vectorized PySpark pandas-UDFs.
-                    </p>
+                <div class="spark-bp-card bp-3">
+                  <div class="spark-bp-top">
+                    <div class="spark-bp-icon">🚫</div>
+                    <div class="spark-bp-num">03</div>
+                  </div>
+                  <div class="spark-bp-title">Avoid Row-by-Row UDFs</div>
+                  <p class="spark-bp-desc">Python or Scala user-defined functions bypass the Catalyst query optimizer and force row-by-row execution. Instead, use native Spark SQL expressions or vectorized PySpark pandas-UDFs.</p>
                 </div>
 
-                <div class="best-practice-card border-t-4 border-[#ef5675]">
-                    <h4 class="font-medium text-base text-[var(--text-primary)]">Enforce Dynamic State Eviction</h4>
-                    <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        Stateful Structured Streaming applications must enforce data retention limits using watermarks. Uncapped state expansion will eventually lead to executor OutOfMemory errors.
-                    </p>
+                <div class="spark-bp-card bp-4">
+                  <div class="spark-bp-top">
+                    <div class="spark-bp-icon">⏱️</div>
+                    <div class="spark-bp-num">04</div>
+                  </div>
+                  <div class="spark-bp-title">Enforce Dynamic State Eviction</div>
+                  <p class="spark-bp-desc">Stateful Structured Streaming applications must enforce data retention limits using watermarks. Uncapped state expansion will eventually lead to executor OutOfMemory errors.</p>
                 </div>
 
-                <div class="best-practice-card border-t-4 border-[#ffa600]">
-                    <h4 class="font-medium text-base text-[var(--text-primary)]">Manage Lineage Length</h4>
-                    <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        Long lineage graphs can overwhelm the Driver JVM's call stack. Cut long DAG paths in iterative algorithms by periodically caching or calling `.checkpoint()` to persist state to disk.
-                    </p>
+                <div class="spark-bp-card bp-5">
+                  <div class="spark-bp-top">
+                    <div class="spark-bp-icon">🔗</div>
+                    <div class="spark-bp-num">05</div>
+                  </div>
+                  <div class="spark-bp-title">Manage Lineage Length</div>
+                  <p class="spark-bp-desc">Long lineage graphs can overwhelm the Driver JVM's call stack. Cut long DAG paths in iterative algorithms by periodically caching or calling <code>.checkpoint()</code> to persist state to disk.</p>
                 </div>
 
-                <div class="best-practice-card border-t-4 border-[#2f4b7c]">
-                    <h4 class="font-medium text-base text-[var(--text-primary)]">Clean Up Memory Storage</h4>
-                    <p class="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        Dataframes persisted via `.cache()` or `.persist()` remain in memory indefinitely. Always call `.unpersist()` in your code as soon as a dataset is no longer needed.
-                    </p>
-                 </div>
-    </div>
-  </section>
-   </div>
-          </div>
+                <div class="spark-bp-card bp-6">
+                  <div class="spark-bp-top">
+                    <div class="spark-bp-icon">🧹</div>
+                    <div class="spark-bp-num">06</div>
+                  </div>
+                  <div class="spark-bp-title">Clean Up Memory Storage</div>
+                  <p class="spark-bp-desc">DataFrames persisted via <code>.cache()</code> or <code>.persist()</code> remain in memory indefinitely. Always call <code>.unpersist()</code> as soon as a dataset is no longer needed to free executor memory.</p>
+                </div>
+
+              </div>
+            </div>
+
+          </div><!-- /view-spark -->
+
+
+
+
+
 
           <!-- 2. PySpark Curriculum Subview -->
           <div id="view-pyspark" class="spark-hub-subview hidden">

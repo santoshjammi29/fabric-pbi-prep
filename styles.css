@@ -5010,3 +5010,1099 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   }
 }
 
+/* ============================================================
+   SPARK ENGINE ARCHITECTURE — PREMIUM REDESIGN
+   ============================================================ */
+
+/* --- Color Tokens for Spark Theme --- */
+:root {
+  --spark-orange: #FF6B35;
+  --spark-amber: #FFB347;
+  --spark-red: #E25822;
+  --spark-glow: rgba(255, 107, 53, 0.18);
+  --spark-glow-strong: rgba(255, 107, 53, 0.35);
+  --spark-deep: #0d1117;
+  --spark-panel: rgba(13, 17, 23, 0.92);
+  --executor-blue: #4f9cf9;
+  --executor-glow: rgba(79, 156, 249, 0.25);
+  --output-green: #22c55e;
+  --output-glow: rgba(34, 197, 94, 0.22);
+}
+
+/* --- Hero Banner --- */
+.spark-hero-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 2.5rem 2rem 2rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a0a2e 40%, #0d1a0a 100%);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  box-shadow: 0 0 60px rgba(255, 107, 53, 0.12), 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.spark-hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 80% at 80% 50%, rgba(255, 107, 53, 0.12) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 60% at 10% 80%, rgba(79, 156, 249, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.spark-hero-banner::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #FF6B35, #FFB347, #FF6B35, transparent);
+  border-radius: 20px 20px 0 0;
+}
+
+.spark-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FF6B35;
+  background: rgba(255, 107, 53, 0.12);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  padding: 0.3rem 0.75rem;
+  border-radius: 50px;
+  margin-bottom: 1rem;
+}
+
+.spark-hero-title {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.spark-hero-title span {
+  background: linear-gradient(90deg, #FF6B35, #FFB347);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.spark-hero-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.6);
+  max-width: 550px;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.spark-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.spark-hero-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 0.35rem 0.8rem;
+  border-radius: 50px;
+  backdrop-filter: blur(8px);
+}
+
+.spark-hero-stat-pill .stat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.spark-hero-icon-cluster {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.15;
+  font-size: 6rem;
+  line-height: 1;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+/* --- Section Headers (reusable) --- */
+.spark-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.spark-section-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FF6B35;
+  margin-bottom: 0.25rem;
+}
+
+.spark-section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.spark-section-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 0.35rem;
+  max-width: 600px;
+}
+
+/* --- Milestone Cards --- */
+.spark-milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.spark-milestone-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.spark-milestone-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+
+.spark-milestone-card.color-red::before { background: linear-gradient(90deg, #E25822, #FF6B35); }
+.spark-milestone-card.color-purple::before { background: linear-gradient(90deg, #7a5195, #bc5090); }
+.spark-milestone-card.color-amber::before { background: linear-gradient(90deg, #d97706, #f59e0b); }
+
+.spark-milestone-card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,107,53,0.15);
+}
+
+.spark-milestone-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.spark-milestone-icon-wrap.bg-red { background: rgba(226, 88, 34, 0.12); border: 1px solid rgba(226, 88, 34, 0.25); }
+.spark-milestone-icon-wrap.bg-purple { background: rgba(188, 80, 144, 0.12); border: 1px solid rgba(188, 80, 144, 0.25); }
+.spark-milestone-icon-wrap.bg-amber { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25); }
+
+.spark-milestone-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.spark-milestone-label.text-red { color: #FF6B35; }
+.spark-milestone-label.text-purple { color: #bc5090; }
+.spark-milestone-label.text-amber { color: #f59e0b; }
+
+.spark-milestone-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+.spark-milestone-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* --- Section Card Container (generic wrapper) --- */
+.spark-section-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Interactive Simulator Redesign --- */
+.spark-sim-panel {
+  background: #0d1117;
+  border: 1px solid rgba(255,107,53,0.25);
+  border-radius: 14px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 380px;
+}
+
+.spark-sim-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(255,107,53,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.spark-sim-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.spark-sim-dot-row {
+  display: flex;
+  gap: 5px;
+}
+
+.spark-sim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.spark-sim-dot.red { background: #ff5f56; }
+.spark-sim-dot.yellow { background: #ffbd2e; }
+.spark-sim-dot.green { background: #27c93f; }
+
+.spark-sim-title-bar {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+.spark-sim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 1rem;
+  align-items: center;
+  min-height: 280px;
+}
+
+.spark-sim-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.spark-sim-col-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.spark-sim-col-label.input-label {
+  color: #4f9cf9;
+  background: rgba(79, 156, 249, 0.1);
+  border: 1px solid rgba(79, 156, 249, 0.2);
+}
+
+.spark-sim-col-label.exec-label {
+  color: #FF6B35;
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+.spark-sim-col-label.output-label {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.spark-partition-node {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(79, 156, 249, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.72rem;
+  color: #c9d1d9;
+  font-family: monospace;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.spark-partition-node::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #4f9cf9;
+  border-radius: 10px 0 0 10px;
+}
+
+.spark-partition-node small {
+  display: block;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 0.2rem;
+}
+
+.spark-executor-node {
+  background: rgba(255, 107, 53, 0.06);
+  border: 2px solid rgba(255, 107, 53, 0.4);
+  border-radius: 12px;
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #FF6B35;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.spark-executor-node::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,107,53,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.spark-executor-status {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: rgba(255,107,53,0.6);
+  margin-top: 0.2rem;
+  font-family: monospace;
+}
+
+.spark-output-node {
+  background: rgba(34, 197, 94, 0.04);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.72rem;
+  color: #c9d1d9;
+  font-family: monospace;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.spark-output-node::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #22c55e;
+  border-radius: 10px 0 0 10px;
+}
+
+.spark-output-ready {
+  display: block;
+  font-size: 0.6rem;
+  color: #22c55e;
+  margin-top: 0.2rem;
+  font-family: monospace;
+}
+
+.spark-sim-log-panel {
+  background: #161b22;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.spark-log-eyebrow {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #FFB347;
+  margin-bottom: 0.5rem;
+}
+
+.spark-log-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+}
+
+.spark-log-text {
+  font-size: 0.75rem;
+  color: rgba(201, 209, 217, 0.85);
+  line-height: 1.65;
+}
+
+.spark-log-insight {
+  background: rgba(255, 179, 71, 0.08);
+  border: 1px solid rgba(255, 179, 71, 0.25);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.72rem;
+  color: #FFB347;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+}
+
+.spark-log-stats {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.spark-log-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 0.35rem;
+}
+
+.spark-log-stat-value {
+  font-family: monospace;
+  font-weight: 600;
+  color: #FFB347;
+}
+
+/* --- Sim Controls --- */
+.spark-sim-controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.spark-sim-select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,107,53,0.3);
+  border-radius: 10px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.spark-sim-select:focus, .spark-sim-select:hover {
+  border-color: #FF6B35;
+}
+
+.spark-sim-run-btn {
+  background: linear-gradient(135deg, #FF6B35, #E25822);
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+  letter-spacing: 0.02em;
+}
+
+.spark-sim-run-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255,107,53,0.45);
+}
+
+.spark-sim-run-btn:active {
+  transform: scale(0.97);
+}
+
+/* --- Memory Allocator Redesign --- */
+.spark-memory-bar-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 44px;
+  display: flex;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 1.25rem;
+}
+
+.spark-mem-bar-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.04em;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.spark-mem-bar-seg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
+}
+
+.spark-mem-seg-reserved { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.spark-mem-seg-execution { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+.spark-mem-seg-storage { background: linear-gradient(135deg, #d97706, #b45309); }
+.spark-mem-seg-user { background: linear-gradient(135deg, #0d9488, #0f766e); }
+
+.spark-mem-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .spark-mem-legend {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.spark-mem-legend-item {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.spark-mem-legend-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.spark-mem-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.spark-mem-legend-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.spark-mem-legend-value {
+  font-family: monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.spark-mem-legend-hint {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* --- Sliders Styled --- */
+.spark-slider-group {
+  background: var(--item-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.spark-slider-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.spark-slider-value {
+  font-family: monospace;
+  color: #FF6B35;
+  background: rgba(255,107,53,0.1);
+  border: 1px solid rgba(255,107,53,0.2);
+  padding: 0.1rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.75rem;
+}
+
+.spark-slider-hint {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+/* --- Lexicon Grid Redesign --- */
+.spark-lexicon-card {
+  padding: 1.1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.spark-lexicon-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  border-color: rgba(255,107,53,0.4);
+}
+
+.spark-lexicon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.spark-lexicon-card[data-category="engine"]::before { background: linear-gradient(90deg, #4f9cf9, #7c3aed); }
+.spark-lexicon-card[data-category="optimization"]::before { background: linear-gradient(90deg, #bc5090, #ef4444); }
+.spark-lexicon-card[data-category="memory"]::before { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.spark-lexicon-card[data-category="streaming"]::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+
+.spark-lexicon-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.spark-lex-cat-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spark-lex-type-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.spark-lexicon-term {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.spark-lexicon-def {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* --- Polyglot Panel Fix (dark mode safe) --- */
+.spark-polyglot-panel {
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--item-bg);
+  transition: border-color 0.2s;
+}
+
+.spark-polyglot-panel:hover {
+  border-color: rgba(255,107,53,0.35);
+}
+
+.spark-polyglot-lang-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.spark-polyglot-lang-desc {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* --- Ecosystem Cards --- */
+.spark-ecosystem-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.spark-ecosystem-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.spark-ecosystem-card.eco-sql::before { background: linear-gradient(90deg, #4f9cf9, #6366f1); }
+.spark-ecosystem-card.eco-streaming::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+.spark-ecosystem-card.eco-mllib::before { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.spark-ecosystem-card.eco-graphx::before { background: linear-gradient(90deg, #10b981, #22c55e); }
+
+.spark-ecosystem-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+}
+
+.spark-ecosystem-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.spark-eco-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.spark-eco-icon.sql-icon { background: rgba(79, 156, 249, 0.12); border: 1px solid rgba(79, 156, 249, 0.25); }
+.spark-eco-icon.stream-icon { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); }
+.spark-eco-icon.ml-icon { background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.25); }
+.spark-eco-icon.graph-icon { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25); }
+
+.spark-eco-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.spark-eco-badge.structured { background: rgba(79, 156, 249, 0.12); color: #4f9cf9; border: 1px solid rgba(79, 156, 249, 0.25); }
+.spark-eco-badge.incremental { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+.spark-eco-badge.iterative { background: rgba(217, 119, 6, 0.12); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.25); }
+.spark-eco-badge.topology { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
+
+.spark-ecosystem-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.spark-ecosystem-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* --- Best Practice Cards Redesign --- */
+.spark-bp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.spark-bp-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.spark-bp-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+}
+
+.spark-bp-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  bottom: 0;
+  border-radius: 14px 0 0 14px;
+}
+
+.spark-bp-card.bp-1::after { background: linear-gradient(180deg, #4f9cf9, #7c3aed); }
+.spark-bp-card.bp-2::after { background: linear-gradient(180deg, #7c3aed, #bc5090); }
+.spark-bp-card.bp-3::after { background: linear-gradient(180deg, #bc5090, #ef4444); }
+.spark-bp-card.bp-4::after { background: linear-gradient(180deg, #ef4444, #f97316); }
+.spark-bp-card.bp-5::after { background: linear-gradient(180deg, #f97316, #FFB347); }
+.spark-bp-card.bp-6::after { background: linear-gradient(180deg, #FFB347, #22c55e); }
+
+.spark-bp-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.spark-bp-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--item-bg);
+  border: 1px solid var(--card-border);
+  flex-shrink: 0;
+}
+
+.spark-bp-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-family: monospace;
+  background: var(--item-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  padding: 0.15rem 0.4rem;
+}
+
+.spark-bp-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.spark-bp-desc {
+  font-size: 0.77rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* --- Modern Enhancements (AQE/DPP) Cards --- */
+.spark-enhancement-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  backdrop-filter: blur(12px);
+}
+
+.spark-enhancement-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+.spark-enhancement-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  gap: 0.5rem;
+}
+
+.spark-enhancement-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.spark-enhancement-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.spark-badge-runtime { background: rgba(122, 81, 149, 0.15); color: var(--primary); border: 1px solid rgba(122,81,149,0.3); }
+.spark-badge-lakehouse { background: rgba(79, 156, 249, 0.12); color: #4f9cf9; border: 1px solid rgba(79, 156, 249, 0.25); }
+
+.spark-enhancement-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 1rem;
+}
+
+.spark-code-pill {
+  background: #0d1117;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.72rem;
+  font-family: monospace;
+  color: #86efac;
+  line-height: 1.7;
+}
+
+/* --- Animations for Simulator nodes --- */
+@keyframes sparkNodePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0); }
+  50% { box-shadow: 0 0 0 6px rgba(255,107,53,0.2); }
+}
+
+@keyframes sparkFlowIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes sparkFlowOut {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.spark-executor-node.active {
+  border-color: #FF6B35;
+  background: rgba(255, 107, 53, 0.12);
+  animation: sparkNodePulse 1.5s infinite;
+}
+
+.spark-partition-node.processing {
+  border-color: rgba(255, 107, 53, 0.6);
+  background: rgba(255, 107, 53, 0.06);
+}
+
+.spark-output-node.done {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.06);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
+}
+
+/* --- Responsive Layout helpers for Spark sections --- */
+.spark-two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .spark-two-col { grid-template-columns: 5fr 4fr; }
+  .spark-sim-grid { grid-template-columns: 1fr 1.4fr 1fr; }
+  .spark-hero-icon-cluster { display: block; }
+}
+
+@media (max-width: 768px) {
+  .spark-hero-icon-cluster { display: none; }
+  .spark-sim-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+  .spark-section-card { padding: 1.25rem; }
+  .spark-hero-banner { padding: 1.5rem 1.25rem; }
+}
+
+/* --- Category filter buttons for lexicon --- */
+.spark-filter-btn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.spark-filter-btn:hover, .spark-filter-btn.active {
+  background: rgba(255,107,53,0.12);
+  border-color: rgba(255,107,53,0.4);
+  color: #FF6B35;
+}
