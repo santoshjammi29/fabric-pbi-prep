@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
     activePersonalisedDomain: 'ALL',
     activePersonalisedQuery: '',
     
+    // Prep Hub & Unified Search State
+    activePrepHubSubTab: 'view-personalised',
+    unifiedSearchPage: 1,
+    
     // Active practice session state
     practice: {
       nicheName: '',
@@ -48,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const DOM = {
     body: document.body,
     navBtns: document.querySelectorAll('.nav-btn'),
-    pageViews: document.querySelectorAll('.page-view'),
+    pageViews: document.querySelectorAll('.main-content > .page-view'),
     
     // Theme Toggle
     themeToggleBtn: document.getElementById('btn-theme-toggle'),
@@ -178,6 +182,18 @@ document.addEventListener('DOMContentLoaded', () => {
       search: document.getElementById('personalised-search'),
       container: document.getElementById('personalised-container'),
       matchCount: document.getElementById('personalised-match-count')
+    },
+    
+    // Unified Prep Hub DOM cache
+    prephub: {
+      subnav: document.getElementById('prep-hub-subnav'),
+      unifiedSearchInput: document.getElementById('unified-search-input'),
+      unifiedFilterDb: document.getElementById('unified-filter-db'),
+      unifiedFilterCategory: document.getElementById('unified-filter-category'),
+      unifiedSearchContainer: document.getElementById('unified-search-container'),
+      unifiedMatchCount: document.getElementById('unified-match-count'),
+      btnUnifiedLoadMore: document.getElementById('btn-unified-load-more'),
+      unifiedLoadMoreContainer: document.getElementById('unified-load-more-container')
     }
   };
 
@@ -391,9 +407,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- SPA ROUTING ---
   
+  function switchPrepHubSubTab(subTabId) {
+    state.activePrepHubSubTab = subTabId;
+    localStorage.setItem('interview_prep_active_subtab', subTabId);
+
+    // Toggle active state of sub-tab chips
+    const subnavChips = document.querySelectorAll('#prep-hub-subnav .topic-chip');
+    subnavChips.forEach(chip => {
+      if (chip.getAttribute('data-subtab') === subTabId) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    // Toggle visibility of subview containers
+    const subviews = document.querySelectorAll('.prep-hub-subview');
+    subviews.forEach(subview => {
+      if (subview.id === subTabId) {
+        subview.classList.remove('hidden');
+        subview.removeAttribute('hidden');
+      } else {
+        subview.classList.add('hidden');
+        subview.setAttribute('hidden', 'true');
+      }
+    });
+
+    // Re-render launcher or explainer to sync numbers and selections
+    if (subTabId === 'view-explainer') {
+      renderExplainer();
+    } else if (subTabId === 'view-practice') {
+      renderNicheSelection();
+    } else if (subTabId === 'view-personalised') {
+      renderPersonalised();
+    } else if (subTabId === 'view-unified-search') {
+      renderUnifiedSearch();
+    }
+  }
+
   function switchView(targetViewId) {
-    state.currentView = targetViewId;
-    localStorage.setItem('interview_prep_active_view', targetViewId);
+    let actualTargetViewId = targetViewId;
+    let targetSubTabId = null;
+
+    const mergedViews = ['view-personalised', 'view-general-de', 'view-practice', 'view-explainer'];
+    if (mergedViews.includes(targetViewId)) {
+      targetSubTabId = targetViewId;
+      actualTargetViewId = 'view-prep-hub';
+    }
+
+    state.currentView = actualTargetViewId;
+    localStorage.setItem('interview_prep_active_view', actualTargetViewId);
     
     // Update hash if different
     if (window.location.hash !== '#' + targetViewId) {
@@ -401,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Hide active practice when leaving Niche Practice
-    if (targetViewId !== 'view-practice') {
+    if (actualTargetViewId !== 'view-prep-hub' || targetSubTabId !== 'view-practice') {
       DOM.activePracticeScreen.classList.add('hidden');
       DOM.nicheSelectionScreen.classList.remove('hidden');
       
@@ -413,7 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Switch active states of nav buttons (desktop sidebar)
     DOM.navBtns.forEach(btn => {
-      if (btn.getAttribute('data-target') === targetViewId) {
+      const target = btn.getAttribute('data-target');
+      if (target === actualTargetViewId || target === targetViewId) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -423,7 +487,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sync mobile bottom nav tabs active state
     const mobileNavTabs = document.querySelectorAll('.mobile-nav-tab[data-target]');
     mobileNavTabs.forEach(tab => {
-      if (tab.getAttribute('data-target') === targetViewId) {
+      const target = tab.getAttribute('data-target');
+      if (target === actualTargetViewId || target === targetViewId) {
         tab.classList.add('active');
         // Scroll the active tab pill into view in the horizontal scroll container
         try { tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
@@ -435,17 +500,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sync More drawer items active state (kept for legacy compatibility)
     const moreDrawerItems = document.querySelectorAll('.mobile-more-item[data-target]');
     moreDrawerItems.forEach(item => {
-      if (item.getAttribute('data-target') === targetViewId) {
+      const target = item.getAttribute('data-target');
+      if (target === actualTargetViewId || target === targetViewId) {
         item.classList.add('active');
       } else {
         item.classList.remove('active');
       }
     });
 
-
     // Toggle view section visibility with clean starting styles
     DOM.pageViews.forEach(view => {
-      if (view.id === targetViewId) {
+      if (view.id === actualTargetViewId) {
         view.classList.remove('hidden');
         view.removeAttribute('hidden');
         
@@ -460,19 +525,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Re-render launcher or explainer to sync numbers and selections
-    if (targetViewId === 'view-dashboard') {
+    // Re-render appropriate contents
+    if (actualTargetViewId === 'view-dashboard') {
       updateDashboardStats();
-    } else if (targetViewId === 'view-explainer') {
-      renderExplainer();
-    } else if (targetViewId === 'view-practice') {
-      renderNicheSelection();
-    } else if (targetViewId === 'view-concepts') {
+    } else if (actualTargetViewId === 'view-concepts') {
       renderConcepts();
-    } else if (targetViewId === 'view-cheatsheet') {
+    } else if (actualTargetViewId === 'view-cheatsheet') {
       renderCheatsheet();
-    } else if (targetViewId === 'view-personalised') {
-      renderPersonalised();
+    } else if (actualTargetViewId === 'view-prep-hub') {
+      if (!targetSubTabId) {
+        targetSubTabId = localStorage.getItem('interview_prep_active_subtab') || 'view-personalised';
+      }
+      switchPrepHubSubTab(targetSubTabId);
     }
     
     // Scroll back to top on view switch
@@ -1081,6 +1145,42 @@ document.addEventListener('DOMContentLoaded', () => {
         switchView(target);
       });
     });
+
+    // Prep Hub Subnav Tabs Switch
+    if (DOM.prephub && DOM.prephub.subnav) {
+      DOM.prephub.subnav.querySelectorAll('.topic-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const subTab = chip.getAttribute('data-subtab');
+          if (subTab) switchPrepHubSubTab(subTab);
+        });
+      });
+    }
+
+    // Unified Search Filter listeners
+    if (DOM.prephub && DOM.prephub.unifiedSearchInput) {
+      DOM.prephub.unifiedSearchInput.addEventListener('input', () => {
+        state.unifiedSearchPage = 1;
+        renderUnifiedSearch(true);
+      });
+    }
+    if (DOM.prephub && DOM.prephub.unifiedFilterDb) {
+      DOM.prephub.unifiedFilterDb.addEventListener('change', () => {
+        state.unifiedSearchPage = 1;
+        renderUnifiedSearch(true);
+      });
+    }
+    if (DOM.prephub && DOM.prephub.unifiedFilterCategory) {
+      DOM.prephub.unifiedFilterCategory.addEventListener('change', () => {
+        state.unifiedSearchPage = 1;
+        renderUnifiedSearch(true);
+      });
+    }
+    if (DOM.prephub && DOM.prephub.btnUnifiedLoadMore) {
+      DOM.prephub.btnUnifiedLoadMore.addEventListener('click', () => {
+        state.unifiedSearchPage = (state.unifiedSearchPage || 1) + 1;
+        renderUnifiedSearch(false);
+      });
+    }
 
     // Click on Dashboard stats card navigates to Concept Explainer and filters
     document.querySelectorAll('.stats-card').forEach(card => {
@@ -2524,6 +2624,174 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       
       DOM.personalised.container.appendChild(card);
+    });
+  }
+
+  function renderUnifiedSearch(resetResults = true) {
+    if (!DOM.prephub || !DOM.prephub.unifiedSearchContainer) return;
+
+    if (resetResults) {
+      state.unifiedSearchPage = 1;
+      DOM.prephub.unifiedSearchContainer.innerHTML = '';
+    }
+
+    const query = (DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
+    const dbFilter = DOM.prephub.unifiedFilterDb ? DOM.prephub.unifiedFilterDb.value : 'ALL';
+    const catFilter = DOM.prephub.unifiedFilterCategory ? DOM.prephub.unifiedFilterCategory.value : 'ALL';
+
+    const pool = [];
+
+    // 1. Accumulate Personalised Prep
+    if (dbFilter === 'ALL' || dbFilter === 'personalised') {
+      (window.PERSONALISED_QUESTIONS || []).forEach(q => {
+        pool.push({
+          ...q,
+          sourceDb: 'personalised',
+          sourceLabel: 'Personalised',
+          categoryLabel: q.subdomain || q.domain || 'Personalised',
+          difficulty: q.difficulty || 'HARD'
+        });
+      });
+    }
+
+    // 2. Accumulate Fabric & PBI Prep
+    if (dbFilter === 'ALL' || dbFilter === 'fabric_pbi') {
+      (window.QUESTIONS_DB || []).forEach(q => {
+        pool.push({
+          ...q,
+          sourceDb: 'fabric_pbi',
+          sourceLabel: 'Fabric & PBI',
+          categoryLabel: q.category,
+          difficulty: q.difficulty || 'MEDIUM'
+        });
+      });
+    }
+
+    // 3. Accumulate General DE Prep
+    if (dbFilter === 'ALL' || dbFilter === 'general') {
+      (window.QUESTIONS_DE_DB || []).forEach(q => {
+        pool.push({
+          ...q,
+          sourceDb: 'general',
+          sourceLabel: 'General DE',
+          categoryLabel: q.category,
+          difficulty: q.difficulty || 'MEDIUM'
+        });
+      });
+    }
+
+    // Filter items
+    const filtered = pool.filter(q => {
+      let matchesCat = true;
+      if (catFilter !== 'ALL') {
+        const itemCat = (q.category || '').toUpperCase().trim();
+        const filterCat = catFilter.toUpperCase().trim();
+        matchesCat = itemCat.includes(filterCat) || filterCat.includes(itemCat);
+      }
+
+      const qText = (q.question || '').toLowerCase();
+      const aText = (q.answer || '').toLowerCase();
+      const catText = (q.categoryLabel || '').toLowerCase();
+      const matchesSearch = !query || qText.includes(query) || aText.includes(query) || catText.includes(query);
+
+      return matchesCat && matchesSearch;
+    });
+
+    if (DOM.prephub.unifiedMatchCount) {
+      DOM.prephub.unifiedMatchCount.textContent = `Showing ${filtered.length} questions`;
+    }
+
+    const itemsPerPage = 50;
+    const currentPage = state.unifiedSearchPage || 1;
+    const endIndex = currentPage * itemsPerPage;
+    const pageItems = filtered.slice(endIndex - itemsPerPage, endIndex);
+
+    if (DOM.prephub.unifiedLoadMoreContainer) {
+      if (endIndex < filtered.length) {
+        DOM.prephub.unifiedLoadMoreContainer.classList.remove('hidden');
+      } else {
+        DOM.prephub.unifiedLoadMoreContainer.classList.add('hidden');
+      }
+    }
+
+    if (filtered.length === 0) {
+      DOM.prephub.unifiedSearchContainer.innerHTML = `
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; color: var(--text-secondary); opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
+        </div>
+      `;
+      return;
+    }
+
+    pageItems.forEach((q, idx) => {
+      const card = document.createElement('div');
+      card.className = 'concept-accordion-card';
+      
+      const overallIndex = (resetResults ? 0 : DOM.prephub.unifiedSearchContainer.querySelectorAll('.concept-accordion-card').length) + idx + 1;
+      
+      let badgeBg = 'var(--accent)';
+      if (q.sourceDb === 'personalised') {
+        badgeBg = 'var(--cat-fabric)';
+      } else if (q.sourceDb === 'fabric_pbi') {
+        badgeBg = '#3b82f6';
+      } else {
+        badgeBg = '#10b981';
+      }
+
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'level-card-header';
+      headerDiv.style.cursor = 'pointer';
+      headerDiv.innerHTML = `
+        <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">#${overallIndex}</div>
+        <div class="level-meta" style="flex: 1; min-width: 0;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px;">
+            <span class="stats-badge" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.sourceLabel}</span>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.categoryLabel}</span>
+          </div>
+          <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
+        </div>
+        <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+      `;
+
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'level-card-body';
+      bodyDiv.style.display = 'none';
+      bodyDiv.style.borderTop = '1px solid var(--card-border)';
+      bodyDiv.style.padding = '1.25rem';
+      bodyDiv.style.background = 'rgba(255, 255, 255, 0.01)';
+      
+      const formattedAnswer = formatArchitectAnswer(q.answer);
+      bodyDiv.innerHTML = `
+        <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+          ${formattedAnswer}
+        </div>
+      `;
+
+      card.appendChild(headerDiv);
+      card.appendChild(bodyDiv);
+
+      headerDiv.addEventListener('click', () => {
+        const isOpen = bodyDiv.style.display !== 'none';
+        const chevron = headerDiv.querySelector('.level-chevron');
+        if (chevron) {
+          chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+        if (isOpen) {
+          bodyDiv.style.display = 'none';
+          card.classList.remove('expanded');
+        } else {
+          bodyDiv.style.display = 'block';
+          card.classList.add('expanded');
+          
+          if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+            MathJax.typesetPromise([bodyDiv]).catch(err => console.error("MathJax error:", err));
+          }
+        }
+      });
+
+      DOM.prephub.unifiedSearchContainer.appendChild(card);
     });
   }
 
