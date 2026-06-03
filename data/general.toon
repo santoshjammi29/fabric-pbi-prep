@@ -306,7 +306,7 @@
   difficulty: HARD
   question: How do you ensure data quality in the data engineering process?
   answer: Data quality is essential in the data engineering process to guarantee accurate and reliable insights. As a data engineer, I employ various strategies to ensure data quality. Firstly, I implement data validation techniques to identify and rectify any inconsistencies or errors. This involves performing data profiling, data cleansing, and data standardization processes. Additionally, I establish data quality metrics and monitor them regularly to track the integrity and consistency of the data. I also implement data lineage to trace the origin and transformations of the data, ensuring transparency and accountability. By implementing these measures, I can ensure high data quality, which leads to more accurate analytics and decision-making.
-- id: scraped-q-44
+- id: scraped-q-44a
   source: General Data Engineering
   category: Data Engineering
   niche: 

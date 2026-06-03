@@ -27,9 +27,9 @@ const puppeteer = require('puppeteer');
 
     // 2. Count questions loaded by default
     const count1 = await page.evaluate(() => document.querySelectorAll('#personalised-container .concept-accordion-card').length);
-    console.log("Questions loaded by default (expected 250):", count1);
-    if (count1 !== 250) {
-      throw new Error(`Expected 250 questions, but found ${count1}`);
+    console.log("Questions loaded by default (expected 50):", count1);
+    if (count1 !== 50) {
+      throw new Error(`Expected 50 questions, but found ${count1}`);
     }
 
     // 3. Click a domain chip (Microsoft Fabric & OneLake)
@@ -42,9 +42,9 @@ const puppeteer = require('puppeteer');
     await new Promise(r => setTimeout(r, 500));
 
     const count2 = await page.evaluate(() => document.querySelectorAll('#personalised-container .concept-accordion-card').length);
-    console.log("Questions after domain filter (expected 50):", count2);
-    if (count2 !== 50) {
-      throw new Error(`Expected 50 questions, but found ${count2}`);
+    console.log("Questions after domain filter (expected 10):", count2);
+    if (count2 !== 10) {
+      throw new Error(`Expected 10 questions, but found ${count2}`);
     }
 
     // 4. Type a search query

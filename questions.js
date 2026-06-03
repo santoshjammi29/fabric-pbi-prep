@@ -10252,17 +10252,6 @@ window.QUESTIONS_DB = [
     "subdomain": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)"
   },
   {
-    "id": "dl-easy-18",
-    "source": "Core Architect",
-    "category": "DATALAKE ARCHITECTURE",
-    "niche": "Cataloging, Metastores, and Data Governance",
-    "difficulty": "EASY",
-    "question": "What is Unity Catalog in Databricks?",
-    "answer": "Unity Catalog is a unified governance tool for Databricks. It provides fine-grained access control (SQL ANSI) for tables, files, and models across workspaces.",
-    "domain": "DATALAKE ARCHITECTURE",
-    "subdomain": "Cataloging, Metastores, and Data Governance"
-  },
-  {
     "id": "dl-easy-19",
     "source": "Core Architect",
     "category": "DATALAKE ARCHITECTURE",
@@ -20555,17 +20544,6 @@ window.QUESTIONS_DB = [
     "difficulty": "MEDIUM",
     "question": "Explain the performance difference between a PySpark SQL built-in function, a Hive UDF, a Python native UDF, and a Scala/Java UDF registered in PySpark.",
     "answer": "1. SQL Built-in (Fastest): Runs natively in the JVM (often vectorized/Photon). (2) Scala/Java UDF: Runs inside the JVM, fast but lacks Catalyst optimizations. (3) Python native UDF (Slowest): Forces data to pipe to Python workers row-by-row, incurring high serialization latency. (4) Hive UDF: Runs in JVM, moderate speed.",
-    "domain": "SPARK & DATABRICKS",
-    "subdomain": "PySpark Internals, Serialization & JNI Bridges"
-  },
-  {
-    "id": "spark-py-6",
-    "source": "Core Architect",
-    "category": "SPARK & DATABRICKS",
-    "niche": "PySpark Internals, Serialization & JNI Bridges",
-    "difficulty": "MEDIUM",
-    "question": "How do you programmatically configure a heap dump on OOM for distributed executors and capture it to a cloud object store for post-mortem analysis?",
-    "answer": "1. JVM Flags: Set executor JVM options: `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/`. (2) Script upload: Configure an entry point or JVM script trigger: `-XX:OnOutOfMemoryError=\"/opt/upload_dump.sh\"`. The script uploads the generated dump file to S3/ADLS for developer analysis.",
     "domain": "SPARK & DATABRICKS",
     "subdomain": "PySpark Internals, Serialization & JNI Bridges"
   },

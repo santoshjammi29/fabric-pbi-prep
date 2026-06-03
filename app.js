@@ -249,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initConcepts();
     initCheatsheet();
     initPersonalised();
+    updateUnifiedSearchCounts();
     
     // Check scroll position to show scroll to top button
     const mainContent = document.querySelector('.main-content');
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sync UI elements if visible
     const explainerCardIndicator = document.querySelector(`.concept-card[data-id="${questionId}"] .status-indicator`);
     if (explainerCardIndicator) {
-      explainerCardIndicator.className = `status-indicator status-${newStatus}`;
+      explainerCardIndicator.className = `status-indicator status-${newStatus}${newStatus === 'unseen' ? ' hidden' : ''}`;
       explainerCardIndicator.textContent = newStatus;
     }
   }
@@ -733,7 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="concept-card-title" style="margin-bottom: 0.75rem;">${q.question}</div>
             <div class="concept-card-footer">
-              <span class="status-indicator status-${status}">${status}</span>
+              <span class="status-indicator status-${status}${status === 'unseen' ? ' hidden' : ''}">${status}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </div>
           `;
@@ -871,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const status = state.progress[q.id] || 'unseen';
       
       li.innerHTML = `
-        <span class="status-indicator status-${status}" style="font-size:0.6rem; padding:0.15rem 0.35rem;">${status}</span>
+        <span class="status-indicator status-${status}${status === 'unseen' ? ' hidden' : ''}" style="font-size:0.6rem; padding:0.15rem 0.35rem;">${status}</span>
         <div class="q-text-line">Q${idx+1}: [${q.difficulty || 'HARD'}] ${q.question}</div>
       `;
       
@@ -2840,6 +2841,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
       DOM.prephub.unifiedSearchContainer.appendChild(card);
     });
+  }
+
+  function updateUnifiedSearchCounts() {
+    const totalPersonalised = (window.PERSONALISED_QUESTIONS || []).length;
+    const totalGeneral = (window.QUESTIONS_DE_DB || []).length;
+    const totalFabricPbi = (window.QUESTIONS_DB || []).length;
+    const totalAll = totalPersonalised + totalGeneral + totalFabricPbi;
+
+    const searchInput = document.getElementById('unified-search-input');
+    if (searchInput) {
+      searchInput.placeholder = `Search across all ${totalAll.toLocaleString()} questions (Fabric, PBI, ADF, SQL, Personalised)...`;
+    }
+
+    const filterDb = document.getElementById('unified-filter-db');
+    if (filterDb) {
+      const options = filterDb.options;
+      for (let i = 0; i < options.length; i++) {
+        const opt = options[i];
+        if (opt.value === 'ALL') {
+          opt.textContent = `All Databases (${totalAll.toLocaleString()})`;
+        } else if (opt.value === 'personalised') {
+          opt.textContent = `Personalised Prep (${totalPersonalised.toLocaleString()})`;
+        } else if (opt.value === 'general') {
+          opt.textContent = `General DE Prep (${totalGeneral.toLocaleString()})`;
+        } else if (opt.value === 'fabric_pbi') {
+          opt.textContent = `Fabric & PBI Prep (${totalFabricPbi.toLocaleString()})`;
+        }
+      }
+    }
   }
 
   // Format architect answer containing numbered lists or bullet points
