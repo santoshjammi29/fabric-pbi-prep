@@ -685,6 +685,18 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: auto;
+}
+
+.concept-card-footer svg {
+  margin-left: auto;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.concept-card:hover .concept-card-footer svg {
+  transform: translateX(3.5px);
+  color: var(--primary-light);
 }
 
 .status-indicator {
@@ -4879,7 +4891,7 @@ pre.code-block code,
 /* 1. Global text wrapping guarantee across all text elements */
 p, li, td, th,
 .dialog-body, .dialog-answer-text,
-.concept-card-title, .concept-term, .concept-definition, .concept-explanation, .concept-impact,
+.concept-term, .concept-definition, .concept-explanation, .concept-impact,
 .level-scenario p, .flashcard-q p, .flashcard-a-text, .best-practice-card p, .lexicon-card p,
 .stats-title, .page-title, .page-subtitle, .practice-sidebar-title, .level-title, .level-tag {
   white-space: normal !important;
