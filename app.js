@@ -3332,38 +3332,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function filterLexiconCategory(category) {
             currentLexiconCategory = category;
-            const buttons = ['all', 'engine', 'optimization', 'memory', 'streaming'];
-            buttons.forEach(btn => {
-                const el = document.getElementById(`cat-btn-${btn}`);
-                if (btn === category) {
-                    el.className = "text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--primary)] text-white transition-all";
-                } else {
-                    el.className = "text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--item-bg)] border border-[var(--card-border)] transition-all";
-                }
-            });
+            // Update spark-filter-btn active state
+            document.querySelectorAll('.spark-filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`cat-btn-${category}`);
+            if (activeBtn) activeBtn.classList.add('active');
             filterLexicon();
         }
 
         function filterLexicon() {
-            const query = document.getElementById('lexicon-search').value.toLowerCase().trim();
-            const cards = document.getElementsByClassName('lexicon-card');
-            
-            for (let i = 0; i < cards.length; i++) {
-                const card = cards[i];
-                const cat = card.getAttribute('data-category');
-                const keywords = card.getAttribute('data-keywords').toLowerCase();
-                const title = card.querySelector('h4').textContent.toLowerCase();
-                const desc = card.querySelector('p').textContent.toLowerCase();
-                
+            const query = (document.getElementById('lexicon-search')?.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('#lexicon-grid .lexicon-card');
+            cards.forEach(card => {
+                const cat = card.dataset.category || '';
+                const keywords = (card.dataset.keywords || '').toLowerCase();
+                // Support both old h4/p selectors and new spark-lexicon-term/def selectors
+                const titleEl = card.querySelector('.spark-lexicon-term') || card.querySelector('h4');
+                const descEl = card.querySelector('.spark-lexicon-def') || card.querySelector('p');
+                const title = (titleEl?.textContent || '').toLowerCase();
+                const desc = (descEl?.textContent || '').toLowerCase();
+
                 const matchesCategory = (currentLexiconCategory === 'all' || cat === currentLexiconCategory);
                 const matchesQuery = (!query || title.includes(query) || desc.includes(query) || keywords.includes(query));
-                
-                if (matchesCategory && matchesQuery) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            }
+
+                card.style.display = (matchesCategory && matchesQuery) ? '' : 'none';
+            });
         }
 
         /* --- Interactive Spark Visual Simulator Core Mechanics --- */
@@ -3613,33 +3605,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${Math.round(valueMB)} MB`;
         }
 
-        // ---- Lexicon Filter Functions ----
-        let currentLexiconCategory = 'all';
-
-        function filterLexicon() {
-            const query = (document.getElementById('lexicon-search')?.value || '').toLowerCase().trim();
-            const cards = document.querySelectorAll('#lexicon-grid .lexicon-card');
-            cards.forEach(card => {
-                const category = card.dataset.category || '';
-                const keywords = (card.dataset.keywords || '').toLowerCase();
-                const term = (card.querySelector('.spark-lexicon-term')?.textContent || '').toLowerCase();
-                const def = (card.querySelector('.spark-lexicon-def')?.textContent || '').toLowerCase();
-
-                const matchesCategory = currentLexiconCategory === 'all' || category === currentLexiconCategory;
-                const matchesQuery = !query || term.includes(query) || def.includes(query) || keywords.includes(query);
-
-                card.style.display = (matchesCategory && matchesQuery) ? '' : 'none';
-            });
-        }
-
-        function filterLexiconCategory(category) {
-            currentLexiconCategory = category;
-            // Update button states
-            document.querySelectorAll('.spark-filter-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`cat-btn-${category}`);
-            if (activeBtn) activeBtn.classList.add('active');
-            filterLexicon();
-        }
+        // (Lexicon and category filter functions defined above at line ~3330)
 
         // ---- Language Tab Switcher ----
         function switchLanguageTab(lang) {
