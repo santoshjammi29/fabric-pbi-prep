@@ -14,41 +14,40 @@ to the FILES list below, then re-run this script.
 import json
 import os
 
+import glob
+
 # Resolve paths relative to this script's location
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 OUTPUT_PATH = os.path.join(PROJECT_ROOT, "questions.js")
 
-# Source JSON files (in load order — order affects the questions.js array order)
-FILES = [
-    "fabric_part1.json",
-    "fabric_part2.json",
-    "pbi_part1.json",
-    "pbi_part2.json",
-    "adf_part1.json",
-    "adf_part2.json",
-    "sql_part1.json",
-    "sql_part2.json",
-    "datalake_part1.json",
-    "datalake_part2.json",
-    "spark_part1.json",
-    "spark_part2.json",
-]
-
 all_questions = []
+seen_ids = set()
 
-for f_name in FILES:
-    path = os.path.join(DATA_DIR, f_name)
-    if os.path.exists(path):
+# Load all JSON files in the data directory dynamically
+pattern = os.path.join(DATA_DIR, "*.json")
+json_files = sorted(glob.glob(pattern))
+
+for path in json_files:
+    f_name = os.path.basename(path)
+    try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-            all_questions.extend(data)
-            print(f"  ✅ Loaded {len(data):>4} questions from {f_name}")
-    else:
-        print(f"  ⚠️  File not found: {f_name} (skipping)")
+        
+        file_added = 0
+        for q in data:
+            q_id = q.get("id")
+            if q_id not in seen_ids:
+                all_questions.append(q)
+                seen_ids.add(q_id)
+                file_added += 1
+                
+        print(f"  ✅ Loaded {file_added:>4} new questions from {f_name} (Total file items: {len(data)})")
+    except Exception as e:
+        print(f"  ❌ Error loading {f_name}: {e}")
 
-print(f"\nTotal: {len(all_questions)} questions compiled")
+print(f"\nTotal: {len(all_questions)} unique questions compiled")
 
 with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     f.write("window.QUESTIONS_DB = ")

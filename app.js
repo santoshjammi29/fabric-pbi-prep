@@ -20,7 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Active filters
     activeExplainerCategory: 'ALL',
     activePracticeCategory: 'ALL',
-  activeDifficulty: 'ALL',
+    activeDifficulty: 'ALL',
+    
+    // Concepts Active Filters
+    activeConceptsCategory: 'ALL',
+    activeConceptsDifficulty: 'ALL',
+    
+    // Cheat Sheet Active Filters
+    activeCheatsheetLang: 'python',
+    activeCheatsheetLevel: 'all',
+    activeCheatsheetQuery: '',
+    
+    // Personalised Active Filters
+    activePersonalisedDomain: 'ALL',
+    activePersonalisedQuery: '',
     
     // Active practice session state
     practice: {
@@ -40,10 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme Toggle
     themeToggleBtn: document.getElementById('btn-theme-toggle'),
     themeToggleLabel: document.querySelector('.theme-toggle-container .theme-toggle-label'),
+    mobileThemeBtn: document.getElementById('btn-mobile-theme') || null,
     
     // Mark Status Toggle
-    statusToggleBtn: document.getElementById('btn-status-toggle'),
-    statusToggleLabel: document.querySelectorAll('.theme-toggle-container .theme-toggle-label')[1],
+    statusToggleBtn: document.getElementById('btn-status-toggle') || null,
+    statusToggleLabel: document.querySelectorAll('.theme-toggle-container .theme-toggle-label')[1] || null,
     
     // Dashboard Stats DOM Elements
     stats: {
@@ -138,7 +152,33 @@ document.addEventListener('DOMContentLoaded', () => {
     dialogStatusBtns: document.querySelectorAll('#details-dialog .status-btn'),
     
     // Scroll To Top
-    btnScrollToTop: document.getElementById('btn-scroll-to-top')
+    btnScrollToTop: document.getElementById('btn-scroll-to-top'),
+
+    // Key Concepts DOM cache
+    concepts: {
+      search: document.getElementById('concepts-search'),
+      difficultyFilters: document.getElementById('concepts-difficulty-filters'),
+      topicsScrollbar: document.getElementById('concepts-topics-scrollbar'),
+      container: document.getElementById('concepts-container')
+    },
+
+    // DE Cheat Sheet DOM cache
+    cheatsheet: {
+      langNav: document.getElementById('cheatsheet-lang-nav'),
+      search: document.getElementById('cheatsheet-search'),
+      levelFilters: document.getElementById('cheatsheet-level-filters'),
+      progressBar: document.getElementById('cheatsheet-progress-bar'),
+      container: document.getElementById('cheatsheet-container'),
+      compTbody: document.getElementById('cheatsheet-comp-tbody')
+    },
+    
+    // Personalised Prep DOM cache
+    personalised: {
+      topicsScrollbar: document.getElementById('personalised-topics-scrollbar'),
+      search: document.getElementById('personalised-search'),
+      container: document.getElementById('personalised-container'),
+      matchCount: document.getElementById('personalised-match-count')
+    }
   };
 
   // Maps category code to nice human readable display name
@@ -148,7 +188,16 @@ document.addEventListener('DOMContentLoaded', () => {
     'ADF': 'Azure Data Factory',
     'SQL SERVER': 'SQL Server',
     'DATALAKE ARCHITECTURE': 'Data Lake Architecture',
-    'SPARK & DATABRICKS': 'Spark & Databricks'
+    'SPARK & DATABRICKS': 'Spark & Databricks',
+    'Databases & SQL': 'Databases & SQL',
+    'Big Data': 'Big Data',
+    'Cloud Platforms': 'Cloud Platforms',
+    'ETL & Pipelines': 'ETL & Pipelines',
+    'Data Engineering': 'Data Engineering',
+    'Data Engineering (General)': 'Data Engineering',
+    'Excel & Analytics': 'Excel & Analytics',
+    'Data Visualization': 'Data Visualization',
+    'Governance & Quality': 'Governance & Quality'
   };
 
   // Maps category code to CSS styles badges classes
@@ -158,7 +207,16 @@ document.addEventListener('DOMContentLoaded', () => {
     'ADF': 'badge-adf',
     'SQL SERVER': 'badge-sql',
     'DATALAKE ARCHITECTURE': 'badge-dl',
-    'SPARK & DATABRICKS': 'badge-spark'
+    'SPARK & DATABRICKS': 'badge-spark',
+    'Databases & SQL': 'badge-sql',
+    'Big Data': 'badge-spark',
+    'Cloud Platforms': 'badge-dl',
+    'ETL & Pipelines': 'badge-adf',
+    'Data Engineering': 'badge-fabric',
+    'Data Engineering (General)': 'badge-fabric',
+    'Excel & Analytics': 'badge-pbi',
+    'Data Visualization': 'badge-pbi',
+    'Governance & Quality': 'badge-dl'
   };
 
   // --- INITIALIZATION & RECOVERY ---
@@ -171,6 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDashboardStats();
     renderExplainer();
     renderNicheSelection();
+    initGeneralDe();
+    initConcepts();
+    initCheatsheet();
+    initPersonalised();
     
     // Check scroll position to show scroll to top button
     const mainContent = document.querySelector('.main-content');
@@ -182,8 +244,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Set initial view and place footer in active container at startup
-    switchView('view-dashboard');
+    // Set initial view from URL hash, fallback to localStorage, or default to dashboard
+    let initialView = 'view-dashboard';
+    const hash = window.location.hash;
+    if (hash && document.getElementById(hash.substring(1))) {
+      initialView = hash.substring(1);
+    } else {
+      const savedView = localStorage.getItem('interview_prep_active_view');
+      if (savedView && document.getElementById(savedView)) {
+        initialView = savedView;
+      }
+    }
+    switchView(initialView);
+
+    // Listen to hashchange events for browser back/forward navigation
+    window.addEventListener('hashchange', () => {
+      const newHash = window.location.hash.substring(1);
+      if (newHash && document.getElementById(newHash) && state.currentView !== newHash) {
+        switchView(newHash);
+      }
+    });
+
+    // Reveal the page now that JS has fully initialized (prevents FOUC / wrong counts flash)
+    const revealPage = () => {
+      document.body.style.transition = 'opacity 0.25s ease';
+      document.body.style.opacity = '1';
+    };
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(revealPage);
+    } else {
+      setTimeout(revealPage, 0);
+    }
   }
 
   // Load and apply progress from localStorage
@@ -247,15 +338,17 @@ document.addEventListener('DOMContentLoaded', () => {
       root.classList.remove('theme-dark');
       DOM.body.classList.add('theme-light');
       DOM.body.classList.remove('theme-dark');
-      DOM.themeToggleBtn.textContent = '🌙';
-      DOM.themeToggleLabel.textContent = 'Dark Theme';
+      if (DOM.themeToggleBtn) DOM.themeToggleBtn.textContent = '🌙';
+      if (DOM.themeToggleLabel) DOM.themeToggleLabel.textContent = 'Dark Theme';
+      if (DOM.mobileThemeBtn) DOM.mobileThemeBtn.textContent = '🌙';
     } else {
       root.classList.add('theme-dark');
       root.classList.remove('theme-light');
       DOM.body.classList.add('theme-dark');
       DOM.body.classList.remove('theme-light');
-      DOM.themeToggleBtn.textContent = '☀️';
-      DOM.themeToggleLabel.textContent = 'Light Theme';
+      if (DOM.themeToggleBtn) DOM.themeToggleBtn.textContent = '☀️';
+      if (DOM.themeToggleLabel) DOM.themeToggleLabel.textContent = 'Light Theme';
+      if (DOM.mobileThemeBtn) DOM.mobileThemeBtn.textContent = '☀️';
     }
     localStorage.setItem('interview_prep_theme', state.theme);
   }
@@ -271,16 +364,24 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyMarkStatusToggle() {
     const root = document.documentElement;
     if (state.markStatusEnabled) {
-      DOM.statusToggleBtn.classList.add('active');
-      DOM.statusToggleBtn.textContent = '✓';
-      DOM.statusToggleLabel.textContent = 'Mark Status';
+      if (DOM.statusToggleBtn) {
+        DOM.statusToggleBtn.classList.add('active');
+        DOM.statusToggleBtn.textContent = '✓';
+      }
+      if (DOM.statusToggleLabel) {
+        DOM.statusToggleLabel.textContent = 'Mark Status';
+      }
       root.classList.remove('mark-status-disabled');
       DOM.practiceStatusSelector.classList.remove('hidden');
       document.querySelectorAll('.dialog-status-selector').forEach(el => el.classList.remove('hidden'));
     } else {
-      DOM.statusToggleBtn.classList.remove('active');
-      DOM.statusToggleBtn.textContent = '✗';
-      DOM.statusToggleLabel.textContent = 'Mark Status';
+      if (DOM.statusToggleBtn) {
+        DOM.statusToggleBtn.classList.remove('active');
+        DOM.statusToggleBtn.textContent = '✗';
+      }
+      if (DOM.statusToggleLabel) {
+        DOM.statusToggleLabel.textContent = 'Mark Status';
+      }
       root.classList.add('mark-status-disabled');
       DOM.practiceStatusSelector.classList.add('hidden');
       document.querySelectorAll('.dialog-status-selector').forEach(el => el.classList.add('hidden'));
@@ -292,6 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   function switchView(targetViewId) {
     state.currentView = targetViewId;
+    localStorage.setItem('interview_prep_active_view', targetViewId);
+    
+    // Update hash if different
+    if (window.location.hash !== '#' + targetViewId) {
+      window.location.hash = targetViewId;
+    }
     
     // Hide active practice when leaving Niche Practice
     if (targetViewId !== 'view-practice') {
@@ -304,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (prScrollbar) prScrollbar.classList.remove('hidden');
     }
     
-    // Switch active states of nav buttons
+    // Switch active states of nav buttons (desktop sidebar)
     DOM.navBtns.forEach(btn => {
       if (btn.getAttribute('data-target') === targetViewId) {
         btn.classList.add('active');
@@ -312,6 +419,29 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.remove('active');
       }
     });
+
+    // Sync mobile bottom nav tabs active state
+    const mobileNavTabs = document.querySelectorAll('.mobile-nav-tab[data-target]');
+    mobileNavTabs.forEach(tab => {
+      if (tab.getAttribute('data-target') === targetViewId) {
+        tab.classList.add('active');
+        // Scroll the active tab pill into view in the horizontal scroll container
+        try { tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // Sync More drawer items active state (kept for legacy compatibility)
+    const moreDrawerItems = document.querySelectorAll('.mobile-more-item[data-target]');
+    moreDrawerItems.forEach(item => {
+      if (item.getAttribute('data-target') === targetViewId) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
 
     // Toggle view section visibility with clean starting styles
     DOM.pageViews.forEach(view => {
@@ -337,7 +467,20 @@ document.addEventListener('DOMContentLoaded', () => {
       renderExplainer();
     } else if (targetViewId === 'view-practice') {
       renderNicheSelection();
+    } else if (targetViewId === 'view-concepts') {
+      renderConcepts();
+    } else if (targetViewId === 'view-cheatsheet') {
+      renderCheatsheet();
+    } else if (targetViewId === 'view-personalised') {
+      renderPersonalised();
     }
+    
+    // Scroll back to top on view switch
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.scrollTop = 0;
+    }
+    window.scrollTo({ top: 0 });
   }
 
   // --- STATS & SVG COMPUTATION ---
@@ -571,7 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.innerHTML = `
         <div>
           <span class="stats-badge ${badgeClass}" style="display:inline-block; margin-bottom: 0.5rem; font-size:0.75rem;">${displayNames[n.category] || n.category}</span>
-          <h4 style="font-size: 1rem; font-weight: 500; line-height:1.4;">${n.nicheName} <div style="margin-top:0.35rem;">${diffsHtml}</div></h4>
+          <h4 style="font-size: 1rem; font-weight: 500; line-height:1.4; word-break:break-word;">${n.nicheName} <div style="margin-top:0.35rem;">${diffsHtml}</div></h4>
         </div>
         <div class="concept-card-footer" style="margin-top:1rem; border-top:1px solid var(--card-border); padding-top:0.5rem;">
           <span style="font-size: 0.8rem; font-weight: 500; color:var(--text-secondary);">${n.mastered} / ${n.total} Mastered (${percentMastered}%)</span>
@@ -629,7 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       li.innerHTML = `
         <span class="status-indicator status-${status}" style="font-size:0.6rem; padding:0.15rem 0.35rem;">${status}</span>
-        <div style="font-size:0.85rem; font-weight: 400; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-top:0.25rem;">Q${idx+1}: [${q.difficulty || 'HARD'}] ${q.question}</div>
+        <div class="q-text-line">Q${idx+1}: [${q.difficulty || 'HARD'}] ${q.question}</div>
       `;
       
       li.addEventListener('click', () => {
@@ -695,12 +838,60 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.btnPracticeNext.disabled = idx === qList.length - 1;
   }
 
+  function formatCodeBlock(code, lang) {
+    lang = lang ? lang.trim().toLowerCase() : 'code';
+    let langClass = '';
+    let langLabel = 'Code';
+    if (lang === 'python') {
+      langClass = 'python';
+      langLabel = 'Python';
+    } else if (lang === 'mssql' || lang === 'sql' || lang === 't-sql' || lang === 'tsql') {
+      langClass = 'mssql';
+      langLabel = 'T-SQL';
+    } else if (lang === 'pyspark') {
+      langClass = 'pyspark';
+      langLabel = 'PySpark';
+    } else if (lang === 'sparksql' || lang === 'spark-sql') {
+      langClass = 'sparksql';
+      langLabel = 'Spark SQL';
+    } else if (lang === 'kql' || lang === 'kusto') {
+      langClass = 'mssql';
+      langLabel = 'KQL';
+    } else if (lang === 'bash' || lang === 'sh') {
+      langClass = 'pyspark';
+      langLabel = 'Bash';
+    } else if (lang) {
+      langLabel = lang.toUpperCase();
+    }
+    
+    return `<div class="code-wrapper ${langClass} my-4">
+      <div class="code-toolbar">
+        <span class="code-lang-badge">${langLabel}</span>
+        <button class="copy-btn" title="Copy code">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copy
+        </button>
+      </div>
+      <pre class="code-block"><code>${code.trim()}</code></pre>
+    </div>`;
+  }
+
   // Parses basic markdown and linebreaks into clean HTML list formatting
   function formatMarkdownAnswer(text) {
     if (!text) return '';
     
     // Clean string formats
     let html = text.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+    
+    // Extract code blocks first
+    const codeBlocks = [];
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
+      const index = codeBlocks.length;
+      codeBlocks.push(formatCodeBlock(code, lang));
+      return `\n__CODE_BLOCK_PLACEHOLDER_${index}__\n`;
+    });
     
     // Normalize inline lists by injecting a newline before " 1) ", " 2. ", etc.
     html = html.replace(/([^\n])(\s)(\d+[\)\.]\s)/g, '$1\n$3');
@@ -710,6 +901,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Escape HTML characters to prevent rendering placeholders like <table_name> as browser tags
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    // Restore placeholders from escaping: &lt;code_block_placeholder...
+    html = html.replace(/__CODE_BLOCK_PLACEHOLDER_(\d+)__/g, '__CODE_BLOCK_PLACEHOLDER_$1__');
     
     // Convert backticks to code block styling
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -726,6 +920,17 @@ document.addEventListener('DOMContentLoaded', () => {
             output += '</p>';
             inParagraph = false;
          }
+         return;
+      }
+      
+      // If it is a placeholder, output it directly and close any lists/paragraphs
+      const placeholderMatch = line.match(/^__CODE_BLOCK_PLACEHOLDER_(\d+)__$/);
+      if (placeholderMatch) {
+         if (inParagraph) { output += '</p>'; inParagraph = false; }
+         if (listType) { output += `</${listType}>`; listType = null; }
+         
+         const idx = parseInt(placeholderMatch[1]);
+         output += codeBlocks[idx];
          return;
       }
       
@@ -791,11 +996,22 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentExplainerIndex = -1;
 
   function openDetailsDialog(questionId) {
-    const qObj = state.questions.find(q => q.id === questionId);
+    let qObj = state.questions.find(q => q.id === questionId);
+    let isDe = false;
+    
+    if (!qObj) {
+      qObj = generalDeState.questions.find(q => q.id === questionId);
+      isDe = true;
+    }
     if (!qObj) return;
     
     // Compute current active list context
-    const cards = document.querySelectorAll('#explainer-accordion .concept-card');
+    let cards;
+    if (isDe) {
+      cards = document.querySelectorAll('#de-questions-container .concept-card');
+    } else {
+      cards = document.querySelectorAll('#explainer-accordion .concept-card');
+    }
     activeExplainerIds = Array.from(cards).map(card => card.getAttribute('data-id'));
     currentExplainerIndex = activeExplainerIds.indexOf(questionId);
     
@@ -811,12 +1027,13 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.dialogQText.textContent = qObj.question;
     
     // Build explanation details layout
-    DOM.dialogAText.innerHTML = formatMarkdownAnswer(qObj.answer);
+    DOM.dialogAText.innerHTML = isDe ? formatDeAnswer(qObj.answer) : formatMarkdownAnswer(qObj.answer);
     
     // Sync active state of status buttons
-    const activeStatus = state.progress[questionId] || 'unseen';
+    const activeStatus = isDe ? (generalDeState.progress[questionId] || 'unseen') : (state.progress[questionId] || 'unseen');
     DOM.dialogStatusBtns.forEach(btn => {
-      if (btn.getAttribute('data-status') === activeStatus) {
+      const btnStatus = btn.getAttribute('data-status');
+      if (btnStatus === activeStatus) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -824,7 +1041,22 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Bind click triggers directly
       btn.onclick = () => {
-        updateQuestionStatus(questionId, btn.getAttribute('data-status'));
+        if (isDe) {
+          generalDeState.progress[questionId] = btnStatus;
+          saveDeProgress();
+          // Update the specific card's DOM attribute & status label
+          const cardEl = document.querySelector(`#de-questions-container .concept-card[data-id="${questionId}"]`);
+          if (cardEl) {
+            cardEl.setAttribute('data-status', btnStatus);
+            const statusIndicator = cardEl.querySelector('.status-indicator');
+            if (statusIndicator) {
+              statusIndicator.className = `status-indicator status-${btnStatus}`;
+              statusIndicator.textContent = btnStatus;
+            }
+          }
+        } else {
+          updateQuestionStatus(questionId, btnStatus);
+        }
         DOM.dialogStatusBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       };
@@ -881,10 +1113,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Mark Status Toggle Trigger
-    DOM.statusToggleBtn.addEventListener('click', () => {
-      state.markStatusEnabled = !state.markStatusEnabled;
-      applyMarkStatusToggle();
-    });
+    if (DOM.statusToggleBtn) {
+      DOM.statusToggleBtn.addEventListener('click', () => {
+        state.markStatusEnabled = !state.markStatusEnabled;
+        applyMarkStatusToggle();
+      });
+    }
+
+    // ---- Mobile Bottom Navigation (scrollable tab bar) ----
+    const mobileBottomNav = document.getElementById('mobile-bottom-nav');
+
+    // Wire up all tab clicks in the scrollable bottom nav
+    if (mobileBottomNav) {
+      mobileBottomNav.querySelectorAll('.mobile-nav-tab[data-target]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.getAttribute('data-target');
+          if (target) switchView(target);
+        });
+      });
+    }
+
+    // Theme toggle in mobile top bar
+    if (DOM.mobileThemeBtn) {
+      DOM.mobileThemeBtn.addEventListener('click', () => {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+        applyTheme();
+      });
+    }
 
     // Horizontal Explainer Topic Chips Click
     const explainerChips = DOM.explainerTopicsScrollbar.querySelectorAll('.topic-chip');
@@ -1069,6 +1324,33 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // --- PYSPARK CURRICULUM PHASE NAVIGATION ---
+    const pysparkPhaseNav = document.getElementById('pyspark-phase-nav');
+    if (pysparkPhaseNav) {
+      const phaseBtns = pysparkPhaseNav.querySelectorAll('.pyspark-phase-btn');
+      const phaseBlocks = document.querySelectorAll('.pyspark-phase-block');
+
+      const filterPhase = (selectedPhase) => {
+        phaseBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-phase') === selectedPhase);
+        });
+        phaseBlocks.forEach(block => {
+          const blockPhase = block.getAttribute('data-phase');
+          if (selectedPhase === 'all' || blockPhase === selectedPhase) {
+            block.classList.remove('hidden-phase');
+          } else {
+            block.classList.add('hidden-phase');
+          }
+        });
+      };
+
+      phaseBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterPhase(btn.getAttribute('data-phase'));
+        });
+      });
+    }
+
     // Scroll to Top Scroll trigger
     DOM.btnScrollToTop.addEventListener('click', () => {
       document.querySelector('.main-content').scrollTo({
@@ -1076,6 +1358,1215 @@ document.addEventListener('DOMContentLoaded', () => {
         behavior: 'smooth'
       });
     });
+
+    // Global copy button event delegation for dynamic code blocks
+    document.addEventListener('click', (e) => {
+      const copyBtn = e.target.closest('.copy-btn');
+      if (!copyBtn) return;
+      
+      e.stopPropagation();
+      const wrapper = copyBtn.closest('.code-wrapper');
+      if (!wrapper) return;
+      
+      const preEl = wrapper.querySelector('pre.code-block code') || wrapper.querySelector('pre code');
+      const preText = preEl ? (preEl.innerText || preEl.textContent) : '';
+      if (!preText) return;
+      
+      navigator.clipboard.writeText(preText.trim()).then(() => {
+        copyBtn.classList.add('copied');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Copied!
+        `;
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyBtn.innerHTML = originalHTML;
+        }, 2000);
+      });
+    });
+  }
+
+  // --- GENERAL DE PREP INTEGRATION ---
+  
+  const categoryNichesDe = {
+    "all": ["All", "Python", "SQL", "Spark", "Cloud", "Pipeline", "Dashboard", "Excel", "Lineage"],
+    "Databases & SQL": ["All", "PostgreSQL", "MySQL", "NoSQL", "MongoDB", "Redis", "Cassandra", "Index", "Query Optimization"],
+    "Big Data": ["All", "Spark", "Hadoop", "HDFS", "MapReduce", "Hive", "Scala", "Distributed"],
+    "Cloud Platforms": ["All", "AWS", "Azure", "GCP", "S3", "Redshift", "Snowflake", "Databricks"],
+    "ETL & Pipelines": ["All", "Airflow", "DBT", "Kafka", "Kinesis", "Orchestration", "Ingestion", "Streaming"],
+    "Data Engineering": ["All", "Python", "Data Structure", "Algorithm", "Modeling", "Git"],
+    "Data Engineering (General)": ["All", "Python", "Data Structure", "Algorithm", "Modeling", "Git"],
+    "Excel & Analytics": ["All", "Formula", "VLOOKUP", "INDEX-MATCH", "Power Query", "Power Pivot", "VBA", "Macro", "Pivot"],
+    "Data Visualization": ["All", "Tableau", "Power BI", "Chart", "Dashboard", "Storytelling"],
+    "Governance & Quality": ["All", "Lineage", "Quality", "Metadata", "Privacy", "Compliance", "Security", "Audit"]
+  };
+
+  const generalDeState = {
+    questions: window.QUESTIONS_DE_DB || [],
+    progress: {},
+    activeCategory: 'all',
+    activeStatus: 'all',
+    activeDifficulty: 'all',
+    activeNiche: 'All',
+    searchQuery: '',
+    currentMode: 'bank',
+    loadedQuestionsLimit: 50,
+    mockSession: {
+      active: false,
+      questions: [],
+      currentIndex: 0,
+      timerVal: 90,
+      timerMax: 90,
+      timerInterval: null
+    }
+  };
+
+  function getDeDomElements() {
+    return {
+      btnModeBank: document.getElementById('btn-de-mode-bank'),
+      btnModeMock: document.getElementById('btn-de-mode-mock'),
+      viewBank: document.getElementById('de-view-bank'),
+      viewMock: document.getElementById('de-view-mock'),
+      searchInput: document.getElementById('de-search-input'),
+      filterStatusSelect: document.getElementById('de-filter-status'),
+      filterDifficultySelect: document.getElementById('de-filter-difficulty'),
+      difficultyChips: document.querySelectorAll('.de-diff-chip'),
+      categoriesScrollbar: document.getElementById('de-categories-scrollbar'),
+      nichesScrollbar: document.getElementById('de-niches-scrollbar'),
+      statTotal: document.getElementById('de-stat-total'),
+      statMastered: document.getElementById('de-stat-mastered'),
+      statReviewing: document.getElementById('de-stat-reviewing'),
+      statNotStarted: document.getElementById('de-stat-not-started'),
+      overallProgressBar: document.getElementById('de-overall-progress-bar'),
+      overallProgressPercent: document.getElementById('de-overall-progress-percent'),
+      masteredCountSidebar: document.getElementById('de-mastered-count-sidebar'),
+      totalCountSidebar: document.getElementById('de-total-count-sidebar'),
+      questionsContainer: document.getElementById('de-questions-container'),
+      loadMoreContainer: document.getElementById('de-load-more-container'),
+      btnLoadMore: document.getElementById('btn-de-load-more'),
+      filterStatus: document.getElementById('de-filter-status-text'),
+      mockSetup: document.getElementById('de-mock-setup'),
+      mockTimerSelect: document.getElementById('de-mock-timer-select'),
+      btnStartMock: document.getElementById('btn-de-start-mock'),
+      mockActive: document.getElementById('de-mock-active'),
+      mockMetaCategory: document.getElementById('de-mock-meta-category'),
+      mockMetaDifficulty: document.getElementById('de-mock-meta-difficulty'),
+      mockMetaProgress: document.getElementById('de-mock-meta-progress'),
+      mockQuestionText: document.getElementById('de-mock-question-text'),
+      mockTimerContainer: document.getElementById('de-mock-timer-container'),
+      mockTimerBar: document.getElementById('de-mock-timer-bar'),
+      mockTimerText: document.getElementById('de-mock-timer-text'),
+      mockAnswerContent: document.getElementById('de-mock-answer-content'),
+      btnQuitMock: document.getElementById('btn-de-quit-mock'),
+      btnRevealMock: document.getElementById('btn-de-reveal-mock'),
+      btnNextMock: document.getElementById('btn-de-next-mock'),
+      mockSummary: document.getElementById('de-mock-summary'),
+      btnRestartMock: document.getElementById('btn-de-restart-mock'),
+      mockSummaryTotal: document.getElementById('de-mock-summary-total')
+    };
+  }
+
+  function initGeneralDe() {
+    loadDeProgress();
+    updateDeStats();
+    renderDeCategories();
+    renderDeNiches();
+    renderDeQuestionsList(true);
+    setupDeEventListeners();
+  }
+
+  function loadDeProgress() {
+    try {
+      const saved = localStorage.getItem('interview_pro_de_progress');
+      if (saved) {
+        generalDeState.progress = JSON.parse(saved);
+      } else {
+        generalDeState.progress = {};
+      }
+      generalDeState.questions.forEach(q => {
+        if (!generalDeState.progress[q.id]) {
+          generalDeState.progress[q.id] = 'unseen';
+        }
+      });
+    } catch (e) {
+      console.error("Could not load DE progress", e);
+      generalDeState.progress = {};
+    }
+  }
+
+  function saveDeProgress() {
+    localStorage.setItem('interview_pro_de_progress', JSON.stringify(generalDeState.progress));
+    updateDeStats();
+  }
+
+  function updateDeStats() {
+    let total = generalDeState.questions.length;
+    let mastered = 0;
+    let reviewing = 0;
+    let unseen = 0;
+
+    generalDeState.questions.forEach(q => {
+      const status = generalDeState.progress[q.id] || 'unseen';
+      if (status === 'mastered') mastered++;
+      else if (status === 'reviewing') reviewing++;
+      else unseen++;
+    });
+
+    const DOM_DE = getDeDomElements();
+    if (!DOM_DE.statTotal) return;
+
+    DOM_DE.statTotal.textContent = total.toLocaleString();
+    DOM_DE.statMastered.textContent = mastered.toLocaleString();
+    DOM_DE.statReviewing.textContent = reviewing.toLocaleString();
+    DOM_DE.statNotStarted.textContent = unseen.toLocaleString();
+
+    DOM_DE.masteredCountSidebar.textContent = mastered.toLocaleString();
+    DOM_DE.totalCountSidebar.textContent = total.toLocaleString();
+
+    const percent = total > 0 ? Math.round((mastered / total) * 100) : 0;
+    DOM_DE.overallProgressPercent.textContent = `${percent}%`;
+
+    const circumference = 2 * Math.PI * 40;
+    const offset = circumference - (percent / 100) * circumference;
+    if (DOM_DE.overallProgressBar) {
+      DOM_DE.overallProgressBar.style.strokeDasharray = `${circumference} ${circumference}`;
+      DOM_DE.overallProgressBar.style.strokeDashoffset = offset;
+    }
+  }
+
+  function renderDeCategories() {
+    const DOM_DE = getDeDomElements();
+    if (!DOM_DE.categoriesScrollbar) return;
+
+    const categories = ["All Topics", ...new Set(generalDeState.questions.map(q => q.category).filter(Boolean))];
+    DOM_DE.categoriesScrollbar.innerHTML = '';
+
+    categories.forEach(cat => {
+      const key = cat === "All Topics" ? "all" : cat;
+      const btn = document.createElement('button');
+      btn.className = `topic-chip ${generalDeState.activeCategory === key ? 'active' : ''}`;
+      btn.textContent = cat;
+      btn.addEventListener('click', () => {
+        DOM_DE.categoriesScrollbar.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        generalDeState.activeCategory = key;
+        generalDeState.activeNiche = 'All';
+        generalDeState.loadedQuestionsLimit = 50;
+        renderDeNiches();
+        renderDeQuestionsList(true);
+      });
+      DOM_DE.categoriesScrollbar.appendChild(btn);
+    });
+  }
+
+  function renderDeNiches() {
+    const DOM_DE = getDeDomElements();
+    if (!DOM_DE.nichesScrollbar) return;
+
+    const category = generalDeState.activeCategory;
+    const niches = categoryNichesDe[category] || ["All"];
+    DOM_DE.nichesScrollbar.innerHTML = '';
+
+    niches.forEach(niche => {
+      const btn = document.createElement('button');
+      btn.className = `topic-chip ${generalDeState.activeNiche === niche ? 'active' : ''}`;
+      btn.textContent = niche;
+      btn.addEventListener('click', () => {
+        DOM_DE.nichesScrollbar.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        generalDeState.activeNiche = niche;
+        generalDeState.loadedQuestionsLimit = 50;
+        renderDeQuestionsList(true);
+      });
+      DOM_DE.nichesScrollbar.appendChild(btn);
+    });
+  }
+
+  function renderDeQuestionsList(resetScroll = false) {
+    const DOM_DE = getDeDomElements();
+    if (!DOM_DE.questionsContainer) return;
+
+    const filtered = generalDeState.questions.filter(q => {
+      const catMatches = generalDeState.activeCategory === 'all' || q.category === generalDeState.activeCategory;
+      const diffMatches = generalDeState.activeDifficulty === 'all' || q.difficulty.toLowerCase() === generalDeState.activeDifficulty.toLowerCase();
+      
+      const status = generalDeState.progress[q.id] || 'unseen';
+      const statusMatches = generalDeState.activeStatus === 'all' || status === generalDeState.activeStatus;
+      
+      let nicheMatches = true;
+      if (generalDeState.activeNiche !== 'All') {
+        const nicheLower = generalDeState.activeNiche.toLowerCase();
+        nicheMatches = q.question.toLowerCase().includes(nicheLower) || q.answer.toLowerCase().includes(nicheLower);
+      }
+      
+      const searchMatches = !generalDeState.searchQuery || 
+        q.question.toLowerCase().includes(generalDeState.searchQuery) ||
+        q.answer.toLowerCase().includes(generalDeState.searchQuery) ||
+        q.category.toLowerCase().includes(generalDeState.searchQuery);
+
+      return catMatches && diffMatches && statusMatches && nicheMatches && searchMatches;
+    });
+
+    DOM_DE.filterStatus.textContent = `Showing ${filtered.length.toLocaleString()} of ${generalDeState.questions.length.toLocaleString()} questions`;
+
+    if (filtered.length === 0) {
+      DOM_DE.questionsContainer.innerHTML = `
+        <div style="text-align:center; padding:3rem; color:var(--text-secondary); grid-column: 1 / -1;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; opacity: 0.5;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          No questions found matching the selected filters.
+        </div>
+      `;
+      DOM_DE.loadMoreContainer.classList.add('hidden');
+      return;
+    }
+
+    const chunk = filtered.slice(0, generalDeState.loadedQuestionsLimit);
+    DOM_DE.questionsContainer.innerHTML = '';
+
+    const badgeClasses = {
+      "Databases & SQL": "badge-sql",
+      "Big Data": "badge-spark",
+      "Cloud Platforms": "badge-cloud",
+      "ETL & Pipelines": "badge-etl",
+      "Data Engineering": "badge-de",
+      "Data Engineering (General)": "badge-de",
+      "Excel & Analytics": "badge-excel",
+      "Data Visualization": "badge-viz",
+      "Governance & Quality": "badge-gov"
+    };
+    const displayNames = {
+      "Databases & SQL": "SQL",
+      "Big Data": "Big Data",
+      "Cloud Platforms": "Cloud",
+      "ETL & Pipelines": "ETL",
+      "Data Engineering": "DE",
+      "Data Engineering (General)": "DE",
+      "Excel & Analytics": "Excel",
+      "Data Visualization": "Viz",
+      "Governance & Quality": "Gov"
+    };
+
+    chunk.forEach(q => {
+      const status = generalDeState.progress[q.id] || 'unseen';
+      const card = document.createElement('div');
+      card.className = `concept-card`;
+      card.setAttribute('data-id', q.id);
+      card.setAttribute('data-status', status);
+
+      const badgeClass = badgeClasses[q.category] || 'badge-spark';
+      const categoryDisplayName = displayNames[q.category] || q.category;
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap; width: 100%;">
+          <span class="stats-badge ${badgeClass}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; width: fit-content;">${categoryDisplayName}</span>
+          <span class="difficulty-badge badge-${q.difficulty.toLowerCase()}" style="margin-left: 0;">${q.difficulty}</span>
+        </div>
+        <div class="concept-card-title" style="margin-bottom: 0.75rem; text-align: left; width: 100%;">${q.question}</div>
+        <div class="concept-card-footer" style="width: 100%;">
+          <span class="status-indicator status-${status}">${status}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        openDetailsDialog(q.id);
+      });
+
+      DOM_DE.questionsContainer.appendChild(card);
+    });
+
+    if (filtered.length > generalDeState.loadedQuestionsLimit) {
+      DOM_DE.loadMoreContainer.classList.remove('hidden');
+    } else {
+      DOM_DE.loadMoreContainer.classList.add('hidden');
+    }
+
+    if (resetScroll) {
+      DOM_DE.questionsContainer.scrollTo({ top: 0 });
+    }
+  }
+
+  function formatDeAnswer(text) {
+    if (!text) return '';
+    let formatted = text;
+    
+    // Extract and format code blocks first
+    const codeBlocks = [];
+    formatted = formatted.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
+      const index = codeBlocks.length;
+      codeBlocks.push(formatCodeBlock(code, lang));
+      return `\n__CODE_BLOCK_PLACEHOLDER_${index}__\n`;
+    });
+    
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight:600;">$1</strong>');
+    formatted = formatted.replace(/\n\n/g, '</div><div style="margin-top:0.75rem;">');
+    
+    // Restore code blocks
+    formatted = formatted.replace(/__CODE_BLOCK_PLACEHOLDER_(\d+)__/g, (match, idx) => {
+      return codeBlocks[parseInt(idx)];
+    });
+    
+    return `<div style="text-align:left;">${formatted}</div>`;
+  }
+
+  function setupDeEventListeners() {
+    const DOM_DE = getDeDomElements();
+    if (!DOM_DE.btnModeBank) return;
+    
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.de-status-options').forEach(p => p.style.display = 'none');
+    });
+
+    DOM_DE.btnModeBank.addEventListener('click', () => {
+      DOM_DE.btnModeBank.classList.add('active');
+      DOM_DE.btnModeMock.classList.remove('active');
+      DOM_DE.viewBank.classList.remove('hidden');
+      DOM_DE.viewMock.classList.add('hidden');
+      generalDeState.currentMode = 'bank';
+      if (generalDeState.mockSession.active) quitDeMockSession();
+    });
+
+    DOM_DE.btnModeMock.addEventListener('click', () => {
+      DOM_DE.btnModeMock.classList.add('active');
+      DOM_DE.btnModeBank.classList.remove('active');
+      DOM_DE.viewMock.classList.remove('hidden');
+      DOM_DE.viewBank.classList.add('hidden');
+      generalDeState.currentMode = 'mock';
+    });
+
+    let searchDebounce;
+    DOM_DE.searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        generalDeState.searchQuery = e.target.value.toLowerCase().trim();
+        generalDeState.loadedQuestionsLimit = 50;
+        renderDeQuestionsList(true);
+      }, 200);
+    });
+
+    DOM_DE.filterStatusSelect.addEventListener('change', (e) => {
+      generalDeState.activeStatus = e.target.value;
+      generalDeState.loadedQuestionsLimit = 50;
+      renderDeQuestionsList(true);
+    });
+
+    DOM_DE.filterDifficultySelect.addEventListener('change', (e) => {
+      generalDeState.activeDifficulty = e.target.value;
+      generalDeState.loadedQuestionsLimit = 50;
+      renderDeQuestionsList(true);
+    });
+
+    DOM_DE.difficultyChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        DOM_DE.difficultyChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        generalDeState.activeDifficulty = chip.getAttribute('data-difficulty');
+        generalDeState.loadedQuestionsLimit = 50;
+        renderDeQuestionsList(true);
+      });
+    });
+
+    DOM_DE.btnLoadMore.addEventListener('click', () => {
+      generalDeState.loadedQuestionsLimit += 100;
+      renderDeQuestionsList(false);
+    });
+
+    DOM_DE.btnStartMock.addEventListener('click', startDeMockSession);
+    DOM_DE.btnQuitMock.addEventListener('click', quitDeMockSession);
+    DOM_DE.btnRevealMock.addEventListener('click', revealDeMockAnswer);
+    DOM_DE.btnNextMock.addEventListener('click', nextDeMockQuestion);
+    DOM_DE.btnRestartMock.addEventListener('click', resetDeMockSetupView);
+  }
+
+  function startDeMockSession() {
+    let pool = generalDeState.questions.filter(q => {
+      const catMatches = generalDeState.activeCategory === 'all' || q.category === generalDeState.activeCategory;
+      const diffMatches = generalDeState.activeDifficulty === 'all' || q.difficulty.toLowerCase() === generalDeState.activeDifficulty.toLowerCase();
+      return catMatches && diffMatches;
+    });
+
+    if (pool.length === 0) pool = generalDeState.questions;
+
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    generalDeState.mockSession.questions = shuffled.slice(0, 5);
+
+    const DOM_DE = getDeDomElements();
+    if (generalDeState.mockSession.questions.length === 0) {
+      alert("No questions available for mock session.");
+      return;
+    }
+
+    const duration = parseInt(DOM_DE.mockTimerSelect.value);
+    generalDeState.mockSession.timerMax = duration;
+    generalDeState.mockSession.timerVal = duration;
+    generalDeState.mockSession.currentIndex = 0;
+    generalDeState.mockSession.active = true;
+
+    DOM_DE.mockSetup.classList.add('hidden');
+    DOM_DE.mockSummary.classList.add('hidden');
+    DOM_DE.mockActive.classList.remove('hidden');
+
+    loadDeMockQuestion();
+  }
+
+  function loadDeMockQuestion() {
+    const q = generalDeState.mockSession.questions[generalDeState.mockSession.currentIndex];
+    const DOM_DE = getDeDomElements();
+
+    DOM_DE.mockAnswerContent.classList.add('blurred');
+    DOM_DE.mockAnswerContent.innerHTML = formatDeAnswer(q.answer);
+
+    DOM_DE.btnNextMock.classList.add('hidden');
+    DOM_DE.btnRevealMock.classList.remove('hidden');
+
+    DOM_DE.mockMetaCategory.textContent = q.category;
+    DOM_DE.mockMetaDifficulty.textContent = q.difficulty;
+    DOM_DE.mockMetaDifficulty.className = `de-badge-diff ${q.difficulty.toLowerCase()}`;
+    DOM_DE.mockMetaProgress.textContent = `Question ${generalDeState.mockSession.currentIndex + 1} of ${generalDeState.mockSession.questions.length}`;
+    DOM_DE.mockQuestionText.textContent = q.question;
+
+    clearInterval(generalDeState.mockSession.timerInterval);
+    if (generalDeState.mockSession.timerMax > 0) {
+      DOM_DE.mockTimerContainer.classList.remove('hidden');
+      generalDeState.mockSession.timerVal = generalDeState.mockSession.timerMax;
+      updateDeTimerDisplay();
+
+      generalDeState.mockSession.timerInterval = setInterval(() => {
+        generalDeState.mockSession.timerVal--;
+        updateDeTimerDisplay();
+        if (generalDeState.mockSession.timerVal <= 0) {
+          clearInterval(generalDeState.mockSession.timerInterval);
+          revealDeMockAnswer();
+        }
+      }, 1000);
+    } else {
+      DOM_DE.mockTimerContainer.classList.add('hidden');
+    }
+  }
+
+  function updateDeTimerDisplay() {
+    const DOM_DE = getDeDomElements();
+    DOM_DE.mockTimerText.textContent = `${generalDeState.mockSession.timerVal}s`;
+    const percentage = (generalDeState.mockSession.timerVal / generalDeState.mockSession.timerMax) * 100;
+    DOM_DE.mockTimerBar.style.width = `${percentage}%`;
+
+    if (percentage <= 25) {
+      DOM_DE.mockTimerBar.style.background = 'var(--danger)';
+    } else if (percentage <= 50) {
+      DOM_DE.mockTimerBar.style.background = 'var(--warning)';
+    } else {
+      DOM_DE.mockTimerBar.style.background = 'linear-gradient(90deg, #a855f7, #ec4899)';
+    }
+  }
+
+  function revealDeMockAnswer() {
+    clearInterval(generalDeState.mockSession.timerInterval);
+    const DOM_DE = getDeDomElements();
+    DOM_DE.mockAnswerContent.classList.remove('blurred');
+    DOM_DE.btnRevealMock.classList.add('hidden');
+    DOM_DE.btnNextMock.classList.remove('hidden');
+
+    const q = generalDeState.mockSession.questions[generalDeState.mockSession.currentIndex];
+    if (q) {
+      const status = generalDeState.progress[q.id] || 'unseen';
+      if (status === 'unseen') {
+        generalDeState.progress[q.id] = 'reviewing';
+        saveDeProgress();
+        const cardEl = document.querySelector(`#de-questions-container .concept-card[data-id="${q.id}"]`);
+        if (cardEl) {
+          cardEl.setAttribute('data-status', 'reviewing');
+          const indicator = cardEl.querySelector('.status-indicator');
+          if (indicator) {
+            indicator.className = 'status-indicator status-reviewing';
+            indicator.textContent = 'reviewing';
+          }
+        }
+      }
+    }
+  }
+
+  function nextDeMockQuestion() {
+    generalDeState.mockSession.currentIndex++;
+    if (generalDeState.mockSession.currentIndex < generalDeState.mockSession.questions.length) {
+      loadDeMockQuestion();
+    } else {
+      finishDeMockSession();
+    }
+  }
+
+  function finishDeMockSession() {
+    generalDeState.mockSession.active = false;
+    const DOM_DE = getDeDomElements();
+    DOM_DE.mockActive.classList.add('hidden');
+    DOM_DE.mockSummary.classList.remove('hidden');
+    DOM_DE.mockSummaryTotal.textContent = generalDeState.mockSession.questions.length;
+  }
+
+  function quitDeMockSession() {
+    clearInterval(generalDeState.mockSession.timerInterval);
+    generalDeState.mockSession.active = false;
+    resetDeMockSetupView();
+  }
+
+  function resetDeMockSetupView() {
+    const DOM_DE = getDeDomElements();
+    DOM_DE.mockActive.classList.add('hidden');
+    DOM_DE.mockSummary.classList.add('hidden');
+    DOM_DE.mockSetup.classList.remove('hidden');
+  }
+
+  // --- KEY CONCEPTS & GLOSSARY VIEW IMPLEMENTATION ---
+
+  function initConcepts() {
+    console.log("Initializing Key Concepts glossary...");
+    console.log("DOM.concepts search found:", !!DOM.concepts.search);
+    console.log("DOM.concepts difficultyFilters found:", !!DOM.concepts.difficultyFilters);
+    console.log("DOM.concepts topicsScrollbar found:", !!DOM.concepts.topicsScrollbar);
+    console.log("DOM.concepts container found:", !!DOM.concepts.container);
+    console.log("window.CONCEPTS_DB count:", window.CONCEPTS_DB ? window.CONCEPTS_DB.length : "undefined");
+    setupConceptsListeners();
+    renderConcepts();
+  }
+
+  function setupConceptsListeners() {
+    // Search input field event
+    if (DOM.concepts.search) {
+      DOM.concepts.search.addEventListener('input', renderConcepts);
+    } else {
+      console.warn("DOM.concepts.search element not found on page!");
+    }
+
+    // Difficulty filter tab button click events
+    if (DOM.concepts.difficultyFilters) {
+      const diffBtns = DOM.concepts.difficultyFilters.querySelectorAll('.de-diff-chip');
+      diffBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          diffBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activeConceptsDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          renderConcepts();
+        });
+      });
+    } else {
+      console.warn("DOM.concepts.difficultyFilters element not found on page!");
+    }
+
+    // Topic scrollbar chip click events
+    if (DOM.concepts.topicsScrollbar) {
+      const topicChips = DOM.concepts.topicsScrollbar.querySelectorAll('.topic-chip');
+      topicChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          topicChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.activeConceptsCategory = chip.getAttribute('data-category') || 'ALL';
+          renderConcepts();
+        });
+      });
+    } else {
+      console.warn("DOM.concepts.topicsScrollbar element not found on page!");
+    }
+  }
+
+  function renderConcepts() {
+    if (!DOM.concepts.container) {
+      console.error("DOM.concepts.container not found on page, cannot render concepts!");
+      return;
+    }
+
+    const query = DOM.concepts.search ? DOM.concepts.search.value.trim().toLowerCase() : '';
+    const filterDiff = state.activeConceptsDifficulty || 'ALL';
+    const filterCat = state.activeConceptsCategory || 'ALL';
+
+    console.log(`Rendering Key Concepts (Category: ${filterCat}, Difficulty: ${filterDiff}, Search Query: "${query}")`);
+
+    // Filter concepts
+    const filtered = (window.CONCEPTS_DB || []).filter(item => {
+      const matchesCategory = (filterCat === 'ALL' || item.category === filterCat);
+      const matchesDifficulty = (filterDiff === 'ALL' || item.difficulty === filterDiff);
+      
+      const termMatch = item.term ? item.term.toLowerCase().includes(query) : false;
+      const defMatch = item.definition ? item.definition.toLowerCase().includes(query) : false;
+      const expMatch = item.explanation ? item.explanation.toLowerCase().includes(query) : false;
+      const pointsMatch = (item.keyPoints || []).some(p => p.toLowerCase().includes(query));
+      const queryMatch = !query || termMatch || defMatch || expMatch || pointsMatch;
+
+      return matchesCategory && matchesDifficulty && queryMatch;
+    });
+
+    // Sort concepts by increasing order of difficulty: EASY -> MEDIUM -> HARD
+    const difficultyWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3 };
+    filtered.sort((a, b) => {
+      const weightA = difficultyWeights[a.difficulty] || 3;
+      const weightB = difficultyWeights[b.difficulty] || 3;
+      return weightA - weightB;
+    });
+
+    DOM.concepts.container.innerHTML = '';
+
+    if (filtered.length === 0) {
+      DOM.concepts.container.innerHTML = `<div style="text-align:center; padding: 3rem; color:var(--text-secondary);">No concepts found matching the selected filters.</div>`;
+      return;
+    }
+
+    filtered.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'concept-accordion-card';
+      card.setAttribute('data-id', item.id);
+
+      const categoryClass = badgeClasses[item.category] || 'badge-spark';
+      const categoryLabel = displayNames[item.category] || item.category;
+
+      card.innerHTML = `
+        <div class="concept-card-header">
+          <div class="concept-card-header-left">
+            <h3 class="concept-term">${item.term}</h3>
+            <span class="difficulty-badge badge-${(item.difficulty || 'easy').toLowerCase()}">${item.difficulty || 'EASY'}</span>
+            <span class="stats-badge ${categoryClass}">${categoryLabel}</span>
+          </div>
+          <svg class="accordion-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="concept-card-body">
+          <div class="concept-card-body-inner">
+            <div class="concept-label">Definition</div>
+            <p class="concept-definition">${item.definition || ''}</p>
+            
+            <div class="concept-label">Explanation</div>
+            <p class="concept-explanation">${item.explanation || ''}</p>
+            
+            <div class="concept-label">Key Takeaways</div>
+            <ul class="concept-key-points">
+              ${(item.keyPoints || []).map(point => `<li>${point}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+
+      const header = card.querySelector('.concept-card-header');
+      const body = card.querySelector('.concept-card-body');
+      const icon = card.querySelector('.accordion-icon');
+
+      header.addEventListener('click', () => {
+        const isOpen = card.classList.contains('active');
+
+        // Accordion behavior: collapse all other cards
+        const allCards = DOM.concepts.container.querySelectorAll('.concept-accordion-card');
+        allCards.forEach(c => {
+          if (c !== card && c.classList.contains('active')) {
+            c.classList.remove('active');
+            c.querySelector('.concept-card-body').style.maxHeight = '0px';
+            c.querySelector('.accordion-icon').style.transform = 'rotate(0deg)';
+          }
+        });
+
+        if (isOpen) {
+          card.classList.remove('active');
+          body.style.maxHeight = '0px';
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          card.classList.add('active');
+          body.style.maxHeight = body.scrollHeight + 'px';
+          icon.style.transform = 'rotate(180deg)';
+        }
+      });
+
+      DOM.concepts.container.appendChild(card);
+    });
+    console.log(`Rendered ${filtered.length} concept cards.`);
+  }
+
+  // --- DATA ENGINEERING CHEAT SHEET IMPLEMENTATION ---
+
+  const Highlighter = {
+    escape(s) {
+      return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    },
+
+    python(code) {
+      let s = this.escape(code);
+      s = s.replace(/(#[^\n]*)/g, '<span class="comment">$1</span>');
+      s = s.replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')/g, '<span class="str">$1</span>');
+      s = s.replace(/(@\w+)/g, '<span class="dec">$1</span>');
+      s = s.replace(/\b(def|class|import|from|as|return|if|elif|else|for|while|in|not|and|or|is|None|True|False|try|except|finally|raise|with|lambda|yield|async|await|pass|break|continue|global|nonlocal|del|assert)\b/g, '<span class="kw">$1</span>');
+      s = s.replace(/\b(print|len|range|type|str|int|float|list|dict|set|tuple|bool|open|enumerate|zip|map|filter|sorted|reversed|any|all|sum|min|max|abs|round|isinstance|issubclass|hasattr|getattr|setattr)\b/g, '<span class="fn">$1</span>');
+      s = s.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+      return s;
+    },
+
+    sql(code) {
+      let s = this.escape(code);
+      s = s.replace(/(--[^\n]*)/g, '<span class="comment">$1</span>');
+      s = s.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="comment">$1</span>');
+      s = s.replace(/('[^']*')/g, '<span class="str">$1</span>');
+      const kws = 'SELECT|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|FULL|ON|GROUP BY|HAVING|ORDER BY|INSERT INTO|UPDATE|DELETE|CREATE|ALTER|DROP|TABLE|VIEW|INDEX|WITH|AS|UNION|INTERSECT|EXCEPT|DISTINCT|TOP|LIMIT|OFFSET|SET|VALUES|INTO|MERGE|USING|MATCHED|WHEN|THEN|ELSE|END|CASE|AND|OR|NOT|IN|EXISTS|BETWEEN|LIKE|IS|NULL|NULLS|BEGIN|COMMIT|ROLLBACK|TRANSACTION|PROCEDURE|FUNCTION|TRIGGER|RETURNS|RETURN|DECLARE|EXEC|EXECUTE|IF|ELSE|WHILE|CURSOR|FETCH|OPEN|CLOSE|DEALLOCATE|PRINT|RAISERROR|THROW|TRY|CATCH|USE|GO|DATABASE|SCHEMA|GRANT|REVOKE|DENY|PARTITION|BY|OVER|ROW|ROWS|RANGE|UNBOUNDED|PRECEDING|FOLLOWING|CURRENT ROW|PRIMARY KEY|FOREIGN KEY|REFERENCES|CONSTRAINT|DEFAULT|CHECK|UNIQUE|IDENTITY|OUTPUT|APPLY|CROSS|PIVOT|UNPIVOT|FOR|XML|JSON|PATH|AUTO|INCLUDE|COLUMNSTORE|CLUSTERED|NONCLUSTERED|OPTIMIZE|VACUUM|DESCRIBE|SHOW|EXPLAIN|ANALYZE|USING DELTA|GENERATE ALWAYS|PERIOD FOR SYSTEM_TIME|SYSTEM_VERSIONING|TEMPORAL|HISTORY|FORCESEEK|FORCESCAN|RECOMPILE|MAXDOP|NOLOCK|READUNCOMMITTED|SNAPSHOT|SERIALIZABLE';
+      s = s.replace(new RegExp(`\\b(${kws})\\b`, 'gi'), '<span class="kw">$1</span>');
+      s = s.replace(/\b(COUNT|SUM|AVG|MIN|MAX|ROW_NUMBER|RANK|DENSE_RANK|NTILE|LAG|LEAD|FIRST_VALUE|LAST_VALUE|PERCENTILE_CONT|COALESCE|ISNULL|NULLIF|CAST|CONVERT|DATEADD|DATEDIFF|GETDATE|GETUTCDATE|FORMAT|YEAR|MONTH|DAY|DATENAME|DATEPART|TRIM|LTRIM|RTRIM|UPPER|LOWER|LEN|CHARINDEX|SUBSTRING|REPLACE|STUFF|STRING_AGG|OPENJSON|JSON_VALUE|FOR JSON|NEWID|SCOPE_IDENTITY|IDENT_CURRENT|OBJECT_ID|DB_NAME|USER_NAME|SUSER_SNAME|HASHBYTES|COMPRESS|DECOMPRESS|IIF|CHOOSE)\b/gi, '<span class="fn">$1</span>');
+      s = s.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+      return s;
+    },
+
+    highlight(code, lang) {
+      if (!code) return '';
+      if (lang === 'python' || lang === 'pyspark') return this.python(code);
+      return this.sql(code); // mssql, sparksql
+    }
+  };
+
+  function initCheatsheet() {
+    console.log("Initializing Code Deepdive for DE...");
+    setupCheatsheetListeners();
+    renderCheatsheet();
+    renderCheatsheetComparison();
+  }
+
+  function setupCheatsheetListeners() {
+    // 1. Search filter input
+    if (DOM.cheatsheet.search) {
+      let debounce;
+      DOM.cheatsheet.search.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+          state.activeCheatsheetQuery = DOM.cheatsheet.search.value.trim();
+          renderCheatsheet();
+        }, 150);
+      });
+    }
+
+    // 2. Language tabs navigation
+    if (DOM.cheatsheet.langNav) {
+      const tabs = DOM.cheatsheet.langNav.querySelectorAll('.topic-chip');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          state.activeCheatsheetLang = tab.getAttribute('data-lang') || 'python';
+          renderCheatsheet();
+        });
+      });
+    }
+
+    // 3. Difficulty/Level chips filters
+    if (DOM.cheatsheet.levelFilters) {
+      const chips = DOM.cheatsheet.levelFilters.querySelectorAll('.de-diff-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.activeCheatsheetLevel = chip.getAttribute('data-level') || 'all';
+          renderCheatsheet();
+        });
+      });
+    }
+  }
+
+  function renderCheatsheet() {
+    if (!DOM.cheatsheet.container) return;
+
+    const lang = state.activeCheatsheetLang || 'python';
+    const level = state.activeCheatsheetLevel || 'all';
+    const query = (state.activeCheatsheetQuery || '').toLowerCase();
+
+    // Select target dataset
+    let dataset = [];
+    if (lang === 'python') dataset = window.PYTHON_DATA || [];
+    else if (lang === 'mssql') dataset = window.MSSQL_DATA || [];
+    else if (lang === 'pyspark') dataset = window.PYSPARK_DATA || [];
+    else if (lang === 'sparksql') dataset = window.SPARKSQL_DATA || [];
+
+    const totalInLang = dataset.length;
+
+    // Filter concepts
+    const filtered = dataset.filter(item => {
+      const matchesLevel = (level === 'all' || item.level === level);
+      
+      const titleMatch = item.title ? item.title.toLowerCase().includes(query) : false;
+      const descMatch = item.description ? item.description.toLowerCase().includes(query) : false;
+      const catMatch = item.category ? item.category.toLowerCase().includes(query) : false;
+      const codeMatch = item.code ? item.code.toLowerCase().includes(query) : false;
+      const ucMatch = item.use_case ? item.use_case.toLowerCase().includes(query) : false;
+      const notesMatch = (item.notes || []).some(n => n.toLowerCase().includes(query));
+      
+      const queryMatch = !query || titleMatch || descMatch || catMatch || codeMatch || ucMatch || notesMatch;
+
+      return matchesLevel && queryMatch;
+    });
+
+    // Update Progress Bar segments based on levels
+    const levels = ['beginner', 'intermediate', 'advanced', 'architect'];
+    const countByLevel = {};
+    levels.forEach(lvl => {
+      countByLevel[lvl] = dataset.filter(d => d.level === lvl).length;
+    });
+
+    // Update progress bar flex widths
+    levels.forEach(lvl => {
+      const segment = DOM.cheatsheet.progressBar.querySelector(`.prog-${lvl}`);
+      if (segment) {
+        const pct = totalInLang ? (countByLevel[lvl] / totalInLang) * 100 : 0;
+        segment.style.flex = pct ? `${pct}` : '0';
+        segment.style.display = pct ? 'block' : 'none';
+      }
+    });
+
+    // Render cards grouped by level
+    DOM.cheatsheet.container.innerHTML = '';
+
+    if (filtered.length === 0) {
+      DOM.cheatsheet.container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>No Code Deepdive concepts found</h3>
+          <p>Try adjusting your search query or level filters.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const byLevelFiltered = {};
+    levels.forEach(lvl => {
+      byLevelFiltered[lvl] = filtered.filter(d => d.level === lvl);
+    });
+
+    levels.forEach(lvl => {
+      const items = byLevelFiltered[lvl];
+      if (!items || items.length === 0) return;
+
+      // Render Level Section Header
+      const levelHeader = document.createElement('div');
+      levelHeader.className = 'level-section-header';
+      const levelLabels = {
+        beginner: { label: 'Beginner', emoji: '🌱' },
+        intermediate: { label: 'Intermediate', emoji: '⚡' },
+        advanced: { label: 'Advanced', emoji: '🔥' },
+        architect: { label: 'Architect', emoji: '🏛️' }
+      };
+      const lvlMeta = levelLabels[lvl];
+      levelHeader.innerHTML = `
+        <span class="level-section-badge lsb-${lvl}">${lvlMeta.emoji} ${lvlMeta.label}</span>
+        <div class="level-section-line"></div>
+        <span class="level-section-count">${items.length} concept${items.length !== 1 ? 's' : ''}</span>
+      `;
+      DOM.cheatsheet.container.appendChild(levelHeader);
+
+      // Render Cards Grid
+      const cardsGrid = document.createElement('div');
+      cardsGrid.className = 'concepts-grid';
+      
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = `concept-card ${lang}`;
+        card.setAttribute('data-id', item.id);
+        card.setAttribute('data-level', item.level);
+
+        const highlightedCode = Highlighter.highlight(item.code || '', lang);
+        
+        card.innerHTML = `
+          <div class="card-header" role="button" aria-expanded="false" tabindex="0">
+            <div class="card-num">${String(index + 1).padStart(2, '0')}</div>
+            <div class="card-meta">
+              <div class="card-title">${escapeHTML(item.title)}</div>
+              <div class="card-tags">
+                <span class="tag tag-level ${item.level}">${lvlMeta.emoji} ${lvlMeta.label}</span>
+                <span class="tag tag-category">${escapeHTML(item.category || '')}</span>
+              </div>
+            </div>
+            <svg class="card-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </div>
+          <div class="card-description">${escapeHTML(item.description || '')}</div>
+          <div class="card-body">
+            <div class="use-case-banner">
+              <span class="uc-icon">🎯</span>
+              <div class="uc-content">
+                <div class="uc-label">Real-World Use Case</div>
+                <div class="uc-text">${escapeHTML(item.use_case || '')}</div>
+              </div>
+            </div>
+            <div class="code-wrapper">
+              <div class="code-toolbar">
+                <span class="code-lang-badge">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                <button class="copy-btn" title="Copy code">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  Copy
+                </button>
+              </div>
+              <pre class="code-block"><code>${highlightedCode}</code></pre>
+            </div>
+            ${item.notes && item.notes.length ? `
+            <div class="card-notes">
+              <div class="notes-label">Key Points</div>
+              ${item.notes.map(n => `
+                <div class="note-item">
+                  <div class="note-bullet"></div>
+                  <span>${escapeHTML(n)}</span>
+                </div>
+              `).join('')}
+            </div>` : ''}
+          </div>
+        `;
+
+        // Click event on card header toggles expansion
+        const headerEl = card.querySelector('.card-header');
+        headerEl.addEventListener('click', () => {
+          const isOpen = card.classList.toggle('open');
+          headerEl.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Copy button click event
+        const copyBtn = card.querySelector('.copy-btn');
+        copyBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const preText = card.querySelector('pre.code-block').innerText || '';
+          navigator.clipboard.writeText(preText).then(() => {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Copied!
+            `;
+            setTimeout(() => {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = `
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy
+              `;
+            }, 2000);
+          });
+        });
+
+        cardsGrid.appendChild(card);
+      });
+
+      DOM.cheatsheet.container.appendChild(cardsGrid);
+    });
+  }
+
+  function renderCheatsheetComparison() {
+    if (!DOM.cheatsheet.compTbody) return;
+    
+    const rows = [
+      { topic: 'Primary Use',       python: 'General-purpose ETL, scripting, ML pipelines', mssql: 'RDBMS analytics, transactional workloads', pyspark: 'Distributed big data processing', sparksql: 'SQL-first distributed analytics' },
+      { topic: 'Scale',             python: 'Single-node (Dask/Ray for distributed)', mssql: 'Vertical scale; horizontal with sharding', pyspark: 'Horizontal scale — TBs to PBs', sparksql: 'Horizontal scale — TBs to PBs' },
+      { topic: 'Execution Engine',  python: 'CPython interpreter', mssql: 'SQL Server / Azure SQL engine', pyspark: 'Spark JVM with Python driver', sparksql: 'Spark Catalyst optimizer' },
+      { topic: 'Data Format',       python: 'Any (CSV, Parquet, Delta, Avro)', mssql: 'Row-based tables, columnstore, JSON', pyspark: 'Any (native Parquet/Delta best)', sparksql: 'Any (native Parquet/Delta best)' },
+      { topic: 'ACID Transactions', python: '⚠️ Via Delta Lake library', mssql: '✅ Native full ACID', pyspark: '✅ Via Delta Lake', sparksql: '✅ Via Delta Lake' },
+      { topic: 'Streaming',         python: '⚠️ Kafka-python / Faust', mssql: '⚠️ CDC + Service Broker', pyspark: '✅ Structured Streaming', sparksql: '⚠️ Limited via spark.sql()' },
+      { topic: 'Delta Lake',        python: '✅ deltalake / delta-spark', mssql: '❌ Not native', pyspark: '✅ Native', sparksql: '✅ Native SQL support' },
+      { topic: 'Microsoft Fabric',  python: '✅ Fabric notebooks', mssql: '✅ Fabric SQL endpoint', pyspark: '✅ Fabric Spark notebooks', sparksql: '✅ Fabric Spark notebooks' },
+      { topic: 'Medallion Arch.',   python: '✅ Custom classes', mssql: '⚠️ Via schemas/views', pyspark: '✅ Native Bronze/Silver/Gold', sparksql: '✅ DLT multi-hop' },
+      { topic: 'SCD Type 2',        python: '⚠️ Manual implementation', mssql: '✅ MERGE INTO + temporal', pyspark: '✅ Delta MERGE', sparksql: '✅ APPLY CHANGES INTO' },
+      { topic: 'Performance Tuning',python: 'Profiling, vectorization, Polars', mssql: 'Query plans, indexes, Query Store', pyspark: 'AQE, partitioning, skew joins', sparksql: 'EXPLAIN, hints, Z-ORDER' },
+      { topic: 'GDPR / Security',   python: 'Azure Key Vault SDK, encryption libs', mssql: 'TDE, Dynamic Data Masking, RLS', pyspark: 'Unity Catalog, Delta deletes', sparksql: 'Unity Catalog row/column masks' },
+      { topic: 'Cloud FinOps',      python: 'Azure SDK cost APIs', mssql: 'DTU/vCore sizing, elastic pools', pyspark: 'AQE, cluster sizing, Photon', sparksql: 'Partition pruning, OPTIMIZE' },
+      { topic: 'Learning Curve',    python: 'Low → High (ecosystem)', mssql: 'Low → Medium', pyspark: 'Medium → High', sparksql: 'Low → Medium (SQL-first)' },
+    ];
+
+    DOM.cheatsheet.compTbody.innerHTML = rows.map(row => `
+      <tr>
+        <td style="padding: 12px 16px; font-weight:600; color:var(--text-primary); border-bottom: 1px solid var(--card-border);">${row.topic}</td>
+        <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">${formatCompCell(row.python)}</td>
+        <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">${formatCompCell(row.mssql)}</td>
+        <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">${formatCompCell(row.pyspark)}</td>
+        <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">${formatCompCell(row.sparksql)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function formatCompCell(text) {
+    if (!text) return '—';
+    return text
+      .replace(/✅/g, '<span class="comp-check">✅</span>')
+      .replace(/❌/g, '<span class="comp-x">❌</span>')
+      .replace(/⚠️/g, '<span class="comp-part">⚠️</span>');
+  }
+
+  // --- PERSONALISED PREP VIEW ---
+
+  function initPersonalised() {
+    console.log("Initializing Personalised Interview Prep...");
+    setupPersonalisedListeners();
+    renderPersonalised();
+  }
+
+  function setupPersonalisedListeners() {
+    // Search input
+    if (DOM.personalised.search) {
+      DOM.personalised.search.addEventListener('input', renderPersonalised);
+    }
+    
+    // Domain chip filters
+    if (DOM.personalised.topicsScrollbar) {
+      const chips = DOM.personalised.topicsScrollbar.querySelectorAll('.topic-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.activePersonalisedDomain = chip.getAttribute('data-domain') || 'ALL';
+          renderPersonalised();
+        });
+      });
+    }
+  }
+
+  function renderPersonalised() {
+    if (!DOM.personalised.container) return;
+    
+    const query = (DOM.personalised.search ? DOM.personalised.search.value : '').toLowerCase().trim();
+    const activeDomain = state.activePersonalisedDomain || 'ALL';
+    
+    // Filter questions
+    const sourceQuestions = window.PERSONALISED_QUESTIONS || [];
+    const filtered = sourceQuestions.filter(q => {
+      const matchesDomain = (activeDomain === 'ALL' || q.domain === activeDomain);
+      
+      const qText = (q.question || '').toLowerCase();
+      const aText = (q.answer || '').toLowerCase();
+      const sText = (q.subdomain || '').toLowerCase();
+      const matchesSearch = !query || qText.includes(query) || aText.includes(query) || sText.includes(query);
+      
+      return matchesDomain && matchesSearch;
+    });
+    
+    // Update count
+    if (DOM.personalised.matchCount) {
+      DOM.personalised.matchCount.textContent = `Showing ${filtered.length} questions`;
+    }
+    
+    // Clear container
+    DOM.personalised.container.innerHTML = '';
+    
+    if (filtered.length === 0) {
+      DOM.personalised.container.innerHTML = `
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; color: var(--text-secondary); opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Render list
+    filtered.forEach(q => {
+      const card = document.createElement('div');
+      card.className = 'concept-accordion-card';
+      
+      const qIndex = (window.PERSONALISED_QUESTIONS || []).indexOf(q) + 1;
+      
+      // We will render clean subdomains and tags
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'level-card-header';
+      headerDiv.style.cursor = 'pointer';
+      
+      // Construct inner html
+      headerDiv.innerHTML = `
+        <div class="level-badge" style="background: var(--cat-fabric); color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">Q${qIndex}</div>
+        <div class="level-meta" style="flex: 1; min-width: 0;">
+          <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; color: var(--accent); margin-bottom: 2px; display: block;">${q.subdomain}</span>
+          <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
+        </div>
+        <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+      `;
+      
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'level-card-body';
+      bodyDiv.style.display = 'none'; // Accordion hidden by default
+      bodyDiv.style.borderTop = '1px solid var(--card-border)';
+      bodyDiv.style.padding = '1.25rem';
+      bodyDiv.style.background = 'rgba(255, 255, 255, 0.01)';
+      
+      // Render structured answers with paragraphs, lists, etc.
+      const formattedAnswer = formatArchitectAnswer(q.answer);
+      bodyDiv.innerHTML = `
+        <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+          ${formattedAnswer}
+        </div>
+      `;
+      
+      card.appendChild(headerDiv);
+      card.appendChild(bodyDiv);
+      
+      // Wire up toggle
+      headerDiv.addEventListener('click', () => {
+        const isOpen = bodyDiv.style.display !== 'none';
+        
+        // Toggle chevron rotation
+        const chevron = headerDiv.querySelector('.level-chevron');
+        if (chevron) {
+          chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+        
+        // Toggle body visibility
+        if (isOpen) {
+          bodyDiv.style.display = 'none';
+          card.classList.remove('expanded');
+        } else {
+          bodyDiv.style.display = 'block';
+          card.classList.add('expanded');
+          
+          // Re-render LaTeX math if MathJax is present
+          if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+            MathJax.typesetPromise([bodyDiv]).catch(err => console.error("MathJax error:", err));
+          }
+        }
+      });
+      
+      DOM.personalised.container.appendChild(card);
+    });
+  }
+
+  // Format architect answer containing numbered lists or bullet points
+  function formatArchitectAnswer(text) {
+    if (!text) return '';
+    
+    // Split into paragraphs by double newlines
+    const paragraphs = text.split('\n\n');
+    return paragraphs.map(p => {
+      // Check if it starts with list items
+      if (p.match(/^\d+\.\s/)) {
+        // Render numbered list
+        const items = p.split(/\n(?=\d+\.\s)/);
+        const listHTML = items.map(item => {
+          const content = item.replace(/^\d+\.\s/, '');
+          return `<li style="margin-bottom: 0.75rem; padding-left: 0.25rem;">${content}</li>`;
+        }).join('');
+        return `<ol style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">${listHTML}</ol>`;
+      }
+      
+      // Or if it starts with bullet lists
+      if (p.startsWith('- ')) {
+        const items = p.split('\n- ');
+        const listHTML = items.map(item => {
+          const content = item.replace(/^- /, '');
+          return `<li style="margin-bottom: 0.5rem; padding-left: 0.25rem;">${content}</li>`;
+        }).join('');
+        return `<ul style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: disc; padding-left: 0;">${listHTML}</ul>`;
+      }
+      
+      // Standard paragraph
+      return `<p style="margin: 0 0 1rem 0;">${p.replace(/\n/g, '<br>')}</p>`;
+    }).join('');
+  }
+
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   // Start the application!
@@ -1348,7 +2839,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Multi-line code block matching
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
-                return `<pre class="terminal-block my-4 overflow-x-auto"><code>${code.trim()}</code></pre>`;
+                return formatCodeBlock(code, lang);
             });
 
             // Single line inline code expressions

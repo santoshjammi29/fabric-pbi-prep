@@ -1,0 +1,506 @@
+[
+  {
+    "id": "pbi-easy-1",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "What is Query Folding in Power Query, and why is it important for report performance?",
+    "answer": "Query Folding is the ability of Power Query to translate data transformation steps (like filtering, sorting, or grouping) into a single SQL query that is executed directly on the source database. This pushes the computation work to the database server rather than loading millions of raw rows into Power BI to transform them locally, significantly reducing refresh duration and memory usage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-2",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "What is the difference between a calculated column and a measure in Power BI?",
+    "answer": "Calculated columns are evaluated row-by-row during dataset refresh and stored in the model, consuming RAM. Measures are evaluated dynamically on-the-fly at query time based on user interactions (slicers, filters), consuming CPU rather than memory storage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-3",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is a Star Schema, and why is it recommended for Power BI data modeling?",
+    "answer": "A Star Schema organizes data into central Fact tables (containing metrics/numbers) and surrounding Dimension tables (containing attributes/filters) linked by relationships. This layout is optimized for the VertiPaq engine, enabling fast filters, clean DAX expressions, and efficient data compression.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-4",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "What is Row-Level Security (RLS) in Power BI, and where is it configured?",
+    "answer": "RLS restricts data access for specific users based on filter rules. The security roles and DAX rules are configured in Power BI Desktop, and users are assigned to those roles in the Power BI Service workspace settings.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-5",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "What is Performance Analyzer in Power BI Desktop, and what does it measure?",
+    "answer": "Performance Analyzer measures the duration of individual report visual rendering steps, including: 1) DAX query execution time, 2) Visual display engine layout time, and 3) Other background network waiting time.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-6",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "How do you split a column containing comma-separated values into multiple rows in Power Query?",
+    "answer": "Select the target column, click 'Split Column' -> 'By Delimiter', choose comma, click 'Advanced options', and select 'Split into Rows' instead of the default columns option.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-7",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "What does the CALCULATE function do in DAX?",
+    "answer": "The CALCULATE function evaluates an expression in a modified filter context. It can add, remove, or update filter rules, and triggers context transition (converting active row context to filter context).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-8",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is the difference between active and inactive relationships in Power BI?",
+    "answer": "Active relationships propagate filters automatically between tables. Inactive relationships do not propagate filters unless explicitly activated in a DAX measure using the `USERELATIONSHIP` function.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-9",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "What is the difference between a workspace Administrator and workspace Member in Power BI?",
+    "answer": "Both can edit workspace content, but workspace Administrators can manage permissions (including adding/removing workspace users), delete the workspace, and update workspace settings, which Members cannot do.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-10",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "How can you reduce the size of a Power BI report file (.pbix) before publishing?",
+    "answer": "Remove unused columns/tables, disable automatic date/time tables (auto date/time setting), convert high-precision columns (like decimal timestamp) to simple dates, and use star schemas to optimize RLE compression.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-easy-11",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "What is the function of the M formula language in Power Query?",
+    "answer": "M is the underlying functional, case-sensitive programming language that specifies all data transformation steps inside Power Query.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "pbi-med-1",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Explain Context Transition in DAX. How is it triggered, and what is its impact on measure performance?",
+    "answer": "Context Transition is the process of converting the current row context (active during loops like iteration) into a filter context that restricts calculations. It is triggered automatically when a measure is evaluated inside a row context (e.g., inside an iterator like SUMX) or when the CALCULATE function is explicitly called. While powerful, context transition can degrade performance under heavy datasets if evaluated on high-cardinality columns, as it requires scanning rows sequentially to build filters.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-2",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is the difference between a calculated table and an imported table in Power BI? How do they affect file size?",
+    "answer": "An imported table is loaded from an external source during refresh, compressed, and stored in-memory by the VertiPaq engine. A calculated table is generated using DAX commands referencing existing tables in the model. Calculated tables are computed post-refresh and also consume RAM, increasing file size and memory footprint, so transformations should be pushed to Power Query or SQL where possible.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-3",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "What is Table.Buffer in Power Query M language, and when should it be used to improve performance?",
+    "answer": "`Table.Buffer` loads a table into local memory, protecting it from being re-evaluated during subsequent query steps. It is useful when performing merge operations on tables where Power Query might otherwise evaluate the source table multiple times (e.g., joining a table to itself or performing recursive loops), preventing long refresh timeouts.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-4",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "Explain the difference between Row-Level Security (RLS) and Object-Level Security (OLS) in Power BI.",
+    "answer": "RLS restricts *rows* of data (e.g., a manager only sees data for their region) but keeps the table and columns visible. OLS restricts the access to the entire *table* or specific *columns*. If a user does not have permission on a column secured with OLS, the column name is hidden, and report visuals referencing it will fail to load, providing complete structural security.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-5",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "How do you analyze xmSQL queries generated by Power BI using DAX Studio? What does high Storage Engine CPU duration indicate?",
+    "answer": "Using DAX Studio, connect to the Power BI model and enable Server Timings. Execute a DAX query to inspect the generated xmSQL statements (pseudo-SQL sent to the VertiPaq engine). A high Storage Engine (SE) CPU duration indicates the SE is executing complex scans (e.g., scanning large columns with high cardinality or handling complex filters), indicating a need to optimize relationships or reduce cardinality.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-6",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "What is the difference between SUMX and SUM in DAX, and when must you use SUMX?",
+    "answer": "SUM is an aggregate function that computes the sum of a column in the active filter context. SUMX is an iterator function that evaluates an expression row-by-row (row context) and sums the results. You must use SUMX when the calculation requires row-level math (e.g., `UnitPrice * Quantity`) before aggregation.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-7",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "Explain bidirectional filtering in Power BI relationships. Why is it discouraged for many-to-many relationships?",
+    "answer": "Bidirectional filtering allows filter propagation to flow in both directions across a relationship. For many-to-many relationships, it is discouraged because it can introduce filter ambiguity, incorrect results, and performance degradation. It creates circular filter paths and leads to unexpected side effects where slicing one visual filters unrelated components.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-8",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "How does dynamic parameterization work in Power Query, and how does it prevent query folding from breaking?",
+    "answer": "Dynamic parameterization uses Power Query parameters to pass values (like server names or date filters) to the source query. To avoid breaking query folding, the parameters must be passed within the native source connection functions (e.g., `Sql.Database(Server, Database, [Query=...])`) rather than filtering the table local-side post-import.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-9",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "What are Power BI deployment pipelines, and how do they manage workspace configurations?",
+    "answer": "Deployment Pipelines manage content delivery across Dev, Test, and Prod stages. The pipeline automates the migration of reports and datasets. Workspace configurations (like dataset connections or parameters) are managed using deployment rules, which update settings automatically when migrating content.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-10",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "Explain the difference between Import mode and DirectQuery mode in Power BI semantic models.",
+    "answer": "Import mode loads data from sources into RAM, using the VertiPaq engine for fast, in-memory queries. DirectQuery mode does not store data in Power BI; it sends SQL queries directly to the source database at report view time, which can cause slow visuals if the source database is not optimized.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-11",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "What is the role of variables (VAR) in DAX, and how do they optimize performance?",
+    "answer": "Variables store the result of an expression within a measure. They are evaluated once (in the context where they are defined) and referenced multiple times, avoiding recalculating the same expression and making code cleaner.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-12",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is a Bridge Table, and when is it required in Power BI modeling?",
+    "answer": "A Bridge Table maps relationships between two tables that share a many-to-many relationship (e.g., Student and Course). It contains unique values of the keys and sits between the tables, allowing standard one-to-many relationships.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-13",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "Explain how query diagnostics can be used in Power Query to analyze slow steps.",
+    "answer": "Query Diagnostics traces the execution details of steps inside Power Query. It logs database queries sent (SQL), CPU duration, and data read sizes, allowing developers to locate steps that break query folding.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-14",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "How do you implement Dynamic RLS in Power BI using Entra ID user principal names?",
+    "answer": "Dynamic RLS is implemented by creating a security role with a DAX filter targeting the user table (e.g., `User[Email] = USERPRINCIPALNAME()`). When a user views the report, Power BI filters the table to match their email address.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-15",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "What are XMLA endpoints in Power BI, and what administrative capabilities do they enable?",
+    "answer": "XMLA Endpoints enable open connection access to semantic models using external tools (like Tabular Editor or SSMS). They allow scripting deployments, updating model metadata, and performing partition management.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-16",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Explain the difference between ALL and ALLSELECTED in DAX.",
+    "answer": "ALL ignores all filters applied to a column or table, regardless of where they come from. ALLSELECTED restores the active filter context to the state prior to the current visual's evaluation (respecting slicers).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-17",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is a dimension table role-playing in Power BI, and how do you resolve it?",
+    "answer": "Role-Playing occurs when a dimension table (like Date) has multiple relationships to a single Fact table (e.g., Order Date and Ship Date). You resolve it by using inactive relationships and `USERELATIONSHIP` in DAX.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-med-18",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "What are M parameters, and how do they enable server name dynamic configurations?",
+    "answer": "M parameters store values that can be updated without editing code. They are configured in Power Query and bound to datasource connection strings, allowing target servers to be changed during CI/CD.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "pbi-hard-1",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Describe the VertiPaq engine dictionary encoding and run-length encoding (RLE) mechanics. How does column cardinality affect model size and query performance?",
+    "answer": "The VertiPaq engine is a columnar database that compresses data using: 1) Value Encoding (for numeric columns), 2) Dictionary Encoding (creates a dictionary of unique values and stores indexes), and 3) Run-Length Encoding (RLE, compresses repeating values by storing value-run pairs: 'Value A, 10 times'). Column cardinality (the number of unique values) directly affects dictionary size and RLE efficiency. High cardinality columns (like timestamps or IDs) prevent RLE compression, leading to large model size and high CPU/IO costs during queries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-2",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "Explain the security and query routing implications of using Composite Models with DirectQuery over Power BI datasets (Thin Reports). How does security inheritance work?",
+    "answer": "Composite Models with DirectQuery allow reports to combine local datasets with remote Power BI datasets. Query routing sends queries to the source workspace. Security (including RLS) is evaluated at the remote source dataset: when a user accesses the composite model, their Entra identity is passed to the remote dataset using SSO. If the user does not have permission on the source dataset, the queries fail, maintaining data security boundary settings.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-3",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "How do you bypass Query Folding limitations in Power Query when dealing with complex source transformations (like Web.Contents or custom headers)? Provide the exact structure.",
+    "answer": "To preserve query folding for upstream databases before applying non-folding transformations (like Web.Contents), separate the query into two components: 1) An upstream query that performs all database operations (filters, joins) and folds, and 2) A downstream query that references the first query (using its name) and performs the non-folding operations, ensuring database filtering occurs on the server.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-4",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "What is the difference between Fabric Capacity reservation and Pay-as-you-go capacity? How do you monitor CU burn rate to avoid resource exhaustion?",
+    "answer": "Fabric Capacity Reservation commits to a fixed capacity level for a period (discounted cost), while Pay-as-you-go allows dynamically starting and stopping capacities billed hourly. You monitor the Capacity Unit (CU) burn rate using the Fabric Capacity Metrics App, tracking active carryforward queues, interactive delays, and smoothing metrics to scale capacity before throttling is triggered.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-5",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "How do you implement dynamic metadata-driven incremental refresh in Power BI using XMLA write-back and TMSL (Tabular Model Scripting Language)?",
+    "answer": "TMSL defines the partitions of a semantic model. For dynamic metadata-driven incremental refresh, connect to the XMLA endpoint and execute a TMSL script that: 1) Creates new partitions for historical periods, 2) Binds each partition to a parameterized M query targeting specific database boundaries (e.g., RangeStart and RangeEnd), and 3) Refreshes only the active partition, avoiding full dataset reloads.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-6",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Describe the difference between the DAX Formula Engine (FE) and Storage Engine (SE) execution pathways. How do you optimize queries that cause excessive FE CPU time?",
+    "answer": "The Formula Engine (FE) is single-threaded, handles complex expressions (DAX logic, conditional evaluations), and coordinates query execution. The Storage Engine (SE) is multi-threaded, scans columnar structures, and aggregates data (executes xmSQL queries). High FE CPU time indicates the query uses operations the SE cannot process (e.g., complex iterations, text operations, or deep nested conditionals), forcing the FE to pull data and process it row-by-row. To optimize, push calculations to the SE (use simple SUMX, avoid iterators over complex measures).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-7",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "Explain the performance risks of Many-to-Many relationships in Power BI. How does the engine handle cross-filtering across tables with duplicate keys?",
+    "answer": "Many-to-many relationships require the engine to evaluate cross-filtering dynamically. When filtering occurs, the engine builds temporary data tables in memory containing unique values of the join keys. If tables have duplicate keys, it leads to Cartesian join expansions, causing high memory usage and query latencies. To mitigate, use a Bridge Table with a 1-to-many relationship mapping.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-8",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "Explain the difference between local query execution and query delegation. How does the M engine handle joins between different database servers?",
+    "answer": "Query delegation (folding) delegates processing to the source database. Local execution performs transformations on the local gateway/machine. When joining tables across different database servers, the M engine cannot fold the join; it must download the tables from both servers local-side and merge them in-memory, leading to high network transfer and CPU bottlenecks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-9",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "Explain how workspace roles (Admin, Member, Contributor, Viewer) interact with RLS. Which roles bypass security policies?",
+    "answer": "Administrators, Members, and Contributors bypass RLS by default because they have edit permissions on the dataset. Only users assigned to the Viewer role are restricted by Row-Level Security rules. To test RLS, you must use the 'Test as role' feature in Desktop or Service.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-10",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "Describe how to set up ALM Toolkit for model comparison and deployment. How do you prevent target RLS configurations from being overwritten?",
+    "answer": "ALM Toolkit compares database schemas via XMLA endpoints. To prevent target RLS roles from being overwritten during deployment, open ALM Toolkit settings, locate the comparison options, and check the box to 'Skip Roles and Role Members' during update script generation, ensuring target environment configurations remain intact.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-11",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Explain the difference between KEEPFILTERS and standard filter arguments inside CALCULATE.",
+    "answer": "Standard filter arguments in CALCULATE overwrite existing filters on the target column. KEEPFILTERS does not overwrite; it intersects the new filter with the existing filter context, ensuring existing slicer selections are preserved.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-12",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "Describe the structure and purpose of Calculation Groups in Power BI. How do they affect measure formatting dynamically?",
+    "answer": "Calculation Groups group common DAX expressions (like time intelligence metrics) into a single column. They utilize Calculation Items, which can modify existing measures dynamically (e.g., converting value to YTD). They also support dynamic format string expressions, allowing formatting (likecurrency or percentage) to change based on the selected item.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-13",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "How does Value.NativeQuery work in Power Query, and how is it used to force query folding on custom SQL statements?",
+    "answer": "`Value.NativeQuery` allows running custom SQL queries against databases. To enable query folding on top of custom SQL, set the `EnableFolding` option to true in the parameters record: `Value.NativeQuery(Source, \"SELECT * FROM Table\", null, [EnableFolding=true])`.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-14",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "What is Service Principal Authentication in Power BI, and how is it configured for API execution?",
+    "answer": "Service Principal Authentication uses Azure Entra ID App Registrations to authenticate programmatic connections. To configure, register the App in Entra, create a secret, add the Service Principal to an Entra security group, and enable the tenant setting 'Allow service principals to use Power BI APIs' in the Admin portal.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-15",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "Describe the Tabular Editor Best Practice Analyzer (BPA) integration. How do you deploy rules for automated CI pipelines?",
+    "answer": "Tabular Editor BPA uses JSON rules to validate model metadata. To integrate with CI pipelines, run Tabular Editor CLI with the BPA flag passing the rules file: `TE2.exe database.bim -BPA rules.json`. If rules are violated, the pipeline fails, ensuring model standards.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-16",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Explain the DAX filter propagation rules across many-to-many relationships using the TREATAS function.",
+    "answer": "`TREATAS` applies the columns of a table expression as filters to columns of unrelated tables. It acts as a lightweight, virtual relationship, passing filter context without physical relationship paths, which is highly efficient.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-17",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "Describe the difference between weak and strong relationships in Composite Models.",
+    "answer": "Strong relationships exist between tables in the same storage group (direct mapping). Weak (limited) relationships span across different storage groups or target different sources, meaning filter propagation behavior is limited and doesn't support RLS propagation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-18",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "Explain the difference between Shared and Local M queries in Power Query.",
+    "answer": "Shared queries can be referenced by other queries in the model (e.g., helper functions or parameter configurations). Local queries are isolated and cannot be referenced. Use shared queries to build common libraries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-19",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "Explain how Power BI Tenant Settings manage cross-tenant sharing and workspace migration options.",
+    "answer": "Tenant Settings are configured by Power BI Administrators. They manage security options such as: 1) Allowing external Azure B2B guest users to access content, 2) Permitting workspaces to be moved to different capacities, and 3) Restricting dataset exporting permissions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-20",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "Describe the XMLA endpoint read-write configuration settings in the Power BI Admin portal.",
+    "answer": "Under Capacity Settings, XMLA endpoints can be set to Off, Read, or Read Write. Enabling Read Write allows external tools to perform full metadata updates, deployment operations, and schema changes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-21",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Describe the impact of high-precision decimal numbers on the VertiPaq engine dictionary compression rate.",
+    "answer": "High-precision decimals (e.g., exchange rates or sensor readings) have high cardinality, preventing run-length encoding. To optimize, round values or split the integer and fractional parts into separate columns.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-22",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is the role of surrogate keys in star schemas, and why are composite keys avoided in relationships?",
+    "answer": "Surrogate keys are unique integer identifiers that link fact and dimension tables. Composite keys (joining on multiple columns) are avoided because Power BI does not support multi-column relationships natively, forcing concatenations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-23",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "Describe how to handle API throttling (rate limits) in Power Query using custom retry loops in M.",
+    "answer": "API throttling can be handled using custom M functions with `Value.WaitFor` or recursive calls that inspect the HTTP status code (e.g., 429) and retry the request after a delay period.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-24",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "Explain the difference between workspace app permissions and direct item sharing in Power BI.",
+    "answer": "Workspace apps publish a packaged version of reports to users with controlled navigation. Direct item sharing shares individual reports directly. Apps are recommended for broad distribution as they decouple sharing from workspace changes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-25",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "How do you automate Power BI workspace assignments to dedicated Fabric capacities using PowerShell?",
+    "answer": "Use the Power BI Management cmdlet `Set-PowerBICapacity` or the REST API: `POST https://api.powerbi.com/v1.0/myorg/groups/{groupId}/AssignToCapacity` passing the target Capacity ID in the request body.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-26",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Explain the difference between standard time intelligence functions (YTD, MTD) and custom calendar calculations in DAX.",
+    "answer": "Standard functions (like `TOTALYTD`) require standard Gregorian calendars and specific date table configurations. Custom calendar calculations (like 4-4-5 calendars) must be coded manually using filters and date offset offsets.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-27",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "Describe the impact of bidirectional relationship propagation on RLS security filters.",
+    "answer": "Bidirectional relationships propagate RLS security filters automatically. Slicing one table will filter related tables. If not managed carefully, this can cause unintended RLS filtering that blocks users from seeing valid summary statistics.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-28",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "Explain how to handle schema drift in Power Query when source columns can be added dynamically.",
+    "answer": "Schema drift can be handled in M by avoiding hardcoded column lists in functions (like `Table.SelectColumns`) and using dynamic functions like `Table.ColumnNames` to dynamically inspect and process source schemas.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-29",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "Describe the Power BI Activity Log API and how it tracks user report views.",
+    "answer": "The Activity Log API retrieves a stream of audit events (e.g., ViewReport, ExportData) for the tenant. It allows administrators to track activity without needing access to Microsoft 365 logs, retaining data for governance.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-30",
+    "category": "POWER BI",
+    "niche": "CI/CD, ALM, Lifecycle Management, & Real-World Performance Tuning",
+    "question": "How do you perform warm cache testing on Power BI datasets using DAX Studio?",
+    "answer": "Connect to the model in DAX Studio, execute `CLEARCACHE` to clear the active VertiPaq cache, run your query (cold run), then immediately run the query again (warm run) to measure cached execution speed.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-31",
+    "category": "POWER BI",
+    "niche": "Advanced DAX, Context Transition, & Engine Internals",
+    "question": "Explain the difference between row context and filter context in DAX.",
+    "answer": "Row context exists during row-by-row iteration (e.g., in a calculated column or iterator). Filter context is the active set of filters that restricts the data before calculations run (e.g., from slicers, rows, or visual layouts).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-32",
+    "category": "POWER BI",
+    "niche": "Complex Data Modeling, Composite Models, & Enterprise Architecture",
+    "question": "What is the difference between active and inactive relationships, and how does the engine handle multiple paths between two tables?",
+    "answer": "Active relationships propagate filters automatically. Inactive relationships must be activated using `USERELATIONSHIP`. Power BI prevents multiple active paths between tables to avoid filter ambiguity.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-33",
+    "category": "POWER BI",
+    "niche": "Power Query (M), Data Ingestion Optimization, & Query Folding",
+    "question": "Describe how to resolve a 'Formula.Firewall' error in Power Query.",
+    "answer": "A Formula.Firewall error occurs when a query combines data from multiple sources with different privacy levels (e.g., public and private). Resolve it by setting privacy levels to Organizational or staging sources in separate queries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "pbi-hard-34",
+    "category": "POWER BI",
+    "niche": "Enterprise Administration, Governance, Security (RLS/OLS), & Capacity Management",
+    "question": "How does the Power BI Service handle credentials for cloud datasources during gateway routing?",
+    "answer": "For cloud sources, the Service manages OAuth/API keys natively. If the source sits behind a gateway, credentials can be stored securely in the gateway configuration, avoiding the need to pass them in the model.",
+    "difficulty": "HARD"
+  }
+]

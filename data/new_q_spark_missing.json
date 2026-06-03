@@ -1,0 +1,818 @@
+[
+  {
+    "id": "spark-easy-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "What is the Catalyst Optimizer in Apache Spark?",
+    "answer": "The Catalyst Optimizer is Spark SQL's extensible query optimizer. It automates query optimization by applying rules to logical plans (like constant folding, predicate pushdown, and projection pruning) before translating them into physical execution plans.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "What is the Tungsten Engine in Apache Spark?",
+    "answer": "Tungsten is a Spark execution engine optimization phase that improves memory and CPU efficiency. It manages memory explicitly (on-heap and off-heap) in binary format (UnsafeRow), bypassing JVM garbage collection and utilizing Whole-Stage Code Generation.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "What is a Shuffle operation in Apache Spark, and why is it expensive?",
+    "answer": "A Shuffle is the process of redistributing data across partition boundaries (e.g., during a join or groupBy). It is expensive because it requires writing partition files to disk, transferring them over the network, and sorting them on executor nodes.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "What is Adaptive Query Execution (AQE) in Apache Spark?",
+    "answer": "AQE is a query optimization feature that adjusts physical execution plans at runtime based on statistics collected during execution (e.g., coalescing shuffle partitions, upgrading joins to broadcast, and resolving skew joins).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What is the difference between event time and processing time in Structured Streaming?",
+    "answer": "Event time is the timestamp embedded inside the data record itself (when the event occurred). Processing time is the local system time of the Spark executor node when it processes the record.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is the purpose of the Delta Lake transaction log?",
+    "answer": "The Delta Lake transaction log (`_delta_log/`) is a single source of truth that records all committed transactions in chronological order (JSON files). This provides ACID properties, time travel, and schema enforcement.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "Explain the difference between a Spark DataFrame and a Spark Dataset.",
+    "answer": "A DataFrame is a distributed collection of data organized into named columns (untyped, dynamically checked). A Dataset is a strongly-typed extension that provides compile-time safety (checked in Java/Scala, not Python).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "What is off-heap memory in Apache Spark?",
+    "answer": "Off-heap memory is RAM allocated outside the JVM garbage collector heap. Spark uses it via Tungsten to store raw binary row data, avoiding GC pause overhead and serialization costs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "How do you control the number of shuffle partitions in Spark SQL?",
+    "answer": "You can control it by setting the configuration parameter `spark.sql.shuffle.partitions` (which defaults to 200) or by letting AQE coalesce partitions dynamically.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "What configuration setting enables AQE in Spark 3.0+?",
+    "answer": "AQE is enabled by setting `spark.sql.adaptive.enabled` to true. It is enabled by default in Spark 3.2+.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-11",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What is checkpointing in Spark Structured Streaming?",
+    "answer": "Checkpointing is the process of periodically saving metadata (like partition offsets) to a durable storage path (like ADLS or S3) to allow the stream to resume from the last offset if it crashes.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-12",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is the difference between VACUUM and OPTIMIZE in Delta Lake?",
+    "answer": "OPTIMIZE compacts small files into larger files (typically 1GB) and reorders data. VACUUM deletes files that are no longer referenced in the transaction log and are older than a retention threshold.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-13",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What is the default memory fraction allocation for Spark storage memory?",
+    "answer": "By default, storage memory is allocated 50% of the total unified memory pool (configured using `spark.memory.storageFraction`), sharing space dynamically with execution memory.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-14",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "What is a Broadcast Hash Join (BHJ) in Apache Spark?",
+    "answer": "A Broadcast Hash Join broadcasts a small DataFrame (typically < 10MB) to all executors, avoiding a shuffle operation for the large table. The executors build a local hash table to perform the join.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-15",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What does a java.lang.OutOfMemoryError (OOM) on a Spark executor indicate?",
+    "answer": "An executor OOM indicates that the JVM heap size is insufficient for the active workload, typically caused by data skew, large broadcast tables, or memory leaks inside Python UDFs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-16",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "What is a Sort-Merge Join (SMJ) in Apache Spark?",
+    "answer": "A Sort-Merge Join is the default join strategy for large datasets. It shuffles data so rows with the same key end up on the same node, sorts both sides, and scans them sequentially to find matching keys.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-17",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What configuration setting controls the off-heap memory size in Spark?",
+    "answer": "The off-heap memory size is configured using the setting `spark.memory.offHeap.size` and requires `spark.memory.offHeap.enabled` to be set to true.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-easy-18",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "What query hint forces a Broadcast Hash Join in Spark SQL?",
+    "answer": "You can force a broadcast join using the SQL query hint `/*+ BROADCAST(table) */` or by calling `broadcast(df)` in the DataFrame API.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "spark-med-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "Explain the compilation stages of a Spark SQL query. How does it go from Unresolved Logical Plan to Physical Execution Plan?",
+    "answer": "The stages are: 1) Unresolved Logical Plan (syntax checked, table names and columns unresolved), 2) Analyzer (resolves columns and table names using Catalog metadata to create Analyzed Logical Plan), 3) Optimizer (Catalyst applies optimization rules like constant folding and projection pruning to create Optimized Logical Plan), 4) Physical Planning (generates multiple physical plans, selects the best plan using Cost-Based Optimization), and 5) Code Generation (compiles physical plan into Java bytecode via Whole-Stage Code Gen).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "How does Tungsten's UnsafeRow binary layout avoid JVM garbage collection costs?",
+    "answer": "Standard JVM objects introduce memory overhead (header, alignment padding) and require garbage collection tracking. Tungsten bypasses this by allocating raw off-heap memory byte arrays and storing records in a custom binary layout called UnsafeRow. It writes offsets and lengths to locate fields, allowing operations (like sorting or comparison) to run directly on the byte stream without deserializing into JVM objects, completely bypassing GC overhead.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain the difference between Sort Shuffle and Hash Shuffle in Spark. Why is Sort Shuffle default?",
+    "answer": "Hash Shuffle creates partition files for every target reducer partition per task (causing thousands of open file descriptors and disk seeks). Sort Shuffle writes a single data file containing sorted partition blocks and a companion index file pointing to partition boundaries. This reduces file handles to 2 per task, minimizing disk I/O seek times and network buffer overheads, which makes Sort Shuffle the default choice.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "Explain the Dynamic Partition Coalescing algorithm in Spark AQE.",
+    "answer": "Dynamic Partition Coalescing simplifies query execution. When a stage completes, AQE checks the size of shuffle map partition outputs. If partitions are small, AQE merges adjacent partitions into larger physical partitions (targeting an advisory partition size, e.g., 64MB). This reduces scheduler task scheduling overhead and prevents executor serialization bottlenecks.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What are RocksDB State Store backends in Spark Structured Streaming, and why are they used over the In-Memory state store?",
+    "answer": "The default In-Memory state store keeps all streaming state in JVM heap RAM, causing GC spikes and OOM failures when managing millions of keys (large state). The RocksDB State Store backend stores state off-heap in local SSD files, using local cache mapping. This decouples state size from JVM heap limits, allowing structured streams to manage multi-terabyte state configurations reliably.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Explain Delta Lake transaction conflict reconciliation using Optimistic Concurrency Control (OCC).",
+    "answer": "Delta Lake assumes writes will not overlap. When Job A starts, it reads table snapshot version 10. If Job B commits version 11 before Job A finishes, Job A checks if Job B modified the same partitions. If Job B modified Partition B and Job A modified Partition A (no overlap), Job A commits version 12 without issues. If both modified Partition A, Job A raises a write conflict exception and aborts.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "What is the Salting technique, and how does it resolve data skew in Spark joins?",
+    "answer": "Data skew occurs when a partition has 90% of rows for a single join key (e.g., NULL or empty key), bottlenecking the executor. Salting resolves this by appending a random integer prefix (e.g., 0-9) to the join key of the skewed table, and duplicating rows in the small dimension table with matching prefixes. This distributes the key across 10 partitions, allowing parallel processing.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What are the differences between execution memory and storage memory in Spark's unified memory manager?",
+    "answer": "Execution memory stores temporary data during shuffles, joins, and aggregations. Storage memory caches persisted tables. Both share a unified pool. If no storage memory is cached, execution memory can occupy 100% of the pool. If execution memory needs space, it can evict cached tables from storage memory, but cached tables cannot evict active execution memory.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "How does predicate pushdown optimize Spark performance when reading parquet files?",
+    "answer": "Predicate pushdown evaluates filter conditions (e.g., `WHERE Year = 2025`) at the storage level before loading files. When reading Parquet, Spark inspects the page-level metadata containing min/max values. If the filter key falls outside the range, Spark skips reading the entire file/row group, minimizing network transfer.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "What is Whole-Stage Code Generation (WSCG) in Spark, and how does it improve CPU efficiency?",
+    "answer": "WSCG consolidates multiple physical operators (like filter, projection, and aggregation) into a single optimized Java function compile-time. This replaces the traditional Volcano iterator model (which invokes Virtual function calls per record), reducing CPU cycles and instruction cache misses.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-11",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "How does the Spark External Shuffle Service optimize memory management during dynamic allocation?",
+    "answer": "When dynamic allocation is enabled, Spark terminates idle executors to save costs. However, running executors store shuffle files. If terminated, child stages fail. External Shuffle Service runs as a background daemon on each cluster node, serving shuffle files to reducer tasks even if the executor that wrote them has been shut down.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-12",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "How does Spark AQE dynamically upgrade Sort-Merge Joins to Broadcast Hash Joins?",
+    "answer": "At compile time, Spark determines join strategies using table statistics. If statistics are missing or dynamic filtering occurs, Spark plans a Sort-Merge Join. During runtime, when the map stage of a table completes, AQE checks the actual output size. If the size is below the broadcast threshold, it updates the physical plan to use a Broadcast Hash Join instead, avoiding shuffles.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-13",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain watermarking in Structured Streaming. How does it handle late-arriving data in window aggregations?",
+    "answer": "Watermarking defines the maximum threshold for late-arriving data (e.g., `withWatermark(\"EventTime\", \"10 minutes\")`). It tracks the maximum event time seen so far. If incoming data has an EventTime older than `MaxEventTime - 10 minutes`, Spark discards the record and cleans up the corresponding state from memory, bounding state size.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-14",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Describe the Delta Lake Universal Format (UniForm) and how it enables Iceberg and Hudi read paths.",
+    "answer": "UniForm writes Delta Lake tables but automatically generates companion metadata formats matching Apache Iceberg or Apache Hudi specifications. It writes the data in standard parquet format and builds Iceberg manifest lists/manifests concurrently, allowing external engines (like Trino or Snowflake) to read the table as if it were a native Iceberg table.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-15",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "How does JVM G1GC garbage collection tuning optimize executor stability in memory-intensive Spark workloads?",
+    "answer": "Memory-intensive workloads cause high object allocation rates, triggering frequent JVM GC pauses. Tuning G1GC (e.g., setting `-XX:G1HeapRegionSize=32m` and `-XX:InitiatingHeapOccupancyPercent=35`) optimizes memory management by adjusting heap region sizes and starting mark sweeps early, preventing long GC pauses that trigger Spark node heartbeat timeouts.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-16",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain the difference between Broadcast Nested Loop Join and Cartesian Product join in Spark.",
+    "answer": "A Broadcast Nested Loop Join (BNLJ) is used when there is no equality condition in the join. It broadcasts one table to all nodes and loops through rows. A Cartesian Product join shuffles data to execute a full cross-join. BNLJ is faster if one table fits in memory, but both scale poorly and should be avoided.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-17",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "How do Python worker memory allocations differ from JVM executor memory allocations in PySpark?",
+    "answer": "PySpark runs a Python process alongside the JVM executor. JVM memory is managed by the unified memory manager. Python memory is allocated outside the JVM heap. If PySpark executes Python UDFs, data is serialized and sent to Python workers. Python memory growth is not tracked by JVM, which can cause OS out-of-memory kills.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-18",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain the difference between a Semi-Join and an Anti-Join in Spark SQL.",
+    "answer": "A Semi-Join returns rows from the left table where a matching key exists in the right table (behaves like an EXISTS clause). An Anti-Join returns rows from the left table where NO matching key exists in the right table (behaves like a NOT EXISTS clause). Both avoid duplicating left-side rows.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-19",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "How does cost-based optimization (CBO) estimate join cardinality in Spark SQL?",
+    "answer": "CBO uses statistics gathered by running `ANALYZE TABLE` (like row count, column histograms, and null count). It calculates cardinality estimates by multiplying the size of join inputs by selectiveness factors, allowing it to select optimal join orders.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-20",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "What is BytesToBytesMap, and how does Tungsten utilize it during aggregations?",
+    "answer": "BytesToBytesMap is an off-heap hash map designed by Tungsten to store aggregation keys and values in binary format. It avoids creating Java objects for keys and values, reducing memory consumption and speeding up hash lookups during group-by operations.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-21",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain how netty-based network transport operates during the shuffle pull phase.",
+    "answer": "Reducer tasks use Netty to request shuffle partition blocks from remote executor nodes. Netty handles connection pooling and uses DirectByteBuffers to read and stream files from disk to socket without copying bytes, accelerating network transfers.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-22",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "How does Spark AQE dynamically resolve data skew during execution?",
+    "answer": "If AQE is enabled, it monitors shuffle stage partition sizes. If it detects a skewed partition (e.g., a partition larger than the average * skew factor), it splits the partition into multiple smaller tasks, duplicating the matching join key on the other side, balancing the work.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-23",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What is mapGroupsWithState in Structured Streaming, and how does it support session timeouts?",
+    "answer": "`mapGroupsWithState` allows users to define custom stateful logic for key groups. It takes a user-defined function that updates state dynamically. It supports timeout policies (ProcessingTime or EventTime) to trigger state cleanup when no messages are received for a duration.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-24",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What are Deletion Vectors in Delta Lake, and how do they optimize UPDATE and DELETE performance?",
+    "answer": "By default, UPDATE or DELETE operations require Delta Lake to rewrite the entire parquet file containing the rows. Deletion Vectors write a small companion file containing the row indexes of deleted records. During read operations, the engine applies the deletion vectors dynamically, avoiding rewrites.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-25",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "Explain how Executor Lost errors can occur due to long GC pauses.",
+    "answer": "When an executor executes a long GC pause, its execution threads are stopped. If the pause exceeds the heartbeat timeout (configured by `spark.network.timeout`), the Spark Driver assumes the executor has died, terminates its resources, and schedules task re-runs.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-26",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain the difference between Shuffle Hash Join and Sort-Merge Join.",
+    "answer": "Shuffle Hash Join shuffles data and builds an in-memory hash table for the small table on each node. Sort-Merge Join shuffles, sorts both tables, and merges them. Shuffle Hash Join is faster but requires the hash table to fit in memory, whereas SMJ is more robust.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-27",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "How do Pandas UDFs optimize PySpark code compared to standard Python UDFs?",
+    "answer": "Standard Python UDFs serialize data row-by-row between JVM and Python workers. Pandas UDFs use Apache Arrow format to transfer data in columnar batches, avoiding row-by-row serialization overhead and allowing vectorized calculations.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-28",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "How does Spark SQL handle Null values in Join conditions?",
+    "answer": "In standard SQL joins, Null values do not match other Null values. Spark filters out Null keys during shuffles to avoid unnecessary joins, but if a full cross join or outer join is used, Null values must be handled manually to prevent performance skew.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-29",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "What is Constant Folding in Catalyst, and how does it optimize logical plans?",
+    "answer": "Constant Folding is an optimization rule that evaluates expressions containing constants at compile time rather than runtime. For example, it translates `WHERE Age > 10 + 20` to `WHERE Age > 30`, avoiding calculating the expression per row.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-30",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "What is the role of the TreeNode class in Catalyst Optimizer API?",
+    "answer": "All plans and expressions in Catalyst are represented as trees of TreeNode objects. The optimizer applies transformation rules (using pattern matching and partial functions) to modify these trees, generating optimized structures.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-31",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "How do you identify a disk spill during a shuffle operation using the Spark UI?",
+    "answer": "In the Spark UI 'Stages' tab, select the target stage. Look at the task metrics table: if 'Spill (Memory)' and 'Spill (Disk)' metrics are greater than zero, it indicates executors ran out of execution memory and spilled data to disk.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-32",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "What is OptimizeSkewedJoin in AQE?",
+    "answer": "`OptimizeSkewedJoin` is an AQE optimization rule. If data skew is detected during execution, it inserts a plan node that splits skewed partitions and adjusts join keys, balancing the join processing.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-33",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain flatMapGroupsWithState in Structured Streaming. How does it differ from mapGroupsWithState?",
+    "answer": "`flatMapGroupsWithState` allows returning an arbitrary number of rows (including zero rows) per group-by key group, whereas `mapGroupsWithState` restricts the user function to returning exactly one row.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-34",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is Liquid Clustering in Delta Lake, and how does it replace partition keys?",
+    "answer": "Liquid Clustering dynamically groups data based on columns defined as clustering keys, without creating nested directories. It avoids over-partitioning, allows partition keys to evolve, and scales partition sizes automatically.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-35",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What does a GC pause indicator in the Spark UI Task Metrics timeline tell you?",
+    "answer": "It shows the duration during which execution was paused by JVM GC. If this duration represents a significant percentage of the total task execution duration, it indicates memory pressure, suggesting GC tuning.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-med-36",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain Star Schema Join optimization in Spark SQL.",
+    "answer": "Star Schema Join optimization rearranges join sequences to execute filters on dimension tables first, minimizing the data size of intermediate tables before performing joins on the large Fact table.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "spark-hard-1",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "Explain the interaction between Catalyst Rules and the Physical Planning stage. How do you inject a custom physical planning rule programmatically?",
+    "answer": "Catalyst rules operate on logical plans to perform transformations. In the Physical Planning stage, Spark applies physical strategies to map logical nodes to physical SparkPlans. You can inject custom rules programmatically using `spark.experimental.extraStrategies` or by adding rules to `spark.sql.extensions`. These rules take a LogicalPlan node and return a sequence of matching SparkPlan physical executions, allowing custom optimizations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-2",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "Describe the implementation details of Tungsten sort. How does it sort UnsafeRow records using prefix comparison without dereferencing?",
+    "answer": "Tungsten sort utilizes a cache-aware algorithm. Instead of sorting UnsafeRow references directly (which requires dereferencing pointers to fetch values, causing cache misses), it creates a dedicated array of 128-bit pointers. Each entry contains: 1) A 64-bit page offset pointer to the raw row, and 2) A 64-bit normalized prefix of the sort key. The sort algorithm compares prefixes directly on the CPU register. It only dereferences the row pointer if prefixes are equal, optimizing CPU L1/L2 cache efficiency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-3",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain the architecture of Push-Based Shuffle (introduced in Spark 3.2+). How does it mitigate the random IO limitations of standard pull-based shuffles?",
+    "answer": "In standard pull shuffles, reducers read partition blocks from all executors, causing heavy random I/O reads. Push-Based Shuffle (Spark 3.2+) changes this by having mapper tasks push their shuffle partition blocks to dedicated External Shuffle Services running on target coordinator nodes. The service merges blocks sequentially into merged partition files. When reducers start, they perform large sequential reads from the merged files, optimizing I/O throughput.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-4",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "How does AQE collect partition statistics during execution, and how does it interact with Whole-Stage Code Generation when plans are updated?",
+    "answer": "AQE executes query plans in stages (demarcated by ShuffleMapStages). When a stage completes, mappers write partition statistics (bytes, row count) to memory. The Driver reads these stats to update plan logic. To update execution dynamically without breaking Whole-Stage Code Generation, Spark wraps code-gen execution nodes in physical adapter nodes (e.g., `AdaptiveSparkPlanExec`). The adapter updates child execution nodes based on statistics and triggers bytecode compilation for the new layout.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-5",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Explain the exact state storage serialization format used by RocksDB in Spark Structured Streaming. How does it handle schema evolution of state keys?",
+    "answer": "RocksDB state store serializes keys and values into raw binary byte arrays using the state schema (defined by the streaming query). Keys are serialized using Tungsten's UnsafeRow format, and stored in RocksDB as byte keys. To support schema evolution, Spark writes a state metadata file containing the schema version. When a stream resumes, Spark reads the metadata; if a schema change occurred (e.g., column added), Spark applies compatibility rules or raises exceptions if changes are incompatible.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-6",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is the Delta Lake checkpoint process, and how does it optimize transaction log scanning for tables with millions of commits?",
+    "answer": "Delta Lake writes commit logs as JSON files (e.g., `000000.json`). To prevent scanning thousands of JSON files, Delta Lake generates a checkpoint file (Parquet format) every 10 commits. The checkpoint file aggregates all historical transactions, schema details, and active files up to that commit version. When reading a table, the engine reads the latest checkpoint parquet file first, then reads only the incremental JSON logs committed after that checkpoint, optimizing start latency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-7",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain how Spark executes a join between a large Fact table and a slowly-changing Dimension table. How does range join optimization work?",
+    "answer": "When joining Fact and Dimension tables where keys are valid within range intervals (e.g., `Fact.Timestamp BETWEEN Dim.Start and Dim.End`), standard joins fall back to Cartesian products. Range Join Optimization uses interval trees. Spark builds a range metadata map of the dimension table. During execution, it checks if range keys overlap, pruning non-matching partitions dynamically and avoiding Cartesian calculations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-8",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "How do you diagnose off-heap memory leaks in Spark executors, and what tools are used to trace allocations from sun.misc.Unsafe?",
+    "answer": "Off-heap leaks bypass JVM GC monitoring. To diagnose, use tools like `jemalloc` or `valgrind` by wrapping the executor process launcher. You can also analyze memory allocation metrics in the Spark UI. Look for growing off-heap allocations. Tracking JVM native memory allocation (NMT) via `-XX:NativeMemoryTracking=detail` exposes memory allocations initiated by `sun.misc.Unsafe` or JNI libraries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-9",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "Explain the difference between Rule-Based Optimization and Cost-Based Optimization in Catalyst.",
+    "answer": "Rule-Based Optimization (RBO) applies fixed logical transformation rules (like predicate pushdown) unconditionally to optimize query plans. Cost-Based Optimization (CBO) uses statistical metadata (cardinality, histograms) to estimate plan costs for multiple execution paths (e.g., evaluating join orders), selecting the path with the lowest resource footprint.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-10",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "How does Tungsten leverage CPU SIMD instructions to accelerate query vectorization?",
+    "answer": "Tungsten vectorizes data processing by reading Parquet/ORC columns in batches into contiguous off-heap memory. When executing filters or projections, it utilizes CPU SIMD (Single Instruction Multiple Data) registers, processing multiple rows in a single CPU instruction cycle, speeding up execution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-11",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain Shuffle Partition Coalescing. How does AQE decide the physical number of reducer tasks dynamically?",
+    "answer": "When mapper stages complete, AQE evaluates the total shuffle output size. It groups adjacent small partitions until their combined size reaches the target advisory partition size (e.g., 64MB). Reducers are spawned for the coalesced partitions, reducing scheduler tasks and avoiding memory pressure.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-12",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "Explain how Runtime Filter (Bloom filter) Pushdown operates under AQE in Spark 3.3+.",
+    "answer": "In Spark 3.3+, when joining a small Dimension and a large Fact table, AQE dynamically builds a Bloom filter in memory from the dimension table keys. It pushes this Bloom filter down to the Fact table scan stage, discarding non-matching Fact rows before they are shuffled, minimizing network transfers.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-13",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "What is the difference between ProcessingTime and AvailableNow triggers in Structured Streaming?",
+    "answer": "ProcessingTime trigger runs micro-batches at fixed intervals. AvailableNow trigger processes all available data in the source in a sequence of micro-batches and then shuts down the query automatically, combining batch and streaming paradigms.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-14",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Explain Delta Lake shallow clones vs deep clones. When is each used, and what are their metadata footprints?",
+    "answer": "A Deep Clone copies both the table metadata (transaction log) and all underlying data parquet files to a new path (independent table). A Shallow Clone copies only the transaction log metadata, pointing to the original source parquet files. Shallow clones are instant and consume zero data storage, useful for staging tests.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-15",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "How do you diagnose and tune GC pauses on Spark Driver node? What JVM flags are recommended?",
+    "answer": "Driver GC pauses block planning and metadata collection. Diagnose by inspecting the GC logs (`-XX:+PrintGCDetails`). To tune, use G1GC and allocate sufficient JVM metaspace. Recommended flags: `-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:MetaspaceSize=256m`.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-16",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Describe the execution flow of a Shuffle Hash Join. When is it chosen over Sort-Merge Join?",
+    "answer": "Shuffle Hash Join shuffles data on key columns. Each executor builds an in-memory hash table for the small relation and streams rows from the large relation to match. It is selected over Sort-Merge Join when the small relation fits in memory and cannot be broadcast, as it avoids sorting costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-17",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "Explain Python worker memory limit configurations. What are spark.executor.pyspark.memory and its relation to executor overhead?",
+    "answer": "`spark.executor.pyspark.memory` sets the physical memory limit for Python worker processes per executor node. It is allocated from the executor memory overhead pool. If Python workers exceed this limit, the node manager kills the worker process, raising task failures.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-18",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain Cartesian Product Join mechanics in Spark. How does it manage memory partition blocks?",
+    "answer": "A Cartesian Product Join matches every row of Table A with every row of Table B. It creates a task partition for every pair of partitions from input tables. Spark manages memory by caching partition blocks of Table B in execution memory, recycling them to match Table A partitions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-19",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "What is the Analyzer stage in Catalyst Optimizer? How does it resolve UnresolvedRelations?",
+    "answer": "The Analyzer resolves UnresolvedRelations (table references) and UnresolvedAttributes (column names) in logical plans. It checks matching entries in the Catalog (schema definitions) and attaches unique IDs and data types to nodes, producing an Analyzed plan.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-20",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "Describe Tungsten off-heap allocation memory layout. How is memory addressed using page numbers?",
+    "answer": "Tungsten off-heap memory is addressed using 64-bit addresses consisting of: 1) A 13-bit page number, and 2) A 51-bit offset within that page. Spark manages these pages dynamically. When accessing data, it resolves page numbers to physical memory blocks, avoiding JVM heap pointers.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-21",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain the bypass merge shuffle threshold config. What happens when shuffle partitions are below this threshold?",
+    "answer": "When the number of shuffle partitions is below `spark.shuffle.sort.bypassMergeThreshold` (default 200) and no map-side aggregation is defined, Spark uses a bypass merge shuffle. It writes to partition files directly, bypassing sorting, which improves write performance.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-22",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "Explain how AQE interacts with Broadcast Joins. What happens if the driver times out during broadcast?",
+    "answer": "If a plan is updated to use a Broadcast Join, the Driver collects the table and broadcasts it. If the broadcast size is larger than expected or the network is slow, it can exceed the timeout (`spark.sql.broadcastTimeout`), raising exception and failing the stage.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-23",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Contrast mapGroupsWithState with flatMapGroupsWithState performance overhead.",
+    "answer": "`flatMapGroupsWithState` has slightly higher serialization overhead because it returns an iterator that can contain multiple records, requiring memory buffer allocations, whereas `mapGroupsWithState` returns a single object mapped directly in-memory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-24",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Describe the Delta Lake Schema Evolution process. How does it handle backward compatibility of old transaction records?",
+    "answer": "Delta Lake Schema Evolution allows adding columns dynamically using `.option(\"mergeSchema\", \"true\")`. It preserves backward compatibility by appending the new schema to the latest commit JSON. Old parquet files do not contain the new column; when read, the engine returns Null values.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-25",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "Explain Task Kills due to container memory limits on YARN/Kubernetes. How does spark.executor.memoryOverhead mitigate this?",
+    "answer": "If an executor process (including off-heap allocations, python processes, and JVM overhead) exceeds the memory limit allocated by YARN or Kubernetes, the orchestrator kills the container. Increasing `spark.executor.memoryOverhead` allocates more non-JVM memory to prevent kills.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-26",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Explain how Spark executes inequality joins (e.g. JOIN ON A.id = B.id AND A.val > B.val).",
+    "answer": "Inequality joins are resolved by first shuffling and sorting on the equality key (id) using Sort-Merge Join. During the merge-scan phase, Spark evaluates the inequality condition (`A.val > B.val`) dynamically on the matching keys, filtering non-matching rows.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-27",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "What is the memory footprint of Spark Broadcast variables? How are they cleaned up dynamically?",
+    "answer": "Broadcast variables are stored on the Driver and cached on executors in TorrentBroadcast format. When they are no longer referenced, the Driver garbage collector clears them, or they can be unpersisted manually using `broadcastVar.unpersist()`, freeing executor memory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-28",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Describe the performance impact of join reordering hints inside Catalyst.",
+    "answer": "Join reordering hints instruct the query optimizer to join tables in a specific sequence (e.g. joining small lookup tables first). This bypasses the optimizer's default cost estimation, which is useful when statistics are missing.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-29",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "What is the Analyzed Logical Plan stage in Catalyst? What errors are caught during this stage?",
+    "answer": "The Analyzed stage resolves plan names and types against the Catalog. Errors caught during this stage include: 1) Non-existent table or column references, 2) Invalid datatype conversions, and 3) Ambiguous column names in join inputs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-30",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "Describe how Spark manages memory pages dynamically. What is PageAllocator in Tungsten?",
+    "answer": "PageAllocator allocates contiguous off-heap memory blocks (pages) for Tungsten execution tasks. It uses memory pools to track allocations, allocating new pages when tasks need memory and recycling them to prevent fragmentation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-31",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain the role of the Index file in Shuffle Sort-based Shuffle.",
+    "answer": "The Index file stores the byte offsets of partition boundaries within the data shuffle file. This allows target reducer tasks to query the index file to locate and read their specific partition segment from the data file directly.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-32",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "What is local shuffle reader in Spark AQE, and how does it optimize broadcast joins?",
+    "answer": "Local shuffle reader is used when Sort-Merge Join is upgraded to Broadcast Join. Instead of shuffling data from mappers, the local reader reads the shuffle files locally on the executor node, avoiding network transfer costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-33",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Describe state store cleanup mechanics in Structured Streaming. How are expired keys removed?",
+    "answer": "State stores remove expired keys based on watermarks or session timeouts. During checkpointing, the state store engine scans keys; if a key is marked as expired, the engine deletes the key-value record from RocksDB or memory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-34",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "Describe Delta Lake transaction file format conversions. How does it handle checkpoints?",
+    "answer": "Delta Lake commits logs as JSON files. Checkpoints are parquet files that consolidate historical JSON logs. The engine writes a checkpoint file every 10 commits, containing the consolidated table state to accelerate startup.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-35",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "Describe how to analyze GC telemetry logs from Spark Executors using 3rd party tools.",
+    "answer": "Configure `-Xloggc:gc.log` on executors. Load the generated log files into tools like GCViewer or GCEasy to visualize heap distribution, scan pause durations, and locate memory leaks or GC bottlenecks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-36",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "What is a broadcast timeout exception? How do you resolve it?",
+    "answer": "A broadcast timeout occurs when the driver fails to broadcast a table within the timeout limit (default 300s). Resolve it by increasing `spark.sql.broadcastTimeout` or increasing driver network bandwidth allocations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-37",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "How does Spark manage page faults in off-heap memory structures?",
+    "answer": "Spark avoids OS page faults by pre-allocating off-heap memory blocks during executor startup, ensuring that Tungsten pages are mapped to physical RAM rather than virtual memory swap space.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-38",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Describe the sort merge join physical execution plan representation in Spark SQL.",
+    "answer": "In physical plans, Sort-Merge Join is represented as: `SortMergeJoin [key], [key] -> Sort [key] -> Exchange hashpartitioning [key]`. Exchange shuffles the data and Sort sorts it before the join.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-39",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "How do you detect memory leaks in custom JVM classes executed inside Spark tasks?",
+    "answer": "Capture heap snapshots of active executors using `jmap` and load them into Memory Analyzer Tool (MAT) to analyze objects, identifying classes that hold references to data blocks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-40",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Describe the skew join hint syntax in Spark SQL.",
+    "answer": "You can hint a skewed join using: `/*+ SKEW(table, column, (value)) */`. This instructs the optimizer to split partitions matching the specified key value dynamically, balancing execution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-41",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Catalyst Optimizer & Query Compilation Internals",
+    "question": "What is physical plan selection inside Catalyst Optimizer?",
+    "answer": "Physical plan selection translates the logical plan into multiple physical plans using Strategies. It then estimates execution cost for each physical plan, selecting the plan with the lowest estimated footprint.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-42",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Tungsten Engine & Off-Heap Memory Architecture",
+    "question": "What is the performance benefit of UnsafeRow structure in column projection?",
+    "answer": "UnsafeRow allows column projection to be executed as a memory copy of byte offsets, avoiding creating new JVM objects and avoiding memory allocation overhead, accelerating projection execution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-43",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Shuffle Architecture, Network Topologies & Spills",
+    "question": "Explain how Netty manages memory pools during block transfer.",
+    "answer": "Netty uses a PooledByteBufAllocator to pre-allocate off-heap memory buffers for network block transfers. This avoids allocating JVM memory blocks dynamically, reducing JNI overhead and garbage collection pauses.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-44",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Adaptive Query Execution (AQE) & Dynamic Optimizations",
+    "question": "How does Spark AQE handle plan adjustments in multi-stage pipelines?",
+    "answer": "In multi-stage pipelines, AQE optimizes stages sequentially. When Stage 1 completes, AQE updates plan parameters for Stage 2 based on Stage 1 output statistics, optimizing downstream join and shuffle decisions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-45",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Structured Streaming & Arbitrary Stateful Processing",
+    "question": "Describe the state store metadata schema versions in Spark 3.0+.",
+    "answer": "State store metadata schema version tracks the formatting of state records (e.g. metadata version 2 adds support for key groupings). Spark checks this version during startup to ensure schema compatibility.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-46",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Delta Lake Internals & Storage Engine Architectures",
+    "question": "What is the transaction isolation level Serializable in Delta Lake?",
+    "answer": "Serializable isolation level guarantees that all table reads and writes occur as if executed in a strict sequential order, preventing concurrent transactions from causing inconsistent states or missing logs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-47",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Memory Management, GC Tuning & OOM Diagnostics",
+    "question": "Describe how to analyze GC pauses using Spark UI executor logs.",
+    "answer": "Locate the executor tab in the Spark UI. Compare GC time against task run time. If GC time is high, expand the executor thread dump to identify threads executing garbage collection sweeps.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "spark-hard-48",
+    "category": "SPARK & DATABRICKS",
+    "niche": "Advanced Join Topologies & Skew Remediation",
+    "question": "Describe the execution plan representation of Broadcast Hash Join.",
+    "answer": "Broadcast Hash Join is represented as: `BroadcastHashJoin [key], [key] -> Exchange broadcast -> table`. The exchange node broadcasts the relation, avoiding shuffles for the larger table.",
+    "difficulty": "HARD"
+  }
+]

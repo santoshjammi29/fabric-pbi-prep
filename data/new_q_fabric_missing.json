@@ -1,0 +1,194 @@
+[
+  {
+    "id": "fab-hard-1",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "How does Microsoft Fabric's V-Order optimization impact parquet file structures, and what are the exact performance trade-offs for write latency vs. Direct Lake mode read paths?",
+    "answer": "V-Order is a proprietary Microsoft optimization applied to Parquet files in OneLake. It rearranges the internal structure of the Parquet file (re-sorting, encoding, and compressing data columns) to align with the VertiPaq engine's in-memory columnar structure. While it increases write latency (due to extra CPU cycles required to sort and organize data during compression), it reduces read latency, specifically enabling the VertiPaq engine in Power BI Direct Lake mode to perform direct memory mapping (paging in parquet columns straight into memory without decompression or transcoding). This eliminates the need for Import-mode refreshes or DirectQuery execution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-2",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the exact mechanism of cross-cloud Shortcuts in OneLake when targeting AWS S3, and how does Fabric handle credential delegation, egress costs, and partition pruning?",
+    "answer": "OneLake shortcuts to AWS S3 act as metadata pointers referencing objects stored in external S3 buckets. When a query is run in Fabric (e.g., via Spark or Synapse SQL), OneLake dynamically delegates access using IAM roles or access keys configured in the connection. Egress costs are incurred on the AWS side as data is transferred out of S3 to Azure. To minimize this, Fabric uses predicate and partition pruning by reading the metadata/Delta log first to fetch only the matching Parquet files, rather than scanning the entire bucket. This reduces egress volume and latency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-3",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "How does the Microsoft Fabric capacity smoothing algorithm work for interactive vs. background jobs, and what happens when the cumulative carryover exceeds 100% capacity throttling limits?",
+    "answer": "Fabric capacity evaluates performance using Capacity Units (CUs). To prevent performance spikes, it uses 'smoothing': interactive operations (like SQL queries or report interactions) are smoothed over a 5-minute window, while background operations (like Spark notebooks or data pipeline runs) are smoothed over 24 hours. When cumulative carryover exceeds the 100% capacity threshold, Fabric initiates throttling. Throttling starts by delaying background operations first, followed by interactive operations, and eventually rejecting new requests with HTTP 429 errors if capacity is not expanded or resource usage doesn't drop.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-4",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "Explain the fallback conditions under which a Power BI report in Direct Lake mode reverts to DirectQuery mode. How do you monitor this transition programmatically?",
+    "answer": "Direct Lake mode falls back to DirectQuery under several conditions: 1) The query requires features not supported by Direct Lake (e.g., specific RLS rules, complex views, or custom columns), 2) The model size exceeds the Fabric capacity guardrails (maximum memory limit per dataset), 3) The underlying Delta table schema is updated in a way that violates VertiPaq constraints (e.g., data types like binary or GUID), 4) The underlying OneLake files are not framed (unframed files). You can monitor this programmatically using SQL Server Profiler, DAX Studio, or the Fabric Capacity Metrics app by tracking the 'DirectQuery' event subclass or the '$system.discover_connections' DMVs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-5",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Compare the execution architecture of the Synapse Data Warehouse vs. the SQL Analytics Endpoint in Microsoft Fabric. How do they handle transactional consistency (ACID)?",
+    "answer": "The SQL Analytics Endpoint is a read-only view generated automatically for Lakehouses, mapping Delta Lake tables directly to a SQL interface. It does not support write transactions (writes occur via Spark/pipelines). The Synapse Data Warehouse is a fully transactional DWH that supports full T-SQL DDL/DML. ACID consistency in the SQL Analytics Endpoint is maintained by reading the Delta transaction log snapshot. Synapse Data Warehouse manages ACID consistency by writing data in V-Ordered Parquet format and committing transactional updates directly to the transaction log, utilizing a lock manager and distributed commit coordinator under the hood.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-6",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How do you implement fine-grained access control (Row-Level Security and Column-Level Security) across Fabric SQL endpoints, and how does this affect Direct Lake mode?",
+    "answer": "RLS and CLS can be defined at the SQL Analytics Endpoint or Synapse Data Warehouse level using standard SQL syntax (CREATE SECURITY POLICY). However, if RLS or CLS is applied to tables accessed by a semantic model in Direct Lake mode, the model will automatically fall back to DirectQuery mode. This is because the VertiPaq engine cannot bypass the SQL security policies to map files directly from OneLake into memory. To maintain Direct Lake performance with RLS, you must define RLS directly within the Power BI semantic model using DAX filters, rather than at the SQL database layer.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-7",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "What is the role of Eventhouse in Microsoft Fabric Real-Time Intelligence, and how does it optimize ingestion indexing for semi-structured JSON payloads?",
+    "answer": "An Eventhouse is a logical group of KQL databases optimized for high-velocity streaming data. It utilizes the Kusto engine, which auto-indexes all columns upon ingestion, including nested properties inside semi-structured JSON payloads. This dynamic indexing splits JSON keys into individual search terms in an inverted index, enabling sub-second query performance over billions of rows using KQL (Kusto Query Language) without needing explicit schema definitions or manual index configurations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-8",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "How do you achieve zero-downtime CI/CD for Microsoft Fabric workspaces using Git Integration and Azure DevOps pipelines, and what are the limitations with semantic models?",
+    "answer": "Fabric Git Integration allows synchronization of workspace metadata with a Git repository. For zero-downtime CI/CD, workspaces are mapped to target branch folders (e.g., dev, test, prod). Azure DevOps pipelines automate testing, validate configuration changes, and deploy artifacts using Fabric REST APIs or workspace deployment pipelines. A major limitation is that semantic models in Direct Lake mode linked to SQL endpoints cannot be fully deployed across workspaces without dynamic parameterization of the SQL connection string, which requires XMLA write-back or script parameter updates post-deployment.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-9",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Explain Delta Lake Liquid Clustering in Microsoft Fabric Spark. How does it resolve the limitations of traditional partition layouts?",
+    "answer": "Delta Lake Liquid Clustering replaces traditional hive-style partition layouts (which suffer from over-partitioning, small file issues, and partition key rigidness). It uses a dynamic multidimensional clustering algorithm that groups data based on columns defined as clustering keys, without creating nested physical directories. This allows the layout to adapt as query patterns or data distributions change. It supports partition evolution (changing clustering keys without rewriting historical data) and significantly improves data skipping by generating tighter min/max statistics for clustered files.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-10",
+    "category": "FABRIC",
+    "niche": "Capacity Management, Smoothing, Throttling, and Cost Optimization",
+    "question": "Explain the concept of 'Smoothing' and 'Interactive vs Background' carryforward mechanisms in Fabric Capacity. How do they affect peak execution limits?",
+    "answer": "In Fabric Capacity, 'Smoothing' averages resource consumption (CU usage) over time to avoid transient spikes from shutting down capacity. Interactive operations (such as DAX queries) are smoothed over 5 minutes. Background operations (such as Spark notebook execution) are smoothed over 24 hours. If an operation consumes more CUs than available in the current interval, the excess usage is 'carried forward' to future intervals. This allows capacity to handle peak executions that exceed the capacity limit, but if the carryforward queue grows too large, it triggers throttling controls (e.g., degradation, rejection).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-11",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "What is the 'Framing' process in Direct Lake, and how does it manage the relationship between Delta table transaction logs and VertiPaq memory allocation?",
+    "answer": "'Framing' is the metadata synchronization process in Direct Lake that maps the active transaction state of a Delta Lake table to the Power BI semantic model schema. When a report is queried, the framing metadata determines the exact files and byte offsets that the VertiPaq engine needs to map into memory. If the Delta table log shifts (due to a write or optimization like Optimize/Vacuum), the framing must be updated. If a query hits a state that has not been framed, or if framing is manually disabled, the engine must either trigger a refresh/frame operation or fall back to DirectQuery mode to access the latest transactional state.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-12",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "How does the Microsoft Fabric Synapse Data Warehouse handle metadata synchronization and data cache management under concurrent read and write operations?",
+    "answer": "The Synapse Data Warehouse uses a metadata synchronization agent that monitors Delta Lake log updates. Under concurrent operations, readers utilize snapshots from the Delta transaction log to ensure read isolation (Snapshot Isolation). For data cache management, Fabric DW leverages local SSD caches on compute nodes. When writes occur, the cache is invalidated for the modified column segments based on the transaction ID, and the next read operation dynamically pulls the updated segments from OneLake and repopulates the local cache.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-13",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does ADLS Gen2 hierarchical namespace atomic rename work in OneLake, and what are the performance impacts for heavy directory moves?",
+    "answer": "In OneLake, the ADLS Gen2 Hierarchical Namespace (HNS) allows directory renaming to be performed as a single atomic metadata operation rather than a slow copy-and-delete of all child files. This is achieved by updating the parent-child relationships in the namespace database. However, under heavy directory moves, metadata locks can occur, causing temporary read/write latency. Fabric minimizes this by decoupling analytical file formats from directory paths and using transaction log files to track logical moves where possible.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-14",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "Describe the V-Order binary format inside Parquet files in Microsoft Fabric. How does it modify standard Apache Parquet metadata?",
+    "answer": "V-Order does not violate the standard Apache Parquet specification (it remains open Parquet), but it optimizes the layout of data *within* the Parquet file. Specifically, it reorders rows and column stripes to group similar data, maximizing the efficiency of dictionary encoding and run-length encoding (RLE). It also writes custom metadata headers that allow Microsoft's VertiPaq engine to identify that the file is V-Ordered and directly map the binary layout into memory without needing costly decompression or translation structures, accelerating Direct Lake queries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-15",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "Explain how Fabric Managed Private Endpoints interact with VNET data gateways to secure communication to on-premises data sources.",
+    "answer": "Fabric Managed Private Endpoints establish a secure, private link from the managed Microsoft VNET (where Fabric compute runs) to target Azure resources (like Azure SQL or Storage) using Private Link. For on-premises data sources, Fabric integrates with a VNET Data Gateway. The gateway sits inside a customer-managed VNET that has a hybrid connection (ExpressRoute or VPN) to the on-premises network. When Fabric requests on-premises data, the query goes through the Managed Private Endpoint to the gateway, which forwards the query to the on-premises database securely without exposing it to the public internet.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-16",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How does Eventstreams execute continuous data ingestion into KQL databases, and how does it guarantee exactly-once processing semantics?",
+    "answer": "Eventstreams utilizes a distributed messaging log (based on Apache Kafka) to ingest and buffer streaming data. When loading to a KQL database, it tracks partition offsets and uses transactional ingestion. The KQL database commits data in batches. If an ingestion batch fails, Eventstreams replays the data from the last committed offset. To guarantee exactly-once processing, Eventstreams embeds a unique message ID in each record. The KQL target database deduplicates incoming records within a configured sliding time window based on these IDs, discarding duplicates.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-17",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Explain how the Fabric Capacity Metrics App tracks CU consumption, specifically explaining how interactive delay and throttling are visualised and calculated.",
+    "answer": "The Fabric Capacity Metrics App tracks CU consumption by polling system telemetry logs. It displays metrics for interactive and background operations. The app calculates CU usage by comparing actual execution time and resource utilization against capacity limits. Interactive delay is visualised as a timeline of deferred requests. Throttling is calculated using a burn-rate metric: if the cumulative carryover exceeds the Capacity Limit * Smoothing Window, it shows the percentage of capacity exhausted and highlights the duration during which requests are either delayed or rejected.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-18",
+    "category": "FABRIC",
+    "niche": "Fabric Spark Runtime, V-Order, and Delta Lake Deep Internals",
+    "question": "What is the conflict resolution mechanism in Delta Lake when multiple concurrent Fabric Spark jobs attempt to merge and write to the same Delta table?",
+    "answer": "Delta Lake uses Optimistic Concurrency Control (OCC) to manage concurrent writes. When a Spark job starts a write operation, it records the starting table version. Before committing, it checks if another transaction committed first. If so, Delta Lake checks if the changes overlap (e.g., if Job A modified Partition A and Job B modified Partition B). If there is no overlap, Delta Lake automatically reconciles the commit metadata. If there is an overlap (e.g., Job A read data that Job B updated), it raises a write conflict exception (e.g., ConcurrentAppendException or ConcurrentDeleteReadException) and aborts the transaction.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-19",
+    "category": "FABRIC",
+    "niche": "Direct Lake Mode, Semantic Modeling, and VertiPaq Engine Nuances",
+    "question": "How does Direct Lake mode page data into the VertiPaq engine on-demand, and how does it handle memory pressure on the Fabric Capacity?",
+    "answer": "Direct Lake maps column files from OneLake directly into the VertiPaq engine memory using memory-mapped I/O. Columns are loaded on-demand (only when a visual requests them). When the capacity experiences memory pressure (e.g., other models or compute jobs need memory), VertiPaq uses an LRU eviction policy to unmap unused columns from memory. If a subsequent query requests an evicted column, it is paged back in from OneLake. If memory usage remains critically high and exceeds capacity thresholds, the model will fall back to DirectQuery mode to run queries directly against the SQL Analytics Endpoint.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-20",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the security delegation model when a Fabric notebook accesses an ADLS Gen2 shortcut using Microsoft Entra ID pass-through?",
+    "answer": "When a Fabric notebook accesses an ADLS Gen2 shortcut using Entra ID pass-through, the notebook runs in the context of the executing user's Entra identity. OneLake forwards the user's OAuth token to the ADLS Gen2 storage account. The storage account validates the token and evaluates RBAC permissions (e.g., Storage Blob Data Reader). If the user does not have direct permission on the target ADLS Gen2 container, the request is rejected, ensuring that OneLake shortcuts do not bypass enterprise data access control lists.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-21",
+    "category": "FABRIC",
+    "niche": "Synapse Data Warehousing, SQL Analytics Endpoints, and Distributed Compute",
+    "question": "Describe the query optimization process in Synapse Data Warehouse, specifically explaining how distributed stats are kept up to date without manual ANALYZE commands.",
+    "answer": "Synapse Data Warehouse automatically creates and updates statistics for tables. When queries are run, the query optimizer checks for missing statistics on queried columns and triggers background statistic generation. It also monitors data modifications (DML); when the number of modified rows exceeds a threshold, it marks the statistics as stale and updates them. This distributed auto-stats mechanism ensures the optimizer makes correct decisions for join paths and aggregations without requiring administrative ANALYZE commands.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-22",
+    "category": "FABRIC",
+    "niche": "Enterprise Governance, Purview Integration, and Network/Data Security",
+    "question": "How does Microsoft Purview capture and show data lineage for Microsoft Fabric items, and what are the limitations for cross-workspace pipelines?",
+    "answer": "Microsoft Purview automatically scans Fabric workspaces and extracts metadata to build a lineage map. It traces data flow from sources (like ADLS or SQL Server) through pipelines and Dataflows to Lakehouses, Warehouses, and eventually Power BI reports. For cross-workspace pipelines, Purview relies on the tenant-level lineage API. A major limitation is that if a pipeline calls a child pipeline or accesses a shortcut located in a workspace across a different tenant or region, Purview may fail to capture the complete path, resulting in broken or disconnected lineage nodes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-23",
+    "category": "FABRIC",
+    "niche": "Real-Time Intelligence, KQL Database, Eventstreams, and Complex Event Processing",
+    "question": "How does KQL Database partitioning work under the hood, and how can you override the default partition policies for high-cardinality keys?",
+    "answer": "Under the hood, KQL databases partition data into shards based on ingestion time. For tables with high-cardinality keys (like DeviceID or CustomerID), this can result in sub-optimal queries if filtering is frequently done on those keys. You can override this by defining a custom partitioning policy (using `.alter table partitioning policy`). This instructs the engine to re-partition shards based on the specified high-cardinality key, grouping similar values together in physical storage, which accelerates filter and aggregation performance for that key.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "fab-hard-24",
+    "category": "FABRIC",
+    "niche": "Advanced Orchestration (Data Factory Gen2, Pipelines, REST APIs, and CI/CD)",
+    "question": "Explain how Fabric capacity metrics app handles smoothing carryover for interactive tasks that run longer than 5 minutes. What is the mathematically adjusted calculation?",
+    "answer": "If an interactive task runs longer than 5 minutes, its CU consumption is smoothed over its entire execution duration, up to a maximum of 24 hours. The mathematically adjusted calculation divides the total CUs consumed by the execution duration in seconds, and attributes this average rate to each 30-second interval during execution. If the task exceeds 24 hours, the remaining CUs are carried over to the next 24-hour window, preventing interactive operations from causing instant capacity exhaustion or immediate throttling.",
+    "difficulty": "HARD"
+  }
+]

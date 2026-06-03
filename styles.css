@@ -129,6 +129,11 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
@@ -136,6 +141,8 @@ body {
   background: var(--bg-gradient);
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   transition: background 0.3s ease;
 }
@@ -150,7 +157,7 @@ body {
 #app-container {
   display: grid;
   grid-template-columns: 280px 1fr;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
 }
 
@@ -161,6 +168,7 @@ body {
   backdrop-filter: blur(var(--blur-radius));
   -webkit-backdrop-filter: blur(var(--blur-radius));
   padding: 1.25rem 1rem;
+  padding-bottom: calc(56px + 1.25rem + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -168,6 +176,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  overflow-y: auto;
 }
 
 .brand {
@@ -307,6 +316,7 @@ body {
 /* Main Content Area */
 .main-content {
   padding: 2rem 3rem;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
   height: 100vh;
   overflow-y: auto;
   position: relative;
@@ -350,6 +360,12 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stats-card {
@@ -660,6 +676,9 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .concept-card-footer {
@@ -683,9 +702,10 @@ body {
 /* Search and Filter styling */
 .filter-bar {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .search-input-wrapper {
@@ -776,6 +796,19 @@ body {
   z-index: 1001;
 }
 
+@media (max-width: 600px) {
+  .dialog-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .dialog-box {
+    width: 100vw;
+    max-height: 92vh;
+    border-radius: 24px 24px 0 0;
+    border-bottom: none;
+  }
+}
+
 .dialog-header {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--card-border);
@@ -805,6 +838,9 @@ body {
   font-weight: 500;
   line-height: 1.4;
   color: var(--text-primary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .dialog-close-btn {
@@ -836,6 +872,9 @@ body {
   flex-direction: column;
   gap: 1rem;
   line-height: 1.5;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .dialog-section-title {
@@ -854,6 +893,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .dialog-answer-text p { margin-bottom: 0.25rem; }
@@ -948,6 +993,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.q-text-line {
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-top: 0.25rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 1200px) {
+  /* On mobile/tablet horizontal scrollbar view, keep list item text to single line with ellipsis */
+  .q-text-line {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
 .practice-q-item {
@@ -1095,20 +1158,19 @@ body {
   margin-bottom: 0.3rem;
 }
 
-/* Selection Niche Launcher Box */
 .niche-select-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1250px) {
   .niche-select-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .niche-select-grid {
     grid-template-columns: 1fr;
   }
@@ -1184,111 +1246,136 @@ body {
   box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
 }
 
-/* Responsiveness (Mobile Adaptation) */
+/* =====================================================
+   BOTTOM PILL NAV — Always visible on every screen
+   Scrollable, icon + label, 9 tabs, no hidden sections
+   ===================================================== */
+
+/* ---- Bottom Navigation Bar (all screens) ---- */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  backdrop-filter: blur(var(--blur-radius));
+  -webkit-backdrop-filter: blur(var(--blur-radius));
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+}
+
+/* Scroll container — hides scrollbar, enables swipe */
+.mobile-nav-scroll {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  height: 100%;
+  padding: 0 1rem;
+}
+
+.mobile-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each tab — pill shape with icon + label */
+.mobile-nav-tab {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.45rem 1rem;
+  border-radius: 50px;
+  border: 1.5px solid transparent;
+  background: var(--item-bg);
+  color: var(--text-secondary);
+  font-family: var(--font-family);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  touch-action: manipulation;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-tab svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  transition: color 0.2s ease;
+}
+
+.mobile-nav-tab span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Active tab — filled pill */
+.mobile-nav-tab.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 12px rgba(108, 92, 231, 0.35);
+}
+
+.mobile-nav-tab.active svg {
+  color: #ffffff;
+}
+
+/* Pressed feedback */
+.mobile-nav-tab:active {
+  transform: scale(0.96);
+}
+
+/* Hover tint for non-active tabs */
+.mobile-nav-tab:not(.active):hover {
+  border-color: var(--card-border);
+  color: var(--text-primary);
+}
+
+/* ===================================================
+   MOBILE-ONLY layout overrides (≤ 900px)
+   =================================================== */
 @media (max-width: 900px) {
+  /* Layout: single column, no sidebar */
   #app-container {
     grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
+  /* Desktop sidebar — hidden on mobile */
   .sidebar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100vw;
-    height: 70px;
-    padding: 0;
-    flex-direction: row;
-    border-right: none;
-    border-top: 1px solid var(--card-border);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .sidebar::-webkit-scrollbar {
     display: none;
   }
 
-  .sidebar nav {
-    width: auto !important;
-    height: 100%;
-    display: flex;
-    align-items: center;
+  /* Taller tab bar on mobile for easier tapping */
+  .mobile-bottom-nav {
+    height: calc(68px + env(safe-area-inset-bottom, 0px));
   }
 
-  .brand, .sidebar-footer, .brand-text {
-    display: none;
-  }
-
-  .dialog-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-  }
-  
-  .dialog-status-selector, .practice-nav-group {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .practice-controls-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .practice-controls-row .status-updater-row, 
-  .practice-controls-row .practice-nav-group {
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .nav-links {
-    flex-direction: row;
-    justify-content: flex-start;
-    width: max-content;
-    gap: 0.25rem;
-    padding: 0 1rem;
-    height: 100%;
-    align-items: center;
-  }
-
-  .nav-item {
-    width: auto;
-    flex-shrink: 0;
-  }
-
-  .nav-btn {
-    padding: 0.5rem 0.75rem;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    font-size: 0.7rem;
-    text-align: center;
-    white-space: nowrap;
-    width: auto;
-    flex-shrink: 0;
-  }
-
-  .nav-btn.active {
-    background: transparent;
-    color: var(--primary);
-    box-shadow: none;
-  }
-
-  .main-content {
-    padding: 1.5rem;
-    padding-top: calc(60px + 1.5rem);
-    padding-bottom: 90px;
-    height: auto;
-    overflow-y: visible;
-  }
-
+  /* ---- Mobile Top Bar ---- */
   .mobile-top-bar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     position: fixed;
     top: 0;
     left: 0;
@@ -1299,8 +1386,8 @@ body {
     backdrop-filter: blur(var(--blur-radius));
     -webkit-backdrop-filter: blur(var(--blur-radius));
     padding: 0 1.25rem;
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   }
 
   .mobile-brand {
@@ -1318,7 +1405,7 @@ body {
 
   .mobile-brand-text h2 {
     font-family: 'Outfit', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     margin: 0;
     color: var(--text-primary);
@@ -1326,26 +1413,50 @@ body {
   }
 
   .mobile-brand-text span {
-    font-size: 0.72rem;
-    font-weight: 500;
+    font-size: 0.68rem;
+    font-weight: 400;
     color: var(--text-secondary);
     display: block;
     margin: 0;
   }
 
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+  .mobile-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .practice-container {
-    grid-template-columns: 1fr;
-    height: auto;
+  .mobile-theme-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--item-bg);
+    border: 1px solid var(--card-border);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.2s ease;
   }
 
-  .practice-sidebar {
-    max-height: 200px;
+  .mobile-theme-btn:active {
+    transform: scale(0.92);
+  }
+
+}
+
+/* ---- On desktop: hide the mobile top bar only; keep the bottom pill nav ---- */
+@media (min-width: 901px) {
+  .mobile-top-bar {
+    display: none !important;
   }
 }
+
+
+
+
 
 /* Accessibility settings for reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -1359,7 +1470,7 @@ body {
 /* Scroll to Top Button styling */
 .scroll-to-top-btn {
   position: fixed;
-  bottom: 2rem;
+  bottom: calc(56px + 1.5rem + env(safe-area-inset-bottom, 0px));
   right: 2rem;
   width: 48px;
   height: 48px;
@@ -1520,6 +1631,12 @@ code {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .answer-content-text p {
@@ -1791,7 +1908,7 @@ code {
 .category-logo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: inherit;
   display: block;
 }
@@ -1851,7 +1968,7 @@ code {
 /* Risk Tier Definitions Cards Grid */
 .gcc-risk-definitions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.25rem;
 }
 
@@ -2453,6 +2570,12 @@ code {
   color: var(--text-primary);
   margin: 0 0 0.2rem 0;
   line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-overflow: initial;
+  overflow: visible;
+  height: auto;
+  min-width: 0;
 }
 
 .level-tag {
@@ -3525,6 +3648,9 @@ code {
   color: var(--text-primary);
   font-size: 0.95rem;
   line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .concept-explanation {
@@ -3532,6 +3658,9 @@ code {
   color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.55;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .concept-key-points {
@@ -3543,6 +3672,9 @@ code {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .concept-key-points li::marker {
@@ -3661,11 +3793,17 @@ code {
 
 .concepts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(500px, 100%), 1fr));
   gap: 1rem;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1250px) {
+  .concepts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
   .concepts-grid {
     grid-template-columns: 1fr;
   }
@@ -3749,6 +3887,9 @@ code {
   color: var(--text-primary);
   line-height: 1.3;
   margin-bottom: 6px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .card-tags {
@@ -3800,6 +3941,9 @@ code {
   color: var(--text-secondary);
   line-height: 1.55;
   border-bottom: 1px solid var(--card-border);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Card Body (collapsible) */
@@ -3841,6 +3985,9 @@ code {
   font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Code Block */
@@ -3850,6 +3997,9 @@ code {
   border: 1px solid var(--card-border);
   border-radius: 8px;
   overflow: hidden;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .code-toolbar {
@@ -3979,6 +4129,9 @@ pre.code-block code,
   font-size: 0.82rem;
   color: var(--text-secondary);
   line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .note-bullet {
@@ -4055,3 +4208,778 @@ pre.code-block code,
 .comp-x     { color: var(--danger); }
 .comp-part  { color: var(--warning); }
 
+/* =======================================================================
+   COMPREHENSIVE MOBILE OPTIMIZATIONS — v1.1.0
+   All view-specific overrides consolidated below this line.
+   Breakpoints: 900px (tablet), 600px (mobile), 400px (small mobile)
+   ======================================================================= */
+
+/* -----------------------------------------------------------------------
+   A. GLOBAL LAYOUT — main-content safe area + page header
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .main-content {
+    padding: 1.25rem;
+    padding-top: calc(60px + 1.25rem);
+    /* Safe area support for devices with notch/home bar */
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    height: auto;
+    overflow-y: visible;
+    overflow-x: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Prevent any child from overflowing the viewport on mobile */
+  .main-content > * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.6rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* Scroll-to-top button — avoid overlap with bottom nav */
+  .scroll-to-top-btn {
+    bottom: calc(68px + 1rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    padding: 1rem;
+    padding-top: calc(60px + 1rem);
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .page-title {
+    font-size: 1.35rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   B. FILTER BARS — stack on mobile across all views
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar .search-input-wrapper {
+    width: 100%;
+  }
+
+  .filter-bar .filter-select,
+  .filter-bar .filter-dropdown {
+    width: 100%;
+  }
+
+  .filter-bar .control-group {
+    justify-content: flex-end;
+  }
+
+  /* Topics/chips scrollbar — ensure smooth horizontal scroll on touch */
+  .topics-scrollbar {
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .topic-chip {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   C. DASHBOARD VIEW
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .stats-card {
+    padding: 1rem;
+  }
+
+  .stats-title {
+    font-size: 1.1rem;
+  }
+
+  .stats-badge {
+    font-size: 0.6rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   D. NICHE PRACTICE VIEW — sidebar & controls
+   ----------------------------------------------------------------------- */
+@media (max-width: 1200px) {
+  .practice-container {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 1rem;
+  }
+
+  .practice-controls-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* Convert sidebar to horizontal scroll bar */
+  .practice-sidebar {
+    max-height: none;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.75rem;
+    gap: 0.5rem;
+    border-radius: 12px;
+    scrollbar-width: none;
+  }
+
+  .practice-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .practice-sidebar-title {
+    display: none;
+  }
+
+  .practice-q-list {
+    flex-direction: row;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .practice-q-item {
+    flex-shrink: 0;
+    min-width: 160px;
+    max-width: 220px;
+  }
+
+  .practice-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .practice-card-niche {
+    font-size: 1.05rem;
+  }
+
+  .status-updater-row {
+    flex-wrap: wrap;
+  }
+
+  .status-selector-label {
+    width: 100%;
+  }
+
+  .dialog-status-selector {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .flashcard-q p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .practice-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .practice-controls-row .status-updater-row,
+  .practice-controls-row .practice-nav-group {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .practice-nav-group {
+    justify-content: space-between;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   E. GCC DIRECTORY VIEW — table, controls, risk cards
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .gcc-risk-definitions {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .gcc-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .gcc-search-box {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .gcc-filter-chips {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+  }
+
+  .gcc-filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Table — ensure horizontal scroll on mobile */
+  .gcc-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gcc-table {
+    min-width: 700px; /* Force scroll instead of squishing */
+  }
+
+  .gcc-table th,
+  .gcc-table td {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  /* Hide the justification column text on smallest screens (still scrollable) */
+  .gcc-table .justification {
+    min-width: 180px;
+    max-width: 240px;
+    font-size: 0.78rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   F. PYSPARK CURRICULUM VIEW
+   ----------------------------------------------------------------------- */
+@media (max-width: 1150px) {
+  .pyspark-phase-nav {
+    gap: 0.4rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+
+  .pyspark-phase-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pyspark-phase-btn {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .pyspark-phase-btn {
+    padding: 0.45rem 0.75rem;
+  }
+
+  .pyspark-phase-btn .phase-label {
+    display: none;
+  }
+
+  .pyspark-phase-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .level-card-header {
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .level-title {
+    font-size: 0.88rem;
+  }
+
+  .level-tag {
+    white-space: normal;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pyspark-header-meta {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   G. GENERAL DE PREP VIEW — mode toggle, stats, search
+   ----------------------------------------------------------------------- */
+@media (max-width: 1150px) {
+  .de-dashboard-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .de-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .de-difficulty-chips {
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+
+  .de-difficulty-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .de-diff-chip {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .de-mock-setup-card,
+  .de-mock-active-card,
+  .de-mock-summary-card {
+    padding: 1.25rem;
+    margin: 0;
+  }
+
+  .de-mode-toggles {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .de-mode-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .de-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .summary-stats-box {
+    padding: 1rem 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .mock-active-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .mock-active-footer .control-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .de-library-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .de-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mock-question-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   H. KEY CONCEPTS VIEW
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .concept-term {
+    font-size: 1rem;
+  }
+
+  .concept-card-header {
+    padding: 1rem;
+  }
+
+  .concept-card-body-inner {
+    padding: 0 1rem 1rem 1rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   I. CODE DEEPDIVE VIEW — comparison table + code blocks
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  /* Comparison table horizontal scroll */
+  .comp-table-wrapper,
+  [class*="comparison"],
+  #cheatsheet-comparison-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .comp-table {
+    min-width: 480px;
+  }
+
+  .comp-table td {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+
+  /* Code block — reduce padding on mobile */
+  pre.code-block {
+    padding: 10px 1rem;
+    font-size: 0.78rem;
+  }
+
+  .code-toolbar {
+    padding: 6px 1rem;
+  }
+
+  /* Language chip nav — already a scrollbar but ensure touch-friendly */
+  #cheatsheet-lang-nav {
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Level section headers — tighten on mobile */
+  .level-section-header {
+    padding: 1rem 0 0.4rem;
+    gap: 8px;
+  }
+
+  .level-section-badge {
+    padding: 4px 10px;
+    font-size: 0.72rem;
+  }
+
+  .level-section-count {
+    font-size: 0.7rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   J. SPARK GUIDE VIEW — simulator, memory mapper overrides
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  /* Contain the Tailwind container so it never overflows mobile viewport */
+  #view-spark .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-x: hidden;
+  }
+
+  /* All sections within Spark must not overflow */
+  #view-spark section {
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  #view-spark [class*="col-span"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Memory mapper sliders — ensure they don't overflow */
+  #view-spark input[type="range"] {
+    width: 100%;
+  }
+
+  /* Make the memory bar text smaller on mobile */
+  #view-spark [id^="bar-"] {
+    font-size: 0.6rem !important;
+  }
+
+  /* Simulator select and run button — stack on mobile */
+  #simulator-flow-type {
+    width: 100%;
+  }
+
+  /* Clamp padding of cards and sections on mobile */
+  #view-spark .p-6,
+  #view-spark .md\:p-8,
+  #view-spark [class*="p-6"],
+  #view-spark [class*="p-8"] {
+    padding: 1.25rem !important;
+  }
+
+  #view-spark .mb-12,
+  #view-spark [class*="mb-12"] {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Clamp typography of inner headings */
+  #view-spark h2.text-2xl,
+  #view-spark h2:not(.page-title) {
+    font-size: 1.35rem !important;
+  }
+
+  #view-spark h3.text-2xl {
+    font-size: 1.2rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #view-spark [class*="grid-cols-3"] {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  #view-spark .p-6,
+  #view-spark .md\:p-8,
+  #view-spark [class*="p-6"],
+  #view-spark [class*="p-8"] {
+    padding: 1rem !important;
+  }
+
+  #view-spark .mb-12,
+  #view-spark [class*="mb-12"] {
+    margin-bottom: 1rem !important;
+  }
+
+  #view-spark h2.text-2xl,
+  #view-spark h2:not(.page-title) {
+    font-size: 1.2rem !important;
+  }
+
+  #view-spark h3.text-2xl {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   K. CONCEPT EXPLAINER VIEW — filter bar & accordion
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #explainer-accordion .accordion-header {
+    font-size: 0.92rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .accordion-inner {
+    padding: 0 1rem 0;
+  }
+
+  /* Cards grid inside accordion — dynamic column count on tablets */
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   L. TOUCH TARGETS — improve tap targets for all interactive elements
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  button,
+  .control-btn,
+  .status-btn,
+  .gcc-chip,
+  .topic-chip,
+  .de-diff-chip,
+  .nav-btn {
+    touch-action: manipulation;
+  }
+
+  /* Ensure minimum 44px tap target height */
+  .control-btn,
+  .status-btn,
+  .gcc-chip {
+    min-height: 40px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   M. SITE FOOTER — compact on mobile
+   ----------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .site-footer {
+    margin-top: 2rem;
+    padding: 1.5rem 1rem 1rem !important;
+    font-size: 0.72rem;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   N. COMPARISON SECTION SPACING
+   ----------------------------------------------------------------------- */
+.comparison-section {
+  margin-top: 3.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .comparison-section {
+    margin-top: 2rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .comparison-section {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* =======================================================================
+   O. GLOBAL RESPONSIVE CONTAINMENT & TEXT WRAPPING OVERRIDES (v1.5.0)
+   Resolves all horizontal overflows, layout breaks, and text wrapping.
+   ======================================================================= */
+
+/* 1. Global text wrapping guarantee across all text elements */
+p, li, td, th,
+.dialog-body, .dialog-answer-text,
+.concept-card-title, .concept-term, .concept-definition, .concept-explanation, .concept-impact,
+.level-scenario p, .flashcard-q p, .flashcard-a-text, .best-practice-card p, .lexicon-card p,
+.stats-title, .page-title, .page-subtitle, .practice-sidebar-title, .level-title, .level-tag {
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  text-overflow: initial !important;
+  overflow: visible !important;
+  height: auto !important;
+  min-width: 0 !important;
+}
+
+code, pre {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* 2. Global container bounds clamps */
+body, html, #app-container, .main-content, .page-view, .container, .grid, .flex, .sidebar, .mobile-top-bar, .mobile-bottom-nav {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. Constrain all card elements to prevent horizontal sizing expansion */
+.stats-card,
+.concept-card,
+.concept-accordion-card,
+.niche-launcher-card,
+.pyspark-level-card,
+.lexicon-card,
+.best-practice-card,
+.dialog-box,
+.practice-sidebar,
+.flashcard-card,
+.flashcard,
+.gcc-tip-card,
+.de-mock-setup-card,
+.de-mock-active-card,
+.de-mock-summary-card,
+.de-difficulty-chips,
+.level-card-header,
+.level-card-body,
+.level-meta,
+.launcher-info,
+.dialog-body,
+.dialog-answer-text,
+.dialog-title-container {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 4. Enforce scrolling behavior on horizontal navigation/scrollbars */
+.topics-scrollbar,
+.gcc-filter-chips,
+.de-difficulty-chips,
+.pyspark-phase-nav,
+.mobile-nav-scroll {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+}
+
+/* 5. MathJax and formula layout containment */
+mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .MathJax_MathML, math {
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  display: block !important;
+  min-width: 0 !important;
+}
+
+/* 6. Code wrappers and preformatted text containment */
+.code-wrapper, pre.code-block {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* 7. Responsive adjustments for stats cards */
+@media (max-width: 480px) {
+  .stats-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* 8. Personalised Prep View Styles */
+.personalised-counter {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  margin-left: auto;
+}
+
+@media (max-width: 600px) {
+  .personalised-counter {
+    margin-left: 0;
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+}

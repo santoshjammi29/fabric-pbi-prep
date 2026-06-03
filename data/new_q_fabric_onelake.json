@@ -1,0 +1,506 @@
+[
+  {
+    "id": "onelake-26",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is OneLake in Microsoft Fabric and how does it differ from Azure Data Lake Storage Gen2 (ADLS Gen2)?",
+    "answer": "OneLake is the unified, single logical data lake built into every Microsoft Fabric tenant, automatically provisioned without any setup. Unlike ADLS Gen2 which is a standalone Azure storage service that must be explicitly created, connected, and paid for separately, OneLake comes as the foundational storage layer within Fabric—one per tenant, shared across all workspaces and experiences. It is built on top of ADLS Gen2 infrastructure but abstracts away storage account management, SAS tokens, and per-account billing. All Fabric items (Lakehouses, Warehouses, Datasets) automatically store their data in OneLake in open formats. ADLS Gen2 requires managing hierarchical namespaces, access keys, and service principals, whereas OneLake uses Fabric's unified identity and RBAC model. Data in OneLake is addressable via the OneLake FileSystem URI scheme (onelake://) and is also accessible through the ADLS Gen2-compatible DFS endpoint.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-27",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the OneLake FileSystem URI format for accessing data stored in a Fabric Lakehouse?",
+    "answer": "OneLake uses a hierarchical URI format: `onelake://<workspaceName>/<itemName>/<itemType>/<path>`. For example, accessing the Tables folder of a Lakehouse would look like `onelake://MyWorkspace/MySalesLakehouse.Lakehouse/Tables/`. The DFS-compatible endpoint follows the pattern `https://onelake.dfs.fabric.microsoft.com/<workspaceId>/<itemId>/`, which allows ADLS Gen2-compatible SDKs and tools (like Azure Storage Explorer, ADLS Gen2 .NET SDK) to interact with OneLake without modification. The workspace GUID and item GUID can be used interchangeably with friendly names in most contexts. This dual-URI support (friendly name and GUID-based) is critical for automation scripts and REST API interactions. The path structure within an item follows open Delta/Parquet folder conventions under the Files/ and Tables/ root folders of a Lakehouse.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-28",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is a OneLake Shortcut and what problem does it solve?",
+    "answer": "A OneLake Shortcut is a virtual pointer to data stored in an external location—either within OneLake itself (cross-workspace), or in external systems like ADLS Gen2, Amazon S3, or Google Cloud Storage—without physically copying or moving that data. It solves the problem of data silos and unnecessary data duplication: organizations can reference data in place while making it appear as if it's part of their Fabric Lakehouse. When a query or Spark job accesses a shortcut, Fabric transparently resolves the pointer and reads data from the source. This enables a 'single pane of glass' experience where all data appears unified in OneLake. Shortcuts appear as regular folders in the Lakehouse Files or Tables section and can be used with any Fabric compute (Spark, SQL endpoint, Power BI Direct Lake). They are defined at the item level and can reference specific paths within source storage containers.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-29",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What external data sources can OneLake Shortcuts point to in 2024-2025?",
+    "answer": "OneLake Shortcuts currently support the following external sources: Azure Data Lake Storage Gen2 (ADLS Gen2), Azure Blob Storage, Amazon S3 (and S3-compatible endpoints), Google Cloud Storage (GCS), and Dataverse. Internal shortcuts (OneLake-to-OneLake) allow cross-workspace and cross-item data referencing within the same or different Fabric tenants. For S3 shortcuts, Fabric uses an IAM role-based trust model or access keys configured as a Cloud Connection in the Fabric Data Gateway. For ADLS Gen2, shortcuts support both organizational account (AAD) auth and SAS/Account Key via Cloud Connections. GCS shortcuts use HMAC keys (service account). Each external shortcut type has different credential management and IAM setup requirements defined in Fabric's 'Manage Connections and Gateways' interface.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-30",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the two main storage zones within a Fabric Lakehouse in OneLake?",
+    "answer": "Every Fabric Lakehouse has two main storage zones within OneLake: the Tables zone and the Files zone. The Tables zone stores managed Delta Lake tables—data here is in Delta Parquet format with transaction logs (_delta_log/), and these tables are automatically registered in the Lakehouse's SQL Analytics Endpoint and can be queried via T-SQL or SPARKSQL. The Files zone is an unmanaged area for raw files in any format (CSV, JSON, Parquet, images, etc.) without schema enforcement. Data in Files can be referenced by Spark notebooks but is not automatically surfaced in the SQL endpoint. This separation mirrors the Databricks concept of managed vs. unmanaged tables. Shortcuts can be created in both zones, and data engineers typically implement Bronze/Silver/Gold medallion layers by organizing subfolders within Files (raw ingestion) and promoting refined data to Tables (Delta).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-31",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Direct Lake mode in Power BI differ from Import and DirectQuery modes?",
+    "answer": "Direct Lake mode is a Fabric-native query mode where Power BI semantic models read Delta Parquet files directly from OneLake without importing data into the VertiPaq in-memory engine (as in Import mode) and without issuing live SQL queries to a data source (as in DirectQuery). In Direct Lake, when a report is opened, Fabric 'frames' (loads column segments from Parquet files) into memory on demand, combining the speed of in-memory VertiPaq with the freshness of live OneLake data. Import mode has a scheduled refresh ceiling (8x/day on Pro, 48x/day on Premium) and data staleness issues. DirectQuery is slow due to live query overhead. Direct Lake supports automatic fallback to DirectQuery if data volumes exceed capacity limits (called 'guardrails'). It is only available for semantic models hosted in Fabric workspaces backed by Fabric capacity, and requires the underlying tables to be in Delta format in OneLake.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-32",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the role of the Fabric Capacity Metrics App and what key metrics does it expose?",
+    "answer": "The Fabric Capacity Metrics App is a pre-built Power BI report installed from AppSource that monitors compute consumption against a Fabric capacity SKU. It exposes Capacity Unit (CU) consumption broken down by workspace, item, operation type (Background vs. Interactive), and time window. Key metrics include: CU seconds consumed per operation, throttling events (when capacity is overloaded), peak vs. average utilization, and smoothing (Fabric's 24-hour burstable pooling mechanism). Background operations (Spark jobs, dataflows) can burst up to 24x their baseline CU allocation and repay over 24 hours. Interactive operations (DAX queries, SQL queries) are throttled immediately if capacity is exhausted. The app helps identify capacity hogs, plan SKU upgrades, and understand the impact of workload concurrency. It connects to the Fabric REST API's `/capacities/{capacityId}/operations` telemetry endpoint.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-33",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the OneLake medallion architecture and how is it typically implemented in Fabric?",
+    "answer": "The OneLake medallion architecture follows the Bronze-Silver-Gold layered data design pattern within a Fabric tenant's OneLake storage. Bronze (raw layer) holds unprocessed, as-ingested data in the Files zone of a Lakehouse or as raw Delta tables—often sourced via Fabric Data Factory pipelines, Event Streams, or shortcuts to source systems. Silver (cleansed layer) stores validated, deduplicated, and standardized Delta tables in a separate Lakehouse or schema. Gold (curated layer) contains business-aggregated, star-schema-oriented Delta tables optimized for reporting, often surfaced via a Warehouse or Direct Lake semantic model. In Fabric, each medallion layer is typically a separate Lakehouse item, connected by Spark notebooks or Data Factory pipelines. Cross-lakehouse shortcuts allow the Gold layer to reference Silver tables without data movement. The SQL Analytics Endpoint on each Lakehouse provides T-SQL access to Tables, enabling cross-workspace querying via three-part naming.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-34",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is Fabric Git Integration and which Git providers does it support?",
+    "answer": "Fabric Git Integration allows Fabric workspace items (Lakehouses, Notebooks, Pipelines, Semantic Models, Reports, etc.) to be synced with a Git repository, enabling version control, CI/CD, and collaborative development workflows. Supported Git providers include Azure DevOps (Azure Repos) and GitHub (including GitHub Enterprise). When connected, item definitions are serialized to YAML/JSON/PBIP format in the repo, and changes can be pushed/pulled between the Fabric workspace and the git branch. Each item type has a specific folder structure in the repo (e.g., `.platform` metadata files). The integration supports branch-based development where developers work on feature branches and merge to main. It does not sync data itself—only item metadata and definitions. Fabric REST API endpoints (`/workspaces/{workspaceId}/git/`) allow programmatic commit, update, and status operations for automation in CI/CD pipelines.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-35",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is a Fabric Workspace and how does it relate to OneLake storage?",
+    "answer": "A Fabric Workspace is a logical container for organizing Fabric items (Lakehouses, Warehouses, Notebooks, Pipelines, Semantic Models, Reports, etc.) within a tenant. Every workspace maps to a dedicated folder within the tenant's OneLake, following the path structure `/workspaces/<workspaceId>/`. All items created within a workspace automatically store their data under this workspace path in OneLake. Workspaces are associated with a Fabric capacity (F SKU or P SKU) that governs the compute resources available. A workspace can have one or more Lakehouses, each with its own subfolder. Access control is managed at the workspace level via roles (Admin, Member, Contributor, Viewer) and at the item level via item permissions. The 'My Workspace' personal workspace uses shared capacity and has limitations around sharing and capacity features.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-36",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is Fabric Mirroring and which source systems does it support?",
+    "answer": "Fabric Mirroring is a zero-ETL replication feature that continuously synchronizes data from external operational databases into OneLake in Delta Parquet format, near real-time. It uses change data capture (CDC) under the hood and does not require Fabric Data Factory pipelines or custom Spark jobs. Supported sources as of 2025 include Azure SQL Database, Azure Cosmos DB (NoSQL API), Azure SQL Managed Instance, Snowflake, and Azure Database for PostgreSQL. Once mirrored, data lands as Delta tables in a Lakehouse and can immediately be queried via the SQL Analytics Endpoint, Spark, or Direct Lake semantic models. Mirroring is configured via the Fabric portal by creating a 'Mirrored Database' item, providing connection credentials, and selecting tables. Replication lag is typically seconds to low minutes. CDC events are translated into Delta MERGE/INSERT/DELETE operations on the OneLake Delta tables.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-37",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the Fabric REST API and what categories of operations does it support?",
+    "answer": "The Fabric REST API (`api.fabric.microsoft.com/v1`) is the programmatic management plane for all Fabric resources and items. It supports operations across the following categories: Workspace management (create, list, update, delete workspaces), Item management (create, get, update, delete items like Lakehouses, Notebooks, Pipelines), Capacity management (list capacities, assign workspaces to capacities), OneLake (list, create, and manage shortcuts), Git operations (connect, commit, update from git), Job scheduling (trigger on-demand runs of Data Factory pipelines and Notebooks), and Admin operations (tenant settings, usage metrics). The API uses OAuth 2.0 bearer tokens from Azure AD with delegated or application permissions. Item definitions can be retrieved and updated via the `getItemDefinition` and `updateItemDefinition` endpoints, enabling Infrastructure-as-Code patterns. The Fabric REST API is distinct from the Power BI REST API, though both are available within a Fabric tenant.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-38",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is an Eventhouse in Microsoft Fabric and how does it relate to KQL databases?",
+    "answer": "An Eventhouse is a Fabric item that serves as a container for one or more KQL (Kusto Query Language) databases, designed for real-time analytics on high-volume, time-series, and streaming data. It is the Fabric equivalent of an Azure Data Explorer (ADX) cluster. Each Eventhouse can host multiple KQL databases, and each database stores data in the Kusto columnar storage format optimized for time-series and log analytics. Data can be ingested into an Eventhouse via Event Streams (Kafka-compatible streaming), Fabric Pipelines, or direct ingestion APIs. KQL databases in an Eventhouse are also accessible via the OneLake integration feature, where data can be exposed as Delta tables in OneLake. The Eventhouse auto-scales compute based on data volume and query load. It supports materialized views, update policies, and continuous exports to OneLake.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-39",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is Fabric Data Activator and what types of triggers does it support?",
+    "answer": "Fabric Data Activator (also known as Reflex) is a no-code real-time monitoring and alerting tool in Microsoft Fabric that watches data streams or Power BI report visuals and triggers actions when defined conditions are met. It can monitor data from Event Streams, Power BI report visuals, and OneLake tables. Supported trigger conditions include threshold comparisons (value exceeds/falls below X), rate of change conditions, and custom expressions evaluated on streaming data. When a trigger fires, Data Activator can invoke actions such as sending email notifications, sending Teams messages, triggering a Fabric Data Factory pipeline, calling a Power Automate flow, or starting a Spark notebook job. It is configured via the Fabric portal by creating a 'Reflex' item, defining 'objects' (data entities to watch), 'properties' (metrics), and 'triggers' (conditions + actions). It is particularly used in supply chain, IoT, and financial monitoring scenarios.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-40",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the SQL Analytics Endpoint in a Fabric Lakehouse?",
+    "answer": "The SQL Analytics Endpoint is an automatically provisioned, read-only T-SQL query interface associated with every Fabric Lakehouse. It allows users to query Delta tables stored in the Lakehouse's Tables zone using standard T-SQL syntax—including SELECT, JOIN, aggregate functions, and views—without writing Spark code. The endpoint is powered by the Fabric Warehouse engine and supports SSMS, Azure Data Studio, and any ODBC/JDBC-compatible tool via the TDS (Tabular Data Stream) protocol. Tables in the Tables zone are automatically schema-discovered and registered; new tables added by Spark are reflected within minutes. The endpoint does not support DML (INSERT, UPDATE, DELETE)—it is read-only. Cross-database queries are supported using three-part naming: `[WorkspaceName].[LakehouseName].[schema].[TableName]`. Views and stored procedures can be created on the endpoint for additional abstraction. Default behavior uses V-Order optimized Parquet reads for query performance.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-41",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the difference between a Fabric Lakehouse and a Fabric Warehouse?",
+    "answer": "A Fabric Lakehouse is a unified data store combining a data lake (raw file storage in Files zone) and a Delta Lake layer (managed Delta tables in Tables zone), accessed via both Spark (notebook/Spark jobs) and a read-only SQL Analytics Endpoint (T-SQL). It is schema-on-read and supports semi-structured data. A Fabric Warehouse (formerly Synapse Data Warehouse) is a fully managed, dedicated SQL data warehouse with full read/write T-SQL support (DDL, DML, stored procedures, transactions), a schema-on-write model, and enterprise warehouse features like multi-table transactions. Both store data in Delta Parquet format in OneLake. The Warehouse is optimized for SQL-first, analyst-focused workloads with higher concurrency SLAs. The Lakehouse is preferred for data engineering, ML, and multi-language (Python/Scala/R) workloads. Both can be queried via Power BI Direct Lake or DirectQuery.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-42",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does OneLake handle data residency and geo-replication for multi-region tenants?",
+    "answer": "OneLake stores data in the Azure region associated with the Fabric tenant's home region, selected during initial tenant setup and tied to the Microsoft 365 tenant region. For workspaces assigned to capacity in a different region, data is stored in the capacity's Azure region rather than the home tenant region—this is called 'multi-geo' support. Fabric capacities can be provisioned in different Azure regions (e.g., East US, West Europe), and workspaces attached to those capacities store data locally in that region to meet data residency requirements. OneLake itself does not natively geo-replicate data across regions for disaster recovery; organizations requiring cross-region HA must implement their own replication (e.g., using ADF pipeline copies or ADLS Gen2 geo-redundant storage for shortcuts). The Fabric Admin Portal shows the region associated with each capacity, and the OneLake DFS endpoint reflects the regional endpoint for data access.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-43",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What authentication methods does the OneLake ADLS Gen2-compatible API support?",
+    "answer": "The OneLake ADLS Gen2-compatible DFS endpoint (`https://onelake.dfs.fabric.microsoft.com`) supports authentication via Azure Active Directory (now Entra ID) OAuth 2.0 bearer tokens—both delegated (user identity) and application (service principal) flows. Managed Identities for Azure resources can also authenticate to OneLake when running within Azure compute (e.g., Azure Functions, ADF IR). Shared Access Signatures (SAS tokens) and account keys are NOT supported for OneLake directly, unlike traditional ADLS Gen2 accounts—this is by design to enforce identity-based access control. Tools like Azure Storage Explorer, the Azure Storage Python SDK (`azure-storage-file-datalake`), and ADLS Gen2 REST APIs work with OneLake by targeting the DFS endpoint with an Entra ID token. The `DataLakeServiceClient` can be pointed at `https://onelake.dfs.fabric.microsoft.com` with a `DefaultAzureCredential` or `ClientSecretCredential`.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-44",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the purpose of the OneLake Explorer desktop application?",
+    "answer": "OneLake Explorer is a Windows desktop application (similar to Windows File Explorer) that mounts OneLake as a virtual drive on a user's local machine, allowing browsing, uploading, downloading, and managing files in OneLake workspaces through a familiar file system interface. It uses the OneLake ADLS Gen2-compatible DFS API under the hood and authenticates via the user's Microsoft Entra ID credentials. Users can drag-and-drop files between local folders and OneLake, view Lakehouse file structures, and open notebooks in VS Code directly from the Explorer. It synchronizes with OneLake in real-time. The Explorer is particularly useful for data engineers who want to stage raw files into a Lakehouse's Files zone without writing code. It is available as a download from the Microsoft Fabric documentation and integrates with Windows shell contexts.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-45",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is Fabric Real-Time Intelligence and what are its core components?",
+    "answer": "Fabric Real-Time Intelligence (RTI) is the suite of Fabric capabilities for ingesting, processing, analyzing, and acting on high-velocity streaming and time-series data. Its core components are: (1) Event Streams — a no-code/low-code streaming ingestion service supporting Kafka-compatible sources, Azure Event Hubs, IoT Hub, and custom endpoints; (2) Eventhouse — the managed KQL database container for storing and analyzing time-series data at scale; (3) KQL Database — the actual data store within an Eventhouse using Kusto's columnar storage; (4) KQL Queryset — a workspace item for saving and sharing KQL queries; (5) Real-Time Dashboard — a live-updating analytics dashboard built on KQL; and (6) Data Activator (Reflex) — for trigger-based alerting on streaming data. RTI integrates with OneLake via continuous export and shortcuts, allowing KQL data to be queried alongside Delta Lake data. It is purpose-built for telemetry, IoT, financial tick data, and log analytics use cases.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-46",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the Fabric GraphQL API and what does it enable?",
+    "answer": "The Fabric GraphQL API (also called API for GraphQL) is a Fabric item type that creates a managed GraphQL endpoint over data stored in Fabric Lakehouses or Warehouses, enabling front-end applications and microservices to query data using GraphQL syntax without exposing raw SQL or Spark connections. It auto-generates a GraphQL schema from the selected Lakehouse/Warehouse tables and supports both query (read) and mutation (write, for Warehouse) operations. The API is published with a unique endpoint URL and secured via Entra ID tokens or API keys. It simplifies data access for web developers who are more comfortable with GraphQL than T-SQL. Use cases include building data-driven web apps, mobile backends, and microservices that consume Fabric data. The Fabric GraphQL API handles query parsing, optimization, and translates GraphQL resolvers into underlying SQL queries against the Fabric Warehouse or Lakehouse SQL Endpoint.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-47",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is a managed private endpoint in Microsoft Fabric and when is it needed?",
+    "answer": "A Managed Private Endpoint in Fabric is a network-level secure connection from within the Fabric managed virtual network to a private Azure resource (e.g., Azure SQL Database with public access disabled, private ADLS Gen2 account, Azure Key Vault) without exposing data to the public internet. It creates an Azure Private Endpoint within Microsoft's managed VNet that maps to the target resource's private endpoint, preventing data exfiltration via public routes. Managed private endpoints are needed when organizational security policy requires all data traffic to remain on private network paths—common in banking, healthcare, and government GCC scenarios. They are configured in the Fabric Admin Portal under 'Managed private endpoints' for a workspace. The target resource must have the private endpoint connection approved by an Azure subscription administrator. Once approved, Fabric pipelines, Spark notebooks, and shortcuts can access the private resource transparently without any VPN or self-hosted gateway.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-48",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the 'framing' concept in Power BI Direct Lake mode?",
+    "answer": "Framing in Power BI Direct Lake mode is the process by which the semantic model (dataset) reads and caches the current state of Delta table Parquet files from OneLake into the VertiPaq in-memory column store at query time. When a user opens a report or runs a DAX query, Fabric checks whether the in-memory columns are up-to-date by comparing the Delta transaction log version; if new commits exist, it re-frames (reloads) only the changed column segments from the updated Parquet files. Framing is different from Import refresh—it happens automatically and on-demand, not on a scheduled basis, meaning reports always reflect the latest committed Delta table state without a manual refresh. The framing operation reads column chunks via the Parquet column projection APIs and populates the VertiPaq dictionary-encoded columns. If framing is not possible (e.g., data exceeds guardrail limits), Direct Lake automatically falls back to DirectQuery mode. The `XMLA` endpoint and SSAS Tabular APIs expose framing metadata via model trace events.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-49",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What types of Fabric items are supported by Git Integration for version control?",
+    "answer": "Fabric Git Integration supports serializing and version-controlling the following item types as of 2025: Notebooks (`.ipynb` + `.platform` metadata), Data Pipelines (JSON definition), Lakehouse (metadata only, not data), Warehouse (metadata only), Semantic Models / Datasets (PBIM/PBIR TMDL format), Reports (PBIR format), Environments, Spark Job Definitions, KQL Databases (schema definition), KQL Querysets, Real-Time Dashboards, Eventhouses, and ML Models (metadata). Data itself (Parquet files, Delta logs) is not version-controlled through Git Integration—only item definitions. The `.platform` folder within each item's git directory contains Fabric-specific metadata like item type, display name, and logical ID. Git integration supports Azure DevOps and GitHub, with branch management, commit messages, and conflict resolution handled through the Fabric portal or Fabric REST API (`/workspaces/{id}/git/commitToGit`).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-50",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the difference between Fabric F SKUs and P SKUs?",
+    "answer": "Fabric F SKUs (F2 through F2048) are the new Fabric-native capacity SKUs purchased through the Azure portal with pay-as-you-go or reserved pricing, measured in Capacity Units (CUs). P SKUs (P1–P5) are legacy Power BI Premium SKUs purchased through Microsoft 365 admin center, measured in vCores. F SKUs offer all Fabric workloads (Spark, Data Factory, Real-Time Analytics, Warehouse, etc.), while P SKUs were originally Power BI-only and gained Fabric features via upgrade. F SKUs support the new Fabric bursting and smoothing model (24x burst with 24-hour repayment), while P SKUs have different throttling behavior. F1 is the entry-level capacity (2 CUs), supporting all Fabric experiences. P SKUs are being phased out in favor of F SKUs. F SKUs can be paused/resumed (cost optimization), while P SKUs cannot be paused. Both support Direct Lake, semantic models, and workspace isolation.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-51",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the Semantic Model (formerly Dataset) in Microsoft Fabric and how does it connect to OneLake?",
+    "answer": "A Semantic Model (renamed from Power BI Dataset) in Microsoft Fabric is the business logic layer that defines measures, calculated columns, hierarchies, relationships, and security rules on top of underlying data sources. In Fabric, semantic models can connect to OneLake data via three modes: Import (data copied into VertiPaq engine), DirectQuery (live SQL queries via the Lakehouse SQL Endpoint or Warehouse), or Direct Lake (native Parquet/Delta reads from OneLake without import). Semantic models are stored as `.pbism` items in the workspace and their TMDL (Tabular Model Definition Language) definitions can be version-controlled via Git Integration. They support Row-Level Security (RLS) and Object-Level Security (OLS) for data governance. The XMLA endpoint (`powerbi://api.powerbi.com/v1.0/myorg/<workspace>`) allows third-party tools like Tabular Editor, DAX Studio, and SSAS APIs to interact with semantic models programmatically.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-52",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is Fabric's 'Data Engineering' experience and what items does it include?",
+    "answer": "The Fabric Data Engineering experience is the workspace view mode optimized for building data pipelines, transforming data, and managing Lakehouses. It exposes the following Fabric item types: Lakehouse (Delta Lake + file storage), Notebook (PySpark, Scala, SQL, R), Spark Job Definition (batch Spark job as a scheduled item), Data Pipeline (ADF-compatible orchestration), Environment (custom Spark library management), and Lakehouse (also accessible from Data Warehouse experience). The experience provides the 'Lakehouse Explorer' UI for browsing Tables and Files, inline Spark notebook editing with attached Lakehouse, and schema browser for Delta tables. It is the primary workspace for data engineers implementing ETL/ELT workflows. Notebooks in Data Engineering support magic commands (`%%sql`, `%%scala`), `mssparkutils` library for Fabric-specific operations (file I/O, credentials, notebook chaining), and built-in integration with Fabric Runtime (Spark 3.4/3.5 based).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-53",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the OneLake Catalog (formerly Data Hub) in Microsoft Fabric?",
+    "answer": "The OneLake Catalog (previously called the OneLake Data Hub or simply Data Hub) is the centralized data discovery and governance interface within Fabric that provides a unified view of all data items across all workspaces in the tenant that a user has access to. It displays Lakehouses, Warehouses, Semantic Models, KQL Databases, and other data items with metadata including description, owner, sensitivity labels, and endorsement status (Promoted, Certified). Users can search and filter items by type, workspace, endorsement, or sensitivity label. It supports data lineage views showing upstream sources and downstream consumers. The Catalog integrates with Microsoft Purview for unified data governance, allowing Purview classifications, sensitivity labels, and data map scans to surface within Fabric. It serves as the discovery layer in a data mesh architecture where teams can find and subscribe to data products from other domains.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-54",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the difference between a OneLake internal shortcut and an external shortcut?",
+    "answer": "A OneLake internal shortcut (also called an intra-OneLake shortcut) points to data stored within the same OneLake tenant—either within the same workspace or a different workspace. Data access goes through OneLake's internal routing, and permissions are evaluated against Fabric RBAC (the user must have at least read access to the source workspace item). An external shortcut points to data outside OneLake—in ADLS Gen2, Amazon S3, Google Cloud Storage, or Azure Blob Storage—using a Cloud Connection with stored credentials (account key, SAS, IAM role, or AAD). Internal shortcuts reflect permissions of the source item (access-controlled by Fabric), while external shortcuts rely on the credentials stored in the Cloud Connection and do not enforce the source system's native ACLs beyond what the stored credential allows. Internal shortcuts incur no egress cost since data remains within the Microsoft network; external shortcuts may incur cloud egress charges when reading data from AWS S3 or GCS.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-55",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What Fabric item type enables you to run scheduled Python scripts or custom application code in Fabric?",
+    "answer": "The Spark Job Definition item in Microsoft Fabric enables running scheduled or on-demand Python scripts, PySpark applications, Scala JARs, or SQL files using the Fabric Spark compute without requiring a notebook interface. It supports `.py`, `.jar`, and `.sql` file references stored in OneLake or Lakehouse file storage, along with configurable Spark configurations, command-line arguments, and library dependencies (via attached Fabric Environment items). Spark Job Definitions can be triggered on a schedule, via Fabric Data Factory pipeline activities, or via the Fabric REST API (`POST /workspaces/{id}/items/{itemId}/jobs/instances`). They are ideal for production batch jobs that should not rely on notebook cell execution order. The job execution uses the same Fabric Runtime (Spark 3.4/3.5) as notebooks, with full access to `mssparkutils`, Delta Lake, and OneLake storage. Output logs are viewable in the Monitoring Hub.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-56",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the Fabric Monitoring Hub and what does it track?",
+    "answer": "The Fabric Monitoring Hub is a centralized observability interface within the Fabric portal that tracks the execution status and history of all Fabric activities in a workspace. It displays: Notebook runs (with cell-level execution logs), Spark Job Definition runs, Data Pipeline runs (with activity-level status), Dataflow Gen2 runs, Data Activator trigger history, and semantic model refresh history. For each run, the Monitoring Hub shows: start time, duration, status (success, failed, cancelled, in progress), triggered by (user, schedule, pipeline), and links to detailed logs. Spark jobs show Spark UI links for job/stage/task-level diagnostics. It integrates with the Fabric Capacity Metrics App for correlating compute consumption with individual job runs. Users with Admin or Member workspace roles can view all activity; Contributors and Viewers see only their own activity. There is no native export of Monitoring Hub data, but the Fabric REST API (`/workspaces/{id}/jobs/instances`) can be used to query run history programmatically.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "onelake-57",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does OneLake enforce access control for shortcuts pointing to cross-workspace data, and what are the permission inheritance rules?",
+    "answer": "When a OneLake internal shortcut points to a source item in another workspace, access control follows a 'pass-through' model: the user or service principal accessing the shortcut must have at minimum ReadAll (or appropriate) permissions on both the target item (where the shortcut is created) and the source item (where the data actually lives). This means a user with Viewer access on the target workspace but no access to the source workspace will be unable to read the shortcut data—they receive a 403 Forbidden. This is distinct from SQL shortcut tables, where SQL Analytics Endpoint queries on shortcuts use the SQL Endpoint's service identity (not the calling user's identity) to access source data—this model is called 'computed entity permission pass-through.' Spark-level shortcut access always requires the calling user/principal to have direct access to the source. This dual-model creates a common gotcha in enterprise Fabric deployments: analysts with SQL Endpoint access can read shortcut data (service identity resolves), but the same users hitting the shortcut via Spark get denied. Fabric's item permission model (ReadAll vs. Read vs. Write vs. Execute) for Lakehouses governs what operations are permitted.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-58",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What happens at the Delta transaction log level when a OneLake shortcut points to a Delta table in an external S3 bucket, and how does Fabric maintain ACID guarantees?",
+    "answer": "When a OneLake external shortcut targets a Delta table in Amazon S3, Fabric reads the Delta transaction log (`_delta_log/*.json` and `*.checkpoint.parquet` files) directly from S3 via the shortcut's credential (IAM role or access key stored in a Cloud Connection). Fabric does NOT replicate or cache the transaction log locally—every read operation resolves the latest consistent snapshot by reading the log from S3 at query time. This means Fabric inherits the Delta protocol's snapshot isolation (readers see a consistent snapshot based on the highest committed log version), but ACID write guarantees are NOT maintained from Fabric's side—Fabric only reads through shortcuts, it does not write back to external Delta tables. Concurrent writes to the same S3-based Delta table from external systems (Databricks, EMR Spark) can create log conflicts that Fabric will transparently handle by reading the resolved log. If the external writer uses optimistic concurrency control (Delta's default), Fabric readers see the latest committed version. Delta log size and S3 list operation costs are relevant performance considerations; tables with thousands of small log files degrade shortcut read performance and should be optimized with `OPTIMIZE` + `VACUUM` on the writer side.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-59",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain how Fabric capacity throttling works for interactive vs. background operations, and how the smoothing mechanism affects workload scheduling decisions.",
+    "answer": "Fabric capacity throttling operates on a Capacity Unit (CU) consumption model where each SKU has a fixed CU/second budget. Operations are classified as Interactive (DAX queries, SQL queries via the Warehouse/Lakehouse SQL endpoint, on-demand notebook runs, Direct Lake framing) or Background (scheduled Spark jobs, Data Factory pipelines, Dataflow Gen2, scheduled refreshes). Background operations are eligible for 24x burst: an F64 (256 CUs) capacity can burst background operations to consume as if it were an F1536, with the excess 'borrowed' CUs repaid over the following 24 hours—this is called smoothing. Interactive operations have no burst allowance; if CU consumption exceeds the SKU baseline, interactive requests are immediately rejected with HTTP 429 (throttled) or queued (for up to 60 seconds before rejection). The smoothing algorithm evaluates a 10-second rolling window of background CU consumption against the cumulative 24-hour repayment capacity. In practice, scheduling heavy Spark ETL jobs during off-peak hours allows them to burst without impacting daytime interactive query SLAs. The Fabric Capacity Metrics App's 'Throttling' tab shows the current throttling state and the estimated repayment burn-down curve. A critical design decision: placing multiple high-CU Spark jobs simultaneously on a capacity exhausts the burst pool and causes queuing for subsequent jobs.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-60",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Direct Lake mode handle the fallback to DirectQuery, and what specific guardrail thresholds trigger the fallback?",
+    "answer": "Direct Lake mode falls back to DirectQuery when the in-memory framing requirements exceed the capacity's guardrail limits, which are defined per SKU. Guardrails include: maximum number of rows per table (e.g., F2 supports 300M rows per table, F64 supports 1.5B rows), maximum number of model tables, maximum columns per table, and maximum Parquet file size for framing. When a user queries a semantic model and the framing operation cannot complete within guardrail limits, Fabric automatically re-routes the query to the Lakehouse SQL Analytics Endpoint as a DirectQuery operation—the semantic model does not error out, it silently degrades. Fallback can also be triggered by query concurrency: if too many users simultaneously trigger framing operations that exhaust capacity compute resources, new queries fall back. The fallback is transparent to report users but causes significant query latency increases (DirectQuery vs. in-memory VertiPaq). DAX Studio and Performance Analyzer in Power BI Desktop show `Storage Engine Query` events—Direct Lake framing events appear as `VertiPaq` SE, while fallback queries appear as SQL `DirectQuery` SE events. To prevent fallback, organizations should: use Liquid Clustering or partition pruning on large Delta tables, maintain V-Order optimization, and right-size their Fabric SKU.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-61",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the architectural difference between Fabric Mirroring and using a Data Factory pipeline to copy data from an external database into OneLake?",
+    "answer": "Fabric Mirroring uses CDC (Change Data Capture) at the source database transaction log level to stream only changed rows into OneLake in near real-time (seconds to low minutes latency), without polling or full-table scans. The source system's CDC mechanism (SQL Server change tracking, Cosmos DB change feed, etc.) drives the replication. Data lands as Delta MERGE/INSERT/DELETE operations, maintaining row-level currency. A Fabric Data Factory pipeline copy activity performs batch replication: it issues SELECT queries against the source (or uses watermark columns for incremental loads), pulls data in bulk, and writes it to OneLake as new Delta files—typically with 15-minute to hourly latency depending on trigger frequency. Mirroring is zero-code, lower latency, and has no impact on source query load (reads from log, not tables). ADF pipelines are code-configurable, support complex transformations, and can access any connector in ADF's 100+ connector library—including systems not supported by Mirroring (e.g., Oracle, SAP, Salesforce). Mirroring also handles schema changes automatically (DDL propagation), while ADF pipelines require manual schema mapping updates. The trade-off: Mirroring is limited to supported sources; ADF covers the long tail of enterprise connectivity.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-62",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the Fabric Git Integration handle conflicts when multiple developers push changes to the same workspace item simultaneously?",
+    "answer": "Fabric Git Integration uses a last-write-wins model at the item definition level for conflict resolution in the portal UI—it does not support granular merge at the field or attribute level within an item. When two developers push changes to the same item (e.g., a Notebook or Data Pipeline), the Git repository resolves conflicts through standard Git merge conflict mechanisms in the underlying repo (Azure DevOps / GitHub)—if both branches modified the same lines in the serialized JSON/YAML definition, a merge conflict is flagged in the Git provider's PR interface. The Fabric portal's 'Update from Git' operation performs a `git pull`-equivalent; if the local workspace state diverges from the remote branch, Fabric shows a 'Conflict' status per item and requires the developer to either accept the remote (overwrite local) or keep local (reject remote). There is no three-way merge UI in Fabric itself. Best practice is to use short-lived feature branches per developer and item-level ownership to minimize concurrent edits. The Fabric REST API endpoint `GET /workspaces/{id}/git/status` returns per-item conflict states programmatically, enabling automated CI checks. Semantic models in TMDL format (multiple files per model) support finer-grained Git diff resolution compared to PBIX binary format.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-63",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are managed private endpoints in Fabric, how are they different from self-hosted integration runtimes, and when should each be used?",
+    "answer": "Managed Private Endpoints (MPEs) in Fabric are Microsoft-managed Azure Private Endpoints within a managed VNet that Fabric's backend infrastructure controls—no customer-managed VMs or network infrastructure required. They enable Fabric workloads (Spark, pipelines, dataflows) to connect to private Azure resources (Azure SQL DB, ADLS Gen2, Key Vault) without public internet exposure. The customer only approves the private endpoint connection in Azure, and Fabric handles routing. Self-Hosted Integration Runtimes (SHIR) are customer-deployed VMs (Windows) running within the customer's on-premises or Azure VNet that act as reverse proxies for Data Factory pipeline connectivity to on-premises or private cloud resources. MPEs are suitable for Azure PaaS resources with private endpoint support; they auto-scale and require zero infrastructure management. SHIR is required for: on-premises data sources (SQL Server, Oracle, SAP), non-Azure cloud resources not reachable via private endpoint, and complex network topologies where managed VNet cannot reach the source. MPEs support only Fabric-native compute (Spark, pipelines with IR=Fabric); SHIR supports any ADF-compatible activity. For GCC Hyderabad (JPMorgan, Goldman) deployments, MPEs are preferred for Azure-to-Azure secure connectivity, while SHIR is mandated for core banking system (on-premises Teradata/Oracle) integration.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-64",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Fabric Warehouse implement distributed query execution, and how does it differ from Synapse Dedicated SQL Pool?",
+    "answer": "Fabric Warehouse uses a serverless, distributed MPP (Massively Parallel Processing) execution engine that runs queries as distributed plans across multiple nodes, but unlike Synapse Dedicated SQL Pool, there are no pre-allocated, always-on DWU nodes. Fabric Warehouse is fully serverless—compute scales automatically with query demand and is billed per CU consumed (not per allocated DWU). Data is stored in Delta Parquet files in OneLake (not in SQL Pool's proprietary PDW distribution files), meaning data is always accessible by other Fabric engines (Spark, SQL Endpoint). Synapse Dedicated SQL Pool uses hash-distributed tables across 60 distributions with round-robin or hash key-based data placement that must be designed upfront for query performance; Fabric Warehouse uses Delta Parquet columnar format with optional V-Order optimization and Liquid Clustering instead of static distributions. Fabric Warehouse supports full T-SQL DDL/DML, stored procedures, multi-statement transactions (within a session), and cross-warehouse queries via three-part naming. Synapse Dedicated Pool supports polybase external tables and workload management groups (wlm). The key architectural difference: Fabric Warehouse's storage is open (readable by any Delta-compatible engine), whereas Synapse Dedicated Pool's storage is proprietary and accessible only via its own engine.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-65",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does OneLake's Microsoft Purview integration enable data governance, and what specific Purview features work natively with Fabric?",
+    "answer": "OneLake integrates with Microsoft Purview through the Fabric-Purview connector, enabling automatic data catalog registration and governance without manual scanning configuration. When enabled at the tenant level (Fabric Admin Portal → Integration), Purview automatically discovers all Fabric items (Lakehouses, Warehouses, Semantic Models, Pipelines) and their schemas, and registers them in the Purview Data Map as assets. Purview features that work natively with Fabric: (1) Sensitivity Labels — Microsoft Information Protection labels set on Fabric items propagate to downstream Power BI reports and exported files; (2) Data Lineage — Fabric automatically publishes lineage metadata to Purview, showing data flow from Pipelines → Lakehouses → Semantic Models → Reports; (3) Data Classification — Purview scans OneLake content and auto-classifies columns (PII detection, credit card numbers, etc.) using built-in classifiers; (4) Access Policy — Purview Data Use Management policies can grant access to OneLake data through Purview itself, bypassing the need for Fabric portal RBAC for certain enterprise governance scenarios; (5) Glossary and Business Terms — business terms defined in Purview can be applied to Fabric items for semantic enrichment. The integration uses the `account.purview.azure.com` API and requires the Fabric tenant's Entra ID to be linked to the Purview account.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-66",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the performance implications of creating many small files (the 'small file problem') in OneLake's Delta tables, and what strategies does Fabric provide to address it?",
+    "answer": "The small file problem in OneLake Delta tables occurs when high-frequency writes (streaming, micro-batch, frequent incremental loads) produce thousands of small Parquet files per partition, causing: high Parquet file open overhead during reads, excessive S3/ADLS metadata list operations to enumerate files, VertiPaq framing slowdowns in Direct Lake (many file handles to open), and increased Delta transaction log size. Fabric provides several mitigation strategies: (1) `OPTIMIZE` command via Spark SQL or Lakehouse SQL Endpoint — compacts small files into larger target-sized files (default 128MB–1GB) using bin-packing, rewriting the Delta log to point to compacted files; (2) Auto-compaction — Fabric Spark runtime can be configured with `spark.databricks.delta.autoCompact.enabled=true` and `spark.databricks.delta.optimizeWrite.enabled=true` for automatic post-write compaction; (3) Optimize Write — Fabric's Spark Delta writer uses coalescing before writing to minimize output file count; (4) V-Order optimization during OPTIMIZE ensures compacted files are read-optimized for Power BI; (5) Liquid Clustering as a modern alternative to static partitioning that avoids partition skew causing small files. `VACUUM` should be run regularly (default 7-day retention) to reclaim storage from obsolete pre-compaction files.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-67",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the Fabric Event Streams feature handle backpressure and at-least-once delivery guarantees for high-volume IoT data?",
+    "answer": "Fabric Event Streams provides a managed streaming ingestion pipeline built on Azure Event Hubs infrastructure under the hood, offering Kafka-compatible producer APIs. For backpressure handling, Event Streams uses checkpointed consumer groups—each downstream destination (Eventhouse, Lakehouse, KQL Database) maintains its own consumer group offset stored in Event Hubs, allowing independent consumption rates. If a downstream destination is slow (e.g., KQL ingestion queue is full), Event Streams buffers events in the underlying Event Hub partitions up to the configured retention window (1–7 days). At-least-once delivery is guaranteed: events are not dropped if the destination is temporarily unavailable; they are replayed from the last committed checkpoint offset when connectivity is restored. Exactly-once semantics are NOT guaranteed—idempotent processing (e.g., using device ID + event timestamp as deduplication key in KQL update policies or Delta MERGE conditions) must be implemented by the application. For high-volume IoT scenarios (millions of events/sec), Event Streams auto-scales Event Hub processing units (PUs) and supports partitioning for parallelism. The Fabric Event Streams UI shows throughput metrics (events/sec, bytes/sec, consumer lag) per source and destination.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-68",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the role of the `mssparkutils` library in Fabric Notebooks, and what are its key modules?",
+    "answer": "`mssparkutils` (Microsoft Spark Utilities) is the Fabric/Synapse-specific Python library pre-installed in every Fabric Notebook that provides utility functions for common data engineering tasks without needing custom code. Key modules: (1) `mssparkutils.fs` — file system operations on OneLake/ADLS (ls, cp, mv, rm, mkdirs, put, head), replacing manual ADLS SDK calls; (2) `mssparkutils.credentials` — securely retrieve secrets from Azure Key Vault (`getSecret(keyVaultName, secretName, linkedService)`) and get Entra ID tokens for service principals without hardcoding credentials; (3) `mssparkutils.notebook` — run child notebooks from a parent notebook (`mssparkutils.notebook.run('NotebookName', timeout, arguments)`) and retrieve their return values, enabling notebook orchestration; (4) `mssparkutils.env` — retrieve runtime environment metadata (workspace ID, user name, capacity ID); (5) `mssparkutils.data` — preview DataFrames and interact with Spark catalogs. In GCC/enterprise pipelines, `mssparkutils.credentials.getSecret()` is the recommended pattern for secret management, avoiding plaintext credentials in notebook code. `mssparkutils.notebook.run()` with `exitValue` return enables modular, testable notebook workflows with parameter passing.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-69",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the Fabric Warehouse's cross-database query capability work, and what are its limitations compared to a traditional federated SQL system?",
+    "answer": "Fabric Warehouse supports cross-database queries using three-part naming syntax: `[WorkspaceName].[ItemName].[schema].[TableName]`, allowing a Warehouse T-SQL query to JOIN tables from multiple Warehouses and Lakehouse SQL Endpoints within the same or different workspaces in a single SELECT statement. The cross-database query engine resolves item names to their respective OneLake Delta Parquet locations and uses distributed query fragments that are pushed down to each source's compute for predicate filtering before joining results. Limitations compared to traditional federated SQL: (1) Read-only cross-database access—DML (INSERT/UPDATE/DELETE) cannot target cross-database tables; (2) No cross-tenant queries—only workspaces within the same Fabric tenant; (3) Performance: large cross-database joins may move significant data between query fragments, causing latency—partition pruning and predicate pushdown are critical; (4) No distributed transaction support across warehouses—ACID transactions are per-warehouse only; (5) Statistical metadata (row counts, column histograms) may not be available for cross-database tables, causing suboptimal query plans; (6) Cross-database queries through the SQL Endpoint of a Lakehouse use the Lakehouse's service identity for source resolution, not the caller's identity—this can bypass intended access restrictions if not governed carefully.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-70",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the OneLake data access pattern for Direct Lake semantic models in terms of which user's identity is used when reading Parquet files?",
+    "answer": "In Direct Lake mode, when a Power BI report executes a DAX query against a semantic model, the VertiPaq engine frames (reads) Parquet files from OneLake using a Fabric service identity (system-assigned managed identity of the semantic model's workspace), NOT the end user's Entra ID identity. This means: (1) The semantic model's workspace must have ReadAll access to the underlying Lakehouse's OneLake path; (2) Row-Level Security (RLS) defined in the semantic model is still enforced at the VertiPaq engine layer against the USER's identity—OneLake storage access is service-identity-based, but result filtering is user-identity-based; (3) If the Lakehouse is in a different workspace from the semantic model, the semantic model's workspace service identity needs read permissions on the source workspace item; (4) Object-Level Security (OLS) on semantic model tables/columns is also enforced at the engine layer per user. This architecture means that unauthorized data access at the OneLake storage level is not possible by end users—they only see filtered DAX results. However, Fabric admins or workspace admins with Lakehouse direct access can bypass semantic model RLS by querying the Lakehouse SQL Endpoint directly.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-71",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Fabric implement row-level security across its different compute engines (Spark, SQL Endpoint, Warehouse, Direct Lake), and what are the gaps?",
+    "answer": "Row-Level Security (RLS) is implemented differently per Fabric compute engine, creating important governance gaps: (1) Semantic Model (Direct Lake/Import/DirectQuery) — RLS is enforced by the VertiPaq/Analysis Services engine using DAX filter expressions per role and user identity; this is the most robust enforcement layer for BI consumers. (2) Warehouse — native T-SQL RLS using `CREATE SECURITY POLICY` with inline table-valued functions (FILTER PREDICATE) per schema; enforced by the SQL engine for all T-SQL connections. (3) Lakehouse SQL Endpoint — does NOT support native T-SQL RLS security policies; access control is at the item/column level via workspace RBAC, not row-level. (4) Spark/Notebooks — NO automatic RLS; Spark jobs run as the workspace service identity or user's delegated identity and see all rows; row filtering must be implemented manually in notebook logic. The critical gap: a user with Contributor role on a Lakehouse workspace can run a Spark notebook and access all rows of a Delta table, bypassing any RLS policies defined in the semantic model or Warehouse. Enterprise governance architectures must account for this by restricting Lakehouse contributor roles to trusted data engineers only, while analysts are given SQL Endpoint read access where RLS/OLS can be enforced via views.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-72",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the purpose of the Fabric Environment item, and how does it improve upon the traditional Spark library management approach?",
+    "answer": "A Fabric Environment item is a reusable, version-controlled Spark configuration container that packages: custom Python libraries (`.whl` files from PyPI or uploaded), Spark configuration properties (executor memory, driver cores, shuffle partitions), and runtime version selection (Fabric Runtime 1.1 = Spark 3.3, Runtime 1.2 = Spark 3.4, Runtime 1.3 = Spark 3.5). Multiple notebooks and Spark Job Definitions within a workspace can attach to the same Environment, ensuring consistent library versions across all team members—eliminating the 'it works on my notebook but not yours' problem caused per-session `%pip install` commands. Environments are installed once (library resolution takes 2–10 min on first activation) and cached for subsequent sessions. Prior to Environments, the approach was session-level `%pip install` (installed per session, slow startup, version inconsistency) or custom pool-level library installation (required admin access, applied to all users). Environments support pre-built environments (saving install time per session) and can be assigned as the default for a workspace. Environment definitions are serializable and can be version-controlled via Fabric Git Integration. In production GCC pipelines, environment pinning ensures reproducibility of ETL jobs across dev/test/prod workspace deployments.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-73",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the KQL OneLake integration in Fabric Eventhouse, and what are its use cases and limitations?",
+    "answer": "KQL OneLake integration (also called 'Eventhouse OneLake availability' or 'Delta export') allows KQL database tables in a Fabric Eventhouse to be automatically mirrored to OneLake in Delta Parquet format. When enabled for a KQL table, Kusto continuously exports ingested data as Delta files to the KQL database's associated OneLake path, creating a `_delta_log` that allows any Delta-compatible engine (Spark, SQL Endpoint, Power BI Direct Lake) to query the same data that resides in Kusto. This enables a 'write once, query anywhere' architecture: streaming IoT data ingested via Event Streams into Kusto for real-time KQL analytics is simultaneously available as Delta tables for batch Spark processing or Power BI Direct Lake reporting. Limitations: (1) The OneLake Delta copy is eventually consistent with Kusto (latency of minutes); (2) Schema changes in KQL (adding columns) propagate to Delta asynchronously; (3) Delta delete/update operations (from KQL `.delete` commands) may not propagate as expected—KQL is append-optimized; (4) The OneLake path is read-only for external engines (no writes back to KQL via Delta); (5) Enabling OneLake availability increases storage costs (duplicate storage in Kusto and Delta formats). This feature is critical for organizations using Eventhouse for real-time alerts (Data Activator) while also needing historical Delta Lake data for ML training in Spark.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-74",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the Fabric Data Factory pipeline differ from Azure Data Factory in terms of runtime, connectors, and integration patterns?",
+    "answer": "Fabric Data Factory pipelines are largely ADF-compatible in terms of activity types (Copy, Notebook, Stored Procedure, For-Each, If Condition, Wait, Web, etc.) and use the same JSON pipeline definition format, but have several Fabric-specific differences: (1) Native Fabric activities — dedicated activities for triggering Fabric Notebook, Spark Job Definition, Lakehouse, Warehouse, Data Flow Gen2, and KQL Database Script—these are not available in standalone ADF; (2) Integration Runtime — Fabric pipelines use Fabric's managed cloud IR by default (no Azure IR provisioning needed); SHIR and Azure IR are supported for on-premises and private endpoint connectivity; (3) Connector availability — Fabric Data Factory inherits most ADF connectors but some specialized enterprise connectors (SAP BW, SAP HANA, Oracle via SHIR) require additional configuration; (4) No triggers linked to Event Grid — Fabric pipelines are triggered by schedule, manual, or called from other Fabric items; Event Grid triggers require ADF; (5) Monitoring — Fabric pipeline runs are tracked in the Fabric Monitoring Hub, not ADF Monitor; (6) CI/CD — pipeline definitions are serialized for Git integration in Fabric's format. In GCC scenarios (e.g., JPMorgan GCC Hyderabad), Fabric pipelines are preferred over standalone ADF when all data destinations are in OneLake, as they eliminate cross-service authentication complexity.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-75",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the 'OneLake BCDR' (Business Continuity and Disaster Recovery) model, and how should enterprise architects design for it?",
+    "answer": "OneLake does not currently offer built-in automated geo-disaster recovery (geo-DR) with cross-region failover in the traditional Azure storage GRS sense. OneLake data durability is guaranteed within the capacity region via locally-redundant storage (LRS) at the Azure infrastructure level (3 replicas within a single Azure datacenter zone). Microsoft's SLA covers data durability but not multi-region availability failover. For enterprise BCDR, architects must implement: (1) Cross-workspace shortcuts from a DR workspace pointing to the primary workspace's Lakehouse data (read-only DR access without data copy); (2) Scheduled ADF/Fabric pipeline-based replication of critical OneLake Delta tables to a secondary capacity in a different region using ADLS Gen2 cross-region copy; (3) Fabric capacity region assignment—deploying a standby F SKU in a paired Azure region (e.g., primary East US, DR West US 2) with workspaces pre-configured; (4) Git Integration as a recovery mechanism—all item definitions are in git, allowing workspace reconstruction in a DR region; (5) For Warehouses, periodic CETAS (CREATE EXTERNAL TABLE AS SELECT) exports to ADLS Gen2 in a different region. Microsoft has roadmap items for OneLake geo-replication, but as of 2025, it requires custom architecture. RTO for full workspace rebuild is 2–4 hours; with pre-provisioned DR capacity and shortcuts, RTO can be reduced to under 30 minutes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-76",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the Fabric Shortcut for Amazon S3 authenticate, and what IAM trust policy configuration is required for cross-cloud access?",
+    "answer": "Fabric S3 shortcuts use one of two authentication mechanisms: (1) AWS IAM Access Key + Secret Key — stored as a Cloud Connection credential in Fabric's 'Manage Connections and Gateways'; this is simpler but involves long-lived secrets. (2) AWS IAM Role (trust-based, recommended for enterprise) — Fabric's managed identity presents a federated OIDC token to AWS STS's AssumeRoleWithWebIdentity API, and AWS grants a temporary session token for the specified IAM role. For the IAM trust policy, the principal must be configured as Fabric's Azure AD service principal (`arn:aws:iam::<accountId>:oidc-provider/fabric.microsoft.com`), with a condition matching the subject claim (`sub`) to the Fabric workspace or tenant ID. The IAM role's permissions policy must grant `s3:GetObject`, `s3:ListBucket`, `s3:GetBucketLocation` on the target bucket and prefix. S3 bucket policies must also allow the IAM role. Key networking consideration: if the S3 bucket has a bucket policy restricting access to specific VPC endpoints or IP ranges, Fabric's managed VNet IP ranges (which vary and are not static) may need to be whitelisted—or the bucket policy must rely solely on IAM conditions. For GCS shortcuts, HMAC (service account) keys are used; GCS does not support trust-based federated auth from Fabric.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-77",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the Fabric Dataflow Gen2 and how does it differ from Power Query and Dataflow Gen1?",
+    "answer": "Fabric Dataflow Gen2 is a visual data transformation tool using Power Query Online (M language) that outputs data to OneLake Delta tables, Fabric Warehouse, or other destinations. It differs from its predecessors in critical ways: (1) Staging layer — Gen2 uses an internal Lakehouse as a staging area where Power Query transformations are broken into phases: data is first staged as Parquet in OneLake, then transformed and written to the output destination—this improves refresh reliability and enables Spark-based scale for larger datasets; (2) Multiple output destinations — unlike Gen1 (single Power BI dataflow output to Azure Premium Gen1 storage) and classic Power Query datasets, Gen2 can write to multiple destinations in a single refresh run; (3) Native Fabric integration — Gen2 runs on Fabric compute and benefits from Fabric capacity CU allocation; (4) No CDM (Common Data Model) format—Gen2 outputs to Delta Parquet, not CDM; Gen1 used CDM; (5) Connector parity with ADF — Gen2 inherits many of the same 150+ connectors as Power Query; (6) CI/CD — Gen2 definitions are serializable for Git integration; Gen1 definitions were not. Limitation: Gen2 is not ideal for very large datasets (>100M rows) where Spark notebooks are more efficient; Gen2 is best for medium-complexity ETL that business analysts can maintain without Spark expertise.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-78",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does the Fabric XMLA endpoint enable enterprise BI tool integration, and what operations does it support?",
+    "answer": "The Fabric XMLA (XML for Analysis) endpoint exposes semantic models (datasets) in Fabric workspaces via the industry-standard XMLA/OLAP protocol, allowing third-party BI and data management tools to connect to and interact with Fabric semantic models as if they were SSAS Tabular or Azure Analysis Services instances. The XMLA endpoint URL format is: `powerbi://api.powerbi.com/v1.0/myorg/<WorkspaceName>`. Supported operations: (1) Read — Tabular Editor, DAX Studio, SSMS can browse model metadata, run DAX queries, and profile performance; (2) Write (requires Premium/Fabric capacity) — Tabular Editor and deployment scripts can deploy semantic model metadata (tables, measures, relationships) using XMLA scripts or TMSL (Tabular Model Scripting Language); (3) Refresh via XMLA — programmatic selective refresh of model partitions using XMLA commands, enabling fine-grained partition refresh strategies; (4) ALM Toolkit operations — comparing and merging model definitions; (5) Process commands — partition processing, recalculation. The XMLA endpoint does NOT support Direct Lake model definition changes through XMLA if the model sources are managed by Fabric (Lakehouse-backed Direct Lake). Enterprise ALM workflows in large GCCs (e.g., Goldman Sachs BI teams) use XMLA + CI/CD pipelines with Tabular Editor CLI (`te3 deploy`) to automate model deployments across dev/test/prod workspaces.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-79",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the security implications of the SQL Analytics Endpoint's service identity model when used with OneLake shortcuts pointing to sensitive cross-workspace data?",
+    "answer": "The SQL Analytics Endpoint (SAE) uses a workspace-level service identity (a managed identity representing the Lakehouse's workspace) to resolve OneLake paths, including shortcut targets. When a user queries a shortcut via the SAE (e.g., `SELECT * FROM shortcut_table`), the storage read is performed using this service identity—not the user's Entra ID. This creates a critical security pattern: if the service identity has ReadAll permission on the shortcut's source workspace, any user with SQL query access to the Lakehouse SAE can read that data, regardless of whether they have direct access to the source workspace. In practice: a data analyst with Viewer role on Lakehouse A (which has a shortcut to Lakehouse B's sensitive HR data) can query the HR data via T-SQL through the SAE even if they have no access to Lakehouse B. Mitigations: (1) Use SQL views with row filtering on the SAE to restrict what shortcut data is visible; (2) Control shortcut creation—only admins/members should create shortcuts to sensitive workspaces; (3) Implement Object-Level Security (OLS) on the SAE by managing view/table visibility; (4) Audit shortcut creation events via the Fabric Admin API (`GET /admin/workspaces/{id}/shortcuts`) and Microsoft Purview activity log. This is a commonly missed vulnerability in enterprise Fabric deployments and a topic in JPMorgan/Goldman Sachs GCC security architecture reviews.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-80",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What is the Fabric OneLake FileSystem API and how does it compare to the ADLS Gen2 DFS API for programmatic file operations?",
+    "answer": "The OneLake FileSystem API is the REST API surface exposed at `https://onelake.dfs.fabric.microsoft.com` that implements the ADLS Gen2 DFS REST API specification, enabling ADLS Gen2-compatible SDKs to interact with OneLake without modification. Supported operations: filesystem create/delete, path create (upload file), path append (streaming upload), path flush, path read (download), path list (ls), path rename, path delete, path update (set properties/ACLs), and path get properties. The API uses the same HTTP verbs and query parameters as ADLS Gen2 DFS (`action=append`, `action=flush`, `action=lease`, `recursive=true`). Differences from ADLS Gen2 DFS: (1) No account key or SAS token auth—only Entra ID tokens; (2) File system root corresponds to a Fabric Workspace, not a storage account; (3) Container path corresponds to a Fabric item (Lakehouse) path; (4) ACL operations (`x-ms-acl`, `x-ms-permissions`) are translated to Fabric RBAC—POSIX-style ACLs set via DFS are not natively enforced in Fabric; (5) Transactional operations (atomic rename for Hadoop compatibility) are supported via the `rename` path action. Python code using `azure-storage-file-datalake` `DataLakeServiceClient(account_url='https://onelake.dfs.fabric.microsoft.com', credential=token)` works directly against OneLake without changes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "onelake-81",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Explain the internal mechanics of how Direct Lake mode uses Delta transaction log checkpoints to decide whether to re-frame or serve cached VertiPaq data for a Power BI query.",
+    "answer": "Direct Lake mode maintains a 'version stamp' — the Delta table's transaction log version number — for each table loaded in the VertiPaq engine. When a DAX query arrives: (1) The semantic model checks the last known log version for each referenced table against the current `_delta_log` in OneLake by reading the `_last_checkpoint` pointer file and the highest committed `.json` action file version number; (2) If the versions match, VertiPaq serves the query entirely from in-memory column segments — sub-millisecond latency, no OneLake I/O; (3) If a new version exists (new Delta commit since last frame), the engine determines which column segments are affected by inspecting the `add`/`remove` actions in the new log entries; (4) Only affected column segments (specific columns of changed Parquet files) are re-framed — partial re-framing avoids full model reload; (5) V-Order encoding in the Parquet files allows VertiPaq to memory-map column data with minimal deserialization, leveraging the fact that V-Order pre-sorts data in VertiPaq dictionary order. Delta checkpoint files (`.checkpoint.parquet`, created every 10 commits by default) are used to reconstruct table state without replaying all JSON log entries. For large tables with frequent small commits, the per-query version check overhead is non-trivial; OPTIMIZE+VACUUM reduces log file count and speeds version resolution. This mechanism is implemented in the Analysis Services engine's DirectLake storage engine plugin, not in Spark.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-82",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the exact failure modes and race conditions that can occur when multiple Spark sessions concurrently write to the same Delta table in OneLake, and how does Delta's optimistic concurrency control handle them?",
+    "answer": "Delta Lake's optimistic concurrency control (OCC) in OneLake handles concurrent writes using a compare-and-swap (CAS) mechanism on the `_delta_log`. Each Spark write transaction: (1) reads the current log version N to determine the table's state snapshot; (2) performs its computation; (3) attempts to write a new log entry at version N+1 by creating `N+1.json` in OneLake's `_delta_log/` — OneLake's atomic blob creation semantics (create-if-not-exists via ADLS Gen2's `If-None-Match: *` etag header) ensure only one writer succeeds at N+1; (4) the losing writer receives a 412 Precondition Failed error, reads the winning N+1.json, re-evaluates its predicate against the new state, and retries if its changes are still valid (non-conflicting) or aborts with `ConcurrentModificationException` if conflicts exist. Conflict types: APPEND-only operations on non-overlapping partitions always succeed (no conflict); UPDATE/DELETE/MERGE on overlapping partitions fail if another transaction modified the same files. Real failure modes: (a) `ConcurrentDeleteReadException` — reader sees deleted files mid-scan; (b) `ConcurrentDeleteDeleteException` — two transactions try to remove the same file; (c) `MetadataChangedException` — concurrent schema change; (d) `ProtocolChangedException` — concurrent Delta protocol upgrade. In OneLake, large Delta tables with many partitions reduce conflict probability by scoping transactions to non-overlapping partition paths. The `delta.dataSkippingNumIndexedCols` property affects which columns are included in transaction log statistics used for conflict detection resolution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-83",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does OneLake's ADLS Gen2-compatible API implement atomic rename operations, and why is this critical for Delta Lake transaction log integrity?",
+    "answer": "OneLake's ADLS Gen2-compatible DFS API implements atomic path rename via the `PATCH /filesystem/{filesystem}/path/{path}?action=rename` operation, which uses the Azure Data Lake's hierarchical namespace atomic rename capability. For Delta Lake transaction log integrity, atomic rename is critical because Delta's writer protocol for the 'delta.appendOnly' and conflict resolution mechanisms rely on the ability to: (1) write a completed Parquet data file to a temporary location (e.g., `_delta_log/tmp_XXXX.parquet`); (2) atomically rename it to the final committed path (e.g., `_delta_log/0000000N.json`) only after all data is written. If rename were not atomic (as in S3 which simulates rename via copy+delete), there's a window where a partial file appears at the destination path—crashing Delta readers. OneLake's ADLS Gen2 hierarchical namespace guarantees that rename is a metadata-only operation (no data copy), completing in milliseconds, and is atomic from the perspective of concurrent readers: no intermediate state is visible. This is why external Delta shortcuts pointing to S3 (which lacks true atomic rename) rely on S3's conditional PUT (`If-None-Match`) for log file creation rather than rename—different atomicity primitive. For production Fabric workloads, the namespace atomicity of OneLake is a key advantage over S3-backed Delta tables, which require `spark.databricks.delta.retryWriteConflict.enabled=true` and longer retry intervals due to S3's eventual consistency for list operations (mitigated by S3's strong read-after-write consistency post-2020 but list operation weaknesses persist).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-84",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Describe the complete data path and latency profile for a streaming IoT event from device to a Power BI Real-Time Dashboard in Fabric, identifying each component's contribution to end-to-end latency.",
+    "answer": "The complete data path for a streaming IoT event to a Power BI Real-Time Dashboard in Fabric involves these stages and latency contributions: (1) Device → Event Hub/IoT Hub: MQTT/AMQP/HTTPS publish with Kafka-compatible send — network RTT, typically <100ms; (2) Event Streams source connector polls/consumes from Event Hub partition — Event Streams consumer lag, typically <1 second per checkpoint interval; (3) Event Streams transformation (if any filtering/enrichment is configured using no-code operators): additional 200–500ms per transformation hop; (4) Event Streams → KQL Database ingestion via Event Streams sink: KQL ingest queue (batching policy — default `ingestionBatching` policy is 5 min / 1GB / 1000 files, whichever first) — this is the dominant latency contributor: 5–10 minutes for default policy; optimized with `ingestionBatching` set to `00:00:30` (30 seconds) reducing to <1 min; (5) KQL materialized views or real-time queries execute on ingested data — sub-second query time for KQL aggregations; (6) Real-Time Dashboard auto-refresh polls KQL database at configured interval (minimum 30 seconds in public preview, 5 seconds in some configurations): 5–30 seconds additional lag; (7) Browser rendering: <100ms. Total end-to-end latency with default settings: 6–15 minutes. With optimized batching policy (30-second ingestion batch) and 30-second dashboard refresh: 45–90 seconds. True sub-10-second latency requires using Fabric's streaming API direct ingest (bypass batch queue) and dashboard push APIs. The KQL ingestion batching policy is the critical tuning lever: `ALTER TABLE T POLICY ingestionbatching '{ \"MaximumBatchingTimeSpan\": \"00:00:10\" }'`.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-85",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "What are the specific internal mechanisms that can cause a OneLake shortcut pointing to an external S3 Delta table to return stale or inconsistent data, and how should engineers detect and mitigate this?",
+    "answer": "External S3 shortcuts reading Delta tables can return stale or inconsistent data through multiple mechanisms: (1) S3 List Consistency Latency — despite S3's strong read-after-write consistency (post-2020), S3 list operations can have eventual consistency under extreme partition counts or concurrent delete/recreate cycles; Delta log file enumeration via S3 LIST may miss recently committed `N+1.json` files, causing the reader to see an older snapshot; (2) Delta Log Checkpoint Race — if the external writer (Databricks/EMR) creates a new checkpoint file and simultaneously cleans up old JSON log files (via VACUUM), a Fabric shortcut reader mid-scan may dereference a log version where the checkpoint hasn't been LIST-visible yet but old JSON files are gone — causing `FileNotFoundException` on transaction log entries; (3) VACUUM Race on External Writer — if the external writer runs `VACUUM` with a retention period shorter than the shortcut query scan window, Parquet data files referenced in an older Delta snapshot that the Fabric reader is scanning may be deleted mid-query; (4) Schema Evolution Lag — external writer adding a new column may not be reflected in the shortcut metadata for the first few seconds, causing schema mismatch errors; (5) Delta Protocol Version Incompatibility — if external writer upgrades Delta protocol to a writer version unsupported by Fabric's Delta reader (e.g., Deletion Vectors v7+), Fabric returns `InvalidProtocolVersionException`. Detection: monitor `_delta_log` version numbers from both writer and shortcut reader using the Fabric REST API and external CloudWatch/Databricks audit logs. Mitigation: enforce minimum VACUUM retention of 7 days, pin Delta protocol version on the external table (`delta.minReaderVersion=2`), and use a separate 'read replica' Lakehouse with a scheduled CLONE or mirror rather than a live external shortcut for time-critical reporting.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-86",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Fabric's capacity smoothing algorithm interact with Spark job scheduling, and what patterns cause 'capacity debt' that throttles subsequent interactive workloads for hours?",
+    "answer": "Fabric's smoothing algorithm tracks Capacity Unit (CU) consumption in a sliding 24-hour window using an 'overages repayment' debt model. When a background operation (Spark job) consumes CUs above the SKU's per-10-second baseline (e.g., F64 = 256 CUs/sec baseline = 2560 CUs per 10-sec window), the excess is recorded as debt. Debt repayment is spread over the remaining 24-hour window: `debt_repayment_per_second = total_debt / (86400 - elapsed_seconds)`. While debt exists, new background operations are throttled proportionally — their effective CU budget is reduced by the repayment rate. Interactive operations (DAX, SQL) are NOT subject to smoothing but ARE blocked if background debt repayment consumes the capacity's baseline CUs: if background repayment requires 200 CUs/sec and the interactive workload requires 100 CUs/sec on an F64 (256 CU baseline), interactive queries are throttled with HTTP 429. Patterns causing problematic capacity debt: (1) Running multiple large Spark OPTIMIZE+ZORDER jobs simultaneously — each job bursts heavily, creating compound debt; (2) Triggering a full semantic model refresh (Import mode, large tables) on top of active Spark ETL; (3) Scheduled Dataflow Gen2 refreshes coinciding with business-hours DAX query peaks; (4) Unbounded Spark shuffle operations with `spark.sql.shuffle.partitions=200` on small clusters causing many small executor tasks each consuming CU-seconds. Detection via Capacity Metrics App: 'Throttling' visual shows exact minutes of throttling and debt accumulation curve. Mitigation: stagger background jobs using time-based pipeline triggers, limit concurrent Spark job pool size, and set `spark.dynamicAllocation.maxExecutors` to cap peak CU consumption per job.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-87",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "Describe the full mechanics of how Fabric Mirroring implements CDC from Azure SQL Database, including the internal change tracking mechanism, the replication topology, and edge cases that cause data loss or duplication.",
+    "answer": "Fabric Mirroring for Azure SQL Database uses SQL Server's Change Tracking (CT) feature (not CDC/Change Data Capture) as the source mechanism. The mirroring process: (1) Fabric enables Change Tracking on the source database (`ALTER DATABASE ... SET CHANGE_TRACKING = ON (CHANGE_RETENTION = 7 DAYS)`) and on each selected table (`ALTER TABLE ... ENABLE CHANGE_TRACKING WITH (TRACK_COLUMNS_UPDATED = ON)`); (2) Fabric's mirroring service polls the source using `CHANGETABLE(CHANGES ..., @last_sync_version)` T-SQL function to retrieve changed rows since the last watermark version — not a log-based CDC stream; (3) Changed rows are materialized as Delta MERGE operations in OneLake: INSERT maps to new rows, UPDATE maps to MERGE with matched update, DELETE maps to MERGE with matched delete; (4) The OneLake Delta table maintains current row state (not a CDC history log — deleted rows are removed from Delta). Edge cases causing issues: (a) Change Tracking retention expiry — if the mirroring service is paused for longer than the CT retention window (7 days default), the watermark version becomes invalid and Fabric must perform a full table resync (full scan, high load on source); (b) Schema changes — adding a column to the source table requires mirroring to pause and resync that table (CT doesn't capture DDL); (c) Large transaction rollbacks — CT records phantom changes for transactions that ultimately rollback, causing mirroring to attempt upserts that may produce incorrect Delta state; (d) High-cardinality deletes — mass DELETE on the source generates a huge CHANGETABLE result set that increases mirroring poll latency and Delta MERGE complexity; (e) Computed columns — not replicated. Monitoring: Fabric Admin API exposes mirroring lag metric per table; alert on lag >5 minutes for SLA-sensitive workloads.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "onelake-88",
+    "category": "FABRIC",
+    "niche": "OneLake Architecture, Shortcuts, and Multi-Cloud Interoperability",
+    "question": "How does Microsoft Purview's data access policy integration with OneLake work at the API level, and what are the latency and consistency implications for enterprise access control?",
+    "answer": "Microsoft Purview Data Use Management (DUM) policies for OneLake operate through a policy evaluation plane that Fabric's OneLake access gateway consults at read/write time. The integration: (1) Purview policies are defined in the Purview portal against OneLake resource sets (specific workspace + item paths) for specific Entra ID users, groups, or MSI; (2) Purview publishes compiled policy bundles to an Azure Policy distribution endpoint; (3) When a principal attempts to access OneLake data (via ADLS Gen2 DFS API or Fabric compute), the OneLake access layer sends an authorization request to the Purview policy evaluation service, passing the caller identity, resource path, and action (Read/Write/Execute); (4) The policy service evaluates applicable policies and returns Allow/Deny within a target of <100ms SLA; (5) Fabric caches policy decisions per principal+resource+action for a configurable TTL (default ~5 minutes) to avoid per-request latency overhead. Consistency implications: policy updates in Purview are propagated asynchronously — a new Deny policy may take up to 15 minutes to take effect across all Fabric nodes due to policy bundle publication latency + per-node cache TTL. This creates a window where access continues after policy revocation. For real-time access revocation (security incidents), operators must use Fabric's native RBAC removal (immediate effect) rather than relying solely on Purview policy. The Purview-OneLake policy integration also does NOT cover Spark compute identity (jobs run as workspace MSI) — Purview policies only govern user-delegated access. Large GCCs with thousands of policies must monitor the Purview policy evaluation service's latency via Azure Monitor (`PurviewPolicyEvaluationDuration_ms` metric).",
+    "difficulty": "HARD"
+  }
+]

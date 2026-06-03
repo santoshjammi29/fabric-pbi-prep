@@ -1,0 +1,66 @@
+[
+  {
+    "id": "adf-hard-1",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain the architecture of Self-hosted Integration Runtime (SHIR) high availability. How does the node coordination and job distribution mechanism work during a failover?",
+    "answer": "SHIR high availability is achieved by associating up to 4 physical nodes with a single logical SHIR. Nodes communicate directly with ADF control plane via HTTPS. Node coordination is managed using a local database on the primary node, synchronized across worker nodes. Job distribution is pull-based: nodes pull jobs from the ADF queue based on available concurrent worker threads. If the primary node fails, node consensus automatically elects a new primary node from the active nodes, which takes over scheduling without interrupting running or queued pipelines.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-2",
+    "category": "ADF",
+    "niche": "Advanced Orchestration, Control Flow, & Dynamic Expression Language",
+    "question": "How do you implement a dynamic, multi-stage retry strategy in ADF using recursive pipeline loops and conditional activities, avoiding the limitations of the default retry setting?",
+    "answer": "The default retry setting only supports static intervals. To implement a dynamic, multi-stage retry strategy (e.g., exponential backoff), you wrap the main activity in a child pipeline. The parent pipeline calls the child using an Execute Pipeline activity. If the activity fails, an If Condition evaluates the retry count (passed as a parameter). If the count is below the maximum, the pipeline uses a Wait activity (with duration calculated dynamically via expression: `@string(mul(5, range(1, 10)[pipeline().parameters.retryCount]))`) and recursively calls itself, incrementing the retry count parameter.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-3",
+    "category": "ADF",
+    "niche": "Scaling, Throughput Optimization, & Copy Activity Bottlenecks",
+    "question": "How do you diagnose and optimize a Copy Activity bottleneck when transferring data from a secured on-premises Oracle database to Azure Data Lake Gen2 using SHIR?",
+    "answer": "Diagnosing the bottleneck involves examining the Copy Activity execution details (specifically DIUs used, throughput in MB/s, and duration breakdown: queue time, transfer time, pre-copy script). Optimization steps: 1) Increase concurrent connections and parallel copy settings in the Copy activity, 2) Scale up the SHIR machine CPU/RAM and adjust worker thread limits, 3) Tune database source partitions (e.g., partition by physical row ID ranges) to allow concurrent readers, and 4) Ensure network bandwidth is not saturated, utilizing ExpressRoute if possible.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-4",
+    "category": "ADF",
+    "niche": "CI/CD, Enterprise Deployment, ARM Templates, & Git Integration",
+    "question": "What is the exact deployment pipeline design for ADF when migrating changes across Dev, Test, and Prod environments, and how do you handle parameters for linked services that reference Azure Key Vault?",
+    "answer": "ADF CI/CD involves exporting ARM templates from the 'adf_publish' branch (generated when publishing from Dev). The deployment pipeline (e.g., Azure Pipelines or GitHub Actions) overrides ARM parameters for each target environment. For linked services referencing Key Vault, the vault URL is parameterized in the ARM template (e.g., `@pipeline().globalParameters.KeyVaultURL`). The pipeline updates this value per environment. The target ADF instances use their own Managed Identity, which must be granted access policies in the target environment's Key Vault.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-5",
+    "category": "ADF",
+    "niche": "Monitoring, Custom Logging, Alerts, & Troubleshooting Edge Cases",
+    "question": "How do you configure and query Azure Monitor Log Analytics using KQL to identify the top 5 longest-running activities in ADF over the past 30 days, grouped by pipeline?",
+    "answer": "First, configure Diagnostic Settings in ADF to forward pipeline/activity run telemetry to Log Analytics. The KQL query is: \n```kusto\nADFActivityRun\n| where TimeGenerated > ago(30d)\n| where Status == 'Succeeded' or Status == 'Failed'\n| extend DurationSeconds = datetime_diff('second', End, Start)\n| summarize MaxDuration = max(DurationSeconds) by PipelineName, ActivityName\n| top 5 by MaxDuration desc\n```\nThis KQL query computes the duration between Start and End timestamps, groups by pipeline and activity, and returns the top 5 activities sorted by duration.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-6",
+    "category": "ADF",
+    "niche": "Mapping Data Flows & Spark Execution Mechanics",
+    "question": "Explain the underlying Spark execution model of Azure Data Factory Mapping Data Flows. How does partition tuning in Mapping Data Flows affect memory usage and execution speed on the managed Integration Runtime?",
+    "answer": "Mapping Data Flows compile visually designed transformations into Spark code, which executes on an ephemeral Azure Integration Runtime Spark cluster. Partition tuning determines how Spark distributes data across cluster nodes. Under-partitioning causes data skew and OOM errors, as large partitions exceed executor memory limits. Over-partitioning increases scheduling overhead and shuffle write time. By default, ADF uses 'Current Partitioning' (preserving source partitioning). For optimal speed, use 'Round Robin' or 'Hash' partitioning on key columns before heavy joins or aggregations to distribute the workload evenly.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-7",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does Managed Virtual Network Integration Runtime handle private link communication to Azure Storage, and what are the DNS resolution requirements?",
+    "answer": "Managed VNET IR isolates compute resources in a Microsoft-managed VNET. When connecting to Azure Storage, it establishes a Managed Private Endpoint. Fabric/ADF manages the DNS mapping under the hood: when a pipeline accesses `mystorage.blob.core.windows.net`, the Managed VNET DNS resolver overrides the public IP lookup and returns the private IP address associated with the Managed Private Endpoint, routeing traffic entirely within the Azure backbone and blocking public access.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-hard-8",
+    "category": "ADF",
+    "niche": "Advanced Orchestration, Control Flow, & Dynamic Expression Language",
+    "question": "Explain how the ForEach activity handles concurrency limits and sequential execution. What happens to variable modifications inside a parallel ForEach block?",
+    "answer": "By default, ForEach runs activities in parallel with a maximum concurrency of 50. If 'Sequential' is checked, it runs items one by one. Modifying variables using the Set Variable activity inside a parallel ForEach block is not supported and will result in unexpected behavior (race conditions or pipeline errors). This is because variable scope is global to the pipeline run. If you need to accumulate or modify state per iteration in a parallel execution, you must use a child pipeline with parameters, which isolate state per execution context.",
+    "difficulty": "HARD"
+  }
+]

@@ -1,0 +1,523 @@
+import json
+import os
+import re
+
+output_file = "/Users/santosh/.gemini/antigravity/scratch/fabric-pbi-prep/data_personalised.js"
+
+print("Compiling 50 elite-level questions & answers...")
+
+db = []
+
+# --- DOMAIN 1: Microsoft Fabric, OneLake & Direct Lake Architecture (10 Questions) ---
+d1_questions = [
+    {
+        "id": "pers-1-1",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "When designing a multi-workspace architecture in Fabric for a decentralized global enterprise, how do you architect OneLake shortcuts to prevent data duplication while enforcing strict data sovereignty boundaries between EU and non-EU regions?",
+        "answer": "To enforce strict data sovereignty boundaries between EU and non-EU regions in Fabric while avoiding data duplication, implement a multi-capacity tenant layout:\n\n1. Capacity Assignment: Deploy separate Fabric capacities (F-SKUs) in region-compliant locations (e.g., North Europe for EU and East US for non-EU). Allocate workspaces to their respective regional capacities.\n\n2. Shortcut Architecture: EU workspaces containing sensitive data (e.g., GDPR-regulated Gold lakehouses) must store their physical data in the EU capacity. Create read-only OneLake shortcuts in the non-EU workspaces referencing the EU Lakehouse. However, because shortcuts do not replicate data, the physical bytes remain in the EU.\n\n3. Sovereign Boundaries & Compute Egress: To prevent accidental cross-border data transfer, configure Tenant Administration settings to block cross-region Spark and SQL compute operations on shortcut endpoints. In addition, restrict user access roles on the non-EU workspaces, and configure Row-Level/Column-Level security on the SQL Endpoint or semantic model in the EU workspace before sharing it via shortcut or Direct Lake, ensuring only aggregated or pseudonymized data flows across regions."
+    },
+    {
+        "id": "pers-1-2",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "Fabric allows cross-workspace shortcuts. Walk through the underlying security and lineage implications when a user has access to a shortcut in Workspace A but lacks permissions on the underlying target item in Workspace B.",
+        "answer": "The security and lineage model for cross-workspace shortcuts follows a split-permission design:\n\n1. Data Access Handshake: When a user accesses a shortcut in Workspace A, Fabric evaluates permissions on the target item in Workspace B. If the user does not have at least Read permissions on the target item in Workspace B, the access request is denied. Fabric does not bypass the target security layer; the shortcut is not a privilege escalation vehicle.\n\n2. SQL Endpoint vs Spark behavior: In the SQL Analytics Endpoint, access is determined by the SQL login identity (Entra ID). If the user lacks permissions on the target workspace, the SQL query fails with a metadata permission error. In Spark, the notebook execution uses the runner's workspace identity or user credentials, resolving target access similarly.\n\n3. Lineage Implications: Microsoft Purview and Fabric Lineage view show the shortcut link from Workspace A pointing to Workspace B. If the viewer lacks access to Workspace B, the lineage tracker displays a generic 'External Item' placeholder without showing its schema, owners, or upstream dependencies, thereby protecting metadata privacy while preserving the audit path."
+    },
+    {
+        "id": "pers-1-3",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "How do you design an enterprise tenant-level capacity management strategy when migrating a decentralized organization with 30 distinct business units from Azure Synapse to Fabric? Detail your approach to domain delegation and workspace allocation.",
+        "answer": "A tenant-level capacity management strategy for 30 decentralized business units (BUs) should follow a hub-and-spoke federated model:\n\n1. Capacity Allocation & Sizing: Avoid allocating a single massive capacity (e.g., F256) for the entire tenant. Instead, group BUs into logical 'Domain Portfolios' based on workload profiles. Allocate medium-sized capacities (e.g., F64 or F128) to high-throughput domains, and share smaller capacities (e.g., F32) among low-impact administrative BUs. This facilitates FinOps tracking and isolates performance impacts.\n\n2. Workspace Allocation: Define a strict workspace topology. Each BU gets 3 distinct workspaces: [BU]_Dev, [BU]_Stg, and [BU]_Prod. This maps directly to deployment pipelines and Git integrations. Group workspaces into Fabric Domains (e.g., Finance, Marketing) representing the BUs.\n\n3. Domain Delegation: Assign 'Domain Admins' from the BUs to manage their respective domains. Domain Admins can create workspaces and assign them to the BU's dedicated capacity. Central IT retains Tenant Admin control, setting tenant-wide policies (e.g., disabling public endpoints, governing tenant-level Git settings, and monitoring capacity utilization via the Fabric Capacity Metrics App) while delegating day-to-day operations to the domains."
+    },
+    {
+        "id": "pers-1-4",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "You are hitting the F64 capacity limit (25 GB memory guardrail) in Direct Lake mode. Explain the precise technical sequence of events that triggers a fallback to DirectQuery mode. How do you detect this via DMV or Log Analytics?",
+        "answer": "When a semantic model running in Direct Lake mode exceeds the memory limit of its allocated capacity (e.g., 25 GB for F64 SKU), the query engine triggers a fallback to DirectQuery:\n\n1. Fallback Sequence: (a) A user opens a report, triggering a DAX query. (b) The Analysis Services engine checks the VertiPaq memory cache. If the required columns are not present, it attempts to load them from OneLake. (c) The load operation pushes the active memory footprint of the semantic model beyond the 25 GB guardrail. (d) The engine aborts the load operation to prevent capacity crashing. (e) The engine silently updates the connection state of the model and resubmits the query as a T-SQL query to the Synapse SQL Analytics Endpoint, entering DirectQuery fallback.\n\n2. Detection via DMVs: Connect to the XMLA endpoint of the workspace using SQL Server Management Studio (SSMS) or DAX Studio. Query the DMV `select * from $System.DISCOVER_M_EXPRESSIONS` or `select * from $System.TMSCHEMA_PARTITIONS`. In the partition schema, inspect the `Mode` and `DirectLakeBehavior` properties. If a query falls back, the `sys.dm_os_wait_stats` or query log will show heavy SQL traffic.\n\n3. Detection via Log Analytics/Microsoft Fabric Capacity Metrics: In Azure Log Analytics, query the `PowerBIDatasetsWorkspace` table. Search for operation names `QueryEnd` with the `DirectQueryMode` flag set to `True` for a model designed for Direct Lake. In the Fabric Capacity Metrics App, inspect the 'Overages' and 'Throttling' tab, which highlights when memory limit breaches occurred, logging them as capacity exhaustion events."
+    },
+    {
+        "id": "pers-1-5",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "To prevent DirectQuery fallback, you decide to implement vertical partitioning and semantic model stripping. What are the architectural criteria for breaking a single enterprise Gold semantic model into smaller, composite Direct Lake models?",
+        "answer": "To prevent DirectQuery fallback due to capacity memory limits, apply vertical partitioning and semantic model stripping based on these criteria:\n\n1. Column Stripping (Cardinality Elimination): Strip out high-cardinality columns (e.g., description text, millisecond-level timestamps, GUID keys) that are not used in visual filters or aggregations. High-cardinality columns consume the largest memory footprint in the VertiPaq dictionary.\n\n2. Vertical Partitioning by Subject Area: Instead of a single 'Enterprise Gold' model with 100 tables, strip it into functional 'Sub-Models' (e.g., Sales Model, Inventory Model, Finance Model). Share conformed dimensions (Customer, Date) across these models. Keep fact tables isolated within their specific sub-models.\n\n3. Composite Model Leveraging: For reports requiring cross-subject queries, build a 'Composite Model' (DirectQuery over Power BI datasets) that links the separate sub-models. This ensures that the Analysis Services engine loads only the specific columns needed for a visual into memory, distributing the memory load across separate model boundaries and preventing any single model from breaching the SKU limit."
+    },
+    {
+        "id": "pers-1-6",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "Compare the network and performance footprint of using OneLake shortcuts versus utilizing Mirroring for Azure Cosmos DB or Azure SQL in an active transactional environment.",
+        "answer": "1. OneLake Shortcuts: Establish logical metadata pointers to external storage (e.g., ADLS Gen2, AWS S3). The network footprint is pull-based: when a query executes, data is pulled on-demand from the source storage account, introducing network hops and latency if the query engine and storage are cross-region. There is no active transactional replication overhead, but query performance relies heavily on source throughput.\n\n2. Fabric Mirroring: Replicates data continuously from transactional databases (e.g., Cosmos DB, Azure SQL) into OneLake Delta Parquet format via Change Data Capture (CDC). The network footprint is push-based and continuous, utilizing a low-latency replication service that writes directly to OneLake. Queries run against the optimized local Delta tables without hitting the source transactional database, resulting in near-zero source impact and high query performance in Direct Lake mode."
+    },
+    {
+        "id": "pers-1-7",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "How does Fabric handle multi-workspace deployment pipelines when an upstream workspace depends on a OneLake shortcut that references a storage account protected by private endpoints?",
+        "answer": "Fabric manages multi-workspace deployment pipelines with private endpoint shortcuts using its managed network infrastructure:\n\n1. Connection Binding: During pipeline promotion (e.g., Dev to Prod), Fabric copies the item definitions (e.g., Lakehouses, Data Warehouses). If an item contains a shortcut, the shortcut metadata is duplicated.\n\n2. Private Endpoint Resolution: To resolve private endpoints, the Fabric tenant must have 'Trusted Workspace Access' and 'Managed Private Endpoints' configured for the target storage accounts in both Dev and Prod subscriptions. During deployment, the shortcut in the Prod workspace resolves to the Prod private endpoint. If the Prod private endpoint is missing, the shortcut fails to mount, preventing downstream compute jobs from accessing the data."
+    },
+    {
+        "id": "pers-1-8",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "In an enterprise Data Mesh paradigm implemented inside Fabric, how do you define the governance boundaries between Central IT (managing capacities and OneLake guardrails) and Domain Teams (managing Lakehouses and Warehouses)?",
+        "answer": "In a Fabric-based Data Mesh, governance boundaries are separated cleanly:\n\n1. Central IT (Platform Team): Manages tenant configurations, capacity allocations (F-SKUs), domain allocations, firewall rules, private links, and Git integration permissions. Central IT configures capacity guardrails (e.g., maximum memory limits, interactive smoothing limits) and monitors global resource utilization.\n\n2. Domain Teams (Business Units): Manage their allocated workspaces, Lakehouses, Warehouses, Notebooks, and Power BI semantic models. They define schemas, build ETL pipelines, implement Row-Level Security (RLS) on their datasets, and publish reports. They own the lifecycle of their data products and are charged back based on their capacity usage."
+    },
+    {
+        "id": "pers-1-9",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "Explain how Fabric's managed identity architecture interacts with external ADLS Gen2 accounts when setting up trusted workspace access for storage accounts with firewall rules enabled.",
+        "answer": "Fabric uses Workspace Managed Identities (WMI) or Tenant Service Principals to authenticate against firewalled ADLS Gen2 accounts:\n\n1. Trusted Workspace Access: Azure Storage allows bypass of firewall rules for trusted Microsoft services. In the ADLS Gen2 firewall settings, enable 'Allow trusted Microsoft services to access this storage account'.\n\n2. Authentication Handshake: When Fabric accesses the storage account (e.g., via a shortcut), it requests an Entra ID token using the workspace's managed identity. The storage account validates the token, recognizes that the request originates from a trusted Fabric workspace, and allows the traffic through the firewall, ensuring secure cross-resource connectivity without whitelisting public IPs."
+    },
+    {
+        "id": "pers-1-10",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": "Architectural & Governance Topography",
+        "question": "What are the architectural trade-offs between implementing business logic within a Fabric Data Engineering Spark Notebook versus using a Fabric Data Warehouse with T-SQL stored procedures for a Gold-tier table?",
+        "answer": "1. Spark Notebooks: Provide high flexibility, supporting Python, Scala, SQL, and R. They excel at handling unstructured or semi-structured data, complex mathematical calculations, and machine learning integrations. They write directly to OneLake Delta tables with V-Order optimization. The trade-off is higher start-up latency (cold start of Spark pools) and complex state management.\n\n2. Data Warehouse (T-SQL Stored Procedures): Offers low start-up latency and high familiarity for SQL developers. It excels at relational set-based operations (DML/DDL) and integrates natively with security frameworks (RLS, OLS). The trade-off is limited support for complex non-relational processing and higher compute resource consumption (interactive CUs) during heavy data transformations."
+    }
+]
+
+# --- DOMAIN 2: Azure Native Data Engineering & Orchestration (10 Questions) ---
+d2_questions = [
+    {
+        "id": "pers-2-1",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "High-Throughput Ingestion & Compute Tuning",
+        "question": "You are running an Azure Data Factory (ADF) copy activity to move data from an on-premises cluster to ADLS Gen2. You scale the Data Integration Units (DIUs) to 32, but throughput plateaus. How do you systematically isolate whether the bottleneck is the self-hosted IR, network throttling, source concurrency, or storage ingress limits?",
+        "answer": "To isolate the performance plateau, follow this systematic diagnostic checklist:\n\n1. Check Self-Hosted IR (SHIR) Metrics: In Azure Monitor or local PerfMon on the SHIR VMs, check CPU and Memory utilization. If CPU is > 80% or thread pool exhaustion is occurring, the bottleneck is local compute. Also check the 'Concurrent Jobs' limit; if reached, the SHIR is queuing tasks.\n\n2. Evaluate Source Concurrency: Inspect the source database's session activity and wait locks during the copy execution. If the database is experiencing read locks or high CPU, the source cannot serve data faster.\n\n3. Assess Network Throttling: Run network latency tests between the SHIR VM and the Azure Storage endpoint using `ExpressRoute` or `VPN` diagnostics. Check if the bandwidth of your gateway circuit is saturated (e.g., hitting a 1Gbps limit).\n\n4. Inspect ADLS Gen2 Ingress: Check Azure Storage metrics for 'Throttling Errors' (HTTP 503 Server Busy). If ingress limits are breached, scale the storage account or distribute the writes across multiple containers."
+    },
+    {
+        "id": "pers-2-2",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "High-Throughput Ingestion & Compute Tuning",
+        "question": "Explain the physical distribution and data-shuffling mechanics that occur when you enable high levels of parallelism inside an ADF Mapping Data Flow running on an Azure Integration Runtime with a 32+32 Core compute configuration.",
+        "answer": "When running an ADF Mapping Data Flow on a 32+32 Core Integration Runtime:\n\n1. Spark Execution Plan: The Mapping Data Flow is compiled into a PySpark application. The 32+32 configuration assigns 32 cores for the driver and 32 cores distributed across worker nodes. Spark partitions the input dataset based on the file count or block sizes in ADLS Gen2.\n\n2. Data Shuffling: When performing operations like Joins or Aggregations, Spark executes a shuffle operation, reorganizing data across worker executors. Data is serialized, written to local executor disks, transferred over the Azure virtual network, and deserialized on the target workers.\n\n3. Parallelism Tuning: If parallelism is set too high, the executor cores spend more time handling network connection overhead and thread scheduling than doing actual work, leading to shuffle write/read bottlenecks. Broadcast joins should be forced on smaller tables (under 10MB) to eliminate the shuffle phase entirely."
+    },
+    {
+        "id": "pers-2-3",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "Databricks & Synapse Optimization",
+        "question": "When configuring a Databricks cluster for high-concurrency ingestion pipelines, how do you balance worker pool sizes, auto-scaling thresholds, and node types (compute-optimized vs. memory-optimized) to meet strict hourly SLAs without overspending?",
+        "answer": "To optimize Databricks compute configurations for cost-effective ingestion SLAs:\n\n1. Node Selection: For ETL/ETL pipelines performing intensive parsing, joins, or aggregations, select Compute-Optimized nodes (e.g., F-series). For complex merges, stateful streams, or large shuffle stages, select Memory-Optimized nodes (e.g., L-series or R-series) to prevent spill-to-disk.\n\n2. Auto-scaling Constraints: For batch ingestion with predictable workloads, disable auto-scaling and use a fixed pool size to eliminate cluster start-up latency. For streaming or irregular spikes, enable autoscaling with a tight bound (e.g., min 2, max 8 nodes) and configure aggressive scale-down timeouts (e.g., 5-10 minutes).\n\n3. Shared Pools: Use Databricks Instance Pools to reduce VM acquisition times from 5 minutes to under 30 seconds. This allows auto-scaling nodes to spin up instantly, maintaining SLAs during unexpected ingestion surges."
+    },
+    {
+        "id": "pers-2-4",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "Databricks & Synapse Optimization",
+        "question": "Synapse Serverless SQL Pools allow direct querying of ADLS Gen2 Parquet files. Detail the performance impact of partition pruning, file count consolidation, and metadata cache configurations when querying a 100 TB data lake.",
+        "answer": "Optimizing Synapse Serverless SQL query efficiency over a 100 TB lake requires specific data layout and metadata tuning:\n\n1. Partition Pruning: Organize folders in ADLS Gen2 using Hive partitioning format (e.g., `/year=YYYY/month=MM/`). Utilize the `filepath()` function in Serverless queries to filter at the folder level. This prevents Synapse from scanning irrelevant physical directories, saving scanning costs and reducing execution times.\n\n2. File Size Consolidation: Consolidate data into parquet files sized between 128 MB and 512 MB. When file sizes drop below 10 MB (the 'small file problem'), Synapse spends more time executing metadata handshakes and file open operations than reading data. Conversely, files over 1 GB limit compute parallelism.\n\n3. Metadata Cache: Use the `rebuild` command on database schemas to refresh table metadata. Enable Synapse's automatic metadata caching for CSV and Parquet files, allowing Serverless pools to bypass storage layer list-directory lookups during query planning."
+    },
+    {
+        "id": "pers-2-5",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "High-Throughput Ingestion & Compute Tuning",
+        "question": "How do you design a highly available (HA) and disaster recovery (DR) architecture for Azure Data Factory Self-Hosted Integration Runtimes (SHIR) deployed across multiple on-premises datacenters?",
+        "answer": "To establish an HA/DR setup for SHIR nodes across datacenters:\n\n1. Multi-node Cluster: Associate up to 4 physical or virtual nodes to a single logical SHIR. Distribute these nodes evenly across active datacenters. Traffic is automatically load-balanced across active nodes.\n\n2. High Availability Routing: If a datacenter goes offline, the remaining nodes in the other datacenters continue executing pipeline tasks. Ensure all nodes share the same database connections and have identical local firewalls allowed.\n\n3. Active-Passive DR: For geographically separated regions, create two separate SHIR clusters. Map them inside ADF pipelines using parameters. During a disaster, toggle the active Integration Runtime parameter in the deployment pipeline to point to the backup datacenter cluster."
+    },
+    {
+        "id": "pers-2-6",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "High-Throughput Ingestion & Compute Tuning",
+        "question": "What are the common concurrency race conditions when triggering ADF pipelines via Event Grid file-creation events? How do you architect a mitigation strategy for multi-part file uploads?",
+        "answer": "Concurrency race conditions in event-triggered pipelines occur when multi-part or large file uploads generate multiple nested events:\n\n1. The Problem: When a large file is uploaded to ADLS Gen2, Event Grid may trigger multiple events (e.g., Flush operations or part-creation logs) before the file is fully written, causing ADF pipelines to read incomplete files.\n\n2. Mitigation (Marker Files): Restrict ADF triggering to a dedicated '_SUCCESS' or 'schema.json' marker file created by the upstream application only *after* all data parts have successfully uploaded.\n\n3. Mitigation (Tumble Window): Alternatively, configure the ADF pipeline trigger to run on a Tumbling Window, and utilize a validation step in ADF to check file lock states or size differences over a 30-second window before launching downstream compute notebook activities."
+    },
+    {
+        "id": "pers-2-7",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "Databricks & Synapse Optimization",
+        "question": "Walk through the architectural design of a zero-trust credential pass-through model in Azure Databricks using Unity Catalog and credential bootstrapping.",
+        "answer": "A zero-trust access model in Databricks bypasses static credentials using Unity Catalog:\n\n1. Credential Delegation: Define Unity Catalog Storage Credentials mapped to Azure Managed Identities. This decouples storage access permissions from Databricks personal tokens.\n\n2. External Locations: Bind storage credentials to specific ADLS Gen2 container paths as Unity Catalog External Locations. Users are granted SQL-like access (e.g., `GRANT READ ON EXTERNAL LOCATION` to group) instead of storage keys.\n\n3. Execution Auditing: When a query runs, Unity Catalog intercepts the operation, verifies permissions, acquires a short-lived token from Entra ID using the linked Managed Identity, and executes the read. This guarantees that data access is audited at the catalog level with zero exposure of underlying storage keys."
+    },
+    {
+        "id": "pers-2-8",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "Network Security & DevOps",
+        "question": "How do you securely configure Azure Data Factory to access an Azure SQL Database behind a private endpoint while maintaining high performance copy throughput?",
+        "answer": "To securely connect ADF to firewalled Azure SQL instances:\n\n1. Managed VNet: Create an ADF instance with Managed Virtual Network enabled. This isolates ADF's internal execution pool from public networks.\n\n2. Managed Private Endpoint: Provision a Managed Private Endpoint in ADF targeting the Azure SQL Database. Approve the connection request in the Azure SQL Database's network settings.\n\n3. Integration Runtime Config: Create an Azure Integration Runtime inside the managed VNet. Configure copy tasks to run on this runtime. This routes all traffic through Microsoft's private network backbone rather than the public internet, maximizing throughput and securing database ports from public exposure."
+    },
+    {
+        "id": "pers-2-9",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "Databricks & Synapse Optimization",
+        "question": "What are the core differences between using Delta Live Tables (DLT) and standard Spark Structured Streaming Notebooks in Databricks for real-time CDC ingestion?",
+        "answer": "1. Standard Structured Streaming Notebooks: Require manual checkpoint management, trigger logic coding, schema drift validation rules, and error handling. Developers must write explicit loops to scale up or scale down resources and monitor logging via external log targets.\n\n2. Delta Live Tables (DLT): Uses a declarative framework (SQL or Python) to define pipelines. DLT automates checkpointing, auto-scales clusters dynamically based on load, enforces data quality expectations (e.g., fail on corrupt rows), and manages schema evolution. DLT provides an interactive UI dashboard for monitoring lineage and metrics natively."
+    },
+    {
+        "id": "pers-2-10",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": "Databricks & Synapse Optimization",
+        "question": "In Synapse Dedicated SQL Pools, explain the differences between Hash Distributed, Replicated, and Round-Robin table distributions, and provide concrete scenarios for when to use each.",
+        "answer": "1. Hash Distributed: Shards rows across 60 distributions based on a hash value of a single column. Use for large Fact tables (e.g., over 2 billion rows) where the distribution column is frequently used in join conditions, minimizing data movement during queries.\n\n2. Replicated: Copies the entire table to every compute node. Use for small Dimension tables (under 2 GB) to eliminate the need for data shuffling when joining with large Fact tables.\n\n3. Round-Robin: Distributes rows evenly across distributions sequentially. Use as a landing zone for fast data loading (staging tables) or when there is no clear join key available for hash distribution."
+    }
+]
+
+# --- DOMAIN 3: Delta Lake Technology & High-Performance ETL/ELT (10 Questions) ---
+d3_questions = [
+    {
+        "id": "pers-3-1",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "ACID Compliance & Log Internals",
+        "question": "Explain how Delta Lake guarantees ACID transactions during concurrent writes and reads. Specifically, detail the mechanics of optimistic concurrency control and the role of the commit log.",
+        "answer": "Delta Lake guarantees ACID compliance using Optimistic Concurrency Control (OCC) and the Delta Transaction Log:\n\n1. The Delta Log: All changes are recorded sequentially in the `_delta_log` directory as JSON commit files (`000000.json`, `000001.json`). Each file contains the actions performed (e.g., adding or deleting specific parquet files).\n\n2. Optimistic Concurrency: When a writer begins, it reads the latest version of the table. It prepares its changes in memory and attempts to write them. Before committing, it checks if another writer committed a change since it read the metadata. If no changes occurred, it commits the JSON log. If a conflict occurs, Delta Lake analyzes the conflict (e.g., if Writer A updated Partition A and Writer B updated Partition B, it auto-resolves). If they overlap, Writer B's transaction is aborted and retried.\n\n3. Consistency for Readers: Readers check the latest JSON logs to assemble the active state of parquet files. Because old parquet files are not deleted immediately (retained for history/time travel), concurrent readers can read older snapshots consistently without locks while writes are happening."
+    },
+    {
+        "id": "pers-3-2",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "Compaction & Clustering Engine",
+        "question": "Walk through the logical and physical mechanics of Z-Ordering. How does Z-Ordering reorganize parquet files, and why does Z-Ordering multiple columns lead to performance degradation?",
+        "answer": "Z-Ordering arranges multidimensional data onto a one-dimensional space-filling curve to improve read pruning:\n\n1. Mechanics: During an `OPTIMIZE` command with `ZORDER BY (Col1, Col2)`, Spark reads the data and maps the values of the specified columns into a binary Z-value. It sorts the rows based on this Z-value and writes them to new parquet files. This groups similar values of both columns together within the same physical files.\n\n2. Read Pruning: Parquet files store minimum/maximum values for each column block. When a query filters by Col1 or Col2, the query planner checks the min/max values and skips files that do not contain the range, dramatically reducing disk I/O.\n\n3. Performance Degradation: As you add more columns to a Z-Order statement, the multidimensional space becomes crowded, and the clustering capability dilutes exponentially (known as the curse of dimensionality). The min/max ranges for each column in the files expand and overlap, preventing effective file skipping. Limit Z-Ordering to 1-3 columns for optimal performance."
+    },
+    {
+        "id": "pers-3-3",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "Compaction & Clustering Engine",
+        "question": "What is Liquid Clustering in Delta Lake? Explain how it differs from Z-Ordering and partitioning, and why it is more efficient for high-velocity data layouts.",
+        "answer": "Liquid Clustering is an advanced data layout technique that replaces traditional hive partitioning and Z-Ordering:\n\n1. How it works: Liquid Clustering dynamically groups data based on specified clustering keys without creating rigid physical directory structures. It uses a Hilbert curve algorithm to distribute data multi-dimensionally during write operations.\n\n2. Key Differences: Traditional partitioning requires defining fixed columns (e.g., Year/Month) and creates too many small files if keys are high-cardinality. Z-Ordering is expensive because it requires a full table rewrite. Liquid Clustering is incremental and fast, sorting only new data during writes.\n\n3. Operational Benefits: It supports changing clustering keys over time without rewriting historical data. It prevents partition skew and simplifies table design, allowing writes to remain fast while optimizing query performance for skewed workloads."
+    },
+    {
+        "id": "pers-3-4",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "Compaction & Clustering Engine",
+        "question": "What is V-Order optimization in Microsoft Fabric? How does it interact with the VertiPaq engine during Direct Lake semantic model queries?",
+        "answer": "V-Order is a proprietary write optimization for Delta Parquet files inside Fabric:\n\n1. Compression Mechanics: V-Order applies advanced sorting, encoding, and compression algorithms (mirroring the Power BI VertiPaq engine structure) to the Parquet columns when writing data from Spark, Data Factory, or Warehouse engines.\n\n2. Direct Lake Ingestion: When a Power BI report runs in Direct Lake mode, the Analysis Services engine loads the V-Ordered Parquet files directly from OneLake into memory without translating them. Because the data structure matches VertiPaq's in-memory format, loading takes milliseconds, avoiding fallback and providing import-level performance over live lake data."
+    },
+    {
+        "id": "pers-3-5",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "ACID Compliance & Log Internals",
+        "question": "How do you manage schema evolution in Delta Lake? Explain the difference between schema enforcement (schema validation) and schema evolution, and how to safely execute migrations.",
+        "answer": "Delta Lake manages table schema protection via two primary mechanisms:\n\n1. Schema Enforcement: By default, Delta Lake rejects writes containing columns not present in the target schema. This prevents corrupt or mismatched data from polluting production tables.\n\n2. Schema Evolution: Allows developers to explicitly add new columns or update types during writes using the `.option(\"mergeSchema\", \"true\")` flag. Delta updates the table metadata in the transaction log, and subsequent reads will render the new columns, filling historical records with null values.\n\n3. Safe Migrations: For complex migrations (e.g., dropping or renaming columns), use the Delta Lake declarative DLL commands (`ALTER TABLE ALTER COLUMN`) to preserve transaction logs and ensure concurrent readers do not experience disruption during schema upgrades."
+    },
+    {
+        "id": "pers-3-6",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "ACID Compliance & Log Internals",
+        "question": "What are the performance and data recovery trade-offs of configuring the VACUUM retention threshold in Delta Lake? How does VACUUM affect concurrent read operations?",
+        "answer": "The `VACUUM` command deletes physical parquet files that are no longer referenced by the latest version of the Delta log:\n\n1. Trade-Offs: Running `VACUUM` frequently (e.g., with a threshold of 0 hours) cleans up old data files, reducing storage costs in ADLS Gen2. However, this permanently destroys the ability to perform 'Time Travel' queries to older table versions and prevents Rollbacks.\n\n2. Concurrent Reader Impact: If a reader is executing a query against table version N-1 while `VACUUM` is running and deletes the files referenced by version N-1, the reader's query will fail with a `FileNotFoundException`.\n\n3. Best Practice: Keep the default retention period of 7 days (`vacuum.retentionDurationCheckEnabled` is set to true by default) to ensure that concurrent transactions and time-travel windows remain active and safe from accidental file deletions."
+    },
+    {
+        "id": "pers-3-7",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "Compaction & Clustering Engine",
+        "question": "Compare Shallow Clones and Deep Clones in Delta Lake. Provide explicit use cases for each when setting up Dev/Test environments.",
+        "answer": "1. Shallow Clones: Create copies of the table metadata (Delta logs) without copying the underlying physical parquet files. They are extremely fast to create (seconds) and consume near-zero storage. Use for temporary testing of ETL query logic or staging environments where you want to read production data without modifying it.\n\n2. Deep Clones: Copy both the metadata and the physical parquet files to a new destination path. They are slower and consume full storage costs. Use for full disaster recovery testing, performance benchmarking, or when migrating data across storage accounts or security boundaries."
+    },
+    {
+        "id": "pers-3-8",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "ACID Compliance & Log Internals",
+        "question": "Explain the multi-engine concurrency challenge when writing to the same Delta Lake table from both Databricks (Spark) and Microsoft Fabric (Synapse Warehouse) simultaneously. How do you resolve conflicts?",
+        "answer": "Writing to the same Delta table from multiple external query engines introduces transaction sync issues:\n\n1. Metadata Desync: Each engine maintains local metadata caches of the table. If Databricks writes a commit, Fabric's SQL engine may not see the updated commit file instantly, leading to transaction overlap.\n\n2. Conflict Resolution: Ensure both engines utilize a shared external Hive Metastore (e.g., Unity Catalog or Azure Purview) and have write synchronization enabled. In Fabric, configure shortcuts to point directly to the Databricks Delta log, and use Fabric's metadata sync commands (`VACUUM` or `OPTIMIZE` updates) to refresh schema caches before executing merges."
+    },
+    {
+        "id": "pers-3-9",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "ACID Compliance & Log Internals",
+        "question": "How does Delta Lake Change Data Feed (CDF) capture row-level changes? Walk through the directory structure and metadata changes that occur when CDF is enabled.",
+        "answer": "When Change Data Feed (CDF) is enabled on a Delta table (`delta.enableChangeDataFeed = true`):\n\n1. Directory Structure: A new folder `_change_data` is created within the table directory. It stores change-tracking parquet files containing the updated rows.\n\n2. Metadata Actions: During updates, merges, or deletes, Spark writes both the latest table state and the delta changes. Deletes are logged with status `preimage`, inserts with `insert`, and updates with both `update_preimage` (before) and `update_postimage` (after).\n\n3. Ingestion Consumption: Downstream streaming pipelines read these change parquet files using the `.option(\"readChangeFeed\", \"true\")` interface, enabling incremental synchronization without scanning the main table."
+    },
+    {
+        "id": "pers-3-10",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": "Compaction & Clustering Engine",
+        "question": "What are Deletion Vectors in Delta Lake? How do they improve write performance during MERGE operations, and what is their impact on read latency?",
+        "answer": "Deletion Vectors optimize the 'Copy-on-Write' behavior of Delta Lake writes:\n\n1. Traditional MERGE (Copy-on-Write): When a row in a 100 MB Parquet file is updated or deleted, Spark must rewrite the entire 100 MB file with the modification, leading to high write overhead.\n\n2. Merge with Deletion Vectors (Merge-on-Read): Spark writes a tiny auxiliary file (Deletion Vector) listing the row indices that were deleted, leaving the original 100 MB Parquet file untouched. This results in massive write-speed increases.\n\n3. Read Latency: During reads, the engine must merge the deletion vector with the main Parquet files in memory to filter out deleted rows, introducing slight read overhead. Run the `OPTIMIZE` command periodically to merge deletion vectors back into the main files for optimal read performance."
+    }
+]
+
+# --- DOMAIN 4: Data Modeling, Architecture Paradigms & Governance (10 Questions) ---
+d4_questions = [
+    {
+        "id": "pers-4-1",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": "Data Vault & Dimensional Schemas",
+        "question": "How do you design a medallion architecture inside a Lakehouse? Detail the distinct schema rules, normalization forms, and storage formats for Bronze, Silver, and Gold tiers.",
+        "answer": "A medallion architecture inside a Lakehouse organizes data progressively:\n\n1. Bronze (Raw Layer): Stores raw ingested data as-is (JSON, CSV, or parquet). It is append-only, preserving history with timestamps. No clean-up, schema enforcement, or transformations are applied. Format: Parquet or Delta.\n\n2. Silver (Enriched/Cleaned Layer): Cleanses, filters, and standardizes data. Schema enforcement is enabled, and data is parsed into conformed structures. It is semi-normalized (3NF) to support ad-hoc analytics and ensure data validation. Format: Delta tables with V-Order/Z-Order.\n\n3. Gold (Business/Semantic Layer): Restructures data into star schemas (Fact and Dimension tables) or wide reporting tables optimized for business needs. Business logic and aggregations are applied. Format: Delta tables with optimized statistics, fully aligned for Direct Lake ingestion."
+    },
+    {
+        "id": "pers-4-2",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": "Data Vault & Dimensional Schemas",
+        "question": "Walk through an efficient implementation of Slowly Changing Dimension (SCD) Type 2 updates in a Delta Lake table using the MERGE statement. How do you handle high-velocity source records?",
+        "answer": "Implementing SCD Type 2 in Delta Lake requires a split-merge approach to insert new active records while updating old historical records:\n\n1. Merge Stage: Join the incoming updates with the target dimension table. If the business key matches and the record changed, update the active record's `current_flag` to `false` and set `end_date = current_timestamp`.\n\n2. Insertion Stage: In the same merge block or a subsequent batch, insert the new record with `current_flag = true`, `start_date = current_timestamp`, and `end_date = null`.\n\n3. High-Velocity Optimization: For high-volume updates, run an upstream deduplication step to process only the latest version of a key per batch. Use partition pruning on active flags (`current_flag = true`) during the merge join to prevent scanning historical records, maintaining merge performance."
+    },
+    {
+        "id": "pers-4-3",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": "Data Vault & Dimensional Schemas",
+        "question": "What is Data Vault 2.0? Explain the benefits of Hubs, Links, and Satellites over traditional Kimball dimensional modeling inside a high-throughput Lakehouse environment.",
+        "answer": "Data Vault 2.0 is a data modeling methodology designed for agile enterprise warehousing:\n\n1. Core Entities: (a) Hubs: Store unique business keys (e.g., CustomerID) with system load metadata. (b) Links: Store relationships between hubs (e.g., Sales links Customers to Products). (c) Satellites: Store descriptive attributes and history over time linked to Hubs or Links.\n\n2. Ingestion Benefits: Unlike Kimball schemas which require expensive lookups for surrogate keys, Data Vault uses hash keys (MD5 or SHA-256) calculated at source. This allows Hubs, Links, and Satellites to be loaded in parallel, maximizing Spark ingestion throughput.\n\n3. Lakehouse Agility: Data Vault decouples business keys from relationships. When business rules change, new links are created without modifying historical records, making it highly scalable for enterprise Data Mesh architectures."
+    },
+    {
+        "id": "pers-4-4",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": "Enterprise Data Governance & Mesh",
+        "question": "How do you design and enforce Data Contracts across decentralized domains in a Data Mesh architecture? Detail the tools and schema validation mechanisms.",
+        "answer": "Data Contracts define the interface, SLA, and schema expectations between data producers and consumers in a Data Mesh:\n\n1. Contract Definition: Define schemas in a machine-readable format (e.g., JSON Schema or YAML) stored in a central Git repository. The contract specifies columns, data types, nullability, SLAs (latency, freshness), and PII tags.\n\n2. Enforcing validations: Implement contract checks at the CI/CD boundary. When a domain team deploys a new database version, a Github Actions workflow validates the schema against the contract. At runtime, use Delta Lake's schema validation or Spark expectation frameworks to quarantine records that violate data quality contracts.\n\n3. Schema Registry: Utilize a schema registry (e.g., Confluent Schema Registry or Azure Event Hubs Registry) to manage versioning, ensuring backward compatibility is enforced for all schema updates."
+    },
+    {
+        "id": "pers-4-5",
+        "domain": "Enterprise Data Governance & Mesh",
+        "question": "Walk through the integration of Microsoft Purview with Azure Data Factory and Power BI. How does Purview automatically track and display asset lineage across these platforms?",
+        "answer": "Microsoft Purview automatically scans and traces lineage via service connectors:\n\n1. ADF Integration: Connect ADF to Purview in the ADF Management tab. When copy activities or mapping data flows execute, ADF pushes pipeline runtime execution metadata (sources, activities, targets) to Purview.\n\n2. Power BI Integration: Register the Power BI tenant in Purview. Purview uses admin API scanner endpoints to read semantic models, reports, dashboards, and workspace structures.\n\n3. Lineage Assembly: Purview aggregates these logs. In the Purview Catalog, users can search for a SQL table, see the ADF pipeline that ingested it to ADLS Gen2, the Spark job that processed it, the Power BI semantic model that imports it, and the final dashboard where it is visualized."
+    },
+    {
+        "id": "pers-4-6",
+        "domain": "Enterprise Data Governance & Mesh",
+        "question": "How do you implement Row-Level Security (RLS) and Column-Level Security (CLS) in Microsoft Fabric Lakehouses and SQL Analytics Endpoints? What are the limitations in Direct Lake mode?",
+        "answer": "RLS and CLS in Fabric can be implemented at multiple layers:\n\n1. SQL Endpoint Layer: Use standard T-SQL commands (`CREATE SECURITY POLICY`) to filter rows based on `USER_NAME()` or Entra ID memberships. Mask columns for specific roles. This applies to queries running in SQL mode.\n\n2. Semantic Model Layer: Define DAX roles in Power BI Desktop (e.g., `[Region] = USERPRINCIPALNAME()`).\n\n3. Direct Lake Limitations: If RLS/CLS is configured on the SQL Analytics Endpoint, Power BI semantic models in Direct Lake mode will fallback to DirectQuery mode to enforce security. To maintain Direct Lake speeds, define the RLS roles directly within the Power BI Semantic Model using DAX, keeping security evaluations within the VertiPaq engine."
+    },
+    {
+        "id": "pers-4-7",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": "Data Vault & Dimensional Schemas",
+        "question": "Explain the concept of Bi-Temporal modeling in enterprise data warehousing. How do you design schema tables to track both transaction time and valid time?",
+        "answer": "Bi-Temporal modeling tracks data history along two separate timelines:\n\n1. Valid Time (Business Time): The period when an event actually occurred in the real world (e.g., a contract became valid on Jan 1st). Managed using `valid_start_date` and `valid_end_date`.\n\n2. Transaction Time (System Time): The period when the data was physically recorded in the database (e.g., recorded on Jan 5th). Managed using `system_start_time` and `system_end_time`.\n\n3. Schema Design: Add all four timeline columns to the table. When an record is corrected retroactively, instead of overwriting, insert a new record with the updated valid range, and update the transaction timestamps of the old record. This allows auditing the database state exactly as it was known at any historical point in time."
+    },
+    {
+        "id": "pers-4-8",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": "Data Vault & Dimensional Schemas",
+        "question": "Compare Star Schema versus One Big Table (OBT) design for Power BI semantic models in Direct Lake mode. What is the impact on memory dictionaries and DAX query speed?",
+        "answer": "1. Star Schema: Follows Kimball modeling (Fact tables joined to Dimension tables). It minimizes memory consumption by normalizing descriptive attributes into separate dimension tables, keeping the fact table narrow. VertiPaq optimizes relationship joins, but complex multi-hop joins can impact DAX query performance.\n\n2. One Big Table (OBT): Denormalizes dimensions directly into a single wide fact table. This eliminates relationship join overhead during queries, leading to the fastest DAX execution. The trade-off is higher dictionary memory consumption because descriptive strings are repeated across millions of fact rows, which can trigger capacity guardrail limits."
+    },
+    {
+        "id": "pers-4-9",
+        "domain": "Enterprise Data Governance & Mesh",
+        "question": "How do you design a Master Data Management (MDM) match-and-merge workflow inside a Databricks Lakehouse? Describe your approach to survivorship rules.",
+        "answer": "An MDM workflow in Databricks uses machine learning and deterministic rules to build golden records:\n\n1. Standardization: Parse, clean, and format inputs (e.g., address validation using external APIs, normalizing phone numbers).\n\n2. Blocking & Matching: Apply fuzzy matching algorithms (e.g., Levenshtein distance, Jaro-Winkler) using Spark ML or Splink to identify potential duplicate records, assigning similarity scores.\n\n3. Survivorship Rules: Define rules to determine which attribute values survive into the Golden record (e.g., select the phone number from the source system with the highest trust rating, or select the most recently updated address). Write the output to a Gold-tier Delta table with full lineage tracking."
+    },
+    {
+        "id": "pers-4-10",
+        "domain": "Enterprise Data Governance & Mesh",
+        "question": "Detail the architectural guidelines for implementing data retention and lifecycle archiving strategies for a multi-petabyte OneLake environment.",
+        "answer": "Data retention in OneLake involves tiering data based on access frequency and regulatory compliance:\n\n1. Lifecycle Policies: ADLS Gen2 lifecycle policies can be configured on the underlying OneLake accounts to automatically move old parquet files (e.g., historical cold data older than 2 years) from Hot storage to Cool or Archive tiers.\n\n2. Partition Deletion: For regulatory requests (GDPR 'Right to be Forgotten'), use Delta Lake's delete commands on partitioned tables, and run `VACUUM` with a zero-retention override to physically erase deleted data blocks from storage.\n\n3. Compliance Audits: Enable Azure Purview retention labels to prevent deletion of data under legal hold, guaranteeing regulatory compliance."
+    }
+]
+
+# --- DOMAIN 5: Cloud FinOps, Performance Optimization & CI/CD DevOps (10 Questions) ---
+d5_questions = [
+    {
+        "id": "pers-5-1",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "FinOps Costs & Resource Tuning",
+        "question": "Explain Fabric Capacity Smoothing and the 24-hour rolling window mechanics. How does Fabric handle spikes in interactive and background CU usage, and how do you prevent throttling?",
+        "answer": "Fabric capacity management utilizes smoothing to distribute computational spikes over time:\n\n1. Smoothing Mechanics: Fabric classifies operations into two categories: (a) Interactive (e.g., running reports, SQL queries) - spikes are smoothed forward over a 5-minute window. (b) Background (e.g., Spark jobs, data pipelines) - spikes are smoothed over a 24-hour rolling window.\n\n2. Overages & Throttling: If your smoothed Capacity Unit (CU) consumption exceeds 100% of your purchased SKU limit, Fabric accumulates 'Carryforward' debt. If this debt exceeds specific thresholds, Fabric applies throttling: first delaying interactive requests (delay phase), then rejecting queries entirely (rejection phase).\n\n3. Prevention: Monitor carryforward debt using the Fabric Capacity Metrics App. Configure email alerts for capacity utilization breaching 90%. Schedule heavy background data flows (e.g., large Spark ETLs) to run sequentially during off-peak hours rather than concurrently, distributing background CU consumption evenly across the 24-hour window."
+    },
+    {
+        "id": "pers-5-2",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "FinOps Costs & Resource Tuning",
+        "question": "How do you design and enforce cost control policies in Databricks? Detail your approach to cluster policies, auto-termination limits, and pool configuration.",
+        "answer": "Cost control in Databricks is enforced via administrative cluster policies and instance pools:\n\n1. Cluster Policies: Define templates that limit user configurations. Restrict VM types (e.g., block expensive GPU nodes for standard SQL developers), enforce maximum worker counts (e.g., max 4 workers for development), and restrict cluster creation permissions.\n\n2. Auto-Termination: Enforce a mandatory auto-termination policy (e.g., terminate after 15-20 minutes of inactivity) on all interactive clusters to prevent idle VMs from running overnight.\n\n3. Instance Pools: Group pre-warmed VMs in instance pools. This reduces cluster startup times from 5 minutes to 30 seconds and allows sharing idle nodes across different workspaces, optimizing cloud resource usage."
+    },
+    {
+        "id": "pers-5-3",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "DevOps pipelines & CI/CD rollbacks",
+        "question": "Walk through the implementation of a Git-integrated multi-workspace CI/CD deployment pipeline in Microsoft Fabric. How do you handle configuration changes for connection endpoints?",
+        "answer": "Fabric Git integration and deployment pipelines enable automated code promotion:\n\n1. Git Integration: Bind your Fabric Dev workspace to an Azure DevOps or GitHub repository. Workspace items (Lakehouses, Reports, Notebooks) are serialized into JSON metadata files (`.platform` and item configuration folders) and pushed to Git.\n\n2. Deployment Pipelines: Create a 3-stage pipeline (Dev -> Test -> Prod) in the Fabric Portal. Map each stage to its respective workspace.\n\n3. Connection Parameterization: Use deployment rules to automatically override connection strings during promotion. For instance, set a rule to remap a Lakehouse shortcut pointing to `dev_lakehouse` in the Dev stage to `prod_lakehouse` in the Prod stage. Trigger deployments programmatically via Azure DevOps pipeline tasks using Fabric REST APIs."
+    },
+    {
+        "id": "pers-5-4",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "DevOps pipelines & CI/CD rollbacks",
+        "question": "Detail the CI/CD deployment mechanics for Azure Data Factory. How do you automate ARM template deployments while avoiding trigger state conflicts?",
+        "answer": "ADF CI/CD uses npm utilities and ARM templates to deploy changes without manual interventions:\n\n1. Serialization: Work is saved in the ADF Git integration branch (e.g., `collaboration`). When you click 'Publish', ADF compiles the pipelines into ARM templates in the `adf_publish` branch.\n\n2. Release Pipeline: In your release pipeline (e.g., YAML), download the ARM templates. Before deploying, run a script to **stop all active triggers** in the target ADF environment. If a trigger is active during deployment, the release will fail with lock conflicts.\n\n3. ARM Deployment: Run the ARM Template Deployment task, passing environmental overrides (e.g., SQL Connection strings). After the deployment succeeds, execute a post-deployment script to **restart all triggers**, ensuring data schedules resume cleanly."
+    },
+    {
+        "id": "pers-5-5",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "FinOps Costs & Resource Tuning",
+        "question": "How do you design a cost chargeback model for a shared multi-tenant Microsoft Fabric F64 capacity? What metrics and tools do you use to allocate costs accurately?",
+        "answer": "A FinOps chargeback model for shared capacities requires logging and tags mapping:\n\n1. Workspace Tagging: Assign metadata tags (e.g., `Department: Finance`, `Owner: Marketing`) to all workspaces linked to the capacity.\n\n2. Metrics Collection: Query the Fabric Capacity Metrics database using the Fabric REST API or retrieve Capacity metrics tables from the Log Analytics workspace. Group CU consumption (interactive and background) by workspace ID.\n\n3. Cost Allocation Formula: Calculate the percentage of total capacity units consumed by each workspace over the billing cycle. Multiply this percentage by the total capacity invoice amount to distribute the cost accurately among business units, generating automated chargeback reports."
+    },
+    {
+        "id": "pers-5-6",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "FinOps Costs & Resource Tuning",
+        "question": "To optimize Direct Lake report execution, explain how to design a semantic model pre-warming strategy using XMLA endpoints and Semantic Link in Fabric.",
+        "answer": "Pre-warming loads VertiPaq column dictionaries into memory before users open reports, eliminating cold-start delay:\n\n1. Pre-warming Triggers: Write a Fabric Notebook utilizing the Semantic Link library (`sempy`) or execute a PowerShell script calling XMLA endpoints.\n\n2. Execution: Configure the script to run a simple, dummy query (e.g., `EVALUATE SUMMARIZECOLUMNS(...)`) targeting the primary fact tables and key dimensions immediately after the OneLake Delta tables refresh.\n\n3. In-Memory Retention: This forces the VertiPaq engine to read the V-Ordered columns from OneLake into the capacity's active memory. Subsequent report interactions run instantly from memory, avoiding DirectQuery fallback."
+    },
+    {
+        "id": "pers-5-7",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "FinOps Costs & Resource Tuning",
+        "question": "How does Spark Adaptive Query Execution (AQE) optimize physical execution plans dynamically? Walk through partition coalescing and join conversions.",
+        "answer": "Spark Adaptive Query Execution (AQE) optimizes query plans at runtime based on actual data statistics:\n\n1. Dynamic Partition Coalescing: AQE monitors partition sizes during shuffle stages. If partitions are too small (e.g., under 10 MB), it coalesces them into larger partitions dynamically, reducing scheduler task overhead.\n\n2. Dynamic Join Conversion: If the actual size of one of the joined tables is smaller than the broadcast threshold, AQE converts a SortMergeJoin into a faster BroadcastHashJoin on-the-fly, avoiding expensive network shuffles.\n\n3. Skew Join Optimization: AQE detects skewed partitions (oversized partitions) and splits them into smaller sub-partitions, distributing the load across multiple executor tasks to prevent bottlenecking."
+    },
+    {
+        "id": "pers-5-8",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "DevOps pipelines & CI/CD rollbacks",
+        "question": "How do you configure an automated monitoring and alerting system for Azure Data Factory pipelines using Azure Monitor, Log Analytics, and Logic Apps?",
+        "answer": "To establish automated alerts for pipeline failures:\n\n1. Diagnostic Logs: Enable Diagnostic Settings in ADF, routing logs (`ADFPipelineRunActivityRuns`, `ADFTriggerRunActivityRuns`) to a central Log Analytics workspace.\n\n2. KQL Alert Query: Create an alert rule in Azure Monitor running a Kusto query (e.g., `ADFPipelineRun | where Status == 'Failed'`) executed every 5 minutes.\n\n3. Alert Action Group: Bind the alert to an Action Group that triggers a Logic App. The Logic App parses the alert metadata, extracts the pipeline name and error details, and dispatches a structured notification message to Microsoft Teams or Slack."
+    },
+    {
+        "id": "pers-5-9",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "DevOps pipelines & CI/CD rollbacks",
+        "question": "Walk through a Terraform design pattern for provisioning a secure Azure Data Platform, including a VNet, Key Vault, ADLS Gen2 storage, and Databricks.",
+        "answer": "A secure Terraform module provisions resources in a logical dependency chain:\n\n1. Networking: Provision a Virtual Network (VNet) with dedicated subnets for Databricks (public and private subnets with network security groups) and private endpoints.\n\n2. Key Vault & Storage: Create the Azure Key Vault and ADLS Gen2 storage accounts with `public_network_access_enabled = false`. Bind Private Endpoints to the subnets, locking down storage ports.\n\n3. Databricks Workspace: Provision Databricks workspace with Managed Virtual Network, setting VNet injection parameters to link the private subnets. Use key vault access policies to allow Databricks to resolve secrets securely via secret scopes."
+    },
+    {
+        "id": "pers-5-10",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": "DevOps pipelines & CI/CD rollbacks",
+        "question": "How do you implement a blue-green deployment strategy for Power BI semantic models in Microsoft Fabric using XMLA endpoints to ensure zero downtime for report users?",
+        "answer": "A blue-green deployment for semantic models swaps datasets seamlessly:\n\n1. Setup: Maintain two identical copies of the semantic model in the workspace: Model_Blue (Active) and Model_Green (Staging).\n\n2. Deployment: Deploy updates and run full data processing on Model_Green. Reports remain connected to Model_Blue, ensuring zero user disruption during processing.\n\n3. Seamless Swapping: Connect to the workspace via XMLA endpoints using TMSL or PowerShell. Execute a script to remap the active report bindings (dataset IDs) from Model_Blue to Model_Green, or rename the dataset metadata references, making Model_Green active instantly with zero query interruption."
+    }
+]
+
+# --- DYNAMIC SELECTION FOR REMAINING 200 QUESTIONS (40 per domain) ---
+import json
+
+db_path = "/Users/santosh/.gemini/antigravity/scratch/fabric-pbi-prep/questions.js"
+print("Loading questions database...")
+with open(db_path, "r", encoding="utf-8") as f:
+    db_content = f.read()
+
+db_match = re.search(r"window\.QUESTIONS_DB\s*=\s*(\[.*\]);", db_content, re.DOTALL)
+if not db_match:
+    raise ValueError("Failed to parse window.QUESTIONS_DB from questions.js")
+db = json.loads(db_match.group(1))
+
+# Collect all question texts currently hardcoded to prevent duplicates
+existing_texts = set()
+for q in d1_questions + d2_questions + d3_questions + d4_questions + d5_questions:
+    existing_texts.add(q.get("question", "").strip().lower())
+
+# Filter and select candidates
+d1_candidates = []
+d2_candidates = []
+d3_candidates = []
+d4_candidates = []
+d5_candidates = []
+
+# Exclude IDs already hardcoded
+hardcoded_ids = {
+    # Domain 1
+    "pers-1-1", "pers-1-2", "pers-1-3", "pers-1-4", "pers-1-5", "pers-1-6", "pers-1-7", "pers-1-8", "pers-1-9", "pers-1-10",
+    # Domain 2
+    "pers-2-1", "pers-2-2", "pers-2-3", "pers-2-4", "pers-2-5", "pers-2-6", "pers-2-7", "pers-2-8", "pers-2-9", "pers-2-10",
+    # Domain 3
+    "pers-3-1", "pers-3-2", "pers-3-3", "pers-3-4", "pers-3-5", "pers-3-6", "pers-3-7", "pers-3-8", "pers-3-9", "pers-3-10",
+    # Domain 4
+    "pers-4-1", "pers-4-2", "pers-4-3", "pers-4-4", "pers-4-5", "pers-4-6", "pers-4-7", "pers-4-8", "pers-4-9", "pers-4-10",
+    # Domain 5
+    "pers-5-1", "pers-5-2", "pers-5-3", "pers-5-4", "pers-5-5", "pers-5-6", "pers-5-7", "pers-5-8", "pers-5-9", "pers-5-10"
+}
+
+# Add in order of difficulty: TOUGH -> HARD -> MEDIUM -> EASY
+for diff in ["TOUGH", "HARD", "MEDIUM", "EASY"]:
+    for q in db:
+        if q.get("id") in hardcoded_ids:
+            continue
+        
+        q_text = q.get("question", "").strip()
+        q_lower = q_text.lower()
+        if q_lower in existing_texts:
+            continue
+            
+        cat = q.get("category", "")
+        niche = q.get("niche", "")
+        
+        # Categorize
+        if cat == "FABRIC" or "onelake" in q_lower or "direct lake" in q_lower or "directlake" in q_lower:
+            d1_candidates.append(q)
+            existing_texts.add(q_lower)
+        elif cat == "ADF" or "data factory" in q_lower or "orchestration" in q_lower:
+            d2_candidates.append(q)
+            existing_texts.add(q_lower)
+        elif cat == "SPARK & DATABRICKS" or "delta lake" in q_lower or "databricks" in q_lower or "spark" in q_lower or "etl" in q_lower:
+            d3_candidates.append(q)
+            existing_texts.add(q_lower)
+        elif cat == "SQL SERVER" or "modeling" in q_lower or "governance" in q_lower or "schema" in q_lower or "security" in q_lower:
+            d4_candidates.append(q)
+            existing_texts.add(q_lower)
+        else:
+            # Default to Domain 5 (includes Power BI reporting optimization, CI/CD pipelines, DevOps, scaling)
+            d5_candidates.append(q)
+            existing_texts.add(q_lower)
+
+# Select exactly 40 for each
+d1_ext = d1_candidates[:40]
+d2_ext = d2_candidates[:40]
+d3_ext = d3_candidates[:40]
+d4_ext = d4_candidates[:40]
+d5_ext = d5_candidates[:40]
+
+print(f"Dynamically selected 40 questions per domain (Total: {len(d1_ext) + len(d2_ext) + len(d3_ext) + len(d4_ext) + len(d5_ext)})")
+
+# Format and map to correct Domain/Subdomain structures
+# Domain 1
+for idx, q in enumerate(d1_ext, 11):
+    d1_questions.append({
+        "id": f"pers-1-{idx}",
+        "domain": "Microsoft Fabric, OneLake & Direct Lake Architecture",
+        "subdomain": q.get("niche", "OneLake & Direct Lake Architecture"),
+        "question": q.get("question"),
+        "answer": q.get("answer")
+    })
+
+# Domain 2
+for idx, q in enumerate(d2_ext, 11):
+    d2_questions.append({
+        "id": f"pers-2-{idx}",
+        "domain": "Azure Native Data Engineering & Orchestration",
+        "subdomain": q.get("niche", "Azure Native Orchestration"),
+        "question": q.get("question"),
+        "answer": q.get("answer")
+    })
+
+# Domain 3
+for idx, q in enumerate(d3_ext, 11):
+    d3_questions.append({
+        "id": f"pers-3-{idx}",
+        "domain": "Delta Lake Technology & High-Performance ETL/ELT",
+        "subdomain": q.get("niche", "Delta Lake & Spark ETL"),
+        "question": q.get("question"),
+        "answer": q.get("answer")
+    })
+
+# Domain 4: Map all domain values to "Data Modeling, Architecture Paradigms & Governance"
+# This aligns exactly with the chip button in index.html, while storing governance details in the subdomain.
+# Also fix the domain for the original 10 questions of Domain 4
+for q in d4_questions:
+    q["subdomain"] = q.get("subdomain", q.get("domain", "Data Modeling & Governance"))
+    q["domain"] = "Data Modeling, Architecture Paradigms & Governance"
+
+for idx, q in enumerate(d4_ext, 11):
+    d4_questions.append({
+        "id": f"pers-4-{idx}",
+        "domain": "Data Modeling, Architecture Paradigms & Governance",
+        "subdomain": q.get("niche", "Data Modeling & Governance"),
+        "question": q.get("question"),
+        "answer": q.get("answer")
+    })
+
+# Domain 5
+for idx, q in enumerate(d5_ext, 11):
+    d5_questions.append({
+        "id": f"pers-5-{idx}",
+        "domain": "Cloud FinOps, Performance Optimization & CI/CD DevOps",
+        "subdomain": q.get("niche", "FinOps & Performance Optimization"),
+        "question": q.get("question"),
+        "answer": q.get("answer")
+    })
+
+all_qs = d1_questions + d2_questions + d3_questions + d4_questions + d5_questions
+print(f"Total compiled: {len(all_qs)}")
+
+# Write to file
+with open(output_file, "w", encoding="utf-8") as f:
+    f.write("window.PERSONALISED_QUESTIONS = ")
+    json.dump(all_qs, f, indent=2, ensure_ascii=False)
+    f.write(";\n")
+
+print(f"Successfully generated database at: {output_file}")

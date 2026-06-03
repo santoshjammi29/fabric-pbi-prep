@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 (async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 800 });
   
   page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 

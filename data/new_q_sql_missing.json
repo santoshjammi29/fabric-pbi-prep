@@ -1,0 +1,298 @@
+[
+  {
+    "id": "sql-med-1",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "What is the purpose of the Buffer Pool Extension (BPE) in SQL Server, and under what workloads does it offer the most benefit?",
+    "answer": "Buffer Pool Extension (BPE) provides seamless integration of a non-volatile random-access storage (like SSDs) as an extension to the SQL Server buffer pool. It acts as a Level 2 cache for clean data pages. It is most beneficial for read-heavy workloads that exceed the physical RAM size, as it allows SQL Server to fetch clean pages from the SSD tier rather than performing expensive random physical disk reads from slower hard disk drives.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-med-2",
+    "category": "SQL SERVER",
+    "niche": "Concurrency, Locking, Latches & Spinlocks",
+    "question": "Explain the difference between a lock, a latch, and a spinlock in SQL Server, detailing their usage scenarios.",
+    "answer": "Locks are logical transaction-level synchronization mechanisms used to protect database consistency (rows, tables, keys) and are visible to users. Latches are lightweight internal physical synchronization mechanisms used by the storage engine to protect memory structures (like pages in the buffer pool) from concurrent access. Spinlocks are low-level, CPU-efficient mutual exclusion mechanisms used to protect global memory resources (like active transaction lists) where the wait duration is expected to be extremely short, causing the thread to loop or 'spin' on the CPU rather than context switching.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-med-3",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "What is the role of the page PFS (Page Free Space) allocation map in SQL Server database storage files?",
+    "answer": "A PFS (Page Free Space) page tracks the allocation status and the amount of free space within an 8KB data page. Each PFS page covers an interval of 8,088 pages. The storage engine references the PFS page when inserting new records to identify pages that have enough free space to accommodate the row, avoiding scanning individual pages. It also tracks whether pages contain forwarding pointers or are heap tables.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-med-4",
+    "category": "SQL SERVER",
+    "niche": "Query Optimizer & Statistics Internals",
+    "question": "Explain the difference between a clustered index seek and a clustered index scan in SQL Server execution plans.",
+    "answer": "A Clustered Index Seek uses the B-tree structure to navigate directly to the specific leaf-level page containing the requested key(s) based on a search predicate, touching only the necessary parent-child nodes. A Clustered Index Scan reads the entire table from beginning to end by traversing the leaf-level page chain sequentially (using the next/previous pointers), which is much more expensive and occurs when there is no matching predicate on the index key.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-med-5",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "How does SQL Server handle Virtual Log Files (VLFs) inside the transaction log file, and why can having too many VLFs degrade database startup performance?",
+    "answer": "SQL Server divides the physical transaction log file (.ldf) into multiple logical segments called Virtual Log Files (VLFs). When the log file grows, SQL Server adds new VLFs. If the log is configured with small autogrow increments (e.g., 1MB), it creates thousands of tiny VLFs. During database startup, recovery, or backup, SQL Server must scan all VLFs. Having too many VLFs (high VLF count) increases this metadata scanning duration, significantly degrading database startup, backup, and AlwaysOn replication performance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "sql-hard-1",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "Explain the exact cause of PAGELATCH contention on TempDB system pages (like GAM, SGAM, and PFS) under high concurrent connection workloads, and how do you resolve it?",
+    "answer": "PAGELATCH contention in TempDB occurs when many threads concurrently create and destroy temporary tables or table variables. The storage engine must update the allocation maps (GAM, SGAM, and PFS pages) to track page allocations. Since these maps are located on specific pages, threads must latch these pages, causing serialization bottlenecks. Resolution: 1) Configure multiple TempDB data files (typically equal to the number of logical cores up to 8), 2) Enable trace flag 1117 (grow all files equally) and 1118 (allocate uniform extents), which are default in SQL Server 2016+, and 3) Optimize code to reduce temp table creation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-2",
+    "category": "SQL SERVER",
+    "niche": "Concurrency, Locking, Latches & Spinlocks",
+    "question": "Describe the internal structure and lifecycle of a spinlock wait. How do you identify which spinlocks are causing CPU spikes using DMVs?",
+    "answer": "A spinlock is used to protect low-level memory structures. When a thread requests a spinlock and it is held, the thread enters a loop ('spins') checking if the lock is free. It does this for a short duration to avoid the overhead of a thread context switch. If it remains busy, it yields CPU and sleeps. To diagnose spinlock contention, query `sys.dm_os_spinlock_stats`. Look for spinlocks with high 'spins', 'collisions', and 'backoffs' (such as LOCK_HASH or MUTEX). High collisions indicate threads are wasting CPU cycles spinning, leading to high CPU usage.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-3",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "How does Page Compression work internally in SQL Server? Contrast ROW compression with PAGE compression and explain the decompression CPU overhead.",
+    "answer": "ROW compression reduces storage by storing numeric types and char types in variable-length formats and ignoring zero/empty values. PAGE compression builds on ROW compression and applies two additional steps to data pages: 1) Prefix Compression (identifies common prefixes in columns and replaces them with references in a prefix anchor), and 2) Dictionary Compression (identifies common values across the entire page and stores them in a page dictionary, replacing values with a byte reference). Decompression requires extra CPU cycles to reconstruct rows from prefix and dictionary maps, which can bottleneck write-intensive workloads.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-4",
+    "category": "SQL SERVER",
+    "niche": "Query Optimizer & Statistics Internals",
+    "question": "What is the Cardinality Estimation (CE) feedback loop in SQL Server? How does the query optimizer adjust plan selection based on runtime feedback?",
+    "answer": "Starting with SQL Server 2022, the Query Optimizer features Cardinality Estimation Feedback. When a query executes, the engine compares the estimated number of rows against the actual number of rows processed. If a significant discrepancy is detected (e.g., due to parameter sniffing or correlated columns), the engine stores feedback in Query Store. During subsequent compilations of the query, the optimizer adjusts its estimation models (e.g., using different join assumptions or statistics) to produce a more optimal plan, avoiding plan regressions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-5",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the Write-Ahead Logging (WAL) protocol in SQL Server. How does the buffer pool interact with the log manager during a transaction commit and checkpoint?",
+    "answer": "The WAL protocol guarantees transactional durability. When data is modified, the page is updated in the buffer pool (dirty page) and the log manager writes the transaction details to the log buffer. Before the dirty data page can be written to disk, the corresponding log record must be flushed and written to physical disk. During a transaction commit, SQL Server writes the commit log record to disk (synchronous commit). During a checkpoint, the engine flushes all dirty pages to disk, but it must first ensure that all related log records are written to disk, ensuring recovery can rebuild state.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-6",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the Bw-Tree index structure used by SQL Server's In-Memory OLTP (Hekaton) engine. How does it support lock-free updates?",
+    "answer": "The Bw-Tree index is a lock-free, latch-free index structure. Instead of updating pages in-place (which requires latches), it uses a mapping table to translate logical page IDs to physical memory addresses. When a modification is made, a 'delta record' containing the change is appended to a version chain for the page, and the mapping table is updated using a Compare-and-Swap (CAS) atomic instruction. This avoids write locking and blocking, enabling linear write scaling under heavy concurrency. Occasionally, the version chains are consolidated into new pages to reclaim memory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-7",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "How does the Tuple Mover process columnstore indexes in SQL Server, and what triggers are used to merge delta stores into compressed rowgroups?",
+    "answer": "In Columnstore indexes, new row inserts are written to a rowstore-based buffer called the Delta Store. When a Delta Store rowgroup reaches its maximum capacity of 1,048,576 rows, its status changes from OPEN to CLOSED. The Tuple Mover is a background process that scans for CLOSED rowgroups and compresses them into columnar format (creating a COMPRESSED rowgroup) in the background. You can also force this merge manually using `ALTER INDEX ... REBUILD` or `REORGANIZE` commands.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-8",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "Explain the distributed query execution model of PolyBase in SQL Server. How does it handle pushdown predicates when querying Hadoop or Azure Blob Storage?",
+    "answer": "PolyBase acts as a distributed query engine that bridges SQL Server and external data sources. When a query is run, the SQL Server Query Optimizer parses the statement and determines which parts of the query can be pushed down to the external data source (like Hadoop MapReduce or Azure SQL). It generates a query plan that sends filter predicates and aggregations directly to the external engine, fetching only the filtered results. This minimizes network traffic and compute overhead on the SQL Server host.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-9",
+    "category": "SQL SERVER",
+    "niche": "Concurrency, Locking, Latches & Spinlocks",
+    "question": "Explain the difference between Optimistic Concurrency (RCSI) and Snapshot Isolation (SI) in SQL Server. How does the version store in TempDB manage these isolation levels?",
+    "answer": "Read Committed Snapshot Isolation (RCSI) is a statement-level optimistic isolation level where queries read the transaction-consistent data snapshot as of the start of the *statement*. Snapshot Isolation (SI) is transaction-level; queries read the data snapshot as of the start of the *transaction*. Both utilize row versioning: when a row is updated, the old version is written to the TempDB version store. RCSI does not cause update conflicts (last-write-wins), whereas SI raises an update conflict error (error 3960) if another transaction modifies the same row concurrently.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-10",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "How does SQL Server manage memory allocations for the Plan Cache, and what mechanisms prevent single-use query plans from causing plan cache bloat?",
+    "answer": "SQL Server stores execution plans in the Plan Cache to avoid recompilation costs. However, ad-hoc queries can bloat the cache with single-use plans. SQL Server manages this by: 1) Using an internal memory broker to evict plans based on age and cost when memory pressure is detected, 2) Allowing users to enable the 'Optimize for Ad hoc Workloads' setting (which stores a lightweight plan stub on first execution, writing the full plan only if the query is executed a second time), and 3) Forcing parameterization using parameter scripts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-11",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "What are IAM (Index Allocation Map) pages, and how does the storage engine utilize them to locate extents belonging to a specific table or index partition?",
+    "answer": "An Index Allocation Map (IAM) page tracks the physical extents (blocks of 8 pages) allocated to an allocation unit (table heap or index B-tree). Each IAM page covers a range of physical allocation files. When the storage engine needs to read a table sequentially (a heap scan), it queries the IAM pages for that table to build a list of extents to scan, rather than traversing leaf nodes. This allows for fast sequential I/O operations.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-12",
+    "category": "SQL SERVER",
+    "niche": "Query Optimizer & Statistics Internals",
+    "question": "How do filtered statistics differ from full-scan statistics in SQL Server, and how do they resolve estimation problems on skewed datasets?",
+    "answer": "Filtered statistics are created with a WHERE clause, limiting the statistics collection to a subset of data (e.g., `WHERE IsActive = 1`). Standard statistics capture a histogram of the entire table, which has a 200-step limit and can smooth out details in skewed columns. Filtered statistics provide a highly detailed histogram for the specific subset, enabling the query optimizer to produce more accurate cardinality estimates and better execution plans for queries targeting that subset.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-13",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Explain the difference between Sync and Async commit modes in SQL Server AlwaysOn Availability Groups. How does this impact log writer throughput?",
+    "answer": "In Synchronous Commit mode, the primary replica waits to send a commit confirmation to the client until the secondary replica confirms it has hardened the transaction log records to disk (ensuring zero data loss). In Asynchronous Commit mode, the primary commits immediately after local hardening. Synchronous commit introduces replication latency (log send and log apply queues), which can bottleneck log writer throughput if network bandwidth is limited or secondary storage is slow.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-14",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Describe the memory-optimized table checkpoint process in Hekaton. How do data and delta files differ from standard page writes?",
+    "answer": "Hekaton does not write standard 8KB data pages to disk. Instead, it writes sequential 'Data' and 'Delta' file pairs. The Data files contain newly inserted rows (written sequentially to minimize disk write heads), while the Delta files contain lists of deleted row IDs. During database startup, Hekaton reads these files to reconstruct the active rows in-memory. Checkpoints are written in the background by a merge process, optimizing disk I/O.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-15",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "What is the role of Distributed Partitioned Views (DPVs) in scaling database write workloads across multiple SQL Server instances?",
+    "answer": "Distributed Partitioned Views (DPVs) allow tables to be horizontally partitioned across multiple physical SQL Server databases. A UNION ALL view is defined on each server, referencing tables on remote servers using linked servers. When a query is run, the optimizer routes the read/write requests directly to the server hosting the target data based on a CHECK constraint. DPVs allow scaling beyond a single server instance, but they require managing distributed transactions (MSDTC) and network overhead.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-16",
+    "category": "SQL SERVER",
+    "niche": "Concurrency, Locking, Latches & Spinlocks",
+    "question": "Explain the mechanics of a Lock Escalation in SQL Server. Under what thresholds does it trigger, and how can it be disabled?",
+    "answer": "Lock Escalation is the process of converting many fine-grained locks (like row or page locks) into a single coarse-grained lock (like a table lock) to reduce buffer pool memory usage. It triggers when a single statement acquires more than 5,000 locks on a single reference, or when lock memory consumption exceeds 40% of the database engine memory. You can disable it or change its behavior using `ALTER TABLE ... SET (LOCK_ESCALATION = DISABLE | AUTO)`. Disabling it prevents escalations but can cause OOM errors under heavy workloads.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-17",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "Explain the concept of 'Dirty Page' management. How does the lazy writer process differ from checkpoint operations in freeing up buffer pool memory?",
+    "answer": "A dirty page is a page modified in-memory but not yet written to disk. The Checkpoint process is a scheduled event that flushes all dirty pages to disk to shorten recovery time. The Lazy Writer is a background process that monitors buffer pool memory pressure. If free memory drops below a threshold, the Lazy Writer scans pages (using a clock sweep algorithm), flushes dirty pages to disk, and immediately releases the memory for allocation, whereas Checkpoint does not release the page memory.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-18",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "How do forwarding pointers occur in Heap tables, and what is their impact on I/O operations and query performance?",
+    "answer": "In Heap tables (tables without a clustered index), rows are referenced by their physical address (RID). If an update increases a row's size such that it no longer fits on its current page, SQL Server moves the row to a new page and leaves a 'forwarding pointer' at the original location. When a query scans the table, it must perform extra random I/O operations to follow these pointers to fetch the actual rows, significantly degrading scan performance. Resolving this requires rebuilding the table (`ALTER TABLE ... REBUILD`) or creating a clustered index.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-19",
+    "category": "SQL SERVER",
+    "niche": "Query Optimizer & Statistics Internals",
+    "question": "Describe parameter sniffing in SQL Server. How do trace flags 4136 and the OPTIMIZE FOR query hint mitigate plan regression?",
+    "answer": "Parameter Sniffing occurs when the Query Optimizer inspects the parameter values during compilation and compiles an execution plan tailored for those specific values. If subsequent runs use parameters with very different data distributions, the plan can be highly sub-optimal. Trace flag 4136 disables parameter sniffing globally, forcing the optimizer to use average densities. The `OPTIMIZE FOR` query hint allows specifying a representative value for compilation, ensuring consistent plan generation across executions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-20",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "What is the difference between Database Mirrored state and Availability Group replication under AlwaysOn, and how is session safety implemented?",
+    "answer": "Database Mirroring operates at the individual database level, whereas AlwaysOn Availability Groups (AGs) operate at the database group level (supporting multiple databases that failover together). AlwaysOn runs on Windows Server Failover Clustering (WSFC) metadata, which coordinates node states. Session safety (synchronous replication) is implemented by having the primary wait for the secondary's log-hardening confirmation before committing. AGs support read-only secondaries, whereas mirroring targets are completely offline.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-21",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Contrast interop execution with native compilation for stored procedures in SQL Server In-Memory OLTP.",
+    "answer": "Interop execution allows standard T-SQL stored procedures to query memory-optimized tables by calling internal Hekaton APIs, introducing execution context switching overhead. Native compilation compiles T-SQL stored procedures directly into C code, which is then compiled into a native DLL loaded into SQL Server process space. Natively compiled procedures execute without SQL interpreter overhead, offering significantly faster execution speed but supporting a limited T-SQL feature subset.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-22",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "How does SQL Server handle Resource Governor CPU resource allocation, and what is the difference between CAP_CPU_PERCENT and MAX_CPU_PERCENT?",
+    "answer": "Resource Governor limits resource consumption per workload group. `MAX_CPU_PERCENT` sets a soft limit: a group can consume more CPU if other groups are idle. `CAP_CPU_PERCENT` sets a hard limit (cap): the group's CPU usage is restricted to the specified percentage even if other CPU cycles are completely idle. This prevents a single workload from saturating resources on consolidated SQL Server hosts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-23",
+    "category": "SQL SERVER",
+    "niche": "Concurrency, Locking, Latches & Spinlocks",
+    "question": "Explain Deadlock detection mechanics in SQL Server. How does the lock manager build the wait-for graph, and what criteria determine the deadlock victim?",
+    "answer": "The lock manager runs a background thread (the deadlock monitor) every 5 seconds. It scans for circular dependencies between transactions waiting for locks, building a 'wait-for graph'. If a cycle is detected, a deadlock exists. The engine selects the transaction with the lowest deadlock priority as the victim. If priorities are equal, the transaction that has written the least transaction log volume is rolled back, releasing its locks and allowing the other transaction to proceed.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-24",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "How do you analyze Page Life Expectancy (PLE) on a NUMA (Non-Uniform Memory Access) SQL Server system, and what does a drop in a single NUMA node's PLE indicate?",
+    "answer": "On a NUMA system, you should monitor PLE per NUMA node using the counter `SQLServer:Buffer Node\\Page life expectancy`. A drop in a single NUMA node's PLE indicates localized memory pressure on that node (e.g., queries allocating large tables local to that NUMA node). A low average PLE is misleading if one node is starving. Analyzing node-specific PLE helps optimize query routing and processor affinity.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-25",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "Describe the difference between clustered and non-clustered index storage structures in SQL Server. How does a leaf-level page link back to a row in a heap?",
+    "answer": "A clustered index stores the actual data rows at the leaf level of the index B-tree. A non-clustered index stores only the index keys and a pointer at the leaf level. If the table is a heap, the leaf-level pointer of the non-clustered index is a physical Row Identifier (RID: file number, page number, slot number). If the table has a clustered index, the pointer is the clustered index key, requiring SQL Server to perform a clustered index seek to fetch the row.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-26",
+    "category": "SQL SERVER",
+    "niche": "Query Optimizer & Statistics Internals",
+    "question": "Explain the search space pruning technique used by the Query Optimizer during phase 1 and phase 2 search stages.",
+    "answer": "The Query Optimizer uses rules and heuristics to prune search paths early to prevent compilation timeouts. In Phase 1 (Transaction Processing), it looks for simple, obvious plans. In Phase 2 (Quick Optimization), it evaluates join orders and indexes using cost estimates. If the cost of evaluating more paths exceeds the potential savings of a slightly better plan, the optimizer stops search execution and selects the best plan found so far, avoiding plan compilation bottlenecks.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-27",
+    "category": "SQL SERVER",
+    "niche": "High Availability, Recovery & Log Internals",
+    "question": "Describe the recovery phase process: Analysis, Redo, and Undo. How does the database engine handle crashed transactions on startup?",
+    "answer": "During database startup, the recovery engine runs three phases: 1) Analysis (scans the transaction log forward from the last checkpoint to identify active transactions and dirty pages), 2) Redo (rolls forward all committed and uncommitted transactions from the oldest active transaction log record to rebuild state), and 3) Undo (rolls back all uncommitted transactions identified in the Analysis phase, releasing locks and ensuring database consistency).",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-28",
+    "category": "SQL SERVER",
+    "niche": "In-Memory OLTP (Hekaton) & Columnstore Architecture",
+    "question": "Explain memory limit guardrails for In-Memory OLTP tables. What happens when memory usage hits the maximum Resource Pool configuration?",
+    "answer": "In-Memory OLTP tables must fit entirely in physical memory. Memory allocation is governed by a user-defined Resource Pool. If memory usage hits the pool's limit, subsequent insert or update operations will fail with error 41805 (out of memory for memory-optimized tables). Running queries will continue, but DML writes are blocked until memory is freed (e.g., by deleting rows) or the resource pool capacity is increased.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-29",
+    "category": "SQL SERVER",
+    "niche": "Extreme Scale, Integration & Distributed Architecture",
+    "question": "What is the difference between partition switching and partition splitting in partitioned tables, and how are metadata locks managed during these operations?",
+    "answer": "Partition Switching is a metadata-only operation that swaps a partition of a table with a staging table (instantaneous). Partition Splitting splits a single partition into two based on a boundary value. Switch operations require a schema modification lock (Sch-M) on both tables, blocking concurrent queries during execution. Split operations on populated partitions can be slow as data is copied to the new physical partition, so it is recommended to split empty partitions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-30",
+    "category": "SQL SERVER",
+    "niche": "Concurrency, Locking, Latches & Spinlocks",
+    "question": "Explain intent locks (IS, IX) and their role in preventing conflict between coarse-grained and fine-grained transactions.",
+    "answer": "Intent locks (Intent Shared, Intent Exclusive) are acquired at higher levels of the object hierarchy (e.g., table or page) before acquiring fine-grained locks (e.g., row locks). An IX lock indicates that a transaction holds exclusive locks on rows within the table. If another transaction attempts to acquire a coarse table lock (S or X), the engine checks the intent locks at the table level and blocks the request immediately, avoiding the need to scan all row locks to find conflicts.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-31",
+    "category": "SQL SERVER",
+    "niche": "Memory Management, TempDB & Buffer Pool",
+    "question": "Explain how the buffer pool handles read-ahead requests, and what metrics indicate read-ahead optimization is failing.",
+    "answer": "Read-ahead allows the database engine to predict the data pages needed for a query and read them from disk into the buffer pool before the query executes them. It reads up to 512KB (64 pages) in a single physical read. You can monitor read-ahead performance using the `SQLServer:Buffer Manager\\Readahead pages/sec` counter. A high rate of physical reads combined with low read-ahead pages indicates the read-ahead optimizer is failing, likely due to index fragmentation or lack of RAM.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "sql-hard-32",
+    "category": "SQL SERVER",
+    "niche": "Storage Engine & Disk Architecture Internals",
+    "question": "How does SQL Server handle sparse columns internally, and what is the storage overhead for non-null values in sparse columns?",
+    "answer": "Sparse columns optimize storage for columns that contain mostly NULL values. Under the hood, NULL values in sparse columns consume 0 bytes of storage. However, non-null values in sparse columns incur a storage overhead of 4 additional bytes plus the actual value length. If a column contains more than 40-50% non-null values, converting it to a sparse column will increase storage consumption rather than reducing it.",
+    "difficulty": "HARD"
+  }
+]

@@ -1,0 +1,802 @@
+[
+  {
+    "id": "dl-easy-1",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is the difference between Parquet and CSV file formats in data lakes?",
+    "answer": "CSV is a row-oriented, plain-text format (large file size, slow to query, no schema support). Parquet is a column-oriented, binary format (highly compressed, supports schema metadata, optimized for selective column reads), making it ideal for analytical workloads.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-2",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "What are the three main open table formats used in modern data lakes?",
+    "answer": "The three main open table formats are: 1) Delta Lake (originally from Databricks), 2) Apache Iceberg (originally from Netflix), and 3) Apache Hudi (originally from Uber).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-3",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is the role of a data catalog in a data lake architecture?",
+    "answer": "A data catalog provides a central repository for metadata, defining database schemas, table locations, column types, and access control rules across the data lake (e.g. AWS Glue Data Catalog or Unity Catalog).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-4",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is Change Data Capture (CDC) in data engineering?",
+    "answer": "CDC is the process of identifying and capturing insertions, updates, and deletions from source databases in real-time, streaming those changes downstream to keep data lake tables synchronized.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-5",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "What is the difference between encryption at rest and encryption in transit in data lakes?",
+    "answer": "Encryption at rest encrypts data stored on disk (e.g. using keys in Azure Key Vault or AWS KMS). Encryption in transit encrypts data as it moves over networks (e.g. using HTTPS or TLS protocols).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-6",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is column projection in data processing?",
+    "answer": "Column projection is the ability to read only the specific columns requested by a query (e.g. selecting `Name` and `Age` from a Parquet file), skipping all other columns to save I/O and network costs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-7",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "What does ACID stand for, and why is it important for data lakes?",
+    "answer": "ACID stands for Atomicity, Consistency, Isolation, and Durability. It is important because it prevents data corruption when multiple users write and read data lake tables concurrently.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-8",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is the Hive Metastore?",
+    "answer": "The Hive Metastore is a database (like MySQL or Postgres) that stores structural metadata (table definitions, schemas, physical locations) for Hadoop/Hive tables, acting as the classic data lake catalog.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-9",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is Apache Kafka used for in data lakes?",
+    "answer": "Apache Kafka is a distributed event streaming platform used to ingest high-velocity real-time event logs, acting as a buffer before streaming data is processed and written to storage.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-10",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "What is data masking, and how does it protect PII?",
+    "answer": "Data masking replaces sensitive details (like credit card numbers or names) with fictional but realistic values, ensuring PII (Personally Identifiable Information) is protected from unauthorized users.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-11",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is the metadata footer in a Parquet file?",
+    "answer": "The Parquet metadata footer stores file structure details: column schemas, row counts, key-value metadata, and row group locations with min/max values for data skipping.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-12",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Time Travel in Delta Lake or Apache Iceberg.",
+    "answer": "Time Travel is the ability to query a table as it existed at a previous point in time or at a specific snapshot ID, enabled by keeping historical files and transaction logs.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-13",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is AWS Glue Data Catalog?",
+    "answer": "AWS Glue Data Catalog is a fully managed metadata repository on AWS. It stores schemas and locations of tables on S3, integrating with Athena, EMR, and Redshift.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-14",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is log-based CDC compared to query-based CDC?",
+    "answer": "Log-based CDC reads database transaction logs directly (fast, no write impact on source). Query-based CDC periodically queries tables for modified columns (slow, increases source read locks).",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-15",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "What is RBAC (Role-Based Access Control)?",
+    "answer": "RBAC grants permissions based on user roles (e.g., Data Reader, Data Admin) rather than assigning permissions to individual users, simplifying security management.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-16",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is the purpose of Row Groups in a Parquet file?",
+    "answer": "Row Groups segment the Parquet file horizontally into chunks of rows (typically 50MB-1GB), allowing parallel processing and data skipping within the file.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-17",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain schema enforcement in Delta Lake.",
+    "answer": "Schema Enforcement blocks write operations if the incoming data schema does not match the target table schema (e.g. extra columns or mismatched types), preventing data corruption.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-18",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is Unity Catalog in Databricks?",
+    "answer": "Unity Catalog is a unified governance tool for Databricks. It provides fine-grained access control (SQL ANSI) for tables, files, and models across workspaces.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-19",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is the difference between Flink and Kafka?",
+    "answer": "Kafka is a message streaming log that stores data. Flink is a stateful streaming calculation engine that processes data streams dynamically.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-20",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "What is ABAC (Attribute-Based Access Control)?",
+    "answer": "ABAC grants access based on attributes (e.g., user department, resource tags, IP address), enabling dynamic security rules.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-21",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What are magic bytes in file formats?",
+    "answer": "Magic bytes are specific byte sequences at the beginning of a file (e.g., 'PAR1' for Parquet) that identify the file format to readers.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-easy-22",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "What is the partition pruning optimization?",
+    "answer": "Partition pruning scans only the specific folders matching a partition query filter (e.g., `WHERE Year = 2025`), completely skipping other folders to save I/O.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "dl-med-1",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Compare Apache Iceberg's metadata architecture with Delta Lake's transaction log structure.",
+    "answer": "Delta Lake uses a transaction log (`_delta_log/`) containing ordered JSON files and Parquet checkpoints, representing table states by rolling forward. Apache Iceberg uses a tree-based metadata layout (Metadata file -> Manifest List -> Manifest files -> Data files). This tracks snapshots explicitly, enabling Iceberg to evolve partitioning layouts (hidden partitioning) and schemas without rewriting data files.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-2",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Explain Snappy, Gzip, and ZSTD compression algorithms. When should you select each for Parquet storage?",
+    "answer": "Snappy offers fast compression/decompression speeds with moderate compression rates (default for real-time query paths). Gzip offers high compression rates but is slow (ideal for archival storage). ZSTD offers a configurable balance of high compression rates and fast speeds, making it the modern standard for general analytical tables.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-3",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is data lineage, and how do OpenLineage and metadata tagging automate governance?",
+    "answer": "Data Lineage traces the lifecycle of data from source, through transformations, to final targets. OpenLineage is an open standard that captures execution run metadata from pipelines (like Spark or Airflow) using facets. Metadata tagging attaches classifications (like 'PII' or 'Restricted') to columns, allowing security tools to apply dynamic masking rules.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-4",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Explain the difference between Lambda and Kappa architectures for data processing.",
+    "answer": "Lambda Architecture uses two paths: a Speed layer (for real-time streaming) and a Batch layer (for historical accuracy), joining results at query time. Kappa Architecture processes all data through a single stream processing path (like Flink or Spark Streaming), eliminating dual-codebases.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-5",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain the difference between POSIX ACLs and RBAC security controls in Azure Data Lake Storage Gen2.",
+    "answer": "RBAC controls access at the container level using Azure roles (e.g. Storage Blob Data Reader). POSIX ACLs (Access Control Lists) specify fine-grained read/write/execute permissions on individual directories and files within the container, mimicking Linux file systems.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-6",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Describe Parquet Dictionary Encoding and Run-Length Encoding (RLE). How do they operate together?",
+    "answer": "Dictionary encoding replaces values with small integer indexes stored in a dictionary. RLE compresses these indexes by grouping repeating runs (e.g., index 1 repeated 5 times is stored as '1, 5'). They optimize space for columns with duplicate values.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-7",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Hidden Partitioning in Apache Iceberg. How does it compare to traditional partitioning?",
+    "answer": "Traditional partitioning requires queries to filter on physical folder columns (e.g., `WHERE year = 2025`). Iceberg's Hidden Partitioning maintains relationship mapping: when a query filters on timestamp, Iceberg matches it to day/month partitions automatically, preventing partition misuse.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-8",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is Polaris, and how does it act as an open catalog for Apache Iceberg?",
+    "answer": "Polaris is an open-source metadata catalog for Apache Iceberg (originally developed by Snowflake). It uses Iceberg's REST catalog specification, allowing multiple query engines (like Snowflake, Spark, and Trino) to access tables securely with shared permissions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-9",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is the Outbox Pattern in CDC, and how does it prevent dual-write inconsistencies?",
+    "answer": "Dual-writes (updating a database and sending a message to Kafka) can fail if one succeeds and the other fails. The Outbox Pattern writes the event to a dedicated 'Outbox' table within the same database transaction. A CDC tool (like Debezium) polls this table to publish events.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-10",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "How do you achieve compliance with GDPR 'Right to be Forgotten' in a read-only Parquet-based data lake?",
+    "answer": "Parquet files are immutable. To comply with GDPR deletes, you must rewrite the Parquet files containing the user's data to exclude their rows, or use open table formats (like Delta or Iceberg v2) with deletion vectors to mark rows as deleted.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-11",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is the Small File Problem in data lakes, and how does compaction resolve it?",
+    "answer": "Ingesting small files (e.g., streaming batches) causes metadata bloat on catalogs and forces query engines to perform thousands of file seeks. Compaction merges small files into larger, optimized files, reducing metadata and speeding up scans.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-12",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Hudi's Copy-on-Write (COW) vs Merge-on-Read (MOR) storage types.",
+    "answer": "Copy-on-Write rewrites the entire data file during updates (high write latency, fast reads). Merge-on-Read appends updates to log files (low write latency, higher read latency due to merging data and log files on-the-fly).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-13",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is the difference between AWS Lake Formation and IAM permissions on S3?",
+    "answer": "IAM permissions grant access at the bucket or folder level (all or nothing). Lake Formation provides fine-grained, database-style access control (granting permissions on specific databases, tables, columns, or rows) for S3 objects.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-14",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "How does Kafka Topic Compaction operate to preserve table states?",
+    "answer": "Topic Compaction ensures that Kafka retains the last known value for each message key within a topic partition. It deletes old versions of the key during log cleanup, acting as a compact changelog for table states.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-15",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain how Column-Level Encryption protects PII columns while keeping other columns readable.",
+    "answer": "Column-Level Encryption encrypts only the binary data of target columns (like SSN) before writing to Parquet. The encryption keys are restricted: authorized users de-crypt the column, while other users see ciphertext.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-16",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is ADLS Gen2 Hierarchical Namespace (HNS), and how does it optimize directory renames?",
+    "answer": "HNS organizes files into a hierarchical directory tree (like a local OS). Renaming a directory is an atomic metadata operation, whereas flat namespaces require copying and deleting every file individually.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-17",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Describe Delta Lake's Schema Evolution. How does it handle columns added during writes?",
+    "answer": "Schema Evolution permits adding columns dynamically if enabled (`mergeSchema=true`). It updates table metadata JSON: existing parquet files do not change, and queries return NULL for the new column when reading old files.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-18",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain Schema Registry's role in Kafka streaming pipelines.",
+    "answer": "Schema Registry stores and manages schemas for Kafka topics. It validates message payloads against compatibility rules (e.g. Backward, Forward) during production and consumption, preventing serialization failures.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-19",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Explain dynamic rate limiting in Kafka consumers using lag metrics.",
+    "answer": "Kafka consumers track consumer lag (offsets behind producer). If lag grows, consumers adjust ingestion rate (rate limiting) or scale worker threads to prevent resource exhaustion.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-20",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain dynamic data masking in modern analytics platforms.",
+    "answer": "Dynamic masking evaluates user identity at query time. If the user is not authorized, it masks the data (e.g., `XXXX-XXXX`) on-the-fly, preserving the underlying raw data on disk.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-21",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Contrast Avro with Parquet file formats. When is Avro preferred?",
+    "answer": "Avro is a row-based format optimized for write-heavy workloads (streaming ingestion). Parquet is a columnar format optimized for read-heavy analytical queries. Avro is preferred for Kafka schemas and landing zones.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-22",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Z-Ordering (Multi-Dimensional clustering) in data lakes.",
+    "answer": "Z-Ordering co-locates related information in the same set of files based on multiple columns, maximizing the efficiency of min/max data skipping and accelerating queries that filter on those columns.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-23",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain the difference between a Data Catalog and a Metadata Repository.",
+    "answer": "A Data Catalog is user-facing (supporting business glossaries and search). A Metadata Repository is system-facing (storing schema definitions, table physical locations, and access control mappings).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-24",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is the role of Debezium in modern CDC architectures?",
+    "answer": "Debezium is a set of distributed connectors that monitor databases (MySQL, Postgres, SQL Server) and stream row-level changes to Kafka topics, enabling low-latency real-time ingestion.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-25",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "What is tokenization, and how does it secure sensitive values in data lakes?",
+    "answer": "Tokenization replaces sensitive values (like credit card numbers) with a non-sensitive token index. The mapping is stored in a secure vault, protecting data in the lake from being exposed if breached.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-26",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Explain how multipart upload works in object storage like AWS S3.",
+    "answer": "Multipart upload splits large files into smaller parts and uploads them concurrently. If a part fails, only that part is re-uploaded. Once complete, S3 merges parts into a single object, speeding up uploads.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-27",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Describe the file layout of an Apache Iceberg table. What is the metadata tree structure?",
+    "answer": "Iceberg tables are structured as: Metadata File (tracks schema and snapshots) -> Manifest List (tracks snapshots and manifests) -> Manifest Files (track parquet files and stats) -> Data Files (parquet files).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-28",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What are OpenLineage facets, and how do they capture pipeline executions?",
+    "answer": "Facets are structured JSON metadata blocks that capture specific pipeline parameters (like input datasets, output schemas, and execution run status), standardizing lineage collection across systems.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-29",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "What is the difference between tumbling and sliding windows in streaming?",
+    "answer": "A Tumbling Window is non-overlapping and has a fixed duration (e.g. every 5 minutes). A Sliding Window is overlapping and has a duration and slide step (e.g., every 5 minutes sliding by 1 minute).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-med-30",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain dynamic column-level security implementation in Athena.",
+    "answer": "Athena implements column security using Lake Formation. When a user runs a query, Lake Formation checks their catalog permissions and filters out unauthorized columns before query execution.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "dl-hard-1",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain the transaction conflict resolution and merge metadata processes in Apache Iceberg v2 table specifications, specifically detailing positional vs. equality deletes.",
+    "answer": "Iceberg v2 table specifications introduce row-level updates using two delete files: 1) Positional Deletes (contain the file path and row index of deleted records, fast reads but slow writes), and 2) Equality Deletes (contain the value of a key column that has been deleted, fast writes but slower reads as the engine must scan all values). During merge, Iceberg evaluates these delete files against active data files, avoiding rewriting data files during updates.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-2",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Explain the internal block structure of Apache Parquet. How do page headers, definition levels, and repetition levels support nested schemas?",
+    "answer": "Parquet splits files into Row Groups. Each Row Group has Column Chunks containing Page blocks. Parquet uses Dremel record shredding: 1) Definition Levels (indicate how many optional parent fields are defined, tracking nulls), and 2) Repetition Levels (indicate at what level in the nested path a value repeats). This allows Parquet to store arbitrary nested structures (lists, maps) in flat column arrays, enabling selective nested field reading.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-3",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "How do you implement fine-grained row-level security (RLS) dynamically across a multi-engine catalog architecture (like Snowflake, Trino, and Databricks) using Polaris and Entra ID?",
+    "answer": "Implement Polaris REST Catalog mapped to a central Entra ID tenant. Access tokens are passed by Snowflake, Trino, and Databricks to Polaris when querying metadata. Polaris evaluates access control lists (SQL ANSI mappings) and returns a filtered list of data storage paths and manifest files matching the user's RLS policy, ensuring consistent security evaluation across different engines.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-4",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Explain how Apache Flink guarantees exactly-once processing semantics during distributed stream joins using the Chandy-Lamport checkpointing algorithm.",
+    "answer": "Flink uses the Chandy-Lamport checkpointing algorithm. It injects 'checkpoint barriers' into source streams. Barriers flow through join operators, which align incoming streams: if Barrier A arrives on stream 1, the operator blocks stream 1 and buffers incoming records until Barrier A arrives on stream 2. Once aligned, the operator saves its state and forwards the barrier downstream, guaranteeing exactly-once state consistency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-5",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Describe the security delegation model in multi-cloud data lakes using AWS Lake Formation and Microsoft Entra ID integration. How do cross-account mappings work?",
+    "answer": "AWS Lake Formation coordinates S3 permissions by delegating access to IAM roles. For Entra ID integration, SAML/OIDC federates users. When an Entra user queries data, they fetch temporary credentials via STS mapped to a Lake Formation role. Cross-account mappings are managed by granting Lake Formation permissions directly to target AWS Account IDs, which map incoming federated users to local resources securely.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-6",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "What is S3 Eventual Consistency, and how did the 2021 AWS S3 update to Strong Consistency modify data pipeline design patterns?",
+    "answer": "Prior to 2021, S3 was eventually consistent for PUT/DELETE operations (queries could return stale lists of files post-write). Data pipelines required helper tools (like S3Guard or DynamoDB locks) to manage state. The 2021 update introduced Strong Read-After-Write consistency for all writes. This eliminated listing delays, allowing pipelines to read committed files immediately and simplifying metadata tracking.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-7",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Describe partition evolution limitations in Apache Iceberg. How does it handle changing partition boundaries without rewriting historical partitions?",
+    "answer": "Iceberg supports partition evolution dynamically. If partition layout changes from daily to monthly, Iceberg writes a new partition spec to metadata. Old parquet files remain in daily folders, and new files are written to monthly structures. When a query is run, Iceberg uses both specs, split-scanning the data dynamically and returning correct results without requiring data rewrites.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-8",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain how OpenLineage tracks schema transformations across Spark SQL operations using the AST (Abstract Syntax Tree) representation.",
+    "answer": "OpenLineage Spark integration hooks into Spark's execution listener. It intercepts the optimized logical plan (AST representation) before physical code-generation. The OpenLineage agent parses the logical nodes (like Project, Join, Aggregate) to trace source-to-target column mappings (facets) and sends the run lineage to the catalog.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-9",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "How does Kafka handle Consumer Rebalancing under the Cooperative Sticky Assignor protocol? How does this minimize stream ingestion latency?",
+    "answer": "The Cooperative Sticky Assignor protocol replaces the traditional 'eager' assignor (which pauses all consumer threads during rebalances). It uses cooperative rebalancing, which only revokes partitions that need to be reassigned, leaving other consumers running. This minimizes rebalance pauses and reduces stream ingestion latency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-10",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "How do you design a compliant PII purging architecture in a Parquet-based data lake using cryptographic deletion (crypto-shredding)?",
+    "answer": "Crypto-Shredding secures PII by encrypting each user's sensitive data using a unique key before writing it to Parquet. The keys are stored in a secure key store. To purge user data (GDPR right to be forgotten), delete the user's specific encryption key from the vault. The data remains in Parquet but is rendered unreadable, avoiding file rewrites.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-11",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Describe S3 Select and Glacier Select architecture. How do they optimize network bandwidth during query execution?",
+    "answer": "S3/Glacier Select executes predicate filtering directly on the storage node. Instead of transferring a 10GB parquet file over the network to the query engine to extract 10 rows, S3 Select scans the file locally and returns only the filtered CSV/JSON results, saving network bandwidth.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-12",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Hudi's HoodieActiveTimeline and its role in coordinating concurrent reader/writer snapshots.",
+    "answer": "HoodieActiveTimeline tracks transactions (commits, rollbacks) as 'instants' on a timeline. Each instant has a state (requested, inflight, completed). Readers use the timeline to identify the latest completed instant, query data consistent with that commit, and ignore in-flight transactions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-13",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Describe how Polaris maps enterprise directories to database catalog structures dynamically.",
+    "answer": "Polaris connects to identity providers (like Azure AD) using SCIM protocols. It maps group memberships to database role configurations. When a user runs a query, Polaris evaluates their group membership mappings against catalog permissions dynamically, managing secure connections.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-14",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Describe Kafka broker recovery mechanics after disk failures. How are partition replicas synchronized?",
+    "answer": "When a broker starts post-failure, it reads its replication checkpoint offset. It connects to the partition leader and requests log replication from that offset. The replica remains out-of-sync (OSR) until it catches up to the leader's High Watermark, at which point it is added back to ISR.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-15",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain how dynamic column masking affects predicate pushdown optimizations in Trino/Presto.",
+    "answer": "Dynamic column masking evaluates security policies dynamically. If columns are masked, the query engine cannot execute predicate pushdown on those columns, as the underlying storage data differs from the masked results, forcing the engine to scan and mask data locally.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-16",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Explain how storage throttle retry mechanisms are implemented in cloud object storage SDKs.",
+    "answer": "SDKs implement exponential backoff with jitter to handle API throttle errors (HTTP 503). When a request is throttled, the client waits a duration that increases exponentially (e.g., `2^retryCount * baseDelay`) plus a random value, preventing retry storms.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-17",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain partition evolution in Apache Iceberg. How does it handle historical partition boundaries?",
+    "answer": "Iceberg partition evolution updates metadata with a new partition spec. Historical files remain partitioned by the old spec. When a query is run, Iceberg splits the query plan, scanning historical files under the old spec and new files under the new spec, returning consistent results.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-18",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain column-level lineage tracking. How does OpenLineage capture column modifications?",
+    "answer": "OpenLineage parses physical execution plans to build column dependency mappings. It tracks columns as they flow through transformations, logging target columns and their corresponding source inputs (facets), allowing users to trace PII source columns.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-19",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Explain the outbox pattern. How does CDC capture transactional changes in an outbox table?",
+    "answer": "The outbox pattern writes transactional data and its corresponding event log (outbox row) in a single database transaction. A CDC agent (like Debezium) monitors the outbox table changes, streaming events to Kafka, ensuring database and queue consistency.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-20",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Describe tokenization vault security architectures for cloud-based data lakes.",
+    "answer": "Tokenization vaults encrypt and map sensitive data to token indexes. The vault is isolated behind firewalls with restricted API permissions. The data lake stores only tokens, requiring query engines to call the vault dynamically to de-tokenise data for authorized users.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-21",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Contrast Parquet Dictionary Encoding with RLE-Bitpacking compression.",
+    "answer": "Dictionary encoding replaces values with integer indexes. RLE-Bitpacking compresses these indexes: Bitpacking packs multiple small integer indexes into contiguous bits (e.g. packing 3-bit values), and RLE groups repeating sequences, optimizing space.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-22",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain how Delta Universal Format (UniForm) reconciles partition schema differences across Delta and Iceberg specs.",
+    "answer": "UniForm handles partition differences by generating a partition translation map. It writes standard Parquet files and generates Delta logs. For Iceberg, it translates Delta partition definitions to Iceberg partition specs, writing manifest files dynamically.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-23",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is the metadata catalog caching policy in Trino? How do you prevent stale metadata issues?",
+    "answer": "Trino caches catalog metadata (schemas, file locations) to speed up queries. If files change, queries can run into stale metadata errors. Mitigate by setting TTL values on cache policies or using catalog events (like S3 Event Notifications) to invalidate cache.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-24",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Describe exactly-once semantics in Flink streaming pipelines with Kafka source and Delta Lake sink.",
+    "answer": "Flink guarantees exactly-once using a two-phase commit protocol. The Kafka source tracks offsets. Flink's checkpoint barrier triggers commit operations: the Delta sink writes data in in-flight files, and commits the Delta transaction log only when the checkpoint completes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-25",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain dynamic Row-Level Security evaluation in Trino using Open Policy Agent (OPA).",
+    "answer": "Trino can integrate with OPA. When a user runs a query, Trino sends the catalog context and user details to OPA. OPA evaluates policies and returns SQL query filters (e.g. `WHERE Region = 'US'`) that Trino appends to the logical plan before execution.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-26",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Describe how to analyze network bottlenecks in S3 data reads using S3 Server Access Logs.",
+    "answer": "Enable Server Access Logs. Query logs using Athena to identify requests with high Turn-Around Time (time between last byte sent and request received). This points to slow network pipelines or throttled buckets.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-27",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Describe row-level delete overheads in Iceberg v2. What is compaction reconciliation?",
+    "answer": "Iceberg v2 positional/equality deletes cause read slowdowns as delete files are merged on-the-fly. Compaction reconciliation (running `OPTIMIZE` or compaction jobs) rewrites data files, applying deletes physically to clean up state.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-28",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is the difference between physical data lineage and logical data lineage?",
+    "answer": "Physical lineage tracks data flow at the file/database level (e.g., File A copied to Table B). Logical lineage tracks data flow at the business concept level (e.g., Customer Address flow), mapping fields across systems.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-29",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "How do you handle late-arriving data in streaming state aggregation?",
+    "answer": "Late-arriving data can be handled by defining a watermark. If the event timestamp falls within the watermark window, Flink/Spark aggregates the row, updating the state. If it falls outside, the record is discarded.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-30",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain dynamic row-level security implementation in Snowflake.",
+    "answer": "Snowflake implements row security using Row Access Policies. A policy function is defined with SQL filter rules. When a user queries a table, Snowflake applies the function dynamically based on the user's role mapping.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-31",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Contrast Snappy compression rate with ZSTD compression speed.",
+    "answer": "Snappy has a lower compression rate but extremely fast speeds. ZSTD has higher compression rates and comparable read decompression speeds, but requires more CPU during write compression.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-32",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Delta Lake transaction conflict types ConcurrentAppendException vs ConcurrentDeleteReadException.",
+    "answer": "`ConcurrentAppendException` occurs when a transaction appends data to a partition that another transaction also modified. `ConcurrentDeleteReadException` occurs when a transaction reads data that a concurrent transaction deleted.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-33",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain the difference between Unity Catalog and Apache Ranger access controls.",
+    "answer": "Unity Catalog manages permissions within Databricks using dynamic SQL grants. Apache Ranger is a centralized security administrator for Hadoop components (Hive, HDFS, HBase) using policy daemons on each service.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-34",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "How do you monitor consumer lag in Kafka topic partition consumption?",
+    "answer": "Monitor consumer lag using tools like Burrow or Prometheus by comparing the log end offset (latest broker offset) against the consumer committed offset, alerting if the gap is growing.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-35",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Explain dynamic data masking policies in BigQuery.",
+    "answer": "BigQuery implements masking using Policy Tags mapped to columns. When a user runs a query, BigQuery checks their Entra/IAM permissions and applies masking rules (e.g. SHA256 hashing) dynamically on-the-fly.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-36",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Describe object lifecycle management rules in S3. What are the tier transitions?",
+    "answer": "Lifecycle rules automate tier transitions (e.g., Standard -> Intelligent Tiering -> Glacier Instant Retrieval -> Glacier Deep Archive -> Permanent Delete) based on object age, reducing storage costs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-37",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain Hudi timelines and commit instants.",
+    "answer": "Hudi timeline records all transactions on the dataset. Each transaction is represented as an commit instant with a state. This coordinates concurrent reads and writes, enabling point-in-time queries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-38",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain schema registry compatibility levels BACKWARD and FULL.",
+    "answer": "BACKWARD compatibility allows reading data written with old schemas. FULL compatibility allows reading data written with old schemas, and old readers can read data written with new schemas.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-39",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Describe event-time processing and watermarking in Apache Flink.",
+    "answer": "Flink event-time processing uses event timestamps. Watermarks are special events that track progress. A watermark of timestamp T indicates that all records with EventTime < T have been processed.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-40",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "Describe how to secure S3 bucket policies using VPC endpoint restrictions.",
+    "answer": "Add a condition to the S3 bucket policy: `\"StringEquals\": {\"aws:sourceVpc\": \"vpc-12345\"}`. This restricts access, allowing only queries routed through the specified VPC endpoint to read data.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-41",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Contrast ORC format with Parquet. What are the index differences?",
+    "answer": "ORC uses Stripe indexes (stores column statistics at stripe and row group levels). Parquet uses Page-level statistics. ORC indexes are optimized for Hive execution engines, while Parquet is standard for Spark.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-42",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Describe Delta Lake transaction commits file naming structure.",
+    "answer": "Delta transaction log files are named sequentially using zero-padded integers: `00000000000000000000.json`, `00000000000000000001.json`. This maintains transaction sequence order.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-43",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "Explain AWS Glue Schema Registry integrations with Kafka.",
+    "answer": "AWS Glue Schema Registry registers schemas for Kafka streams. Producers serialize data using registered schemas, and consumers fetch the schemas from the registry dynamically to deserialize payloads.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-44",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Streaming, CDC, and Real-Time Ingestion",
+    "question": "Describe state backends in Flink. What is RocksDBStateBackend?",
+    "answer": "Flink state backends store state during streaming. `RocksDBStateBackend` stores state in local RocksDB databases on task managers, flushing checkpoints to S3/ADLS to manage large state sizes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-45",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Security, Privacy, and Compliance",
+    "question": "How does Ranger manage Knox gateway security mappings?",
+    "answer": "Knox acts as a gateway for Hadoop service endpoints. Ranger manages access control policies for Knox, evaluating incoming Knox requests and routing them based on mapped user permissions.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-46",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Storage, File Formats, and Object Storage Deep Internals",
+    "question": "Explain how S3 bucket replication coordinates file versioning.",
+    "answer": "S3 replication requires Versioning to be enabled. When a file is updated, S3 assigns a version ID and replicates both the data payload and its matching version ID to the target bucket.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-47",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Open Table Formats (Delta Lake, Apache Iceberg, Apache Hudi)",
+    "question": "Explain how Delta Lake optimizes MERGE operations.",
+    "answer": "Delta Lake optimizes MERGE using a find-then-write pattern. It first reads index files and join tables to locate partitions containing matching keys, and rewrites only the target files.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "dl-hard-48",
+    "category": "DATALAKE ARCHITECTURE",
+    "niche": "Cataloging, Metastores, and Data Governance",
+    "question": "What is the Hive Metastore Schema Upgrade process?",
+    "answer": "Hive Metastore upgrade modifies the database schema (tables, constraints) to match the new Hive version, executed using the `schematool` script during service updates.",
+    "difficulty": "HARD"
+  }
+]

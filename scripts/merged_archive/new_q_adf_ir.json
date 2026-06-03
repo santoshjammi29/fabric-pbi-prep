@@ -1,0 +1,554 @@
+[
+  {
+    "id": "adf-ir-36",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What are the three types of Integration Runtimes available in Azure Data Factory and when would you use each?",
+    "answer": "Azure Data Factory offers three IR types: Azure IR, Self-hosted IR (SHIR), and Azure-SSIS IR. Azure IR is a fully managed, serverless compute used for cloud-to-cloud data movement and data flow execution; it requires no infrastructure management. Self-hosted IR is installed on an on-premises or cloud VM and is used when the source or sink resides behind a firewall or on a private network not accessible from the internet. Azure-SSIS IR is a dedicated managed cluster that lifts and shifts existing SQL Server Integration Services packages to the cloud, supporting SSISDB hosted in Azure SQL Database or SQL Managed Instance. You choose based on network topology and workload type: Azure IR for cloud-native, SHIR for hybrid connectivity, and Azure-SSIS IR for SSIS package migrations.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-37",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the Azure Integration Runtime and what workloads does it support?",
+    "answer": "The Azure Integration Runtime is a fully managed, serverless compute infrastructure provided by Microsoft to support data movement and transformation in the public cloud. It supports three capabilities: data movement between cloud data stores, dispatch of transformation activities to compute services such as Azure Databricks, HDInsight, and Azure Machine Learning, and execution of SSIS packages when deployed on Azure-SSIS IR. Azure IR scales automatically and does not require any installation or patching. You can configure the region or set it to Auto-resolve, in which case ADF selects the optimal region based on sink and source proximity. Azure IR is the default runtime created automatically when you create an ADF instance.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-38",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is a Self-hosted Integration Runtime and why is it needed for on-premises data sources?",
+    "answer": "A Self-hosted Integration Runtime (SHIR) is a Windows-based software agent installed on an on-premises machine or a private cloud VM that enables ADF to access data sources behind corporate firewalls or in private networks. Without SHIR, ADF's cloud-based Azure IR cannot reach databases, file servers, or APIs that are not publicly accessible. SHIR communicates outbound over HTTPS (port 443) to Azure Service Bus relay endpoints, so no inbound firewall ports need to be opened. You register the SHIR with ADF using an authentication key generated in the ADF portal under Manage > Integration Runtimes. The SHIR node then acts as the compute gateway performing data read/write operations locally and transferring data securely to the cloud sink.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-39",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you register a Self-hosted Integration Runtime node with Azure Data Factory?",
+    "answer": "To register a SHIR node, you first create an Integration Runtime of type Self-hosted in the ADF portal under Manage > Integration Runtimes and then download the SHIR installer (Microsoft Integration Runtime setup .msi) on the target Windows machine. During or after installation, you paste one of the two authentication keys displayed in the ADF portal into the Integration Runtime Configuration Manager application. The node contacts Azure over HTTPS port 443 to Azure Service Bus relay endpoints and completes registration. Once registered, the node status changes to Running in the ADF portal. The two keys (Key1, Key2) allow key rotation without downtime—you can regenerate one key while the other remains active.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-40",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What outbound network requirements must be met for a Self-hosted IR to communicate with Azure Data Factory?",
+    "answer": "A SHIR node requires outbound HTTPS connectivity on port 443 to several Azure endpoints. Specifically, it must reach *.servicebus.windows.net for the Azure Service Bus relay used for command-and-control traffic, *.frontend.clouddatahub.net for ADF pipeline coordination, and *.core.windows.net or *.blob.core.windows.net when staging data through Azure Blob storage. Additionally, login.microsoftonline.com must be reachable for Azure Active Directory token acquisition. No inbound ports need to be opened on the firewall since all communication is outbound initiated. If your corporate proxy blocks these endpoints, you must configure proxy settings in the Integration Runtime Configuration Manager.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-41",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the Azure-SSIS Integration Runtime and how does it differ from the Self-hosted IR?",
+    "answer": "Azure-SSIS IR is a fully managed cluster of Azure VMs configured to natively execute SQL Server Integration Services packages in the cloud. Unlike SHIR, which you install and manage on your own machine, Azure-SSIS IR is provisioned and scaled by Microsoft within your Azure subscription. It supports SSISDB hosted in Azure SQL Database, SQL Managed Instance, or file system/Azure Files storage. You define the node size (e.g., Standard_D4_v3) and number of nodes when creating it. Azure-SSIS IR supports custom setups via a setup script stored in Blob storage, allowing installation of custom drivers or third-party components. SHIR, in contrast, is for general data movement and cannot execute SSIS packages.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-42",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the ADF Managed Virtual Network Integration Runtime and what problem does it solve?",
+    "answer": "The Managed Virtual Network IR is a variant of the Azure IR that runs within a Microsoft-managed Virtual Network, allowing it to access data sources through private endpoints without exposing data to the public internet. It solves the problem of cloud-to-cloud data movement where the target service (e.g., Azure SQL Database, ADLS Gen2, Synapse) has public network access disabled and only accepts connections via Private Link. You create a Managed VNet IR in ADF, then create Managed Private Endpoints that provision private endpoints in the ADF-managed VNet to the target service. The target service owner approves the private endpoint connection, and all data movement traverses Microsoft's private backbone. This eliminates the need for a self-hosted IR for purely cloud-to-cloud private connectivity.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-43",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the difference between a Managed Private Endpoint and a regular Private Endpoint in Azure?",
+    "answer": "A regular Private Endpoint is a network interface resource you create in your own Azure Virtual Network that assigns a private IP to a target PaaS service, resolving DNS to that private IP. A Managed Private Endpoint is created inside the ADF Managed Virtual Network, which is an isolated VNet owned and managed by Microsoft—not in your subscription's VNet. Managed Private Endpoints appear under Manage > Managed Private Endpoints in the ADF portal and require approval from the target resource's owner via the Azure portal or CLI. You cannot directly access the Managed VNet or inspect its configuration; Microsoft handles routing and DNS resolution internally. This means you do not need to configure UDRs, DNS forwarders, or NSG rules—the managed environment handles it.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-45",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is SHIR auto-upgrade and how does it work?",
+    "answer": "SHIR auto-upgrade is a feature where Microsoft automatically pushes updates to your SHIR nodes to install newer versions of the Integration Runtime software without manual intervention. By default, auto-upgrade is enabled, but you can disable it in the ADF portal at the IR level or set a specific upgrade schedule (weekly, within a defined maintenance window). When an upgrade is triggered, the SHIR installer downloads the new version package from Azure, applies it, and restarts the IR service. If you have a multi-node SHIR setup for HA, nodes are upgraded in a rolling fashion to maintain availability. You can monitor upgrade history and node version in the ADF monitoring view. Disabling auto-upgrade gives you control but requires you to manually apply updates to stay on a supported version.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-46",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is Managed Identity in ADF and how is it used with Integration Runtimes?",
+    "answer": "Managed Identity in ADF is a system-assigned or user-assigned Azure AD identity automatically created for the ADF instance, eliminating the need to store credentials in linked services. When using Azure IR (including Managed VNet IR), ADF can authenticate to supported data stores such as Azure Blob Storage, ADLS Gen2, Azure SQL Database, and Azure Key Vault using the ADF Managed Identity rather than a service principal or key. In the linked service configuration, you select 'Managed Identity' as the authentication method, and Azure RBAC roles (e.g., Storage Blob Data Contributor) are assigned to the ADF Managed Identity on the target resource. This approach improves security by removing secrets entirely from the pipeline configuration. SHIR-based connectors may also support Managed Identity when the SHIR host is itself an Azure VM with a Managed Identity.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-47",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is a Service Principal and how does it differ from Managed Identity for ADF authentication?",
+    "answer": "A Service Principal is an application identity registered in Azure Active Directory with an application ID and a client secret or certificate. In ADF linked services, you provide the tenant ID, service principal ID, and secret/certificate to authenticate to resources like ADLS Gen2 or Azure SQL. Managed Identity, by contrast, is automatically provisioned and tied directly to the ADF instance—no secret needs to be stored or rotated because Azure handles the credential lifecycle. The key disadvantage of Service Principal is secret rotation risk: if a secret expires or is compromised, all pipelines using that linked service fail. Managed Identity avoids this entirely. However, Service Principals are useful in scenarios where cross-tenant authentication is required or where the target resource does not yet support Managed Identity authentication.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-48",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you store sensitive credentials (passwords, keys) securely in ADF linked services?",
+    "answer": "ADF supports storing sensitive values as Azure Key Vault secret references in linked services rather than embedding them as plain text. In the linked service configuration, instead of entering a password field value directly, you select 'Azure Key Vault' and specify the Key Vault linked service, secret name, and optionally the secret version. The ADF Managed Identity (or Service Principal) must have 'Get' permission on Key Vault secrets (Key Vault Secrets User role). At pipeline runtime, ADF fetches the secret dynamically from Key Vault. For SHIR-based linked services, the SHIR node itself retrieves the secret, so the SHIR host must be able to reach the Key Vault endpoint. ADF also supports the 'secureString' type for inline secrets, which encrypts the value at rest but embeds it in the pipeline definition.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-49",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the difference between secureString and regular string parameter types in ADF linked services?",
+    "answer": "In ADF linked service definitions, a regular string value is stored as plaintext in the pipeline JSON and is visible to users with read access to the factory. A secureString marks the field as sensitive: the value is encrypted at rest in ADF's internal store and is masked (shown as asterisks) in the ADF portal UI and in ARM template exports. SecureString values cannot be read back once saved—they can only be overwritten. When you export an ARM template from ADF, secureString fields are replaced with a parameter reference, prompting you to supply the value during deployment. Using secureString is the minimum baseline for security, but referencing Azure Key Vault secrets is the recommended enterprise approach since it allows centralized secret rotation without redeployment.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-50",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How many nodes can a Self-hosted Integration Runtime have, and why would you add more than one?",
+    "answer": "A Self-hosted IR can have up to four nodes registered to a single IR instance. Adding multiple nodes provides two benefits: high availability and increased throughput. For high availability, if one node goes down due to OS patching or hardware failure, the other nodes continue to service pipeline requests—ADF automatically routes work to healthy nodes. For throughput, multiple nodes allow concurrent copy activities and data flows to run in parallel across nodes, reducing overall job duration. Each node runs independently on separate Windows machines. All nodes share the same authentication keys and are managed as a single logical SHIR. You can monitor each node's status, CPU, memory, and disk usage in the ADF portal under the IR's monitoring section.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-51",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is VNET injection for Azure-SSIS IR and when is it required?",
+    "answer": "VNET injection for Azure-SSIS IR is the capability to deploy the Azure-SSIS IR nodes into a customer-managed Azure Virtual Network, giving them private IP addresses within that network. This is required when SSIS packages need to access on-premises data sources, use private Azure resources (such as an Azure SQL Managed Instance SSISDB), or when you want to enforce network security policies via NSGs and UDRs. You configure VNET injection during Azure-SSIS IR creation by specifying the subscription, VNet, and subnet. The subnet must have sufficient IP address space (at least one IP per node plus overhead), and specific service endpoints or private DNS configurations may be needed. Microsoft-managed components like the IR management plane still communicate with Azure services, so you must allow the required outbound rules in your NSG.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-52",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the node heartbeat in SHIR and what does it indicate when a node stops sending heartbeats?",
+    "answer": "The SHIR node heartbeat is a periodic signal sent by each registered SHIR node to Azure Data Factory to indicate that the node is alive and operational. Heartbeats are sent at regular intervals (approximately every 30 seconds) via the HTTPS connection to Azure Service Bus relay. In the ADF portal under Integration Runtime monitoring, each node shows a 'Last heartbeat' timestamp. If a node stops sending heartbeats for more than a threshold period, the portal marks the node status as 'Unavailable' or 'Offline.' Common causes include network connectivity loss to Azure Service Bus endpoints, SHIR Windows service stopping, proxy misconfiguration, or the host machine being powered off. When a node goes offline, ADF fails over to other healthy nodes if the IR has multiple nodes registered; otherwise, pipelines using that IR will fail with a connectivity error.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-53",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What are the minimum hardware requirements for hosting a Self-hosted Integration Runtime?",
+    "answer": "Microsoft's recommended minimum hardware for a SHIR host is a machine with at least 4 CPU cores, 8 GB RAM, and 80 GB of available disk space for OS and SHIR installation. The SHIR must run on Windows (Windows Server 2016/2019/2022 or Windows 10/11 64-bit). For production workloads with high concurrency, Microsoft recommends 8+ cores and 16+ GB RAM to support multiple concurrent copy jobs and data movement threads. The .NET Framework 4.7.2 or later must be installed. The SHIR service runs as a Windows service (DIAHostService) under a local or domain service account. Network throughput of the host machine's NIC is also critical—for high-throughput copy activities, a 1 Gbps or higher NIC is recommended to avoid the network becoming the bottleneck.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-54",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the ADF Express IR setup option and in what scenario is it typically used?",
+    "answer": "The ADF Express IR setup allows you to install and register a Self-hosted IR on an Azure VM or a local machine with a single click directly from the ADF portal, bypassing the manual download-and-register workflow. It is available when creating a new SHIR from the Manage > Integration Runtimes blade; you click 'Express setup' and copy a one-click PowerShell command that installs the SHIR software and registers it automatically using embedded authentication keys. It is typically used for quick proof-of-concept setups, developer environments, or when setting up SHIR on Azure VMs where you have RDP or Azure Bastion access. For enterprise deployments, organizations prefer the manual or silent installation approach integrated into CI/CD pipelines and configuration management tools like Ansible or DSC.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-55",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How can you share a Self-hosted Integration Runtime across multiple ADF instances?",
+    "answer": "ADF supports SHIR sharing, where a SHIR registered in one ADF factory (the 'owner' factory) can be used by other ADF factories (the 'user' factories) in the same Azure subscription or tenant. The owner factory grants sharing permission to the user factory by specifying its resource ID in the SHIR's sharing configuration. The user factory then creates a 'Linked Self-hosted IR' that references the shared SHIR without installing a separate SHIR on any machine. This is useful in enterprise setups where multiple ADF instances (e.g., dev, QA, prod) need access to the same on-premises data source without duplicating SHIR infrastructure. The shared SHIR nodes still run in the owner factory's context, so RBAC and network permissions are managed centrally. The user factory cannot modify the shared IR's properties.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-57",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the role of Azure Service Bus relay in SHIR communication?",
+    "answer": "Azure Service Bus relay acts as the secure communication channel between the ADF cloud service and the Self-hosted IR node. The SHIR node establishes an outbound HTTPS connection to the Service Bus relay endpoint (*.servicebus.windows.net on port 443), creating a persistent relay listener. When ADF needs to run a pipeline activity on the SHIR, it sends a command through this relay channel to the SHIR node. The SHIR node receives the command, executes the data movement or transformation locally, and reports status back through the same relay. This architecture means no inbound ports need to be opened on the corporate firewall—the SHIR initiates all connections outbound. Service Bus relay handles NAT traversal and provides reliable message delivery even across proxy and firewall environments.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-58",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you update the authentication key on a Self-hosted IR without causing downtime?",
+    "answer": "SHIR key rotation is designed to be zero-downtime thanks to the dual-key design. Each SHIR instance in ADF has two authentication keys (Key1 and Key2), both valid simultaneously. To rotate without downtime: first regenerate one key (e.g., Key1) in the ADF portal under the IR settings—this immediately invalidates the old Key1 but Key2 remains active on all registered nodes. Then update each SHIR node by opening the Integration Runtime Configuration Manager, pasting the new Key1, and clicking Register. The node reconnects using the new key. Finally, regenerate Key2 and update nodes with Key2 if you also want to rotate the second key. During the update window, nodes using the still-valid key continue processing pipelines uninterrupted. This workflow also applies when transferring SHIR registration to a new ADF instance.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-59",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the concurrent jobs limit on a Self-hosted IR node, and what is the default?",
+    "answer": "Each SHIR node can execute a limited number of concurrent copy and data flow jobs. The default maximum concurrent jobs per SHIR node is based on the logical CPU core count of the host machine—typically it is set to 2× the number of logical cores, with a maximum cap of 32 concurrent jobs per node. You can view and adjust the concurrent jobs setting in the Integration Runtime Configuration Manager under 'Settings.' Increasing concurrent jobs allows more pipeline activities to run simultaneously on the node, which improves throughput for workloads with many small parallel copy tasks. However, setting it too high can cause CPU and memory contention on the host machine, degrading performance. Microsoft recommends load testing to find the optimal setting for your specific workload and hardware configuration.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-60",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is Data Integration Unit (DIU) in Azure Data Factory and what is its relationship to Copy activity performance?",
+    "answer": "A Data Integration Unit (DIU), formerly called Data Movement Unit (DMU), is a measure of processing power combining CPU, memory, and network bandwidth allocated to a cloud copy activity running on the Azure IR. DIU values range from 2 to 256 in multiples of 2 (e.g., 2, 4, 8, 16, 32, 64, 128, 256). In a copy activity's 'Settings' tab, you set the DIU count (or leave it at 'Auto' for ADF to determine it). Higher DIU counts enable higher parallelism and throughput—useful for large files or high-volume data movement. DIUs only apply to Azure IR-based copy activities; SHIR-based copies use the host machine's physical resources instead. Cost increases proportionally with DIU count and execution time, so tuning DIUs is a balance between speed and cost.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-61",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What types of authentication does SHIR support for connecting to on-premises SQL Server?",
+    "answer": "SHIR supports multiple authentication methods for connecting to on-premises SQL Server via the SQL Server linked service. These include SQL Authentication (username and password), Windows Authentication (using the domain account under which the SHIR Windows service runs, or a specified domain account), and Azure Active Directory authentication (when the SQL Server supports Azure AD pass-through). For Windows Authentication, the SHIR service account must have network logon rights to the SQL Server. Credentials can be stored inline as secureString, or better, referenced from Azure Key Vault. The linked service also supports encrypting the connection (Encrypt=True) and trusting the server certificate (TrustServerCertificate=True), both of which are configurable in the additional connection properties.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-62",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Can the Azure Integration Runtime be used to access on-premises data sources? Why or why not?",
+    "answer": "No, the standard Azure Integration Runtime cannot access on-premises data sources because it runs in Microsoft's public cloud infrastructure and has no network path to private or on-premises resources behind a corporate firewall. Azure IR can only reach data stores that have public endpoints accessible over the internet. To access on-premises resources, you must use a Self-hosted IR deployed within the on-premises or private network environment. The only exception is the Managed VNet IR, which can use Managed Private Endpoints to reach Azure PaaS services privately, but even this cannot reach truly on-premises resources without an ExpressRoute or VPN gateway integrated into the VNet. For on-premises connectivity, SHIR remains the required approach.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-63",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What happens to running pipeline activities if a SHIR node goes offline?",
+    "answer": "If a SHIR node goes offline mid-execution, any activity currently running on that node will fail with a connectivity or execution error, and the pipeline's retry policy will determine whether ADF attempts to re-run the activity. If the SHIR has multiple healthy nodes registered, ADF will route new activity requests to the remaining nodes, but in-flight activities on the failed node cannot be transparently migrated—they must retry from scratch. Activities in a 'queued' state waiting for the offline node will be reassigned to a healthy node. If no healthy nodes are available, all activities queue until a node comes back online or timeout. This underscores the importance of deploying at least two SHIR nodes for production workloads to ensure high availability and prevent single-node failures from causing pipeline outages.",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "adf-ir-64",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain the architecture of SHIR high availability with multiple nodes, including how ADF routes activity requests across nodes.",
+    "answer": "When multiple nodes are registered to a single Self-hosted IR, ADF uses a load-balancing mechanism to distribute activity requests across healthy nodes. Each node maintains a persistent outbound relay connection to Azure Service Bus. When a pipeline triggers an activity requiring the SHIR, the ADF control plane checks node availability via heartbeat status and routes the request to a node with available concurrent job slots. If Node A is at its max concurrent job limit, the next request goes to Node B. If Node A fails and stops sending heartbeats, ADF marks it unavailable and stops routing new requests to it—existing in-flight tasks on Node A fail and can be retried on another node per the pipeline's retry configuration. During SHIR auto-upgrade, nodes are upgraded sequentially: Node A is upgraded while Node B handles traffic, ensuring rolling zero-downtime updates. Node-level metrics (CPU, memory, available slots) are visible in the ADF portal's IR monitoring section.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-65",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does the Managed Virtual Network IR differ from the standard Azure IR in terms of data exfiltration prevention?",
+    "answer": "The standard Azure IR operates in a shared Microsoft-managed network where outbound traffic routing is not customer-controlled, making it impossible to enforce strict data exfiltration policies since the IR nodes can in theory reach any internet endpoint. The Managed VNet IR, by contrast, runs within an isolated Microsoft-managed VNet where all outbound internet access is blocked by default—only explicitly approved Managed Private Endpoints are permitted. This means data can only flow to resources for which a private endpoint has been created and approved, preventing accidental or malicious exfiltration to external endpoints. You enable the Managed VNet by setting 'virtualNetworkEnabled: true' on the IR resource. Additionally, when using Managed VNet IR with Data Flows, the Spark clusters are also launched within the managed VNet, ensuring data flow compute is equally isolated. This architecture aligns with enterprise zero-trust and data perimeter requirements.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-66",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "A SHIR node's concurrent jobs are maxed out and copy activities are queuing. What configuration and architectural changes would you make to resolve this?",
+    "answer": "First, increase the concurrent jobs limit in the Integration Runtime Configuration Manager if the host machine has unused CPU and memory headroom—the setting can go up to 32 per node. Second, review whether the bottleneck is truly the concurrent job limit or whether individual copy jobs are running slowly due to network, disk I/O, or source/sink throttling; use the copy activity monitoring metrics (throughput MB/s, rows/s) to distinguish. Third, add additional SHIR nodes (up to 4) to horizontally scale concurrent capacity—each additional node adds its own concurrent job capacity to the pool. Fourth, if the workload is consistently high, consider upgrading the host machine to one with more CPU cores since the default concurrent job limit scales with core count. Fifth, evaluate whether some activities can be migrated to Azure IR or Managed VNet IR if the source data is cloud-accessible, reducing SHIR load. Finally, review pipeline design to see if excessive ForEach parallelism is creating a thundering herd of SHIR requests.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-68",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the difference between Interactive Authoring mode on SHIR and regular pipeline execution mode?",
+    "answer": "Interactive Authoring mode on a Self-hosted IR enables the ADF data authoring experience—specifically features like 'Test Connection,' 'Get Schema,' 'Preview Data,' and 'Debug' pipeline runs—to work through the SHIR. Without Interactive Authoring enabled, the SHIR can only execute production pipeline runs; any authoring action that requires live connectivity to the on-premises source will fail. You enable Interactive Authoring in the ADF portal under the SHIR's settings; it can be enabled for a configurable TTL window (between 1 and 60 minutes) to minimize security exposure, or left always-on. When enabled, the SHIR node reserves a portion of its concurrent job slots for interactive authoring sessions. The key distinction from production mode is that interactive mode supports synchronous, user-initiated ad-hoc queries used during development, whereas production mode handles asynchronous pipeline-triggered executions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-69",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain how Managed Private Endpoints are approved and what happens if an approval is pending.",
+    "answer": "When you create a Managed Private Endpoint in ADF for a target resource (e.g., an Azure SQL Database), Azure creates a private endpoint connection request on the target resource. The target resource owner must approve this request—they see it under the resource's 'Private endpoint connections' blade in the Azure portal and click 'Approve.' Until approved, the Managed Private Endpoint remains in 'Pending' state in ADF. During this pending state, any ADF pipeline or data flow activity that uses the linked service pointing to this resource through the Managed VNet IR will fail with a connection refused or private endpoint not resolved error. Once approved, DNS resolution within the managed VNet resolves the resource's hostname to the private IP of the endpoint, and connectivity succeeds. If the target resource uses a Private DNS Zone, ADF automatically configures name resolution within the managed VNet. You should monitor pending endpoints and build approval into your deployment runbook.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-70",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does DIU (Data Integration Unit) auto-scaling work in ADF Copy activity, and when should you override the auto setting?",
+    "answer": "When DIU is set to 'Auto' in a copy activity, ADF analyzes the source and sink connector type, data volume estimation, and historical performance data to select an initial DIU count at job start time, typically beginning at 4 DIUs and scaling up based on observed throughput. ADF caps auto-selected DIUs at 256. You should override the auto setting when: (1) you have predictable, large-volume jobs and want to guarantee maximum parallelism from the start rather than waiting for ADF to ramp up; (2) you need to cap DIU consumption to control costs for lower-priority jobs; (3) the data source or sink has rate limits (e.g., Salesforce API calls, Cosmos DB RU limits) and fewer DIUs prevent throttling; (4) you are copying binary files where ADF cannot estimate size and may under-allocate DIUs. Use the copy activity monitoring output field 'usedDataIntegrationUnits' in activity run details to understand what ADF actually consumed and tune from there.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-71",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How would you design SHIR deployment in a regulated financial services environment with strict network segmentation?",
+    "answer": "In a regulated financial environment, SHIR deployment must comply with network segmentation policies that typically prohibit general internet access from servers in the data tier. The SHIR host should be placed in a dedicated DMZ or data tier subnet with egress rules that permit only specific Azure Service Bus relay FQDNs (*.servicebus.windows.net) and ADF control plane endpoints on port 443—all other internet egress is blocked. Use an explicit authenticated corporate proxy for all outbound traffic, configured in the SHIR Configuration Manager and diahost.exe.config. The SHIR service account should be a least-privilege domain account (gMSA preferred) with access only to required data sources. All secrets (DB passwords, storage keys) must be stored in Azure Key Vault with Key Vault behind a Private Endpoint accessible from the data subnet via VNet peering or ExpressRoute. Audit logs for SHIR activities should be forwarded to a SIEM (Azure Sentinel/Splunk) via Windows Event Forwarding. Deploy at minimum two SHIR nodes in an HA pair across separate physical hosts or availability zones for RTO compliance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-72",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the impact of enabling encryption in transit on SHIR-based copy activities and how is it configured?",
+    "answer": "Encryption in transit for SHIR-based copy activities means that data moving between the SHIR node and the source/sink is encrypted using TLS. For SQL Server sources, you enable this by setting 'Encrypt=True' in the connection string and optionally 'TrustServerCertificate=False' to enforce certificate validation. For file-based sources over SMB, you rely on SMB 3.0 encryption if the Windows file server supports it. For the SHIR-to-Azure data path (when staging data through Blob/ADLS), the transmission uses HTTPS with TLS 1.2 enforced by Azure Storage. Enabling full certificate validation has a minor CPU overhead on the SHIR host but eliminates man-in-the-middle attack risk. In regulated environments, 'TrustServerCertificate=True' should be avoided as it bypasses certificate chain validation. You should also configure the data store linked service's 'Additional connection properties' to enforce minimum TLS version where the connector supports it.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-73",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Describe how Azure-SSIS IR handles package execution and what role the SSISDB catalog plays.",
+    "answer": "Azure-SSIS IR executes SSIS packages by provisioning a cluster of Azure VMs that run the SSIS runtime components. When you trigger a package execution (via Execute SSIS Package activity in ADF or SSMS), the request is sent to the Azure-SSIS IR, which distributes execution across available nodes. The SSISDB catalog is a SQL Server database (hosted in Azure SQL Database or SQL Managed Instance) that stores SSIS project and package definitions, parameter values, environment variables, execution logs, and reports. When a package is deployed to SSISDB using the Project Deployment Model, Azure-SSIS IR fetches the package binary from SSISDB at execution time. Alternatively, in the Package Deployment Model, packages are stored in Azure Files, Blob Storage, or SQL Server MSDB and Azure-SSIS IR mounts the file share at execution time. Execution logs including message events, task durations, and error details are written back to SSISDB and can be queried via the SSISDB catalog views (catalog.executions, catalog.event_messages).",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-74",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you implement linked service parameterization with IR selection to support multi-environment deployments?",
+    "answer": "Linked service parameterization allows you to define a single linked service template with parameters for connection string components (server, database, authentication values) and even the IR name, enabling environment-specific configuration without creating separate linked services per environment. In the linked service definition, you set the integration runtime reference to a parameter (e.g., '@linkedService().IRName') and define a parameter 'IRName' of type string. At pipeline execution time or through global parameters, the correct IR name is passed in. In ARM template-based CI/CD deployments, parameter files for dev, QA, and prod supply different IR names and connection strings. This approach means one ARM template deploys to all environments, with only the parameter file changing per environment. Combine with Azure Key Vault references for secrets so that each environment's Key Vault supplies the correct credentials. This pattern is formalized in the ADF CI/CD best practice of using environment-specific parameter files generated by the adf_publish branch.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-75",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What firewall rules must be configured on the SHIR host Windows Firewall to allow SHIR to function correctly?",
+    "answer": "The SHIR service initiates all connections outbound, so Windows Firewall inbound rules do not need modification for core SHIR functionality. However, you must ensure Windows Firewall outbound rules (if enabled in restricted mode) allow HTTPS (TCP 443) to Azure Service Bus relay FQDNs and ADF control plane endpoints. The SHIR installer typically adds necessary Windows Firewall exceptions for the DIAHostService process automatically. Additionally, if Interactive Authoring is used and your source is a SQL Server on the local network, you may need to ensure the firewall on the SQL Server machine allows incoming TCP connections from the SHIR host IP on port 1433. For SFTP or FTP sources on-premises, the corresponding outbound ports (22 for SFTP, 21 for FTP control) must be open from the SHIR host to the file server. Always use IP-based allowlists rather than 'any' rules for enterprise security compliance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-76",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF Managed Identity authentication work with ADLS Gen2 and what RBAC roles are needed?",
+    "answer": "When ADF uses its Managed Identity to authenticate to ADLS Gen2, the linked service specifies 'Managed Identity' as the authentication type and provides the storage account URL (https://<accountname>.dfs.core.windows.net). At runtime, the ADF service acquires an OAuth 2.0 access token from Azure AD for the Managed Identity and uses it in the Authorization header of ADLS Gen2 REST API calls. For read operations, the ADF Managed Identity requires the 'Storage Blob Data Reader' role or the ADLS-specific 'Storage Blob Data Contributor' role on the storage account or specific container/filesystem. For write operations, 'Storage Blob Data Contributor' is required. If the storage account uses hierarchical namespace (HNS) with fine-grained POSIX ACLs, the Managed Identity must also have execute (x) permission on all parent directories in the path hierarchy, not just the target directory. Role assignments are made in the Azure portal under the storage resource's Access Control (IAM) blade. No storage account key or SAS token is needed.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-77",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is SHIR worker thread configuration and how does it relate to data throughput optimization?",
+    "answer": "SHIR worker threads control the number of threads used for data reading and writing within a single copy job running on the SHIR node. This is separate from concurrent jobs (which controls how many jobs run simultaneously). Within a single copy activity, multiple worker threads can read from the source in parallel (parallel copy) and write to the sink in parallel, increasing throughput. The 'parallelCopies' setting in the copy activity's source or directly in the activity controls the parallel copy count, which maps to the number of worker threads spawned per job. If the source supports partitioned reads (e.g., SQL with partition option 'DynamicRange' or 'PhysicalPartitions'), each partition uses a separate thread. Worker threads share the SHIR node's CPU and memory—if too many threads are spawned across multiple concurrent jobs, context switching and memory pressure degrade rather than improve throughput. Monitoring the SHIR node's CPU utilization and copy throughput metrics helps find the optimal parallelCopies value.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-78",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you implement a zero-downtime migration of a SHIR from one physical host to another?",
+    "answer": "Zero-downtime SHIR host migration leverages the multi-node HA capability. First, add the new machine as a second node to the existing SHIR by installing the SHIR software on the new host and registering it with the same authentication key. Verify the new node shows 'Running' status in ADF and starts receiving heartbeats. Run a test pipeline through the new node to validate connectivity to all data sources. Then drain the old node by waiting for in-flight activities to complete (or letting retry handle failures) and removing the old node from the SHIR via the ADF portal under the IR's node management. The ADF routing automatically stops sending new requests to a removed node. Finally, decommission the old host. This approach requires no downtime because new requests are continuously routed to healthy nodes. If the SHIR currently has only one node, you must temporarily accept single-node risk during the window between adding the new node and removing the old one.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-79",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain how private endpoint DNS resolution works when using a Managed VNet IR to connect to an Azure SQL Database with public access disabled.",
+    "answer": "When you create a Managed Private Endpoint in ADF for Azure SQL Database, Azure provisions a private endpoint in the ADF Managed VNet and registers the SQL server's FQDN (e.g., myserver.database.windows.net) in a private DNS zone (privatelink.database.windows.net) within the managed environment. ADF manages this DNS integration internally—you do not need to configure Private DNS Zones in your own subscription. The private DNS zone resolves myserver.database.windows.net to the private IP of the endpoint (e.g., 10.x.x.x) for connections originating inside the Managed VNet. When the Managed VNet IR's copy activity attempts to connect to myserver.database.windows.net, the DNS query resolves to the private IP, and the TCP connection traverses the private endpoint rather than the public internet. Azure SQL Database's built-in firewall rejects public connections, but the private endpoint connection bypasses the public firewall and is subject only to Azure AD authentication and SQL-level permissions.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-80",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does SHIR handle credential encryption for linked service secrets stored locally?",
+    "answer": "When a linked service uses SHIR and the credentials are configured to be encrypted by the SHIR (rather than stored in Azure Key Vault), SHIR encrypts the credential using the Windows Data Protection API (DPAPI) on the SHIR host machine. The encrypted credential blob is stored in the ADF service (not on the SHIR machine), but it can only be decrypted by the same SHIR node that encrypted it, using the machine-specific DPAPI master key. This has an important implication for multi-node SHIR HA setups: if credentials were encrypted by Node A, Node B cannot decrypt them because DPAPI keys are machine-specific. To avoid this, the recommended practice is to store credentials in Azure Key Vault (not encrypted by SHIR locally), so all nodes can retrieve the same secret. Alternatively, using 'Credential manager' encryption mode in SHIR shares a credential encryption key across all nodes in the same SHIR instance.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-81",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What are the specific NSG rules required on the subnet hosting Azure-SSIS IR in a VNet-injected deployment?",
+    "answer": "For VNet-injected Azure-SSIS IR, the subnet NSG must allow specific inbound and outbound rules. Inbound rules: allow TCP port 29876-29877 from the 'BatchNodeManagement' service tag (used by Azure Batch management plane to manage SSIS IR nodes), allow TCP port 3389 (RDP) from your management IP range if custom setup debugging is needed. Outbound rules: allow TCP 443 to 'AzureCloud' service tag (for IR registration and Azure services), allow TCP 1433 to the Azure SQL Database or SQL Managed Instance hosting SSISDB, allow TCP 443 to Azure Container Registry if using custom setup with container images, and allow DNS resolution on UDP/TCP 53 to the VNet DNS server. If using SQL MI for SSISDB, also allow TCP 11000-11999 for SQL MI redirect connection mode. Failing to configure BatchNodeManagement inbound is the most common cause of Azure-SSIS IR provisioning failure in VNet-injected mode.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-82",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you diagnose and resolve a SHIR node that repeatedly shows 'Limited' status despite the service running?",
+    "answer": "The 'Limited' status on a SHIR node indicates the node is partially functional—it can receive heartbeats and commands but has reduced capability, often because it cannot reach all required Azure endpoints. Diagnostic steps: (1) Open Integration Runtime Configuration Manager > Diagnostics tab and run the connectivity test, which checks Service Bus relay connectivity and optionally a specific data source. (2) Check Windows Event Viewer Application logs for DIAHostService errors indicating failed Azure endpoint connections. (3) Verify that proxy settings in diahost.exe.config match your corporate proxy and that proxy bypass rules include Azure Service Bus FQDNs. (4) Run nslookup and Test-NetConnection from the SHIR host to *.servicebus.windows.net on port 443 to isolate DNS or firewall issues. (5) Check if TLS inspection (SSL inspection) on the corporate firewall is intercepting the SHIR's HTTPS connections and presenting a corporate certificate that the SHIR's .NET runtime doesn't trust—add the corporate CA to the Windows Certificate Store. (6) Restart the DIAHostService after any network or certificate changes.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-83",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the difference between user-assigned and system-assigned Managed Identity in ADF, and which is preferred for enterprise use?",
+    "answer": "System-assigned Managed Identity is automatically created when the ADF instance is provisioned and tied to the ADF resource lifecycle—it is deleted when ADF is deleted. User-assigned Managed Identity is created as an independent Azure resource and can be associated with multiple ADF instances or other Azure services. For enterprise use, user-assigned Managed Identity is preferred for several reasons: (1) It survives ADF deletion and recreation during disaster recovery or environment replication. (2) The same identity can be pre-granted permissions on target resources (Key Vault, ADLS, SQL) before ADF is deployed, enabling infrastructure-as-code consistency. (3) Multiple ADF instances (dev, QA, prod) can use different user-assigned identities with different permission scopes, enforcing least privilege per environment. (4) RBAC role assignments on storage accounts, Key Vaults, and SQL databases reference a stable object ID that doesn't change across ADF re-deployments. System-assigned identity is simpler for smaller setups but creates operational complexity during DR scenarios.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-85",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What is the maximum number of Managed Private Endpoints supported per Managed VNet IR, and what are the supported resource types?",
+    "answer": "ADF Managed VNet supports up to 1000 Managed Private Endpoints per factory. Supported target resource types include Azure Blob Storage, ADLS Gen2, Azure SQL Database, Azure Synapse Analytics (both SQL pool and Spark pool), Azure Key Vault, Azure Data Factory itself (for linked factories), Azure Cosmos DB, Azure Event Hubs, Azure Service Bus, Azure SQL Managed Instance, Azure Database for PostgreSQL, MySQL, and MariaDB, Azure Cognitive Services, and Azure Functions. Each resource type uses the appropriate privatelink sub-zone (e.g., privatelink.blob.core.windows.net for Blob, privatelink.database.windows.net for SQL). Resources not in the supported list cannot use Managed Private Endpoints and must be accessed via public endpoints or through a SHIR. Some resource types require the target to be in the same region as the ADF Managed VNet for private endpoint support.",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "adf-ir-87",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Describe the internal mechanics of how the Managed VNet IR provisions and manages Spark clusters for Data Flows, including startup latency implications.",
+    "answer": "When a Data Flow activity runs on a Managed VNet IR, ADF provisions an Apache Spark cluster (Azure Databricks or Azure-managed Spark) within the Managed VNet using private IPs. Unlike standard Azure IR where clusters are provisioned in a shared Microsoft pool, Managed VNet IR clusters are isolated per factory. Cluster provisioning involves allocating VMs in the managed VNet, attaching managed disks, configuring private DNS, and starting the Spark runtime—this typically takes 5–8 minutes for a cold start. To mitigate this, you can enable TTL (Time-to-Live) on the Managed VNet IR's Data Flow cluster setting (configurable from 0 to 60 minutes), which keeps the Spark cluster alive for reuse by subsequent Data Flow activities within the TTL window. Warm clusters reduce startup to seconds. However, a running warm cluster accrues compute cost even when idle, so TTL must be balanced against cost. With Managed VNet, ADF also creates Managed Private Endpoints for data sources accessed by the Data Flow, and Spark nodes communicate with those private endpoints internally.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-88",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain a race condition scenario that can occur during SHIR key rotation in a multi-node setup and how to mitigate it.",
+    "answer": "A race condition during SHIR key rotation occurs in the following scenario: You regenerate Key1 in the ADF portal to generate a new key. All existing SHIR nodes are still registered using the old Key1. Before you can update Node B with the new key, an auto-upgrade cycle kicks in on Node B and the upgrade process internally re-validates the authentication key as part of the upgrade handshake. Since the node still has the old Key1 (now invalid), the upgrade authentication fails, and Node B goes into a faulted state. Meanwhile, Node A is still running on Key2, which remains valid, so pipelines continue—but Node B is lost from the pool. Mitigation: (1) Schedule key rotation during a known low-traffic window. (2) Regenerate Key1, immediately update all nodes with new Key1 before doing anything else, then proceed to disable auto-upgrade temporarily during the rotation window. (3) Use the dual-key design correctly—always rotate one key at a time and complete all node registrations for that key before touching the second. (4) Monitor all nodes' 'Last Heartbeat' timestamps to confirm re-registration success before re-enabling auto-upgrade.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-89",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF handle the Kerberos authentication chain when a SHIR on a non-domain-joined Azure VM needs to access an on-premises Kerberos-secured Hadoop cluster?",
+    "answer": "Kerberos authentication from a non-domain-joined SHIR to an on-premises Hadoop cluster (HDFS or Hive with Kerberos) requires configuring MIT Kerberos on the Windows SHIR host as a Kerberos client. Steps: (1) Install MIT Kerberos for Windows (KfW) on the SHIR host. (2) Create a krb5.conf file pointing to the on-premises KDC (Key Distribution Center) with the correct realm, KDC hostname, and admin server. (3) In the HDFS or Hive linked service, set authentication type to 'Kerberos' and provide the Kerberos principal (e.g., hive/hiveserver2@CORP.COM) and keytab file path (a file accessible to the SHIR) or username/password for kinit-based authentication. (4) The SHIR process calls kinit to obtain a Kerberos TGT from the KDC before initiating the Hadoop connection. Network path from the SHIR host to the KDC on UDP/TCP port 88 must be open. The SHIR host's system time must be within 5 minutes of the KDC clock (Kerberos Clock Skew requirement)—use an NTP server aligned with the on-premises KDC's time source. Ticket renewal policies in the KDC must accommodate long-running copy activities.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-90",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Describe how to architect a hub-and-spoke SHIR topology for a global enterprise with data sources in multiple geographic regions and strict data sovereignty requirements.",
+    "answer": "In a hub-and-spoke SHIR architecture for global data sovereignty: Each geographic region (e.g., EU, APAC, US) has its own ADF factory acting as the 'hub' for that region, with a dedicated SHIR deployed within the regional network perimeter. Data sovereign requirements mandate that data from EU sources never traverses US or APAC infrastructure. Each regional SHIR connects to the regional ADF factory and is configured with only the regional Azure Service Bus relay endpoints (which are in the same Azure region). A global orchestration factory acts as the 'meta-factory' and invokes regional factories via ADF-to-ADF pipeline invocations (using the Execute Pipeline activity against linked ADF instances or via HTTP Web activity calling the ADF REST API). Regional factories contain all sensitive data movement and transformation logic; the global factory only orchestrates sequencing and aggregation. SHIR sharing is not used across regions to maintain data isolation. Azure Policy enforces that linked services in each regional factory can only reference data stores in the approved geographic zones (enforced via allowed-location policies). Audit logs from each regional ADF are streamed to a regional Log Analytics Workspace to comply with data residency laws like GDPR.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-91",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does SHIR handle the scenario where the corporate TLS inspection proxy intercepts and re-signs HTTPS traffic, and what specific failures manifest?",
+    "answer": "When a corporate SSL/TLS inspection proxy intercepts SHIR's outbound HTTPS connections, it terminates the TLS session and presents its own certificate (signed by an internal corporate CA) to the SHIR client. The SHIR's .NET runtime performs certificate chain validation and fails if the corporate CA root certificate is not in the Windows Trusted Root Certification Authorities store, manifesting as System.Net.WebException: 'The underlying connection was closed: Could not establish trust relationship for the SSL/TLS secure channel' in SHIR logs. Additionally, some TLS inspection appliances perform certificate pinning bypass detection or rewrite HTTP headers, which can cause the Azure Service Bus AMQP-over-WebSocket handshake to fail with protocol negotiation errors. Specific failure modes: (1) Service Bus relay connection failures causing 'Limited' node status. (2) Key Vault secret retrieval failures with SSL errors. (3) OAuth token acquisition failures against login.microsoftonline.com. Resolution: (1) Export the corporate CA root certificate and import it into the Windows Trusted Root store on the SHIR host using certutil -addstore Root <cert.cer>. (2) Add ADF and Service Bus FQDNs to the proxy's SSL inspection bypass list. (3) Verify with Test-NetConnection and openssl s_client to confirm the certificate presented matches the expected Azure certificate chain after fix.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-92",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF's Managed VNet IR handle the scenario where a Data Flow needs to join data from two sources each behind separate private endpoints, and what are the failure modes if DNS resolution conflicts?",
+    "answer": "When a Data Flow running on Managed VNet IR joins data from two sources—say ADLS Gen2 and Azure SQL Database—each with private endpoints, ADF creates separate Managed Private Endpoints for each resource in the Managed VNet. The Managed VNet's internal DNS resolver resolves each resource's FQDN to its respective private IP. A DNS conflict occurs if both resources share the same FQDN suffix and the private DNS zone resolution priority is ambiguous—though in practice ADLS Gen2 uses privatelink.dfs.core.windows.net and SQL uses privatelink.database.windows.net, so sub-zone conflicts are rare. A real failure mode occurs when the Managed Private Endpoint approval is pending for one source: the Data Flow Spark cluster can reach the approved source but gets a TCP connection refused from the unapproved one, causing the Spark job to fail with a data source unreachable exception that is often surfaced as a cryptic 'Job aborted' message in ADF Data Flow monitoring. To diagnose, check the Managed Private Endpoint status in the portal and cross-reference Spark driver logs in the Data Flow debug monitoring output. Another failure mode is when the target resource's private DNS zone conditional forwarder is misconfigured in the customer's VNet (irrelevant here since ADF manages DNS internally, but relevant if the customer's VNet is peered to the Managed VNet via a custom setup). Always approve all Managed Private Endpoints and validate status before executing Data Flows in production.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-93",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What internals of the SHIR DPAPI credential encryption model create security risks in a multi-node setup, and how should enterprises remediate them?",
+    "answer": "SHIR's DPAPI-based credential encryption binds encrypted credential blobs to the machine-specific DPAPI master key of the encrypting node. In a multi-node SHIR, if Node A encrypted the credentials, those encrypted blobs stored in ADF cannot be decrypted by Node B or Node C, creating a scenario where if Node A is permanently lost (hardware failure, decommission), the associated linked service credentials become unrecoverable—requiring re-entry of all credentials. Additionally, DPAPI keys are protected by the Windows service account's password and the machine key; if the SHIR host is cloned as a VM or the machine SID changes (e.g., via sysprep), DPAPI keys are invalidated, again making credentials unrecoverable. The security risk is also directional: an administrator with local admin rights on the SHIR host can call CryptUnprotectData to decrypt any SHIR credential since DPAPI does not require additional authorization beyond the current user context. Remediation: (1) Migrate all linked services to Azure Key Vault references—Key Vault secrets are decryptable by any SHIR node with Key Vault access, eliminating DPAPI dependency. (2) Use the 'Credential Store' mode in SHIR (ADF uses a shared encryption key distributed to all nodes in the IR group) as an interim measure. (3) Implement Privileged Access Workstation (PAW) controls to restrict who has local admin on SHIR hosts. (4) Periodically audit which linked services still use inline encrypted credentials via ARM template inspection.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-94",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Describe the complete data path and security layers when ADF copies data from an on-premises Oracle database to ADLS Gen2 using SHIR, including what encrypts data at each hop.",
+    "answer": "The complete data path: (1) ADF control plane (in Azure) sends a copy activity command to the SHIR node via Azure Service Bus relay over HTTPS TLS 1.2—this carries only metadata and instructions, not data. (2) The SHIR node, running on-premises, connects to Oracle DB using JDBC with Oracle JDBC driver. If TNS encryption is enabled on Oracle, the JDBC connection uses Oracle Native Network Encryption (NNE) or TCPS (TCP over SSL/TLS); if not, traffic is unencrypted on the LAN between SHIR and Oracle. This is the most vulnerable hop—organizations should enforce TCPS or at minimum ensure the SHIR host and Oracle server are on the same secure VLAN segment. (3) The SHIR reads data from Oracle into memory, applies any column mapping or type conversion transformations. (4) Data is then uploaded to ADLS Gen2 via HTTPS REST API calls (PUT or PATCH) using TLS 1.2. The SHIR authenticates to ADLS using the configured method (Managed Identity token, SAS, or storage key). The ADLS account key or SAS is retrieved from Azure Key Vault if configured, which itself is an HTTPS call. (5) Data at rest in ADLS Gen2 is encrypted using AES-256 with Microsoft-managed keys or customer-managed keys (CMK) in Key Vault. At no point does data traverse the public internet between Oracle and SHIR; only between SHIR and Azure does data traverse the internet (or ExpressRoute if configured). Enterprises using ExpressRoute with private peering to Azure Storage remove internet exposure entirely for step 4.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-95",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF handle DIU throttling and back-pressure from cloud data sources like Salesforce or Dynamics, and what internals govern the retry and rate-limit behavior?",
+    "answer": "Cloud SaaS sources like Salesforce enforce API rate limits: Salesforce allows a limited number of concurrent API requests (governed by the org's API request daily limit and query concurrency limit). When ADF copy activity with high DIU count hits Salesforce's concurrency limit, Salesforce returns HTTP 503 (Service Unavailable) or a QUERY_TIMEOUT error in the Salesforce Bulk API response. ADF's Salesforce connector implements exponential backoff retry internally—on receiving a 503, it waits an increasing interval (starting at a few seconds) and retries up to a configurable number of times (the 'requestTimeout' and retry settings in the copy activity). The DIU count directly controls how many parallel Salesforce Bulk API query jobs ADF creates; using a DIU of 32 might create 16 parallel Bulk API jobs, easily exceeding Salesforce's concurrent query limit. The mitigation is to cap DIU for Salesforce sources at 4–8 and use Salesforce Bulk API 2.0 (which has higher limits than Bulk API 1.0). Additionally, the 'additionalColumns' and 'queryTimeout' properties on the Salesforce source let you tune query behavior. For Dynamics, similar throttling is via HTTP 429 (Too Many Requests) with Retry-After headers; ADF's Dynamics connector respects Retry-After and pauses accordingly. Monitor the copy activity's 'dataRead' and elapsed time metrics in ADF monitoring to detect when rate limiting is causing throughput degradation.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-96",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain the security boundary model of Managed VNet IR: what is managed by Microsoft versus by the customer, and what attack surfaces remain customer-responsible?",
+    "answer": "In the Managed VNet IR model, Microsoft manages: the VNet itself (IP space, routing, DNS forwarders), the compute nodes running the IR (patching, scaling, isolation), the network security between IR nodes and Azure backbone, and the private DNS zones for Managed Private Endpoints. Microsoft guarantees network isolation between different customers' managed VNets. Customer-managed attack surfaces: (1) Managed Private Endpoint approval—customers decide which resources get approved endpoints; an incorrectly approved endpoint could expose data stores to ADF pipelines that shouldn't have access. (2) ADF pipeline access control—who can create/modify linked services, datasets, and pipelines that use the Managed VNet IR; compromised ADF developer credentials could be used to create rogue pipelines exfiltrating data through approved private endpoints. (3) Target resource permissions—RBAC roles granted to the ADF Managed Identity on ADLS, SQL, Key Vault are customer-managed; over-privileged Managed Identity assignments are a key risk. (4) ADF's own network access—the ADF portal and REST API have no mandatory private endpoint requirement unless you enable ADF's own Private Endpoint for the control plane. (5) Log data—pipeline run logs, activity output (which may contain sampled data), and Data Flow debug logs can contain sensitive data and their access is controlled by customer-managed Log Analytics workspace RBAC.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-97",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you implement SHIR in a high-availability configuration across two separate on-premises data centers with active-active load distribution, ensuring no data center becomes a single point of failure?",
+    "answer": "Active-active SHIR HA across two data centers: Register two SHIR nodes (Node DC1 and Node DC2) to the same SHIR instance—one node physically located in each data center. Both nodes maintain independent outbound relay connections to Azure Service Bus, so if DC1's WAN link fails, Node DC2 continues servicing pipelines without intervention. ADF's load balancer distributes new activity requests to whichever node has available concurrent job slots, achieving active-active behavior. Critical considerations: (1) Data source access symmetry—both SHIR nodes must have network access to the same on-premises data sources; if sources are in DC1 only, Node DC2 will fail to read them even if the SHIR routing sends requests there. Configure source-level network routes (VPN or MPLS) to ensure both nodes can reach all sources. (2) Credential symmetry—all linked service credentials must be in Azure Key Vault (not DPAPI-encrypted) so both nodes can decrypt them. (3) Custom driver installations (ODBC drivers, Oracle Instant Client, etc.) must be identical on both nodes; maintain them via configuration management (Ansible, Chef). (4) Node-specific concurrent job limits should be consistent; if DC1 machine has 16 cores and DC2 has 8 cores, set consistent limits in Configuration Manager to avoid imbalanced routing. (5) Test failover explicitly by simulating DC1 network loss and verifying pipelines continue on Node DC2 within the retry window.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-98",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does the ADF Managed Identity token acquisition process work internally, and what failure modes occur when Azure AD token issuance is degraded?",
+    "answer": "When an ADF pipeline activity (running on Azure IR or Managed VNet IR) needs to authenticate to a resource using Managed Identity, the ADF service calls the Azure Instance Metadata Service (IMDS) endpoint at 169.254.169.254 from within the Azure compute running the IR to obtain an OAuth 2.0 access token for the Managed Identity's client ID. The IMDS returns a short-lived token (typically 1 hour expiry) signed by Azure AD. ADF caches this token and uses it in the Authorization Bearer header for subsequent API calls to the target resource (ADLS, Key Vault, SQL, etc.). Token acquisition failure modes: (1) Azure AD regional outage—if the Azure AD token endpoint is degraded, IMDS calls fail with HTTP 503 or timeout; ADF retries with exponential backoff but if the outage exceeds the activity timeout, pipelines fail. (2) Managed Identity not assigned—if the ADF Managed Identity was accidentally removed from the target resource's RBAC, token acquisition succeeds but API calls return HTTP 403, manifesting as 'AuthorizationPermissionMismatch' errors. (3) Token cache invalidation after Managed Identity credential rotation (rare for system-assigned, but relevant for user-assigned identity secret rotation)—ADF must re-acquire a new token, which is handled automatically. (4) Clock skew between ADF's compute and Azure AD can cause 'nbf' (not before) claim validation failures if the token is used too early—Azure AD allows a 5-minute skew tolerance. For SHIR-based Managed Identity (Azure VM with Managed Identity), the token is acquired from IMDS on the VM and is subject to the same failure modes.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-99",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Describe a production incident where misconfigured NSG rules for VNet-injected Azure-SSIS IR cause a specific class of intermittent failures, and how would you diagnose and resolve it.",
+    "answer": "Incident scenario: Azure-SSIS IR is VNet-injected into a subnet with an NSG. Packages run successfully in the morning but fail intermittently in the afternoon with 'System.Net.Sockets.SocketException: A connection attempt failed because the connected party did not properly respond after a period of time' when accessing SSISDB on Azure SQL Managed Instance. Root cause: The NSG outbound rule allows TCP to SQL MI's primary listener port 1433 but does not allow TCP 11000-11999, which is required for SQL MI's redirect connection mode (the default after first connection establishment). The first connection (TCP 1433) succeeds to get the redirect URL, but the actual data connection on a port in the 11000-11999 range is blocked by NSG. This is intermittent because some sessions reuse cached connections that were established before the NSG was modified, while new sessions fail. Diagnosis: (1) Enable NSG flow logs on the subnet and route to Log Analytics. (2) Query flow logs with KQL: AzureNetworkAnalytics_CL | where DestPort_d between (11000 .. 11999) | where FlowStatus_s == 'D' to identify dropped packets. (3) Correlate timestamps of NSG drops with SSIS package failure timestamps. (4) Confirm with SQL MI's connection policy setting (az sql mi show --query 'connectionType')—if it's 'Redirect', ports 11000-11999 are needed; change to 'Proxy' (port 1433 only) as a quick mitigation, or add NSG outbound rule allowing TCP 11000-11999 to the SQL MI subnet CIDR. Resolution: Add NSG outbound rule: priority 200, destination SQL MI subnet, destination ports 11000-11999, protocol TCP, action Allow.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-101",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What internal mechanism does ADF use to determine DIU count when 'Auto' is selected, and under what conditions can Auto result in under-provisioning causing throttled throughput?",
+    "answer": "When DIU is set to Auto, ADF uses a heuristic estimation engine that considers: source connector type, estimated data size (from metadata if available, or a fixed default for connectors where size cannot be pre-scanned), historical performance data from previous runs of the same pipeline (if available), and the sink type's write throughput characteristics. The engine starts at a baseline of 4 DIUs and may scale to 8, 16, or 32 based on file count and estimated volume. Under-provisioning occurs in these scenarios: (1) Binary file copy of many small files—ADF estimates size per file but the overhead of many small file opens limits effective parallelism even with high DIU; the auto-selector may stop at 8 DIUs when 32 would provide better concurrency. (2) First-ever run of a pipeline with no historical baseline—ADF has no performance data so starts conservatively. (3) Connector types that don't expose row count or byte size metadata (e.g., REST API connector, generic HTTP connector)—ADF cannot estimate volume and defaults to low DIU. (4) Sink write rate limits (e.g., Azure SQL DTU limits, Cosmos DB RU limits) that cap effective throughput regardless of DIU—Auto may over-provision DIUs that cause sink throttling and HTTP 429 responses, degrading rather than improving performance. Monitoring 'usedDataIntegrationUnits' in the activity output and comparing to actual throughput MB/s reveals whether DIU was the bottleneck or sink/source was the constraint.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-102",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain how ADF handles cross-tenant Service Principal authentication in linked services and what specific Azure AD configurations are required.",
+    "answer": "Cross-tenant Service Principal authentication in ADF is used when the target data store (e.g., an ADLS Gen2 account in Tenant B) is in a different Azure AD tenant from the ADF instance (Tenant A). In the linked service, you configure authentication type as 'Service Principal' and provide: the Service Principal Application ID registered in Tenant B (not Tenant A), the Tenant ID of Tenant B, and the Service Principal secret or certificate. The SP must be registered in Tenant B and granted appropriate RBAC roles on the target resource in Tenant B. Azure AD must be configured to allow multi-tenant app registrations or a specific invitation. The ADF linked service uses the MSAL (Microsoft Authentication Library) flow to acquire a token from Tenant B's Azure AD token endpoint (https://login.microsoftonline.com/<TenantB-ID>/oauth2/v2.0/token) using the SP credentials. Managed Identity cannot be used for cross-tenant authentication because the ADF Managed Identity is registered only in Tenant A's Azure AD. Conditional Access policies in Tenant B may block Service Principal token issuance if the SP doesn't satisfy policy requirements (e.g., IP-based CA policies)—this manifests as AADSTS error codes (AADSTS53003, AADSTS70011) in the ADF activity error details. Cross-tenant SP authentication is common in ISV scenarios and financial services conglomerates with multiple Azure AD tenants for different subsidiaries.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-103",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does the ADF Managed VNet IR interact with an Azure Firewall or NVA when you want to inspect all egress traffic from the Managed VNet, and what are the limitations?",
+    "answer": "By default, the ADF Managed VNet is fully managed by Microsoft with no customer UDR or NVA insertion capability—customers cannot route Managed VNet traffic through their own Azure Firewall or Network Virtual Appliance (NVA). This is a fundamental architectural limitation: the Managed VNet is opaque to customers, and Microsoft does not support inserting customer-managed network inspection appliances into the Managed VNet egress path. The security model relies on Managed Private Endpoints as the exclusive egress mechanism (no internet egress from the Managed VNet data path). As a result, enterprises that require all cloud egress to pass through their Azure Firewall for deep packet inspection, IDPS (Intrusion Detection and Prevention), or URL filtering cannot achieve this with Managed VNet IR—it's an all-or-nothing trust model where you trust Microsoft's isolation. Alternative for enterprises requiring egress inspection: use standard Azure IR (not Managed VNet) deployed in a VNet-injected mode (not currently supported for Azure IR, only for Azure-SSIS IR), or use SHIR deployed in an Azure VNet that is peered to a hub VNet containing the Azure Firewall, allowing UDR-based traffic inspection. This is a known gap in ADF Managed VNet's feature set and is a frequent discussion point in regulated industries (banking, insurance) where egress inspection is a compliance requirement.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-104",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Describe the failure cascade that occurs when an Azure Key Vault referenced by multiple ADF linked services becomes unavailable during a pipeline burst execution, and how to design for resilience.",
+    "answer": "Failure cascade scenario: 50 pipelines are triggered simultaneously in ADF. All linked services reference secrets in a single Azure Key Vault. ADF's runtime retrieves Key Vault secrets at activity start time (not at pipeline compile time). When Key Vault becomes unavailable (e.g., due to firewall rule change blocking the ADF Managed Identity, or a transient Key Vault service outage), all 50 concurrent copy activities fail simultaneously at the secret retrieval step with error code 'KeyVaultOperationFailed' or HTTP 403/503. The retry policy on each copy activity retries, creating 50× retry bursts against Key Vault at the same time—a thundering herd pattern—potentially worsening Key Vault throttling (Key Vault standard tier limits: 2000 GET operations per 10 seconds per vault per region). The cascading effect: retries hit Key Vault throttling (HTTP 429 with Retry-After), extending the outage duration even after Key Vault recovers. Resilience design: (1) Use ADF's Key Vault integration which caches secrets for the duration of an activity run—verify ADF caches within a run vs. per-activity. (2) Distribute secrets across multiple Key Vault instances (by region or by linked service group) to reduce blast radius. (3) Enable Key Vault soft-delete and purge protection to prevent accidental deletion. (4) Configure Key Vault with private endpoints and redundant DNS resolution via Azure Private DNS Resolver with multiple resolvers. (5) Implement pipeline-level retry with jitter (exponential backoff) rather than immediate retry to prevent thundering herd. (6) Use Azure Key Vault's Premium tier for higher transaction limits in burst scenarios. (7) Monitor Key Vault availability and set Azure Monitor alerts on 'ServiceApiLatency' and 'Availability' metrics to detect issues before they cascade.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-105",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How do you implement customer-managed key (CMK) encryption for ADF and what are the operational implications for SHIR credential management?",
+    "answer": "ADF supports customer-managed key (CMK) encryption for encrypting data factory artifacts (pipeline definitions, linked service credentials, dataset definitions) at rest, using a key stored in Azure Key Vault. To configure: (1) Create a Key Vault with purge protection enabled (mandatory for CMK). (2) Grant the ADF Managed Identity 'Key Vault Crypto Service Encryption User' role or Key Wrap/Unwrap permissions on the key. (3) In the ADF instance settings (via ARM template or Azure portal > ADF > Encryption), specify the Key Vault key URI (including key version for version-pinned CMK, or without version for auto-rotation). ADF then encrypts all artifact metadata using AES-256 with the CMK-wrapped data encryption key (envelope encryption pattern). Operational implications for SHIR: SHIR credentials stored as secureString in linked service JSON are part of the artifact payload, so they are encrypted by CMK at rest in ADF's storage. If the CMK key is disabled or the Key Vault is inaccessible, ADF cannot decrypt its own artifact definitions, causing all pipeline operations to fail—not just secret retrieval but even pipeline listing and editing. Key rotation: when you rotate the CMK, ADF re-encrypts all artifacts with the new key version, which is a background operation that can take time for large factories. During rotation, pipeline execution may be briefly unavailable. DR implication: if Key Vault with CMK is deleted without recovery, all encrypted ADF artifacts are permanently unrecoverable—maintain Key Vault geo-redundant backups and configure Key Vault's backup policy.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-106",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "Explain the internals of SHIR's parallel copy mechanism at the thread level and how it interacts with source database connection pooling.",
+    "answer": "When a copy activity with parallelCopies=N runs on SHIR, the SHIR spawns N reader threads and N writer threads (or a configurable ratio). Each reader thread opens an independent JDBC/ODBC connection to the source database and executes a partitioned sub-query (e.g., WHERE id BETWEEN 1 AND 1000000 for partition 1, WHERE id BETWEEN 1000001 AND 2000000 for partition 2, etc.). This means N concurrent connections are opened to the source database. For SQL Server, each JDBC connection is a separate session visible in sys.dm_exec_sessions. The SHIR does not use a connection pool per se for copy activities—each parallel copy thread opens and closes its own connection. This has implications: if the source database has a max connections limit (e.g., SQL Server Express with 32768 max connections but licensing limits on SQL Standard), N=16 parallel copy threads across multiple concurrent jobs can exhaust connection limits. Additionally, each parallel query performs a full index/table scan on its partition range, causing N simultaneous full table scans which can spike source DB CPU and I/O. To mitigate: set parallelCopies to a value that the source DB can handle (test with source DB DMVs: SELECT count(*) FROM sys.dm_exec_sessions WHERE login_name = 'adf_user'), use physical partitioning on the source table (partition option: PhysicalPartitions in the SQL source) to leverage existing table partitions rather than range-based partitioning which can cause hot spots, and monitor source DB wait stats (SELECT * FROM sys.dm_exec_query_stats) during copy runs.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-107",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF integration with Azure Private Link for the control plane (ADF portal and APIs) work, and what are the DNS configuration requirements for it to function correctly?",
+    "answer": "ADF supports Private Link for its own control plane, allowing access to the ADF Studio portal and REST API exclusively through a private endpoint rather than over the internet. This is distinct from Managed Private Endpoints (which are for data plane connectivity). To configure: create a Private Endpoint for the ADF instance in your VNet, selecting 'Azure Data Factory' as the target resource type and 'dataFactory' as the sub-resource. Azure provisions a private NIC in your subnet. DNS configuration: the ADF Studio's FQDN (adf.azure.com and <factory-name>.adf.azure.com) must resolve to the private IP of the private endpoint from within the VNet. Create an Azure Private DNS Zone privatelink.adf.azure.com and link it to the VNet; Azure creates the A record automatically. For users accessing ADF Studio from on-premises, DNS conditional forwarders must redirect privatelink.adf.azure.com queries to Azure DNS (168.63.129.16) via the on-premises DNS servers or Azure DNS Resolver inbound endpoints. If DNS is misconfigured, ADF Studio resolves to the public IP and Private Link is bypassed—validate with nslookup <factory>.adf.azure.com from within the VNet confirming it returns the private IP. When ADF Private Link is enabled, you must also configure Private Link for any downstream services (Key Vault, ADLS) if those were previously accessed via public endpoints, since ADF Studio's backend now operates within the VNet context. The ADF Private Link control plane endpoint and Managed VNet data plane are separate and independently configurable.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-109",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "What are the specific limitations of using User-Assigned Managed Identity (UAMI) with SHIR-based linked services, and how do you work around them?",
+    "answer": "User-Assigned Managed Identity (UAMI) with SHIR-based linked services has specific constraints: (1) SHIR runs on a Windows machine (on-premises or Azure VM). If the SHIR host is an Azure VM, it can have a UAMI assigned to it, and SHIR can use that VM's UAMI to authenticate to Azure resources. However, if the SHIR host is an on-premises server, there is no Azure VM context to attach a UAMI to—IMDS is not available on-premises machines. In this case, UAMI cannot be used; you must use Service Principal authentication or a system-assigned Managed Identity on an Azure Arc-enabled server. (2) Not all SHIR-based connectors support Managed Identity authentication; for example, on-premises SQL Server via SHIR supports Windows Auth and SQL Auth but not Managed Identity (since MI is an Azure AD concept and the SQL Server must support Azure AD auth). (3) When SHIR accesses Azure Key Vault for secret retrieval, the SHIR host Azure VM's UAMI must have Key Vault secrets access, but this is only possible if SHIR runs on an Azure VM (not on-premises). Workaround for on-premises SHIR: (a) Register the on-premises server with Azure Arc, which provisions a Managed Identity for the on-premises machine via the Azure Arc connected machine agent, making IMDS-like token acquisition available. (b) Use Azure Arc Managed Identity to authenticate to Key Vault and storage, replacing the need for UAMI or Service Principal in on-premises SHIR scenarios. This is an emerging pattern for zero-secret on-premises hybrid connectivity.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-110",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF IR selection interact with pipeline-level concurrency limits, and what deadlock scenario can arise when using nested pipelines with SHIR?",
+    "answer": "Pipeline-level concurrency in ADF limits how many simultaneous runs of the same pipeline are allowed (configured under pipeline Settings > Concurrency, max 50). A deadlock scenario with nested pipelines and SHIR: Parent Pipeline (concurrency=10) invokes Child Pipeline via Execute Pipeline activity (Wait on completion=True). Child Pipeline uses a ForEach with batchCount=5, triggering 5 parallel copy activities on SHIR. SHIR has concurrent jobs limit=10. If 10 parent pipeline runs execute simultaneously (hitting the concurrency limit), each spawns 5 SHIR copy jobs = 50 total SHIR jobs requested. But SHIR max concurrent jobs is 10, so 40 jobs queue. The queued jobs hold their pipeline run slots (counted against concurrency). Now consider: the child pipelines are waiting for SHIR jobs to complete, but SHIR has filled its 10 slots with the first batch and cannot accept new jobs. The parent pipelines are blocked waiting for child completions, and child pipelines are blocked waiting for SHIR slots. No new SHIR slots free up because the running SHIR jobs are for other parent pipeline instances. This is not a true deadlock (existing SHIR jobs will eventually complete), but it creates severe head-of-line blocking and starvation for lower-priority pipeline runs. Mitigation: (1) Size SHIR concurrent jobs to handle peak parallelism: (parent_concurrency × child_ForEach_batchCount) ≤ SHIR_concurrent_jobs × SHIR_node_count. (2) Add SHIR nodes to increase capacity. (3) Use pipeline trigger scheduling to stagger parent pipeline invocations rather than bursting simultaneously. (4) Set child pipeline concurrency independently to throttle child execution rate.",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "adf-ir-112",
+    "category": "ADF",
+    "niche": "Integration Runtimes & Hybrid Network Security Architecture",
+    "question": "How does ADF handle the scenario where a linked service must connect to different endpoints based on runtime parameters (e.g., multi-tenant SaaS connecting to different customer DB instances), and what are the security isolation implications?",
+    "answer": "ADF supports fully parameterized linked services where the server name, database name, and credentials are all pipeline parameters resolved at runtime. You define a generic linked service (e.g., SQL Server) with all connection string components as parameters: serverName, databaseName, userName, password (as Key Vault reference parameter). At pipeline runtime, the ForEach activity iterates over a configuration table (stored in a control database) with rows per customer (customerId, serverName, dbName, kvSecretName), and each iteration constructs the linked service override using dynamic content: @{serverName: item().serverName, databaseName: item().dbName}. This enables a single pipeline to connect to N different customer databases without N linked services. Security isolation implications: (1) All customer DBs are accessed under a single ADF Managed Identity or Service Principal—there is no per-customer credential isolation unless each customer's linked service parameters point to a different service principal or Key Vault secret. Compromise of the ADF identity gives access to all customer databases. (2) Key Vault secrets per customer (kvSecretName) provide credential isolation if each customer has a unique DB password, but all secrets are in the same ADF-accessible Key Vault—KV RBAC cannot restrict the ADF identity to only one customer's secrets (it's vault-level access). For true security isolation, use separate Key Vaults per customer group and parameterize the Key Vault URI as well. (3) Pipeline run logs in ADF monitoring may log connection string components (server names, database names) in activity input details—ensure ADF monitoring access is restricted to authorized operators only.",
+    "difficulty": "HARD"
+  }
+]
