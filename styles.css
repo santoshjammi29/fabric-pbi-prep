@@ -688,6 +688,7 @@ body {
 }
 
 .status-indicator {
+  display: none !important;
   font-size: 0.75rem;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
