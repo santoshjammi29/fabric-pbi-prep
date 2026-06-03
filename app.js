@@ -2531,33 +2531,77 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatArchitectAnswer(text) {
     if (!text) return '';
     
-    // Split into paragraphs by double newlines
-    const paragraphs = text.split('\n\n');
-    return paragraphs.map(p => {
-      // Check if it starts with list items
-      if (p.match(/^\d+\.\s/)) {
-        // Render numbered list
-        const items = p.split(/\n(?=\d+\.\s)/);
-        const listHTML = items.map(item => {
-          const content = item.replace(/^\d+\.\s/, '');
-          return `<li style="margin-bottom: 0.75rem; padding-left: 0.25rem;">${content}</li>`;
-        }).join('');
-        return `<ol style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">${listHTML}</ol>`;
+    let html = text.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+    
+    // Escape HTML characters to prevent issues
+    html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    // Convert backticks to code block styling
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Convert bold markdown to strong tags
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight:600;">$1</strong>');
+    
+    let lines = html.split('\n');
+    let output = '';
+    let listType = null;
+    let inParagraph = false;
+
+    lines.forEach(line => {
+      line = line.trim();
+      if (!line) {
+         if (inParagraph) {
+            output += '</p>';
+            inParagraph = false;
+         }
+         return;
       }
       
-      // Or if it starts with bullet lists
-      if (p.startsWith('- ')) {
-        const items = p.split('\n- ');
-        const listHTML = items.map(item => {
-          const content = item.replace(/^- /, '');
-          return `<li style="margin-bottom: 0.5rem; padding-left: 0.25rem;">${content}</li>`;
-        }).join('');
-        return `<ul style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: disc; padding-left: 0;">${listHTML}</ul>`;
-      }
+      let olMatch = line.match(/^(\d+)[\)\.]\s/);
       
-      // Standard paragraph
-      return `<p style="margin: 0 0 1rem 0;">${p.replace(/\n/g, '<br>')}</p>`;
-    }).join('');
+      if (olMatch) {
+        if (inParagraph) { output += '</p>'; inParagraph = false; }
+        
+        let num = parseInt(olMatch[1]);
+        if (listType === 'ol' && num === 1) {
+          output += '</ol><ol style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">';
+        } else if (listType !== 'ol') {
+          if (listType === 'ul') output += '</ul>';
+          output += `<ol start="${num}" style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">`;
+          listType = 'ol';
+        }
+        let cleanIt = line.replace(/^\d+[\)\.]\s+/, '');
+        output += `<li style="margin-bottom: 0.75rem; padding-left: 0.25rem;">${cleanIt}</li>`;
+      } else if (/^[\-\*]\s/.test(line)) {
+        if (inParagraph) { output += '</p>'; inParagraph = false; }
+        
+        if (listType !== 'ul') {
+          if (listType === 'ol') output += '</ol>';
+          output += '<ul style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: disc; padding-left: 0;">';
+          listType = 'ul';
+        }
+        let cleanIt = line.replace(/^[\-\*]\s+/, '');
+        output += `<li style="margin-bottom: 0.5rem; padding-left: 0.25rem;">${cleanIt}</li>`;
+      } else {
+        if (listType) {
+          output += `</${listType}>`;
+          listType = null;
+        }
+        
+        if (!inParagraph) {
+          output += '<p style="margin: 0 0 1rem 0;">';
+          inParagraph = true;
+          output += line;
+        } else {
+          output += '<br>' + line;
+        }
+      }
+    });
+    
+    if (inParagraph) output += '</p>';
+    if (listType) output += `</${listType}>`;
+    
+    return output;
   }
 
   function escapeHTML(str) {
