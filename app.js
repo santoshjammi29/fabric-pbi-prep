@@ -445,6 +445,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function switchSparkHubSubTab(subTabId) {
+    state.activeSparkHubSubTab = subTabId;
+    localStorage.setItem('interview_prep_active_spark_subtab', subTabId);
+
+    // Toggle active state of sub-tab chips
+    const subnavChips = document.querySelectorAll('#spark-hub-subnav .topic-chip');
+    subnavChips.forEach(chip => {
+      if (chip.getAttribute('data-subtab') === subTabId) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    // Toggle visibility of subview containers
+    const subviews = document.querySelectorAll('.spark-hub-subview');
+    subviews.forEach(subview => {
+      if (subview.id === subTabId) {
+        subview.classList.remove('hidden');
+        subview.removeAttribute('hidden');
+      } else {
+        subview.classList.add('hidden');
+        subview.setAttribute('hidden', 'true');
+      }
+    });
+  }
+
   function switchView(targetViewId) {
     let actualTargetViewId = targetViewId;
     let targetSubTabId = null;
@@ -453,6 +480,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mergedViews.includes(targetViewId)) {
       targetSubTabId = targetViewId;
       actualTargetViewId = 'view-prep-hub';
+    }
+
+    const sparkMergedViews = ['view-spark', 'view-pyspark'];
+    if (sparkMergedViews.includes(targetViewId) || targetViewId === 'view-spark-hub') {
+      targetSubTabId = targetViewId === 'view-spark-hub' ? null : targetViewId;
+      actualTargetViewId = 'view-spark-hub';
     }
 
     state.currentView = actualTargetViewId;
@@ -537,6 +570,11 @@ document.addEventListener('DOMContentLoaded', () => {
         targetSubTabId = localStorage.getItem('interview_prep_active_subtab') || 'view-personalised';
       }
       switchPrepHubSubTab(targetSubTabId);
+    } else if (actualTargetViewId === 'view-spark-hub') {
+      if (!targetSubTabId || targetSubTabId === 'view-spark-hub') {
+        targetSubTabId = localStorage.getItem('interview_prep_active_spark_subtab') || 'view-spark';
+      }
+      switchSparkHubSubTab(targetSubTabId);
     }
     
     // Scroll back to top on view switch
@@ -1152,6 +1190,17 @@ document.addEventListener('DOMContentLoaded', () => {
         chip.addEventListener('click', () => {
           const subTab = chip.getAttribute('data-subtab');
           if (subTab) switchPrepHubSubTab(subTab);
+        });
+      });
+    }
+
+    // Spark Hub Subnav Tabs Switch
+    const sparkHubSubnav = document.getElementById('spark-hub-subnav');
+    if (sparkHubSubnav) {
+      sparkHubSubnav.querySelectorAll('.topic-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const subTab = chip.getAttribute('data-subtab');
+          if (subTab) switchSparkHubSubTab(subTab);
         });
       });
     }
