@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prep Hub & Unified Search State
     activePrepHubSubTab: 'view-personalised',
     unifiedSearchPage: 1,
+    activeUnifiedDb: 'ALL',
+    activeUnifiedCategory: 'ALL',
     
     // Active practice session state
     practice: {
@@ -188,8 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
     prephub: {
       subnav: document.getElementById('prep-hub-subnav'),
       unifiedSearchInput: document.getElementById('unified-search-input'),
-      unifiedFilterDb: document.getElementById('unified-filter-db'),
-      unifiedFilterCategory: document.getElementById('unified-filter-category'),
+      unifiedDbScrollbar: document.getElementById('unified-db-scrollbar'),
+      unifiedCategoryScrollbar: document.getElementById('unified-category-scrollbar'),
       unifiedSearchContainer: document.getElementById('unified-search-container'),
       unifiedMatchCount: document.getElementById('unified-match-count'),
       btnUnifiedLoadMore: document.getElementById('btn-unified-load-more'),
@@ -1211,16 +1213,28 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUnifiedSearch(true);
       });
     }
-    if (DOM.prephub && DOM.prephub.unifiedFilterDb) {
-      DOM.prephub.unifiedFilterDb.addEventListener('change', () => {
-        state.unifiedSearchPage = 1;
-        renderUnifiedSearch(true);
+    if (DOM.prephub && DOM.prephub.unifiedDbScrollbar) {
+      const chips = DOM.prephub.unifiedDbScrollbar.querySelectorAll('.topic-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.activeUnifiedDb = chip.getAttribute('data-db') || 'ALL';
+          state.unifiedSearchPage = 1;
+          renderUnifiedSearch(true);
+        });
       });
     }
-    if (DOM.prephub && DOM.prephub.unifiedFilterCategory) {
-      DOM.prephub.unifiedFilterCategory.addEventListener('change', () => {
-        state.unifiedSearchPage = 1;
-        renderUnifiedSearch(true);
+    if (DOM.prephub && DOM.prephub.unifiedCategoryScrollbar) {
+      const chips = DOM.prephub.unifiedCategoryScrollbar.querySelectorAll('.topic-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.activeUnifiedCategory = chip.getAttribute('data-category') || 'ALL';
+          state.unifiedSearchPage = 1;
+          renderUnifiedSearch(true);
+        });
       });
     }
     if (DOM.prephub && DOM.prephub.btnUnifiedLoadMore) {
@@ -2684,8 +2698,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const query = (DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
-    const dbFilter = DOM.prephub.unifiedFilterDb ? DOM.prephub.unifiedFilterDb.value : 'ALL';
-    const catFilter = DOM.prephub.unifiedFilterCategory ? DOM.prephub.unifiedFilterCategory.value : 'ALL';
+    const dbFilter = state.activeUnifiedDb || 'ALL';
+    const catFilter = state.activeUnifiedCategory || 'ALL';
 
     const pool = [];
 
@@ -2854,21 +2868,20 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.placeholder = `Search across all ${totalAll.toLocaleString()} questions (Fabric, PBI, ADF, SQL, Personalised)...`;
     }
 
-    const filterDb = document.getElementById('unified-filter-db');
-    if (filterDb) {
-      const options = filterDb.options;
-      for (let i = 0; i < options.length; i++) {
-        const opt = options[i];
-        if (opt.value === 'ALL') {
-          opt.textContent = `All Databases (${totalAll.toLocaleString()})`;
-        } else if (opt.value === 'personalised') {
-          opt.textContent = `Personalised Prep (${totalPersonalised.toLocaleString()})`;
-        } else if (opt.value === 'general') {
-          opt.textContent = `General DE Prep (${totalGeneral.toLocaleString()})`;
-        } else if (opt.value === 'fabric_pbi') {
-          opt.textContent = `Fabric & PBI Prep (${totalFabricPbi.toLocaleString()})`;
+    if (DOM.prephub && DOM.prephub.unifiedDbScrollbar) {
+      const chips = DOM.prephub.unifiedDbScrollbar.querySelectorAll('.topic-chip');
+      chips.forEach(chip => {
+        const db = chip.getAttribute('data-db');
+        if (db === 'ALL') {
+          chip.textContent = `All Databases (${totalAll.toLocaleString()})`;
+        } else if (db === 'personalised') {
+          chip.textContent = `Personalised Prep (${totalPersonalised.toLocaleString()})`;
+        } else if (db === 'general') {
+          chip.textContent = `General DE Prep (${totalGeneral.toLocaleString()})`;
+        } else if (db === 'fabric_pbi') {
+          chip.textContent = `Fabric & PBI Prep (${totalFabricPbi.toLocaleString()})`;
         }
-      }
+      });
     }
   }
 
