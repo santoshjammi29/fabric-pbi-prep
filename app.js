@@ -810,8 +810,6 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.minHeight = '140px';
       
       const badgeClass = badgeClasses[n.category] || 'badge-fabric';
-      const percentMastered = Math.round((n.mastered / n.total) * 100);
-      
       const diffsHtml = Array.from(n.difficulties).map(d => `<span class="difficulty-badge badge-${d.toLowerCase()}">${d}</span>`).join(' ');
       card.innerHTML = `
         <div>
@@ -819,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <h4 style="font-size: 1rem; font-weight: 500; line-height:1.4; word-break:break-word;">${n.nicheName} <div style="margin-top:0.35rem;">${diffsHtml}</div></h4>
         </div>
         <div class="concept-card-footer" style="margin-top:1rem; border-top:1px solid var(--card-border); padding-top:0.5rem;">
-          <span style="font-size: 0.8rem; font-weight: 500; color:var(--text-secondary);">${n.mastered} / ${n.total} Mastered (${percentMastered}%)</span>
+          <span style="font-size: 0.8rem; font-weight: 500; color:var(--text-secondary);">${n.mastered} / ${n.total} Mastered</span>
           <button class="status-btn status-btn-mastered active" style="padding:0.35rem 0.65rem; font-size:0.75rem;">Practice</button>
         </div>
       `;
