@@ -21,12 +21,15 @@ if (!Array.isArray(db)) {
   process.exit(1);
 }
 console.log(`✅ Loaded questions database. Total questions: ${db.length}`);
-if (db.length !== 1200) {
-  console.warn(`⚠️ Warning: Expected 1200 questions, but found ${db.length}.`);
+if (db.length !== 1590) {
+  console.warn(`⚠️ Warning: Expected 1590 questions, but found ${db.length}.`);
 }
 
-// Test 2: Check Category Counts (Expected 200 per category)
-const categories = ['FABRIC', 'POWER BI', 'ADF', 'SQL SERVER', 'DATALAKE ARCHITECTURE', 'SPARK & DATABRICKS'];
+// Test 2: Check Category Counts (Expected 200 per category for core, 30 for new ones)
+const categories = [
+  'FABRIC', 'POWER BI', 'ADF', 'SQL SERVER', 'DATALAKE ARCHITECTURE', 'SPARK & DATABRICKS',
+  'RAG', 'DAG', 'AIRFLOW', 'KAFKA', 'SPARK_PYSPARK', 'FLINK', 'DBT', 'VECTOR_DB', 'LLM_FRAMEWORKS', 'LAKEHOUSE', 'CLOUD_DATA', 'CDC', 'INGESTION'
+];
 const counts = {};
 categories.forEach(c => counts[c] = 0);
 
@@ -78,8 +81,9 @@ console.log("Category Distribution:");
 let countFail = false;
 categories.forEach(c => {
   console.log(`  - ${c}: ${counts[c]} questions`);
-  if (counts[c] !== 200) {
-    console.warn(`  ⚠️ Warning: Category ${c} has ${counts[c]} questions instead of 200.`);
+  const expected = ['FABRIC', 'POWER BI', 'ADF', 'SQL SERVER', 'DATALAKE ARCHITECTURE', 'SPARK & DATABRICKS'].includes(c) ? 200 : 30;
+  if (counts[c] !== expected) {
+    console.warn(`  ⚠️ Warning: Category ${c} has ${counts[c]} questions instead of ${expected}.`);
     countFail = true;
   }
 });

@@ -215,7 +215,20 @@ document.addEventListener('DOMContentLoaded', () => {
     'Data Engineering (General)': 'Data Engineering',
     'Excel & Analytics': 'Excel & Analytics',
     'Data Visualization': 'Data Visualization',
-    'Governance & Quality': 'Governance & Quality'
+    'Governance & Quality': 'Governance & Quality',
+    'RAG': 'RAG (Retrieval-Augmented)',
+    'DAG': 'DAG (Directed Acyclic Graph)',
+    'AIRFLOW': 'Apache Airflow',
+    'KAFKA': 'Apache Kafka',
+    'SPARK_PYSPARK': 'Apache Spark / PySpark',
+    'FLINK': 'Apache Flink',
+    'DBT': 'dbt (Data Build Tool)',
+    'VECTOR_DB': 'Vector Databases',
+    'LLM_FRAMEWORKS': 'LLMs & Frameworks',
+    'LAKEHOUSE': 'Data Lakehouse Formats',
+    'CLOUD_DATA': 'Cloud Data Platforms',
+    'CDC': 'Change Data Capture (CDC)',
+    'INGESTION': 'Data Ingestion'
   };
 
   // Maps category code to CSS styles badges classes
@@ -234,7 +247,20 @@ document.addEventListener('DOMContentLoaded', () => {
     'Data Engineering (General)': 'badge-fabric',
     'Excel & Analytics': 'badge-pbi',
     'Data Visualization': 'badge-pbi',
-    'Governance & Quality': 'badge-dl'
+    'Governance & Quality': 'badge-dl',
+    'RAG': 'badge-de',
+    'DAG': 'badge-de',
+    'AIRFLOW': 'badge-etl',
+    'KAFKA': 'badge-spark',
+    'SPARK_PYSPARK': 'badge-spark',
+    'FLINK': 'badge-spark',
+    'DBT': 'badge-de',
+    'VECTOR_DB': 'badge-cloud',
+    'LLM_FRAMEWORKS': 'badge-de',
+    'LAKEHOUSE': 'badge-dl',
+    'CLOUD_DATA': 'badge-cloud',
+    'CDC': 'badge-etl',
+    'INGESTION': 'badge-etl'
   };
 
   // --- INITIALIZATION & RECOVERY ---
