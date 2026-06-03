@@ -700,6 +700,10 @@ body {
 .status-review, .status-reviewing { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
 .status-unseen { background: rgba(100, 116, 139, 0.1); color: var(--text-secondary); }
 
+/* Hide Mastered/Reviewing progress rows on database cards and topic card footers */
+.progress-list { display: none !important; }
+.concept-card-footer > span:first-child { display: none !important; }
+
 /* Search and Filter styling */
 .filter-bar {
   display: flex;
