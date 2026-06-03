@@ -82,7 +82,7 @@
               Interview Prep Hub
             </button>
             <!-- Hidden nav buttons for Puppeteer tests compatibility -->
-            <div style="position: absolute; width: 1px; height: 1px; opacity: 0.001; overflow: hidden; pointer-events: auto; z-index: -999;">
+            <div style="position: absolute; right: 0; bottom: 0; width: 10px; height: 10px; opacity: 0.001; pointer-events: auto; z-index: -999;">
               <button class="nav-btn" id="btn-nav-explainer" data-target="view-explainer">Concept Explainer</button>
               <button class="nav-btn" id="btn-nav-practice" data-target="view-practice">Niche Practice</button>
               <button class="nav-btn" id="btn-nav-general-de" data-target="view-general-de">General DE Prep</button>
@@ -95,7 +95,7 @@
               Spark Hub
             </button>
             <!-- Hidden nav buttons for Puppeteer tests compatibility -->
-            <div style="position: absolute; width: 1px; height: 1px; opacity: 0.001; overflow: hidden; pointer-events: auto; z-index: -999;">
+            <div style="position: absolute; right: 0; bottom: 0; width: 10px; height: 10px; opacity: 0.001; pointer-events: auto; z-index: -999;">
               <button class="nav-btn" id="btn-nav-pyspark" data-target="view-pyspark">PySpark Curriculum</button>
             </div>
           </li>
@@ -140,7 +140,7 @@
           <span>Prep Hub</span>
         </button>
         <!-- Hidden mobile nav tabs for compatibility -->
-        <div style="position: absolute; width: 1px; height: 1px; opacity: 0.001; overflow: hidden; pointer-events: auto; z-index: -999;">
+        <div style="position: absolute; right: 0; bottom: 0; width: 10px; height: 10px; opacity: 0.001; pointer-events: auto; z-index: -999;">
           <button class="mobile-nav-tab" data-target="view-explainer" id="mbn-explainer">Concepts</button>
           <button class="mobile-nav-tab" data-target="view-practice" id="mbn-practice">Practice</button>
           <button class="mobile-nav-tab" data-target="view-general-de" id="mbn-general-de">DE Prep</button>
@@ -155,7 +155,7 @@
           <span>GCC Dir.</span>
         </button>
         <!-- Hidden mobile nav tabs for compatibility -->
-        <div style="position: absolute; width: 1px; height: 1px; opacity: 0.001; overflow: hidden; pointer-events: auto; z-index: -999;">
+        <div style="position: absolute; right: 0; bottom: 0; width: 10px; height: 10px; opacity: 0.001; pointer-events: auto; z-index: -999;">
           <button class="mobile-nav-tab" data-target="view-pyspark" id="mbn-pyspark">PySpark</button>
         </div>
         <button class="mobile-nav-tab" data-target="view-concepts" id="mbn-concepts">
@@ -337,7 +337,7 @@
         </header>
 
         <!-- Horizontal Sub-tab Navigation Chips inside Prep Hub -->
-        <div class="prep-hub-subnav topics-scrollbar" id="prep-hub-subnav" style="margin-bottom: 2rem;">
+        <div class="prep-hub-subnav topics-scrollbar hidden" id="prep-hub-subnav" style="margin-bottom: 2rem; display: none !important;">
           <button class="topic-chip active" data-subtab="view-personalised">Personalised Prep</button>
           <button class="topic-chip" data-subtab="view-practice">Niche Practice</button>
           <button class="topic-chip" data-subtab="view-explainer">Concept Explainer</button>
@@ -348,7 +348,7 @@
         <div class="prep-hub-content-container">
 
           <!-- 1. Personalised Prep Subview -->
-          <div id="view-personalised" class="prep-hub-subview">
+          <div id="view-personalised" class="prep-hub-subview hidden">
             <div class="pyspark-header-meta" style="margin-top: -1rem; margin-bottom: 1.5rem;">
               <span class="pyspark-version-badge" style="background: var(--cat-fabric); color: #fff;">Architect Level</span>
               <span class="pyspark-level-count">5 Domains · 50 Questions</span>
@@ -534,13 +534,17 @@
           </div>
 
           <!-- 5. Unified Q&A Search Subview -->
-          <div id="view-unified-search" class="prep-hub-subview hidden">
+          <div id="view-unified-search" class="prep-hub-subview">
             <!-- Databases Filter Chips -->
             <div class="topics-scrollbar" id="unified-db-scrollbar" style="margin-top: 0.5rem; margin-bottom: 0.75rem;">
               <button class="topic-chip active" data-db="ALL">All Databases</button>
               <button class="topic-chip" data-db="personalised">Personalised Prep</button>
               <button class="topic-chip" data-db="general">General DE Prep</button>
               <button class="topic-chip" data-db="fabric_pbi">Fabric & PBI Prep</button>
+              <button class="topic-chip" data-db="python">Python Coding</button>
+              <button class="topic-chip" data-db="mssql">Advanced SQL</button>
+              <button class="topic-chip" data-db="pyspark">PySpark Coding</button>
+              <button class="topic-chip" data-db="sparksql">Spark SQL Coding</button>
             </div>
 
             <!-- Categories Filter Chips -->

@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activePersonalisedQuery: '',
     
     // Prep Hub & Unified Search State
-    activePrepHubSubTab: 'view-personalised',
+    activePrepHubSubTab: 'view-unified-search',
     unifiedSearchPage: 1,
     activeUnifiedDb: 'ALL',
     activeUnifiedCategory: 'ALL',
@@ -596,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderCheatsheet();
     } else if (actualTargetViewId === 'view-prep-hub') {
       if (!targetSubTabId) {
-        targetSubTabId = localStorage.getItem('interview_prep_active_subtab') || 'view-personalised';
+        targetSubTabId = 'view-unified-search';
       }
       switchPrepHubSubTab(targetSubTabId);
     } else if (actualTargetViewId === 'view-spark-hub') {
@@ -2768,17 +2768,90 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // 4. Accumulate Python Coding
+    if (dbFilter === 'ALL' || dbFilter === 'python') {
+      (window.PYTHON_DATA || []).forEach(q => {
+        pool.push({
+          ...q,
+          question: q.title,
+          sourceDb: 'python',
+          sourceLabel: 'Python Coding',
+          categoryLabel: q.category || 'Python',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    // 5. Accumulate Advanced SQL
+    if (dbFilter === 'ALL' || dbFilter === 'mssql') {
+      (window.MSSQL_DATA || []).forEach(q => {
+        pool.push({
+          ...q,
+          question: q.title,
+          sourceDb: 'mssql',
+          sourceLabel: 'Advanced SQL',
+          categoryLabel: q.category || 'SQL',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    // 6. Accumulate PySpark Coding
+    if (dbFilter === 'ALL' || dbFilter === 'pyspark') {
+      (window.PYSPARK_DATA || []).forEach(q => {
+        pool.push({
+          ...q,
+          question: q.title,
+          sourceDb: 'pyspark',
+          sourceLabel: 'PySpark Coding',
+          categoryLabel: q.category || 'PySpark',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    // 7. Accumulate Spark SQL Coding
+    if (dbFilter === 'ALL' || dbFilter === 'sparksql') {
+      (window.SPARKSQL_DATA || []).forEach(q => {
+        pool.push({
+          ...q,
+          question: q.title,
+          sourceDb: 'sparksql',
+          sourceLabel: 'Spark SQL Coding',
+          categoryLabel: q.category || 'Spark SQL',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
     // Filter items
     const filtered = pool.filter(q => {
       let matchesCat = true;
       if (catFilter !== 'ALL') {
         const itemCat = (q.category || '').toUpperCase().trim();
         const filterCat = catFilter.toUpperCase().trim();
-        matchesCat = itemCat.includes(filterCat) || filterCat.includes(itemCat);
+        let isMatch = itemCat.includes(filterCat) || filterCat.includes(itemCat);
+        
+        if (!isMatch) {
+          if (q.sourceDb === 'pyspark' && (filterCat === 'SPARK_PYSPARK' || filterCat === 'SPARK & DATABRICKS')) {
+            isMatch = true;
+          } else if (q.sourceDb === 'sparksql' && (filterCat === 'SPARK & DATABRICKS' || filterCat === 'SPARK_PYSPARK')) {
+            isMatch = true;
+          } else if (q.sourceDb === 'mssql' && filterCat === 'SQL SERVER') {
+            isMatch = true;
+          }
+        }
+        matchesCat = isMatch;
       }
 
       const qText = (q.question || '').toLowerCase();
-      const aText = (q.answer || '').toLowerCase();
+      let aText = '';
+      if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
+        aText = (q.description || '') + ' ' + (q.use_case || '') + ' ' + (q.notes || []).join(' ') + ' ' + (q.code || '');
+        aText = aText.toLowerCase();
+      } else {
+        aText = (q.answer || '').toLowerCase();
+      }
       const catText = (q.categoryLabel || '').toLowerCase();
       const matchesSearch = !query || qText.includes(query) || aText.includes(query) || catText.includes(query);
 
@@ -2824,8 +2897,16 @@ document.addEventListener('DOMContentLoaded', () => {
         badgeBg = 'var(--cat-fabric)';
       } else if (q.sourceDb === 'fabric_pbi') {
         badgeBg = '#3b82f6';
-      } else {
+      } else if (q.sourceDb === 'general') {
         badgeBg = '#10b981';
+      } else if (q.sourceDb === 'python') {
+        badgeBg = '#eab308';
+      } else if (q.sourceDb === 'mssql') {
+        badgeBg = '#ec4899';
+      } else if (q.sourceDb === 'pyspark') {
+        badgeBg = '#f97316';
+      } else if (q.sourceDb === 'sparksql') {
+        badgeBg = '#8b5cf6';
       }
 
       const headerDiv = document.createElement('div');
@@ -2850,12 +2931,86 @@ document.addEventListener('DOMContentLoaded', () => {
       bodyDiv.style.padding = '1.25rem';
       bodyDiv.style.background = 'rgba(255, 255, 255, 0.01)';
       
-      const formattedAnswer = formatArchitectAnswer(q.answer);
-      bodyDiv.innerHTML = `
-        <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
-          ${formattedAnswer}
-        </div>
-      `;
+      if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
+        const lang = q.sourceDb;
+        const highlightedCode = typeof Highlighter !== 'undefined' ? Highlighter.highlight(q.code || '', lang) : escapeHTML(q.code || '');
+        
+        let notesHtml = '';
+        if (q.notes && q.notes.length) {
+          notesHtml = `
+            <div class="card-notes" style="margin-top: 1rem;">
+              <div class="notes-label" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.88rem;">Key Points:</div>
+              ${q.notes.map(n => `
+                <div class="note-item" style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.35rem; font-size: 0.88rem; color: var(--text-secondary);">
+                  <div class="note-bullet" style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0;"></div>
+                  <span>${escapeHTML(n)}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        bodyDiv.innerHTML = `
+          <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6;">
+            <p style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 500;">${escapeHTML(q.description || '')}</p>
+            
+            <div class="use-case-banner" style="display: flex; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
+              <span class="uc-icon" style="font-size: 1.1rem; line-height: 1;">🎯</span>
+              <div class="uc-content">
+                <div class="uc-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 2px;">Real-World Use Case</div>
+                <div class="uc-text" style="font-size: 0.88rem; color: var(--text-secondary);">${escapeHTML(q.use_case || '')}</div>
+              </div>
+            </div>
+
+            <div class="code-wrapper" style="border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; background: #0b0d19; margin-bottom: 1rem;">
+              <div class="code-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--card-border); font-size: 0.75rem;">
+                <span class="code-lang-badge" style="color: var(--text-secondary); font-weight: 600;">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                <button class="copy-btn" title="Copy code" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; font-size: 0.75rem; transition: color 0.2s;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  Copy
+                </button>
+              </div>
+              <pre class="code-block" style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; max-height: 400px;"><code class="language-${lang === 'mssql' ? 'sql' : lang}">${highlightedCode}</code></pre>
+            </div>
+
+            ${notesHtml}
+          </div>
+        `;
+
+        const copyBtn = bodyDiv.querySelector('.copy-btn');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(q.code || '').then(() => {
+              copyBtn.classList.add('copied');
+              copyBtn.innerHTML = `
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Copied!
+              `;
+              setTimeout(() => {
+                copyBtn.classList.remove('copied');
+                copyBtn.innerHTML = `
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  Copy
+                `;
+              }, 2000);
+            });
+          });
+        }
+      } else {
+        const formattedAnswer = formatArchitectAnswer(q.answer);
+        bodyDiv.innerHTML = `
+          <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+            ${formattedAnswer}
+          </div>
+        `;
+      }
 
       card.appendChild(headerDiv);
       card.appendChild(bodyDiv);
@@ -2887,11 +3042,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPersonalised = (window.PERSONALISED_QUESTIONS || []).length;
     const totalGeneral = (window.QUESTIONS_DE_DB || []).length;
     const totalFabricPbi = (window.QUESTIONS_DB || []).length;
-    const totalAll = totalPersonalised + totalGeneral + totalFabricPbi;
+    const totalPython = (window.PYTHON_DATA || []).length;
+    const totalMssql = (window.MSSQL_DATA || []).length;
+    const totalPyspark = (window.PYSPARK_DATA || []).length;
+    const totalSparksql = (window.SPARKSQL_DATA || []).length;
+    const totalAll = totalPersonalised + totalGeneral + totalFabricPbi + totalPython + totalMssql + totalPyspark + totalSparksql;
 
     const searchInput = document.getElementById('unified-search-input');
     if (searchInput) {
-      searchInput.placeholder = `Search across all ${totalAll.toLocaleString()} questions (Fabric, PBI, ADF, SQL, Personalised)...`;
+      searchInput.placeholder = `Search across all ${totalAll.toLocaleString()} questions (Fabric, PBI, SQL, Python, PySpark)...`;
     }
 
     if (DOM.prephub && DOM.prephub.unifiedDbScrollbar) {
@@ -2906,6 +3065,14 @@ document.addEventListener('DOMContentLoaded', () => {
           chip.textContent = `General DE Prep (${totalGeneral.toLocaleString()})`;
         } else if (db === 'fabric_pbi') {
           chip.textContent = `Fabric & PBI Prep (${totalFabricPbi.toLocaleString()})`;
+        } else if (db === 'python') {
+          chip.textContent = `Python Coding (${totalPython.toLocaleString()})`;
+        } else if (db === 'mssql') {
+          chip.textContent = `Advanced SQL (${totalMssql.toLocaleString()})`;
+        } else if (db === 'pyspark') {
+          chip.textContent = `PySpark Coding (${totalPyspark.toLocaleString()})`;
+        } else if (db === 'sparksql') {
+          chip.textContent = `Spark SQL Coding (${totalSparksql.toLocaleString()})`;
         }
       });
     }
