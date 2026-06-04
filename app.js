@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const state = {
     currentView: 'view-concepts',
     theme: 'dark', // 'dark' or 'light'
+    progress: {},
     questions: (() => {
       const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3, 'ARCHITECT': 4 };
       const qList = [];
@@ -317,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   function init() {
     loadTheme();
+    loadProgress();
     setupEventListeners();
     initExplainer();
     initPractice();
@@ -372,7 +374,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // --- THEME & UTILITIES ---
-  
+
+  // Load and apply progress from localStorage
+  function loadProgress() {
+    try {
+      const savedProgress = localStorage.getItem('interview_prep_progress');
+      if (savedProgress) {
+        state.progress = JSON.parse(savedProgress);
+      } else {
+        state.progress = {};
+      }
+    } catch (e) {
+      console.error("Could not load progress", e);
+      state.progress = {};
+    }
+  }
+
+  // Save progress to localStorage
+  function saveProgress() {
+    try {
+      localStorage.setItem('interview_prep_progress', JSON.stringify(state.progress));
+    } catch (e) {
+      console.error("Could not save progress", e);
+    }
+  }
+
+  // Update a single question status
+  function updateQuestionStatus(questionId, newStatus) {
+    if (newStatus === 'unseen') {
+      delete state.progress[questionId];
+    } else {
+      state.progress[questionId] = newStatus;
+    }
+    saveProgress();
+    
+    // Sync UI elements if visible
+    const explainerCardIndicator = document.querySelector(`.concept-card[data-id="${questionId}"] .status-indicator`);
+    if (explainerCardIndicator) {
+      explainerCardIndicator.className = `status-indicator status-${newStatus}${newStatus === 'unseen' ? ' hidden' : ''}`;
+      explainerCardIndicator.textContent = newStatus;
+    }
+  }
+
   function loadTheme() {
     const savedTheme = localStorage.getItem('interview_prep_theme');
     if (savedTheme) {

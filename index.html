@@ -22,10 +22,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="styles.css?v=1.5.0">
+  <style>
+    /* Anti-FOUC: hide until JS sets opacity:1. CSS animation fallback ensures page
+       is never permanently invisible even if JS fails or is blocked. */
+    @keyframes fouc-reveal { to { opacity: 1; } }
+    body {
+      opacity: 0;
+      animation: fouc-reveal 0s 1.5s forwards;
+    }
+  </style>
+
+  <link rel="stylesheet" href="styles.css?v=1.5.1">
 
   <!-- Anti-FOUC: apply theme + hide body BEFORE first paint -->
-  <style>body { opacity: 0; }</style>
   <script>
     (function () {
       try {
