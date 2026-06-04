@@ -4431,7 +4431,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Start the application!
   init();
-});
 
 
 /* --- SPARK GUIDE INTEGRATED LOGIC --- */
@@ -4558,37 +4557,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Language API Selection Tab Logic
-        function switchLanguageTab(lang) {
-            const languages = ['pyspark', 'scala', 'sql', 'java'];
-            languages.forEach(l => {
-                const btn = document.getElementById(`lang-btn-${l}`);
-                const panel = document.getElementById(`lang-panel-${l}`);
-                if (l === lang) {
-                    btn.className = "px-4 py-2 text-xs font-semibold border-b-2 border-[#7a5195] text-[#7a5195] focus:outline-none";
-                    panel.classList.remove('hidden');
-                } else {
-                    btn.className = "px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-[#7a5195] focus:outline-none";
-                    panel.classList.add('hidden');
-                }
-            });
-        }
-
-        // AI Sandbox Interaction Tab Logic
-        function switchSandboxTab(tabId) {
-            const tabs = ['optimizer', 'simulator', 'drafter'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                const panel = document.getElementById(`panel-${t}`);
-                if (t === tabId) {
-                    btn.className = "flex-1 py-3 px-4 text-center font-semibold text-sm border-b-2 border-[#7a5195] text-[#7a5195] focus:outline-none transition-all";
-                    panel.classList.remove('hidden');
-                } else {
-                    btn.className = "flex-1 py-3 px-4 text-center font-semibold text-sm border-b-2 border-transparent text-gray-500 hover:text-[#7a5195] focus:outline-none transition-all";
-                    panel.classList.add('hidden');
-                }
-            });
-        }
+        // (Visual Language and Sandbox tab switcher functions consolidated at the bottom of the file)
 
         const presets = {
             optimizer: {
@@ -4630,7 +4599,294 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Live API Orchestrator Block
-        async function fetchGeminiIntelligence(systemPrompt, userQuery, statusText) {
+        // Local Offline Mock Generator
+        function getOfflineMockResponse(type, presetValue, customInput) {
+            const mockDb = {
+                optimizer: {
+                    "pyspark-join": `### Spark Code Optimization: Broadcast Hash Join (Map-side Join)
+                    
+#### 1. Catalyst Optimizer Analysis
+In the unoptimized query plan, joining \`df_large\` and \`df_small\` triggers a **SortMergeJoin (SMJ)** or a **ShuffleHashJoin**. The physical plan injects an \`Exchange hashpartitioning\` node for both datasets. For the large dataset, this results in serializing, partitioning, and transferring gigabytes of event data across the network, leading to heavy I/O overhead.
+
+#### 2. Optimized Code
+\`\`\`python
+from pyspark.sql.functions import broadcast
+
+# Use broadcast join to load the small lookup table (df_small) in executor memory
+result = df_large.join(broadcast(df_small), "store_id")
+\`\`\`
+
+#### 3. How the Physical Plan Changes
+- **Before**: 
+  \`SortMergeJoin\` -> \`Exchange\` -> \`FileScan (Parquet)\`
+- **After**: 
+  \`BroadcastHashJoin\` -> \`BroadcastExchange\` on \`df_small\`, direct \`FileScan\` on \`df_large\` without any shuffle exchange.
+- **Performance Benefit**: Reduces shuffle write/read bytes to zero for the event dataset. Run time drops from minutes to seconds.`,
+                    
+                    "rdd-groupby": `### Spark Code Optimization: Map-Side Aggregations via reduceByKey
+
+#### 1. Catalyst Optimizer Analysis
+The unoptimized code uses \`groupByKey()\`, which forces Spark to transfer all values associated with a key across the network during the shuffle phase. This prevents map-side combining, causing immense memory pressure and GC churn inside executors if a key has millions of records.
+
+#### 2. Optimized Code
+\`\`\`python
+# Use reduceByKey to combine values locally before shuffling
+counts = rdd.map(lambda line: (line.split()[0], 1)).reduceByKey(lambda a, b: a + b)
+\`\`\`
+
+#### 3. How the Physical Plan Changes
+- **Before**: Spark builds \`ShuffledRDD\` containing collections of elements, leading to OutOfMemory (OOM) errors for skewed keys.
+- **After**: Spark injects a map-side combine step. Executors aggregate counts locally before sending partition updates over the wire, shrinking network payload sizes by up to 99%.`,
+                    
+                    "uncached-actions": `### Spark Code Optimization: Lineage Caching for Multi-Action DAGs
+
+#### 1. Catalyst Optimizer Analysis
+The DataFrame \`df\` is evaluated twice: once for \`df.count()\` (Action 1) and once for \`df.write\` (Action 2). Without caching, Spark recompiles the entire execution plan and reads the raw source files from cloud storage (S3) twice, doubling storage I/O cost.
+
+#### 2. Optimized Code
+\`\`\`python
+# Cache the DataFrame in memory (MEM_AND_DISK_SER by default for DataFrames)
+df.cache()
+
+# Action 1: Triggers initial computation and populates the cache
+cnt = df.count()
+
+# Action 2: Pulls data directly from memory/disk cache
+df.write.partitionBy("country").mode("overwrite").parquet("/analytics/purchases")
+
+# Clean up memory resources
+df.unpersist()
+\`\`\`
+
+#### 3. How the Physical Plan Changes
+- **Before**: Two independent DAGs are submitted, each starting with \`FileScan (JSON)\`.
+- **After**: The first DAG computes and writes to \`InMemoryRelation\`. The second DAG uses \`InMemoryTableScan\`, bypassing the file parser and network fetch.`
+                },
+                simulator: {
+                    "oom": `### Incident Diagnosis: OutOfMemory (OOM) / GC Overhead Limit Exceeded
+
+#### 1. Root Cause Analysis
+The \`OutOfMemoryError: GC overhead limit exceeded\` indicates that Spark executors are spending more than 98% of their time on garbage collection while recovering less than 2% of the heap. This occurs when large graph structures or massive data frames are stored as raw JVM objects (causing high memory overhead) or when dynamic allocation spawns tasks faster than JVM can collect memory.
+
+#### 2. Recommended Configuration Adjustments
+Apply these parameters in \`spark-defaults.conf\`:
+\`\`\`properties
+# Switch to serialized storage level for GraphX or intermediate RDDs
+spark.memory.offHeap.enabled true
+spark.memory.offHeap.size 4g
+
+# Adjust G1GC garbage collector settings for low-pause performance
+spark.executor.extraJavaOptions -XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=35 -XX:G1ReservePercent=15
+
+# Tune memory fractions (Storage vs Execution)
+spark.memory.fraction 0.6
+spark.memory.storageFraction 0.4
+\`\`\`
+
+#### 3. Remediation Plan
+- Serialize RDD partitions using \`StorageLevel.MEMORY_AND_DISK_SER\`.
+- Increase \`spark.executor.memoryOverhead\` to \`2048\` (or 15% of executor memory) to allow for native off-heap storage.`,
+                    
+                    "skew": `### Incident Diagnosis: Data Skew during SortMergeJoin
+
+#### 1. Root Cause Analysis
+Data skew occurs when a single join key (e.g. \`customer_id = 99999\`) has disproportionately more rows than other keys. When Spark partitions the data using \`HashPartitioning\`, all records with key \`99999\` land in the same partition. This single task handles gigabytes of data while other tasks handle kilobytes, causing the stage to hang.
+
+#### 2. Recommended Configuration Adjustments
+Enable **Adaptive Query Execution (AQE)** skew optimization:
+\`\`\`properties
+# Enable AQE (On by default in Spark 3.x)
+spark.sql.adaptive.enabled true
+
+# Enable skew join optimization
+spark.sql.adaptive.skewJoin.enabled true
+spark.sql.adaptive.skewJoin.skewedPartitionFactor 5
+spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes 268435456
+\`\`\`
+
+#### 3. Code-Level Remediation (Salting)
+If AQE cannot optimize the plan, manually salt the join key:
+\`\`\`python
+import pyspark.sql.functions as F
+
+# Add random salt (0-9) to the large skewed table
+df_large = df_large.withColumn("salt", F.concat(F.col("customer_id"), F.lit("_"), F.randint(0, 9)))
+
+# Replicate the small table 10x with salt suffixes
+df_small_salted = df_small.withColumn("salt_array", F.array([F.lit(i) for i in range(10)])) \
+                           .withColumn("exploded_salt", F.explode("salt_array")) \
+                           .withColumn("salt", F.concat(F.col("customer_id"), F.lit("_"), F.col("exploded_salt")))
+                           
+# Perform join on the salted key
+result = df_large.join(df_small_salted, "salt")
+\`\`\`\n`,
+                    
+                    "streaming": `### Incident Diagnosis: Kafka Source Consumer Lag Spike
+
+#### 1. Root Cause Analysis
+When Kafka traffic spikes, a stateful streaming engine can ingest partitions faster than it can process window aggregations or write to sinks. Without rate limiting, the micro-batch size grows unchecked, exceeding the executor heap limits, triggering long GC pauses, and causing a cascading performance degradation.
+
+#### 2. Recommended Configuration Adjustments
+Configure explicit backpressure and rate limiting parameters:
+\`\`\`properties
+# Enable Backpressure mechanism
+spark.streaming.backpressure.enabled true
+
+# Set max messages per partition per second for Structured Streaming Kafka source
+spark.sql.streaming.maxFilesPerTrigger 100
+spark.sql.streaming.kafka.maxRatePerPartition 500
+
+# Tune task-scheduler delays
+spark.locality.wait 0s
+\`\`\`
+
+#### 3. Remediation Plan
+- Switch task execution trigger from Processing Time to a micro-batch interval: \`.trigger(processingTime='10 seconds')\`.
+- Scale Kafka partitions and executor counts in a 1:1 match to maximize concurrent partition reading.`
+                },
+                drafter: {
+                    "tungsten": `# Project Tungsten: JVM Garbage Collection vs. Off-Heap Execution
+
+### 1. The Bottleneck: JVM Object Overheads
+In standard Java applications, storing a simple 4-byte integer inside a heap object incurs massive byte overheads:
+- 12-byte object header (Mark Word + Klass Word)
+- 4-byte padding
+This results in a 400% memory inflation rate. Furthermore, millions of short-lived row objects trigger heavy garbage collection cycles, pausing Spark execution.
+
+### 2. Tungsten Binary Row Representation
+Tungsten avoids JVM overhead by storing rows in contiguous, off-heap native memory buffers:
+- **Null Bitmap**: Preceding bits indicating nullability of each column.
+- **Fixed-Width Fields**: Raw primitive bytes (8 bytes each).
+- **Variable-Length Fields**: Offsets and lengths pointing to variable data (e.g. String UTF-8 blocks).
+
+| Section | Size | Contents |
+| :--- | :--- | :--- |
+| Null Bitmap | 8 bytes | Bit flag representation of column states |
+| Column 1 (id) | 8 bytes | Raw 64-bit Long Value |
+| Column 2 (name) | 8 bytes | Offset (32-bit) + Length (32-bit) of string |
+
+### 3. Whole-Stage Code Generation (CodeGen)
+Rather than calling virtual function methods (Iterator pattern) for each operator (e.g. Filter -> Project -> Aggregate) on every row, Tungsten generates clean Java bytecode at compile time using the Java compiler (\`Janino\`). This flattens the processing loop into a single optimized CPU loop:
+
+\`\`\`scala
+// Tungsten generates highly-optimized flat loops like:
+while (rows.hasNext()) {
+  long val = rows.getLong(0);
+  if (val > 100) {
+    // Direct operation on off-heap memory
+    output.writeLong(val * 2);
+  }
+}
+\`\`\`\n`,
+                    
+                    "aqe": `# Adaptive Query Execution (AQE): Dynamic Optimization Internals
+
+### 1. The Core Innovation
+Before Spark 3.0, the Catalyst Optimizer compiled a static physical plan based on estimated data statistics. If statistics were missing or outdated, Spark chose poor plans (e.g. SortMergeJoin instead of BroadcastJoin). AQE solves this by intercepting the physical plan at **Materialization Points** (between query stages), inspecting partition statistics, and optimizing the plan on-the-fly.
+
+### 2. Three Dimensions of AQE Optimization
+
+#### A. Coalescing Post-Shuffle Partitions
+When shuffling, Spark defaults to 200 partitions (\`spark.sql.shuffle.partitions\`). If the output dataset is small, this results in hundreds of "small task" overheads. AQE automatically coalesces adjacent small partitions into single larger tasks.
+
+#### B. Dynamic Join Conversion
+If a SortMergeJoin stage finishes and AQE detects that one side of the dataset is smaller than \`spark.sql.autoBroadcastJoinThreshold\` (default 10MB), AQE dynamically converts the execution plan to a **Broadcast Hash Join**, eliminating the shuffle for the next stage.
+
+#### C. Skew Join Remediation
+If one partition is significantly larger than the median partition size, AQE splits the skewed partition into multiple sub-partitions, reads them concurrently, and joins them with duplicated chunks of the target table.
+
+### 3. Execution Logic Flowchart
+\`\`\`
+[Logical Plan] -> [Physical Plan] 
+                      |
+                [Stage 1 Run] 
+                      |
+             [Inspect Statistics] -> (Any Skew or Small Partitions?)
+                      |
+            [Optimize Shuffle Plan] -> [Stage 2 Run]
+\`\`\`\n`,
+                    
+                    "dpp": `# Dynamic Partition Pruning (DPP): Star-Schema Join Acceleration
+
+### 1. Traditional Partition Pruning
+Static partition pruning works when the filter condition is applied directly to the partition column:
+\`WHERE date_id = '2026-06-04'\`.
+However, in star-schema warehousing (Fact table joined with Dimension table), filters are applied to the dimension table:
+\`WHERE dim_date.quarter = 'Q2'\`.
+Traditionally, Spark had to scan the entire partition layout of the Fact table and filter rows *after* reading.
+
+### 2. DPP Mechanics: The Inner Loop
+DPP injects the dimension filter directly into the Fact table scan at runtime:
+
+1. Spark evaluates the filter on the Dimension table: \`dim_date.quarter = 'Q2'\`.
+2. It builds a **Subquery Broadcast** containing the matching keys (\`date_id\`s).
+3. It injects this list of keys directly as a dynamic filter inside the Fact table file scanner.
+4. The Fact table scanner reads ONLY the matching partitions, skipping directories that do not contain matching records.
+
+\`\`\`
+[Fact Table]                      [Dim Table]
+ (Partitioned by date_id)          (Filter: quarter = 'Q2')
+      |                                  |
+      |<-- [Broadcast Keys] <------------| (Subquery)
+      |
+[Reads matching partitions ONLY]
+\`\`\`
+
+### 3. Catalyst Plan Signature
+In the physical query plan, DPP is represented as a \`DynamicPartitionPruning\` node:
+\`FileScan parquet default.fact_sales [partitionFilters: [date_id#123 IN dynamicpruning#456]]\`\n`
+                }
+            };
+
+            let responseText = "";
+            if (presetValue && mockDb[type] && mockDb[type][presetValue]) {
+                responseText = mockDb[type][presetValue];
+            } else {
+                const queryLower = (customInput || "").toLowerCase();
+                if (queryLower.includes("memory") || queryLower.includes("gc") || queryLower.includes("oom") || queryLower.includes("heap")) {
+                    responseText = `### Spark Memory Management Analysis
+
+We have analyzed your configuration containing references to memory bottlenecks.
+
+#### 1. Core Architecture Checks
+- Ensure \`spark.memory.fraction\` is set appropriately. The default of \`0.6\` allocates 60% of the executor JVM heap to Spark execution and storage memory, leaving 40% for user metadata and internal tracking.
+- If GC pause times exceed 10% of total run time, enable G1GC using \`spark.executor.extraJavaOptions = -XX:+UseG1GC\`.
+
+#### 2. Local Recommendations
+- Switch to serialized structures like Spark DataFrames instead of raw Java RDDs, to reduce the heap overhead.
+- Ensure that memory is freed up by running \`unpersist()\` after you are done with cached DataFrames.`;
+                } else if (queryLower.includes("join") || queryLower.includes("shuffle") || queryLower.includes("broadcast") || queryLower.includes("merge")) {
+                    responseText = `### Spark Join & Shuffle Optimization
+
+We have analyzed your join query constraints.
+
+#### 1. Core Architecture Checks
+- Check if your smaller dataset is under 10MB. If so, Spark's Catalyst Optimizer should automatically convert the join to a **Broadcast Hash Join** using \`broadcast(df_small)\`.
+- Shuffling can be tuned by modifying \`spark.sql.shuffle.partitions\` to prevent high numbers of small files or executor bottlenecks.
+
+#### 2. Local Recommendations
+- Salt highly skewed keys by appending a random integer suffix to distribute the workload evenly across executors.
+- Ensure that partition filters are pushed down to the storage layer before executing the join.`;
+                } else {
+                    responseText = `### Spark Engine Architecture Insights
+Thank you for your custom query. Since your workspace is running locally, we have executed an offline query evaluation.
+
+#### 1. Configuration Review
+Your input highlights the need for dynamic optimization of distributed executors. We recommend verifying:
+- \`spark.sql.shuffle.partitions\` (set to \`2 * total_cores\` as a baseline)
+- \`spark.serializer\` (set to \`org.apache.spark.serializer.KryoSerializer\`)
+
+#### 2. Performance Checkpoints
+- Avoid operations like \`count()\` in raw pipelines unless strictly necessary, as they block stage materialization.
+- Always filter partitions as early as possible in your DAG to allow predicate pushdowns.`;
+                }
+            }
+
+            return responseText + "\n\n---\n*⚡ Evaluated via Local Workspace Offline Engine (API key not configured).*";
+        }
+
+        // Live API Orchestrator Block
+        async function fetchGeminiIntelligence(systemPrompt, userQuery, statusText, type, presetValue) {
             const outContainer = document.getElementById('sandbox-output-container');
             const loader = document.getElementById('sandbox-loading');
             const resultBox = document.getElementById('sandbox-result');
@@ -4642,7 +4898,24 @@ document.addEventListener('DOMContentLoaded', () => {
             resultBox.innerHTML = "";
             statusLabel.textContent = statusText;
 
-            const apiKey = ""; // Implicitly injected during live workspace executions
+            const apiKey = localStorage.getItem('gemini_api_key') || window.GEMINI_API_KEY || "";
+            if (!apiKey) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                loader.classList.add('hidden');
+                
+                const customInput = type === 'optimizer' ? document.getElementById('optimizer-code-input').value :
+                                    type === 'simulator' ? document.getElementById('simulator-input').value :
+                                    document.getElementById('drafter-custom').value;
+                const generatedText = getOfflineMockResponse(type, presetValue, customInput);
+                rawResponseText = generatedText;
+                resultBox.innerHTML = formatMarkdown(generatedText);
+                resultBox.classList.remove('hidden');
+                if (window.MathJax) {
+                    MathJax.typesetPromise([resultBox]);
+                }
+                return;
+            }
+
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-preview:generateContent?key=${apiKey}`;
 
             const payload = {
@@ -4680,13 +4953,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultBox.innerHTML = formatMarkdown(generatedText);
                 resultBox.classList.remove('hidden');
                 
-                // Re-render LaTeX math notation after inserting dynamic text content
                 if (window.MathJax) {
                     MathJax.typesetPromise([resultBox]);
                 }
             } else {
-                resultBox.innerHTML = `<p class="text-red-600 font-semibold text-xs">Runtime Error: Unable to query Spark Engine Intelligence. Please check cloud connection settings.</p>`;
+                const customInput = type === 'optimizer' ? document.getElementById('optimizer-code-input').value :
+                                    type === 'simulator' ? document.getElementById('simulator-input').value :
+                                    document.getElementById('drafter-custom').value;
+                const generatedText = getOfflineMockResponse(type, presetValue, customInput) + "\n\n*⚠️ Warning: Cloud intelligence API failed. Serviced via offline backup.*";
+                rawResponseText = generatedText;
+                resultBox.innerHTML = formatMarkdown(generatedText);
                 resultBox.classList.remove('hidden');
+                if (window.MathJax) {
+                    MathJax.typesetPromise([resultBox]);
+                }
             }
         }
 
@@ -4697,23 +4977,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;");
 
-            // Multi-line code block matching
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
                 return formatCodeBlock(code, lang);
             });
 
-            // Single line inline code expressions
             html = html.replace(/`([^`]+)`/g, '<code class="bg-[var(--code-bg)] text-[var(--primary)] px-1.5 py-0.5 rounded font-mono text-xs font-medium border border-[var(--card-border)]">$1</code>');
 
-            // Bold markers
             html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-            // Headers formatting replacements
             html = html.replace(/^### (.*$)/gim, '<h4 class="text-base font-bold text-[#003f5c] mt-4 mb-2">$1</h4>');
             html = html.replace(/^## (.*$)/gim, '<h3 class="text-lg font-bold text-[#003f5c] mt-6 mb-3">$1</h3>');
             html = html.replace(/^# (.*$)/gim, '<h2 class="text-xl font-bold text-[#003f5c] mt-8 mb-4">$1</h2>');
 
-            // List item layouts
             const lines = html.split('\n');
             let inList = false;
             for (let i = 0; i < lines.length; i++) {
@@ -4737,7 +5012,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             html = lines.join('\n');
 
-            // Line breaks spacing
             html = html.replace(/\n\n/g, '<br><br>');
             return html;
         }
@@ -4748,9 +5022,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Please select or enter Spark code transformations.");
                 return;
             }
+            const presetValue = document.getElementById('optimizer-preset').value;
             const systemPrompt = "You are the Lead Core Apache Spark Architect. Analyze this Spark code for architectural bottlenecks like wide shuffles, missing broadcast joins, or uncached RDD lineage. Provide optimized replacement code and explain how the physical plan changes step-by-step. Keep explanations rigorous and technical.";
             const userQuery = `Analyze and optimize this code:\n\n${code}`;
-            fetchGeminiIntelligence(systemPrompt, userQuery, "Reconstructing physical execution plans & analyzing Catalyst query trees...");
+            fetchGeminiIntelligence(systemPrompt, userQuery, "Reconstructing physical execution plans & analyzing Catalyst query trees...", "optimizer", presetValue);
         }
 
         function runScenarioSimulation() {
@@ -4759,9 +5034,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Please select or describe a production scenario.");
                 return;
             }
+            const presetValue = document.getElementById('simulator-preset').value;
             const systemPrompt = "You are a Senior Infrastructure and Platform Reliability Engineer for large-scale Spark clusters. Diagnose the given memory or runtime issue. Explain the JVM memory overhead patterns, state store concerns, and supply the precise configuration parameters (e.g., spark.sql.shuffle.partitions, spark.memory.offHeap.size) to apply in spark-defaults.conf.";
             const userQuery = `Diagnose and fix this production issue:\n\n${context}`;
-            fetchGeminiIntelligence(systemPrompt, userQuery, "Evaluating heap storage distributions & planning state reallocations...");
+            fetchGeminiIntelligence(systemPrompt, userQuery, "Evaluating heap storage distributions & planning state reallocations...", "simulator", presetValue);
         }
 
         function runContentDrafting() {
@@ -4770,9 +5046,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Please select or define an educational topic.");
                 return;
             }
+            const presetValue = document.getElementById('drafter-preset').value;
             const systemPrompt = "You are a Distinguished Tech Lead writing a definitive textbook on Apache Spark. Write a highly detailed, technical textbook chapter or blog post explaining this concept. Include clear technical breakdowns, comparisons with raw JVM layouts, and code examples in both PySpark and Scala. Use markdown headers, tables, and clear technical formatting.";
             const userQuery = `Write a deep-dive educational chapter on:\n\n${topic}`;
-            fetchGeminiIntelligence(systemPrompt, userQuery, "Generating technical chapter drafts & verifying code syntax structures...");
+            fetchGeminiIntelligence(systemPrompt, userQuery, "Generating technical chapter drafts & verifying code syntax structures...", "drafter", presetValue);
         }
 
         function copyOutputContent() {
@@ -5108,5 +5385,22 @@ document.addEventListener('DOMContentLoaded', () => {
         window.onload = function () {
             changeSimulatorFlow();
             updateMemoryMapper();
-        }
+        };
+
+        // Expose handlers globally so inline HTML handlers can find them
+        window.switchSandboxTab = switchSandboxTab;
+        window.switchLanguageTab = switchLanguageTab;
+        window.applyOptimizerPreset = applyOptimizerPreset;
+        window.applySimulatorPreset = applySimulatorPreset;
+        window.applyDrafterPreset = applyDrafterPreset;
+        window.runCodeOptimization = runCodeOptimization;
+        window.runScenarioSimulation = runScenarioSimulation;
+        window.runContentDrafting = runContentDrafting;
+        window.copyOutputContent = copyOutputContent;
+        window.changeSimulatorFlow = changeSimulatorFlow;
+        window.triggerSimulatorAnimation = triggerSimulatorAnimation;
+        window.updateMemoryMapper = updateMemoryMapper;
+        window.filterLexiconCategory = filterLexiconCategory;
+        window.filterLexicon = filterLexicon;
+});
     

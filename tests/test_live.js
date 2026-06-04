@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer');
   console.log("=== Diagnosing Live Site ===");
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
+  await page.setViewport({ width: 1200, height: 800 });
 
   // Listen for console messages
   page.on('console', msg => {

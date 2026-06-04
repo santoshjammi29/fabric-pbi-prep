@@ -19,7 +19,7 @@ async function auditLayout(viewportWidth) {
       console.log(`⚠️ GLOBAL HORIZONTAL OVERFLOW: Scroll width (${scrollWidth}px) exceeds body viewport (${bodyWidth}px)!`);
     }
 
-    const views = ['view-dashboard', 'view-explainer', 'view-practice', 'view-spark', 'view-gcc', 'view-pyspark', 'view-concepts', 'view-cheatsheet', 'view-personalised'];
+    const views = ['view-explainer', 'view-practice', 'view-spark', 'view-gcc', 'view-pyspark', 'view-concepts', 'view-cheatsheet', 'view-personalised'];
     
     for (const viewId of views) {
       // Toggle to the view using hash change

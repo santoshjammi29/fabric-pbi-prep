@@ -4,6 +4,7 @@ async function runDiagnose(url, label) {
   console.log(`\n=== Diagnosing ${label} (${url}) ===`);
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
+  await page.setViewport({ width: 1200, height: 800 });
 
   const consoleMsgs = [];
   page.on('console', msg => {
