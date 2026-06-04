@@ -1046,11 +1046,11 @@ body {
 }
 
 @media (max-width: 1200px) {
-  /* On mobile/tablet horizontal scrollbar view, keep list item text to single line with ellipsis */
+  /* On mobile/tablet horizontal scrollbar view, allow list item text to wrap dynamically */
   .q-text-line {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }
 
@@ -4473,6 +4473,7 @@ pre.code-block code,
     flex-direction: row;
     gap: 0.5rem;
     flex-wrap: nowrap;
+    width: max-content;
   }
 
   .practice-q-item {
@@ -6366,6 +6367,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   flex-wrap: nowrap;
   gap: 0.4rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-bottom: 2px;
@@ -6381,6 +6383,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   flex-direction: row !important;
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   max-height: none !important;
   padding-right: 0 !important;
   scrollbar-width: none;
@@ -6390,6 +6393,28 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .qa-hfilter-chips-row .qa-sidebar-list::-webkit-scrollbar {
   display: none;
+}
+
+/* On mobile viewports, wrap horizontal filters vertically with word/chip wrap */
+@media (max-width: 600px) {
+  .qa-hfilter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+  }
+  .qa-hfilter-label {
+    min-width: 0;
+    margin-bottom: 0.2rem;
+  }
+  .qa-chips-scroll {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .qa-hfilter-chips-row .qa-sidebar-list {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+  }
 }
 
 /* Horizontal Filter Chips Bar — scrollable pill row for DB/domain/topic filters */
