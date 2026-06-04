@@ -2762,97 +2762,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     DOM.prephub.unifiedCategoryScrollbar.innerHTML = '';
 
-    // helper to map category to one of 3 rows
-    function getCategoryRow(cat) {
-      if (cat === 'ALL') return 1;
-      const lower = cat.toLowerCase();
-      
-      // Row 3: AI, Languages, Cloud, and Personalised Prep
-      if (
-        lower.includes('rag') || lower.includes('vector') || lower.includes('llm') || lower.includes('ai') ||
-        lower.includes('python') || lower.includes('decorator') || lower.includes('generator') ||
-        lower.includes('concurrency') || lower.includes('threading') || lower.includes('pattern') ||
-        lower.includes('language') || lower.includes('foundation') || lower.includes('cleaning') ||
-        lower.includes('manipulation') || lower.includes('functional') || lower.includes('cloud') ||
-        lower.includes('finops') || lower.includes('devops') || lower.includes('personalised') ||
-        lower.includes('custom')
-      ) {
-        return 3;
-      }
-
-      // Row 2: Compute, Streaming, and Ingestion
-      if (
-        lower.includes('adf') || lower.includes('factory') || lower.includes('pipeline') ||
-        lower.includes('orchestration') || lower.includes('etl') || lower.includes('elt') ||
-        lower.includes('big data') || lower.includes('streaming') || lower.includes('ingestion') ||
-        lower.includes('cdc') || lower.includes('dbt') || lower.includes('kafka') ||
-        lower.includes('flink') || lower.includes('airflow') || lower.includes('dag') ||
-        lower.includes('spark') || lower.includes('pyspark') || lower.includes('databricks') ||
-        lower.includes('distributed') || lower.includes('optimization') || lower.includes('tuning') ||
-        lower.includes('resource') || lower.includes('performance') || lower.includes('observability') ||
-        lower.includes('monitoring') || lower.includes('integration')
-      ) {
-        return 2;
-      }
-
-      // Row 1: Data Platform, Modeling, and Storage
-      return 1;
-    }
-
-    // Partition categories into three rows
-    const rowChips = {
-      1: [],
-      2: [],
-      3: []
-    };
-
-    // Always put "All Categories" as the first chip in Row 1
     const allChip = document.createElement('button');
     allChip.className = `topic-chip${state.activeUnifiedCategory === 'ALL' ? ' active' : ''}`;
     allChip.setAttribute('data-category', 'ALL');
     allChip.textContent = 'All Categories';
-    rowChips[1].push(allChip);
+    DOM.prephub.unifiedCategoryScrollbar.appendChild(allChip);
 
     sortedCategories.forEach(cat => {
       const chip = document.createElement('button');
       chip.className = `topic-chip${state.activeUnifiedCategory === cat ? ' active' : ''}`;
       chip.setAttribute('data-category', cat);
       chip.textContent = displayNames[cat] || cat;
-      const rowId = getCategoryRow(cat);
-      rowChips[rowId].push(chip);
+      DOM.prephub.unifiedCategoryScrollbar.appendChild(chip);
     });
 
-    const rowMetadata = [
-      { id: 1, label: 'Platform & Storage' },
-      { id: 2, label: 'Compute & Ingestion' },
-      { id: 3, label: 'AI & Languages' }
-    ];
-
-    rowMetadata.forEach(meta => {
-      const chipsInRow = rowChips[meta.id];
-      // Render the row if it has chips. Row 1 has at least "All Categories", which is always rendered.
-      if (chipsInRow.length > 0) {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'category-row';
-
-        const labelDiv = document.createElement('div');
-        labelDiv.className = 'category-row-label';
-        labelDiv.textContent = meta.label;
-
-        const chipsWrapDiv = document.createElement('div');
-        chipsWrapDiv.className = 'category-row-chips';
-
-        chipsInRow.forEach(chip => {
-          chipsWrapDiv.appendChild(chip);
-        });
-
-        rowDiv.appendChild(labelDiv);
-        rowDiv.appendChild(chipsWrapDiv);
-        DOM.prephub.unifiedCategoryScrollbar.appendChild(rowDiv);
-      }
-    });
-
-    // Wire up event listeners
     const chips = DOM.prephub.unifiedCategoryScrollbar.querySelectorAll('.topic-chip');
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
