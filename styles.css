@@ -1564,6 +1564,11 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+.chips-wrap {
+  flex-wrap: wrap !important;
+  overflow-x: visible !important;
+}
+
 .topics-scrollbar::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }

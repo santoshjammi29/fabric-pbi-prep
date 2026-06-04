@@ -470,6 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (subTabId === 'view-personalised') {
       renderPersonalised();
     } else if (subTabId === 'view-unified-search') {
+      renderUnifiedCategoryChips();
       renderUnifiedSearch();
     }
   }
@@ -1246,19 +1247,9 @@ document.addEventListener('DOMContentLoaded', () => {
           chips.forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
           state.activeUnifiedDb = chip.getAttribute('data-db') || 'ALL';
+          state.activeUnifiedCategory = 'ALL';
           state.unifiedSearchPage = 1;
-          renderUnifiedSearch(true);
-        });
-      });
-    }
-    if (DOM.prephub && DOM.prephub.unifiedCategoryScrollbar) {
-      const chips = DOM.prephub.unifiedCategoryScrollbar.querySelectorAll('.topic-chip');
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          chips.forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-          state.activeUnifiedCategory = chip.getAttribute('data-category') || 'ALL';
-          state.unifiedSearchPage = 1;
+          renderUnifiedCategoryChips();
           renderUnifiedSearch(true);
         });
       });
@@ -2715,6 +2706,88 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function renderUnifiedCategoryChips() {
+    if (!DOM.prephub || !DOM.prephub.unifiedCategoryScrollbar) return;
+
+    const dbFilter = state.activeUnifiedDb || 'ALL';
+    const pool = [];
+
+    // Compile active pool questions to extract categories
+    if (dbFilter === 'ALL' || dbFilter === 'personalised') {
+      (window.PERSONALISED_QUESTIONS || []).forEach(q => {
+        pool.push({ category: q.subdomain || q.domain || 'Personalised' });
+      });
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'fabric_pbi') {
+      (window.QUESTIONS_DB || []).forEach(q => {
+        pool.push({ category: q.category });
+      });
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'general') {
+      (window.QUESTIONS_DE_DB || []).forEach(q => {
+        pool.push({ category: q.category });
+      });
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'python') {
+      (window.PYTHON_DATA || []).forEach(q => {
+        pool.push({ category: q.category || 'Python' });
+      });
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'mssql') {
+      (window.MSSQL_DATA || []).forEach(q => {
+        pool.push({ category: q.category || 'SQL' });
+      });
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'pyspark') {
+      (window.PYSPARK_DATA || []).forEach(q => {
+        pool.push({ category: q.category || 'PySpark' });
+      });
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'sparksql') {
+      (window.SPARKSQL_DATA || []).forEach(q => {
+        pool.push({ category: q.category || 'Spark SQL' });
+      });
+    }
+
+    const categories = new Set();
+    pool.forEach(q => {
+      if (q.category) categories.add(q.category.trim());
+    });
+
+    const sortedCategories = Array.from(categories).sort();
+
+    if (state.activeUnifiedCategory !== 'ALL' && !categories.has(state.activeUnifiedCategory)) {
+      state.activeUnifiedCategory = 'ALL';
+    }
+
+    DOM.prephub.unifiedCategoryScrollbar.innerHTML = '';
+
+    const allChip = document.createElement('button');
+    allChip.className = `topic-chip${state.activeUnifiedCategory === 'ALL' ? ' active' : ''}`;
+    allChip.setAttribute('data-category', 'ALL');
+    allChip.textContent = 'All Categories';
+    DOM.prephub.unifiedCategoryScrollbar.appendChild(allChip);
+
+    sortedCategories.forEach(cat => {
+      const chip = document.createElement('button');
+      chip.className = `topic-chip${state.activeUnifiedCategory === cat ? ' active' : ''}`;
+      chip.setAttribute('data-category', cat);
+      chip.textContent = displayNames[cat] || cat;
+      DOM.prephub.unifiedCategoryScrollbar.appendChild(chip);
+    });
+
+    const chips = DOM.prephub.unifiedCategoryScrollbar.querySelectorAll('.topic-chip');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.activeUnifiedCategory = chip.getAttribute('data-category') || 'ALL';
+        state.unifiedSearchPage = 1;
+        renderUnifiedSearch(true);
+      });
+    });
+  }
+
   function renderUnifiedSearch(resetResults = true) {
     if (!DOM.prephub || !DOM.prephub.unifiedSearchContainer) return;
 
@@ -2913,7 +2986,7 @@ document.addEventListener('DOMContentLoaded', () => {
       headerDiv.className = 'level-card-header';
       headerDiv.style.cursor = 'pointer';
       headerDiv.innerHTML = `
-        <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">#${overallIndex}</div>
+        <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">${overallIndex}</div>
         <div class="level-meta" style="flex: 1; min-width: 0;">
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px;">
             <span class="stats-badge" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.sourceLabel}</span>
@@ -3106,6 +3179,16 @@ document.addEventListener('DOMContentLoaded', () => {
             inParagraph = false;
          }
          return;
+      }
+
+      // Parse markdown headings (e.g. ### Phase 1)
+      let headingMatch = line.match(/^(#+)\s*(.*)$/);
+      if (headingMatch) {
+        if (inParagraph) { output += '</p>'; inParagraph = false; }
+        if (listType) { output += `</${listType}>`; listType = null; }
+        const headingText = headingMatch[2];
+        output += `<h5 style="color: var(--text-primary); font-weight: 700; margin: 1rem 0 0.5rem 0; font-size: 0.95rem; font-family: 'Space Grotesk', sans-serif;">${headingText}</h5>`;
+        return;
       }
       
       let olMatch = line.match(/^(\d+)[\)\.]\s/);
