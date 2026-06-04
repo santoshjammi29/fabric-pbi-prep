@@ -3,19 +3,110 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- STATE ---
   const state = {
-    currentView: 'view-dashboard',
+    currentView: 'view-concepts',
     theme: 'dark', // 'dark' or 'light'
-    markStatusEnabled: true,
-    progress: {}, // maps questionId -> status ('unseen', 'reviewing', 'mastered')
     questions: (() => {
-      const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3 };
-      const qList = window.QUESTIONS_DB || [];
+      const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3, 'ARCHITECT': 4 };
+      const qList = [];
+      
+      // 1. Fabric & PBI
+      (window.QUESTIONS_DB || []).forEach(q => {
+        qList.push({
+          ...q,
+          db: 'fabric_pbi',
+          sourceDb: 'fabric_pbi',
+          sourceLabel: 'Fabric & PBI',
+          categoryLabel: q.category,
+          difficulty: q.difficulty || 'MEDIUM'
+        });
+      });
+
+      // 2. Personalised
+      (window.PERSONALISED_QUESTIONS || []).forEach(q => {
+        qList.push({
+          ...q,
+          db: 'personalised',
+          sourceDb: 'personalised',
+          sourceLabel: 'Personalised',
+          categoryLabel: q.subdomain || q.domain || 'Personalised',
+          difficulty: q.difficulty || 'HARD'
+        });
+      });
+
+      // 3. General DE
+      (window.QUESTIONS_DE_DB || []).forEach(q => {
+        qList.push({
+          ...q,
+          db: 'general',
+          sourceDb: 'general',
+          sourceLabel: 'General DE',
+          categoryLabel: q.category,
+          difficulty: q.difficulty || 'MEDIUM'
+        });
+      });
+
+      // 4. Python
+      (window.PYTHON_DATA || []).forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'python',
+          sourceDb: 'python',
+          sourceLabel: 'Python Coding',
+          categoryLabel: q.category || 'Python',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+
+      // 5. MSSQL
+      (window.MSSQL_DATA || []).forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'mssql',
+          sourceDb: 'mssql',
+          sourceLabel: 'Advanced SQL',
+          categoryLabel: q.category || 'SQL',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+
+      // 6. PySpark
+      (window.PYSPARK_DATA || []).forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'pyspark',
+          sourceDb: 'pyspark',
+          sourceLabel: 'PySpark Coding',
+          categoryLabel: q.category || 'PySpark',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+
+      // 7. Spark SQL
+      (window.SPARKSQL_DATA || []).forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'sparksql',
+          sourceDb: 'sparksql',
+          sourceLabel: 'Spark SQL Coding',
+          categoryLabel: q.category || 'Spark SQL',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+
       return qList.sort((a, b) => {
         const weightA = diffWeights[a.difficulty] || 3;
         const weightB = diffWeights[b.difficulty] || 3;
         return weightA - weightB;
       });
-  })(),
+    })(),
     
     // Active filters
     activeExplainerCategory: 'ALL',
@@ -27,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activeConceptsDifficulty: 'ALL',
     
     // Cheat Sheet Active Filters
-    activeCheatsheetLang: 'python',
+    activeCheatsheetLang: 'all',
     activeCheatsheetLevel: 'all',
     activeCheatsheetQuery: '',
     
@@ -40,6 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
     unifiedSearchPage: 1,
     activeUnifiedDb: 'ALL',
     activeUnifiedCategory: 'ALL',
+    activeUnifiedDifficulty: 'ALL',
+    activeUnifiedStatus: 'ALL',
+    expandedUnifiedSections: {},
+    unifiedSectionLimits: {},
+    
+    // Personalised Prep State
+    activePersonalisedDifficulty: 'ALL',
+    activePersonalisedDomain: 'ALL',
+    expandedPersonalisedSections: {},
+    
+    // Niche Practice State
+    activePracticeDifficulty: 'ALL',
+    activePracticeCategory: 'ALL',
+    expandedPracticeSections: {},
+    
+    // Concept Explainer State
+    activeExplainerDifficulty: 'ALL',
+    activeExplainerCategory: 'ALL',
+    expandedExplainerSections: {},
     
     // Active practice session state
     practice: {
@@ -60,63 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggleBtn: document.getElementById('btn-theme-toggle'),
     themeToggleLabel: document.querySelector('.theme-toggle-container .theme-toggle-label'),
     mobileThemeBtn: document.getElementById('btn-mobile-theme') || null,
-    
-    // Mark Status Toggle
-    statusToggleBtn: document.getElementById('btn-status-toggle') || null,
-    statusToggleLabel: document.querySelectorAll('.theme-toggle-container .theme-toggle-label')[1] || null,
-    
-    // Dashboard Stats DOM Elements
-    stats: {
-      'FABRIC': {
-        mastered: document.getElementById('count-fabric-mastered'),
-        review: document.getElementById('count-fabric-review'),
-        unseen: document.getElementById('count-fabric-unseen'),
-        chart: document.getElementById('chart-fabric-progress'),
-        percent: document.getElementById('label-fabric-percent'),
-        badge: document.getElementById('badge-fabric')
-      },
-      'POWER BI': {
-        mastered: document.getElementById('count-pbi-mastered'),
-        review: document.getElementById('count-pbi-review'),
-        unseen: document.getElementById('count-pbi-unseen'),
-        chart: document.getElementById('chart-pbi-progress'),
-        percent: document.getElementById('label-pbi-percent'),
-        badge: document.getElementById('badge-pbi')
-      },
-      'ADF': {
-        mastered: document.getElementById('count-adf-mastered'),
-        review: document.getElementById('count-adf-review'),
-        unseen: document.getElementById('count-adf-unseen'),
-        chart: document.getElementById('chart-adf-progress'),
-        percent: document.getElementById('label-adf-percent'),
-        badge: document.getElementById('badge-adf')
-      },
-      'SQL SERVER': {
-        mastered: document.getElementById('count-sql-mastered'),
-        review: document.getElementById('count-sql-review'),
-        unseen: document.getElementById('count-sql-unseen'),
-        chart: document.getElementById('chart-sql-progress'),
-        percent: document.getElementById('label-sql-percent'),
-        badge: document.getElementById('badge-sql')
-      },
-      'DATALAKE ARCHITECTURE': {
-        mastered: document.getElementById('count-datalake-mastered'),
-        review: document.getElementById('count-datalake-review'),
-        unseen: document.getElementById('count-datalake-unseen'),
-        chart: document.getElementById('chart-datalake-progress'),
-        percent: document.getElementById('label-datalake-percent'),
-        badge: document.getElementById('badge-datalake')
-      },
-      'SPARK & DATABRICKS': {
-        mastered: document.getElementById('count-spark-mastered'),
-        review: document.getElementById('count-spark-review'),
-        unseen: document.getElementById('count-spark-unseen'),
-        chart: document.getElementById('chart-spark-progress'),
-        percent: document.getElementById('label-spark-percent'),
-        badge: document.getElementById('badge-spark')
-      }
-    },
-    
     // Concept Explainer Filters & Accordion
     explainerTopicsScrollbar: document.getElementById('explainer-topics-scrollbar'),
     explainerSearch: document.getElementById('explainer-search'),
@@ -139,8 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
     activePracticeAContainer: document.getElementById('active-practice-a-container'),
     activePracticeRevealBtn: document.getElementById('btn-practice-reveal'),
     activePracticeAText: document.getElementById('active-practice-a-text'),
-    practiceStatusSelector: document.getElementById('practice-status-selector'),
-    practiceStatusBtns: document.querySelectorAll('#practice-status-selector .status-btn'),
     btnPracticeBack: document.getElementById('btn-practice-back'),
     btnPracticeShuffle: document.getElementById('btn-practice-shuffle'),
     btnPracticePrev: document.getElementById('btn-practice-prev'),
@@ -155,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnDialogDone: document.getElementById('btn-dialog-done'),
     btnDialogPrev: document.getElementById('btn-dialog-prev'),
     btnDialogNext: document.getElementById('btn-dialog-next'),
-    dialogStatusBtns: document.querySelectorAll('#details-dialog .status-btn'),
     
     // Scroll To Top
     btnScrollToTop: document.getElementById('btn-scroll-to-top'),
@@ -180,22 +230,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Personalised Prep DOM cache
     personalised: {
-      topicsScrollbar: document.getElementById('personalised-topics-scrollbar'),
+      domainList: document.getElementById('personalised-domain-list'),
       search: document.getElementById('personalised-search'),
       container: document.getElementById('personalised-container'),
-      matchCount: document.getElementById('personalised-match-count')
+      matchCount: document.getElementById('personalised-match-count'),
+      difficultySelector: document.getElementById('personalised-difficulty-selector')
     },
     
     // Unified Prep Hub DOM cache
     prephub: {
       subnav: document.getElementById('prep-hub-subnav'),
       unifiedSearchInput: document.getElementById('unified-search-input'),
-      unifiedDbScrollbar: document.getElementById('unified-db-scrollbar'),
-      unifiedCategoryScrollbar: document.getElementById('unified-category-scrollbar'),
       unifiedSearchContainer: document.getElementById('unified-search-container'),
       unifiedMatchCount: document.getElementById('unified-match-count'),
-      btnUnifiedLoadMore: document.getElementById('btn-unified-load-more'),
-      unifiedLoadMoreContainer: document.getElementById('unified-load-more-container')
+      dbList: document.getElementById('unified-db-list'),
+      domainList: document.getElementById('unified-domain-list'),
+      difficultySelector: document.getElementById('unified-difficulty-selector')
     }
   };
 
@@ -266,13 +316,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- INITIALIZATION & RECOVERY ---
   
   function init() {
-    loadProgress();
     loadTheme();
-    loadMarkStatusToggle();
     setupEventListeners();
-    updateDashboardStats();
-    renderExplainer();
-    renderNicheSelection();
+    initExplainer();
+    initPractice();
     initGeneralDe();
     initConcepts();
     initCheatsheet();
@@ -289,8 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Set initial view from URL hash, fallback to localStorage, or default to dashboard
-    let initialView = 'view-dashboard';
+    // Set initial view from URL hash, fallback to localStorage, or default to concepts
+    let initialView = 'view-concepts';
     const hash = window.location.hash;
     if (hash && document.getElementById(hash.substring(1))) {
       initialView = hash.substring(1);
@@ -322,47 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Load and apply progress from localStorage
-  function loadProgress() {
-    try {
-      const savedProgress = localStorage.getItem('interview_prep_progress');
-      if (savedProgress) {
-        state.progress = JSON.parse(savedProgress);
-      } else {
-        state.progress = {};
-      }
-    } catch (e) {
-      console.error("Could not load progress", e);
-      state.progress = {};
-    }
-  }
 
-  // Save progress to localStorage
-  function saveProgress() {
-    try {
-      localStorage.setItem('interview_prep_progress', JSON.stringify(state.progress));
-    } catch (e) {
-      console.error("Could not save progress", e);
-    }
-  }
-
-  // Update a single question status
-  function updateQuestionStatus(questionId, newStatus) {
-    if (newStatus === 'unseen') {
-      delete state.progress[questionId];
-    } else {
-      state.progress[questionId] = newStatus;
-    }
-    saveProgress();
-    updateDashboardStats();
-    
-    // Sync UI elements if visible
-    const explainerCardIndicator = document.querySelector(`.concept-card[data-id="${questionId}"] .status-indicator`);
-    if (explainerCardIndicator) {
-      explainerCardIndicator.className = `status-indicator status-${newStatus}${newStatus === 'unseen' ? ' hidden' : ''}`;
-      explainerCardIndicator.textContent = newStatus;
-    }
-  }
 
   // --- THEME & UTILITIES ---
   
@@ -398,41 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('interview_prep_theme', state.theme);
   }
 
-  function loadMarkStatusToggle() {
-    const savedToggle = localStorage.getItem('interview_prep_mark_status_enabled');
-    if (savedToggle !== null) {
-      state.markStatusEnabled = savedToggle === 'true';
-    }
-    applyMarkStatusToggle();
-  }
 
-  function applyMarkStatusToggle() {
-    const root = document.documentElement;
-    if (state.markStatusEnabled) {
-      if (DOM.statusToggleBtn) {
-        DOM.statusToggleBtn.classList.add('active');
-        DOM.statusToggleBtn.textContent = '✓';
-      }
-      if (DOM.statusToggleLabel) {
-        DOM.statusToggleLabel.textContent = 'Mark Status';
-      }
-      root.classList.remove('mark-status-disabled');
-      DOM.practiceStatusSelector.classList.remove('hidden');
-      document.querySelectorAll('.dialog-status-selector').forEach(el => el.classList.remove('hidden'));
-    } else {
-      if (DOM.statusToggleBtn) {
-        DOM.statusToggleBtn.classList.remove('active');
-        DOM.statusToggleBtn.textContent = '✗';
-      }
-      if (DOM.statusToggleLabel) {
-        DOM.statusToggleLabel.textContent = 'Mark Status';
-      }
-      root.classList.add('mark-status-disabled');
-      DOM.practiceStatusSelector.classList.add('hidden');
-      document.querySelectorAll('.dialog-status-selector').forEach(el => el.classList.add('hidden'));
-    }
-    localStorage.setItem('interview_prep_mark_status_enabled', state.markStatusEnabled);
-  }
 
   // --- SPA ROUTING ---
   
@@ -470,7 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (subTabId === 'view-personalised') {
       renderPersonalised();
     } else if (subTabId === 'view-unified-search') {
-      renderUnifiedCategoryChips();
       renderUnifiedSearch();
     }
   }
@@ -589,9 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Re-render appropriate contents
-    if (actualTargetViewId === 'view-dashboard') {
-      updateDashboardStats();
-    } else if (actualTargetViewId === 'view-concepts') {
+    if (actualTargetViewId === 'view-concepts') {
       renderConcepts();
     } else if (actualTargetViewId === 'view-cheatsheet') {
       renderCheatsheet();
@@ -617,246 +587,874 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- STATS & SVG COMPUTATION ---
   
-  function updateDashboardStats() {
-    const categories = Object.keys(DOM.stats);
+  function getCategorySectionKey(q) {
+    if (!q) return 'PLATFORM_STORAGE';
+    const db = q.db || q.sourceDb || '';
+    const cat = q.category || '';
+    const lowerDb = db.toLowerCase();
+    const lowerCat = cat.toLowerCase();
     
-    categories.forEach(cat => {
-      const catQuestions = state.questions.filter(q => q.category === cat);
-      const total = catQuestions.length || 200;
-      
-      let masteredCount = 0;
-      let reviewCount = 0;
-      
-      catQuestions.forEach(q => {
-        const status = state.progress[q.id];
-        if (status === 'mastered') masteredCount++;
-        else if (status === 'reviewing') reviewCount++;
-      });
-      
-      const unseenCount = total - (masteredCount + reviewCount);
-      
-      // Update DOM Text counts
-      const domStats = DOM.stats[cat];
-      if (domStats.mastered) domStats.mastered.textContent = `${masteredCount} / ${total}`;
-      if (domStats.review) domStats.review.textContent = `${reviewCount} / ${total}`;
-      if (domStats.unseen) domStats.unseen.textContent = `${unseenCount} / ${total}`;
-      
-      // Calculate Percent Mastered
-      const percentVal = Math.round((masteredCount / total) * 100);
-      if (domStats.percent) domStats.percent.innerHTML = `${percentVal}% <span>Mastered</span>`;
-      
-      // Sync SVG Radial Progress (Circumference ~ 377px)
-      if (domStats.chart) {
-        const offset = 377 - (masteredCount / total) * 377;
-        domStats.chart.style.strokeDashoffset = offset;
-      }
-      
-      // Update Difficulty Badge
-      if (domStats.badge) {
-        const easyCount = catQuestions.filter(q => q.difficulty === 'EASY').length;
-        const medCount = catQuestions.filter(q => q.difficulty === 'MEDIUM').length;
-        const hardCount = catQuestions.filter(q => q.difficulty === 'HARD').length;
-        domStats.badge.innerHTML = `E: ${easyCount} | M: ${medCount} | H: ${hardCount}`;
-      }
-    });
+    // Check by database source first:
+    if (lowerDb === 'python') return 'LANGUAGES_CLOUD';
+    if (lowerDb === 'mssql') return 'LANGUAGES_CLOUD';
+    if (lowerDb === 'pyspark') return 'COMPUTE_STREAMING';
+    if (lowerDb === 'sparksql') return 'COMPUTE_STREAMING';
+    
+    // AI & Vector DBs
+    if (
+      lowerCat.includes('rag') || lowerCat.includes('vector') || lowerCat.includes('llm') || lowerCat.includes('ai')
+    ) {
+      return 'AI_VECTOR_DB';
+    }
+
+    // Languages & Cloud
+    if (
+      lowerCat.includes('python') || lowerCat.includes('decorator') || lowerCat.includes('generator') ||
+      lowerCat.includes('concurrency') || lowerCat.includes('threading') || lowerCat.includes('pattern') ||
+      lowerCat.includes('language') || lowerCat.includes('foundation') || lowerCat.includes('cleaning') ||
+      lowerCat.includes('manipulation') || lowerCat.includes('functional') || lowerCat.includes('cloud') ||
+      lowerCat.includes('finops') || lowerCat.includes('devops') || lowerCat.includes('personalised') ||
+      lowerCat.includes('custom') || lowerCat.includes('error handling')
+    ) {
+      return 'LANGUAGES_CLOUD';
+    }
+
+    // Pipelines & Integration
+    if (
+      lowerCat.includes('adf') || lowerCat.includes('factory') || lowerCat.includes('pipeline') ||
+      lowerCat.includes('orchestration') || lowerCat.includes('etl') || lowerCat.includes('elt') ||
+      lowerCat.includes('ingestion') || lowerCat.includes('cdc') || lowerCat.includes('dbt') ||
+      lowerCat.includes('airflow') || lowerCat.includes('dag') || lowerCat.includes('integration') ||
+      lowerCat.includes('delta live tables')
+    ) {
+      return 'PIPELINES_INTEGRATION';
+    }
+
+    // Compute & Streaming
+    if (
+      lowerCat.includes('spark') || lowerCat.includes('pyspark') || lowerCat.includes('databricks') ||
+      lowerCat.includes('distributed') || lowerCat.includes('kafka') || lowerCat.includes('flink') ||
+      lowerCat.includes('streaming') || lowerCat.includes('big data') || lowerCat.includes('engineering') ||
+      lowerCat.includes('tuning') || lowerCat.includes('resource') || lowerCat.includes('performance') ||
+      lowerCat.includes('observability') || lowerCat.includes('monitoring') || lowerCat.includes('optimization')
+    ) {
+      return 'COMPUTE_STREAMING';
+    }
+
+    // Platform & Storage
+    return 'PLATFORM_STORAGE';
   }
+
+  function getStandardizedDomain(q) {
+    if (!q) return 'General Data Engineering';
+    const sourceDb = q.sourceDb || q.db || '';
+    const cat = (q.categoryLabel || q.category || '').toUpperCase().trim();
+    
+    // 1. Compute & Orchestration
+    if (
+      cat.includes('SPARK') || 
+      cat.includes('DATABRICKS') || 
+      cat.includes('AIRFLOW') || 
+      cat.includes('FLINK') || 
+      cat.includes('BIG DATA') || 
+      cat.includes('DISTRIBUTED') || 
+      cat.includes('RESOURCE') ||
+      sourceDb === 'pyspark'
+    ) {
+      return 'Compute & Orchestration';
+    }
+    
+    // 2. Databases, SQL & Storage
+    if (
+      cat.includes('SQL') || 
+      cat.includes('DATABASE') || 
+      cat.includes('QUERY') || 
+      cat.includes('JOINS') || 
+      cat.includes('AGGREGATION') || 
+      cat.includes('DML') || 
+      cat.includes('DDL') || 
+      cat.includes('PROGRAMMABILITY') || 
+      sourceDb === 'mssql' || 
+      sourceDb === 'sparksql'
+    ) {
+      return 'Databases, SQL & Storage';
+    }
+    
+    // 3. Data Pipelines & Ingestion
+    if (
+      cat.includes('ADF') || 
+      cat.includes('PIPELINE') || 
+      cat.includes('INGESTION') || 
+      cat.includes('CDC') || 
+      cat.includes('KAFKA') || 
+      cat.includes('DBT') || 
+      cat.includes('ETL') || 
+      cat.includes('INTEGRATION')
+    ) {
+      return 'Data Pipelines & Ingestion';
+    }
+    
+    // 4. Data Lakehouse & Architecture
+    if (
+      cat.includes('LAKEHOUSE') || 
+      cat.includes('DATALAKE') || 
+      cat.includes('DELTA') || 
+      cat.includes('MODELING') || 
+      cat.includes('VAULT') || 
+      cat.includes('STORAGE') || 
+      cat.includes('ARCHITECTURE') || 
+      cat.includes('MEDALLION') || 
+      cat.includes('FORMAT')
+    ) {
+      return 'Data Lakehouse & Architecture';
+    }
+    
+    // 5. Data Governance & Quality
+    if (
+      cat.includes('GOVERNANCE') || 
+      cat.includes('QUALITY') || 
+      cat.includes('SECURITY') || 
+      cat.includes('DEVOPS') || 
+      cat.includes('METADATA') || 
+      cat.includes('CATALOG') || 
+      cat.includes('TOPOGRAPHY') || 
+      cat.includes('LINEAGE')
+    ) {
+      return 'Data Governance & Quality';
+    }
+    
+    // 6. Analytics, BI & AI
+    if (
+      cat.includes('FABRIC') || 
+      cat.includes('POWER BI') || 
+      cat.includes('VISUALIZATION') || 
+      cat.includes('EXCEL') || 
+      cat.includes('ANALYTICS') || 
+      cat.includes('RAG') || 
+      cat.includes('VECTOR') || 
+      cat.includes('LLM') || 
+      cat.includes('SEMANTIC')
+    ) {
+      return 'Analytics, BI & AI';
+    }
+    
+    // 7. FinOps & Performance Optimization
+    if (
+      cat.includes('FINOPS') || 
+      cat.includes('COST') || 
+      cat.includes('PERFORMANCE') || 
+      cat.includes('OPTIMIZATION') || 
+      cat.includes('TUNING') || 
+      cat.includes('DEBUG')
+    ) {
+      return 'FinOps & Performance Optimization';
+    }
+    
+    return 'General Data Engineering';
+  }
+
+
 
   // --- CONCEPT EXPLAINER ACCORDION & FILTERS ---
   
-  function renderExplainer() {
-    const filterCat = state.activeExplainerCategory;
-    const filterStatus = DOM.explainerFilterStatus.value;
-    const filterDifficulty = DOM.explainerFilterDifficulty ? DOM.explainerFilterDifficulty.value : 'ALL';
-    const query = DOM.explainerSearch.value.trim().toLowerCase();
+  function updateExplainerCounts() {
+    const query = (document.getElementById('explainer-search') ? document.getElementById('explainer-search').value : '').toLowerCase().trim();
+    const activeDiff = state.activeExplainerDifficulty || 'ALL';
     
-    // Group active questions by Category -> Niche
-    const grouped = {};
+    // Compile pool of questions
+    const pool = state.questions.filter(q => q.db === 'fabric_pbi');
     
-    state.questions.forEach(q => {
-      // Apply filters
-      if (filterCat !== 'ALL' && q.category !== filterCat) return;
+    // Get unique categories present in pool
+    const categoriesMap = new Map();
+    pool.forEach(q => {
+      if (q.category) {
+        categoriesMap.set(q.category, true);
+      }
+    });
+    const categories = Array.from(categoriesMap.keys()).sort();
+    
+    const container = document.getElementById('explainer-topic-list');
+    if (container) {
+      container.innerHTML = '';
       
-      const status = state.progress[q.id] || 'unseen';
-      if (filterStatus !== 'ALL' && status !== filterStatus) return;
+      // All Topics button count
+      const totalMatching = pool.filter(q => {
+        const matchesSearch = !query || 
+                              (q.question || '').toLowerCase().includes(query) || 
+                              (q.answer || '').toLowerCase().includes(query) || 
+                              (q.category || '').toLowerCase().includes(query);
+        const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+        return matchesSearch && matchesDiff;
+      }).length;
+      
+      const allBtn = document.createElement('button');
+      allBtn.setAttribute('data-category', 'ALL');
+      allBtn.className = 'qa-sidebar-btn' + (state.activeExplainerCategory === 'ALL' ? ' active' : '');
+      allBtn.innerHTML = `
+        <span>📂 All Topics</span>
+        <span class="qa-btn-count-badge">${totalMatching.toLocaleString()}</span>
+      `;
+      allBtn.addEventListener('click', () => {
+        state.activeExplainerCategory = 'ALL';
+        container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        renderExplainer(true);
+      });
+      container.appendChild(allBtn);
+      
+      categories.forEach(catName => {
+        const catPool = pool.filter(q => q.category === catName);
+        
+        const matchCount = catPool.filter(q => {
+          const matchesSearch = !query || 
+                                (q.question || '').toLowerCase().includes(query) || 
+                                (q.answer || '').toLowerCase().includes(query) || 
+                                (q.category || '').toLowerCase().includes(query);
+          const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+          return matchesSearch && matchesDiff;
+        }).length;
+        
+        if (matchCount === 0) return;
+        
+        const displayName = displayNames[catName] || catName;
+        
+        const btn = document.createElement('button');
+        btn.setAttribute('data-category', catName);
+        btn.className = 'qa-sidebar-btn' + (state.activeExplainerCategory === catName ? ' active' : '');
+        btn.innerHTML = `
+          <span>${displayName}</span>
+          <span class="qa-btn-count-badge">${matchCount}</span>
+        `;
+        btn.addEventListener('click', () => {
+          state.activeExplainerCategory = catName;
+          container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderExplainer(true);
+        });
+        container.appendChild(btn);
+      });
+    }
+  }
 
-      // Apply difficulty filter
-      const difficulty = (q.difficulty || 'HARD').toUpperCase();
-      if (filterDifficulty !== 'ALL' && difficulty !== filterDifficulty) return;
-      
-      // Apply text search filter
-      if (query) {
-        const qText = q.question.toLowerCase();
-        const aText = q.answer.toLowerCase();
-        if (!qText.includes(query) && !aText.includes(query)) return;
-      }
-      
-      if (!grouped[q.category]) {
-        grouped[q.category] = {};
-      }
-      if (!grouped[q.category][q.niche]) {
-        grouped[q.category][q.niche] = [];
-      }
-      grouped[q.category][q.niche].push(q);
+  function renderExplainer(resetResults = true) {
+    const filterCat = state.activeExplainerCategory || 'ALL';
+    const activeDiff = state.activeExplainerDifficulty || 'ALL';
+    const query = (document.getElementById('explainer-search') ? document.getElementById('explainer-search').value : '').toLowerCase().trim();
+    
+    // Group active questions by Category
+    const pool = state.questions.filter(q => q.db === 'fabric_pbi');
+    
+    const filtered = pool.filter(q => {
+      const matchesCat = (filterCat === 'ALL' || q.category === filterCat);
+      const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+      const matchesSearch = !query || 
+                            (q.question || '').toLowerCase().includes(query) || 
+                            (q.answer || '').toLowerCase().includes(query) || 
+                            (q.category || '').toLowerCase().includes(query);
+      return matchesCat && matchesDiff && matchesSearch;
     });
     
-    DOM.explainerAccordion.innerHTML = '';
+    const container = document.getElementById('explainer-accordion');
+    if (!container) return;
+    container.innerHTML = '';
     
-    const catKeys = Object.keys(grouped);
-    if (catKeys.length === 0) {
-      DOM.explainerAccordion.innerHTML = `<div style="text-align:center; padding: 3rem; color:var(--text-secondary);">No questions found matching the selected filters.</div>`;
+    if (document.getElementById('explainer-match-count')) {
+      document.getElementById('explainer-match-count').textContent = `Showing ${filtered.length.toLocaleString()} matching concepts`;
+    }
+    
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1.25rem; color: var(--text-secondary); opacity: 0.4;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching concepts found</h4>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
+        </div>
+      `;
       return;
     }
     
-    // Render Category Groups & Niche Accordions
-    catKeys.forEach(cat => {
-      const niches = grouped[cat];
+    // Group questions by Category
+    const categoriesMap = {};
+    filtered.forEach(q => {
+      if (!categoriesMap[q.category]) {
+        categoriesMap[q.category] = [];
+      }
+      categoriesMap[q.category].push(q);
+    });
+    
+    const sortedCats = Object.keys(categoriesMap).sort();
+    
+    if (resetResults) {
+      state.expandedExplainerSections = {};
+      if (sortedCats.length > 0) {
+        state.expandedExplainerSections[sortedCats[0]] = true;
+      }
+    }
+    
+    let overallIdx = 1;
+    
+    sortedCats.forEach(catName => {
+      const sectItems = categoriesMap[catName];
+      const isExpanded = !!state.expandedExplainerSections[catName];
       
-      // Insert Section Header for Category (Formatted Title)
-      const catHeader = document.createElement('h3');
-      catHeader.className = 'practice-section-header';
-      catHeader.style.margin = '2rem 0 1rem 0';
-      catHeader.style.fontSize = '1.4rem';
-      catHeader.style.fontWeight = '800';
-      catHeader.style.color = 'var(--primary)';
-      catHeader.style.textTransform = 'uppercase';
-      catHeader.style.letterSpacing = '0.05em';
-      catHeader.textContent = displayNames[cat] || cat;
-      DOM.explainerAccordion.appendChild(catHeader);
+      const sectionWrapper = document.createElement('div');
+      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.style.marginBottom = '1.25rem';
+      sectionWrapper.style.border = '1px solid var(--card-border)';
+      sectionWrapper.style.borderRadius = '16px';
+      sectionWrapper.style.overflow = 'hidden';
       
-      Object.keys(niches).forEach(nicheName => {
-        const qList = niches[nicheName];
+      const badgeClass = badgeClasses[catName] || 'badge-fabric';
+      const sectEmoji = catName.includes('FABRIC') ? '📊' :
+                        catName.includes('POWER BI') ? '📊' :
+                        catName.includes('ADF') ? '⚡' :
+                        catName.includes('SQL') ? '🔷' :
+                        catName.includes('LAKEHOUSE') ? '🔥' : '⚙️';
+      
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'unified-section-header';
+      headerDiv.style.cursor = 'pointer';
+      headerDiv.style.display = 'flex';
+      headerDiv.style.alignItems = 'center';
+      headerDiv.style.justifyContent = 'space-between';
+      headerDiv.style.padding = '1.1rem 1.5rem';
+      headerDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+      
+      headerDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.15rem;">${sectEmoji}</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.02em;">${displayNames[catName] || catName}</span>
+          <span style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; font-weight: 600;">${sectItems.length}</span>
+        </div>
+        <svg class="section-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease; transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}; color: var(--text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
+      `;
+      sectionWrapper.appendChild(headerDiv);
+      
+      // Body
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'unified-section-body';
+      bodyDiv.style.display = isExpanded ? 'block' : 'none';
+      bodyDiv.style.padding = '1.5rem';
+      bodyDiv.style.borderTop = '1px solid var(--card-border)';
+      bodyDiv.style.background = 'rgba(0, 0, 0, 0.1)';
+      
+      {
+        // Section sub-header controls (counts and expand/collapse pills)
+        const subHeaderDiv = document.createElement('div');
+        subHeaderDiv.className = 'qa-section-controls';
+        subHeaderDiv.style.display = 'flex';
+        subHeaderDiv.style.justifyContent = 'space-between';
+        subHeaderDiv.style.alignItems = 'center';
+        subHeaderDiv.style.marginBottom = '1.25rem';
+        subHeaderDiv.style.padding = '0.5rem 1rem';
+        subHeaderDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+        subHeaderDiv.style.borderRadius = '10px';
+        subHeaderDiv.style.border = '1px solid var(--card-border)';
         
-        const accordionItem = document.createElement('div');
-        accordionItem.className = 'accordion-item';
+        const countText = document.createElement('span');
+        countText.style.fontSize = '0.8rem';
+        countText.style.fontWeight = '600';
+        countText.style.color = 'var(--text-secondary)';
+        countText.textContent = `Showing ${sectItems.length} matching questions`;
+        subHeaderDiv.appendChild(countText);
         
-        const header = document.createElement('button');
-        header.className = 'accordion-header';
-        const diffs = Array.from(new Set(qList.map(q => q.difficulty || 'HARD')));
-        const diffsHtml = diffs.map(d => `<span class="difficulty-badge badge-${d.toLowerCase()}">${d}</span>`).join(' ');
-        header.innerHTML = `
-          <span>${nicheName} (${qList.length} questions) ${diffsHtml}</span>
-          <span class="accordion-arrow">▼</span>
-        `;
+        const pillsContainer = document.createElement('div');
+        pillsContainer.style.display = 'flex';
+        pillsContainer.style.gap = '0.5rem';
         
-        const content = document.createElement('div');
-        content.className = 'accordion-content';
+        const expandPill = document.createElement('button');
+        expandPill.className = 'control-btn';
+        expandPill.style.padding = '0.3rem 0.6rem';
+        expandPill.style.fontSize = '0.7rem';
+        expandPill.style.borderRadius = '6px';
+        expandPill.style.cursor = 'pointer';
+        expandPill.style.border = '1px solid var(--card-border)';
+        expandPill.style.background = 'rgba(255, 255, 255, 0.02)';
+        expandPill.style.color = 'var(--text-secondary)';
+        expandPill.textContent = 'Expand All';
+        expandPill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.add('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'block';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+          });
+        });
         
-        const inner = document.createElement('div');
-        inner.className = 'accordion-inner';
+        const collapsePill = document.createElement('button');
+        collapsePill.className = 'control-btn';
+        collapsePill.style.padding = '0.3rem 0.6rem';
+        collapsePill.style.fontSize = '0.7rem';
+        collapsePill.style.borderRadius = '6px';
+        collapsePill.style.cursor = 'pointer';
+        collapsePill.style.border = '1px solid var(--card-border)';
+        collapsePill.style.background = 'rgba(255, 255, 255, 0.02)';
+        collapsePill.style.color = 'var(--text-secondary)';
+        collapsePill.textContent = 'Collapse All';
+        collapsePill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.remove('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'none';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+          });
+        });
         
-        const cardsGrid = document.createElement('div');
-        cardsGrid.className = 'cards-grid';
+        pillsContainer.appendChild(expandPill);
+        pillsContainer.appendChild(collapsePill);
+        subHeaderDiv.appendChild(pillsContainer);
+        bodyDiv.appendChild(subHeaderDiv);
         
-        qList.forEach(q => {
+        // Sub-grid
+        const subGrid = document.createElement('div');
+        subGrid.className = 'concepts-grid';
+        bodyDiv.appendChild(subGrid);
+        
+        sectItems.forEach(q => {
           const card = document.createElement('div');
-          card.className = 'concept-card';
-          card.setAttribute('data-id', q.id);
+          card.className = 'concept-accordion-card';
           
-          const status = state.progress[q.id] || 'unseen';
-          const badgeClass = badgeClasses[q.category] || 'badge-spark';
-          const categoryDisplayName = displayNames[q.category] || q.category;
-          
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
-              <span class="stats-badge ${badgeClass}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; width: fit-content;">${categoryDisplayName}</span>
-              <span class="difficulty-badge badge-${(q.difficulty || 'hard').toLowerCase()}" style="margin-left: 0;">${q.difficulty || 'HARD'}</span>
+          const cardHeader = document.createElement('div');
+          cardHeader.className = 'level-card-header';
+          cardHeader.style.cursor = 'pointer';
+          cardHeader.innerHTML = `
+            <div class="level-badge" style="background: var(--cat-fabric); color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">${overallIdx++}</div>
+            <div class="level-meta" style="flex: 1; min-width: 0;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px; align-items: center;">
+                <span class="stats-badge ${badgeClass}" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.niche}</span>
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.difficulty || 'HARD'}</span>
+              </div>
+              <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
             </div>
-            <div class="concept-card-title" style="margin-bottom: 0.75rem;">${q.question}</div>
-            <div class="concept-card-footer">
-              <span class="status-indicator status-${status}${status === 'unseen' ? ' hidden' : ''}">${status}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+          `;
+          
+          const cardBody = document.createElement('div');
+          cardBody.className = 'level-card-body';
+          cardBody.style.display = 'none';
+          cardBody.style.borderTop = '1px solid var(--card-border)';
+          cardBody.style.padding = '1.25rem';
+          cardBody.style.background = 'rgba(255, 255, 255, 0.01)';
+          
+          const formattedAnswer = formatArchitectAnswer(q.answer);
+          cardBody.innerHTML = `
+            <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+              ${formattedAnswer}
             </div>
           `;
           
-          card.addEventListener('click', () => {
-            openDetailsDialog(q.id);
+          card.appendChild(cardHeader);
+          card.appendChild(cardBody);
+          
+          cardHeader.addEventListener('click', () => {
+            const isOpen = cardBody.style.display !== 'none';
+            const chevron = cardHeader.querySelector('.level-chevron');
+            if (chevron) {
+              chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+            if (isOpen) {
+              cardBody.style.display = 'none';
+              card.classList.remove('expanded');
+            } else {
+              cardBody.style.display = 'block';
+              card.classList.add('expanded');
+              if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([cardBody]).catch(err => console.error("MathJax error:", err));
+              }
+            }
           });
           
-          cardsGrid.appendChild(card);
+          subGrid.appendChild(card);
         });
-        
-        inner.appendChild(cardsGrid);
-        content.appendChild(inner);
-        accordionItem.appendChild(header);
-        accordionItem.appendChild(content);
-        
-        // Expand accordions by default so contents are visible immediately
-        accordionItem.classList.add('active');
-        
-        DOM.explainerAccordion.appendChild(accordionItem);
-        
-        // Accordion toggle behavior
-        header.addEventListener('click', () => {
-          accordionItem.classList.toggle('active');
-        });
+      }
+      
+      sectionWrapper.appendChild(bodyDiv);
+      
+      headerDiv.addEventListener('click', () => {
+        state.expandedExplainerSections[catName] = !state.expandedExplainerSections[catName];
+        renderExplainer(false);
       });
+      
+      container.appendChild(sectionWrapper);
     });
   }
 
   // --- NICHE PRACTICE SELECTION GRID ---
-  
-  function renderNicheSelection() {
-    const filterCat = state.activePracticeCategory;
+
+  function initExplainer() {
+    console.log("Initializing Concept Explainer...");
+    setupExplainerListeners();
+    updateExplainerCounts();
+    renderExplainer();
+  }
+
+  function setupExplainerListeners() {
+    const searchInput = document.getElementById('explainer-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        updateExplainerCounts();
+        renderExplainer(true);
+      });
+    }
+
+    const diffSelector = document.getElementById('explainer-difficulty-selector');
+    if (diffSelector) {
+      const btns = diffSelector.querySelectorAll('.qa-sidebar-btn[data-difficulty]');
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activeExplainerDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          updateExplainerCounts();
+          renderExplainer(true);
+        });
+      });
+    }
+
+    const btnExpandAll = document.getElementById('btn-explainer-expand-all');
+    if (btnExpandAll) {
+      btnExpandAll.addEventListener('click', () => {
+        const pool = state.questions.filter(q => q.db === 'fabric_pbi');
+        const categoriesMap = new Map();
+        pool.forEach(q => {
+          if (q.category) categoriesMap.set(q.category, true);
+        });
+        categoriesMap.forEach((val, catName) => {
+          state.expandedExplainerSections[catName] = true;
+        });
+        renderExplainer(false);
+        document.querySelectorAll('#explainer-accordion .concept-accordion-card').forEach(card => {
+          card.classList.add('expanded');
+          const body = card.querySelector('.level-card-body');
+          if (body) body.style.display = 'block';
+          const chevron = card.querySelector('.level-chevron');
+          if (chevron) chevron.style.transform = 'rotate(180deg)';
+        });
+      });
+    }
+
+    const btnCollapseAll = document.getElementById('btn-explainer-collapse-all');
+    if (btnCollapseAll) {
+      btnCollapseAll.addEventListener('click', () => {
+        state.expandedExplainerSections = {};
+        renderExplainer(false);
+        document.querySelectorAll('#explainer-accordion .concept-accordion-card').forEach(card => {
+          card.classList.remove('expanded');
+          const body = card.querySelector('.level-card-body');
+          if (body) body.style.display = 'none';
+          const chevron = card.querySelector('.level-chevron');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        });
+      });
+    }
+  }
+
+  function initPractice() {
+    console.log("Initializing Niche Practice...");
+    setupPracticeListeners();
+    updatePracticeCounts();
+    renderNicheSelection();
+  }
+
+  function setupPracticeListeners() {
+    const searchInput = document.getElementById('practice-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        updatePracticeCounts();
+        renderNicheSelection(true);
+      });
+    }
+
+    const diffSelector = document.getElementById('practice-difficulty-selector');
+    if (diffSelector) {
+      const btns = diffSelector.querySelectorAll('.qa-sidebar-btn[data-difficulty]');
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activePracticeDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          updatePracticeCounts();
+          renderNicheSelection(true);
+        });
+      });
+    }
+
+    const btnExpandAll = document.getElementById('btn-practice-expand-all');
+    if (btnExpandAll) {
+      btnExpandAll.addEventListener('click', () => {
+        const pool = state.questions.filter(q => q.db === 'fabric_pbi');
+        const categoriesMap = new Map();
+        pool.forEach(q => {
+          if (q.category) categoriesMap.set(q.category, true);
+        });
+        categoriesMap.forEach((val, catName) => {
+          state.expandedPracticeSections[catName] = true;
+        });
+        renderNicheSelection(false);
+      });
+    }
+
+    const btnCollapseAll = document.getElementById('btn-practice-collapse-all');
+    if (btnCollapseAll) {
+      btnCollapseAll.addEventListener('click', () => {
+        state.expandedPracticeSections = {};
+        renderNicheSelection(false);
+      });
+    }
+  }
+
+  function updatePracticeCounts() {
+    const query = (document.getElementById('practice-search') ? document.getElementById('practice-search').value : '').toLowerCase().trim();
+    const activeDiff = state.activePracticeDifficulty || 'ALL';
+    const pool = state.questions.filter(q => q.db === 'fabric_pbi');
     
-    // Group all niches and counts
-    const nicheSummary = {};
-    
-    state.questions.forEach(q => {
-      if (filterCat !== 'ALL' && q.category !== filterCat) return;
-      
-      if (state.activeDifficulty !== 'ALL') {
-        const diff = q.difficulty || 'HARD';
-        if (diff !== state.activeDifficulty) return;
+    const categoriesMap = new Map();
+    pool.forEach(q => {
+      if (q.category) {
+        categoriesMap.set(q.category, true);
       }
+    });
+    const categories = Array.from(categoriesMap.keys()).sort();
+    
+    const container = document.getElementById('practice-category-list');
+    if (container) {
+      container.innerHTML = '';
       
+      const totalMatching = pool.filter(q => {
+        const matchesSearch = !query || 
+                              (q.niche || '').toLowerCase().includes(query) ||
+                              (q.category || '').toLowerCase().includes(query) ||
+                              (q.question || '').toLowerCase().includes(query) || 
+                              (q.answer || '').toLowerCase().includes(query);
+        const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+        return matchesSearch && matchesDiff;
+      }).length;
+      
+      const allBtn = document.createElement('button');
+      allBtn.setAttribute('data-category', 'ALL');
+      allBtn.className = 'qa-sidebar-btn' + (state.activePracticeCategory === 'ALL' ? ' active' : '');
+      allBtn.innerHTML = `
+        <span>📂 All Topics</span>
+        <span class="qa-btn-count-badge">${totalMatching.toLocaleString()}</span>
+      `;
+      allBtn.addEventListener('click', () => {
+        state.activePracticeCategory = 'ALL';
+        container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        renderNicheSelection(true);
+      });
+      container.appendChild(allBtn);
+      
+      categories.forEach(catName => {
+        const catPool = pool.filter(q => q.category === catName);
+        
+        const matchCount = catPool.filter(q => {
+          const matchesSearch = !query || 
+                                (q.niche || '').toLowerCase().includes(query) ||
+                                (q.category || '').toLowerCase().includes(query) ||
+                                (q.question || '').toLowerCase().includes(query) || 
+                                (q.answer || '').toLowerCase().includes(query);
+          const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+          return matchesSearch && matchesDiff;
+        }).length;
+        
+        if (matchCount === 0) return;
+        
+        const displayName = displayNames[catName] || catName;
+        
+        const btn = document.createElement('button');
+        btn.setAttribute('data-category', catName);
+        btn.className = 'qa-sidebar-btn' + (state.activePracticeCategory === catName ? ' active' : '');
+        btn.innerHTML = `
+          <span>${displayName}</span>
+          <span class="qa-btn-count-badge">${matchCount}</span>
+        `;
+        btn.addEventListener('click', () => {
+          state.activePracticeCategory = catName;
+          container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderNicheSelection(true);
+        });
+        container.appendChild(btn);
+      });
+    }
+  }
+
+  function renderNicheSelection(resetResults = true) {
+    const query = (document.getElementById('practice-search') ? document.getElementById('practice-search').value : '').toLowerCase().trim();
+    const activeDiff = state.activePracticeDifficulty || 'ALL';
+    const filterCat = state.activePracticeCategory || 'ALL';
+    
+    const pool = state.questions.filter(q => q.db === 'fabric_pbi');
+    
+    const filteredQuestions = pool.filter(q => {
+      const matchesCat = (filterCat === 'ALL' || q.category === filterCat);
+      const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+      const matchesSearch = !query || 
+                            (q.niche || '').toLowerCase().includes(query) ||
+                            (q.category || '').toLowerCase().includes(query) ||
+                            (q.question || '').toLowerCase().includes(query) || 
+                            (q.answer || '').toLowerCase().includes(query);
+      return matchesCat && matchesDiff && matchesSearch;
+    });
+    
+    const container = document.getElementById('niche-launcher-grid');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const uniqueNiches = new Set(filteredQuestions.map(q => q.niche));
+    if (document.getElementById('practice-match-count')) {
+      document.getElementById('practice-match-count').textContent = `Showing ${uniqueNiches.size.toLocaleString()} matching niches`;
+    }
+    
+    if (filteredQuestions.length === 0) {
+      container.innerHTML = `
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1.25rem; color: var(--text-secondary); opacity: 0.4;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching practice niches found</h4>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    const nicheSummary = {};
+    filteredQuestions.forEach(q => {
       if (!nicheSummary[q.niche]) {
         nicheSummary[q.niche] = {
           nicheName: q.niche,
           category: q.category,
           total: 0,
-          mastered: 0,
           difficulties: new Set()
         };
       }
-      
       nicheSummary[q.niche].total++;
       nicheSummary[q.niche].difficulties.add(q.difficulty || 'HARD');
-      if (state.progress[q.id] === 'mastered') {
-        nicheSummary[q.niche].mastered++;
-      }
     });
     
-    DOM.nicheLauncherGrid.innerHTML = '';
+    const categoriesMap = {};
+    Object.values(nicheSummary).forEach(n => {
+      if (!categoriesMap[n.category]) {
+        categoriesMap[n.category] = [];
+      }
+      categoriesMap[n.category].push(n);
+    });
     
-    const nicheList = Object.values(nicheSummary);
-    if (nicheList.length === 0) {
-      DOM.nicheLauncherGrid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:3rem; color:var(--text-secondary);">No practice niches found for this category.</div>`;
-      return;
+    const sortedCats = Object.keys(categoriesMap).sort();
+    
+    if (resetResults) {
+      state.expandedPracticeSections = {};
+      if (sortedCats.length > 0) {
+        state.expandedPracticeSections[sortedCats[0]] = true;
+      }
     }
     
-    nicheList.forEach(n => {
-      const card = document.createElement('div');
-      card.className = 'concept-card';
-      card.style.minHeight = '140px';
+    sortedCats.forEach(catName => {
+      const sectItems = categoriesMap[catName];
+      const isExpanded = !!state.expandedPracticeSections[catName];
       
-      const badgeClass = badgeClasses[n.category] || 'badge-fabric';
-      const diffsHtml = Array.from(n.difficulties).map(d => `<span class="difficulty-badge badge-${d.toLowerCase()}">${d}</span>`).join(' ');
-      card.innerHTML = `
-        <div>
-          <span class="stats-badge ${badgeClass}" style="display:inline-block; margin-bottom: 0.5rem; font-size:0.75rem;">${displayNames[n.category] || n.category}</span>
-          <h4 style="font-size: 1rem; font-weight: 500; line-height:1.4; word-break:break-word;">${n.nicheName} <div style="margin-top:0.35rem;">${diffsHtml}</div></h4>
+      const sectionWrapper = document.createElement('div');
+      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.style.marginBottom = '1.25rem';
+      sectionWrapper.style.border = '1px solid var(--card-border)';
+      sectionWrapper.style.borderRadius = '16px';
+      sectionWrapper.style.overflow = 'hidden';
+      
+      const badgeClass = badgeClasses[catName] || 'badge-fabric';
+      const sectEmoji = catName.includes('FABRIC') ? '📊' :
+                        catName.includes('POWER BI') ? '📊' :
+                        catName.includes('ADF') ? '⚡' :
+                        catName.includes('SQL') ? '🔷' :
+                        catName.includes('LAKEHOUSE') ? '🔥' : '⚙️';
+      
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'unified-section-header';
+      headerDiv.style.cursor = 'pointer';
+      headerDiv.style.display = 'flex';
+      headerDiv.style.alignItems = 'center';
+      headerDiv.style.justifyContent = 'space-between';
+      headerDiv.style.padding = '1.1rem 1.5rem';
+      headerDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+      
+      headerDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.15rem;">${sectEmoji}</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.02em;">${displayNames[catName] || catName}</span>
+          <span style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; font-weight: 600;">${sectItems.length}</span>
         </div>
-        <div class="concept-card-footer" style="margin-top:1rem; border-top:1px solid var(--card-border); padding-top:0.5rem;">
-          <span style="font-size: 0.8rem; font-weight: 500; color:var(--text-secondary);">${n.mastered} / ${n.total} Mastered</span>
-          <button class="status-btn status-btn-mastered active" style="padding:0.35rem 0.65rem; font-size:0.75rem;">Practice</button>
-        </div>
+        <svg class="section-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease; transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}; color: var(--text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
       `;
+      sectionWrapper.appendChild(headerDiv);
       
-      card.addEventListener('click', () => {
-        startPracticeSession(n.nicheName);
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'unified-section-body';
+      bodyDiv.style.display = isExpanded ? 'block' : 'none';
+      bodyDiv.style.padding = '1.5rem';
+      bodyDiv.style.borderTop = '1px solid var(--card-border)';
+      bodyDiv.style.background = 'rgba(0, 0, 0, 0.1)';
+      
+      {
+        const subHeaderDiv = document.createElement('div');
+        subHeaderDiv.className = 'qa-section-controls';
+        subHeaderDiv.style.display = 'flex';
+        subHeaderDiv.style.justifyContent = 'space-between';
+        subHeaderDiv.style.alignItems = 'center';
+        subHeaderDiv.style.marginBottom = '1.25rem';
+        subHeaderDiv.style.padding = '0.5rem 1rem';
+        subHeaderDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+        subHeaderDiv.style.borderRadius = '10px';
+        subHeaderDiv.style.border = '1px solid var(--card-border)';
+        
+        const countText = document.createElement('span');
+        countText.style.fontSize = '0.8rem';
+        countText.style.fontWeight = '600';
+        countText.style.color = 'var(--text-secondary)';
+        countText.textContent = `Showing ${sectItems.length} matching niches`;
+        subHeaderDiv.appendChild(countText);
+        bodyDiv.appendChild(subHeaderDiv);
+        
+        const subGrid = document.createElement('div');
+        subGrid.className = 'concepts-grid';
+        bodyDiv.appendChild(subGrid);
+        
+        sectItems.forEach(n => {
+          const card = document.createElement('div');
+          card.className = 'concept-card';
+          card.style.minHeight = '140px';
+          card.style.cursor = 'pointer';
+          
+          const diffsHtml = Array.from(n.difficulties).map(d => `<span class="difficulty-badge badge-${d.toLowerCase()}">${d}</span>`).join(' ');
+          card.innerHTML = `
+            <div>
+              <span class="stats-badge ${badgeClass}" style="display:inline-block; margin-bottom: 0.5rem; font-size:0.75rem;">${displayNames[n.category] || n.category}</span>
+              <h4 style="font-size: 1rem; font-weight: 500; line-height:1.4; word-break:break-word;">${n.nicheName} <div style="margin-top:0.35rem;">${diffsHtml}</div></h4>
+            </div>
+            <div class="concept-card-footer" style="margin-top:1rem; border-top:1px solid var(--card-border); padding-top:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size: 0.8rem; font-weight: 500; color:var(--text-secondary);">${n.total} questions</span>
+              <button class="status-btn status-btn-mastered active" style="padding:0.35rem 0.65rem; font-size:0.75rem;">Practice</button>
+            </div>
+          `;
+          
+          card.addEventListener('click', (e) => {
+            startPracticeSession(n.nicheName);
+          });
+          
+          subGrid.appendChild(card);
+        });
+      }
+      
+      sectionWrapper.appendChild(bodyDiv);
+      
+      headerDiv.addEventListener('click', () => {
+        state.expandedPracticeSections[catName] = !state.expandedPracticeSections[catName];
+        renderNicheSelection(false);
       });
       
-      DOM.nicheLauncherGrid.appendChild(card);
+      container.appendChild(sectionWrapper);
     });
   }
 
@@ -864,7 +1462,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   function startPracticeSession(nicheName) {
     state.practice.nicheName = nicheName;
-    state.practice.questionsList = state.questions.filter(q => q.niche === nicheName);
+    state.practice.questionsList = state.questions.filter(q => q.db === 'fabric_pbi' && q.niche === nicheName);
     state.practice.currentIndex = 0;
     state.practice.isAnswerRevealed = false;
     
@@ -898,10 +1496,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('active');
       }
       
-      const status = state.progress[q.id] || 'unseen';
-      
       li.innerHTML = `
-        <span class="status-indicator status-${status}${status === 'unseen' ? ' hidden' : ''}" style="font-size:0.6rem; padding:0.15rem 0.35rem;">${status}</span>
         <div class="q-text-line">Q${idx+1}: [${q.difficulty || 'HARD'}] ${q.question}</div>
       `;
       
@@ -953,15 +1548,7 @@ document.addEventListener('DOMContentLoaded', () => {
       DOM.activePracticeAContainer.classList.remove('revealed');
     }
     
-    // Update active status buttons
-    const activeStatus = state.progress[activeQ.id] || 'unseen';
-    DOM.practiceStatusBtns.forEach(btn => {
-      if (btn.getAttribute('data-status') === activeStatus) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
+
     
     // Enable/disable navigation buttons
     DOM.btnPracticePrev.disabled = idx === 0;
@@ -1159,38 +1746,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Build explanation details layout
     DOM.dialogAText.innerHTML = isDe ? formatDeAnswer(qObj.answer) : formatMarkdownAnswer(qObj.answer);
     
-    // Sync active state of status buttons
-    const activeStatus = isDe ? (generalDeState.progress[questionId] || 'unseen') : (state.progress[questionId] || 'unseen');
-    DOM.dialogStatusBtns.forEach(btn => {
-      const btnStatus = btn.getAttribute('data-status');
-      if (btnStatus === activeStatus) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-      
-      // Bind click triggers directly
-      btn.onclick = () => {
-        if (isDe) {
-          generalDeState.progress[questionId] = btnStatus;
-          saveDeProgress();
-          // Update the specific card's DOM attribute & status label
-          const cardEl = document.querySelector(`#de-questions-container .concept-card[data-id="${questionId}"]`);
-          if (cardEl) {
-            cardEl.setAttribute('data-status', btnStatus);
-            const statusIndicator = cardEl.querySelector('.status-indicator');
-            if (statusIndicator) {
-              statusIndicator.className = `status-indicator status-${btnStatus}`;
-              statusIndicator.textContent = btnStatus;
-            }
-          }
-        } else {
-          updateQuestionStatus(questionId, btnStatus);
-        }
-        DOM.dialogStatusBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      };
-    });
+
     
     DOM.detailsDialog.classList.remove('hidden');
     DOM.detailsDialog.removeAttribute('hidden');
@@ -1237,53 +1793,98 @@ document.addEventListener('DOMContentLoaded', () => {
     if (DOM.prephub && DOM.prephub.unifiedSearchInput) {
       DOM.prephub.unifiedSearchInput.addEventListener('input', () => {
         state.unifiedSearchPage = 1;
+        updateUnifiedSearchCounts();
         renderUnifiedSearch(true);
       });
     }
-    if (DOM.prephub && DOM.prephub.unifiedDbScrollbar) {
-      const chips = DOM.prephub.unifiedDbScrollbar.querySelectorAll('.topic-chip');
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          chips.forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-          state.activeUnifiedDb = chip.getAttribute('data-db') || 'ALL';
-          state.activeUnifiedCategory = 'ALL';
+
+    // Database Sources selector click binding
+    if (DOM.prephub && DOM.prephub.dbList) {
+      const btns = DOM.prephub.dbList.querySelectorAll('.qa-sidebar-btn');
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activeUnifiedDb = btn.getAttribute('data-db') || 'ALL';
+          state.activeUnifiedCategory = 'ALL'; // Reset domain filter when changing DB source
           state.unifiedSearchPage = 1;
-          renderUnifiedCategoryChips();
+          updateUnifiedSearchCounts();
           renderUnifiedSearch(true);
         });
       });
     }
-    if (DOM.prephub && DOM.prephub.btnUnifiedLoadMore) {
-      DOM.prephub.btnUnifiedLoadMore.addEventListener('click', () => {
-        state.unifiedSearchPage = (state.unifiedSearchPage || 1) + 1;
-        renderUnifiedSearch(false);
+
+    // Difficulty Level selector click binding
+    if (DOM.prephub && DOM.prephub.difficultySelector) {
+      const btns = DOM.prephub.difficultySelector.querySelectorAll('.qa-sidebar-btn[data-difficulty]');
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activeUnifiedDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          state.unifiedSearchPage = 1;
+          renderUnifiedSearch(true);
+        });
       });
     }
 
-    // Click on Dashboard stats card navigates to Concept Explainer and filters
-    document.querySelectorAll('.stats-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const category = card.getAttribute('data-category');
-        if (category) {
-          // 1. Switch active chip in explainer scrollbar
-          const explainerChips = DOM.explainerTopicsScrollbar.querySelectorAll('.topic-chip');
-          explainerChips.forEach(chip => {
-            if (chip.getAttribute('data-category') === category) {
-              chip.classList.add('active');
-            } else {
-              chip.classList.remove('active');
-            }
-          });
-          
-          // 2. Set state filter
-          state.activeExplainerCategory = category;
-          
-          // 3. Navigate to Concept Explainer page
-          switchView('view-explainer');
-        }
+
+    // Expand All / Collapse All buttons click binding
+    const btnQaExpandAll = document.getElementById('btn-qa-expand-all');
+    if (btnQaExpandAll) {
+      btnQaExpandAll.addEventListener('click', () => {
+        const domainsList = [
+          'Analytics, BI & AI',
+          'Compute & Orchestration',
+          'Databases, SQL & Storage',
+          'Data Pipelines & Ingestion',
+          'Data Lakehouse & Architecture',
+          'Data Governance & Quality',
+          'FinOps & Performance Optimization',
+          'General Data Engineering'
+        ];
+        domainsList.forEach(domName => {
+          state.expandedUnifiedSections[domName] = true;
+        });
+        renderUnifiedSearch(false);
+        document.querySelectorAll('#unified-search-container .concept-accordion-card').forEach(card => {
+          card.classList.add('expanded');
+          const body = card.querySelector('.level-card-body');
+          if (body) body.style.display = 'block';
+          const chevron = card.querySelector('.level-chevron');
+          if (chevron) chevron.style.transform = 'rotate(180deg)';
+        });
       });
-    });
+    }
+
+    const btnQaCollapseAll = document.getElementById('btn-qa-collapse-all');
+    if (btnQaCollapseAll) {
+      btnQaCollapseAll.addEventListener('click', () => {
+        const domainsList = [
+          'Analytics, BI & AI',
+          'Compute & Orchestration',
+          'Databases, SQL & Storage',
+          'Data Pipelines & Ingestion',
+          'Data Lakehouse & Architecture',
+          'Data Governance & Quality',
+          'FinOps & Performance Optimization',
+          'General Data Engineering'
+        ];
+        domainsList.forEach(domName => {
+          state.expandedUnifiedSections[domName] = false;
+        });
+        renderUnifiedSearch(false);
+        document.querySelectorAll('#unified-search-container .concept-accordion-card').forEach(card => {
+          card.classList.remove('expanded');
+          const body = card.querySelector('.level-card-body');
+          if (body) body.style.display = 'none';
+          const chevron = card.querySelector('.level-chevron');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        });
+      });
+    }
+
+
 
     // Theme Toggle Trigger
     DOM.themeToggleBtn.addEventListener('click', () => {
@@ -1320,52 +1921,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Horizontal Explainer Topic Chips Click
-    const explainerChips = DOM.explainerTopicsScrollbar.querySelectorAll('.topic-chip');
-    explainerChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        explainerChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.activeExplainerCategory = chip.getAttribute('data-category');
-        renderExplainer();
-      });
-    });
-
-    // Horizontal Practice Topic Chips Click
-    const practiceChips = DOM.practiceTopicsScrollbar.querySelectorAll('.topic-chip');
-    practiceChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        practiceChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.activePracticeCategory = chip.getAttribute('data-category');
-        
-        // Exit practice session if active so the filtered grid is visible
-        DOM.activePracticeScreen.classList.add('hidden');
-        DOM.nicheSelectionScreen.classList.remove('hidden');
-        
-        renderNicheSelection();
-      });
-    });
-
-    // Concept Explainer Filters Clicks
-    DOM.explainerFilterStatus.addEventListener('change', renderExplainer);
-    DOM.explainerSearch.addEventListener('input', renderExplainer);
-    if (DOM.explainerFilterDifficulty) {
-      DOM.explainerFilterDifficulty.addEventListener('change', renderExplainer);
-    }
-
-    // Expand All / Collapse All Buttons clicks
-    DOM.btnExplainerExpandAll.addEventListener('click', () => {
-      document.querySelectorAll('#explainer-accordion .accordion-item').forEach(item => {
-        item.classList.add('active');
-      });
-    });
-
-    DOM.btnExplainerCollapseAll.addEventListener('click', () => {
-      document.querySelectorAll('#explainer-accordion .accordion-item').forEach(item => {
-        item.classList.remove('active');
-      });
-    });
+    // Concept Explainer and Niche Practice event listeners are registered via separate setup listeners
 
     // Active practice reveal button
     DOM.activePracticeRevealBtn.addEventListener('click', () => {
@@ -1417,25 +1973,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadActivePracticeQuestion();
     });
 
-    // Practice status selector buttons click bind
-    DOM.practiceStatusBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetStatus = btn.getAttribute('data-status');
-        const activeQ = state.practice.questionsList[state.practice.currentIndex];
-        
-        if (activeQ) {
-          updateQuestionStatus(activeQ.id, targetStatus);
-          
-          DOM.practiceStatusBtns.forEach(b => {
-            if (b === btn) b.classList.add('active');
-            else b.classList.remove('active');
-          });
-          
-          // Re-render side questions list to sync tags
-          renderActivePracticeQList();
-        }
-      });
-    });
+
 
     // Close Dialog Modal bindings
     DOM.btnDialogClose.addEventListener('click', closeDetailsDialog);
@@ -2347,16 +2885,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderCheatsheet() {
     if (!DOM.cheatsheet.container) return;
 
-    const lang = state.activeCheatsheetLang || 'python';
+    const lang = state.activeCheatsheetLang || 'all';
     const level = state.activeCheatsheetLevel || 'all';
     const query = (state.activeCheatsheetQuery || '').toLowerCase();
 
     // Select target dataset
     let dataset = [];
-    if (lang === 'python') dataset = window.PYTHON_DATA || [];
-    else if (lang === 'mssql') dataset = window.MSSQL_DATA || [];
-    else if (lang === 'pyspark') dataset = window.PYSPARK_DATA || [];
-    else if (lang === 'sparksql') dataset = window.SPARKSQL_DATA || [];
+    if (lang === 'all') {
+      dataset = [
+        ...(window.PYTHON_DATA || []).map(item => ({ ...item, sourceDb: 'python' })),
+        ...(window.MSSQL_DATA || []).map(item => ({ ...item, sourceDb: 'mssql' })),
+        ...(window.PYSPARK_DATA || []).map(item => ({ ...item, sourceDb: 'pyspark' })),
+        ...(window.SPARKSQL_DATA || []).map(item => ({ ...item, sourceDb: 'sparksql' }))
+      ];
+    } else {
+      let rawData = [];
+      if (lang === 'python') rawData = window.PYTHON_DATA || [];
+      else if (lang === 'mssql') rawData = window.MSSQL_DATA || [];
+      else if (lang === 'pyspark') rawData = window.PYSPARK_DATA || [];
+      else if (lang === 'sparksql') rawData = window.SPARKSQL_DATA || [];
+      dataset = rawData.map(item => ({ ...item, sourceDb: lang }));
+    }
 
     const totalInLang = dataset.length;
 
@@ -2439,11 +2988,12 @@ document.addEventListener('DOMContentLoaded', () => {
       
       items.forEach((item, index) => {
         const card = document.createElement('div');
-        card.className = `concept-card ${lang}`;
+        const cardLang = item.sourceDb || 'python';
+        card.className = `concept-card ${cardLang}`;
         card.setAttribute('data-id', item.id);
         card.setAttribute('data-level', item.level);
 
-        const highlightedCode = Highlighter.highlight(item.code || '', lang);
+        const highlightedCode = Highlighter.highlight(item.code || '', cardLang);
         
         card.innerHTML = `
           <div class="card-header" role="button" aria-expanded="false" tabindex="0">
@@ -2470,7 +3020,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="code-wrapper">
               <div class="code-toolbar">
-                <span class="code-lang-badge">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                <span class="code-lang-badge">${cardLang === 'python' ? 'Python' : cardLang === 'mssql' ? 'T-SQL' : cardLang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
                 <button class="copy-btn" title="Copy code">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -2517,7 +3067,7 @@ document.addEventListener('DOMContentLoaded', () => {
               copyBtn.classList.remove('copied');
               copyBtn.innerHTML = `
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"/>
                 </svg>
                 Copy
               `;
@@ -2576,323 +3126,463 @@ document.addEventListener('DOMContentLoaded', () => {
   function initPersonalised() {
     console.log("Initializing Personalised Interview Prep...");
     setupPersonalisedListeners();
+    updatePersonalisedCounts();
     renderPersonalised();
   }
 
   function setupPersonalisedListeners() {
     // Search input
     if (DOM.personalised.search) {
-      DOM.personalised.search.addEventListener('input', renderPersonalised);
+      DOM.personalised.search.addEventListener('input', () => {
+        updatePersonalisedCounts();
+        renderPersonalised(true);
+      });
     }
     
-    // Domain chip filters
-    if (DOM.personalised.topicsScrollbar) {
-      const chips = DOM.personalised.topicsScrollbar.querySelectorAll('.topic-chip');
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          chips.forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-          state.activePersonalisedDomain = chip.getAttribute('data-domain') || 'ALL';
-          renderPersonalised();
+    // Difficulty Selector click binding
+    if (DOM.personalised.difficultySelector) {
+      const btns = DOM.personalised.difficultySelector.querySelectorAll('.qa-sidebar-btn[data-difficulty]');
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activePersonalisedDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          updatePersonalisedCounts();
+          renderPersonalised(true);
+        });
+      });
+    }
+
+    // Expand All / Collapse All buttons click binding
+    const btnExpandAll = document.getElementById('btn-personalised-expand-all');
+    if (btnExpandAll) {
+      btnExpandAll.addEventListener('click', () => {
+        const personalisedDomains = [
+          'Microsoft Fabric, OneLake & Direct Lake Architecture',
+          'Azure Native Data Engineering & Orchestration',
+          'Delta Lake Technology & High-Performance ETL/ELT',
+          'Data Modeling, Architecture Paradigms & Governance',
+          'Cloud FinOps, Performance Optimization & CI/CD DevOps'
+        ];
+        personalisedDomains.forEach(domName => {
+          state.expandedPersonalisedSections[domName] = true;
+        });
+        renderPersonalised(false);
+        document.querySelectorAll('#personalised-container .concept-accordion-card').forEach(card => {
+          card.classList.add('expanded');
+          const body = card.querySelector('.level-card-body');
+          if (body) body.style.display = 'block';
+          const chevron = card.querySelector('.level-chevron');
+          if (chevron) chevron.style.transform = 'rotate(180deg)';
+        });
+      });
+    }
+
+    const btnCollapseAll = document.getElementById('btn-personalised-collapse-all');
+    if (btnCollapseAll) {
+      btnCollapseAll.addEventListener('click', () => {
+        const personalisedDomains = [
+          'Microsoft Fabric, OneLake & Direct Lake Architecture',
+          'Azure Native Data Engineering & Orchestration',
+          'Delta Lake Technology & High-Performance ETL/ELT',
+          'Data Modeling, Architecture Paradigms & Governance',
+          'Cloud FinOps, Performance Optimization & CI/CD DevOps'
+        ];
+        personalisedDomains.forEach(domName => {
+          state.expandedPersonalisedSections[domName] = false;
+        });
+        renderPersonalised(false);
+        document.querySelectorAll('#personalised-container .concept-accordion-card').forEach(card => {
+          card.classList.remove('expanded');
+          const body = card.querySelector('.level-card-body');
+          if (body) body.style.display = 'none';
+          const chevron = card.querySelector('.level-chevron');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
         });
       });
     }
   }
 
-  function renderPersonalised() {
+  function updatePersonalisedCounts() {
+    const query = (DOM.personalised.search ? DOM.personalised.search.value : '').toLowerCase().trim();
+    const activeDiff = state.activePersonalisedDifficulty || 'ALL';
+    
+    const personalisedDomains = [
+      'Microsoft Fabric, OneLake & Direct Lake Architecture',
+      'Azure Native Data Engineering & Orchestration',
+      'Delta Lake Technology & High-Performance ETL/ELT',
+      'Data Modeling, Architecture Paradigms & Governance',
+      'Cloud FinOps, Performance Optimization & CI/CD DevOps'
+    ];
+    
+    const container = DOM.personalised.domainList;
+    if (container) {
+      container.innerHTML = '';
+      
+      const pool = window.PERSONALISED_QUESTIONS || [];
+      // Count total matching difficulty & search in the pool
+      const totalMatching = pool.filter(q => {
+        const matchesSearch = !query || 
+                              (q.question || '').toLowerCase().includes(query) || 
+                              (q.answer || '').toLowerCase().includes(query) || 
+                              (q.subdomain || '').toLowerCase().includes(query);
+        const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+        return matchesSearch && matchesDiff;
+      }).length;
+      
+      // All Domains button
+      const allBtn = document.createElement('button');
+      allBtn.setAttribute('data-domain', 'ALL');
+      allBtn.className = 'qa-sidebar-btn' + (state.activePersonalisedDomain === 'ALL' ? ' active' : '');
+      allBtn.innerHTML = `
+        <span>📂 All Domains</span>
+        <span class="qa-btn-count-badge">${totalMatching.toLocaleString()}</span>
+      `;
+      allBtn.addEventListener('click', () => {
+        state.activePersonalisedDomain = 'ALL';
+        container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        renderPersonalised(true);
+      });
+      container.appendChild(allBtn);
+      
+      personalisedDomains.forEach(domName => {
+        const domPool = pool.filter(q => q.domain === domName);
+        if (domPool.length === 0) return;
+        
+        const matchCount = domPool.filter(q => {
+          const matchesSearch = !query || 
+                                (q.question || '').toLowerCase().includes(query) || 
+                                (q.answer || '').toLowerCase().includes(query) || 
+                                (q.subdomain || '').toLowerCase().includes(query);
+          const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+          return matchesSearch && matchesDiff;
+        }).length;
+        
+        if (matchCount === 0) return; // Hide domain if no match
+        
+        // nice domain display label
+        const displayLabel = domName.includes('Fabric') ? 'Microsoft Fabric & OneLake' :
+                             domName.includes('Azure Native') ? 'Azure Native Orchestration' :
+                             domName.includes('Delta Lake') ? 'Delta Lake & ETL' :
+                             domName.includes('Data Modeling') ? 'Data Modeling & Governance' : 'FinOps & DevOps';
+        
+        const btn = document.createElement('button');
+        btn.setAttribute('data-domain', domName);
+        btn.className = 'qa-sidebar-btn' + (state.activePersonalisedDomain === domName ? ' active' : '');
+        btn.innerHTML = `
+          <span>${displayLabel}</span>
+          <span class="qa-btn-count-badge">${matchCount}</span>
+        `;
+        btn.addEventListener('click', () => {
+          state.activePersonalisedDomain = domName;
+          container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderPersonalised(true);
+        });
+        container.appendChild(btn);
+      });
+    }
+  }
+
+  function renderPersonalised(resetResults = true) {
     if (!DOM.personalised.container) return;
     
     const query = (DOM.personalised.search ? DOM.personalised.search.value : '').toLowerCase().trim();
     const activeDomain = state.activePersonalisedDomain || 'ALL';
+    const activeDiff = state.activePersonalisedDifficulty || 'ALL';
     
-    // Filter questions
-    const sourceQuestions = window.PERSONALISED_QUESTIONS || [];
-    const filtered = sourceQuestions.filter(q => {
+    const pool = window.PERSONALISED_QUESTIONS || [];
+    
+    const filtered = pool.filter(q => {
       const matchesDomain = (activeDomain === 'ALL' || q.domain === activeDomain);
-      
-      const qText = (q.question || '').toLowerCase();
-      const aText = (q.answer || '').toLowerCase();
-      const sText = (q.subdomain || '').toLowerCase();
-      const matchesSearch = !query || qText.includes(query) || aText.includes(query) || sText.includes(query);
-      
-      return matchesDomain && matchesSearch;
+      const matchesDiff = (activeDiff === 'ALL' || (q.difficulty || 'HARD').toUpperCase() === activeDiff);
+      const matchesSearch = !query || 
+                            (q.question || '').toLowerCase().includes(query) || 
+                            (q.answer || '').toLowerCase().includes(query) || 
+                            (q.subdomain || '').toLowerCase().includes(query);
+      return matchesDomain && matchesDiff && matchesSearch;
     });
     
-    // Update count
     if (DOM.personalised.matchCount) {
-      DOM.personalised.matchCount.textContent = `Showing ${filtered.length} questions`;
+      DOM.personalised.matchCount.textContent = `Showing ${filtered.length.toLocaleString()} matching questions`;
     }
     
-    // Clear container
     DOM.personalised.container.innerHTML = '';
     
     if (filtered.length === 0) {
       DOM.personalised.container.innerHTML = `
-        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; color: var(--text-secondary); opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1.25rem; color: var(--text-secondary); opacity: 0.4;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
           <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
         </div>
       `;
       return;
     }
     
-    // Render list
-    filtered.forEach(q => {
-      const card = document.createElement('div');
-      card.className = 'concept-accordion-card';
-      
-      const qIndex = (window.PERSONALISED_QUESTIONS || []).indexOf(q) + 1;
-      
-      // We will render clean subdomains and tags
-      const headerDiv = document.createElement('div');
-      headerDiv.className = 'level-card-header';
-      headerDiv.style.cursor = 'pointer';
-      
-      // Construct inner html
-      headerDiv.innerHTML = `
-        <div class="level-badge" style="background: var(--cat-fabric); color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">Q${qIndex}</div>
-        <div class="level-meta" style="flex: 1; min-width: 0;">
-          <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; color: var(--accent); margin-bottom: 2px; display: block;">${q.subdomain}</span>
-          <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
-        </div>
-        <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
-      `;
-      
-      const bodyDiv = document.createElement('div');
-      bodyDiv.className = 'level-card-body';
-      bodyDiv.style.display = 'none'; // Accordion hidden by default
-      bodyDiv.style.borderTop = '1px solid var(--card-border)';
-      bodyDiv.style.padding = '1.25rem';
-      bodyDiv.style.background = 'rgba(255, 255, 255, 0.01)';
-      
-      // Render structured answers with paragraphs, lists, etc.
-      const formattedAnswer = formatArchitectAnswer(q.answer);
-      bodyDiv.innerHTML = `
-        <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
-          ${formattedAnswer}
-        </div>
-      `;
-      
-      card.appendChild(headerDiv);
-      card.appendChild(bodyDiv);
-      
-      // Wire up toggle
-      headerDiv.addEventListener('click', () => {
-        const isOpen = bodyDiv.style.display !== 'none';
-        
-        // Toggle chevron rotation
-        const chevron = headerDiv.querySelector('.level-chevron');
-        if (chevron) {
-          chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
-        
-        // Toggle body visibility
-        if (isOpen) {
-          bodyDiv.style.display = 'none';
-          card.classList.remove('expanded');
-        } else {
-          bodyDiv.style.display = 'block';
-          card.classList.add('expanded');
-          
-          // Re-render LaTeX math if MathJax is present
-          if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-            MathJax.typesetPromise([bodyDiv]).catch(err => console.error("MathJax error:", err));
-          }
-        }
-      });
-      
-      DOM.personalised.container.appendChild(card);
-    });
-  }
-
-  function renderUnifiedCategoryChips() {
-    if (!DOM.prephub || !DOM.prephub.unifiedCategoryScrollbar) return;
-
-    const dbFilter = state.activeUnifiedDb || 'ALL';
-    const pool = [];
-
-    // Compile active pool questions to extract categories
-    if (dbFilter === 'ALL' || dbFilter === 'personalised') {
-      (window.PERSONALISED_QUESTIONS || []).forEach(q => {
-        pool.push({ category: q.subdomain || q.domain || 'Personalised' });
-      });
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'fabric_pbi') {
-      (window.QUESTIONS_DB || []).forEach(q => {
-        pool.push({ category: q.category });
-      });
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'general') {
-      (window.QUESTIONS_DE_DB || []).forEach(q => {
-        pool.push({ category: q.category });
-      });
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'python') {
-      (window.PYTHON_DATA || []).forEach(q => {
-        pool.push({ category: q.category || 'Python' });
-      });
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'mssql') {
-      (window.MSSQL_DATA || []).forEach(q => {
-        pool.push({ category: q.category || 'SQL' });
-      });
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'pyspark') {
-      (window.PYSPARK_DATA || []).forEach(q => {
-        pool.push({ category: q.category || 'PySpark' });
-      });
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'sparksql') {
-      (window.SPARKSQL_DATA || []).forEach(q => {
-        pool.push({ category: q.category || 'Spark SQL' });
-      });
-    }
-
-    const categories = new Set();
-    pool.forEach(q => {
-      if (q.category) categories.add(q.category.trim());
-    });
-
-    const sortedCategories = Array.from(categories).sort();
-
-    if (state.activeUnifiedCategory !== 'ALL' && !categories.has(state.activeUnifiedCategory)) {
-      state.activeUnifiedCategory = 'ALL';
-    }
-
-    DOM.prephub.unifiedCategoryScrollbar.innerHTML = '';
-
-    // helper to map category to one of 5 rows/sections
-    function getCategoryRow(cat) {
-      if (cat === 'ALL') return 1;
-      const lower = cat.toLowerCase();
-      
-      // Row 4: AI & Vector DBs
-      if (
-        lower.includes('rag') || lower.includes('vector') || lower.includes('llm') || lower.includes('ai')
-      ) {
-        return 4;
-      }
-
-      // Row 5: Languages & Cloud
-      if (
-        lower.includes('python') || lower.includes('decorator') || lower.includes('generator') ||
-        lower.includes('concurrency') || lower.includes('threading') || lower.includes('pattern') ||
-        lower.includes('language') || lower.includes('foundation') || lower.includes('cleaning') ||
-        lower.includes('manipulation') || lower.includes('functional') || lower.includes('cloud') ||
-        lower.includes('finops') || lower.includes('devops') || lower.includes('personalised') ||
-        lower.includes('custom') || lower.includes('error handling')
-      ) {
-        return 5;
-      }
-
-      // Row 2: Pipelines & Integration
-      if (
-        lower.includes('adf') || lower.includes('factory') || lower.includes('pipeline') ||
-        lower.includes('orchestration') || lower.includes('etl') || lower.includes('elt') ||
-        lower.includes('ingestion') || lower.includes('cdc') || lower.includes('dbt') ||
-        lower.includes('airflow') || lower.includes('dag') || lower.includes('integration') ||
-        lower.includes('delta live tables')
-      ) {
-        return 2;
-      }
-
-      // Row 3: Compute & Streaming
-      if (
-        lower.includes('spark') || lower.includes('pyspark') || lower.includes('databricks') ||
-        lower.includes('distributed') || lower.includes('kafka') || lower.includes('flink') ||
-        lower.includes('streaming') || lower.includes('big data') || lower.includes('engineering') ||
-        lower.includes('tuning') || lower.includes('resource') || lower.includes('performance') ||
-        lower.includes('observability') || lower.includes('monitoring') || lower.includes('optimization')
-      ) {
-        return 3;
-      }
-
-      // Row 1: Data Platform, Modeling, and Storage
-      return 1;
-    }
-
-    // Partition categories into five rows
-    const rowChips = {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: []
-    };
-
-    // Always put "All Categories" as the first chip in Row 1
-    const allChip = document.createElement('button');
-    allChip.className = `topic-chip${state.activeUnifiedCategory === 'ALL' ? ' active' : ''}`;
-    allChip.setAttribute('data-category', 'ALL');
-    allChip.textContent = 'All Categories';
-    rowChips[1].push(allChip);
-
-    sortedCategories.forEach(cat => {
-      const chip = document.createElement('button');
-      chip.className = `topic-chip${state.activeUnifiedCategory === cat ? ' active' : ''}`;
-      chip.setAttribute('data-category', cat);
-      chip.textContent = displayNames[cat] || cat;
-      const rowId = getCategoryRow(cat);
-      rowChips[rowId].push(chip);
-    });
-
-    const rowMetadata = [
-      { id: 1, label: 'Platform & Storage' },
-      { id: 2, label: 'Pipelines & Integration' },
-      { id: 3, label: 'Compute & Streaming' },
-      { id: 4, label: 'AI & Vector DBs' },
-      { id: 5, label: 'Languages & Cloud' }
+    const personalisedDomains = [
+      'Microsoft Fabric, OneLake & Direct Lake Architecture',
+      'Azure Native Data Engineering & Orchestration',
+      'Delta Lake Technology & High-Performance ETL/ELT',
+      'Data Modeling, Architecture Paradigms & Governance',
+      'Cloud FinOps, Performance Optimization & CI/CD DevOps'
     ];
-
-    rowMetadata.forEach(meta => {
-      const chipsInRow = rowChips[meta.id];
-      // Render the row if it has chips. Row 1 has at least "All Categories", which is always rendered.
-      if (chipsInRow.length > 0) {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'category-row';
-
-        const labelDiv = document.createElement('div');
-        labelDiv.className = 'category-row-label';
-        labelDiv.textContent = meta.label;
-
-        const chipsWrapDiv = document.createElement('div');
-        chipsWrapDiv.className = 'category-row-chips';
-
-        chipsInRow.forEach(chip => {
-          chipsWrapDiv.appendChild(chip);
-        });
-
-        rowDiv.appendChild(labelDiv);
-        rowDiv.appendChild(chipsWrapDiv);
-        DOM.prephub.unifiedCategoryScrollbar.appendChild(rowDiv);
+    
+    const sections = {};
+    personalisedDomains.forEach(d => {
+      sections[d] = [];
+    });
+    
+    filtered.forEach(q => {
+      if (sections[q.domain]) {
+        sections[q.domain].push(q);
       }
     });
-
-    // Wire up event listeners
-    const chips = DOM.prephub.unifiedCategoryScrollbar.querySelectorAll('.topic-chip');
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.activeUnifiedCategory = chip.getAttribute('data-category') || 'ALL';
-        state.unifiedSearchPage = 1;
-        renderUnifiedSearch(true);
+    
+    const activeSections = personalisedDomains.filter(d => sections[d].length > 0);
+    
+    if (resetResults) {
+      state.expandedPersonalisedSections = {};
+      if (activeSections.length > 0) {
+        state.expandedPersonalisedSections[activeSections[0]] = true;
+      }
+    }
+    
+    let overallIdx = 1;
+    
+    activeSections.forEach(sectKey => {
+      const sectItems = sections[sectKey];
+      if (!sectItems || sectItems.length === 0) return;
+      
+      const isExpanded = !!state.expandedPersonalisedSections[sectKey];
+      
+      // Section Wrapper
+      const sectionWrapper = document.createElement('div');
+      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.style.marginBottom = '1.25rem';
+      sectionWrapper.style.border = '1px solid var(--card-border)';
+      sectionWrapper.style.borderRadius = '16px';
+      sectionWrapper.style.overflow = 'hidden';
+      
+      const sectionIcons = {
+        'Microsoft Fabric, OneLake & Direct Lake Architecture': '📊',
+        'Azure Native Data Engineering & Orchestration': '⚙️',
+        'Delta Lake Technology & High-Performance ETL/ELT': '⚡',
+        'Data Modeling, Architecture Paradigms & Governance': '🛡️',
+        'Cloud FinOps, Performance Optimization & CI/CD DevOps': '💸'
+      };
+      
+      const sectEmoji = sectionIcons[sectKey] || '📁';
+      
+      // Header
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'unified-section-header';
+      headerDiv.style.cursor = 'pointer';
+      headerDiv.style.display = 'flex';
+      headerDiv.style.alignItems = 'center';
+      headerDiv.style.justifyContent = 'space-between';
+      headerDiv.style.padding = '1.1rem 1.5rem';
+      headerDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+      
+      headerDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.15rem;">${sectEmoji}</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.02em;">${sectKey}</span>
+          <span style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; font-weight: 600;">${sectItems.length}</span>
+        </div>
+        <svg class="section-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease; transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}; color: var(--text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
+      `;
+      sectionWrapper.appendChild(headerDiv);
+      
+      // Body
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'unified-section-body';
+      bodyDiv.style.display = isExpanded ? 'block' : 'none';
+      bodyDiv.style.padding = '1.5rem';
+      bodyDiv.style.borderTop = '1px solid var(--card-border)';
+      bodyDiv.style.background = 'rgba(0, 0, 0, 0.1)';
+      
+      {
+        // Section sub-header controls (counts and expand/collapse pills)
+        const subHeaderDiv = document.createElement('div');
+        subHeaderDiv.className = 'qa-section-controls';
+        subHeaderDiv.style.display = 'flex';
+        subHeaderDiv.style.justifyContent = 'space-between';
+        subHeaderDiv.style.alignItems = 'center';
+        subHeaderDiv.style.marginBottom = '1.25rem';
+        subHeaderDiv.style.padding = '0.5rem 1rem';
+        subHeaderDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+        subHeaderDiv.style.borderRadius = '10px';
+        subHeaderDiv.style.border = '1px solid var(--card-border)';
+        
+        const countText = document.createElement('span');
+        countText.style.fontSize = '0.8rem';
+        countText.style.fontWeight = '600';
+        countText.style.color = 'var(--text-secondary)';
+        countText.textContent = `Showing ${sectItems.length} matching questions`;
+        subHeaderDiv.appendChild(countText);
+        
+        const pillsContainer = document.createElement('div');
+        pillsContainer.style.display = 'flex';
+        pillsContainer.style.gap = '0.5rem';
+        
+        const expandPill = document.createElement('button');
+        expandPill.className = 'control-btn';
+        expandPill.style.padding = '0.3rem 0.6rem';
+        expandPill.style.fontSize = '0.7rem';
+        expandPill.style.borderRadius = '6px';
+        expandPill.style.cursor = 'pointer';
+        expandPill.style.border = '1px solid var(--card-border)';
+        expandPill.style.background = 'rgba(255, 255, 255, 0.02)';
+        expandPill.style.color = 'var(--text-secondary)';
+        expandPill.textContent = 'Expand All';
+        expandPill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.add('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'block';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+          });
+        });
+        
+        const collapsePill = document.createElement('button');
+        collapsePill.className = 'control-btn';
+        collapsePill.style.padding = '0.3rem 0.6rem';
+        collapsePill.style.fontSize = '0.7rem';
+        collapsePill.style.borderRadius = '6px';
+        collapsePill.style.cursor = 'pointer';
+        collapsePill.style.border = '1px solid var(--card-border)';
+        collapsePill.style.background = 'rgba(255, 255, 255, 0.02)';
+        collapsePill.style.color = 'var(--text-secondary)';
+        collapsePill.textContent = 'Collapse All';
+        collapsePill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.remove('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'none';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+          });
+        });
+        
+        pillsContainer.appendChild(expandPill);
+        pillsContainer.appendChild(collapsePill);
+        subHeaderDiv.appendChild(pillsContainer);
+        bodyDiv.appendChild(subHeaderDiv);
+        
+        // Sub-grid
+        const subGrid = document.createElement('div');
+        subGrid.className = 'concepts-grid';
+        bodyDiv.appendChild(subGrid);
+        
+        sectItems.forEach(q => {
+          const card = document.createElement('div');
+          card.className = 'concept-accordion-card';
+          
+          const cardHeader = document.createElement('div');
+          cardHeader.className = 'level-card-header';
+          cardHeader.style.cursor = 'pointer';
+          cardHeader.innerHTML = `
+            <div class="level-badge" style="background: var(--cat-fabric); color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">${overallIdx++}</div>
+            <div class="level-meta" style="flex: 1; min-width: 0;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px; align-items: center;">
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.subdomain}</span>
+              </div>
+              <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
+            </div>
+            <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+          `;
+          
+          const cardBody = document.createElement('div');
+          cardBody.className = 'level-card-body';
+          cardBody.style.display = 'none';
+          cardBody.style.borderTop = '1px solid var(--card-border)';
+          cardBody.style.padding = '1.25rem';
+          cardBody.style.background = 'rgba(255, 255, 255, 0.01)';
+          
+          const formattedAnswer = formatArchitectAnswer(q.answer);
+          cardBody.innerHTML = `
+            <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+              ${formattedAnswer}
+            </div>
+          `;
+          
+          card.appendChild(cardHeader);
+          card.appendChild(cardBody);
+          
+          cardHeader.addEventListener('click', () => {
+            const isOpen = cardBody.style.display !== 'none';
+            const chevron = cardHeader.querySelector('.level-chevron');
+            if (chevron) {
+              chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+            if (isOpen) {
+              cardBody.style.display = 'none';
+              card.classList.remove('expanded');
+            } else {
+              cardBody.style.display = 'block';
+              card.classList.add('expanded');
+              if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([cardBody]).catch(err => console.error("MathJax error:", err));
+              }
+            }
+          });
+          
+          subGrid.appendChild(card);
+        });
+      }
+      
+      sectionWrapper.appendChild(bodyDiv);
+      
+      headerDiv.addEventListener('click', () => {
+        state.expandedPersonalisedSections[sectKey] = !state.expandedPersonalisedSections[sectKey];
+        renderPersonalised(false);
       });
+      
+      DOM.personalised.container.appendChild(sectionWrapper);
     });
   }
+
+  function matchesSearchQuery(q, query, sourceDb) {
+    if (!query) return true;
+    const qText = (q.question || q.title || '').toLowerCase();
+    let aText = '';
+    if (['python', 'mssql', 'pyspark', 'sparksql'].includes(sourceDb)) {
+      aText = (q.description || '') + ' ' + (q.use_case || '') + ' ' + (q.notes || []).join(' ') + ' ' + (q.code || '');
+      aText = aText.toLowerCase();
+    } else {
+      aText = (q.answer || '').toLowerCase();
+    }
+    const catLabel = sourceDb === 'personalised' ? (q.subdomain || q.domain || 'Personalised') :
+                     sourceDb === 'fabric_pbi' ? q.category :
+                     sourceDb === 'general' ? q.category :
+                     sourceDb === 'python' ? (q.category || 'Python') :
+                     sourceDb === 'mssql' ? (q.category || 'SQL') :
+                     sourceDb === 'pyspark' ? (q.category || 'PySpark') :
+                     sourceDb === 'sparksql' ? (q.category || 'Spark SQL') : '';
+    const catText = (catLabel || '').toLowerCase();
+    return qText.includes(query) || aText.includes(query) || catText.includes(query);
+  }
+
+
 
   function renderUnifiedSearch(resetResults = true) {
     if (!DOM.prephub || !DOM.prephub.unifiedSearchContainer) return;
 
     if (resetResults) {
       state.unifiedSearchPage = 1;
-      DOM.prephub.unifiedSearchContainer.innerHTML = '';
     }
+    DOM.prephub.unifiedSearchContainer.innerHTML = '';
 
     const query = (DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
     const dbFilter = state.activeUnifiedDb || 'ALL';
     const catFilter = state.activeUnifiedCategory || 'ALL';
+    const diffFilter = state.activeUnifiedDifficulty || 'ALL';
+    const statusFilter = 'ALL';
 
     const pool = [];
 
@@ -2993,24 +3683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Filter items
     const filtered = pool.filter(q => {
-      let matchesCat = true;
-      if (catFilter !== 'ALL') {
-        const itemCat = (q.category || '').toUpperCase().trim();
-        const filterCat = catFilter.toUpperCase().trim();
-        let isMatch = itemCat.includes(filterCat) || filterCat.includes(itemCat);
-        
-        if (!isMatch) {
-          if (q.sourceDb === 'pyspark' && (filterCat === 'SPARK_PYSPARK' || filterCat === 'SPARK & DATABRICKS')) {
-            isMatch = true;
-          } else if (q.sourceDb === 'sparksql' && (filterCat === 'SPARK & DATABRICKS' || filterCat === 'SPARK_PYSPARK')) {
-            isMatch = true;
-          } else if (q.sourceDb === 'mssql' && filterCat === 'SQL SERVER') {
-            isMatch = true;
-          }
-        }
-        matchesCat = isMatch;
-      }
-
+      // 1. Text Search Filter
       const qText = (q.question || '').toLowerCase();
       let aText = '';
       if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
@@ -3021,226 +3694,598 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const catText = (q.categoryLabel || '').toLowerCase();
       const matchesSearch = !query || qText.includes(query) || aText.includes(query) || catText.includes(query);
+      if (!matchesSearch) return false;
 
-      return matchesCat && matchesSearch;
+      // 2. Standardized Domain Category Filter
+      if (catFilter !== 'ALL') {
+        const itemDomain = getStandardizedDomain(q);
+        if (itemDomain !== catFilter) return false;
+      }
+
+      // 3. Difficulty Filter
+      if (diffFilter !== 'ALL') {
+        const itemDiff = (q.difficulty || 'MEDIUM').toUpperCase();
+        if (itemDiff !== diffFilter) return false;
+      }
+
+      // 4. Status Filter
+      if (statusFilter !== 'ALL') {
+        const status = state.progress[q.id] || 'unseen';
+        if (status !== statusFilter) return false;
+      }
+
+      return true;
     });
 
+    // Update match count display
     if (DOM.prephub.unifiedMatchCount) {
-      DOM.prephub.unifiedMatchCount.textContent = `Showing ${filtered.length} questions`;
-    }
-
-    const itemsPerPage = 50;
-    const currentPage = state.unifiedSearchPage || 1;
-    const endIndex = currentPage * itemsPerPage;
-    const pageItems = filtered.slice(endIndex - itemsPerPage, endIndex);
-
-    if (DOM.prephub.unifiedLoadMoreContainer) {
-      if (endIndex < filtered.length) {
-        DOM.prephub.unifiedLoadMoreContainer.classList.remove('hidden');
-      } else {
-        DOM.prephub.unifiedLoadMoreContainer.classList.add('hidden');
-      }
+      DOM.prephub.unifiedMatchCount.textContent = `Showing ${filtered.length.toLocaleString()} matching questions`;
     }
 
     if (filtered.length === 0) {
       DOM.prephub.unifiedSearchContainer.innerHTML = `
-        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; color: var(--text-secondary); opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1.25rem; color: var(--text-secondary); opacity: 0.4;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
           <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
         </div>
       `;
       return;
     }
 
-    pageItems.forEach((q, idx) => {
-      const card = document.createElement('div');
-      card.className = 'concept-accordion-card';
-      
-      const overallIndex = (resetResults ? 0 : DOM.prephub.unifiedSearchContainer.querySelectorAll('.concept-accordion-card').length) + idx + 1;
-      
-      let badgeBg = 'var(--accent)';
-      if (q.sourceDb === 'personalised') {
-        badgeBg = 'var(--cat-fabric)';
-      } else if (q.sourceDb === 'fabric_pbi') {
-        badgeBg = '#3b82f6';
-      } else if (q.sourceDb === 'general') {
-        badgeBg = '#10b981';
-      } else if (q.sourceDb === 'python') {
-        badgeBg = '#eab308';
-      } else if (q.sourceDb === 'mssql') {
-        badgeBg = '#ec4899';
-      } else if (q.sourceDb === 'pyspark') {
-        badgeBg = '#f97316';
-      } else if (q.sourceDb === 'sparksql') {
-        badgeBg = '#8b5cf6';
-      }
+    // Group items into standardized domains
+    const sections = {};
+    const domainsList = [
+      'Analytics, BI & AI',
+      'Compute & Orchestration',
+      'Databases, SQL & Storage',
+      'Data Pipelines & Ingestion',
+      'Data Lakehouse & Architecture',
+      'Data Governance & Quality',
+      'FinOps & Performance Optimization',
+      'General Data Engineering'
+    ];
 
+    domainsList.forEach(domName => {
+      sections[domName] = [];
+    });
+
+    filtered.forEach(item => {
+      const domName = getStandardizedDomain(item);
+      if (sections[domName]) {
+        sections[domName].push(item);
+      }
+    });
+
+    const activeSections = domainsList.filter(domName => sections[domName].length > 0);
+
+    if (resetResults) {
+      state.unifiedSectionLimits = {};
+      state.expandedUnifiedSections = {};
+      if (activeSections.length > 0) {
+        state.expandedUnifiedSections[activeSections[0]] = true;
+      }
+    }
+
+    let overallIdx = 1;
+
+    activeSections.forEach(sectKey => {
+      const sectItems = sections[sectKey];
+      if (!sectItems || sectItems.length === 0) return;
+
+      const isExpanded = !!state.expandedUnifiedSections[sectKey];
+      const limit = state.unifiedSectionLimits[sectKey] || 30;
+
+      // Section Wrapper
+      const sectionWrapper = document.createElement('div');
+      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.style.marginBottom = '1.25rem';
+      sectionWrapper.style.border = '1px solid var(--card-border)';
+      sectionWrapper.style.borderRadius = '16px';
+      sectionWrapper.style.overflow = 'hidden';
+      sectionWrapper.style.transition = 'all 0.3s ease';
+
+      // Section Icon Map
+      const sectionIcons = {
+        'Analytics, BI & AI': '📊',
+        'Compute & Orchestration': '⚙️',
+        'Databases, SQL & Storage': '🔷',
+        'Data Pipelines & Ingestion': '⚡',
+        'Data Lakehouse & Architecture': '🔥',
+        'Data Governance & Quality': '🛡️',
+        'FinOps & Performance Optimization': '💸',
+        'General Data Engineering': '📚'
+      };
+
+      const sectEmoji = sectionIcons[sectKey] || '📁';
+
+      // Header
       const headerDiv = document.createElement('div');
-      headerDiv.className = 'level-card-header';
+      headerDiv.className = 'unified-section-header';
       headerDiv.style.cursor = 'pointer';
+      headerDiv.style.display = 'flex';
+      headerDiv.style.alignItems = 'center';
+      headerDiv.style.justifyContent = 'space-between';
+      headerDiv.style.padding = '1.1rem 1.5rem';
+      headerDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+      headerDiv.style.transition = 'background 0.2s';
+      
       headerDiv.innerHTML = `
-        <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">${overallIndex}</div>
-        <div class="level-meta" style="flex: 1; min-width: 0;">
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px;">
-            <span class="stats-badge" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.sourceLabel}</span>
-            <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.categoryLabel}</span>
-          </div>
-          <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.15rem;">${sectEmoji}</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.02em;">${sectKey}</span>
+          <span style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; font-weight: 600;">${sectItems.length}</span>
         </div>
-        <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="section-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease; transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}; color: var(--text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
       `;
 
+      sectionWrapper.appendChild(headerDiv);
+
+      // Body (only rendered/expanded if active)
       const bodyDiv = document.createElement('div');
-      bodyDiv.className = 'level-card-body';
-      bodyDiv.style.display = 'none';
+      bodyDiv.className = 'unified-section-body';
+      bodyDiv.style.display = isExpanded ? 'block' : 'none';
+      bodyDiv.style.padding = '1.5rem';
       bodyDiv.style.borderTop = '1px solid var(--card-border)';
-      bodyDiv.style.padding = '1.25rem';
-      bodyDiv.style.background = 'rgba(255, 255, 255, 0.01)';
-      
-      if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
-        const lang = q.sourceDb;
-        const highlightedCode = typeof Highlighter !== 'undefined' ? Highlighter.highlight(q.code || '', lang) : escapeHTML(q.code || '');
+      bodyDiv.style.background = 'rgba(0, 0, 0, 0.1)';
+
+      if (isExpanded) {
+        // Section sub-header controls (counts and expand/collapse pills)
+        const subHeaderDiv = document.createElement('div');
+        subHeaderDiv.className = 'qa-section-controls';
+        subHeaderDiv.style.display = 'flex';
+        subHeaderDiv.style.justifyContent = 'space-between';
+        subHeaderDiv.style.alignItems = 'center';
+        subHeaderDiv.style.marginBottom = '1.25rem';
+        subHeaderDiv.style.padding = '0.5rem 1rem';
+        subHeaderDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+        subHeaderDiv.style.borderRadius = '10px';
+        subHeaderDiv.style.border = '1px solid var(--card-border)';
         
-        let notesHtml = '';
-        if (q.notes && q.notes.length) {
-          notesHtml = `
-            <div class="card-notes" style="margin-top: 1rem;">
-              <div class="notes-label" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.88rem;">Key Points:</div>
-              ${q.notes.map(n => `
-                <div class="note-item" style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.35rem; font-size: 0.88rem; color: var(--text-secondary);">
-                  <div class="note-bullet" style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0;"></div>
-                  <span>${escapeHTML(n)}</span>
+        // Count text
+        const countText = document.createElement('span');
+        countText.style.fontSize = '0.8rem';
+        countText.style.fontWeight = '600';
+        countText.style.color = 'var(--text-secondary)';
+        countText.textContent = `Showing ${Math.min(limit, sectItems.length)} of ${sectItems.length} matching questions`;
+        subHeaderDiv.appendChild(countText);
+        
+        // Pill Buttons Container
+        const pillsContainer = document.createElement('div');
+        pillsContainer.style.display = 'flex';
+        pillsContainer.style.gap = '0.5rem';
+        
+        const expandPill = document.createElement('button');
+        expandPill.className = 'control-btn';
+        expandPill.style.padding = '0.3rem 0.6rem';
+        expandPill.style.fontSize = '0.7rem';
+        expandPill.style.borderRadius = '6px';
+        expandPill.style.cursor = 'pointer';
+        expandPill.style.border = '1px solid var(--card-border)';
+        expandPill.style.background = 'rgba(255, 255, 255, 0.02)';
+        expandPill.style.color = 'var(--text-secondary)';
+        expandPill.textContent = 'Expand All';
+        expandPill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Expand all cards in this section's sub-grid
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.add('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'block';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+          });
+        });
+        
+        const collapsePill = document.createElement('button');
+        collapsePill.className = 'control-btn';
+        collapsePill.style.padding = '0.3rem 0.6rem';
+        collapsePill.style.fontSize = '0.7rem';
+        collapsePill.style.borderRadius = '6px';
+        collapsePill.style.cursor = 'pointer';
+        collapsePill.style.border = '1px solid var(--card-border)';
+        collapsePill.style.background = 'rgba(255, 255, 255, 0.02)';
+        collapsePill.style.color = 'var(--text-secondary)';
+        collapsePill.textContent = 'Collapse All';
+        collapsePill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Collapse all cards in this section's sub-grid
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.remove('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'none';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+          });
+        });
+        
+        pillsContainer.appendChild(expandPill);
+        pillsContainer.appendChild(collapsePill);
+        subHeaderDiv.appendChild(pillsContainer);
+        
+        bodyDiv.appendChild(subHeaderDiv);
+
+        // Render sub-grid
+        const subGrid = document.createElement('div');
+        subGrid.className = 'concepts-grid';
+        bodyDiv.appendChild(subGrid);
+
+        // Slice items
+        const visibleSectItems = sectItems.slice(0, limit);
+        visibleSectItems.forEach(q => {
+          const card = document.createElement('div');
+          card.className = 'concept-accordion-card';
+          
+          let badgeBg = 'var(--accent)';
+          if (q.sourceDb === 'personalised') {
+            badgeBg = '#ef4444';
+          } else if (q.sourceDb === 'fabric_pbi') {
+            badgeBg = '#3b82f6';
+          } else if (q.sourceDb === 'general') {
+            badgeBg = '#10b981';
+          } else if (q.sourceDb === 'python') {
+            badgeBg = '#eab308';
+          } else if (q.sourceDb === 'mssql') {
+            badgeBg = '#ec4899';
+          } else if (q.sourceDb === 'pyspark') {
+            badgeBg = '#f97316';
+          } else if (q.sourceDb === 'sparksql') {
+            badgeBg = '#8b5cf6';
+          }
+
+          const qStatus = state.progress[q.id] || 'unseen';
+
+          const cardHeader = document.createElement('div');
+          cardHeader.className = 'level-card-header';
+          cardHeader.style.cursor = 'pointer';
+          cardHeader.innerHTML = `
+            <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">${overallIdx++}</div>
+            <div class="level-meta" style="flex: 1; min-width: 0;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px; align-items: center;">
+                <span class="stats-badge" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.sourceLabel}</span>
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.categoryLabel}</span>
+                <span class="status-indicator status-${qStatus}" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase; padding: 2px 6px; border-radius: 4px; ${qStatus === 'unseen' ? 'display:none;' : ''}">${qStatus}</span>
+              </div>
+              <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
+            </div>
+            <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+          `;
+
+          const cardBody = document.createElement('div');
+          cardBody.className = 'level-card-body';
+          cardBody.style.display = 'none';
+          cardBody.style.borderTop = '1px solid var(--card-border)';
+          cardBody.style.padding = '1.25rem';
+          cardBody.style.background = 'rgba(255, 255, 255, 0.01)';
+
+          // Format answer block
+          let answerHtml = '';
+          if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
+            const lang = q.sourceDb;
+            const highlightedCode = typeof Highlighter !== 'undefined' ? Highlighter.highlight(q.code || '', lang) : escapeHTML(q.code || '');
+            
+            let notesHtml = '';
+            if (q.notes && q.notes.length) {
+              notesHtml = `
+                <div class="card-notes" style="margin-top: 1rem;">
+                  <div class="notes-label" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.88rem;">Key Points:</div>
+                  ${q.notes.map(n => `
+                    <div class="note-item" style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.35rem; font-size: 0.88rem; color: var(--text-secondary);">
+                      <div class="note-bullet" style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0;"></div>
+                      <span>${escapeHTML(n)}</span>
+                    </div>
+                  `).join('')}
                 </div>
-              `).join('')}
+              `;
+            }
+
+            answerHtml = `
+              <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6;">
+                <p style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 500;">${escapeHTML(q.description || '')}</p>
+                
+                <div class="use-case-banner" style="display: flex; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
+                  <span class="uc-icon" style="font-size: 1.1rem; line-height: 1;">🎯</span>
+                  <div class="uc-content">
+                    <div class="uc-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 2px;">Real-World Use Case</div>
+                    <div class="uc-text" style="font-size: 0.88rem; color: var(--text-secondary);">${escapeHTML(q.use_case || '')}</div>
+                  </div>
+                </div>
+
+                <div class="code-wrapper" style="border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; background: #0b0d19; margin-bottom: 1rem;">
+                  <div class="code-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--card-border); font-size: 0.75rem;">
+                    <span class="code-lang-badge" style="color: var(--text-secondary); font-weight: 600;">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                    <button class="copy-btn" title="Copy code" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; font-size: 0.75rem; transition: color 0.2s;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                      </svg>
+                      Copy
+                    </button>
+                  </div>
+                  <pre class="code-block" style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; max-height: 400px;"><code class="language-${lang === 'mssql' ? 'sql' : lang}">${highlightedCode}</code></pre>
+                </div>
+
+                ${notesHtml}
+              </div>
+            `;
+          } else {
+            const formattedAnswer = formatArchitectAnswer(q.answer);
+            answerHtml = `
+              <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+                ${formattedAnswer}
+              </div>
+            `;
+          }
+
+          // Add interactive action buttons to card body
+          cardBody.innerHTML = `
+            ${answerHtml}
+            <div class="qa-card-actions">
+              <button class="qa-action-btn${qStatus === 'reviewing' ? ' active-review' : ''}" data-action="review">⭐️ Reviewing</button>
+              <button class="qa-action-btn${qStatus === 'mastered' ? ' active-mastered' : ''}" data-action="master">✅ Mastered</button>
             </div>
           `;
-        }
 
-        bodyDiv.innerHTML = `
-          <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6;">
-            <p style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 500;">${escapeHTML(q.description || '')}</p>
-            
-            <div class="use-case-banner" style="display: flex; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
-              <span class="uc-icon" style="font-size: 1.1rem; line-height: 1;">🎯</span>
-              <div class="uc-content">
-                <div class="uc-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 2px;">Real-World Use Case</div>
-                <div class="uc-text" style="font-size: 0.88rem; color: var(--text-secondary);">${escapeHTML(q.use_case || '')}</div>
-              </div>
-            </div>
+          // Handle Copy button inside coding blocks
+          if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
+            const copyBtn = cardBody.querySelector('.copy-btn');
+            if (copyBtn) {
+              copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(q.code || '').then(() => {
+                  copyBtn.innerHTML = `
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Copied!
+                  `;
+                  setTimeout(() => {
+                    copyBtn.innerHTML = `
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"/>
+                      </svg>
+                      Copy
+                    `;
+                  }, 2000);
+                });
+              });
+            }
+          }
 
-            <div class="code-wrapper" style="border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; background: #0b0d19; margin-bottom: 1rem;">
-              <div class="code-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--card-border); font-size: 0.75rem;">
-                <span class="code-lang-badge" style="color: var(--text-secondary); font-weight: 600;">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
-                <button class="copy-btn" title="Copy code" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; font-size: 0.75rem; transition: color 0.2s;">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                  Copy
-                </button>
-              </div>
-              <pre class="code-block" style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; max-height: 400px;"><code class="language-${lang === 'mssql' ? 'sql' : lang}">${highlightedCode}</code></pre>
-            </div>
+          // Wire up status click buttons inside card
+          const statusBtns = cardBody.querySelectorAll('.qa-action-btn');
+          statusBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const action = btn.getAttribute('data-action');
+              let newStatus = 'unseen';
 
-            ${notesHtml}
-          </div>
-        `;
+              if (action === 'master') {
+                newStatus = qStatus === 'mastered' ? 'unseen' : 'mastered';
+              } else if (action === 'review') {
+                newStatus = qStatus === 'reviewing' ? 'unseen' : 'reviewing';
+              }
 
-        const copyBtn = bodyDiv.querySelector('.copy-btn');
-        if (copyBtn) {
-          copyBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            navigator.clipboard.writeText(q.code || '').then(() => {
-              copyBtn.classList.add('copied');
-              copyBtn.innerHTML = `
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                Copied!
-              `;
-              setTimeout(() => {
-                copyBtn.classList.remove('copied');
-                copyBtn.innerHTML = `
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                  Copy
-                `;
-              }, 2000);
+              updateQuestionStatus(q.id, newStatus);
+              updateUnifiedSearchCounts();
+              
+              // Local UI update instead of rebuilding whole DOM to preserve expand/scroll states
+              const indicator = cardHeader.querySelector('.status-indicator');
+              if (indicator) {
+                indicator.className = `status-indicator status-${newStatus}`;
+                indicator.textContent = newStatus;
+                indicator.style.display = newStatus === 'unseen' ? 'none' : 'inline-block';
+              }
+              
+              // Toggle classes on card buttons
+              const masterBtn = cardBody.querySelector('[data-action="master"]');
+              const reviewBtn = cardBody.querySelector('[data-action="review"]');
+              
+              if (masterBtn) masterBtn.className = `qa-action-btn${newStatus === 'mastered' ? ' active-mastered' : ''}`;
+              if (reviewBtn) reviewBtn.className = `qa-action-btn${newStatus === 'reviewing' ? ' active-review' : ''}`;
+              
+              // Re-cache status inside this closure
+              q.difficulty = q.difficulty || 'MEDIUM';
+              state.progress[q.id] = newStatus;
+              
+              // Sync Niche or Personalized Prep if visible
+              const personalisedIndicator = document.querySelector(`.personalised-card[data-id="${q.id}"] .status-badge`);
+              if (personalisedIndicator) {
+                personalisedIndicator.className = `status-badge status-${newStatus}`;
+                personalisedIndicator.textContent = newStatus;
+              }
             });
           });
+
+          card.appendChild(cardHeader);
+          card.appendChild(cardBody);
+
+          // Card Expand Toggle
+          cardHeader.addEventListener('click', () => {
+            const isOpen = cardBody.style.display !== 'none';
+            const chevron = cardHeader.querySelector('.level-chevron');
+            if (chevron) {
+              chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+            if (isOpen) {
+              cardBody.style.display = 'none';
+              card.classList.remove('expanded');
+            } else {
+              cardBody.style.display = 'block';
+              card.classList.add('expanded');
+              
+              if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                MathJax.typesetPromise([cardBody]).catch(err => console.error("MathJax error:", err));
+              }
+            }
+          });
+
+          subGrid.appendChild(card);
+        });
+
+        // Load More button inside section
+        if (sectItems.length > limit) {
+          const loadMoreWrap = document.createElement('div');
+          loadMoreWrap.style.display = 'flex';
+          loadMoreWrap.style.justifyContent = 'center';
+          loadMoreWrap.style.marginTop = '1.5rem';
+
+          const loadMoreBtn = document.createElement('button');
+          loadMoreBtn.className = 'de-load-more-btn';
+          loadMoreBtn.style.padding = '0.5rem 1.5rem';
+          loadMoreBtn.style.fontSize = '0.85rem';
+          loadMoreBtn.textContent = `Show More Questions (showing ${limit} of ${sectItems.length})`;
+          
+          loadMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.unifiedSectionLimits[sectKey] = limit + 30;
+            renderUnifiedSearch(false);
+          });
+
+          loadMoreWrap.appendChild(loadMoreBtn);
+          bodyDiv.appendChild(loadMoreWrap);
         }
-      } else {
-        const formattedAnswer = formatArchitectAnswer(q.answer);
-        bodyDiv.innerHTML = `
-          <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
-            ${formattedAnswer}
-          </div>
-        `;
       }
 
-      card.appendChild(headerDiv);
-      card.appendChild(bodyDiv);
+      sectionWrapper.appendChild(bodyDiv);
 
+      // Section Header Click Listener
       headerDiv.addEventListener('click', () => {
-        const isOpen = bodyDiv.style.display !== 'none';
-        const chevron = headerDiv.querySelector('.level-chevron');
-        if (chevron) {
-          chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
-        if (isOpen) {
-          bodyDiv.style.display = 'none';
-          card.classList.remove('expanded');
-        } else {
-          bodyDiv.style.display = 'block';
-          card.classList.add('expanded');
-          
-          if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-            MathJax.typesetPromise([bodyDiv]).catch(err => console.error("MathJax error:", err));
-          }
-        }
+        state.expandedUnifiedSections[sectKey] = !state.expandedUnifiedSections[sectKey];
+        renderUnifiedSearch(false);
       });
 
-      DOM.prephub.unifiedSearchContainer.appendChild(card);
+      DOM.prephub.unifiedSearchContainer.appendChild(sectionWrapper);
     });
   }
 
   function updateUnifiedSearchCounts() {
-    const totalPersonalised = (window.PERSONALISED_QUESTIONS || []).length;
-    const totalGeneral = (window.QUESTIONS_DE_DB || []).length;
-    const totalFabricPbi = (window.QUESTIONS_DB || []).length;
-    const totalPython = (window.PYTHON_DATA || []).length;
-    const totalMssql = (window.MSSQL_DATA || []).length;
-    const totalPyspark = (window.PYSPARK_DATA || []).length;
-    const totalSparksql = (window.SPARKSQL_DATA || []).length;
+    const query = (DOM.prephub && DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
+
+    // 1. Calculate database counts matching search query
+    const totalPersonalised = (window.PERSONALISED_QUESTIONS || []).filter(q => matchesSearchQuery(q, query, 'personalised')).length;
+    const totalGeneral = (window.QUESTIONS_DE_DB || []).filter(q => matchesSearchQuery(q, query, 'general')).length;
+    const totalFabricPbi = (window.QUESTIONS_DB || []).filter(q => matchesSearchQuery(q, query, 'fabric_pbi')).length;
+    const totalPython = (window.PYTHON_DATA || []).filter(q => matchesSearchQuery(q, query, 'python')).length;
+    const totalMssql = (window.MSSQL_DATA || []).filter(q => matchesSearchQuery(q, query, 'mssql')).length;
+    const totalPyspark = (window.PYSPARK_DATA || []).filter(q => matchesSearchQuery(q, query, 'pyspark')).length;
+    const totalSparksql = (window.SPARKSQL_DATA || []).filter(q => matchesSearchQuery(q, query, 'sparksql')).length;
     const totalAll = totalPersonalised + totalGeneral + totalFabricPbi + totalPython + totalMssql + totalPyspark + totalSparksql;
 
-    const searchInput = document.getElementById('unified-search-input');
-    if (searchInput) {
-      searchInput.placeholder = 'Search...';
+    // Update DB list badges
+    const dbBadges = {
+      'count-db-all': totalAll,
+      'count-db-personalised': totalPersonalised,
+      'count-db-fabric_pbi': totalFabricPbi,
+      'count-db-general': totalGeneral,
+      'count-db-python': totalPython,
+      'count-db-mssql': totalMssql,
+      'count-db-pyspark': totalPyspark,
+      'count-db-sparksql': totalSparksql
+    };
+
+    for (const [id, count] of Object.entries(dbBadges)) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = count.toLocaleString();
+        
+        // Hide option if count is 0, except for 'count-db-all'
+        const btn = el.closest('.qa-sidebar-btn');
+        if (btn && id !== 'count-db-all') {
+          if (count === 0) {
+            btn.style.display = 'none';
+          } else {
+            btn.style.display = 'flex';
+          }
+        }
+      }
     }
 
-    if (DOM.prephub && DOM.prephub.unifiedDbScrollbar) {
-      const chips = DOM.prephub.unifiedDbScrollbar.querySelectorAll('.topic-chip');
-      chips.forEach(chip => {
-        const db = chip.getAttribute('data-db');
-        if (db === 'ALL') {
-          chip.textContent = `All Databases (${totalAll.toLocaleString()})`;
-        } else if (db === 'personalised') {
-          chip.textContent = `Personalised Prep (${totalPersonalised.toLocaleString()})`;
-        } else if (db === 'general') {
-          chip.textContent = `General DE Prep (${totalGeneral.toLocaleString()})`;
-        } else if (db === 'fabric_pbi') {
-          chip.textContent = `Fabric & PBI Prep (${totalFabricPbi.toLocaleString()})`;
-        } else if (db === 'python') {
-          chip.textContent = `Python Coding (${totalPython.toLocaleString()})`;
-        } else if (db === 'mssql') {
-          chip.textContent = `Advanced SQL (${totalMssql.toLocaleString()})`;
-        } else if (db === 'pyspark') {
-          chip.textContent = `PySpark Coding (${totalPyspark.toLocaleString()})`;
-        } else if (db === 'sparksql') {
-          chip.textContent = `Spark SQL Coding (${totalSparksql.toLocaleString()})`;
-        }
+    // 2. Accumulate active database pool
+    const dbFilter = state.activeUnifiedDb || 'ALL';
+    const pool = [];
+
+    if (dbFilter === 'ALL' || dbFilter === 'personalised') {
+      (window.PERSONALISED_QUESTIONS || []).forEach(q => pool.push({...q, sourceDb: 'personalised'}));
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'fabric_pbi') {
+      (window.QUESTIONS_DB || []).forEach(q => pool.push({...q, sourceDb: 'fabric_pbi'}));
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'general') {
+      (window.QUESTIONS_DE_DB || []).forEach(q => pool.push({...q, sourceDb: 'general'}));
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'python') {
+      (window.PYTHON_DATA || []).forEach(q => pool.push({...q, sourceDb: 'python'}));
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'mssql') {
+      (window.MSSQL_DATA || []).forEach(q => pool.push({...q, sourceDb: 'mssql'}));
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'pyspark') {
+      (window.PYSPARK_DATA || []).forEach(q => pool.push({...q, sourceDb: 'pyspark'}));
+    }
+    if (dbFilter === 'ALL' || dbFilter === 'sparksql') {
+      (window.SPARKSQL_DATA || []).forEach(q => pool.push({...q, sourceDb: 'sparksql'}));
+    }
+
+    // 3. Rebuild domains sidebar selector inside #unified-domain-list
+    const domains = [
+      'Analytics, BI & AI',
+      'Compute & Orchestration',
+      'Databases, SQL & Storage',
+      'Data Pipelines & Ingestion',
+      'Data Lakehouse & Architecture',
+      'Data Governance & Quality',
+      'FinOps & Performance Optimization',
+      'General Data Engineering'
+    ];
+
+    const container = document.getElementById('unified-domain-list');
+    if (container) {
+      container.innerHTML = '';
+
+      // Count total matching in active DB pool
+      const activeDbMatchingCount = pool.filter(q => matchesSearchQuery(q, query, q.sourceDb)).length;
+
+      // Add "All Domains" button
+      const allBtn = document.createElement('button');
+      allBtn.className = 'qa-sidebar-btn' + (state.activeUnifiedCategory === 'ALL' ? ' active' : '');
+      allBtn.setAttribute('data-domain', 'ALL');
+      allBtn.innerHTML = `
+        <span>📂 All Domains</span>
+        <span class="qa-btn-count-badge">${activeDbMatchingCount.toLocaleString()}</span>
+      `;
+      allBtn.addEventListener('click', () => {
+        state.activeUnifiedCategory = 'ALL';
+        container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        state.unifiedSearchPage = 1;
+        renderUnifiedSearch(true);
+      });
+      container.appendChild(allBtn);
+
+      domains.forEach(domName => {
+        // Filter pool by domain name
+        const domPool = pool.filter(q => getStandardizedDomain(q) === domName);
+        if (domPool.length === 0) return; // Hide domains with no questions in active database
+
+        // Count matching in this domain
+        const matchCount = domPool.filter(q => matchesSearchQuery(q, query, q.sourceDb)).length;
+        if (matchCount === 0) return; // Hide domain if no matching questions for current search query
+
+        const btn = document.createElement('button');
+        btn.className = 'qa-sidebar-btn' + (state.activeUnifiedCategory === domName ? ' active' : '');
+        btn.setAttribute('data-domain', domName);
+        btn.innerHTML = `
+          <span>${domName}</span>
+          <span class="qa-btn-count-badge">${matchCount}</span>
+        `;
+        btn.addEventListener('click', () => {
+          state.activeUnifiedCategory = domName;
+          container.querySelectorAll('.qa-sidebar-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.unifiedSearchPage = 1;
+          renderUnifiedSearch(true);
+        });
+        container.appendChild(btn);
       });
     }
   }
@@ -3949,17 +4994,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const storageMB = unifiedMB * storageInput;
             const userMB = usableMB * (1 - fractionInput);
 
-            // Convert to percentages relative to total heap for bar scaling
+            // Convert to percentages relative to total heap for chart scaling
             const reservedPct = (reservedMB / totalHeapMB) * 100;
             const executionPct = (executionMB / totalHeapMB) * 100;
             const storagePct = (storageMB / totalHeapMB) * 100;
             const userPct = (userMB / totalHeapMB) * 100;
 
-            // Scale UI bars
-            document.getElementById('bar-reserved').style.width = `${reservedPct}%`;
-            document.getElementById('bar-execution').style.width = `${executionPct}%`;
-            document.getElementById('bar-storage').style.width = `${storagePct}%`;
-            document.getElementById('bar-user').style.width = `${userPct}%`;
+            // Calculate cumulative limits for conic-gradient
+            const p1 = reservedPct;
+            const p2 = p1 + executionPct;
+            const p3 = p2 + storagePct;
+
+            // Render interactive pie/donut chart
+            const chartEl = document.getElementById('memory-pie-chart');
+            if (chartEl) {
+                chartEl.style.background = `conic-gradient(#ef4444 0% ${p1.toFixed(2)}%, #7c3aed ${p1.toFixed(2)}% ${p2.toFixed(2)}%, #d97706 ${p2.toFixed(2)}% ${p3.toFixed(2)}%, #0d9488 ${p3.toFixed(2)}% 100%)`;
+            }
+            
+            // Update Center heap label
+            const labelCenterEl = document.getElementById('lbl-total-heap-center');
+            if (labelCenterEl) {
+                labelCenterEl.textContent = `${heapInput} GB`;
+            }
 
             // Render value labels
             document.getElementById('lbl-val-reserved').textContent = "300 MB";

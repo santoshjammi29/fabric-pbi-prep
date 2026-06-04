@@ -54,13 +54,11 @@ document.head.appendChild(scriptEl2);
 
 // Wait for DOMContentLoaded logic
 setTimeout(() => {
-    const scrollbar = document.getElementById('practice-topics-scrollbar');
-    const fabricBtn = scrollbar.querySelector('button[data-category="FABRIC"]');
+    const categoryList = document.getElementById('practice-category-list');
+    const fabricBtn = categoryList.querySelector('button[data-category="FABRIC"]');
     
     console.log("Before click, nicheLauncherGrid has children:", document.getElementById('niche-launcher-grid').children.length);
-    
     fabricBtn.click();
-    
     console.log("After click, nicheLauncherGrid has children:", document.getElementById('niche-launcher-grid').children.length);
     
     // Check if the HTML inside the grid is correct

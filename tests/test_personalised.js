@@ -35,7 +35,7 @@ const puppeteer = require('puppeteer');
     // 3. Click a domain chip (Microsoft Fabric & OneLake)
     console.log("Clicking 'Microsoft Fabric & OneLake' domain chip...");
     await page.evaluate(() => {
-      const chip = document.querySelector('#personalised-topics-scrollbar .topic-chip[data-domain="Microsoft Fabric, OneLake & Direct Lake Architecture"]');
+      const chip = document.querySelector('#personalised-domain-list button[data-domain="Microsoft Fabric, OneLake & Direct Lake Architecture"]');
       if (chip) chip.click();
       else console.log("Fabric chip not found");
     });

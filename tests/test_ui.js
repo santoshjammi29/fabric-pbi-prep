@@ -20,7 +20,7 @@ const puppeteer = require('puppeteer');
   // Click a topic chip
   console.log("Clicking FABRIC topic chip...");
   await page.evaluate(() => {
-     const chip = document.querySelector('#practice-topics-scrollbar button[data-category="FABRIC"]');
+     const chip = document.querySelector('#practice-category-list button[data-category="FABRIC"]');
      if (chip) chip.click();
      else console.log("Chip not found");
   });

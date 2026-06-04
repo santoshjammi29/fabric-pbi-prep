@@ -14,7 +14,7 @@ const puppeteer = require('puppeteer');
   await new Promise(r => setTimeout(r, 500));
   
   // Count accordions before filter
-  const count1 = await page.evaluate(() => document.querySelectorAll('#explainer-accordion .accordion-item').length);
+  const count1 = await page.evaluate(() => document.querySelectorAll('#explainer-accordion .concept-accordion-card').length);
   console.log("Accordions before filter:", count1);
 
   // Type in search filter
@@ -23,16 +23,8 @@ const puppeteer = require('puppeteer');
   await new Promise(r => setTimeout(r, 500));
   
   // Count items
-  const count2 = await page.evaluate(() => document.querySelectorAll('#explainer-accordion .accordion-item').length);
+  const count2 = await page.evaluate(() => document.querySelectorAll('#explainer-accordion .concept-accordion-card').length);
   console.log("Accordions after search 'lakehouse':", count2);
-  
-  // Change status filter
-  await page.select('#explainer-filter-status', 'mastered');
-  
-  await new Promise(r => setTimeout(r, 500));
-  
-  const count3 = await page.evaluate(() => document.querySelectorAll('#explainer-accordion .accordion-item').length);
-  console.log("Accordions after status 'mastered':", count3);
   
   await browser.close();
 })();
