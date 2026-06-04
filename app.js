@@ -3217,7 +3217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const searchInput = document.getElementById('unified-search-input');
     if (searchInput) {
-      searchInput.placeholder = `Search across all ${totalAll.toLocaleString()} questions (Fabric, PBI, SQL, Python, PySpark)...`;
+      searchInput.placeholder = 'Search...';
     }
 
     if (DOM.prephub && DOM.prephub.unifiedDbScrollbar) {
