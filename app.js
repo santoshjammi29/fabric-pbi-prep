@@ -2762,20 +2762,114 @@ document.addEventListener('DOMContentLoaded', () => {
 
     DOM.prephub.unifiedCategoryScrollbar.innerHTML = '';
 
+    // helper to map category to one of 5 rows/sections
+    function getCategoryRow(cat) {
+      if (cat === 'ALL') return 1;
+      const lower = cat.toLowerCase();
+      
+      // Row 4: AI & Vector DBs
+      if (
+        lower.includes('rag') || lower.includes('vector') || lower.includes('llm') || lower.includes('ai')
+      ) {
+        return 4;
+      }
+
+      // Row 5: Languages & Cloud
+      if (
+        lower.includes('python') || lower.includes('decorator') || lower.includes('generator') ||
+        lower.includes('concurrency') || lower.includes('threading') || lower.includes('pattern') ||
+        lower.includes('language') || lower.includes('foundation') || lower.includes('cleaning') ||
+        lower.includes('manipulation') || lower.includes('functional') || lower.includes('cloud') ||
+        lower.includes('finops') || lower.includes('devops') || lower.includes('personalised') ||
+        lower.includes('custom') || lower.includes('error handling')
+      ) {
+        return 5;
+      }
+
+      // Row 2: Pipelines & Integration
+      if (
+        lower.includes('adf') || lower.includes('factory') || lower.includes('pipeline') ||
+        lower.includes('orchestration') || lower.includes('etl') || lower.includes('elt') ||
+        lower.includes('ingestion') || lower.includes('cdc') || lower.includes('dbt') ||
+        lower.includes('airflow') || lower.includes('dag') || lower.includes('integration') ||
+        lower.includes('delta live tables')
+      ) {
+        return 2;
+      }
+
+      // Row 3: Compute & Streaming
+      if (
+        lower.includes('spark') || lower.includes('pyspark') || lower.includes('databricks') ||
+        lower.includes('distributed') || lower.includes('kafka') || lower.includes('flink') ||
+        lower.includes('streaming') || lower.includes('big data') || lower.includes('engineering') ||
+        lower.includes('tuning') || lower.includes('resource') || lower.includes('performance') ||
+        lower.includes('observability') || lower.includes('monitoring') || lower.includes('optimization')
+      ) {
+        return 3;
+      }
+
+      // Row 1: Data Platform, Modeling, and Storage
+      return 1;
+    }
+
+    // Partition categories into five rows
+    const rowChips = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: []
+    };
+
+    // Always put "All Categories" as the first chip in Row 1
     const allChip = document.createElement('button');
     allChip.className = `topic-chip${state.activeUnifiedCategory === 'ALL' ? ' active' : ''}`;
     allChip.setAttribute('data-category', 'ALL');
     allChip.textContent = 'All Categories';
-    DOM.prephub.unifiedCategoryScrollbar.appendChild(allChip);
+    rowChips[1].push(allChip);
 
     sortedCategories.forEach(cat => {
       const chip = document.createElement('button');
       chip.className = `topic-chip${state.activeUnifiedCategory === cat ? ' active' : ''}`;
       chip.setAttribute('data-category', cat);
       chip.textContent = displayNames[cat] || cat;
-      DOM.prephub.unifiedCategoryScrollbar.appendChild(chip);
+      const rowId = getCategoryRow(cat);
+      rowChips[rowId].push(chip);
     });
 
+    const rowMetadata = [
+      { id: 1, label: 'Platform & Storage' },
+      { id: 2, label: 'Pipelines & Integration' },
+      { id: 3, label: 'Compute & Streaming' },
+      { id: 4, label: 'AI & Vector DBs' },
+      { id: 5, label: 'Languages & Cloud' }
+    ];
+
+    rowMetadata.forEach(meta => {
+      const chipsInRow = rowChips[meta.id];
+      // Render the row if it has chips. Row 1 has at least "All Categories", which is always rendered.
+      if (chipsInRow.length > 0) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'category-row';
+
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'category-row-label';
+        labelDiv.textContent = meta.label;
+
+        const chipsWrapDiv = document.createElement('div');
+        chipsWrapDiv.className = 'category-row-chips';
+
+        chipsInRow.forEach(chip => {
+          chipsWrapDiv.appendChild(chip);
+        });
+
+        rowDiv.appendChild(labelDiv);
+        rowDiv.appendChild(chipsWrapDiv);
+        DOM.prephub.unifiedCategoryScrollbar.appendChild(rowDiv);
+      }
+    });
+
+    // Wire up event listeners
     const chips = DOM.prephub.unifiedCategoryScrollbar.querySelectorAll('.topic-chip');
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
