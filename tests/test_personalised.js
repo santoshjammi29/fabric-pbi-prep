@@ -53,11 +53,10 @@ const puppeteer = require('puppeteer');
     await page.evaluate(() => {
       const searchInput = document.getElementById('personalised-search');
       if (searchInput) {
-        searchInput.value = '';
+        searchInput.value = 'governance';
         searchInput.dispatchEvent(new Event('input'));
       }
     });
-    await page.type('#personalised-search', 'governance');
     await new Promise(r => setTimeout(r, 500));
 
     const count3 = await page.evaluate(() => document.querySelectorAll('#personalised-container .concept-accordion-card').length);

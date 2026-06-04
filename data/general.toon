@@ -15366,7 +15366,7 @@
     
     The following graphic describes the interaction of components within a sharded cluster:
     
-    ![Diagram of a sample sharded cluster for production purposes.  Contains exactly 3 config servers, 2 or more ``mongos`` query routers, and at least 2 shards. The shards are replica sets.](https://www.mongodb.com/docs/manual/images/sharded-cluster-production-architecture.bakedsvg.svg)
+    ![Diagram of a sample sharded cluster for production purposes.  Contains exactly 3 config servers, 2 or more `mongos` query routers, and at least 2 shards. The shards are replica sets.](https://www.mongodb.com/docs/manual/images/sharded-cluster-production-architecture.bakedsvg.svg)
     
     MongoDB shards data at the [collection](https://www.mongodb.com/docs/manual/reference/glossary/#std-term-collection) level, distributing the collection data across the shards in the cluster.
 - id: scraped-q-1787

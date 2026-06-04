@@ -341,11 +341,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set initial view from URL hash, fallback to localStorage, or default to concepts
     let initialView = 'view-concepts';
     const hash = window.location.hash;
-    if (hash && document.getElementById(hash.substring(1))) {
+    const validViews = ['view-prep-hub', 'view-spark-hub', 'view-gcc', 'view-concepts', 'view-cheatsheet',
+                        'view-personalised', 'view-general-de', 'view-practice', 'view-explainer', 'view-spark', 'view-pyspark', 'view-unified-search'];
+    if (hash && (document.getElementById(hash.substring(1)) || validViews.includes(hash.substring(1)))) {
       initialView = hash.substring(1);
     } else {
       const savedView = localStorage.getItem('interview_prep_active_view');
-      if (savedView && document.getElementById(savedView)) {
+      if (savedView && (document.getElementById(savedView) || validViews.includes(savedView))) {
         initialView = savedView;
       }
     }
@@ -354,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen to hashchange events for browser back/forward navigation
     window.addEventListener('hashchange', () => {
       const newHash = window.location.hash.substring(1);
-      if (newHash && document.getElementById(newHash) && state.currentView !== newHash) {
+      if (newHash && (document.getElementById(newHash) || validViews.includes(newHash)) && state.currentView !== newHash) {
         switchView(newHash);
       }
     });
@@ -521,9 +523,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let actualTargetViewId = targetViewId;
     let targetSubTabId = null;
 
-    const mergedViews = ['view-personalised', 'view-general-de', 'view-practice', 'view-explainer'];
+    const mergedViews = ['view-personalised', 'view-general-de', 'view-practice', 'view-explainer', 'view-unified-search'];
     if (mergedViews.includes(targetViewId)) {
-      targetSubTabId = targetViewId;
+      targetSubTabId = targetViewId === 'view-general-de' ? 'view-unified-search' : targetViewId;
       actualTargetViewId = 'view-prep-hub';
     }
 
@@ -5382,10 +5384,8 @@ Your input highlights the need for dynamic optimization of distributed executors
         }
 
         // Start default structures on page launch
-        window.onload = function () {
-            changeSimulatorFlow();
-            updateMemoryMapper();
-        };
+        changeSimulatorFlow();
+        updateMemoryMapper();
 
         // Expose handlers globally so inline HTML handlers can find them
         window.switchSandboxTab = switchSandboxTab;
