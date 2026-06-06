@@ -35,7 +35,7 @@
   --glass-shadow-dark: 0 4px 16px 0 rgba(0, 0, 0, 0.45), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
 
   /* Font Setup */
-  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-size-base: clamp(0.875rem, 0.8rem + 0.3vw, 1.125rem);
 }
 
@@ -79,12 +79,12 @@
   --accent: hsl(160, 90%, 50%);
   --warning: hsl(35, 100%, 65%);
   --danger: hsl(0, 85%, 68%);
-  --bg-gradient: linear-gradient(135deg, hsl(240, 25%, 8%) 0%, hsl(240, 20%, 4%) 100%);
-  --card-bg: rgba(18, 18, 30, 0.65);
-  --card-border: rgba(255, 255, 255, 0.12);
-  --text-primary: hsl(240, 10%, 93%);
-  --text-secondary: hsl(240, 8%, 70%);
-  --glass-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.45), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
+  --bg-gradient: #000000;
+  --card-bg: rgba(10, 10, 10, 0.75);
+  --card-border: rgba(255, 255, 255, 0.09);
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --glass-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.65), 0 1px 2px 0 rgba(255, 255, 255, 0.04);
   
   /* Category Colors */
   --cat-pbi: hsl(245, 85%, 72%);
@@ -100,11 +100,11 @@
   --cat-gov: hsl(38, 90%, 65%);
   
   /* Helper Surface Colors */
-  --item-bg: rgba(255, 255, 255, 0.04);
-  --dialog-bg: hsl(240, 22%, 10%);
+  --item-bg: rgba(255, 255, 255, 0.03);
+  --dialog-bg: #000000;
   --primary-hover: hsl(var(--hue), 80%, 65%);
   --code-bg: rgba(255, 255, 255, 0.08);
-  --blur-overlay-bg: rgba(10, 10, 20, 0.88);
+  --blur-overlay-bg: rgba(0, 0, 0, 0.92);
 }
 
 /* System Theme Integration */
@@ -119,7 +119,7 @@
 
 .theme-dark {
   color-scheme: dark;
-  background: hsl(240, 25%, 8%);
+  background: #000000;
 }
 
 /* Base Resets */
@@ -137,6 +137,7 @@ html {
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
+  line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-gradient);
   min-height: 100vh;
@@ -145,6 +146,9 @@ body {
   max-width: 100%;
   display: flex;
   transition: background 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Custom Scrollbars */
@@ -912,7 +916,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  line-height: 1.5;
+  line-height: 1.6;
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
@@ -931,6 +935,7 @@ body {
 .dialog-answer-text {
   font-size: 0.95rem;
   color: var(--text-primary);
+  line-height: 1.6;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -1733,6 +1738,7 @@ code {
 .answer-content-text {
   font-size: 0.95rem;
   color: var(--text-primary);
+  line-height: 1.6;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
