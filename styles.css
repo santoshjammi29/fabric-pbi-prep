@@ -81,7 +81,7 @@
   --danger: hsl(0, 85%, 68%);
   --bg-gradient: #000000;
   --card-bg: rgba(10, 10, 10, 0.75);
-  --card-border: rgba(255, 255, 255, 0.09);
+  --card-border: rgba(255, 255, 255, 0.16);
   --text-primary: #ffffff;
   --text-secondary: #cbd5e1;
   --glass-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.65), 0 1px 2px 0 rgba(255, 255, 255, 0.04);
@@ -1614,7 +1614,7 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .category-row:last-child {
@@ -3736,7 +3736,7 @@ code {
 
 .concept-card-body-inner {
   padding: 0 1.2rem 1.2rem 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--card-border);
   padding-top: 1rem;
 }
 
@@ -5709,7 +5709,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   justify-content: center;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), var(--glass-shadow);
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--card-border);
   transition: background 0.3s ease;
 }
 
@@ -6726,7 +6726,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 /* Expandable Q&A card refinements */
 .concept-accordion-card {
   background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -6734,7 +6734,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 }
 
 .concept-accordion-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.28);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.025);
@@ -6753,7 +6753,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .level-card-body {
   background: rgba(0, 0, 0, 0.2) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-top: 1px solid var(--card-border) !important;
 }
 
 
@@ -6774,7 +6774,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   padding: 0.42rem 0.9rem !important;
   border-radius: 99px !important;
   background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: var(--text-secondary) !important;
   font-family: var(--font-family) !important;
   font-size: 0.82rem !important;
