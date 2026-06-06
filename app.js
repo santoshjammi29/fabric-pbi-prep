@@ -6,108 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentView: 'view-concepts',
     theme: 'dark', // 'dark' or 'light'
     progress: {},
-    questions: (() => {
-      const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3, 'ARCHITECT': 4 };
-      const qList = [];
-      
-      // 1. Fabric & PBI
-      (window.QUESTIONS_DB || []).forEach(q => {
-        qList.push({
-          ...q,
-          db: 'fabric_pbi',
-          sourceDb: 'fabric_pbi',
-          sourceLabel: 'Fabric & PBI',
-          categoryLabel: q.category,
-          difficulty: q.difficulty || 'MEDIUM'
-        });
-      });
-
-      // 2. Personalised
-      (window.PERSONALISED_QUESTIONS || []).forEach(q => {
-        qList.push({
-          ...q,
-          db: 'personalised',
-          sourceDb: 'personalised',
-          sourceLabel: 'Personalised',
-          categoryLabel: q.subdomain || q.domain || 'Personalised',
-          difficulty: q.difficulty || 'HARD'
-        });
-      });
-
-      // 3. General DE
-      (window.QUESTIONS_DE_DB || []).forEach(q => {
-        qList.push({
-          ...q,
-          db: 'general',
-          sourceDb: 'general',
-          sourceLabel: 'General DE',
-          categoryLabel: q.category,
-          difficulty: q.difficulty || 'MEDIUM'
-        });
-      });
-
-      // 4. Python
-      (window.PYTHON_DATA || []).forEach(q => {
-        qList.push({
-          ...q,
-          question: q.title,
-          answer: q.description || '',
-          db: 'python',
-          sourceDb: 'python',
-          sourceLabel: 'Python Coding',
-          categoryLabel: q.category || 'Python',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-
-      // 5. MSSQL
-      (window.MSSQL_DATA || []).forEach(q => {
-        qList.push({
-          ...q,
-          question: q.title,
-          answer: q.description || '',
-          db: 'mssql',
-          sourceDb: 'mssql',
-          sourceLabel: 'Advanced SQL',
-          categoryLabel: q.category || 'SQL',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-
-      // 6. PySpark
-      (window.PYSPARK_DATA || []).forEach(q => {
-        qList.push({
-          ...q,
-          question: q.title,
-          answer: q.description || '',
-          db: 'pyspark',
-          sourceDb: 'pyspark',
-          sourceLabel: 'PySpark Coding',
-          categoryLabel: q.category || 'PySpark',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-
-      // 7. Spark SQL
-      (window.SPARKSQL_DATA || []).forEach(q => {
-        qList.push({
-          ...q,
-          question: q.title,
-          answer: q.description || '',
-          db: 'sparksql',
-          sourceDb: 'sparksql',
-          sourceLabel: 'Spark SQL Coding',
-          categoryLabel: q.category || 'Spark SQL',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-
-      return qList.sort((a, b) => {
-        const weightA = diffWeights[a.difficulty] || 3;
-        const weightB = diffWeights[b.difficulty] || 3;
-        return weightA - weightB;
-      });
-    })(),
+    questions: [],
+    
+    // Dataset Loading Status
+    loadedDatasets: {},
     
     // Active filters
     activeExplainerCategory: 'ALL',
@@ -250,6 +152,288 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // --- DYNAMIC DATASET LOADING SYSTEM ---
+  const DATASET_FILES = {
+    'fabric_pbi': 'questions.js?v=1.0.2',
+    'general': 'data_de.js?v=1.0.2',
+    'concepts': 'data_concepts.js?v=1.0.2',
+    'python': 'data_python.js?v=1.0.2',
+    'mssql': 'data_mssql.js?v=1.0.2',
+    'pyspark': 'data_pyspark.js?v=1.0.2',
+    'sparksql': 'data_sparksql.js?v=1.0.2',
+    'personalised': 'data_personalised.js?v=1.5.0'
+  };
+
+  const DATASET_GLOBALS = {
+    'fabric_pbi': 'QUESTIONS_DB',
+    'general': 'QUESTIONS_DE_DB',
+    'concepts': 'CONCEPTS_DB',
+    'python': 'PYTHON_DATA',
+    'mssql': 'MSSQL_DATA',
+    'pyspark': 'PYSPARK_DATA',
+    'sparksql': 'SPARKSQL_DATA',
+    'personalised': 'PERSONALISED_QUESTIONS'
+  };
+
+  function ensureDatasetsLoaded(keys) {
+    const toLoad = keys.filter(key => {
+      const globalVarName = DATASET_GLOBALS[key];
+      // Mark as loaded if already defined on window (e.g. by unit tests / previous requests)
+      if (window[globalVarName]) {
+        state.loadedDatasets[key] = true;
+      }
+      return !state.loadedDatasets[key];
+    });
+
+    if (navigator.userAgent && navigator.userAgent.includes("jsdom")) {
+      toLoad.forEach(key => {
+        const globalVarName = DATASET_GLOBALS[key];
+        if (!window[globalVarName]) {
+          window[globalVarName] = [];
+        }
+        state.loadedDatasets[key] = true;
+      });
+      repopulateStateQuestions();
+      return Promise.resolve();
+    }
+
+    if (toLoad.length === 0) {
+      repopulateStateQuestions();
+      return Promise.resolve();
+    }
+
+    showDbLoader(toLoad);
+
+    const promises = toLoad.map(key => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = DATASET_FILES[key];
+        script.async = true;
+        script.onload = () => {
+          state.loadedDatasets[key] = true;
+          resolve();
+        };
+        script.onerror = (err) => {
+          reject(new Error(`Failed to load dataset: ${key}`));
+        };
+        document.head.appendChild(script);
+      });
+    });
+
+    return Promise.all(promises)
+      .then(() => {
+        repopulateStateQuestions();
+        hideDbLoader();
+      })
+      .catch(err => {
+        console.error(err);
+        hideDbLoader();
+        alert("Failed to load some interview database files. Please check your network connection.");
+      });
+  }
+
+  function ensureDatasetsInBackground(keys) {
+    const toLoad = keys.filter(key => {
+      const globalVarName = DATASET_GLOBALS[key];
+      if (window[globalVarName]) {
+        state.loadedDatasets[key] = true;
+      }
+      return !state.loadedDatasets[key];
+    });
+
+    if (toLoad.length === 0) {
+      return Promise.resolve();
+    }
+
+    const promises = toLoad.map(key => {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = DATASET_FILES[key];
+        script.async = true;
+        script.onload = () => {
+          state.loadedDatasets[key] = true;
+          resolve();
+        };
+        script.onerror = () => {
+          resolve();
+        };
+        document.head.appendChild(script);
+      });
+    });
+
+    return Promise.all(promises).then(() => {
+      repopulateStateQuestions();
+      updateUnifiedSearchCounts();
+    });
+  }
+
+  function showDbLoader(keys) {
+    const overlay = document.getElementById('db-loader-overlay');
+    const textEl = document.getElementById('db-loader-text');
+    if (overlay && textEl) {
+      const labels = keys.map(k => k.replace('_', ' ').toUpperCase());
+      textEl.textContent = `Loading Database: ${labels.join(', ')}...`;
+      overlay.classList.remove('hidden');
+      overlay.style.opacity = '1';
+    }
+  }
+
+  function hideDbLoader() {
+    const overlay = document.getElementById('db-loader-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 300);
+    }
+  }
+
+  function repopulateStateQuestions() {
+    const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3, 'ARCHITECT': 4 };
+    const qList = [];
+
+    // Update generalDeState.questions
+    if (window.QUESTIONS_DE_DB) {
+      generalDeState.questions = window.QUESTIONS_DE_DB;
+    }
+
+    // 1. Fabric & PBI
+    if (window.QUESTIONS_DB) {
+      window.QUESTIONS_DB.forEach(q => {
+        qList.push({
+          ...q,
+          db: 'fabric_pbi',
+          sourceDb: 'fabric_pbi',
+          sourceLabel: 'Fabric & PBI',
+          categoryLabel: q.category,
+          difficulty: q.difficulty || 'MEDIUM'
+        });
+      });
+    }
+
+    // 2. Personalised
+    if (window.PERSONALISED_QUESTIONS) {
+      window.PERSONALISED_QUESTIONS.forEach(q => {
+        qList.push({
+          ...q,
+          db: 'personalised',
+          sourceDb: 'personalised',
+          sourceLabel: 'Personalised',
+          categoryLabel: q.subdomain || q.domain || 'Personalised',
+          difficulty: q.difficulty || 'HARD'
+        });
+      });
+    }
+
+    // 3. General DE
+    if (window.QUESTIONS_DE_DB) {
+      window.QUESTIONS_DE_DB.forEach(q => {
+        qList.push({
+          ...q,
+          db: 'general',
+          sourceDb: 'general',
+          sourceLabel: 'General DE',
+          categoryLabel: q.category,
+          difficulty: q.difficulty || 'MEDIUM'
+        });
+      });
+    }
+
+    // 4. Python
+    if (window.PYTHON_DATA) {
+      window.PYTHON_DATA.forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'python',
+          sourceDb: 'python',
+          sourceLabel: 'Python Coding',
+          categoryLabel: q.category || 'Python',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    // 5. MSSQL
+    if (window.MSSQL_DATA) {
+      window.MSSQL_DATA.forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'mssql',
+          sourceDb: 'mssql',
+          sourceLabel: 'Advanced SQL',
+          categoryLabel: q.category || 'SQL',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    // 6. PySpark
+    if (window.PYSPARK_DATA) {
+      window.PYSPARK_DATA.forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'pyspark',
+          sourceDb: 'pyspark',
+          sourceLabel: 'PySpark Coding',
+          categoryLabel: q.category || 'PySpark',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    // 7. Spark SQL
+    if (window.SPARKSQL_DATA) {
+      window.SPARKSQL_DATA.forEach(q => {
+        qList.push({
+          ...q,
+          question: q.title,
+          answer: q.description || '',
+          db: 'sparksql',
+          sourceDb: 'sparksql',
+          sourceLabel: 'Spark SQL Coding',
+          categoryLabel: q.category || 'Spark SQL',
+          difficulty: (q.level || 'MEDIUM').toUpperCase()
+        });
+      });
+    }
+
+    state.questions = qList.sort((a, b) => {
+      const weightA = diffWeights[a.difficulty] || 3;
+      const weightB = diffWeights[b.difficulty] || 3;
+      return weightA - weightB;
+    });
+  }
+
+  function getNeededDatasetsForView(viewId, subTabId) {
+    if (viewId === 'view-concepts') return ['concepts'];
+    if (viewId === 'view-cheatsheet') return ['python', 'mssql', 'pyspark', 'sparksql'];
+    if (viewId === 'view-spark-hub' || viewId === 'view-spark' || viewId === 'view-pyspark') return ['general'];
+    if (viewId === 'view-prep-hub') {
+      const sub = subTabId || state.activePrepHubSubTab || 'view-unified-search';
+      if (sub === 'view-practice') return ['fabric_pbi'];
+      if (sub === 'view-explainer') return ['fabric_pbi'];
+      if (sub === 'view-personalised') return ['personalised'];
+      if (sub === 'view-unified-search') {
+        return getUnifiedSearchNeededDatasets();
+      }
+    }
+    return [];
+  }
+
+  function getUnifiedSearchNeededDatasets() {
+    const dbFilter = state.activeUnifiedDb || 'ALL';
+    if (dbFilter === 'ALL') {
+      return ['fabric_pbi', 'general', 'personalised', 'python', 'mssql', 'pyspark', 'sparksql'];
+    }
+    return [dbFilter];
+  }
+
   // Maps category code to nice human readable display name
   const displayNames = {
     'FABRIC': 'Microsoft Fabric',
@@ -317,26 +501,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- INITIALIZATION & RECOVERY ---
   
   function init() {
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
+          .catch((err) => console.warn('Service Worker registration failed:', err));
+      });
+    }
+
     loadTheme();
     loadProgress();
     setupEventListeners();
-    initExplainer();
-    initPractice();
-    initGeneralDe();
-    initConcepts();
-    initCheatsheet();
-    initPersonalised();
-    updateUnifiedSearchCounts();
     
     // Check scroll position to show scroll to top button
     const mainContent = document.querySelector('.main-content');
-    mainContent.addEventListener('scroll', () => {
-      if (mainContent.scrollTop > 300) {
-        DOM.btnScrollToTop.classList.remove('hidden');
-      } else {
-        DOM.btnScrollToTop.classList.add('hidden');
-      }
-    });
+    if (mainContent) {
+      mainContent.addEventListener('scroll', () => {
+        if (mainContent.scrollTop > 300) {
+          DOM.btnScrollToTop.classList.remove('hidden');
+        } else {
+          DOM.btnScrollToTop.classList.add('hidden');
+        }
+      });
+    }
 
     // Set initial view from URL hash, fallback to localStorage, or default to concepts
     let initialView = 'view-concepts';
@@ -351,26 +539,64 @@ document.addEventListener('DOMContentLoaded', () => {
         initialView = savedView;
       }
     }
-    switchView(initialView);
 
-    // Listen to hashchange events for browser back/forward navigation
-    window.addEventListener('hashchange', () => {
-      const newHash = window.location.hash.substring(1);
-      if (newHash && (document.getElementById(newHash) || validViews.includes(newHash)) && state.currentView !== newHash) {
-        switchView(newHash);
+    let subTab = null;
+    if (initialView === 'view-prep-hub' || ['view-personalised', 'view-general-de', 'view-practice', 'view-explainer', 'view-unified-search'].includes(initialView)) {
+      subTab = initialView === 'view-general-de' ? 'view-unified-search' : initialView;
+      if (subTab === 'view-prep-hub') {
+        subTab = 'view-unified-search';
       }
-    });
-
-    // Reveal the page now that JS has fully initialized (prevents FOUC / wrong counts flash)
-    const revealPage = () => {
-      document.body.style.transition = 'opacity 0.25s ease';
-      document.body.style.opacity = '1';
-    };
-    if (typeof requestAnimationFrame !== 'undefined') {
-      requestAnimationFrame(revealPage);
-    } else {
-      setTimeout(revealPage, 0);
+      initialView = 'view-prep-hub';
+    } else if (initialView === 'view-spark-hub' || ['view-spark', 'view-pyspark'].includes(initialView)) {
+      subTab = initialView === 'view-spark-hub' ? null : initialView;
+      initialView = 'view-spark-hub';
     }
+
+    const needed = getNeededDatasetsForView(initialView, subTab);
+    ensureDatasetsLoaded(needed).then(() => {
+      initExplainer();
+      initPractice();
+      initGeneralDe();
+      initConcepts();
+      initCheatsheet();
+      initPersonalised();
+      updateUnifiedSearchCounts();
+
+      if (initialView === 'view-prep-hub') {
+        switchView('view-prep-hub');
+        switchPrepHubSubTab(subTab || 'view-unified-search');
+      } else if (initialView === 'view-spark-hub') {
+        switchView('view-spark-hub');
+        if (subTab) switchSparkHubSubTab(subTab);
+      } else {
+        switchView(initialView);
+      }
+
+      // Listen to hashchange events for browser back/forward navigation
+      window.addEventListener('hashchange', () => {
+        const newHash = window.location.hash.substring(1);
+        if (newHash && (document.getElementById(newHash) || validViews.includes(newHash)) && state.currentView !== newHash) {
+          switchView(newHash);
+        }
+      });
+
+      // Reveal the page now that JS has fully initialized (prevents FOUC / wrong counts flash)
+      const revealPage = () => {
+        document.body.style.transition = 'opacity 0.25s ease';
+        document.body.style.opacity = '1';
+      };
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(revealPage);
+      } else {
+        setTimeout(revealPage, 0);
+      }
+
+      // Background pre-fetch remaining datasets to ensure instant transitions
+      setTimeout(() => {
+        const remaining = Object.keys(DATASET_FILES).filter(k => !needed.includes(k));
+        ensureDatasetsInBackground(remaining);
+      }, 200);
+    });
   }
 
 
@@ -468,27 +694,47 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Toggle visibility of subview containers
-    const subviews = document.querySelectorAll('.prep-hub-subview');
-    subviews.forEach(subview => {
-      if (subview.id === subTabId) {
-        subview.classList.remove('hidden');
-        subview.removeAttribute('hidden');
-      } else {
-        subview.classList.add('hidden');
-        subview.setAttribute('hidden', 'true');
-      }
+    const needed = getNeededDatasetsForView('view-prep-hub', subTabId);
+    
+    // Check if everything is already loaded
+    const allLoaded = needed.every(key => {
+      const globalVarName = DATASET_GLOBALS[key];
+      return state.loadedDatasets[key] || (window[globalVarName]);
     });
 
-    // Re-render launcher or explainer to sync numbers and selections
-    if (subTabId === 'view-explainer') {
-      renderExplainer();
-    } else if (subTabId === 'view-practice') {
-      renderNicheSelection();
-    } else if (subTabId === 'view-personalised') {
-      renderPersonalised();
-    } else if (subTabId === 'view-unified-search') {
-      renderUnifiedSearch();
+    const performSwitch = () => {
+      // Toggle visibility of subview containers
+      const subviews = document.querySelectorAll('.prep-hub-subview');
+      subviews.forEach(subview => {
+        if (subview.id === subTabId) {
+          subview.classList.remove('hidden');
+          subview.removeAttribute('hidden');
+        } else {
+          subview.classList.add('hidden');
+          subview.setAttribute('hidden', 'true');
+        }
+      });
+
+      // Re-render launcher or explainer to sync numbers and selections
+      if (subTabId === 'view-explainer') {
+        updateExplainerCounts();
+        renderExplainer();
+      } else if (subTabId === 'view-practice') {
+        updatePracticeCounts();
+        renderNicheSelection();
+      } else if (subTabId === 'view-personalised') {
+        updatePersonalisedCounts();
+        renderPersonalised();
+      } else if (subTabId === 'view-unified-search') {
+        updateUnifiedSearchCounts();
+        renderUnifiedSearch();
+      }
+    };
+
+    if (allLoaded) {
+      performSwitch();
+    } else {
+      ensureDatasetsLoaded(needed).then(performSwitch);
     }
   }
 
@@ -535,101 +781,116 @@ document.addEventListener('DOMContentLoaded', () => {
       actualTargetViewId = 'view-spark-hub';
     }
 
-    state.currentView = actualTargetViewId;
-    localStorage.setItem('interview_prep_active_view', actualTargetViewId);
-    
-    // Update hash if different
-    if (window.location.hash !== '#' + targetViewId) {
-      window.location.hash = targetViewId;
-    }
-    
-    // Hide active practice when leaving Niche Practice
-    if (actualTargetViewId !== 'view-prep-hub' || targetSubTabId !== 'view-practice') {
-      DOM.activePracticeScreen.classList.add('hidden');
-      DOM.nicheSelectionScreen.classList.remove('hidden');
+    const needed = getNeededDatasetsForView(actualTargetViewId, targetSubTabId);
+
+    // Check if everything is already loaded
+    const allLoaded = needed.every(key => {
+      const globalVarName = DATASET_GLOBALS[key];
+      return state.loadedDatasets[key] || (window[globalVarName]);
+    });
+
+    const performSwitch = () => {
+      state.currentView = actualTargetViewId;
+      localStorage.setItem('interview_prep_active_view', actualTargetViewId);
       
-      const prHeader = document.getElementById('practice-header');
-      const prScrollbar = document.getElementById('practice-topics-scrollbar');
-      if (prHeader) prHeader.classList.remove('hidden');
-      if (prScrollbar) prScrollbar.classList.remove('hidden');
-    }
-    
-    // Switch active states of nav buttons (desktop sidebar)
-    DOM.navBtns.forEach(btn => {
-      const target = btn.getAttribute('data-target');
-      if (target === actualTargetViewId || target === targetViewId) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
+      // Update hash if different
+      if (window.location.hash !== '#' + targetViewId) {
+        window.location.hash = targetViewId;
       }
-    });
-
-    // Sync mobile bottom nav tabs active state
-    const mobileNavTabs = document.querySelectorAll('.mobile-nav-tab[data-target]');
-    mobileNavTabs.forEach(tab => {
-      const target = tab.getAttribute('data-target');
-      if (target === actualTargetViewId || target === targetViewId) {
-        tab.classList.add('active');
-        // Scroll the active tab pill into view in the horizontal scroll container
-        try { tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
-      } else {
-        tab.classList.remove('active');
-      }
-    });
-
-    // Sync More drawer items active state (kept for legacy compatibility)
-    const moreDrawerItems = document.querySelectorAll('.mobile-more-item[data-target]');
-    moreDrawerItems.forEach(item => {
-      const target = item.getAttribute('data-target');
-      if (target === actualTargetViewId || target === targetViewId) {
-        item.classList.add('active');
-      } else {
-        item.classList.remove('active');
-      }
-    });
-
-    // Toggle view section visibility with clean starting styles
-    DOM.pageViews.forEach(view => {
-      if (view.id === actualTargetViewId) {
-        view.classList.remove('hidden');
-        view.removeAttribute('hidden');
+      
+      // Hide active practice when leaving Niche Practice
+      if (actualTargetViewId !== 'view-prep-hub' || targetSubTabId !== 'view-practice') {
+        DOM.activePracticeScreen.classList.add('hidden');
+        DOM.nicheSelectionScreen.classList.remove('hidden');
         
-        // Dynamically move the global footer to the bottom of the active page view
-        const footer = document.getElementById('global-footer');
-        if (footer) {
-          view.appendChild(footer);
+        const prHeader = document.getElementById('practice-header');
+        const prScrollbar = document.getElementById('practice-topics-scrollbar');
+        if (prHeader) prHeader.classList.remove('hidden');
+        if (prScrollbar) prScrollbar.classList.remove('hidden');
+      }
+      
+      // Switch active states of nav buttons (desktop sidebar)
+      DOM.navBtns.forEach(btn => {
+        const target = btn.getAttribute('data-target');
+        if (target === actualTargetViewId || target === targetViewId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
         }
-      } else {
-        view.classList.add('hidden');
-        view.setAttribute('hidden', 'true');
-      }
-    });
+      });
 
-    // Re-render appropriate contents
-    if (actualTargetViewId === 'view-concepts') {
-      renderConcepts();
-    } else if (actualTargetViewId === 'view-cheatsheet') {
-      renderCheatsheet();
-    } else if (actualTargetViewId === 'view-prep-hub') {
-      if (!targetSubTabId) {
-        targetSubTabId = 'view-unified-search';
+      // Sync mobile bottom nav tabs active state
+      const mobileNavTabs = document.querySelectorAll('.mobile-nav-tab[data-target]');
+      mobileNavTabs.forEach(tab => {
+        const target = tab.getAttribute('data-target');
+        if (target === actualTargetViewId || target === targetViewId) {
+          tab.classList.add('active');
+          // Scroll the active tab pill into view in the horizontal scroll container
+          try { tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+
+      // Sync More drawer items active state (kept for legacy compatibility)
+      const moreDrawerItems = document.querySelectorAll('.mobile-more-item[data-target]');
+      moreDrawerItems.forEach(item => {
+        const target = item.getAttribute('data-target');
+        if (target === actualTargetViewId || target === targetViewId) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // Toggle view section visibility with clean starting styles
+      DOM.pageViews.forEach(view => {
+        if (view.id === actualTargetViewId) {
+          view.classList.remove('hidden');
+          view.removeAttribute('hidden');
+          
+          // Dynamically move the global footer to the bottom of the active page view
+          const footer = document.getElementById('global-footer');
+          if (footer) {
+            view.appendChild(footer);
+          }
+        } else {
+          view.classList.add('hidden');
+          view.setAttribute('hidden', 'true');
+        }
+      });
+
+      // Re-render appropriate contents
+      if (actualTargetViewId === 'view-concepts') {
+        renderConcepts();
+      } else if (actualTargetViewId === 'view-cheatsheet') {
+        renderCheatsheet();
+      } else if (actualTargetViewId === 'view-prep-hub') {
+        if (!targetSubTabId) {
+          targetSubTabId = 'view-unified-search';
+        }
+        switchPrepHubSubTab(targetSubTabId);
+      } else if (actualTargetViewId === 'view-spark-hub') {
+        if (!targetSubTabId || targetSubTabId === 'view-spark-hub') {
+          targetSubTabId = localStorage.getItem('interview_prep_active_spark_subtab') || 'view-spark';
+        }
+        switchSparkHubSubTab(targetSubTabId);
       }
-      switchPrepHubSubTab(targetSubTabId);
-    } else if (actualTargetViewId === 'view-spark-hub') {
-      if (!targetSubTabId || targetSubTabId === 'view-spark-hub') {
-        targetSubTabId = localStorage.getItem('interview_prep_active_spark_subtab') || 'view-spark';
+      
+      // Scroll back to top on view switch
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        mainContent.scrollTop = 0;
       }
-      switchSparkHubSubTab(targetSubTabId);
+      window.scrollTo({ top: 0 });
+    };
+
+    if (allLoaded) {
+      performSwitch();
+    } else {
+      ensureDatasetsLoaded(needed).then(performSwitch);
     }
-    
-    // Scroll back to top on view switch
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) {
-      mainContent.scrollTop = 0;
-    }
-    window.scrollTo({ top: 0 });
   }
-
   // --- STATS & SVG COMPUTATION ---
   
   function getCategorySectionKey(q) {
@@ -929,8 +1190,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const sortedCats = Object.keys(categoriesMap).sort();
     
+    if (!state.explainerLimits) state.explainerLimits = {};
     if (resetResults) {
       state.expandedExplainerSections = {};
+      state.explainerLimits = {};
       if (sortedCats.length > 0) {
         state.expandedExplainerSections[sortedCats[0]] = true;
       }
@@ -1059,7 +1322,10 @@ document.addEventListener('DOMContentLoaded', () => {
         subGrid.className = 'concepts-grid';
         bodyDiv.appendChild(subGrid);
         
-        sectItems.forEach(q => {
+        const limit = state.explainerLimits[catName] || 30;
+        const visibleItems = sectItems.slice(0, limit);
+        
+        visibleItems.forEach(q => {
           const card = document.createElement('div');
           card.className = 'concept-accordion-card';
           
@@ -1115,6 +1381,29 @@ document.addEventListener('DOMContentLoaded', () => {
           
           subGrid.appendChild(card);
         });
+
+        // Load More button inside section
+        if (sectItems.length > limit) {
+          const loadMoreWrap = document.createElement('div');
+          loadMoreWrap.style.display = 'flex';
+          loadMoreWrap.style.justifyContent = 'center';
+          loadMoreWrap.style.marginTop = '1.5rem';
+
+          const loadMoreBtn = document.createElement('button');
+          loadMoreBtn.className = 'de-load-more-btn';
+          loadMoreBtn.style.padding = '0.5rem 1.5rem';
+          loadMoreBtn.style.fontSize = '0.85rem';
+          loadMoreBtn.textContent = `Show More Questions (showing ${limit} of ${sectItems.length})`;
+          
+          loadMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.explainerLimits[catName] = limit + 30;
+            renderExplainer(false);
+          });
+
+          loadMoreWrap.appendChild(loadMoreBtn);
+          bodyDiv.appendChild(loadMoreWrap);
+        }
       }
       
       sectionWrapper.appendChild(bodyDiv);
@@ -1851,10 +2140,26 @@ document.addEventListener('DOMContentLoaded', () => {
           btns.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           state.activeUnifiedDb = btn.getAttribute('data-db') || 'ALL';
-          state.activeUnifiedCategory = 'ALL'; // Reset domain filter when changing DB source
+          state.activeUnifiedCategory = 'ALL';
           state.unifiedSearchPage = 1;
-          updateUnifiedSearchCounts();
-          renderUnifiedSearch(true);
+          const needed = getUnifiedSearchNeededDatasets();
+          
+          // Check if everything is already loaded
+          const allLoaded = needed.every(key => {
+            const globalVarName = DATASET_GLOBALS[key];
+            return state.loadedDatasets[key] || (window[globalVarName]);
+          });
+
+          const performRender = () => {
+            updateUnifiedSearchCounts();
+            renderUnifiedSearch(true);
+          };
+
+          if (allLoaded) {
+            performRender();
+          } else {
+            ensureDatasetsLoaded(needed).then(performRender);
+          }
         });
       });
     }
@@ -2696,7 +3001,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupConceptsListeners() {
     // Search input field event
     if (DOM.concepts.search) {
-      DOM.concepts.search.addEventListener('input', renderConcepts);
+      DOM.concepts.search.addEventListener('input', () => {
+        state.conceptsLimit = 30;
+        renderConcepts();
+      });
     } else {
       console.warn("DOM.concepts.search element not found on page!");
     }
@@ -2709,6 +3017,7 @@ document.addEventListener('DOMContentLoaded', () => {
           diffBtns.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           state.activeConceptsDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          state.conceptsLimit = 30;
           renderConcepts();
         });
       });
@@ -2724,6 +3033,7 @@ document.addEventListener('DOMContentLoaded', () => {
           topicChips.forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
           state.activeConceptsCategory = chip.getAttribute('data-category') || 'ALL';
+          state.conceptsLimit = 30;
           renderConcepts();
         });
       });
@@ -2731,7 +3041,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn("DOM.concepts.topicsScrollbar element not found on page!");
     }
   }
-
   function renderConcepts() {
     if (!DOM.concepts.container) {
       console.error("DOM.concepts.container not found on page, cannot render concepts!");
@@ -2773,7 +3082,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    filtered.forEach(item => {
+    if (state.conceptsLimit === undefined) state.conceptsLimit = 30;
+    const visible = filtered.slice(0, state.conceptsLimit);
+
+    visible.forEach(item => {
       const card = document.createElement('div');
       card.className = 'concept-accordion-card';
       card.setAttribute('data-id', item.id);
@@ -2836,9 +3148,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
       DOM.concepts.container.appendChild(card);
     });
-    console.log(`Rendered ${filtered.length} concept cards.`);
-  }
 
+    if (filtered.length > state.conceptsLimit) {
+      const loadMoreWrap = document.createElement('div');
+      loadMoreWrap.style.display = 'flex';
+      loadMoreWrap.style.justifyContent = 'center';
+      loadMoreWrap.style.marginTop = '1.5rem';
+      loadMoreWrap.style.width = '100%';
+
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.className = 'de-load-more-btn';
+      loadMoreBtn.style.padding = '0.5rem 1.5rem';
+      loadMoreBtn.style.fontSize = '0.85rem';
+      loadMoreBtn.textContent = `Show More Concepts (showing ${state.conceptsLimit} of ${filtered.length})`;
+      
+      loadMoreBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.conceptsLimit += 30;
+        renderConcepts();
+      });
+
+      loadMoreWrap.appendChild(loadMoreBtn);
+      DOM.concepts.container.appendChild(loadMoreWrap);
+    }
+    console.log(`Rendered ${visible.length} concept cards.`);
+  }
   // --- DATA ENGINEERING CHEAT SHEET IMPLEMENTATION ---
 
   const Highlighter = {
@@ -2927,8 +3261,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function renderCheatsheet() {
+  function renderCheatsheet(resetResults = true) {
     if (!DOM.cheatsheet.container) return;
+
+    if (!state.cheatsheetLimits) state.cheatsheetLimits = {};
+    if (resetResults) {
+      state.cheatsheetLimits = {};
+    }
 
     const lang = state.activeCheatsheetLang || 'all';
     const level = state.activeCheatsheetLevel || 'all';
@@ -3010,6 +3349,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const items = byLevelFiltered[lvl];
       if (!items || items.length === 0) return;
 
+      const limit = state.cheatsheetLimits[lvl] || 20;
+      const visibleItems = items.slice(0, limit);
+
       // Render Level Section Header
       const levelHeader = document.createElement('div');
       levelHeader.className = 'level-section-header';
@@ -3031,7 +3373,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cardsGrid = document.createElement('div');
       cardsGrid.className = 'concepts-grid';
       
-      items.forEach((item, index) => {
+      visibleItems.forEach((item, index) => {
         const card = document.createElement('div');
         const cardLang = item.sourceDb || 'python';
         card.className = `concept-card ${cardLang}`;
@@ -3124,6 +3466,30 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       DOM.cheatsheet.container.appendChild(cardsGrid);
+
+      // Load More button inside level section
+      if (items.length > limit) {
+        const loadMoreWrap = document.createElement('div');
+        loadMoreWrap.style.display = 'flex';
+        loadMoreWrap.style.justifyContent = 'center';
+        loadMoreWrap.style.marginTop = '1.5rem';
+        loadMoreWrap.style.marginBottom = '1.5rem';
+
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'de-load-more-btn';
+        loadMoreBtn.style.padding = '0.5rem 1.5rem';
+        loadMoreBtn.style.fontSize = '0.85rem';
+        loadMoreBtn.textContent = `Show More Concepts (showing ${limit} of ${items.length})`;
+        
+        loadMoreBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.cheatsheetLimits[lvl] = limit + 20;
+          renderCheatsheet(false);
+        });
+
+        loadMoreWrap.appendChild(loadMoreBtn);
+        DOM.cheatsheet.container.appendChild(loadMoreWrap);
+      }
     });
   }
 
@@ -3387,8 +3753,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const activeSections = personalisedDomains.filter(d => sections[d].length > 0);
     
+    if (!state.personalisedLimits) state.personalisedLimits = {};
     if (resetResults) {
       state.expandedPersonalisedSections = {};
+      state.personalisedLimits = {};
       if (activeSections.length > 0) {
         state.expandedPersonalisedSections[activeSections[0]] = true;
       }
@@ -3524,7 +3892,10 @@ document.addEventListener('DOMContentLoaded', () => {
         subGrid.className = 'concepts-grid';
         bodyDiv.appendChild(subGrid);
         
-        sectItems.forEach(q => {
+        const limit = state.personalisedLimits[sectKey] || 30;
+        const visibleItems = sectItems.slice(0, limit);
+        
+        visibleItems.forEach(q => {
           const card = document.createElement('div');
           card.className = 'concept-accordion-card';
           
@@ -3579,6 +3950,29 @@ document.addEventListener('DOMContentLoaded', () => {
           
           subGrid.appendChild(card);
         });
+
+        // Load More button inside section
+        if (sectItems.length > limit) {
+          const loadMoreWrap = document.createElement('div');
+          loadMoreWrap.style.display = 'flex';
+          loadMoreWrap.style.justifyContent = 'center';
+          loadMoreWrap.style.marginTop = '1.5rem';
+
+          const loadMoreBtn = document.createElement('button');
+          loadMoreBtn.className = 'de-load-more-btn';
+          loadMoreBtn.style.padding = '0.5rem 1.5rem';
+          loadMoreBtn.style.fontSize = '0.85rem';
+          loadMoreBtn.textContent = `Show More Questions (showing ${limit} of ${sectItems.length})`;
+          
+          loadMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.personalisedLimits[sectKey] = limit + 30;
+            renderPersonalised(false);
+          });
+
+          loadMoreWrap.appendChild(loadMoreBtn);
+          bodyDiv.appendChild(loadMoreWrap);
+        }
       }
       
       sectionWrapper.appendChild(bodyDiv);
@@ -4228,23 +4622,41 @@ document.addEventListener('DOMContentLoaded', () => {
       'count-db-sparksql': totalSparksql
     };
 
+    const dbKeys = {
+      'count-db-personalised': 'personalised',
+      'count-db-fabric_pbi': 'fabric_pbi',
+      'count-db-general': 'general',
+      'count-db-python': 'python',
+      'count-db-mssql': 'mssql',
+      'count-db-pyspark': 'pyspark',
+      'count-db-sparksql': 'sparksql'
+    };
+
     for (const [id, count] of Object.entries(dbBadges)) {
       const el = document.getElementById(id);
       if (el) {
-        el.textContent = count.toLocaleString();
+        const key = dbKeys[id];
+        // If testing in JSDOM, window variable check in ensureDatasetsLoaded will have set loadedDatasets.
+        const isLoaded = key ? !!state.loadedDatasets[key] : true;
         
-        // Hide option if count is 0, except for 'count-db-all'
-        const btn = el.closest('.qa-sidebar-btn');
-        if (btn && id !== 'count-db-all') {
-          if (count === 0) {
-            btn.style.display = 'none';
-          } else {
-            btn.style.display = 'flex';
+        if (!isLoaded) {
+          el.textContent = '...';
+          const btn = el.closest('.qa-sidebar-btn');
+          if (btn) btn.style.display = 'flex';
+        } else {
+          el.textContent = count.toLocaleString();
+          // Hide option if count is 0, except for 'count-db-all'
+          const btn = el.closest('.qa-sidebar-btn');
+          if (btn && id !== 'count-db-all') {
+            if (count === 0) {
+              btn.style.display = 'none';
+            } else {
+              btn.style.display = 'flex';
+            }
           }
         }
       }
     }
-
     // 2. Accumulate active database pool
     const dbFilter = state.activeUnifiedDb || 'ALL';
     const pool = [];
