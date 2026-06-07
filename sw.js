@@ -1,5 +1,5 @@
 // Service Worker for Fabric PBI Prep App
-const CACHE_NAME = 'fabric-pbi-prep-v1.5.0';
+const CACHE_NAME = 'fabric-pbi-prep-v1.5.1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

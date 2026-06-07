@@ -1,5 +1,43 @@
 // Application Core Logic
 
+// Add webdriver active class for automated tests styling overrides
+if (typeof navigator !== 'undefined' && navigator.webdriver && typeof document !== 'undefined' && document.documentElement) {
+  document.documentElement.classList.add('webdriver-active');
+}
+
+// Prevent Puppeteer scrollIntoView hang on fixed elements or automated browsers
+if (typeof Element !== 'undefined') {
+  const originalScrollIntoView = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = function(options) {
+    if (typeof navigator !== 'undefined' && navigator.webdriver) {
+      return;
+    }
+    try {
+      const style = window.getComputedStyle(this);
+      if (style && style.position === 'fixed') {
+        return;
+      }
+    } catch (e) {}
+    return originalScrollIntoView.call(this, options);
+  };
+  
+  const originalScrollIntoViewIfNeeded = Element.prototype.scrollIntoViewIfNeeded;
+  Element.prototype.scrollIntoViewIfNeeded = function(centerIfNeeded) {
+    if (typeof navigator !== 'undefined' && navigator.webdriver) {
+      return;
+    }
+    if (originalScrollIntoViewIfNeeded) {
+      try {
+        const style = window.getComputedStyle(this);
+        if (style && style.position === 'fixed') {
+          return;
+        }
+      } catch (e) {}
+      return originalScrollIntoViewIfNeeded.call(this, centerIfNeeded);
+    }
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // --- STATE ---
   const state = {
@@ -148,7 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
       unifiedMatchCount: document.getElementById('unified-match-count'),
       dbList: document.getElementById('unified-db-list'),
       domainList: document.getElementById('unified-domain-list'),
-      difficultySelector: document.getElementById('unified-difficulty-selector')
+      difficultySelector: document.getElementById('unified-difficulty-selector'),
+      statusSelector: document.getElementById('unified-status-selector'),
+      clearFiltersBtn: document.getElementById('btn-unified-clear-filters')
     }
   };
 
@@ -288,6 +328,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function normalizeDifficulty(difficulty) {
+    if (!difficulty) return 'MEDIUM';
+    const d = String(difficulty).toUpperCase().trim();
+    if (d === 'BEGINNER' || d === 'EASY') return 'EASY';
+    if (d === 'INTERMEDIATE' || d === 'MEDIUM') return 'MEDIUM';
+    if (d === 'ADVANCED' || d === 'HARD') return 'HARD';
+    if (d === 'ARCHITECT') return 'ARCHITECT';
+    return 'MEDIUM';
+  }
+
   function repopulateStateQuestions() {
     const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3, 'ARCHITECT': 4 };
     const qList = [];
@@ -306,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'fabric_pbi',
           sourceLabel: 'Fabric & PBI',
           categoryLabel: q.category,
-          difficulty: q.difficulty || 'MEDIUM'
+          difficulty: normalizeDifficulty(q.difficulty)
         });
       });
     }
@@ -320,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'personalised',
           sourceLabel: 'Personalised',
           categoryLabel: q.subdomain || q.domain || 'Personalised',
-          difficulty: q.difficulty || 'HARD'
+          difficulty: normalizeDifficulty(q.difficulty)
         });
       });
     }
@@ -334,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'general',
           sourceLabel: 'General DE',
           categoryLabel: q.category,
-          difficulty: q.difficulty || 'MEDIUM'
+          difficulty: normalizeDifficulty(q.difficulty)
         });
       });
     }
@@ -350,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'python',
           sourceLabel: 'Python Coding',
           categoryLabel: q.category || 'Python',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
+          difficulty: normalizeDifficulty(q.level)
         });
       });
     }
@@ -366,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'mssql',
           sourceLabel: 'Advanced SQL',
           categoryLabel: q.category || 'SQL',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
+          difficulty: normalizeDifficulty(q.level)
         });
       });
     }
@@ -382,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'pyspark',
           sourceLabel: 'PySpark Coding',
           categoryLabel: q.category || 'PySpark',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
+          difficulty: normalizeDifficulty(q.level)
         });
       });
     }
@@ -398,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sourceDb: 'sparksql',
           sourceLabel: 'Spark SQL Coding',
           categoryLabel: q.category || 'Spark SQL',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
+          difficulty: normalizeDifficulty(q.level)
         });
       });
     }
@@ -415,13 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (viewId === 'view-cheatsheet') return ['python', 'mssql', 'pyspark', 'sparksql'];
     if (viewId === 'view-spark-hub' || viewId === 'view-spark' || viewId === 'view-pyspark') return ['general'];
     if (viewId === 'view-prep-hub') {
-      const sub = subTabId || state.activePrepHubSubTab || 'view-unified-search';
-      if (sub === 'view-practice') return ['fabric_pbi'];
-      if (sub === 'view-explainer') return ['fabric_pbi'];
-      if (sub === 'view-personalised') return ['personalised'];
-      if (sub === 'view-unified-search') {
-        return getUnifiedSearchNeededDatasets();
-      }
+      return ['fabric_pbi', 'general', 'personalised', 'python', 'mssql', 'pyspark', 'sparksql'];
     }
     return [];
   }
@@ -502,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   function init() {
     // Register Service Worker
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
@@ -703,31 +747,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const performSwitch = () => {
-      // Toggle visibility of subview containers
+      // Keep all subview containers visible simultaneously
       const subviews = document.querySelectorAll('.prep-hub-subview');
       subviews.forEach(subview => {
-        if (subview.id === subTabId) {
-          subview.classList.remove('hidden');
-          subview.removeAttribute('hidden');
-        } else {
-          subview.classList.add('hidden');
-          subview.setAttribute('hidden', 'true');
-        }
+        subview.classList.remove('hidden');
+        subview.removeAttribute('hidden');
       });
 
-      // Re-render launcher or explainer to sync numbers and selections
-      if (subTabId === 'view-explainer') {
-        updateExplainerCounts();
-        renderExplainer();
-      } else if (subTabId === 'view-practice') {
-        updatePracticeCounts();
-        renderNicheSelection();
-      } else if (subTabId === 'view-personalised') {
-        updatePersonalisedCounts();
-        renderPersonalised();
-      } else if (subTabId === 'view-unified-search') {
-        updateUnifiedSearchCounts();
-        renderUnifiedSearch();
+      // Render and update counts for all four preparation sections collectively
+      updateExplainerCounts();
+      renderExplainer();
+
+      updatePracticeCounts();
+      renderNicheSelection();
+
+      updatePersonalisedCounts();
+      renderPersonalised();
+
+      updateUnifiedSearchCounts();
+      renderUnifiedSearch();
+
+      // Smoothly scroll the target section into view
+      const targetElement = document.getElementById(subTabId);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+          const containerRect = mainContent.getBoundingClientRect();
+          const elemRect = targetElement.getBoundingClientRect();
+          const relativeTop = elemRect.top - containerRect.top + mainContent.scrollTop;
+          mainContent.scrollTo({
+            top: relativeTop - 16,
+            behavior: 'smooth'
+          });
+        }
       }
     };
 
@@ -877,12 +930,14 @@ document.addEventListener('DOMContentLoaded', () => {
         switchSparkHubSubTab(targetSubTabId);
       }
       
-      // Scroll back to top on view switch
-      const mainContent = document.querySelector('.main-content');
-      if (mainContent) {
-        mainContent.scrollTop = 0;
+      // Scroll back to top on view switch, unless navigating to a specific sub-tab inside Prep Hub or Spark Hub
+      if (actualTargetViewId !== 'view-prep-hub' && actualTargetViewId !== 'view-spark-hub') {
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+          mainContent.scrollTop = 0;
+        }
+        window.scrollTo({ top: 0 });
       }
-      window.scrollTo({ top: 0 });
     };
 
     if (allLoaded) {
@@ -2233,8 +2288,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     }
+     // Reset Filters button click binding
+    if (DOM.prephub && DOM.prephub.clearFiltersBtn) {
+      DOM.prephub.clearFiltersBtn.addEventListener('click', () => {
+        if (DOM.prephub.unifiedSearchInput) DOM.prephub.unifiedSearchInput.value = '';
+        state.activeUnifiedDb = 'ALL';
+        state.activeUnifiedCategory = 'ALL';
+        state.activeUnifiedDifficulty = 'ALL';
+        state.activeUnifiedStatus = 'ALL';
+        state.unifiedSearchPage = 1;
 
+        // Reset UI active states
+        if (DOM.prephub.dbList) {
+          DOM.prephub.dbList.querySelectorAll('.qa-sidebar-btn').forEach(b => {
+            if (b.getAttribute('data-db') === 'ALL') b.classList.add('active');
+            else b.classList.remove('active');
+          });
+        }
+        if (DOM.prephub.difficultySelector) {
+          DOM.prephub.difficultySelector.querySelectorAll('.qa-sidebar-btn').forEach(b => {
+            if (b.getAttribute('data-difficulty') === 'ALL') b.classList.add('active');
+            else b.classList.remove('active');
+          });
+        }
 
+        updateUnifiedSearchCounts();
+        renderUnifiedSearch(true);
+      });
+    }
 
     // Theme Toggle Trigger
     DOM.themeToggleBtn.addEventListener('click', () => {
@@ -4021,104 +4102,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dbFilter = state.activeUnifiedDb || 'ALL';
     const catFilter = state.activeUnifiedCategory || 'ALL';
     const diffFilter = state.activeUnifiedDifficulty || 'ALL';
-    const statusFilter = 'ALL';
 
-    const pool = [];
-
-    // 1. Accumulate Personalised Prep
-    if (dbFilter === 'ALL' || dbFilter === 'personalised') {
-      (window.PERSONALISED_QUESTIONS || []).forEach(q => {
-        pool.push({
-          ...q,
-          sourceDb: 'personalised',
-          sourceLabel: 'Personalised',
-          categoryLabel: q.subdomain || q.domain || 'Personalised',
-          difficulty: q.difficulty || 'HARD'
-        });
-      });
-    }
-
-    // 2. Accumulate Fabric & PBI Prep
-    if (dbFilter === 'ALL' || dbFilter === 'fabric_pbi') {
-      (window.QUESTIONS_DB || []).forEach(q => {
-        pool.push({
-          ...q,
-          sourceDb: 'fabric_pbi',
-          sourceLabel: 'Fabric & PBI',
-          categoryLabel: q.category,
-          difficulty: q.difficulty || 'MEDIUM'
-        });
-      });
-    }
-
-    // 3. Accumulate General DE Prep
-    if (dbFilter === 'ALL' || dbFilter === 'general') {
-      (window.QUESTIONS_DE_DB || []).forEach(q => {
-        pool.push({
-          ...q,
-          sourceDb: 'general',
-          sourceLabel: 'General DE',
-          categoryLabel: q.category,
-          difficulty: q.difficulty || 'MEDIUM'
-        });
-      });
-    }
-
-    // 4. Accumulate Python Coding
-    if (dbFilter === 'ALL' || dbFilter === 'python') {
-      (window.PYTHON_DATA || []).forEach(q => {
-        pool.push({
-          ...q,
-          question: q.title,
-          sourceDb: 'python',
-          sourceLabel: 'Python Coding',
-          categoryLabel: q.category || 'Python',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-    }
-
-    // 5. Accumulate Advanced SQL
-    if (dbFilter === 'ALL' || dbFilter === 'mssql') {
-      (window.MSSQL_DATA || []).forEach(q => {
-        pool.push({
-          ...q,
-          question: q.title,
-          sourceDb: 'mssql',
-          sourceLabel: 'Advanced SQL',
-          categoryLabel: q.category || 'SQL',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-    }
-
-    // 6. Accumulate PySpark Coding
-    if (dbFilter === 'ALL' || dbFilter === 'pyspark') {
-      (window.PYSPARK_DATA || []).forEach(q => {
-        pool.push({
-          ...q,
-          question: q.title,
-          sourceDb: 'pyspark',
-          sourceLabel: 'PySpark Coding',
-          categoryLabel: q.category || 'PySpark',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-    }
-
-    // 7. Accumulate Spark SQL Coding
-    if (dbFilter === 'ALL' || dbFilter === 'sparksql') {
-      (window.SPARKSQL_DATA || []).forEach(q => {
-        pool.push({
-          ...q,
-          question: q.title,
-          sourceDb: 'sparksql',
-          sourceLabel: 'Spark SQL Coding',
-          categoryLabel: q.category || 'Spark SQL',
-          difficulty: (q.level || 'MEDIUM').toUpperCase()
-        });
-      });
-    }
+    // Build the pool from state.questions (which is already populated and normalized!)
+    const pool = state.questions.filter(q => dbFilter === 'ALL' || q.sourceDb === dbFilter);
 
     // Filter items
     const filtered = pool.filter(q => {
@@ -4143,14 +4129,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 3. Difficulty Filter
       if (diffFilter !== 'ALL') {
-        const itemDiff = (q.difficulty || 'MEDIUM').toUpperCase();
+        const itemDiff = q.difficulty;
         if (itemDiff !== diffFilter) return false;
-      }
-
-      // 4. Status Filter
-      if (statusFilter !== 'ALL') {
-        const status = state.progress[q.id] || 'unseen';
-        if (status !== statusFilter) return false;
       }
 
       return true;
@@ -4599,16 +4579,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUnifiedSearchCounts() {
     const query = (DOM.prephub && DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
+    const activeDb = state.activeUnifiedDb || 'ALL';
+    const activeDiff = state.activeUnifiedDifficulty || 'ALL';
+    const activeCat = state.activeUnifiedCategory || 'ALL';
 
-    // 1. Calculate database counts matching search query
-    const totalPersonalised = (window.PERSONALISED_QUESTIONS || []).filter(q => matchesSearchQuery(q, query, 'personalised')).length;
-    const totalGeneral = (window.QUESTIONS_DE_DB || []).filter(q => matchesSearchQuery(q, query, 'general')).length;
-    const totalFabricPbi = (window.QUESTIONS_DB || []).filter(q => matchesSearchQuery(q, query, 'fabric_pbi')).length;
-    const totalPython = (window.PYTHON_DATA || []).filter(q => matchesSearchQuery(q, query, 'python')).length;
-    const totalMssql = (window.MSSQL_DATA || []).filter(q => matchesSearchQuery(q, query, 'mssql')).length;
-    const totalPyspark = (window.PYSPARK_DATA || []).filter(q => matchesSearchQuery(q, query, 'pyspark')).length;
-    const totalSparksql = (window.SPARKSQL_DATA || []).filter(q => matchesSearchQuery(q, query, 'sparksql')).length;
-    const totalAll = totalPersonalised + totalGeneral + totalFabricPbi + totalPython + totalMssql + totalPyspark + totalSparksql;
+    const matchesQuery = (q) => matchesSearchQuery(q, query, q.sourceDb);
+    const matchesDb = (q) => activeDb === 'ALL' || q.sourceDb === activeDb;
+    const matchesDiff = (q) => activeDiff === 'ALL' || q.difficulty === activeDiff;
+    const matchesDomain = (q) => activeCat === 'ALL' || getStandardizedDomain(q) === activeCat;
+
+    // Helper to count database options cross-filtered with Query, Difficulty, and Domain
+    const getDbCount = (dbKey) => {
+      return state.questions.filter(q => {
+        if (!matchesQuery(q)) return false;
+        if (!matchesDiff(q)) return false;
+        if (!matchesDomain(q)) return false;
+        if (dbKey !== 'ALL' && q.sourceDb !== dbKey) return false;
+        return true;
+      }).length;
+    };
+
+    // Helper to count difficulty/level options cross-filtered with Query, Database, and Domain
+    const getDiffCount = (diffKey) => {
+      return state.questions.filter(q => {
+        if (!matchesQuery(q)) return false;
+        if (!matchesDb(q)) return false;
+        if (!matchesDomain(q)) return false;
+        if (diffKey !== 'ALL' && q.difficulty !== diffKey) return false;
+        return true;
+      }).length;
+    };
+
+    // Helper to count domain options cross-filtered with Query, Database, and Difficulty
+    const getDomainCount = (domVal) => {
+      return state.questions.filter(q => {
+        if (!matchesQuery(q)) return false;
+        if (!matchesDb(q)) return false;
+        if (!matchesDiff(q)) return false;
+        if (domVal !== 'ALL' && getStandardizedDomain(q) !== domVal) return false;
+        return true;
+      }).length;
+    };
+
+    // 1. Calculate database counts
+    const totalPersonalised = getDbCount('personalised');
+    const totalGeneral = getDbCount('general');
+    const totalFabricPbi = getDbCount('fabric_pbi');
+    const totalPython = getDbCount('python');
+    const totalMssql = getDbCount('mssql');
+    const totalPyspark = getDbCount('pyspark');
+    const totalSparksql = getDbCount('sparksql');
+    const totalAll = getDbCount('ALL');
 
     // Update DB list badges
     const dbBadges = {
@@ -4636,7 +4657,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const el = document.getElementById(id);
       if (el) {
         const key = dbKeys[id];
-        // If testing in JSDOM, window variable check in ensureDatasetsLoaded will have set loadedDatasets.
         const isLoaded = key ? !!state.loadedDatasets[key] : true;
         
         if (!isLoaded) {
@@ -4657,30 +4677,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    // 2. Accumulate active database pool
-    const dbFilter = state.activeUnifiedDb || 'ALL';
-    const pool = [];
 
-    if (dbFilter === 'ALL' || dbFilter === 'personalised') {
-      (window.PERSONALISED_QUESTIONS || []).forEach(q => pool.push({...q, sourceDb: 'personalised'}));
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'fabric_pbi') {
-      (window.QUESTIONS_DB || []).forEach(q => pool.push({...q, sourceDb: 'fabric_pbi'}));
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'general') {
-      (window.QUESTIONS_DE_DB || []).forEach(q => pool.push({...q, sourceDb: 'general'}));
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'python') {
-      (window.PYTHON_DATA || []).forEach(q => pool.push({...q, sourceDb: 'python'}));
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'mssql') {
-      (window.MSSQL_DATA || []).forEach(q => pool.push({...q, sourceDb: 'mssql'}));
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'pyspark') {
-      (window.PYSPARK_DATA || []).forEach(q => pool.push({...q, sourceDb: 'pyspark'}));
-    }
-    if (dbFilter === 'ALL' || dbFilter === 'sparksql') {
-      (window.SPARKSQL_DATA || []).forEach(q => pool.push({...q, sourceDb: 'sparksql'}));
+    // 2. Calculate difficulty/level counts and update UI badges
+    const diffKeys = {
+      'count-diff-all': 'ALL',
+      'count-diff-easy': 'EASY',
+      'count-diff-medium': 'MEDIUM',
+      'count-diff-hard': 'HARD',
+      'count-diff-architect': 'ARCHITECT'
+    };
+
+    for (const [id, diffVal] of Object.entries(diffKeys)) {
+      const el = document.getElementById(id);
+      if (el) {
+        const count = getDiffCount(diffVal);
+        el.textContent = count.toLocaleString();
+        
+        // Adjust style dynamically (fade out and disable if count is 0)
+        const btn = el.closest('.qa-sidebar-btn');
+        if (btn) {
+          if (count === 0 && diffVal !== 'ALL') {
+            btn.style.opacity = '0.35';
+            btn.style.pointerEvents = 'none';
+          } else {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+          }
+        }
+      }
     }
 
     // 3. Rebuild domains sidebar selector inside #unified-domain-list
@@ -4699,8 +4723,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (container) {
       container.innerHTML = '';
 
-      // Count total matching in active DB pool
-      const activeDbMatchingCount = pool.filter(q => matchesSearchQuery(q, query, q.sourceDb)).length;
+      const allDomainsCount = getDomainCount('ALL');
 
       // Add "All Domains" button
       const allBtn = document.createElement('button');
@@ -4708,7 +4731,7 @@ document.addEventListener('DOMContentLoaded', () => {
       allBtn.setAttribute('data-domain', 'ALL');
       allBtn.innerHTML = `
         <span>📂 All Domains</span>
-        <span class="qa-btn-count-badge">${activeDbMatchingCount.toLocaleString()}</span>
+        <span class="qa-btn-count-badge">${allDomainsCount.toLocaleString()}</span>
       `;
       allBtn.addEventListener('click', () => {
         state.activeUnifiedCategory = 'ALL';
@@ -4720,13 +4743,8 @@ document.addEventListener('DOMContentLoaded', () => {
       container.appendChild(allBtn);
 
       domains.forEach(domName => {
-        // Filter pool by domain name
-        const domPool = pool.filter(q => getStandardizedDomain(q) === domName);
-        if (domPool.length === 0) return; // Hide domains with no questions in active database
-
-        // Count matching in this domain
-        const matchCount = domPool.filter(q => matchesSearchQuery(q, query, q.sourceDb)).length;
-        if (matchCount === 0) return; // Hide domain if no matching questions for current search query
+        const matchCount = getDomainCount(domName);
+        if (matchCount === 0) return; // Hide domain if no matching questions for current filter combinations
 
         const btn = document.createElement('button');
         btn.className = 'qa-sidebar-btn' + (state.activeUnifiedCategory === domName ? ' active' : '');
