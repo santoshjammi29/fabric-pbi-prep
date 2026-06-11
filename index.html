@@ -3093,8 +3093,10 @@ def execute_pipeline(source_df: DataFrame) -&gt; DataFrame:
       }
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Fix R: Defer non-critical external libraries to avoid blocking page render -->
+  <script>window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']] }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] } };</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
 
   <!-- Database Loader Overlay -->
   <div id="db-loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80 backdrop-blur-md hidden transition-opacity duration-300" style="opacity: 0;">

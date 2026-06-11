@@ -338,7 +338,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'MEDIUM';
   }
 
+  // Fix F: Dirty-flag to skip rebuild when data hasn't changed
+  let _repopulateSignature = '';
   function repopulateStateQuestions() {
+    // Build a signature from which datasets are currently loaded
+    const sig = Object.keys(state.loadedDatasets).sort().join(',');
+    if (sig === _repopulateSignature && state.questions.length > 0) return;
+    _repopulateSignature = sig;
+
     const diffWeights = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3, 'ARCHITECT': 4 };
     const qList = [];
 
@@ -754,23 +761,30 @@ document.addEventListener('DOMContentLoaded', () => {
         subview.removeAttribute('hidden');
       });
 
-      // Render and update counts for all four preparation sections collectively
-      updateExplainerCounts();
-      renderExplainer();
-
-      updatePracticeCounts();
-      renderNicheSelection();
-
-      updatePersonalisedCounts();
-      renderPersonalised();
-
-      updateUnifiedSearchCounts();
-      renderUnifiedSearch();
+      // Fix I: Only render the targeted section — not all four — to avoid 4x redundant work
+      if (subTabId === 'view-unified-search' || subTabId === 'view-general-de') {
+        updateUnifiedSearchCounts();
+        renderUnifiedSearch(true);
+      } else if (subTabId === 'view-explainer') {
+        updateExplainerCounts();
+        renderExplainer(true);
+      } else if (subTabId === 'view-practice') {
+        updatePracticeCounts();
+        renderNicheSelection();
+      } else if (subTabId === 'view-personalised') {
+        updatePersonalisedCounts();
+        renderPersonalised(true);
+      } else {
+        // Fallback: render all (first load or unknown tab)
+        updateExplainerCounts(); renderExplainer();
+        updatePracticeCounts(); renderNicheSelection();
+        updatePersonalisedCounts(); renderPersonalised();
+        updateUnifiedSearchCounts(); renderUnifiedSearch();
+      }
 
       // Smoothly scroll the target section into view
       const targetElement = document.getElementById(subTabId);
       if (targetElement) {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         const mainContent = document.querySelector('.main-content');
         if (mainContent) {
           const containerRect = mainContent.getBoundingClientRect();
@@ -1475,7 +1489,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- NICHE PRACTICE SELECTION GRID ---
 
   function initExplainer() {
-    console.log("Initializing Concept Explainer...");
     setupExplainerListeners();
     updateExplainerCounts();
     renderExplainer();
@@ -1484,9 +1497,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupExplainerListeners() {
     const searchInput = document.getElementById('explainer-search');
     if (searchInput) {
+      let _explainerSearchDebounce;
       searchInput.addEventListener('input', () => {
-        updateExplainerCounts();
-        renderExplainer(true);
+        clearTimeout(_explainerSearchDebounce);
+        _explainerSearchDebounce = setTimeout(() => {
+          updateExplainerCounts();
+          renderExplainer(true);
+        }, 250);
       });
     }
 
@@ -1543,7 +1560,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initPractice() {
-    console.log("Initializing Niche Practice...");
     setupPracticeListeners();
     updatePracticeCounts();
     renderNicheSelection();
@@ -2001,8 +2017,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Normalize inline lists (inject newline if lists are squashed on the same line)
-    html = html.replace(/([^\n])(\s)(\d+[\)\.]\s)/g, '$1\n$3');
-    html = html.replace(/([^\n])(\s)([\-\*]\s)/g, '$1\n$3');
+    // Only match if preceded by end-of-sentence punctuation or closing characters, to avoid splitting prose
+    html = html.replace(/([.!?;:]\s)(\d+[\)\.]\s)/g, '$1\n$2');
+    html = html.replace(/([.!?;:]\s)([\-\*]\s)/g, '$1\n$2');
     
     // Escape HTML characters for the rest of the text
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -2209,12 +2226,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Unified Search Filter listeners
+    // Unified Search Filter listeners — debounced to avoid freeze on every keystroke
     if (DOM.prephub && DOM.prephub.unifiedSearchInput) {
+      let _unifiedSearchDebounce;
       DOM.prephub.unifiedSearchInput.addEventListener('input', () => {
-        state.unifiedSearchPage = 1;
-        updateUnifiedSearchCounts();
-        renderUnifiedSearch(true);
+        clearTimeout(_unifiedSearchDebounce);
+        _unifiedSearchDebounce = setTimeout(() => {
+          state.unifiedSearchPage = 1;
+          updateUnifiedSearchCounts();
+          renderUnifiedSearch(true);
+        }, 250);
       });
     }
 
@@ -2259,6 +2280,8 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.add('active');
           state.activeUnifiedDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
           state.unifiedSearchPage = 1;
+          // Fix L: Must update counts before rendering so badge counts are in sync
+          updateUnifiedSearchCounts();
           renderUnifiedSearch(true);
         });
       });
@@ -2648,7 +2671,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Fix C: Cached DOM reference — computed once, reused everywhere
+  let _DOM_DE = null;
+
   function initGeneralDe() {
+    _DOM_DE = getDeDomElements(); // Cache once after DOM is ready
     loadDeProgress();
     updateDeStats();
     renderDeCategories();
@@ -2694,7 +2721,7 @@ document.addEventListener('DOMContentLoaded', () => {
       else unseen++;
     });
 
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     if (!DOM_DE.statTotal) return;
 
     DOM_DE.statTotal.textContent = total.toLocaleString();
@@ -2717,7 +2744,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDeCategories() {
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     if (!DOM_DE.categoriesScrollbar) return;
 
     const categories = ["All Topics", ...new Set(generalDeState.questions.map(q => q.category).filter(Boolean))];
@@ -2742,7 +2769,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDeNiches() {
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     if (!DOM_DE.nichesScrollbar) return;
 
     const category = generalDeState.activeCategory;
@@ -2765,7 +2792,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDeQuestionsList(resetScroll = false) {
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     if (!DOM_DE.questionsContainer) return;
 
     const filtered = generalDeState.questions.filter(q => {
@@ -2844,8 +2871,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="difficulty-badge badge-${q.difficulty.toLowerCase()}" style="margin-left: 0;">${q.difficulty}</span>
         </div>
         <div class="concept-card-title" style="margin-bottom: 0.75rem; text-align: left; width: 100%;">${q.question}</div>
-        <div class="concept-card-footer" style="width: 100%;">
-          <span class="status-indicator status-${status}">${status}</span>
+        <div class="concept-card-footer" style="width: 100%; display: flex; justify-content: flex-end;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
       `;
@@ -2874,7 +2900,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupDeEventListeners() {
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     if (!DOM_DE.btnModeBank) return;
     
     document.addEventListener('click', () => {
@@ -2975,7 +3001,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loadDeMockQuestion() {
     const q = generalDeState.mockSession.questions[generalDeState.mockSession.currentIndex];
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
 
     DOM_DE.mockAnswerContent.classList.add('blurred');
     DOM_DE.mockAnswerContent.innerHTML = formatDeAnswer(q.answer);
@@ -3009,7 +3035,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateDeTimerDisplay() {
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     DOM_DE.mockTimerText.textContent = `${generalDeState.mockSession.timerVal}s`;
     const percentage = (generalDeState.mockSession.timerVal / generalDeState.mockSession.timerMax) * 100;
     DOM_DE.mockTimerBar.style.width = `${percentage}%`;
@@ -3025,7 +3051,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function revealDeMockAnswer() {
     clearInterval(generalDeState.mockSession.timerInterval);
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     DOM_DE.mockAnswerContent.classList.remove('blurred');
     DOM_DE.btnRevealMock.classList.add('hidden');
     DOM_DE.btnNextMock.classList.remove('hidden');
@@ -3060,7 +3086,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function finishDeMockSession() {
     generalDeState.mockSession.active = false;
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     DOM_DE.mockActive.classList.add('hidden');
     DOM_DE.mockSummary.classList.remove('hidden');
     DOM_DE.mockSummaryTotal.textContent = generalDeState.mockSession.questions.length;
@@ -3073,7 +3099,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function resetDeMockSetupView() {
-    const DOM_DE = getDeDomElements();
+    const DOM_DE = _DOM_DE || getDeDomElements();
     DOM_DE.mockActive.classList.add('hidden');
     DOM_DE.mockSummary.classList.add('hidden');
     DOM_DE.mockSetup.classList.remove('hidden');
@@ -3082,25 +3108,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- KEY CONCEPTS & GLOSSARY VIEW IMPLEMENTATION ---
 
   function initConcepts() {
-    console.log("Initializing Key Concepts glossary...");
-    console.log("DOM.concepts search found:", !!DOM.concepts.search);
-    console.log("DOM.concepts difficultyFilters found:", !!DOM.concepts.difficultyFilters);
-    console.log("DOM.concepts topicsScrollbar found:", !!DOM.concepts.topicsScrollbar);
-    console.log("DOM.concepts container found:", !!DOM.concepts.container);
-    console.log("window.CONCEPTS_DB count:", window.CONCEPTS_DB ? window.CONCEPTS_DB.length : "undefined");
     setupConceptsListeners();
     renderConcepts();
   }
 
   function setupConceptsListeners() {
-    // Search input field event
+    // Search input field event — debounced for performance
     if (DOM.concepts.search) {
+      let _conceptsSearchDebounce;
       DOM.concepts.search.addEventListener('input', () => {
-        state.conceptsLimit = 30;
-        renderConcepts();
+        clearTimeout(_conceptsSearchDebounce);
+        _conceptsSearchDebounce = setTimeout(() => {
+          state.conceptsLimit = 30;
+          renderConcepts();
+        }, 250);
       });
-    } else {
-      console.warn("DOM.concepts.search element not found on page!");
     }
 
     // Difficulty filter tab button click events
@@ -3115,8 +3137,6 @@ document.addEventListener('DOMContentLoaded', () => {
           renderConcepts();
         });
       });
-    } else {
-      console.warn("DOM.concepts.difficultyFilters element not found on page!");
     }
 
     // Topic scrollbar chip click events
@@ -3131,21 +3151,14 @@ document.addEventListener('DOMContentLoaded', () => {
           renderConcepts();
         });
       });
-    } else {
-      console.warn("DOM.concepts.topicsScrollbar element not found on page!");
     }
   }
   function renderConcepts() {
-    if (!DOM.concepts.container) {
-      console.error("DOM.concepts.container not found on page, cannot render concepts!");
-      return;
-    }
+    if (!DOM.concepts.container) return;
 
     const query = DOM.concepts.search ? DOM.concepts.search.value.trim().toLowerCase() : '';
     const filterDiff = state.activeConceptsDifficulty || 'ALL';
     const filterCat = state.activeConceptsCategory || 'ALL';
-
-    console.log(`Rendering Key Concepts (Category: ${filterCat}, Difficulty: ${filterDiff}, Search Query: "${query}")`);
 
     // Filter concepts
     const filtered = (window.CONCEPTS_DB || []).filter(item => {
@@ -3265,7 +3278,6 @@ document.addEventListener('DOMContentLoaded', () => {
       loadMoreWrap.appendChild(loadMoreBtn);
       DOM.concepts.container.appendChild(loadMoreWrap);
     }
-    console.log(`Rendered ${visible.length} concept cards.`);
   }
   // --- DATA ENGINEERING CHEAT SHEET IMPLEMENTATION ---
 
@@ -3309,7 +3321,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function initCheatsheet() {
-    console.log("Initializing Code Deepdive for DE...");
     setupCheatsheetListeners();
     renderCheatsheet();
     renderCheatsheetComparison();
@@ -3629,18 +3640,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- PERSONALISED PREP VIEW ---
 
   function initPersonalised() {
-    console.log("Initializing Personalised Interview Prep...");
     setupPersonalisedListeners();
     updatePersonalisedCounts();
     renderPersonalised();
   }
 
   function setupPersonalisedListeners() {
-    // Search input
+    // Search input — debounced to avoid freeze on fast typing
     if (DOM.personalised.search) {
+      let _personalisedSearchDebounce;
       DOM.personalised.search.addEventListener('input', () => {
-        updatePersonalisedCounts();
-        renderPersonalised(true);
+        clearTimeout(_personalisedSearchDebounce);
+        _personalisedSearchDebounce = setTimeout(() => {
+          updatePersonalisedCounts();
+          renderPersonalised(true);
+        }, 250);
       });
     }
     
@@ -4388,100 +4402,14 @@ document.addEventListener('DOMContentLoaded', () => {
           cardBody.style.borderTop = '1px solid var(--card-border)';
           cardBody.style.padding = '1.25rem';
           cardBody.style.background = 'rgba(255, 255, 255, 0.01)';
-
-          // Format answer block
-          let answerHtml = '';
-          if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
-            const lang = q.sourceDb;
-            const highlightedCode = typeof Highlighter !== 'undefined' ? Highlighter.highlight(q.code || '', lang) : escapeHTML(q.code || '');
-            
-            let notesHtml = '';
-            if (q.notes && q.notes.length) {
-              notesHtml = `
-                <div class="card-notes" style="margin-top: 1rem;">
-                  <div class="notes-label" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.88rem;">Key Points:</div>
-                  ${q.notes.map(n => `
-                    <div class="note-item" style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.35rem; font-size: 0.88rem; color: var(--text-secondary);">
-                      <div class="note-bullet" style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0;"></div>
-                      <span>${escapeHTML(n)}</span>
-                    </div>
-                  `).join('')}
-                </div>
-              `;
-            }
-
-            answerHtml = `
-              <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6;">
-                <p style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 500;">${escapeHTML(q.description || '')}</p>
-                
-                <div class="use-case-banner" style="display: flex; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
-                  <span class="uc-icon" style="font-size: 1.1rem; line-height: 1;">🎯</span>
-                  <div class="uc-content">
-                    <div class="uc-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 2px;">Real-World Use Case</div>
-                    <div class="uc-text" style="font-size: 0.88rem; color: var(--text-secondary);">${escapeHTML(q.use_case || '')}</div>
-                  </div>
-                </div>
-
-                <div class="code-wrapper" style="border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; background: #0b0d19; margin-bottom: 1rem;">
-                  <div class="code-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--card-border); font-size: 0.75rem;">
-                    <span class="code-lang-badge" style="color: var(--text-secondary); font-weight: 600;">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
-                    <button class="copy-btn" title="Copy code" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; font-size: 0.75rem; transition: color 0.2s;">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                      </svg>
-                      Copy
-                    </button>
-                  </div>
-                  <pre class="code-block" style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; max-height: 400px;"><code class="language-${lang === 'mssql' ? 'sql' : lang}">${highlightedCode}</code></pre>
-                </div>
-
-                ${notesHtml}
-              </div>
-            `;
-          } else {
-            const formattedAnswer = formatArchitectAnswer(q.answer);
-            answerHtml = `
-              <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
-                ${formattedAnswer}
-              </div>
-            `;
-          }
-
-          // Set card body content
-          cardBody.innerHTML = answerHtml;
-
-          // Handle Copy button inside coding blocks
-          if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
-            const copyBtn = cardBody.querySelector('.copy-btn');
-            if (copyBtn) {
-              copyBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                navigator.clipboard.writeText(q.code || '').then(() => {
-                  copyBtn.innerHTML = `
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    Copied!
-                  `;
-                  setTimeout(() => {
-                    copyBtn.innerHTML = `
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"/>
-                      </svg>
-                      Copy
-                    `;
-                  }, 2000);
-                });
-              });
-            }
-          }
-
-
+          // Fix H: Lazy rendering — store question index; render content on first expand
+          cardBody.dataset.qIdx = String(visibleSectItems.indexOf(q));
+          cardBody.dataset.rendered = 'false';
 
           card.appendChild(cardHeader);
           card.appendChild(cardBody);
 
-          // Card Expand Toggle
+          // Card Expand Toggle — lazy-renders answer on first open
           cardHeader.addEventListener('click', () => {
             const isOpen = cardBody.style.display !== 'none';
             const chevron = cardHeader.querySelector('.level-chevron');
@@ -4492,6 +4420,77 @@ document.addEventListener('DOMContentLoaded', () => {
               cardBody.style.display = 'none';
               card.classList.remove('expanded');
             } else {
+              // Lazy-render the answer HTML on first expand
+              if (cardBody.dataset.rendered === 'false') {
+                cardBody.dataset.rendered = 'true';
+                let answerHtml = '';
+                if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
+                  const lang = q.sourceDb;
+                  const highlightedCode = typeof Highlighter !== 'undefined' ? Highlighter.highlight(q.code || '', lang) : escapeHTML(q.code || '');
+                  let notesHtml = '';
+                  if (q.notes && q.notes.length) {
+                    notesHtml = `
+                      <div class="card-notes" style="margin-top: 1rem;">
+                        <div class="notes-label" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.88rem;">Key Points:</div>
+                        ${q.notes.map(n => `
+                          <div class="note-item" style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.35rem; font-size: 0.88rem; color: var(--text-secondary);">
+                            <div class="note-bullet" style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0;"></div>
+                            <span>${escapeHTML(n)}</span>
+                          </div>
+                        `).join('')}
+                      </div>
+                    `;
+                  }
+                  answerHtml = `
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6;">
+                      <p style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 500;">${escapeHTML(q.description || '')}</p>
+                      <div class="use-case-banner" style="display: flex; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
+                        <span class="uc-icon" style="font-size: 1.1rem; line-height: 1;">🎯</span>
+                        <div class="uc-content">
+                          <div class="uc-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 2px;">Real-World Use Case</div>
+                          <div class="uc-text" style="font-size: 0.88rem; color: var(--text-secondary);">${escapeHTML(q.use_case || '')}</div>
+                        </div>
+                      </div>
+                      <div class="code-wrapper" style="border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; background: #0b0d19; margin-bottom: 1rem;">
+                        <div class="code-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--card-border); font-size: 0.75rem;">
+                          <span class="code-lang-badge" style="color: var(--text-secondary); font-weight: 600;">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                          <button class="copy-btn" title="Copy code" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; font-size: 0.75rem; transition: color 0.2s;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copy
+                          </button>
+                        </div>
+                        <pre class="code-block" style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; max-height: 400px;"><code class="language-${lang === 'mssql' ? 'sql' : lang}">${highlightedCode}</code></pre>
+                      </div>
+                      ${notesHtml}
+                    </div>
+                  `;
+                } else {
+                  const formattedAnswer = formatArchitectAnswer(q.answer);
+                  answerHtml = `
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+                      ${formattedAnswer}
+                    </div>
+                  `;
+                }
+                cardBody.innerHTML = answerHtml;
+                // Wire up copy button for code cards after lazy render
+                if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
+                  const copyBtn = cardBody.querySelector('.copy-btn');
+                  if (copyBtn) {
+                    copyBtn.addEventListener('click', (e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(q.code || '').then(() => {
+                        copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+                        setTimeout(() => {
+                          copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+                        }, 2000);
+                      });
+                    });
+                  }
+                }
+              }
               cardBody.style.display = 'block';
               card.classList.add('expanded');
               
@@ -4530,10 +4529,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       sectionWrapper.appendChild(bodyDiv);
 
-      // Section Header Click Listener
+      // Section Header Click Listener — debounced to prevent rapid re-renders
+      let _sectionToggleTimeout;
       headerDiv.addEventListener('click', () => {
         state.expandedUnifiedSections[sectKey] = !state.expandedUnifiedSections[sectKey];
-        renderUnifiedSearch(false);
+        clearTimeout(_sectionToggleTimeout);
+        _sectionToggleTimeout = setTimeout(() => renderUnifiedSearch(false), 60);
       });
 
       DOM.prephub.unifiedSearchContainer.appendChild(sectionWrapper);
@@ -4546,43 +4547,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeDiff = state.activeUnifiedDifficulty || 'ALL';
     const activeCat = state.activeUnifiedCategory || 'ALL';
 
-    const matchesQuery = (q) => matchesSearchQuery(q, query, q.sourceDb);
-    const matchesDb = (q) => activeDb === 'ALL' || q.sourceDb === activeDb;
-    const matchesDiff = (q) => activeDiff === 'ALL' || q.difficulty === activeDiff;
-    const matchesDomain = (q) => activeCat === 'ALL' || getStandardizedDomain(q) === activeCat;
+    // --- SINGLE-PASS COMPUTATION (Fix B: was 12-15 separate .filter() calls) ---
+    // Accumulators for all three filter axes
+    const dbCounts = { ALL: 0, fabric_pbi: 0, personalised: 0, general: 0, python: 0, mssql: 0, pyspark: 0, sparksql: 0 };
+    const diffCounts = { ALL: 0, EASY: 0, MEDIUM: 0, HARD: 0, ARCHITECT: 0 };
+    const domainCounts = { ALL: 0 };
 
-    // Helper to count database options cross-filtered with Query, Difficulty, and Domain
-    const getDbCount = (dbKey) => {
-      return state.questions.filter(q => {
-        if (!matchesQuery(q)) return false;
-        if (!matchesDiff(q)) return false;
-        if (!matchesDomain(q)) return false;
-        if (dbKey !== 'ALL' && q.sourceDb !== dbKey) return false;
-        return true;
-      }).length;
-    };
+    const DOMAINS = [
+      'Analytics, BI & AI', 'Compute & Orchestration', 'Databases, SQL & Storage',
+      'Data Pipelines & Ingestion', 'Data Lakehouse & Architecture', 'Data Governance & Quality',
+      'FinOps & Performance Optimization', 'General Data Engineering'
+    ];
+    DOMAINS.forEach(d => { domainCounts[d] = 0; });
 
-    // Helper to count difficulty/level options cross-filtered with Query, Database, and Domain
-    const getDiffCount = (diffKey) => {
-      return state.questions.filter(q => {
-        if (!matchesQuery(q)) return false;
-        if (!matchesDb(q)) return false;
-        if (!matchesDomain(q)) return false;
-        if (diffKey !== 'ALL' && q.difficulty !== diffKey) return false;
-        return true;
-      }).length;
-    };
+    state.questions.forEach(q => {
+      const qMatchesQuery = query ? matchesSearchQuery(q, query, q.sourceDb) : true;
+      const qDb = q.sourceDb;
+      const qDiff = q.difficulty;
+      const qDomain = getStandardizedDomain(q);
 
-    // Helper to count domain options cross-filtered with Query, Database, and Difficulty
-    const getDomainCount = (domVal) => {
-      return state.questions.filter(q => {
-        if (!matchesQuery(q)) return false;
-        if (!matchesDb(q)) return false;
-        if (!matchesDiff(q)) return false;
-        if (domVal !== 'ALL' && getStandardizedDomain(q) !== domVal) return false;
-        return true;
-      }).length;
-    };
+      // For DB counts: cross-filter with query + diff + domain (exclude current DB filter)
+      if (qMatchesQuery) {
+        const qMatchesDiff = activeDiff === 'ALL' || qDiff === activeDiff;
+        const qMatchesDomain = activeCat === 'ALL' || qDomain === activeCat;
+        if (qMatchesDiff && qMatchesDomain) {
+          dbCounts.ALL++;
+          if (dbCounts[qDb] !== undefined) dbCounts[qDb]++;
+        }
+      }
+
+      // For Diff counts: cross-filter with query + db + domain (exclude current diff filter)
+      if (qMatchesQuery) {
+        const qMatchesDb = activeDb === 'ALL' || qDb === activeDb;
+        const qMatchesDomain = activeCat === 'ALL' || qDomain === activeCat;
+        if (qMatchesDb && qMatchesDomain) {
+          diffCounts.ALL++;
+          if (diffCounts[qDiff] !== undefined) diffCounts[qDiff]++;
+        }
+      }
+
+      // For Domain counts: cross-filter with query + db + diff (exclude current domain filter)
+      if (qMatchesQuery) {
+        const qMatchesDb = activeDb === 'ALL' || qDb === activeDb;
+        const qMatchesDiff = activeDiff === 'ALL' || qDiff === activeDiff;
+        if (qMatchesDb && qMatchesDiff) {
+          domainCounts.ALL++;
+          if (domainCounts[qDomain] !== undefined) domainCounts[qDomain]++;
+        }
+      }
+    });
+
+    // Helpers that now just read from pre-computed accumulators
+    const getDbCount = (dbKey) => dbCounts[dbKey] !== undefined ? dbCounts[dbKey] : 0;
+    const getDiffCount = (diffKey) => diffCounts[diffKey] !== undefined ? diffCounts[diffKey] : 0;
+    const getDomainCount = (domVal) => domainCounts[domVal] !== undefined ? domainCounts[domVal] : 0;
 
     // 1. Calculate database counts
     const totalPersonalised = getDbCount('personalised');

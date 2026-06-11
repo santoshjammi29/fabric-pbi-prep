@@ -1366,8 +1366,9 @@ body {
   transition: color 0.2s ease;
 }
 
+/* Fix N: Responsive font size for nav tab labels — prevents wrapping on very small phones */
 .mobile-nav-tab span {
-  font-size: 0.8rem;
+  font-size: clamp(0.68rem, 2vw, 0.8rem);
   font-weight: 500;
   line-height: 1;
 }
@@ -4191,6 +4192,11 @@ pre.code-block {
   line-height: 1.6;
   color: #e2e8f0;
   scrollbar-width: thin;
+  /* Fix M: Prevent code blocks from overflowing card on mobile */
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-all;
+  white-space: pre-wrap;
 }
 
 .theme-light pre.code-block {
@@ -6385,7 +6391,9 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   flex-wrap: nowrap;
   gap: 0.4rem;
   overflow-x: auto;
+  /* Fix O: iOS momentum scrolling for filter chip containers */
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-bottom: 2px;
@@ -6715,6 +6723,9 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   box-shadow: var(--glass-shadow);
   border: 1px solid var(--card-border) !important;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  /* Fix P: Improve paint performance for off-screen sections */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px;
 }
 
 .unified-section-wrapper:hover {
@@ -6735,14 +6746,15 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   background: rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Expandable Q&A card refinements */
+/* Fix Q: GPU-accelerated card transitions — use transform instead of layout-triggering properties */
 .concept-accordion-card {
   background: rgba(255, 255, 255, 0.015);
   border: 1px solid var(--card-border);
   border-radius: 12px;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  will-change: transform;
 }
 
 .concept-accordion-card:hover {
@@ -6756,6 +6768,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   border-color: var(--primary);
   box-shadow: 0 4px 20px rgba(108, 92, 231, 0.15);
   background: rgba(255, 255, 255, 0.02);
+  transform: none;
 }
 
 .level-card-header {
