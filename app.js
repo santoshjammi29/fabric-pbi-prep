@@ -2239,37 +2239,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Database Sources selector click binding
-    if (DOM.prephub && DOM.prephub.dbList) {
-      const btns = DOM.prephub.dbList.querySelectorAll('.qa-sidebar-btn');
-      btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          btns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.activeUnifiedDb = btn.getAttribute('data-db') || 'ALL';
-          state.activeUnifiedCategory = 'ALL';
-          state.unifiedSearchPage = 1;
-          const needed = getUnifiedSearchNeededDatasets();
-          
-          // Check if everything is already loaded
-          const allLoaded = needed.every(key => {
-            const globalVarName = DATASET_GLOBALS[key];
-            return state.loadedDatasets[key] || (window[globalVarName]);
-          });
-
-          const performRender = () => {
-            updateUnifiedSearchCounts();
-            renderUnifiedSearch(true);
-          };
-
-          if (allLoaded) {
-            performRender();
-          } else {
-            ensureDatasetsLoaded(needed).then(performRender);
-          }
-        });
-      });
-    }
+    // Database filter removed — always show all DBs
+    // (DB Sources row no longer exists in the UI)
 
     // Difficulty Level selector click binding
     if (DOM.prephub && DOM.prephub.difficultySelector) {
@@ -2342,23 +2313,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     }
-     // Reset Filters button click binding
+    // Reset Filters button click binding
     if (DOM.prephub && DOM.prephub.clearFiltersBtn) {
       DOM.prephub.clearFiltersBtn.addEventListener('click', () => {
         if (DOM.prephub.unifiedSearchInput) DOM.prephub.unifiedSearchInput.value = '';
-        state.activeUnifiedDb = 'ALL';
         state.activeUnifiedCategory = 'ALL';
         state.activeUnifiedDifficulty = 'ALL';
-        state.activeUnifiedStatus = 'ALL';
         state.unifiedSearchPage = 1;
 
-        // Reset UI active states
-        if (DOM.prephub.dbList) {
-          DOM.prephub.dbList.querySelectorAll('.qa-sidebar-btn').forEach(b => {
-            if (b.getAttribute('data-db') === 'ALL') b.classList.add('active');
-            else b.classList.remove('active');
-          });
-        }
+        // Reset difficulty buttons
         if (DOM.prephub.difficultySelector) {
           DOM.prephub.difficultySelector.querySelectorAll('.qa-sidebar-btn').forEach(b => {
             if (b.getAttribute('data-difficulty') === 'ALL') b.classList.add('active');
@@ -4126,12 +4089,11 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.prephub.unifiedSearchContainer.innerHTML = '';
 
     const query = (DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
-    const dbFilter = state.activeUnifiedDb || 'ALL';
     const catFilter = state.activeUnifiedCategory || 'ALL';
     const diffFilter = state.activeUnifiedDifficulty || 'ALL';
 
-    // Build the pool from state.questions (which is already populated and normalized!)
-    const pool = state.questions.filter(q => dbFilter === 'ALL' || q.sourceDb === dbFilter);
+    // DB filter removed — pool is all questions
+    const pool = state.questions;
 
     // Filter items
     const filtered = pool.filter(q => {
@@ -4387,8 +4349,7 @@ document.addEventListener('DOMContentLoaded', () => {
           cardHeader.innerHTML = `
             <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px;">${overallIdx++}</div>
             <div class="level-meta" style="flex: 1; min-width: 0;">
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px; align-items: center;">
-                <span class="stats-badge" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.sourceLabel}</span>
+              <div style="margin-bottom: 4px;">
                 <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.categoryLabel}</span>
               </div>
               <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
@@ -4543,13 +4504,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUnifiedSearchCounts() {
     const query = (DOM.prephub && DOM.prephub.unifiedSearchInput ? DOM.prephub.unifiedSearchInput.value : '').toLowerCase().trim();
-    const activeDb = state.activeUnifiedDb || 'ALL';
     const activeDiff = state.activeUnifiedDifficulty || 'ALL';
     const activeCat = state.activeUnifiedCategory || 'ALL';
 
-    // --- SINGLE-PASS COMPUTATION (Fix B: was 12-15 separate .filter() calls) ---
-    // Accumulators for all three filter axes
-    const dbCounts = { ALL: 0, fabric_pbi: 0, personalised: 0, general: 0, python: 0, mssql: 0, pyspark: 0, sparksql: 0 };
+    // Single-pass accumulation — DB filter removed, so only diff + domain axes needed
     const diffCounts = { ALL: 0, EASY: 0, MEDIUM: 0, HARD: 0, ARCHITECT: 0 };
     const domainCounts = { ALL: 0 };
 
@@ -4562,102 +4520,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     state.questions.forEach(q => {
       const qMatchesQuery = query ? matchesSearchQuery(q, query, q.sourceDb) : true;
-      const qDb = q.sourceDb;
+      if (!qMatchesQuery) return;
+
       const qDiff = q.difficulty;
       const qDomain = getStandardizedDomain(q);
 
-      // For DB counts: cross-filter with query + diff + domain (exclude current DB filter)
-      if (qMatchesQuery) {
-        const qMatchesDiff = activeDiff === 'ALL' || qDiff === activeDiff;
-        const qMatchesDomain = activeCat === 'ALL' || qDomain === activeCat;
-        if (qMatchesDiff && qMatchesDomain) {
-          dbCounts.ALL++;
-          if (dbCounts[qDb] !== undefined) dbCounts[qDb]++;
-        }
+      // Diff counts: cross-filter with query + domain (no DB axis)
+      const qMatchesDomain = activeCat === 'ALL' || qDomain === activeCat;
+      if (qMatchesDomain) {
+        diffCounts.ALL++;
+        if (diffCounts[qDiff] !== undefined) diffCounts[qDiff]++;
       }
 
-      // For Diff counts: cross-filter with query + db + domain (exclude current diff filter)
-      if (qMatchesQuery) {
-        const qMatchesDb = activeDb === 'ALL' || qDb === activeDb;
-        const qMatchesDomain = activeCat === 'ALL' || qDomain === activeCat;
-        if (qMatchesDb && qMatchesDomain) {
-          diffCounts.ALL++;
-          if (diffCounts[qDiff] !== undefined) diffCounts[qDiff]++;
-        }
-      }
-
-      // For Domain counts: cross-filter with query + db + diff (exclude current domain filter)
-      if (qMatchesQuery) {
-        const qMatchesDb = activeDb === 'ALL' || qDb === activeDb;
-        const qMatchesDiff = activeDiff === 'ALL' || qDiff === activeDiff;
-        if (qMatchesDb && qMatchesDiff) {
-          domainCounts.ALL++;
-          if (domainCounts[qDomain] !== undefined) domainCounts[qDomain]++;
-        }
+      // Domain counts: cross-filter with query + diff (no DB axis)
+      const qMatchesDiff = activeDiff === 'ALL' || qDiff === activeDiff;
+      if (qMatchesDiff) {
+        domainCounts.ALL++;
+        if (domainCounts[qDomain] !== undefined) domainCounts[qDomain]++;
       }
     });
 
-    // Helpers that now just read from pre-computed accumulators
-    const getDbCount = (dbKey) => dbCounts[dbKey] !== undefined ? dbCounts[dbKey] : 0;
     const getDiffCount = (diffKey) => diffCounts[diffKey] !== undefined ? diffCounts[diffKey] : 0;
     const getDomainCount = (domVal) => domainCounts[domVal] !== undefined ? domainCounts[domVal] : 0;
-
-    // 1. Calculate database counts
-    const totalPersonalised = getDbCount('personalised');
-    const totalGeneral = getDbCount('general');
-    const totalFabricPbi = getDbCount('fabric_pbi');
-    const totalPython = getDbCount('python');
-    const totalMssql = getDbCount('mssql');
-    const totalPyspark = getDbCount('pyspark');
-    const totalSparksql = getDbCount('sparksql');
-    const totalAll = getDbCount('ALL');
-
-    // Update DB list badges
-    const dbBadges = {
-      'count-db-all': totalAll,
-      'count-db-personalised': totalPersonalised,
-      'count-db-fabric_pbi': totalFabricPbi,
-      'count-db-general': totalGeneral,
-      'count-db-python': totalPython,
-      'count-db-mssql': totalMssql,
-      'count-db-pyspark': totalPyspark,
-      'count-db-sparksql': totalSparksql
-    };
-
-    const dbKeys = {
-      'count-db-personalised': 'personalised',
-      'count-db-fabric_pbi': 'fabric_pbi',
-      'count-db-general': 'general',
-      'count-db-python': 'python',
-      'count-db-mssql': 'mssql',
-      'count-db-pyspark': 'pyspark',
-      'count-db-sparksql': 'sparksql'
-    };
-
-    for (const [id, count] of Object.entries(dbBadges)) {
-      const el = document.getElementById(id);
-      if (el) {
-        const key = dbKeys[id];
-        const isLoaded = key ? !!state.loadedDatasets[key] : true;
-        
-        if (!isLoaded) {
-          el.textContent = '...';
-          const btn = el.closest('.qa-sidebar-btn');
-          if (btn) btn.style.display = 'flex';
-        } else {
-          el.textContent = count.toLocaleString();
-          // Hide option if count is 0, except for 'count-db-all'
-          const btn = el.closest('.qa-sidebar-btn');
-          if (btn && id !== 'count-db-all') {
-            if (count === 0) {
-              btn.style.display = 'none';
-            } else {
-              btn.style.display = 'flex';
-            }
-          }
-        }
-      }
-    }
 
     // 2. Calculate difficulty/level counts and update UI badges
     const diffKeys = {

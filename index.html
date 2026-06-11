@@ -209,17 +209,13 @@
 
             <!-- Horizontal Filter Stack -->
             <div class="qa-hfilter-stack">
-              <!-- Search Row -->
-              <div class="qa-hfilter-row">
-                <div class="qa-search-wrapper" style="flex: 1;">
+              <!-- Row 1: Search + Level together -->
+              <div class="qa-hfilter-row" style="gap: 0.75rem; flex-wrap: wrap;">
+                <div class="qa-search-wrapper" style="flex: 1; min-width: 200px;">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                  <input type="text" class="qa-search-input" id="unified-search-input" placeholder="Search keywords, code, notes...">
+                  <input type="text" class="qa-search-input" id="unified-search-input" placeholder="Search keywords, concepts, code...">
                 </div>
-              </div>
-              <!-- Difficulty Row -->
-              <div class="qa-hfilter-row qa-hfilter-chips-row">
-                <span class="qa-hfilter-label">LEVEL</span>
-                <div class="qa-chips-scroll" id="unified-difficulty-selector">
+                <div class="qa-chips-scroll" id="unified-difficulty-selector" style="flex: none;">
                   <button class="qa-sidebar-btn active" data-difficulty="ALL">
                     <span>All Levels</span>
                     <span class="qa-btn-count-badge" id="count-diff-all">0</span>
@@ -246,45 +242,7 @@
                   </button>
                 </div>
               </div>
-              <!-- DB Sources Row -->
-              <div class="qa-hfilter-row qa-hfilter-chips-row">
-                <span class="qa-hfilter-label">DATABASE</span>
-                <div class="qa-sidebar-list qa-chips-scroll" id="unified-db-list">
-                  <button class="qa-sidebar-btn active" data-db="ALL">
-                    <span>📚 All DBs</span>
-                    <span class="qa-btn-count-badge" id="count-db-all">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="personalised">
-                    <span>👤 Personalised</span>
-                    <span class="qa-btn-count-badge" id="count-db-personalised">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="fabric_pbi">
-                    <span>📊 Fabric &amp; PBI</span>
-                    <span class="qa-btn-count-badge" id="count-db-fabric_pbi">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="general">
-                    <span>⚙️ General DE</span>
-                    <span class="qa-btn-count-badge" id="count-db-general">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="python">
-                    <span>🐍 Python</span>
-                    <span class="qa-btn-count-badge" id="count-db-python">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="mssql">
-                    <span>🔷 SQL</span>
-                    <span class="qa-btn-count-badge" id="count-db-mssql">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="pyspark">
-                    <span>⚡ PySpark</span>
-                    <span class="qa-btn-count-badge" id="count-db-pyspark">0</span>
-                  </button>
-                  <button class="qa-sidebar-btn" data-db="sparksql">
-                    <span>🔥 Spark SQL</span>
-                    <span class="qa-btn-count-badge" id="count-db-sparksql">0</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Architectural Domains Row -->
+              <!-- Row 2: Domain -->
               <div class="qa-hfilter-row qa-hfilter-chips-row">
                 <span class="qa-hfilter-label">DOMAIN</span>
                 <div class="qa-sidebar-list qa-chips-scroll" id="unified-domain-list">
