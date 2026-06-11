@@ -1984,35 +1984,34 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>`;
   }
 
-  // Parses basic markdown and linebreaks into clean HTML list formatting
-  function formatMarkdownAnswer(text) {
+  // Unified markdown parser that handles code blocks, lists, headings, and bold text cleanly
+  function formatMarkdownToHTML(text) {
     if (!text) return '';
     
-    // Clean string formats
+    // Normalize newlines and quotes
     let html = text.replace(/\\n/g, '\n').replace(/\\"/g, '"');
     
-    // Extract code blocks first
+    // Extract code blocks first to protect comments and indentation
     const codeBlocks = [];
     html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
       const index = codeBlocks.length;
-      codeBlocks.push(formatCodeBlock(code, lang));
+      const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      codeBlocks.push(formatCodeBlock(escapedCode, lang));
       return `\n__CODE_BLOCK_PLACEHOLDER_${index}__\n`;
     });
     
-    // Normalize inline lists by injecting a newline before " 1) ", " 2. ", etc.
+    // Normalize inline lists (inject newline if lists are squashed on the same line)
     html = html.replace(/([^\n])(\s)(\d+[\)\.]\s)/g, '$1\n$3');
-    
-    // Also handle bullet points if they are inline
     html = html.replace(/([^\n])(\s)([\-\*]\s)/g, '$1\n$3');
     
-    // Escape HTML characters to prevent rendering placeholders like <table_name> as browser tags
+    // Escape HTML characters for the rest of the text
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    
-    // Restore placeholders from escaping: &lt;code_block_placeholder...
-    html = html.replace(/__CODE_BLOCK_PLACEHOLDER_(\d+)__/g, '__CODE_BLOCK_PLACEHOLDER_$1__');
     
     // Convert backticks to code block styling
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Convert bold markdown to strong tags
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight:600;">$1</strong>');
     
     let lines = html.split('\n');
     let output = '';
@@ -2028,7 +2027,7 @@ document.addEventListener('DOMContentLoaded', () => {
          }
          return;
       }
-      
+
       // If it is a placeholder, output it directly and close any lists/paragraphs
       const placeholderMatch = line.match(/^__CODE_BLOCK_PLACEHOLDER_(\d+)__$/);
       if (placeholderMatch) {
@@ -2039,6 +2038,33 @@ document.addEventListener('DOMContentLoaded', () => {
          output += codeBlocks[idx];
          return;
       }
+
+      // Parse markdown headings (e.g. ### Phase 1)
+      let headingMatch = line.match(/^(#+)\s*(.*)$/);
+      if (headingMatch) {
+        if (inParagraph) { output += '</p>'; inParagraph = false; }
+        if (listType) { output += `</${listType}>`; listType = null; }
+        
+        let headingText = headingMatch[2].replace(/#+$/, '').trim();
+        let level = headingMatch[1].length;
+        
+        // Pick appropriate heading tag and styling
+        let fontSize = '0.95rem';
+        let margin = '1.25rem 0 0.5rem 0';
+        if (level === 1) {
+          fontSize = '1.15rem';
+          margin = '1.5rem 0 0.75rem 0';
+        } else if (level === 2) {
+          fontSize = '1.05rem';
+          margin = '1.35rem 0 0.65rem 0';
+        } else if (level === 3) {
+          fontSize = '0.98rem';
+          margin = '1.25rem 0 0.55rem 0';
+        }
+        
+        output += `<h5 style="color: var(--text-primary); font-weight: 700; margin: ${margin}; font-size: ${fontSize}; font-family: 'Space Grotesk', sans-serif;">${headingText}</h5>`;
+        return;
+      }
       
       let olMatch = line.match(/^(\d+)[\)\.]\s/);
       
@@ -2047,24 +2073,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let num = parseInt(olMatch[1]);
         if (listType === 'ol' && num === 1) {
-          output += '</ol><ol>';
+          output += '</ol><ol style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">';
         } else if (listType !== 'ol') {
           if (listType === 'ul') output += '</ul>';
-          output += '<ol>';
+          output += `<ol start="${num}" style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">`;
           listType = 'ol';
         }
         let cleanIt = line.replace(/^\d+[\)\.]\s+/, '');
-        output += `<li>${cleanIt}</li>`;
+        output += `<li style="margin-bottom: 0.5rem; padding-left: 0.25rem;">${cleanIt}</li>`;
       } else if (/^[\-\*]\s/.test(line)) {
         if (inParagraph) { output += '</p>'; inParagraph = false; }
         
         if (listType !== 'ul') {
           if (listType === 'ol') output += '</ol>';
-          output += '<ul>';
+          output += '<ul style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: disc; padding-left: 0;">';
           listType = 'ul';
         }
         let cleanIt = line.replace(/^[\-\*]\s+/, '');
-        output += `<li>${cleanIt}</li>`;
+        output += `<li style="margin-bottom: 0.5rem; padding-left: 0.25rem;">${cleanIt}</li>`;
       } else {
         if (listType) {
           output += `</${listType}>`;
@@ -2072,7 +2098,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (!inParagraph) {
-          output += '<p>';
+          output += '<p style="margin: 0 0 1rem 0;">';
           inParagraph = true;
           output += line;
         } else {
@@ -2085,6 +2111,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (listType) output += `</${listType}>`;
     
     return output;
+  }
+
+  // Parses basic markdown and linebreaks into clean HTML list formatting
+  function formatMarkdownAnswer(text) {
+    return formatMarkdownToHTML(text);
   }
 
   // Helper prototype extension string
@@ -2839,25 +2870,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatDeAnswer(text) {
     if (!text) return '';
-    let formatted = text;
-    
-    // Extract and format code blocks first
-    const codeBlocks = [];
-    formatted = formatted.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
-      const index = codeBlocks.length;
-      codeBlocks.push(formatCodeBlock(code, lang));
-      return `\n__CODE_BLOCK_PLACEHOLDER_${index}__\n`;
-    });
-    
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight:600;">$1</strong>');
-    formatted = formatted.replace(/\n\n/g, '</div><div style="margin-top:0.75rem;">');
-    
-    // Restore code blocks
-    formatted = formatted.replace(/__CODE_BLOCK_PLACEHOLDER_(\d+)__/g, (match, idx) => {
-      return codeBlocks[parseInt(idx)];
-    });
-    
-    return `<div style="text-align:left;">${formatted}</div>`;
+    return `<div style="text-align:left;">${formatMarkdownToHTML(text)}</div>`;
   }
 
   function setupDeEventListeners() {
@@ -4717,89 +4730,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Format architect answer containing numbered lists or bullet points
   function formatArchitectAnswer(text) {
-    if (!text) return '';
-    
-    let html = text.replace(/\\n/g, '\n').replace(/\\"/g, '"');
-    
-    // Escape HTML characters to prevent issues
-    html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    
-    // Convert backticks to code block styling
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    
-    // Convert bold markdown to strong tags
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight:600;">$1</strong>');
-    
-    let lines = html.split('\n');
-    let output = '';
-    let listType = null;
-    let inParagraph = false;
-
-    lines.forEach(line => {
-      line = line.trim();
-      if (!line) {
-         if (inParagraph) {
-            output += '</p>';
-            inParagraph = false;
-         }
-         return;
-      }
-
-      // Parse markdown headings (e.g. ### Phase 1)
-      let headingMatch = line.match(/^(#+)\s*(.*)$/);
-      if (headingMatch) {
-        if (inParagraph) { output += '</p>'; inParagraph = false; }
-        if (listType) { output += `</${listType}>`; listType = null; }
-        const headingText = headingMatch[2];
-        output += `<h5 style="color: var(--text-primary); font-weight: 700; margin: 1rem 0 0.5rem 0; font-size: 0.95rem; font-family: 'Space Grotesk', sans-serif;">${headingText}</h5>`;
-        return;
-      }
-      
-      let olMatch = line.match(/^(\d+)[\)\.]\s/);
-      
-      if (olMatch) {
-        if (inParagraph) { output += '</p>'; inParagraph = false; }
-        
-        let num = parseInt(olMatch[1]);
-        if (listType === 'ol' && num === 1) {
-          output += '</ol><ol style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">';
-        } else if (listType !== 'ol') {
-          if (listType === 'ul') output += '</ul>';
-          output += `<ol start="${num}" style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: decimal; padding-left: 0;">`;
-          listType = 'ol';
-        }
-        let cleanIt = line.replace(/^\d+[\)\.]\s+/, '');
-        output += `<li style="margin-bottom: 0.75rem; padding-left: 0.25rem;">${cleanIt}</li>`;
-      } else if (/^[\-\*]\s/.test(line)) {
-        if (inParagraph) { output += '</p>'; inParagraph = false; }
-        
-        if (listType !== 'ul') {
-          if (listType === 'ol') output += '</ol>';
-          output += '<ul style="margin: 0.5rem 0 1rem 1.25rem; list-style-type: disc; padding-left: 0;">';
-          listType = 'ul';
-        }
-        let cleanIt = line.replace(/^[\-\*]\s+/, '');
-        output += `<li style="margin-bottom: 0.5rem; padding-left: 0.25rem;">${cleanIt}</li>`;
-      } else {
-        if (listType) {
-          output += `</${listType}>`;
-          listType = null;
-        }
-        
-        if (!inParagraph) {
-          output += '<p style="margin: 0 0 1rem 0;">';
-          inParagraph = true;
-          output += line;
-        } else {
-          output += '<br>' + line;
-        }
-      }
-    });
-    
-    if (inParagraph) output += '</p>';
-    if (listType) output += `</${listType}>`;
-    
-    return output;
+    return formatMarkdownToHTML(text);
   }
 
   function escapeHTML(str) {
