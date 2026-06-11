@@ -360,9 +360,9 @@
           <div id="view-spark" class="spark-hub-subview">
 
             <!-- ═══ HERO BANNER ═══ -->
-            <div class="spark-hero-banner">
+            <div class="spark-hero-banner reveal-on-scroll">
               <div class="spark-hero-eyebrow">⚡ Apache Spark · Engine Architecture</div>
-              <h1 class="spark-hero-title">How <span>Spark</span> Actually Works</h1>
+              <h2 class="spark-hero-title">How <span>Spark</span> Actually Works</h2>
               <p class="spark-hero-subtitle">
                 Deep internals of the world's fastest distributed processing engine — covering memory management, execution planning, shuffle mechanics, and ecosystem integrations from the core engineering perspective.
               </p>
@@ -377,7 +377,7 @@
             </div>
 
             <!-- ═══ CORE ARCHITECTURAL MILESTONES ═══ -->
-            <div class="spark-milestone-grid">
+            <div class="spark-milestone-grid reveal-on-scroll">
               <!-- Milestone 1 -->
               <div class="spark-milestone-card color-red">
                 <div class="spark-milestone-icon-wrap bg-red">🔗</div>
@@ -408,11 +408,11 @@
             </div>
 
             <!-- ═══ INTERACTIVE ENGINE SIMULATOR ═══ -->
-            <div class="spark-section-card">
+            <div class="spark-section-card reveal-on-scroll">
               <div class="spark-section-header">
                 <div>
                   <div class="spark-section-eyebrow">▶ Live Simulation</div>
-                  <div class="spark-section-title">Interactive Engine Simulator</div>
+                  <h3 class="spark-section-title">Interactive Engine Simulator</h3>
                   <p class="spark-section-desc">A real-time physical simulation demonstrating partition flows, network shuffles, and dynamic task scheduling across executor nodes.</p>
                 </div>
               </div>
@@ -526,11 +526,11 @@
             </div>
 
             <!-- ═══ TUNGSTEN MEMORY ALLOCATOR ═══ -->
-            <div class="spark-section-card">
+            <div class="spark-section-card reveal-on-scroll">
               <div class="spark-section-header">
                 <div>
                   <div class="spark-section-eyebrow">🧮 Live Memory Mapper</div>
-                  <div class="spark-section-title">Tungsten & JVM Unified Memory Allocator</div>
+                  <h3 class="spark-section-title">Tungsten & JVM Unified Memory Allocator</h3>
                   <p class="spark-section-desc">
                     Spark uses a Unified Memory Manager. Execution and Storage pools dynamically evict each other when under pressure. Adjust parameters below to see how changes re-divide resource margins in real time.
                   </p>
@@ -624,29 +624,27 @@
             </div>
 
             <!-- ═══ AI SANDBOX ═══ -->
-            <div class="spark-section-card" style="padding:0; overflow:hidden;">
-              <div style="background:linear-gradient(135deg, #003f5c 0%, #7a5195 100%); padding:1.5rem 2rem; color:white;">
-                <span style="background:rgba(255,179,71,0.25); color:#FFB347; border:1px solid rgba(255,179,71,0.4); font-size:0.65rem; font-weight:700; padding:0.25rem 0.65rem; border-radius:50px; text-transform:uppercase; letter-spacing:0.08em;">Dynamic Interactive Interface</span>
-                <h2 style="font-size:1.35rem; font-weight:600; margin-top:0.6rem; color:#ffffff; display:flex; align-items:center; gap:0.5rem;">
-                  🧠 Interactive Architectural Sandbox
-                </h2>
-                <p style="font-size:0.8rem; color:rgba(255,255,255,0.65); margin-top:0.25rem;">
-                  Powered by gemini-2.5-flash. Test Spark configurations, write code transformations, and generate drafts for your tech blog or upcoming book.
+            <div class="spark-section-card reveal-on-scroll" style="padding:0; overflow:hidden;">
+              <div class="spark-sandbox-header">
+                <span class="spark-sandbox-badge">Dynamic Interactive Interface</span>
+                <h3 class="spark-sandbox-title">🧠 Interactive Architectural Sandbox</h3>
+                <p class="spark-sandbox-desc">
+                  Powered by gemini-3.5-flash. Test Spark configurations, write code transformations, and generate drafts for your tech blog or upcoming book.
                 </p>
               </div>
 
-              <div style="display:flex; border-bottom:1px solid var(--card-border); background:var(--item-bg);">
-                <button id="tab-btn-optimizer" onclick="switchSandboxTab('optimizer')" style="flex:1; padding:0.85rem 1rem; font-weight:600; font-size:0.8rem; border:none; border-bottom:2px solid var(--accent); color:var(--accent); background:transparent; cursor:pointer; transition:all 0.2s;">Code Optimizer</button>
-                <button id="tab-btn-simulator" onclick="switchSandboxTab('simulator')" style="flex:1; padding:0.85rem 1rem; font-weight:600; font-size:0.8rem; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer; transition:all 0.2s;">Runtime Incident Simulator</button>
-                <button id="tab-btn-drafter" onclick="switchSandboxTab('drafter')" style="flex:1; padding:0.85rem 1rem; font-weight:600; font-size:0.8rem; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer; transition:all 0.2s;">Educational Content Writer</button>
+              <div class="spark-sandbox-tabs">
+                <button id="tab-btn-optimizer" onclick="switchSandboxTab('optimizer')" class="spark-sandbox-tab-btn active">Code Optimizer</button>
+                <button id="tab-btn-simulator" onclick="switchSandboxTab('simulator')" class="spark-sandbox-tab-btn">Runtime Incident Simulator</button>
+                <button id="tab-btn-drafter" onclick="switchSandboxTab('drafter')" class="spark-sandbox-tab-btn">Educational Content Writer</button>
               </div>
 
               <div style="padding:1.5rem 2rem;">
                 <!-- Optimizer Tab -->
-                <div id="panel-optimizer" class="space-y-4">
+                <div id="panel-optimizer" style="display: flex; flex-direction: column; gap: 1rem;">
                   <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
                     <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Optimize a common pipeline bottleneck:</label>
-                    <select id="optimizer-preset" onchange="applyOptimizerPreset()" style="width:100%; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:0.5rem 0.85rem; font-size:0.82rem; color:var(--text-primary); outline:none;">
+                    <select id="optimizer-preset" onchange="applyOptimizerPreset()" class="spark-sandbox-select">
                       <option value="">-- Choose a Preset Bottleneck --</option>
                       <option value="pyspark-join">Standard Hash Join (Triggers Massive Shuffle)</option>
                       <option value="rdd-groupby">Raw groupByKey (Heavy In-Memory Serialization)</option>
@@ -655,19 +653,19 @@
                   </div>
                   <div>
                     <label style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Raw Pipeline Code:</label>
-                    <textarea id="optimizer-code-input" rows="6" style="width:100%; font-family:monospace; font-size:0.8rem; background:#0d1117; color:#86efac; padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.08); outline:none; resize:vertical;" placeholder="// Paste your unoptimized transformations here..."></textarea>
+                    <textarea id="optimizer-code-input" rows="6" class="spark-sandbox-code-textarea" placeholder="// Paste your unoptimized transformations here..."></textarea>
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
                     <span style="font-size:0.75rem; color:var(--text-secondary);">Evaluates Catalyst query tree representations</span>
-                    <button onclick="runCodeOptimization()" style="background:var(--danger); color:white; font-weight:600; padding:0.6rem 1.25rem; border-radius:10px; font-size:0.82rem; border:none; cursor:pointer; display:flex; align-items:center; gap:0.4rem;">✨ Optimize Spark Code</button>
+                    <button onclick="runCodeOptimization()" class="spark-sandbox-run-btn">✨ Optimize Spark Code</button>
                   </div>
                 </div>
 
                 <!-- Simulator Tab -->
-                <div id="panel-simulator" class="space-y-4 hidden">
+                <div id="panel-simulator" style="display: none; flex-direction: column; gap: 1rem;">
                   <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
                     <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Select Production Failure Scenario:</label>
-                    <select id="simulator-preset" onchange="applySimulatorPreset()" style="width:100%; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:0.5rem 0.85rem; font-size:0.82rem; color:var(--text-primary); outline:none;">
+                    <select id="simulator-preset" onchange="applySimulatorPreset()" class="spark-sandbox-select">
                       <option value="">-- Select Outage Scenario --</option>
                       <option value="oom">OutOfMemory Error: GC overhead limit exceeded on worker node</option>
                       <option value="skew">Data Skew: Shuffle stage hangs on a single long-running task</option>
@@ -676,19 +674,19 @@
                   </div>
                   <div>
                     <label style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Provide Custom System/Deployment Constraints:</label>
-                    <textarea id="simulator-input" rows="4" style="width:100%; font-size:0.82rem; background:var(--card-bg); color:var(--text-primary); padding:0.85rem; border-radius:10px; border:1px solid var(--card-border); outline:none; resize:vertical;" placeholder="Provide system constraints (heap size, dynamic allocations, data volumes)..."></textarea>
+                    <textarea id="simulator-input" rows="4" class="spark-sandbox-textarea" placeholder="Provide system constraints (heap size, dynamic allocations, data volumes)..."></textarea>
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
                     <span style="font-size:0.75rem; color:var(--text-secondary);">Outputs explicit engine config values (spark.sql.shuffle.partitions)</span>
-                    <button onclick="runScenarioSimulation()" style="background:#bc5090; color:white; font-weight:600; padding:0.6rem 1.25rem; border-radius:10px; font-size:0.82rem; border:none; cursor:pointer;">✨ Troubleshoot Incident</button>
+                    <button onclick="runScenarioSimulation()" class="spark-sandbox-run-btn">✨ Troubleshoot Incident</button>
                   </div>
                 </div>
 
                 <!-- Drafter Tab -->
-                <div id="panel-drafter" class="space-y-4 hidden">
+                <div id="panel-drafter" style="display: none; flex-direction: column; gap: 1rem;">
                   <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
                     <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Choose Topic for Book/Blog Draft:</label>
-                    <select id="drafter-preset" onchange="applyDrafterPreset()" style="width:100%; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:0.5rem 0.85rem; font-size:0.82rem; color:var(--text-primary); outline:none;">
+                    <select id="drafter-preset" onchange="applyDrafterPreset()" class="spark-sandbox-select">
                       <option value="">-- Choose Technical Deep-Dive --</option>
                       <option value="tungsten">Deep-dive: Tungsten CodeGen vs. JVM Object Memory Overhead</option>
                       <option value="aqe">Deep-dive: How AQE Dynamic Coalescing prevents small-file fragmentation</option>
@@ -697,25 +695,25 @@
                   </div>
                   <div>
                     <label style="display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Define Target Audience, Style, or Specific Directives:</label>
-                    <input id="drafter-custom" type="text" style="width:100%; font-size:0.82rem; background:var(--card-bg); color:var(--text-primary); padding:0.85rem; border-radius:10px; border:1px solid var(--card-border); outline:none;" placeholder="E.g., Target: Intermediate Spark users, Tone: Analytical...">
+                    <input id="drafter-custom" type="text" class="spark-sandbox-text-input" placeholder="E.g., Target: Intermediate Spark users, Tone: Analytical...">
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
                     <span style="font-size:0.75rem; color:var(--text-secondary);">Generates comprehensive chapters with Scala, Python, and SQL examples</span>
-                    <button onclick="runContentDrafting()" style="background:var(--accent); color:white; font-weight:600; padding:0.6rem 1.25rem; border-radius:10px; font-size:0.82rem; border:none; cursor:pointer;">✨ Draft Educational Lesson</button>
+                    <button onclick="runContentDrafting()" class="spark-sandbox-run-btn">✨ Draft Educational Lesson</button>
                   </div>
                 </div>
 
                 <!-- Sandbox Output -->
-                <div id="sandbox-output-container" class="mt-8 border-t border-[var(--card-border)] pt-6 hidden" style="margin-top:1.5rem; border-top:1px solid var(--card-border); padding-top:1.25rem;">
+                <div id="sandbox-output-container" class="spark-sandbox-output hidden">
                   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
                     <h4 style="font-size:0.85rem; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:0.5rem;">
-                      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.5s infinite;"></span> Workspace Intelligence Output
+                      <span class="spark-live-dot"></span> Workspace Intelligence Output
                     </h4>
                     <button onclick="copyOutputContent()" style="font-size:0.72rem; font-weight:600; color:#4f9cf9; background:none; border:none; cursor:pointer;">📋 Copy to Clipboard</button>
                   </div>
-                  <div id="sandbox-loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 1rem; gap:0.75rem;">
-                    <div style="width:36px; height:36px; border-radius:50%; border:2px solid transparent; border-bottom-color:var(--accent); animation:spin 0.8s linear infinite;"></div>
-                    <p id="sandbox-loading-status" style="font-size:0.75rem; color:var(--text-secondary);">Consulting Core Engine Architectural plans...</p>
+                  <div id="sandbox-loading" class="spark-sandbox-loading">
+                    <div class="spark-sandbox-spinner"></div>
+                    <p id="sandbox-loading-status" class="spark-sandbox-loading-status">Consulting Core Engine Architectural plans...</p>
                   </div>
                   <div id="sandbox-result" style="font-size:0.82rem; line-height:1.7; color:var(--text-primary); background:var(--item-bg); padding:1.25rem; border-radius:12px; border:1px solid var(--card-border); overflow-x:auto;"></div>
                 </div>
@@ -723,11 +721,11 @@
             </div>
 
             <!-- ═══ ARCHITECT'S LEXICON ═══ -->
-            <div class="spark-section-card">
+            <div class="spark-section-card reveal-on-scroll">
               <div class="spark-section-header">
                 <div>
                   <div class="spark-section-eyebrow">📖 Core Concepts</div>
-                  <div class="spark-section-title">The Architect's Core Lexicon</div>
+                  <h3 class="spark-section-title">The Architect's Core Lexicon</h3>
                   <p class="spark-section-desc">An extensive, searchable encyclopedia of critical execution, optimization, and memory terms.</p>
                 </div>
                 <div style="width:100%; max-width:280px;">
@@ -811,11 +809,11 @@
             </div>
 
             <!-- ═══ POLYGLOT COMMUNICATION MATRIX ═══ -->
-            <div class="spark-section-card">
+            <div class="spark-section-card reveal-on-scroll">
               <div class="spark-section-header">
                 <div>
                   <div class="spark-section-eyebrow">🔤 Language APIs</div>
-                  <div class="spark-section-title">The Polyglot Communication Matrix</div>
+                  <h3 class="spark-section-title">The Polyglot Communication Matrix</h3>
                   <p class="spark-section-desc">Spark is built on Scala and runs inside a JVM, but it supports several major language APIs. Each API has a different execution path and performance profile.</p>
                 </div>
               </div>
@@ -846,17 +844,17 @@
 
                 <!-- Code Comparison Tabs -->
                 <div style="border:1px solid var(--card-border); border-radius:12px; overflow:hidden;">
-                  <div style="display:flex; flex-wrap:wrap; background:var(--item-bg); border-bottom:1px solid var(--card-border);">
-                    <button onclick="switchLanguageTab('pyspark')" id="lang-btn-pyspark" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid #FF6B35; color:#FF6B35; background:transparent; cursor:pointer;">PySpark</button>
-                    <button onclick="switchLanguageTab('scala')" id="lang-btn-scala" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer;">Scala</button>
-                    <button onclick="switchLanguageTab('sql')" id="lang-btn-sql" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer;">Spark SQL</button>
-                    <button onclick="switchLanguageTab('java')" id="lang-btn-java" style="padding:0.6rem 1rem; font-size:0.75rem; font-weight:600; border:none; border-bottom:2px solid transparent; color:var(--text-secondary); background:transparent; cursor:pointer;">Java</button>
+                  <div class="spark-lang-tabs">
+                    <button onclick="switchLanguageTab('pyspark')" id="lang-btn-pyspark" class="spark-lang-tab-btn active">PySpark</button>
+                    <button onclick="switchLanguageTab('scala')" id="lang-btn-scala" class="spark-lang-tab-btn">Scala</button>
+                    <button onclick="switchLanguageTab('sql')" id="lang-btn-sql" class="spark-lang-tab-btn">Spark SQL</button>
+                    <button onclick="switchLanguageTab('java')" id="lang-btn-java" class="spark-lang-tab-btn">Java</button>
                   </div>
-                  <div style="padding:1rem; background:#0d1117; border-radius:0 0 12px 12px;">
-                    <div id="lang-panel-pyspark" class="space-y-2">
-                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                  <div class="spark-lang-code-container">
+                    <div id="lang-panel-pyspark" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                      <div class="spark-lang-panel-header">
                         <span>Standard PySpark DataFrame Window Specification</span>
-                        <span style="color:#FFB347; font-family:monospace;">Uses Apache Arrow if Enabled</span>
+                        <span class="badge-pyspark">Uses Apache Arrow if Enabled</span>
                       </div>
                       <pre class="terminal-block">from pyspark.sql import SparkSession
 from pyspark.sql.window import Window
@@ -870,10 +868,10 @@ df_ranked = spark.read.parquet("hdfs:///data/employees") \
     .withColumn("rank", F.rank().over(windowSpec)) \
     .filter(F.col("rank") <= 3)</pre>
                     </div>
-                    <div id="lang-panel-scala" class="space-y-2 hidden">
-                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                    <div id="lang-panel-scala" style="display: none; flex-direction: column; gap: 0.5rem;">
+                      <div class="spark-lang-panel-header">
                         <span>Type-Safe Dataset Compilation Context</span>
-                        <span style="color:#4f9cf9; font-family:monospace;">Zero Overhead Type Safe API</span>
+                        <span class="badge-scala">Zero Overhead Type Safe API</span>
                       </div>
                       <pre class="terminal-block">import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.expressions.Window
@@ -888,10 +886,10 @@ val windowSpec = Window.partitionBy("department_id").orderBy(col("salary").desc)
 val dataset = spark.read.parquet("hdfs:///data/employees").as[Employee]
 val result = dataset.withColumn("rank", rank().over(windowSpec)).filter($"rank" <= 3)</pre>
                     </div>
-                    <div id="lang-panel-sql" class="space-y-2 hidden">
-                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                    <div id="lang-panel-sql" style="display: none; flex-direction: column; gap: 0.5rem;">
+                      <div class="spark-lang-panel-header">
                         <span>Standard SQL execution parsed via Spark Catalyst Parser</span>
-                        <span style="color:#22c55e; font-family:monospace;">100% Native Tungsten Execution</span>
+                        <span class="badge-sql">100% Native Tungsten Execution</span>
                       </div>
                       <pre class="terminal-block">-- Catalyst automatically transforms this subquery into an optimized 
 -- RankLimit physical instruction, avoiding a costly global sort.
@@ -902,10 +900,10 @@ FROM (
   FROM employees
 ) WHERE rank <= 3;</pre>
                     </div>
-                    <div id="lang-panel-java" class="space-y-2 hidden">
-                      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:rgba(255,255,255,0.4); margin-bottom:0.5rem;">
+                    <div id="lang-panel-java" style="display: none; flex-direction: column; gap: 0.5rem;">
+                      <div class="spark-lang-panel-header">
                         <span>Explicit compilation structures with Java API</span>
-                        <span style="color:#818cf8; font-family:monospace;">Classic Enterprise Deployment</span>
+                        <span class="badge-java">Classic Enterprise Deployment</span>
                       </div>
                       <pre class="terminal-block">import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;
@@ -925,9 +923,9 @@ Dataset&lt;Row&gt; result = df.withColumn("rank", rank().over(windowSpec)).filte
             </div>
 
             <!-- ═══ UNIFIED ECOSYSTEM ═══ -->
-            <div style="margin-bottom:2rem;">
+            <div style="margin-bottom:2rem;" class="reveal-on-scroll">
               <div class="spark-section-eyebrow" style="margin-bottom:0.25rem;">🌐 Component Libraries</div>
-              <div class="spark-section-title" style="margin-bottom:1.25rem;">The Unified Spark Ecosystem</div>
+              <h3 class="spark-section-title" style="margin-bottom:1.25rem;">The Unified Spark Ecosystem</h3>
               <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.25rem;">
 
                 <!-- Spark SQL -->
@@ -986,9 +984,9 @@ Dataset&lt;Row&gt; result = df.withColumn("rank", rank().over(windowSpec)).filte
             </div>
 
             <!-- ═══ MODERN ENGINE ENHANCEMENTS ═══ -->
-            <div style="margin-bottom:2rem;">
+            <div style="margin-bottom:2rem;" class="reveal-on-scroll">
               <div class="spark-section-eyebrow" style="margin-bottom:0.25rem;">🆕 Spark 3.x+</div>
-              <div class="spark-section-title" style="margin-bottom:1.25rem;">Modern Engine Enhancements</div>
+              <h3 class="spark-section-title" style="margin-bottom:1.25rem;">Modern Engine Enhancements</h3>
               <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.25rem;">
 
                 <div class="spark-enhancement-card">
@@ -1018,11 +1016,11 @@ Dataset&lt;Row&gt; result = df.withColumn("rank", rank().over(windowSpec)).filte
             </div>
 
             <!-- ═══ BEST PRACTICES ═══ -->
-            <div class="spark-section-card">
+            <div class="spark-section-card reveal-on-scroll">
               <div class="spark-section-header">
                 <div>
                   <div class="spark-section-eyebrow">✅ Production Rules</div>
-                  <div class="spark-section-title">Architectural Best Practices</div>
+                  <h3 class="spark-section-title">Architectural Best Practices</h3>
                   <p class="spark-section-desc">Rules for designing robust production pipelines, compiled by Spark's core optimization engineers.</p>
                 </div>
               </div>

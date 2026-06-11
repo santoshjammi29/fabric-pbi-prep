@@ -725,6 +725,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (DOM.mobileThemeBtn) DOM.mobileThemeBtn.textContent = '☀️';
     }
     localStorage.setItem('interview_prep_theme', state.theme);
+    
+    if (typeof updateChartThemes === 'function') {
+      updateChartThemes();
+    }
   }
 
 
@@ -3076,15 +3080,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupConceptsListeners() {
-    // Search input field event — debounced for performance
+    // Search input field event — instant search
     if (DOM.concepts.search) {
-      let _conceptsSearchDebounce;
       DOM.concepts.search.addEventListener('input', () => {
-        clearTimeout(_conceptsSearchDebounce);
-        _conceptsSearchDebounce = setTimeout(() => {
-          state.conceptsLimit = 30;
-          renderConcepts();
-        }, 250);
+        state.conceptsLimit = 30;
+        renderConcepts();
       });
     }
 
@@ -4644,8 +4644,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/"/g, '&quot;');
   }
 
-  // Start the application!
-  init();
+  // Application init deferred to the end of DOMContentLoaded wrapper
 
 
 /* --- SPARK GUIDE INTEGRATED LOGIC --- */
@@ -4655,10 +4654,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let rawResponseText = "";
 
+        // Chart instances stored globally in this scope for theme switching
+        let myRadarChart = null;
+        let mySqlChart = null;
+        let myStreamingChart = null;
+        let myMlChart = null;
+        let myGraphChart = null;
+
+        // Theme updater function for charts
+        function updateChartThemes() {
+            const isDark = state.theme === 'dark';
+            const labelColor = isDark ? '#cbd5e1' : '#1e293b';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
+            const angleColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
+
+            if (myRadarChart && myRadarChart.options && myRadarChart.options.scales && myRadarChart.options.scales.r) {
+                myRadarChart.options.scales.r.grid.color = gridColor;
+                myRadarChart.options.scales.r.angleLines.color = angleColor;
+                myRadarChart.options.scales.r.pointLabels.color = labelColor;
+                myRadarChart.update();
+            }
+
+            const donutCharts = [mySqlChart, myStreamingChart, myMlChart, myGraphChart];
+            donutCharts.forEach(chart => {
+                if (chart && chart.options && chart.options.plugins && chart.options.plugins.legend) {
+                    chart.options.plugins.legend.labels.color = labelColor;
+                    chart.update();
+                }
+            });
+        }
+        window.updateChartThemes = updateChartThemes;
+
         // Double-check element definitions before mounting charts
         const ctxRadar = document.getElementById('languageApiChartExtended');
         if (ctxRadar) {
-            new Chart(ctxRadar, {
+            myRadarChart = new Chart(ctxRadar, {
                 type: 'radar',
                 data: {
                     labels: ['Performance (Direct Execution)', 'Ease of Use', 'Ecosystem Integration', 'Type Safety (Compile Time)', 'Memory Footprint'],
@@ -4686,9 +4716,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     maintainAspectRatio: false,
                     scales: {
                         r: {
-                            angleLines: { color: 'rgba(0,0,0,0.1)' },
-                            grid: { color: 'rgba(0,0,0,0.1)' },
-                            pointLabels: { font: { size: 10 } },
+                            angleLines: { color: state.theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)' },
+                            grid: { color: state.theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)' },
+                            pointLabels: { 
+                                font: { size: 10, family: 'Inter' },
+                                color: state.theme === 'light' ? '#1e293b' : '#cbd5e1'
+                            },
                             ticks: { display: false }
                         }
                     }
@@ -4705,7 +4738,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     labels: {
                         boxWidth: 10,
                         padding: 10,
-                        font: { size: 10 }
+                        font: { size: 10, family: 'Inter' },
+                        color: state.theme === 'light' ? '#1e293b' : '#cbd5e1'
                     }
                 }
             },
@@ -4714,7 +4748,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ctxSql = document.getElementById('ecosystemSqlChart');
         if (ctxSql) {
-            new Chart(ctxSql, {
+            mySqlChart = new Chart(ctxSql, {
                 type: 'doughnut',
                 data: {
                     labels: ['Declarative ETL', 'Interactive BI', 'Data Lakes', 'Federated Queries'],
@@ -4729,7 +4763,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ctxStreaming = document.getElementById('ecosystemStreamingChart');
         if (ctxStreaming) {
-            new Chart(ctxStreaming, {
+            myStreamingChart = new Chart(ctxStreaming, {
                 type: 'doughnut',
                 data: {
                     labels: ['Stateful Processing', 'IoT Sensor Logging', 'Dynamic Alerting', 'Data Lake Ingestion'],
@@ -4744,7 +4778,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ctxMl = document.getElementById('ecosystemMlChart');
         if (ctxMl) {
-            new Chart(ctxMl, {
+            myMlChart = new Chart(ctxMl, {
                 type: 'doughnut',
                 data: {
                     labels: ['Distributed Training', 'Feature Pipelines', 'Linear Models', 'Ensembles'],
@@ -4759,7 +4793,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ctxGraph = document.getElementById('ecosystemGraphChart');
         if (ctxGraph) {
-            new Chart(ctxGraph, {
+            myGraphChart = new Chart(ctxGraph, {
                 type: 'doughnut',
                 data: {
                     labels: ['Network Paths', 'Fraud Rings', 'PageRank', 'Entity Graph Modeling'],
@@ -5196,13 +5230,13 @@ Your input highlights the need for dynamic optimization of distributed executors
                 return formatCodeBlock(code, lang);
             });
 
-            html = html.replace(/`([^`]+)`/g, '<code class="bg-[var(--code-bg)] text-[var(--primary)] px-1.5 py-0.5 rounded font-mono text-xs font-medium border border-[var(--card-border)]">$1</code>');
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
             html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-            html = html.replace(/^### (.*$)/gim, '<h4 class="text-base font-bold text-[#003f5c] mt-4 mb-2">$1</h4>');
-            html = html.replace(/^## (.*$)/gim, '<h3 class="text-lg font-bold text-[#003f5c] mt-6 mb-3">$1</h3>');
-            html = html.replace(/^# (.*$)/gim, '<h2 class="text-xl font-bold text-[#003f5c] mt-8 mb-4">$1</h2>');
+            html = html.replace(/^### (.*$)/gim, '<h4 class="markdown-h4">$1</h4>');
+            html = html.replace(/^## (.*$)/gim, '<h3 class="markdown-h3">$1</h3>');
+            html = html.replace(/^# (.*$)/gim, '<h2 class="markdown-h2">$1</h2>');
 
             const lines = html.split('\n');
             let inList = false;
@@ -5210,7 +5244,7 @@ Your input highlights the need for dynamic optimization of distributed executors
                 let line = lines[i].trim();
                 if (line.startsWith('* ') || line.startsWith('- ')) {
                     if (!inList) {
-                        lines[i] = '<ul class="list-disc list-inside space-y-1.5 my-2 ml-4 text-xs text-gray-600">' + '<li>' + line.substring(2) + '</li>';
+                        lines[i] = '<ul class="markdown-ul"><li>' + line.substring(2) + '</li>';
                         inList = true;
                     } else {
                         lines[i] = '<li>' + line.substring(2) + '</li>';
@@ -5314,25 +5348,25 @@ Your input highlights the need for dynamic optimization of distributed executors
                 title: "Narrow Dependency (Map / Filter)",
                 shuffled: "0 Bytes",
                 tasks: "2 parallel tasks",
-                explain: "<p><strong>Execution Mechanics:</strong> Map and Filter transformations represent pipelining in Spark. Data partitions are modified in isolation within the same core execution thread. The physical plan joins operations together into a single <strong>Stage</strong>.</p><div class='p-3 bg-blue-950/40 rounded border border-blue-900 mt-2'><span class='font-bold text-[#ffa600]'>No Spill Over:</span> Because the boundaries are isolated, JVM Garbage collection spikes and memory spills do not occur here. No network resources are touched.</div>"
+                explain: "<p><strong>Execution Mechanics:</strong> Map and Filter transformations represent pipelining in Spark. Data partitions are modified in isolation within the same core execution thread. The physical plan joins operations together into a single <strong>Stage</strong>.</p><div class=\"spark-log-insight\"><span style=\"font-weight:700; color:#ffa600;\">No Spill Over:</span> Because the boundaries are isolated, JVM Garbage collection spikes and memory spills do not occur here. No network resources are touched.</div>"
             },
             "wide-shuffle": {
                 title: "Sort-Merge Shuffle Join (Wide Boundary)",
                 shuffled: "2.4 GB across network",
                 tasks: "200 default partitions",
-                explain: "<p><strong>Execution Mechanics:</strong> To execute a join on keys not already partition-aligned, Spark triggers a physical <strong>Shuffle Exchange</strong> barrier. Rows are hashed, written to shuffle file directories on local storage, and then sorted and fetched across worker nodes.</p><div class='p-3 bg-blue-950/40 rounded border border-blue-900 mt-2'><span class='font-bold text-[#ef5675]'>Critical Spill Warning:</span> A mismatch in partition sizing during a Sort-Merge Join triggers disk spill, forcing Tungsten to fall back onto slower virtual storage paths.</div>"
+                explain: "<p><strong>Execution Mechanics:</strong> To execute a join on keys not already partition-aligned, Spark triggers a physical <strong>Shuffle Exchange</strong> barrier. Rows are hashed, written to shuffle file directories on local storage, and then sorted and fetched across worker nodes.</p><div class=\"spark-log-insight\" style=\"background:rgba(239, 86, 117, 0.08); border-color:rgba(239, 86, 117, 0.25); color:#ef5675;\"><span style=\"font-weight:700; color:#ef5675;\">Critical Spill Warning:</span> A mismatch in partition sizing during a Sort-Merge Join triggers disk spill, forcing Tungsten to fall back onto slower virtual storage paths.</div>"
             },
             broadcast: {
                 title: "Broadcast Hash Join (Map-Side Join)",
                 shuffled: "14.2 MB (Driver-to-worker)",
                 tasks: "Parallel executor maps",
-                explain: "<p><strong>Execution Mechanics:</strong> If one side of a join dataset is under 10MB (configured via `spark.sql.autoBroadcastJoinThreshold`), the Driver fetches it and serializes a copy to all Executors. The workers load the metadata directly into memory, converting a Sort-Merge into a rapid map-side hash join.</p><div class='p-3 bg-blue-950/40 rounded border border-blue-900 mt-2'><span class='font-bold text-emerald-400'>Zero Wide Shuffle:</span> Network transfers are completely avoided across executor stages, cutting execution times significantly.</div>"
+                explain: "<p><strong>Execution Mechanics:</strong> If one side of a join dataset is under 10MB (configured via <code>spark.sql.autoBroadcastJoinThreshold</code>), the Driver fetches it and serializes a copy to all Executors. The workers load the metadata directly into memory, converting a Sort-Merge into a rapid map-side hash join.</p><div class=\"spark-log-insight\" style=\"background:rgba(34, 197, 94, 0.08); border-color:rgba(34, 197, 94, 0.25); color:#22c55e;\"><span style=\"font-weight:700; color:#22c55e;\">Zero Wide Shuffle:</span> Network transfers are completely avoided across executor stages, cutting execution times significantly.</div>"
             },
             aggregation: {
                 title: "Aggregation GroupBy: reduceByKey vs groupByKey",
                 shuffled: "Reduced: 250MB | groupBy: 2.1GB",
                 tasks: "Stage Combiners + Reducers",
-                explain: "<p><strong>Execution Mechanics:</strong> While `groupByKey` sends every matching value raw across the network before execution, `reduceByKey` implements local key-value aggregation combiners inside executors before initiating network shuffles.</p><div class='p-3 bg-blue-950/40 rounded border border-blue-900 mt-2'><span class='font-bold text-amber-300'>Combiner Impact:</span> Pre-reducing locally cuts network transfers by up to 90%, preventing major network and memory congestion on active nodes.</div>"
+                explain: "<p><strong>Execution Mechanics:</strong> While <code>groupByKey</code> sends every matching value raw across the network before execution, <code>reduceByKey</code> implements local key-value aggregation combiners inside executors before initiating network shuffles.</p><div class=\"spark-log-insight\" style=\"background:rgba(255, 179, 71, 0.08); border-color:rgba(255, 179, 71, 0.25); color:#FFB347;\"><span style=\"font-weight:700; color:#FFB347;\">Combiner Impact:</span> Pre-reducing locally cuts network transfers by up to 90%, preventing major network and memory congestion on active nodes.</div>"
             }
         };
 
@@ -5590,8 +5624,7 @@ Your input highlights the need for dynamic optimization of distributed executors
                 const btn = document.getElementById(`tab-btn-${t}`);
                 if (panel) panel.classList.toggle('hidden', t !== tab);
                 if (btn) {
-                    btn.style.borderBottomColor = t === tab ? 'var(--accent)' : 'transparent';
-                    btn.style.color = t === tab ? 'var(--accent)' : 'var(--text-secondary)';
+                    btn.classList.toggle('active', t === tab);
                 }
             });
         }
@@ -5599,6 +5632,9 @@ Your input highlights the need for dynamic optimization of distributed executors
         // Start default structures on page launch
         changeSimulatorFlow();
         updateMemoryMapper();
+
+        // Start the application!
+        init();
 
         // Expose handlers globally so inline HTML handlers can find them
         window.switchSandboxTab = switchSandboxTab;
