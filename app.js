@@ -1275,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const isExpanded = !!state.expandedExplainerSections[catName];
       
       const sectionWrapper = document.createElement('div');
-      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.className = 'unified-section-wrapper reveal-on-scroll';
       sectionWrapper.style.marginBottom = '1.25rem';
       sectionWrapper.style.border = '1px solid var(--card-border)';
       sectionWrapper.style.borderRadius = '16px';
@@ -1763,7 +1763,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const isExpanded = !!state.expandedPracticeSections[catName];
       
       const sectionWrapper = document.createElement('div');
-      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.className = 'unified-section-wrapper reveal-on-scroll';
       sectionWrapper.style.marginBottom = '1.25rem';
       sectionWrapper.style.border = '1px solid var(--card-border)';
       sectionWrapper.style.borderRadius = '16px';
@@ -3843,7 +3843,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Section Wrapper
       const sectionWrapper = document.createElement('div');
-      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.className = 'unified-section-wrapper reveal-on-scroll';
       sectionWrapper.style.marginBottom = '1.25rem';
       sectionWrapper.style.border = '1px solid var(--card-border)';
       sectionWrapper.style.borderRadius = '16px';
@@ -4186,7 +4186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Section Wrapper
       const sectionWrapper = document.createElement('div');
-      sectionWrapper.className = 'unified-section-wrapper';
+      sectionWrapper.className = 'unified-section-wrapper reveal-on-scroll';
       sectionWrapper.style.marginBottom = '1.25rem';
       sectionWrapper.style.border = '1px solid var(--card-border)';
       sectionWrapper.style.borderRadius = '16px';

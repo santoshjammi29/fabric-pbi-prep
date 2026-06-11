@@ -32,7 +32,8 @@
     }
   </style>
 
-  <link rel="stylesheet" href="styles.css?v=1.5.1">
+  <link rel="stylesheet" href="animations.css?v=1.0">
+  <link rel="stylesheet" href="styles.css?v=1.5.2">
 
   <!-- Anti-FOUC: apply theme + hide body BEFORE first paint -->
   <script>
@@ -48,6 +49,13 @@
   </script>
 </head>
 <body>
+
+  <!-- Aurora ambient background -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora-orb aurora-orb-1"></div>
+    <div class="aurora-orb aurora-orb-2"></div>
+    <div class="aurora-orb aurora-orb-3"></div>
+  </div>
 
   <div id="app-container">
     
@@ -199,16 +207,16 @@
           <!-- 1. Unified Q&A Search Subview -->
           <div id="view-unified-search" class="prep-hub-subview">
             
-            <div class="prep-section-header">
+            <div class="prep-section-header reveal-on-scroll">
               <div class="prep-section-header-icon">🔍</div>
               <div class="prep-section-header-content">
-                <h3 class="prep-section-header-title">Unified Q&A Search</h3>
+                <h3 class="prep-section-header-title gradient-text">Unified Q&A Search</h3>
                 <p class="prep-section-header-desc">Search, query, and filter across the entire dataset repository of 2,600+ expert-level questions.</p>
               </div>
             </div>
 
             <!-- Horizontal Filter Stack -->
-            <div class="qa-hfilter-stack">
+            <div class="qa-hfilter-stack reveal-on-scroll">
               <!-- Row 1: Search + Level together -->
               <div class="qa-hfilter-row" style="gap: 0.75rem; flex-wrap: wrap;">
                 <div class="qa-search-wrapper" style="flex: 1; min-width: 200px;">
@@ -3064,5 +3072,6 @@ def execute_pipeline(source_df: DataFrame) -&gt; DataFrame:
     </div>
   </div>
   <script src="app.js?v=1.5.0"></script>
+  <script src="animations.js?v=1.0"></script>
 </body>
 </html>

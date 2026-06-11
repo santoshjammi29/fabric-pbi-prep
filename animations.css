@@ -1,0 +1,652 @@
+/* ============================================================
+   ULTRA PREMIUM ANIMATION SYSTEM
+   Inspired by Linear, Vercel, Stripe, Apple design language
+   ============================================================ */
+
+/* ─── 1. KEYFRAME LIBRARY ─────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Shimmer sweep — runs on glass cards */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Aurora orb float */
+@keyframes auroraFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(60px, -40px) scale(1.08); }
+  66%       { transform: translate(-40px, 30px) scale(0.94); }
+}
+
+@keyframes auroraFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-70px, 50px) scale(1.12); }
+  70%       { transform: translate(50px, -30px) scale(0.92); }
+}
+
+/* Pulse glow ring */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(108, 92, 231, 0); }
+}
+
+/* Spinning gradient border */
+@keyframes rotateBorder {
+  from { --border-angle: 0turn; }
+  to   { --border-angle: 1turn; }
+}
+
+/* Count-up number tick */
+@keyframes numberTick {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Badge pop */
+@keyframes badgePop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  70%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Loading skeleton pulse */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* Chevron bounce hint on first load */
+@keyframes chevronBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
+
+/* Magnetic button hover wiggle */
+@keyframes buttonWiggle {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(-1.5deg); }
+  75%  { transform: rotate(1.5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Gradient text animation */
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── 2. AURORA BACKGROUND ────────────────────────────────── */
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  will-change: transform;
+}
+
+.theme-dark .aurora-orb { opacity: 0.10; }
+.theme-light .aurora-orb { opacity: 0.08; }
+
+.aurora-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, hsl(245, 85%, 65%) 0%, transparent 70%);
+  top: -100px;
+  left: -100px;
+  animation: auroraFloat 18s ease-in-out infinite;
+}
+
+.aurora-orb-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, hsl(160, 90%, 45%) 0%, transparent 70%);
+  bottom: -80px;
+  right: -80px;
+  animation: auroraFloat2 22s ease-in-out infinite;
+}
+
+.aurora-orb-3 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, hsl(280, 80%, 60%) 0%, transparent 70%);
+  top: 40%;
+  right: 20%;
+  animation: auroraFloat 28s ease-in-out infinite reverse;
+}
+
+/* ─── 3. SCROLL-DRIVEN ENTRY REVEALS ─────────────────────── */
+
+/*
+  Elements with .reveal-on-scroll start invisible.
+  IntersectionObserver in animations.js adds .is-visible.
+  Scroll-driven animation used where supported as progressive enhancement.
+*/
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delays for sibling elements */
+.reveal-on-scroll:nth-child(1)  { transition-delay: 0ms; }
+.reveal-on-scroll:nth-child(2)  { transition-delay: 60ms; }
+.reveal-on-scroll:nth-child(3)  { transition-delay: 120ms; }
+.reveal-on-scroll:nth-child(4)  { transition-delay: 180ms; }
+.reveal-on-scroll:nth-child(5)  { transition-delay: 240ms; }
+.reveal-on-scroll:nth-child(6)  { transition-delay: 300ms; }
+.reveal-on-scroll:nth-child(7)  { transition-delay: 360ms; }
+.reveal-on-scroll:nth-child(8)  { transition-delay: 420ms; }
+
+/* Scale variant */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ─── 4. NATIVE SCROLL-DRIVEN (progressive enhancement) ──── */
+
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  .scroll-reveal-native {
+    animation: fadeUp linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+
+/* ─── 5. PAGE / VIEW TRANSITIONS ─────────────────────────── */
+
+/* Wrap content sections in .view-transition-wrap for morphing */
+.page-view {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* View Transitions API (Same-document) */
+::view-transition-old(root) {
+  animation: 280ms cubic-bezier(0.4, 0, 1, 1) both fadeOut;
+}
+::view-transition-new(root) {
+  animation: 380ms cubic-bezier(0.16, 1, 0.3, 1) both fadeIn;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: scale(0.98); }
+}
+
+/* ─── 6. CARD HOVER — PREMIUM LIFT EFFECT ────────────────── */
+
+.concept-accordion-card,
+.unified-section-wrapper,
+.stat-card,
+.personalised-card,
+.niche-card,
+.cheatsheet-card {
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.2s ease;
+}
+
+.concept-accordion-card:hover:not(.expanded),
+.stat-card:hover,
+.personalised-card:hover,
+.niche-card:hover {
+  transform: translateY(-4px) scale(1.005);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(108, 92, 231, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Active press micro-feedback */
+.concept-accordion-card:active,
+.stat-card:active,
+.qa-sidebar-btn:active {
+  transform: scale(0.98) !important;
+  transition-duration: 0.1s !important;
+}
+
+/* ─── 7. SIDEBAR NAV ITEM ANIMATIONS ─────────────────────── */
+
+.nav-item {
+  position: relative;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 70%;
+  background: var(--primary);
+  border-radius: 0 3px 3px 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-item.active::before,
+.nav-item:hover::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.nav-item:hover {
+  transform: translateX(3px);
+}
+
+/* ─── 8. FILTER CHIP ANIMATIONS ──────────────────────────── */
+
+.qa-sidebar-btn {
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s ease;
+}
+
+.qa-sidebar-btn:hover:not(.active) {
+  transform: translateY(-1px);
+}
+
+.qa-sidebar-btn.active {
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.qa-btn-count-badge {
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* ─── 9. SECTION HEADER EXPAND ───────────────────────────── */
+
+.unified-section-header {
+  transition: background 0.2s ease;
+}
+
+/* The chevron has a springy rotation */
+.level-chevron {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  flex-shrink: 0;
+}
+
+/* Card body slide-open — max-height transition for smooth accordion */
+.level-card-body {
+  transition:
+    max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.35s ease,
+    padding 0.35s ease;
+  overflow: hidden;
+}
+
+/* ─── 10. SHIMMER SKELETON LOADER ────────────────────────── */
+
+.skeleton {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.12) 40%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ─── 11. GRADIENT ANIMATED HEADLINE ─────────────────────── */
+
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    hsl(245, 85%, 72%),
+    hsl(280, 80%, 70%),
+    hsl(200, 90%, 65%),
+    hsl(160, 90%, 55%)
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+.theme-light .gradient-text {
+  background: linear-gradient(
+    135deg,
+    hsl(245, 75%, 50%),
+    hsl(280, 70%, 50%),
+    hsl(200, 80%, 42%),
+    hsl(160, 80%, 36%)
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+/* ─── 12. STAT CARD NUMBER TICK-UP ───────────────────────── */
+
+.stat-value[data-animated] {
+  animation: numberTick 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── 13. MOBILE NAV TAB PRESS FEEDBACK ──────────────────── */
+
+.mobile-nav-tab {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mobile-nav-tab:active {
+  transform: scale(0.93);
+}
+
+.mobile-nav-tab.active {
+  animation: scaleIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── 14. SEARCH BOX FOCUS ANIMATION ─────────────────────── */
+
+.qa-search-wrapper {
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.25s ease;
+}
+
+.qa-search-wrapper:focus-within {
+  border-color: var(--primary) !important;
+  box-shadow:
+    0 0 0 3px rgba(108, 92, 231, 0.18),
+    0 4px 16px rgba(108, 92, 231, 0.12) !important;
+  transform: none;
+}
+
+/* ─── 15. TOPIC CHIP / SUBNAV HOVER ──────────────────────── */
+
+.topic-chip {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+}
+
+.topic-chip:hover:not(.active) {
+  transform: translateY(-2px);
+}
+
+.topic-chip:active {
+  transform: scale(0.95) !important;
+  transition-duration: 0.08s !important;
+}
+
+/* ─── 16. GLASSMORPHISM GLOW BORDER ──────────────────────── */
+
+/* Rotating hue border used on key highlighted cards */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0turn;
+  inherits: false;
+}
+
+.glow-border {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  background-image: var(--card-bg);
+  position: relative;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle),
+    hsl(245, 85%, 65%),
+    hsl(280, 80%, 65%),
+    hsl(200, 90%, 60%),
+    hsl(160, 90%, 50%),
+    hsl(245, 85%, 65%)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotateBorder 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.glow-border:hover::before {
+  opacity: 1;
+}
+
+/* ─── 17. SECTION APPEAR ANIMATION ───────────────────────── */
+
+.prep-hub-subview {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* DB-loader overlay fade */
+#db-loader-overlay {
+  transition: opacity 0.4s ease !important;
+}
+
+/* ─── 18. SIDEBAR BRAND ENTRANCE ─────────────────────────── */
+
+.brand {
+  animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.nav-section {
+  animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.nav-section:nth-child(1) { animation-delay: 0.15s; }
+.nav-section:nth-child(2) { animation-delay: 0.22s; }
+.nav-section:nth-child(3) { animation-delay: 0.29s; }
+
+/* ─── 19. MOBILE TOP BAR ENTRANCE ────────────────────────── */
+
+.mobile-top-bar {
+  animation: fadeDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mobile-bottom-nav {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+/* ─── 20. UNIFIED SEARCH CONTAINER ───────────────────────── */
+
+#unified-search-container .unified-section-wrapper {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#unified-search-container .unified-section-wrapper:nth-child(1) { animation-delay: 0ms; }
+#unified-search-container .unified-section-wrapper:nth-child(2) { animation-delay: 50ms; }
+#unified-search-container .unified-section-wrapper:nth-child(3) { animation-delay: 100ms; }
+#unified-search-container .unified-section-wrapper:nth-child(4) { animation-delay: 150ms; }
+#unified-search-container .unified-section-wrapper:nth-child(5) { animation-delay: 200ms; }
+#unified-search-container .unified-section-wrapper:nth-child(6) { animation-delay: 250ms; }
+#unified-search-container .unified-section-wrapper:nth-child(7) { animation-delay: 300ms; }
+#unified-search-container .unified-section-wrapper:nth-child(8) { animation-delay: 350ms; }
+
+/* ─── 21. BUTTON HOVER GLOW ──────────────────────────────── */
+
+.control-btn {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.control-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.control-btn:hover::after { opacity: 1; }
+.control-btn:hover { transform: translateY(-2px); }
+.control-btn:active { transform: scale(0.96) !important; }
+
+/* ─── 22. PROGRESS BAR STRIPE ANIMATION ──────────────────── */
+
+@keyframes progressStripe {
+  from { background-position: 40px 0; }
+  to   { background-position: 0 0; }
+}
+
+.progress-bar-fill {
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    transparent 75%
+  );
+  background-size: 40px 40px;
+  animation: progressStripe 0.8s linear infinite;
+}
+
+/* ─── 23. SCROLLBAR REVEAL ────────────────────────────────── */
+
+/* Theme-aware custom scrollbar */
+.main-content {
+  scrollbar-gutter: stable;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: rgba(108, 92, 231, 0.3);
+  border-radius: 99px;
+  transition: background 0.2s ease;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(108, 92, 231, 0.6);
+}
+
+/* ─── 24. COPY BUTTON FEEDBACK ────────────────────────────── */
+
+.copy-btn {
+  transition: color 0.2s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.copy-btn:hover {
+  color: var(--primary) !important;
+  transform: scale(1.1);
+}
+
+/* ─── 25. STAT BADGE HOVER RIPPLE ────────────────────────── */
+
+.stats-badge {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+}
+
+.stats-badge:hover {
+  transform: scale(1.08);
+}
+
+/* ─── 26. REDUCED MOTION — RESPECT USER PREF ─────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .aurora-orb { display: none; }
+  .reveal-on-scroll { opacity: 1; transform: none; }
+  .gradient-text { animation: none; background-position: 0 0; }
+}
