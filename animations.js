@@ -223,26 +223,46 @@
     document.addEventListener('click', e => {
       const header = e.target.closest('.level-card-header');
       if (!header) return;
-      const card = header.closest('.concept-accordion-card');
+      const card = header.closest('.concept-accordion-card, .pyspark-level-card');
       if (!card) return;
       const body = card.querySelector('.level-card-body');
       if (!body) return;
+
+      const isConceptCard = card.classList.contains('concept-accordion-card');
 
       // Brief delay to let the app's own click handler run first
       requestAnimationFrame(() => {
         const isOpen = card.classList.contains('expanded');
         if (isOpen) {
-          body.style.maxHeight = body.scrollHeight + 'px';
-          // Force reflow then collapse
-          requestAnimationFrame(() => {
-            body.style.maxHeight = '0px';
-            body.style.opacity = '0';
-          });
-        } else {
+          // Card has just been expanded
+          body.style.display = 'block';
+          body.style.maxHeight = '0px';
+          body.style.opacity = '0';
+          // Force layout reflow
+          body.offsetHeight;
+          
           body.style.maxHeight = body.scrollHeight + 'px';
           body.style.opacity = '1';
+          
+          const onTransitionEnd = () => {
+            body.style.maxHeight = 'none';
+          };
+          body.addEventListener('transitionend', onTransitionEnd, { once: true });
+        } else {
+          // Card has just been collapsed
+          body.style.display = 'block';
+          body.style.maxHeight = body.scrollHeight + 'px';
+          body.style.opacity = '1';
+          // Force layout reflow
+          body.offsetHeight;
+          
+          body.style.maxHeight = '0px';
+          body.style.opacity = '0';
+          
           body.addEventListener('transitionend', () => {
-            body.style.maxHeight = 'none'; // allow content growth after open
+            body.style.display = isConceptCard ? 'none' : '';
+            body.style.maxHeight = '';
+            body.style.opacity = '';
           }, { once: true });
         }
       });
