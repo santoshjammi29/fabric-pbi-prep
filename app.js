@@ -4363,7 +4363,6 @@ document.addEventListener('DOMContentLoaded', () => {
               <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 4px; align-items: center;">
                 <span class="stats-badge" style="font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-radius: 4px;">${q.sourceLabel}</span>
                 <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${q.categoryLabel}</span>
-                <span class="status-indicator status-${qStatus}" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase; padding: 2px 6px; border-radius: 4px; ${qStatus === 'unseen' ? 'display:none;' : ''}">${qStatus}</span>
               </div>
               <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
             </div>
@@ -4435,14 +4434,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
           }
 
-          // Add interactive action buttons to card body
-          cardBody.innerHTML = `
-            ${answerHtml}
-            <div class="qa-card-actions">
-              <button class="qa-action-btn${qStatus === 'reviewing' ? ' active-review' : ''}" data-action="review">⭐️ Reviewing</button>
-              <button class="qa-action-btn${qStatus === 'mastered' ? ' active-mastered' : ''}" data-action="master">✅ Mastered</button>
-            </div>
-          `;
+          // Set card body content
+          cardBody.innerHTML = answerHtml;
 
           // Handle Copy button inside coding blocks
           if (['python', 'mssql', 'pyspark', 'sparksql'].includes(q.sourceDb)) {
@@ -4470,50 +4463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
 
-          // Wire up status click buttons inside card
-          const statusBtns = cardBody.querySelectorAll('.qa-action-btn');
-          statusBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const action = btn.getAttribute('data-action');
-              let newStatus = 'unseen';
 
-              if (action === 'master') {
-                newStatus = qStatus === 'mastered' ? 'unseen' : 'mastered';
-              } else if (action === 'review') {
-                newStatus = qStatus === 'reviewing' ? 'unseen' : 'reviewing';
-              }
-
-              updateQuestionStatus(q.id, newStatus);
-              updateUnifiedSearchCounts();
-              
-              // Local UI update instead of rebuilding whole DOM to preserve expand/scroll states
-              const indicator = cardHeader.querySelector('.status-indicator');
-              if (indicator) {
-                indicator.className = `status-indicator status-${newStatus}`;
-                indicator.textContent = newStatus;
-                indicator.style.display = newStatus === 'unseen' ? 'none' : 'inline-block';
-              }
-              
-              // Toggle classes on card buttons
-              const masterBtn = cardBody.querySelector('[data-action="master"]');
-              const reviewBtn = cardBody.querySelector('[data-action="review"]');
-              
-              if (masterBtn) masterBtn.className = `qa-action-btn${newStatus === 'mastered' ? ' active-mastered' : ''}`;
-              if (reviewBtn) reviewBtn.className = `qa-action-btn${newStatus === 'reviewing' ? ' active-review' : ''}`;
-              
-              // Re-cache status inside this closure
-              q.difficulty = q.difficulty || 'MEDIUM';
-              state.progress[q.id] = newStatus;
-              
-              // Sync Niche or Personalized Prep if visible
-              const personalisedIndicator = document.querySelector(`.personalised-card[data-id="${q.id}"] .status-badge`);
-              if (personalisedIndicator) {
-                personalisedIndicator.className = `status-badge status-${newStatus}`;
-                personalisedIndicator.textContent = newStatus;
-              }
-            });
-          });
 
           card.appendChild(cardHeader);
           card.appendChild(cardBody);
