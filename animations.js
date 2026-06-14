@@ -223,7 +223,7 @@
     document.addEventListener('click', e => {
       const header = e.target.closest('.level-card-header');
       if (!header) return;
-      const card = header.closest('.concept-accordion-card, .pyspark-level-card');
+      const card = header.closest('.concept-accordion-card, .pyspark-level-card, .sparksql-level-card');
       if (!card) return;
       const body = card.querySelector('.level-card-body');
       if (!body) return;

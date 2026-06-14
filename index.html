@@ -352,6 +352,8 @@
         <div class="prep-hub-subnav topics-scrollbar" id="spark-hub-subnav" style="margin-bottom: 2rem;">
           <button class="topic-chip active" data-subtab="view-spark">Engine Architecture</button>
           <button class="topic-chip" data-subtab="view-pyspark">PySpark Curriculum</button>
+          <button class="topic-chip" data-subtab="view-sparksql">Spark SQL Curriculum</button>
+          <button class="topic-chip" data-subtab="view-spark-compare">Syntax Comparison</button>
         </div>
 
         <!-- Subviews wrapper -->
@@ -2038,6 +2040,407 @@ def execute_pipeline(source_df: DataFrame) -&gt; DataFrame:
             </div>
           </div>
         </div>
+          </div>
+        </div>
+
+        <!-- 3. Spark SQL Curriculum Subview -->
+        <div id="view-sparksql" class="spark-hub-subview hidden">
+          <div class="sparksql-header-meta" style="margin-top: -1rem; margin-bottom: 1.5rem;">
+            <span class="pyspark-version-badge">Spark 3.4 → 4.0</span>
+            <span class="pyspark-level-count">36 Levels · 4 Phases</span>
+          </div>
+          
+          <div class="sparksql-content">
+            <!-- Phase Navigation Tabs -->
+            <div class="sparksql-phase-nav" id="sparksql-phase-nav">
+              <button class="sparksql-phase-btn active" data-phase="all">All Phases</button>
+              <button class="sparksql-phase-btn" data-phase="1"><span class="phase-num">Phase 1</span><span class="phase-label">Spark SQL Fundamentals</span></button>
+              <button class="sparksql-phase-btn" data-phase="2"><span class="phase-num">Phase 2</span><span class="phase-label">Querying &amp; Joins</span></button>
+              <button class="sparksql-phase-btn" data-phase="3"><span class="phase-num">Phase 3</span><span class="phase-label">Delta Lake &amp; Tuning</span></button>
+              <button class="sparksql-phase-btn" data-phase="4"><span class="phase-num">Phase 4</span><span class="phase-label">Enterprise &amp; Governance</span></button>
+            </div>
+
+            <!-- Phase Blocks -->
+            <div id="sparksql-phase-blocks-container">
+              <!-- Rendered Dynamically -->
+            </div>
+
+            <!-- Curriculum Summary Card -->
+            <div class="sparksql-summary-card">
+              <div class="summary-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+                <h3>Curriculum Mastered — Spark SQL Capabilities</h3>
+              </div>
+              <div class="summary-grid">
+                <div class="summary-item"><span class="summary-icon">⚡</span><div><strong>High-Performance DDL</strong><span>Delta tables, partitioning, and liquid clustering</span></div></div>
+                <div class="summary-item"><span class="summary-icon">📊</span><div><strong>Advanced Analytics</strong><span>Window functions, pivots, and lateral subqueries</span></div></div>
+                <div class="summary-item"><span class="summary-icon">🚀</span><div><strong>Engine Tuning</strong><span>AQE, Catalyst optimization, Z-Order, and Explain hints</span></div></div>
+                <div class="summary-item"><span class="summary-icon">🏗️</span><div><strong>Medallion Pipelines</strong><span>Declarative Delta Live Tables (DLT) SQL pipelines</span></div></div>
+                <div class="summary-item"><span class="summary-icon">🔐</span><div><strong>Enterprise Governance</strong><span>Unity Catalog access controls, row/column masking</span></div></div>
+                <div class="summary-item"><span class="summary-icon">💎</span><div><strong>Data Vault &amp; FinOps</strong><span>Hub-Satellite modeling and partition-level cost control</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Syntax Comparison Subview -->
+        <div id="view-spark-compare" class="spark-hub-subview hidden">
+          <div class="spark-hero-eyebrow" style="margin-bottom: 0.75rem;">🐍 Python vs. ⚡ PySpark vs. 📝 Spark SQL</div>
+          <h3 class="page-title" style="margin-top: 0px; margin-bottom: 1.5rem;">Coding Fundamentals Comparison</h3>
+          
+          <!-- Category Filter Chips -->
+          <div class="prep-hub-subnav topics-scrollbar" id="comp-filters-container" style="margin-bottom: 1.5rem; justify-content: flex-start; padding: 0.25rem 0;">
+            <button class="topic-chip active" data-category="all">All Fundamentals</button>
+            <button class="topic-chip" data-category="ingest">1. Data Ingestion</button>
+            <button class="topic-chip" data-category="select">2. Projections &amp; Filters</button>
+            <button class="topic-chip" data-category="join">3. Joins &amp; Unions</button>
+            <button class="topic-chip" data-category="agg">4. Aggregations</button>
+            <button class="topic-chip" data-category="window">5. Window Functions</button>
+            <button class="topic-chip" data-category="write">6. Writes &amp; DML</button>
+          </div>
+
+          <div class="comparison-container">
+            <!-- Comparison Card 1: Ingestion -->
+            <div class="comparison-card" data-comp-cat="ingest">
+              <div class="comparison-card-header">
+                <span>1. Data Ingestion (Reading Files)</span>
+                <span class="pyspark-version-badge" style="font-size: 0.7rem;">Batch &amp; Stream</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="comparison-section lang-python">
+                  <h5>Python (Pandas / Polars)</h5>
+                  <pre><code>import pandas as pd
+# Pandas: In-memory (Single Node)
+df = pd.read_parquet(
+    "s3://bucket/data.parquet",
+    columns=["id", "name", "val"]
+)
+
+import polars as pl
+# Polars: Fast, Lazy Evaluation
+df = pl.scan_parquet("s3://bucket/data.parquet") \
+       .select(["id", "name", "val"])</code></pre>
+                </div>
+                <div class="comparison-section lang-pyspark">
+                  <h5>PySpark (DataFrame API)</h5>
+                  <pre><code># Programmatic Schema &amp; Read
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+schema = StructType([
+    StructField("id", IntegerType(), False),
+    StructField("name", StringType(), True),
+    StructField("val", IntegerType(), True)
+])
+
+df = spark.read.format("parquet") \
+    .schema(schema) \
+    .option("mergeSchema", "false") \
+    .load("abfss://raw@adls.dfs.core.windows.net/data/")</code></pre>
+                </div>
+                <div class="comparison-section lang-sparksql">
+                  <h5>Spark SQL</h5>
+                  <pre><code>-- 1. Read files directly via syntax path
+SELECT id, name, val
+FROM parquet.`abfss://raw@adls.dfs.core.windows.net/data/`
+WHERE id IS NOT NULL;
+
+-- 2. Create external DDL catalog table
+CREATE TABLE bronze_records (
+    id INT, name STRING, val INT
+)
+USING PARQUET
+LOCATION 'abfss://raw@adls.dfs.core.windows.net/data/';</code></pre>
+                </div>
+              </div>
+              <div class="comparison-tips">
+                💡 <strong>Must-Know Tips &amp; Tricks:</strong>
+                Pandas loads the entire file into driver memory (single node). Always use <strong>Polars lazy scan</strong> or <strong>PySpark</strong> for distributed files.
+                In PySpark/Spark SQL, <strong>avoid schema inference</strong> on large JSON/CSV datasets as it triggers a full scan. Define schemas explicitly.
+                Set <code>mergeSchema = false</code> on Parquet reads unless schema evolution is active; schema merging requires reading footers of all files.
+              </div>
+            </div>
+
+            <!-- Comparison Card 2: Projections & Filters -->
+            <div class="comparison-card" data-comp-cat="select">
+              <div class="comparison-card-header">
+                <span>2. Projections &amp; Filtering (SELECT / WHERE)</span>
+                <span class="pyspark-version-badge" style="font-size: 0.7rem;">Column &amp; Row</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="comparison-section lang-python">
+                  <h5>Python (Pandas / Polars)</h5>
+                  <pre><code># Pandas (Boolean indexing)
+df = df[["id", "name", "val"]]
+df = df[(df["val"] > 100) &amp; (df["name"].notna())]
+
+# Polars (Expression Engine)
+df = df.select(["id", "name", "val"]) \
+       .filter((pl.col("val") > 100) &amp; (pl.col("name").is_not_null()))</code></pre>
+                </div>
+                <div class="comparison-section lang-pyspark">
+                  <h5>PySpark (DataFrame API)</h5>
+                  <pre><code># Using Column objects (compile-time checked)
+from pyspark.sql.functions import col
+
+df = df.select("id", "name", "val") \
+    .filter((col("val") > 100) &amp; col("name").isNotNull())
+    
+# Alternative using SQL expression string
+df = df.select("id", "name", "val") \
+    .where("val > 100 AND name IS NOT NULL")</code></pre>
+                </div>
+                <div class="comparison-section lang-sparksql">
+                  <h5>Spark SQL</h5>
+                  <pre><code>-- Standard ANSI SQL syntax
+SELECT id, name, val
+FROM my_table
+WHERE val > 100 
+  AND name IS NOT NULL;
+  
+-- Null-safe equality operator
+SELECT * FROM my_table
+WHERE name &lt;=&gt; 'Unknown'; -- Returns true if both are NULL</code></pre>
+                </div>
+              </div>
+              <div class="comparison-tips">
+                💡 <strong>Must-Know Tips &amp; Tricks:</strong>
+                PySpark's <code>.filter()</code> and <code>.where()</code> are completely identical aliases.
+                <strong>Predicate Pushdown:</strong> Ensure filtering columns (like dates) are partition keys. Spark pushes down WHERE clauses to storage (e.g. Parquet/Delta) to avoid reading unnecessary files.
+                In Python (Pandas), filtering creates a copy or a view. In Spark/Polars, filtering is compiled into a single optimized logical plan (Catalyst/Query Optimizer).
+              </div>
+            </div>
+
+            <!-- Comparison Card 3: Joins & Unions -->
+            <div class="comparison-card" data-comp-cat="join">
+              <div class="comparison-card-header">
+                <span>3. Joins &amp; Unions (Merging Datasets)</span>
+                <span class="pyspark-version-badge" style="font-size: 0.7rem;">Distributed Shuffles</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="comparison-section lang-python">
+                  <h5>Python (Pandas / Polars)</h5>
+                  <pre><code># Pandas Merge &amp; Concatenate
+merged_df = pd.merge(df1, df2, on="key", how="left")
+union_df = pd.concat([df1, df2], ignore_index=True)
+
+# Polars Join &amp; Union
+merged_pl = df1.join(df2, on="key", how="left")
+union_pl = pl.concat([df1, df2])</code></pre>
+                </div>
+                <div class="comparison-section lang-pyspark">
+                  <h5>PySpark (DataFrame API)</h5>
+                  <pre><code># Broadcast join for small tables (&lt;10MB)
+from pyspark.sql.functions import broadcast
+
+joined_df = df1.join(
+    broadcast(df2), 
+    on="key", 
+    how="left"
+)
+
+# Union by name (ignores column ordering)
+union_df = df1.unionByName(df2, allowMissingColumns=True)</code></pre>
+                </div>
+                <div class="comparison-section lang-sparksql">
+                  <h5>Spark SQL</h5>
+                  <pre><code>-- Broadcast hint for small tables
+SELECT /*+ BROADCAST(t2) */ t1.*, t2.val
+FROM table1 t1
+LEFT JOIN table2 t2 ON t1.key = t2.key;
+
+-- Union by position (standard SQL)
+SELECT id, name FROM table1
+UNION ALL
+SELECT id, name FROM table2;</code></pre>
+                </div>
+              </div>
+              <div class="comparison-tips">
+                💡 <strong>Must-Know Tips &amp; Tricks:</strong>
+                In distributed systems, <strong>SortMergeJoin</strong> requires shuffling data across executors, which is highly expensive.
+                <strong>Broadcast Hash Join (BHJ)</strong> avoids shuffles by copying the small table to all executors. In Spark, it triggers automatically if the table is under <code>spark.sql.autoBroadcastJoinThreshold</code> (default 10MB).
+                Use <code>unionByName(allowMissingColumns=True)</code> in PySpark. Traditional <code>.union()</code> maps columns strictly by position, which causes silent, catastrophic data alignment corruption if columns are reordered.
+              </div>
+            </div>
+
+            <!-- Comparison Card 4: Aggregations -->
+            <div class="comparison-card" data-comp-cat="agg">
+              <div class="comparison-card-header">
+                <span>4. Aggregations &amp; Grouping</span>
+                <span class="pyspark-version-badge" style="font-size: 0.7rem;">Shuffle Boundaries</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="comparison-section lang-python">
+                  <h5>Python (Pandas / Polars)</h5>
+                  <pre><code># Pandas GroupBy
+agg_df = df.groupby("category").agg(
+    total_sales=("sales", "sum"),
+    avg_price=("price", "mean")
+).reset_index()
+
+# Polars GroupBy
+agg_pl = df.group_by("category").agg([
+    pl.col("sales").sum().alias("total_sales"),
+    pl.col("price").mean().alias("avg_price")
+])</code></pre>
+                </div>
+                <div class="comparison-section lang-pyspark">
+                  <h5>PySpark (DataFrame API)</h5>
+                  <pre><code>from pyspark.sql import functions as F
+
+agg_df = df.groupBy("category").agg(
+    F.sum("sales").alias("total_sales"),
+    F.mean("price").alias("avg_price")
+)</code></pre>
+                </div>
+                <div class="comparison-section lang-sparksql">
+                  <h5>Spark SQL</h5>
+                  <pre><code>-- Basic grouping
+SELECT category, 
+       SUM(sales) AS total_sales,
+       AVG(price) AS avg_price
+FROM my_table
+GROUP BY category;
+
+-- Multi-dimensional aggregations
+SELECT category, sub_category, SUM(sales)
+FROM my_table
+GROUP BY GROUPING SETS (
+    (category, sub_category), 
+    (category), 
+    ()
+);</code></pre>
+                </div>
+              </div>
+              <div class="comparison-tips">
+                💡 <strong>Must-Know Tips &amp; Tricks:</strong>
+                Aggregations force a <strong>Shuffle Boundary</strong> in Spark. The Catalyst engine redistributes rows with the same grouping key to the same partition.
+                Use <code>GROUPING SETS</code>, <code>CUBE</code>, or <code>ROLLUP</code> in Spark SQL/PySpark to calculate multiple sub-totals in a single pass instead of running multiple UNION-ed queries.
+                Beware of <strong>Data Skew:</strong> If one grouping key contains 90% of the records, one executor will do all the work. Use *salting* (appending a random number) to distribute the skewed keys.
+              </div>
+            </div>
+
+            <!-- Comparison Card 5: Window Functions -->
+            <div class="comparison-card" data-comp-cat="window">
+              <div class="comparison-card-header">
+                <span>5. Window Functions (Analytical Partitioning)</span>
+                <span class="pyspark-version-badge" style="font-size: 0.7rem;">Analytical Rows</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="comparison-section lang-python">
+                  <h5>Python (Pandas / Polars)</h5>
+                  <pre><code># Pandas (Using transform or cumsum)
+df["rank"] = df.groupby("dept")["salary"].rank(ascending=False)
+df["running_total"] = df.groupby("dept")["sales"].cumsum()
+
+# Polars (Native window functions!)
+df = df.with_columns([
+    pl.col("salary").rank("dense", descending=True).over("dept").alias("rank"),
+    pl.col("sales").sum().over("dept").alias("running_total")
+])</code></pre>
+                </div>
+                <div class="comparison-section lang-pyspark">
+                  <h5>PySpark (DataFrame API)</h5>
+                  <pre><code>from pyspark.sql import Window
+from pyspark.sql import functions as F
+
+window_spec = Window.partitionBy("dept") \
+    .orderBy(F.col("salary").desc())
+    
+df = df.withColumn("rank", F.dense_rank().over(window_spec))
+
+# Running Total Spec (explicit frame bounds!)
+running_spec = Window.partitionBy("dept") \
+    .orderBy("date") \
+    .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+df = df.withColumn("running_total", F.sum("sales").over(running_spec))</code></pre>
+                </div>
+                <div class="comparison-section lang-sparksql">
+                  <h5>Spark SQL</h5>
+                  <pre><code>-- Analytical Dense Rank
+SELECT dept, name, salary,
+       DENSE_RANK() OVER (
+           PARTITION BY dept 
+           ORDER BY salary DESC
+       ) AS rank
+FROM employees;
+
+-- Running Total with Frame specification
+SELECT dept, date, sales,
+       SUM(sales) OVER (
+           PARTITION BY dept 
+           ORDER BY date
+           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+       ) AS running_total
+FROM sales_records;</code></pre>
+                </div>
+              </div>
+              <div class="comparison-tips">
+                💡 <strong>Must-Know Tips &amp; Tricks:</strong>
+                <strong>Always define frame bounds explicitly</strong> (e.g. <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>) when using window aggregation functions like <code>SUM</code> or <code>AVG</code>. Without it, Spark defaults to <code>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>, which is much slower because it requires calculating duplicate values dynamically.
+                Window functions without a <code>PARTITION BY</code> collect all data to a single partition on a single executor, causing <strong>OutOfMemory (OOM)</strong> errors on large datasets.
+              </div>
+            </div>
+
+            <!-- Comparison Card 6: Writes & DML -->
+            <div class="comparison-card" data-comp-cat="write">
+              <div class="comparison-card-header">
+                <span>6. Writes &amp; DML (Data Manipulation)</span>
+                <span class="pyspark-version-badge" style="font-size: 0.7rem;">ACID Transactions</span>
+              </div>
+              <div class="comparison-grid">
+                <div class="comparison-section lang-python">
+                  <h5>Python (Pandas / Polars)</h5>
+                  <pre><code># Pandas Parquet / Delta write
+df.to_parquet("s3://bucket/data.parquet", index=False)
+# Write delta (using deltalake library)
+from deltalake.writer import write_deltalake
+write_deltalake("s3://bucket/table", df, mode="overwrite")
+
+# Polars Parquet write
+df.write_parquet("s3://bucket/data.parquet")</code></pre>
+                </div>
+                <div class="comparison-section lang-pyspark">
+                  <h5>PySpark (DataFrame API)</h5>
+                  <pre><code># Delta Lake Insert/Upsert (DML)
+from delta.tables import DeltaTable
+
+delta_table = DeltaTable.forPath(spark, "abfss://silver/employees")
+
+# Run MERGE INTO (Upsert)
+delta_table.alias("target").merge(
+    source_df.alias("source"),
+    "target.id = source.id"
+).whenMatchedUpdate(set={
+    "name": "source.name",
+    "salary": "source.salary"
+}).whenNotMatchedInsert(values={
+    "id": "source.id",
+    "name": "source.name",
+    "salary": "source.salary"
+}).execute()</code></pre>
+                </div>
+                <div class="comparison-section lang-sparksql">
+                  <h5>Spark SQL</h5>
+                  <pre><code>-- Delta Lake ACID MERGE (Upsert)
+MERGE INTO silver.employees AS target
+USING staging_employees AS source
+ON target.id = source.id
+WHEN MATCHED THEN
+  UPDATE SET 
+    target.name = source.name,
+    target.salary = source.salary
+WHEN NOT MATCHED THEN
+  INSERT (id, name, salary) 
+  VALUES (source.id, source.name, source.salary);</code></pre>
+                </div>
+              </div>
+              <div class="comparison-tips">
+                💡 <strong>Must-Know Tips &amp; Tricks:</strong>
+                In pure Python, writes are single-threaded or client-driven. In Spark, writes are <strong>fully distributed</strong> from executors directly to cloud storage.
+                Delta Lake supports full ACID DML operations (<code>UPDATE</code>, <code>DELETE</code>, <code>MERGE</code>). Standard Parquet tables *do not* support these and require a full table/partition rewrite.
+                Always run <code>OPTIMIZE table_name Z-ORDER BY (cardinality_col)</code> after high-volume merge/insert operations to compact small files and enable efficient file skipping.
+              </div>
+            </div>
           </div>
         </div>
       </section>

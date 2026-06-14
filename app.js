@@ -470,7 +470,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function getNeededDatasetsForView(viewId, subTabId) {
     if (viewId === 'view-concepts') return ['concepts'];
     if (viewId === 'view-cheatsheet') return ['python', 'mssql', 'pyspark', 'sparksql'];
-    if (viewId === 'view-spark-hub' || viewId === 'view-spark' || viewId === 'view-pyspark') return ['general'];
+    if (viewId === 'view-spark-hub' || viewId === 'view-spark' || viewId === 'view-pyspark' || viewId === 'view-sparksql' || viewId === 'view-spark-compare') {
+      if (subTabId === 'view-sparksql' || viewId === 'view-sparksql') return ['sparksql'];
+      return ['general'];
+    }
     if (viewId === 'view-prep-hub') {
       return ['fabric_pbi', 'general', 'personalised', 'python', 'mssql', 'pyspark', 'sparksql'];
     }
@@ -834,6 +837,10 @@ document.addEventListener('DOMContentLoaded', () => {
         subview.setAttribute('hidden', 'true');
       }
     });
+
+    if (subTabId === 'view-sparksql') {
+      renderSparkSqlCurriculum();
+    }
   }
 
   function switchView(targetViewId) {
@@ -846,7 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
       actualTargetViewId = 'view-prep-hub';
     }
 
-    const sparkMergedViews = ['view-spark', 'view-pyspark'];
+    const sparkMergedViews = ['view-spark', 'view-pyspark', 'view-sparksql', 'view-spark-compare'];
     if (sparkMergedViews.includes(targetViewId) || targetViewId === 'view-spark-hub') {
       targetSubTabId = targetViewId === 'view-spark-hub' ? null : targetViewId;
       actualTargetViewId = 'view-spark-hub';
@@ -2520,6 +2527,57 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // --- SPARK SQL CURRICULUM PHASE NAVIGATION ---
+    const sparksqlPhaseNav = document.getElementById('sparksql-phase-nav');
+    if (sparksqlPhaseNav) {
+      const phaseBtns = sparksqlPhaseNav.querySelectorAll('.sparksql-phase-btn');
+      
+      const filterSparkSqlPhase = (selectedPhase) => {
+        const phaseBlocks = document.querySelectorAll('.sparksql-phase-block');
+        phaseBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-phase') === selectedPhase);
+        });
+        phaseBlocks.forEach(block => {
+          const blockPhase = block.getAttribute('data-phase');
+          if (selectedPhase === 'all' || blockPhase === selectedPhase) {
+            block.classList.remove('hidden-phase');
+          } else {
+            block.classList.add('hidden-phase');
+          }
+        });
+      };
+
+      phaseBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterSparkSqlPhase(btn.getAttribute('data-phase'));
+        });
+      });
+    }
+
+    // --- SYNTAX COMPARISON FILTERS ---
+    const compFiltersContainer = document.getElementById('comp-filters-container');
+    if (compFiltersContainer) {
+      const compChips = compFiltersContainer.querySelectorAll('.topic-chip');
+      const compCards = document.querySelectorAll('.comparison-card');
+
+      compChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const category = chip.getAttribute('data-category');
+          
+          compChips.forEach(c => c.classList.toggle('active', c === chip));
+          
+          compCards.forEach(card => {
+            const cardCat = card.getAttribute('data-comp-cat');
+            if (category === 'all' || cardCat === category) {
+              card.classList.remove('hidden-comp');
+            } else {
+              card.classList.add('hidden-comp');
+            }
+          });
+        });
+      });
+    }
+
     // Scroll to Top Scroll trigger
     DOM.btnScrollToTop.addEventListener('click', () => {
       document.querySelector('.main-content').scrollTo({
@@ -3598,6 +3656,102 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/✅/g, '<span class="comp-check">✅</span>')
       .replace(/❌/g, '<span class="comp-x">❌</span>')
       .replace(/⚠️/g, '<span class="comp-part">⚠️</span>');
+  }
+
+  let sparkSqlCurriculumRendered = false;
+  function renderSparkSqlCurriculum() {
+    if (sparkSqlCurriculumRendered) return;
+    const container = document.getElementById('sparksql-phase-blocks-container');
+    if (!container) return;
+
+    if (!window.SPARKSQL_DATA || window.SPARKSQL_DATA.length === 0) {
+      container.innerHTML = '<p class="error-msg">Error: Spark SQL curriculum data not loaded.</p>';
+      return;
+    }
+
+    const phases = {
+      1: {
+        title: "Spark SQL Fundamentals & DDL",
+        desc: "Levels 1–8 · Basic queries, DB/schema creation, Delta Lake DDL, file queries, CTEs",
+        levels: window.SPARKSQL_DATA.filter(item => item.level === 'beginner')
+      },
+      2: {
+        title: "Querying & Relational Operations",
+        desc: "Levels 9–18 · Window functions, complex types (Arrays/Maps/Structs), joins, groupings, pivot/unpivot, date/time functions",
+        levels: window.SPARKSQL_DATA.filter(item => item.level === 'intermediate')
+      },
+      3: {
+        title: "Delta Lake Deep Dive & Tuning",
+        desc: "Levels 19–26 · DML (Merge/Update/Delete), time travel, subqueries, SCD Type 2, optimization, CDF, schema enforcement",
+        levels: window.SPARKSQL_DATA.filter(item => item.level === 'advanced')
+      },
+      4: {
+        title: "Enterprise Architecture & Governance",
+        desc: "Levels 27–36 · DLT, Unity Catalog, Data Vault, GDPR compliance, FinOps, Fabric SQL endpoint, SQL UDFs, data quality",
+        levels: window.SPARKSQL_DATA.filter(item => item.level === 'architect')
+      }
+    };
+
+    let html = '';
+    let globalLevelCounter = 1;
+
+    for (let pNum in phases) {
+      const phase = phases[pNum];
+      html += `
+        <div class="sparksql-phase-block" data-phase="${pNum}">
+          <div class="sparksql-phase-header">
+            <div class="phase-badge phase-badge-${pNum}">Phase ${pNum}</div>
+            <div>
+              <h3 class="phase-title">${phase.title}</h3>
+              <p class="phase-desc">${phase.desc}</p>
+            </div>
+          </div>
+      `;
+
+      phase.levels.forEach(lvl => {
+        const tags = [lvl.category || 'Spark SQL'];
+        const notesHtml = (lvl.notes || []).map(note => `<li>${note}</li>`).join('');
+        
+        const escapedCode = lvl.code
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        html += `
+          <div class="sparksql-level-card" data-phase="${pNum}">
+            <div class="level-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <div class="level-badge">L${globalLevelCounter++}</div>
+              <div class="level-meta">
+                <h4 class="level-title">${lvl.title}</h4>
+                <p class="level-tag">${tags.join(' · ')}</p>
+              </div>
+              <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="level-card-body">
+              <div class="level-scenario">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <p><strong>Enterprise Scenario:</strong> ${lvl.use_case || 'Production Spark SQL use-case.'}</p>
+              </div>
+              <pre class="code-block"><code class="language-sql">${escapedCode}</code></pre>
+              <div class="level-mechanics">
+                <h5>Physical Execution &amp; Internal Mechanics</h5>
+                <p>${lvl.description}</p>
+                ${notesHtml ? `<ul>${notesHtml}</ul>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+    }
+
+    container.innerHTML = html;
+    sparkSqlCurriculumRendered = true;
+    
+    if (window.anim && typeof window.anim.observeRevealTargets === 'function') {
+      window.anim.observeRevealTargets(container);
+    }
   }
 
   // --- PERSONALISED PREP VIEW ---
