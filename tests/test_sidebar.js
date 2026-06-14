@@ -89,6 +89,68 @@ setTimeout(() => {
   }
   console.log("✅ Successfully verified toggle clicks and localStorage updates.");
 
+  // Test 3: Drag Resize verification
+  const resizer = document.getElementById('sidebar-resizer');
+  if (!resizer) {
+    console.error("❌ Test Failed: sidebar-resizer not found in DOM.");
+    process.exit(1);
+  }
+
+  // Verify dragging
+  // Expand first
+  if (appContainer.classList.contains('sidebar-collapsed')) {
+    toggleBtn.click();
+  }
+
+  console.log("Simulating sidebar resize drag...");
+  // Simulate mousedown on resizer
+  const mousedownEvent = new window.MouseEvent('mousedown', { bubbles: true, cancelable: true });
+  resizer.dispatchEvent(mousedownEvent);
+
+  // Simulate mousemove on document to set width to 320px
+  const mousemoveEvent = new window.MouseEvent('mousemove', {
+    bubbles: true,
+    cancelable: true,
+    clientX: 320
+  });
+  document.dispatchEvent(mousemoveEvent);
+
+  // Simulate mouseup
+  const mouseupEvent = new window.MouseEvent('mouseup', { bubbles: true, cancelable: true });
+  document.dispatchEvent(mouseupEvent);
+
+  const customWidthVal = window.localStorage.getItem('sidebar_custom_width');
+  console.log("Saved sidebar_custom_width in localStorage:", customWidthVal);
+  if (customWidthVal !== '320') {
+    console.error("❌ Test Failed: Custom width 320px was not stored in localStorage, got " + customWidthVal);
+    process.exit(1);
+  }
+
+  const currentColumns = appContainer.style.gridTemplateColumns;
+  console.log("Current columns style:", currentColumns);
+  if (currentColumns !== '320px 1fr') {
+    console.error("❌ Test Failed: grid-template-columns inline style not set to '320px 1fr', got: " + currentColumns);
+    process.exit(1);
+  }
+
+  // Collapse and verify width changes to 68px
+  toggleBtn.click();
+  console.log("Columns after collapse:", appContainer.style.gridTemplateColumns);
+  if (appContainer.style.gridTemplateColumns !== '68px 1fr') {
+    console.error("❌ Test Failed: Columns should be '68px 1fr' when collapsed.");
+    process.exit(1);
+  }
+
+  // Expand and verify it restores to 320px
+  toggleBtn.click();
+  console.log("Columns after expand restore:", appContainer.style.gridTemplateColumns);
+  if (appContainer.style.gridTemplateColumns !== '320px 1fr') {
+    console.error("❌ Test Failed: Columns should restore to custom width '320px 1fr'.");
+    process.exit(1);
+  }
+
+  console.log("✅ Successfully verified dynamic sidebar dragging and layout persistence.");
+
   console.log("=== All Sidebar Minimize/Expand DOM tests passed successfully! ===");
   process.exit(0);
 }, 1000);

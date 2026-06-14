@@ -566,10 +566,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadTheme();
 
-    // Restore sidebar minimized preference
+    // Restore sidebar minimized preference & custom width
     const isSidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
-    if (isSidebarCollapsed) {
-      document.getElementById('app-container')?.classList.add('sidebar-collapsed');
+    const savedWidth = localStorage.getItem('sidebar_custom_width') || '280';
+    state.sidebarWidth = parseInt(savedWidth, 10);
+    const appContainer = document.getElementById('app-container');
+    if (appContainer) {
+      if (isSidebarCollapsed) {
+        appContainer.classList.add('sidebar-collapsed');
+        appContainer.style.gridTemplateColumns = '68px 1fr';
+      } else {
+        appContainer.style.gridTemplateColumns = `${state.sidebarWidth}px 1fr`;
+      }
     }
 
     loadProgress();
@@ -847,6 +855,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (subTabId === 'view-sparksql') {
       renderSparkSqlCurriculum();
+    } else if (subTabId === 'view-spark-compare') {
+      highlightComparisonBlocks();
     }
   }
 
@@ -2222,6 +2232,12 @@ document.addEventListener('DOMContentLoaded', () => {
       btnSidebarToggle.addEventListener('click', () => {
         const collapsed = appContainer.classList.toggle('sidebar-collapsed');
         localStorage.setItem('sidebar_collapsed', collapsed);
+        if (collapsed) {
+          appContainer.style.gridTemplateColumns = '68px 1fr';
+        } else {
+          const savedWidth = localStorage.getItem('sidebar_custom_width') || '280';
+          appContainer.style.gridTemplateColumns = `${savedWidth}px 1fr`;
+        }
       });
     }
 
@@ -2631,6 +2647,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
       });
     });
+
+    setupSidebarResizer();
+  }
+
+  function setupSidebarResizer() {
+    const resizer = document.getElementById('sidebar-resizer');
+    const appContainer = document.getElementById('app-container');
+    if (!resizer || !appContainer) return;
+
+    let isResizing = false;
+
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isResizing = true;
+      resizer.classList.add('resizing');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      appContainer.style.transition = 'none';
+    });
+
+    resizer.addEventListener('touchstart', (e) => {
+      isResizing = true;
+      resizer.classList.add('resizing');
+      document.body.style.userSelect = 'none';
+      appContainer.style.transition = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      let newWidth = e.clientX;
+      if (newWidth < 200) newWidth = 200;
+      if (newWidth > 450) newWidth = 450;
+
+      if (!appContainer.classList.contains('sidebar-collapsed')) {
+        state.sidebarWidth = newWidth;
+        localStorage.setItem('sidebar_custom_width', newWidth);
+        appContainer.style.gridTemplateColumns = `${newWidth}px 1fr`;
+      }
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isResizing) return;
+      const touch = e.touches[0];
+      let newWidth = touch.clientX;
+      if (newWidth < 200) newWidth = 200;
+      if (newWidth > 450) newWidth = 450;
+
+      if (!appContainer.classList.contains('sidebar-collapsed')) {
+        state.sidebarWidth = newWidth;
+        localStorage.setItem('sidebar_custom_width', newWidth);
+        appContainer.style.gridTemplateColumns = `${newWidth}px 1fr`;
+      }
+    });
+
+    const stopResize = () => {
+      if (isResizing) {
+        isResizing = false;
+        resizer.classList.remove('resizing');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        appContainer.style.transition = 'grid-template-columns 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+      }
+    };
+
+    document.addEventListener('mouseup', stopResize);
+    document.addEventListener('touchend', stopResize);
   }
 
   // --- GENERAL DE PREP INTEGRATION ---
@@ -3769,6 +3851,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.anim && typeof window.anim.observeRevealTargets === 'function') {
       window.anim.observeRevealTargets(container);
     }
+  }
+
+  let comparisonBlocksHighlighted = false;
+  function highlightComparisonBlocks() {
+    if (comparisonBlocksHighlighted) return;
+    const comparisonCards = document.querySelectorAll('.comparison-card');
+    comparisonCards.forEach(card => {
+      const sections = card.querySelectorAll('.comparison-section');
+      sections.forEach(section => {
+        let lang = '';
+        if (section.classList.contains('lang-python')) lang = 'python';
+        else if (section.classList.contains('lang-pyspark')) lang = 'pyspark';
+        else if (section.classList.contains('lang-sparksql')) lang = 'sparksql';
+        
+        if (!lang) return;
+        const codeEl = section.querySelector('pre code');
+        if (codeEl && !codeEl.dataset.highlighted) {
+          const rawCode = codeEl.textContent;
+          codeEl.innerHTML = Highlighter.highlight(rawCode, lang);
+          codeEl.dataset.highlighted = 'true';
+        }
+      });
+    });
+    comparisonBlocksHighlighted = true;
   }
 
   // --- PERSONALISED PREP VIEW ---

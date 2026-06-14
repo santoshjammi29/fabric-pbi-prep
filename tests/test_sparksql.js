@@ -156,6 +156,26 @@ setTimeout(() => {
   }
   console.log("✅ Successfully verified Syntax Comparison filtering logic.");
 
+  // Test 4: Verify syntax highlighting in comparison cards
+  const firstCard = document.querySelector('.comparison-card');
+  const pythonSection = firstCard.querySelector('.comparison-section.lang-python');
+  const codeEl = pythonSection.querySelector('pre code');
+  
+  // The pre container has the 'code-block' class
+  const preEl = pythonSection.querySelector('pre');
+  if (!preEl.classList.contains('code-block')) {
+    console.error("❌ Test Failed: pre element does not have code-block class.");
+    process.exit(1);
+  }
+  
+  // Let's verify that the code text has some span tag for highlighting (e.g. .kw, .comment)
+  const keywords = codeEl.querySelectorAll('span.kw');
+  if (keywords.length === 0) {
+    console.error("❌ Test Failed: No syntax highlighting keywords (span.kw) found in code block.");
+    process.exit(1);
+  }
+  console.log("✅ Successfully verified syntax highlighting inside comparison code blocks.");
+
   console.log("=== All Spark SQL and Coding Fundamentals DOM tests passed successfully! ===");
   process.exit(0);
 }, 1000);

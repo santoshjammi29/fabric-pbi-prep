@@ -132,6 +132,7 @@
           <button class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Toggle theme">☀️</button>
         </div>
       </div>
+      <div class="sidebar-resizer" id="sidebar-resizer" title="Drag to resize sidebar"></div>
     </aside>
 
     <!-- Mobile Bottom Navigation — all 9 tabs, horizontally scrollable -->
@@ -2114,7 +2115,7 @@ def execute_pipeline(source_df: DataFrame) -&gt; DataFrame:
               <div class="comparison-grid">
                 <div class="comparison-section lang-python">
                   <h5>Python (Pandas / Polars)</h5>
-                  <pre><code>import pandas as pd
+                  <pre class="code-block"><code>import pandas as pd
 # Pandas: In-memory (Single Node)
 df = pd.read_parquet(
     "s3://bucket/data.parquet",
@@ -2128,7 +2129,7 @@ df = pl.scan_parquet("s3://bucket/data.parquet") \
                 </div>
                 <div class="comparison-section lang-pyspark">
                   <h5>PySpark (DataFrame API)</h5>
-                  <pre><code># Programmatic Schema &amp; Read
+                  <pre class="code-block"><code># Programmatic Schema &amp; Read
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 
 schema = StructType([
@@ -2144,7 +2145,7 @@ df = spark.read.format("parquet") \
                 </div>
                 <div class="comparison-section lang-sparksql">
                   <h5>Spark SQL</h5>
-                  <pre><code>-- 1. Read files directly via syntax path
+                  <pre class="code-block"><code>-- 1. Read files directly via syntax path
 SELECT id, name, val
 FROM parquet.`abfss://raw@adls.dfs.core.windows.net/data/`
 WHERE id IS NOT NULL;
@@ -2174,7 +2175,7 @@ LOCATION 'abfss://raw@adls.dfs.core.windows.net/data/';</code></pre>
               <div class="comparison-grid">
                 <div class="comparison-section lang-python">
                   <h5>Python (Pandas / Polars)</h5>
-                  <pre><code># Pandas (Boolean indexing)
+                  <pre class="code-block"><code># Pandas (Boolean indexing)
 df = df[["id", "name", "val"]]
 df = df[(df["val"] > 100) &amp; (df["name"].notna())]
 
@@ -2184,7 +2185,7 @@ df = df.select(["id", "name", "val"]) \
                 </div>
                 <div class="comparison-section lang-pyspark">
                   <h5>PySpark (DataFrame API)</h5>
-                  <pre><code># Using Column objects (compile-time checked)
+                  <pre class="code-block"><code># Using Column objects (compile-time checked)
 from pyspark.sql.functions import col
 
 df = df.select("id", "name", "val") \
@@ -2196,7 +2197,7 @@ df = df.select("id", "name", "val") \
                 </div>
                 <div class="comparison-section lang-sparksql">
                   <h5>Spark SQL</h5>
-                  <pre><code>-- Standard ANSI SQL syntax
+                  <pre class="code-block"><code>-- Standard ANSI SQL syntax
 SELECT id, name, val
 FROM my_table
 WHERE val > 100 
@@ -2224,7 +2225,7 @@ WHERE name &lt;=&gt; 'Unknown'; -- Returns true if both are NULL</code></pre>
               <div class="comparison-grid">
                 <div class="comparison-section lang-python">
                   <h5>Python (Pandas / Polars)</h5>
-                  <pre><code># Pandas Merge &amp; Concatenate
+                  <pre class="code-block"><code># Pandas Merge &amp; Concatenate
 merged_df = pd.merge(df1, df2, on="key", how="left")
 union_df = pd.concat([df1, df2], ignore_index=True)
 
@@ -2234,7 +2235,7 @@ union_pl = pl.concat([df1, df2])</code></pre>
                 </div>
                 <div class="comparison-section lang-pyspark">
                   <h5>PySpark (DataFrame API)</h5>
-                  <pre><code># Broadcast join for small tables (&lt;10MB)
+                  <pre class="code-block"><code># Broadcast join for small tables (&lt;10MB)
 from pyspark.sql.functions import broadcast
 
 joined_df = df1.join(
@@ -2248,7 +2249,7 @@ union_df = df1.unionByName(df2, allowMissingColumns=True)</code></pre>
                 </div>
                 <div class="comparison-section lang-sparksql">
                   <h5>Spark SQL</h5>
-                  <pre><code>-- Broadcast hint for small tables
+                  <pre class="code-block"><code>-- Broadcast hint for small tables
 SELECT /*+ BROADCAST(t2) */ t1.*, t2.val
 FROM table1 t1
 LEFT JOIN table2 t2 ON t1.key = t2.key;
@@ -2276,7 +2277,7 @@ SELECT id, name FROM table2;</code></pre>
               <div class="comparison-grid">
                 <div class="comparison-section lang-python">
                   <h5>Python (Pandas / Polars)</h5>
-                  <pre><code># Pandas GroupBy
+                  <pre class="code-block"><code># Pandas GroupBy
 agg_df = df.groupby("category").agg(
     total_sales=("sales", "sum"),
     avg_price=("price", "mean")
@@ -2290,7 +2291,7 @@ agg_pl = df.group_by("category").agg([
                 </div>
                 <div class="comparison-section lang-pyspark">
                   <h5>PySpark (DataFrame API)</h5>
-                  <pre><code>from pyspark.sql import functions as F
+                  <pre class="code-block"><code>from pyspark.sql import functions as F
 
 agg_df = df.groupBy("category").agg(
     F.sum("sales").alias("total_sales"),
@@ -2299,7 +2300,7 @@ agg_df = df.groupBy("category").agg(
                 </div>
                 <div class="comparison-section lang-sparksql">
                   <h5>Spark SQL</h5>
-                  <pre><code>-- Basic grouping
+                  <pre class="code-block"><code>-- Basic grouping
 SELECT category, 
        SUM(sales) AS total_sales,
        AVG(price) AS avg_price
@@ -2333,7 +2334,7 @@ GROUP BY GROUPING SETS (
               <div class="comparison-grid">
                 <div class="comparison-section lang-python">
                   <h5>Python (Pandas / Polars)</h5>
-                  <pre><code># Pandas (Using transform or cumsum)
+                  <pre class="code-block"><code># Pandas (Using transform or cumsum)
 df["rank"] = df.groupby("dept")["salary"].rank(ascending=False)
 df["running_total"] = df.groupby("dept")["sales"].cumsum()
 
@@ -2345,7 +2346,7 @@ df = df.with_columns([
                 </div>
                 <div class="comparison-section lang-pyspark">
                   <h5>PySpark (DataFrame API)</h5>
-                  <pre><code>from pyspark.sql import Window
+                  <pre class="code-block"><code>from pyspark.sql import Window
 from pyspark.sql import functions as F
 
 window_spec = Window.partitionBy("dept") \
@@ -2361,7 +2362,7 @@ df = df.withColumn("running_total", F.sum("sales").over(running_spec))</code></p
                 </div>
                 <div class="comparison-section lang-sparksql">
                   <h5>Spark SQL</h5>
-                  <pre><code>-- Analytical Dense Rank
+                  <pre class="code-block"><code>-- Analytical Dense Rank
 SELECT dept, name, salary,
        DENSE_RANK() OVER (
            PARTITION BY dept 
@@ -2395,7 +2396,7 @@ FROM sales_records;</code></pre>
               <div class="comparison-grid">
                 <div class="comparison-section lang-python">
                   <h5>Python (Pandas / Polars)</h5>
-                  <pre><code># Pandas Parquet / Delta write
+                  <pre class="code-block"><code># Pandas Parquet / Delta write
 df.to_parquet("s3://bucket/data.parquet", index=False)
 # Write delta (using deltalake library)
 from deltalake.writer import write_deltalake
@@ -2406,7 +2407,7 @@ df.write_parquet("s3://bucket/data.parquet")</code></pre>
                 </div>
                 <div class="comparison-section lang-pyspark">
                   <h5>PySpark (DataFrame API)</h5>
-                  <pre><code># Delta Lake Insert/Upsert (DML)
+                  <pre class="code-block"><code># Delta Lake Insert/Upsert (DML)
 from delta.tables import DeltaTable
 
 delta_table = DeltaTable.forPath(spark, "abfss://silver/employees")
@@ -2426,7 +2427,7 @@ delta_table.alias("target").merge(
                 </div>
                 <div class="comparison-section lang-sparksql">
                   <h5>Spark SQL</h5>
-                  <pre><code>-- Delta Lake ACID MERGE (Upsert)
+                  <pre class="code-block"><code>-- Delta Lake ACID MERGE (Upsert)
 MERGE INTO silver.employees AS target
 USING staging_employees AS source
 ON target.id = source.id

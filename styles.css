@@ -7711,6 +7711,30 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .sidebar {
   transition: padding 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+}
+
+/* Sidebar Resizer drag handle styles */
+.sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 1000;
+  transition: background 0.2s ease;
+}
+
+.sidebar-resizer:hover,
+.sidebar-resizer.resizing {
+  background: rgba(108, 92, 231, 0.2);
+}
+
+.sidebar-collapsed .sidebar-resizer {
+  display: none;
+  pointer-events: none;
 }
 
 .sidebar-collapsed .sidebar {
@@ -7745,6 +7769,15 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   overflow: hidden;
 }
 
+.brand-icon {
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.sidebar-collapsed .brand-icon {
+  width: 42px;
+  height: 42px;
+}
+
 .nav-text {
   transition: opacity 0.15s ease, width 0.15s ease, visibility 0.15s;
   opacity: 1;
@@ -7762,12 +7795,15 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .nav-btn {
   justify-content: flex-start;
-  transition: padding 0.3s ease, justify-content 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar-collapsed .nav-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
   justify-content: center;
-  padding: 0.65rem 0;
+  margin: 0 auto;
 }
 
 .theme-toggle-label {
@@ -7786,11 +7822,25 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 }
 
 .theme-toggle-container {
-  transition: justify-content 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar-collapsed .theme-toggle-container {
+  background: transparent;
+  padding: 0;
+  border: none;
   justify-content: center;
+}
+
+.theme-toggle-btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar-collapsed .theme-toggle-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  margin: 0 auto;
 }
 
 .sidebar-toggle-btn {
@@ -7803,7 +7853,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   flex-shrink: 0;
 }
 
@@ -7814,6 +7864,17 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .sidebar-toggle-btn svg {
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar-collapsed .sidebar-toggle-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  margin: 0 auto;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-collapsed .sidebar-toggle-btn svg {
