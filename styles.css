@@ -7694,4 +7694,130 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   color: var(--accent);
 }
 
+/* -----------------------------------------------------------------------
+   SIDEBAR MINIMIZE/EXPAND TOGGLE STYLES
+   ----------------------------------------------------------------------- */
+#app-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  width: 100%;
+  min-height: 100vh;
+  transition: grid-template-columns 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#app-container.sidebar-collapsed {
+  grid-template-columns: 68px 1fr;
+}
+
+.sidebar {
+  transition: padding 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar-collapsed .sidebar {
+  padding: 1.25rem 0.5rem;
+}
+
+.brand {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar-collapsed .brand {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center !important;
+}
+
+.brand-text {
+  transition: opacity 0.15s ease, width 0.15s ease, visibility 0.15s;
+  opacity: 1;
+  visibility: visible;
+  width: auto;
+}
+
+.sidebar-collapsed .brand-text {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.nav-text {
+  transition: opacity 0.15s ease, width 0.15s ease, visibility 0.15s;
+  opacity: 1;
+  visibility: visible;
+  white-space: nowrap;
+}
+
+.sidebar-collapsed .nav-text {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+.nav-btn {
+  justify-content: flex-start;
+  transition: padding 0.3s ease, justify-content 0.3s ease;
+}
+
+.sidebar-collapsed .nav-btn {
+  justify-content: center;
+  padding: 0.65rem 0;
+}
+
+.theme-toggle-label {
+  transition: opacity 0.15s ease, width 0.15s ease, visibility 0.15s;
+  opacity: 1;
+  visibility: visible;
+  white-space: nowrap;
+}
+
+.sidebar-collapsed .theme-toggle-label {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+.theme-toggle-container {
+  transition: justify-content 0.3s ease;
+}
+
+.sidebar-collapsed .theme-toggle-container {
+  justify-content: center;
+}
+
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  color: var(--primary);
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.sidebar-toggle-btn svg {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar-collapsed .sidebar-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
 

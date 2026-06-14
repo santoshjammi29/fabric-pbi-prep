@@ -75,14 +75,21 @@
 
     <!-- Sidebar Navigation (Desktop only) -->
     <aside class="sidebar" id="sidebar-nav">
-      <div class="brand">
-        <div class="brand-icon">
-          <img src="assets/logo_brand.svg" alt="Microsoft Azure Logo" style="width: 24px; height: 24px; object-fit: contain;">
+      <div class="brand" style="justify-content: space-between; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="brand-icon">
+            <img src="assets/logo_brand.svg" alt="Microsoft Azure Logo" style="width: 24px; height: 24px; object-fit: contain;">
+          </div>
+          <div class="brand-text">
+            <h1>Microsoft Data Platform</h1>
+            <span>Architect Prep</span>
+          </div>
         </div>
-        <div class="brand-text">
-          <h1>Microsoft Data Platform</h1>
-          <span>Architect Prep</span>
-        </div>
+        <button class="sidebar-toggle-btn" id="btn-sidebar-toggle" aria-label="Toggle sidebar" title="Minimize Sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
       </div>
       
       <nav style="width:100%;">
@@ -90,33 +97,31 @@
           <li class="nav-item">
             <button class="nav-btn active" id="btn-nav-concepts" data-target="view-concepts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
-              Key Concepts
+              <span class="nav-text">Key Concepts</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-prep-hub" data-target="view-prep-hub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              Interview Prep Hub
+              <span class="nav-text">Interview Prep Hub</span>
             </button>
-            <!-- Hidden nav buttons for Puppeteer tests compatibility removed from here -->
           </li>
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-cheatsheet" data-target="view-cheatsheet">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              Code Deepdive
+              <span class="nav-text">Code Deepdive</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-spark" data-target="view-spark-hub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Spark Hub
+              <span class="nav-text">Spark Hub</span>
             </button>
-            <!-- Hidden nav buttons for Puppeteer tests compatibility removed from here -->
           </li>
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-gcc" data-target="view-gcc">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              GCC Directory
+              <span class="nav-text">GCC Directory</span>
             </button>
           </li>
         </ul>

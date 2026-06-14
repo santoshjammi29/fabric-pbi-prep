@@ -565,6 +565,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadTheme();
+
+    // Restore sidebar minimized preference
+    const isSidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+    if (isSidebarCollapsed) {
+      document.getElementById('app-container')?.classList.add('sidebar-collapsed');
+    }
+
     loadProgress();
     setupEventListeners();
     
@@ -2208,6 +2215,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- EVENT LISTENERS REGISTRATION ---
   
   function setupEventListeners() {
+    // Sidebar Minimize/Expand Toggle
+    const btnSidebarToggle = document.getElementById('btn-sidebar-toggle');
+    const appContainer = document.getElementById('app-container');
+    if (btnSidebarToggle && appContainer) {
+      btnSidebarToggle.addEventListener('click', () => {
+        const collapsed = appContainer.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebar_collapsed', collapsed);
+      });
+    }
+
     // Navigation Views Switch
     DOM.navBtns.forEach(btn => {
       btn.addEventListener('click', () => {
