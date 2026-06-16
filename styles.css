@@ -334,7 +334,6 @@ body {
 /* Main Content Area */
 .main-content {
   padding: 2rem 3rem;
-  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
   height: 100vh;
   overflow-y: auto;
   position: relative;
@@ -1416,7 +1415,7 @@ body {
 @media (max-width: 900px) {
   /* Layout: single column, no sidebar */
   #app-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
@@ -1520,9 +1519,10 @@ body {
 
 }
 
-/* ---- On desktop: hide the mobile top bar only; keep the bottom pill nav ---- */
+/* ---- On desktop: hide both the mobile top bar and the bottom nav bar ---- */
 @media (min-width: 901px) {
-  .mobile-top-bar {
+  .mobile-top-bar,
+  .mobile-bottom-nav {
     display: none !important;
   }
 }
@@ -5510,7 +5510,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .spark-sim-grid {
   display: grid;
-  grid-template-columns: 1fr 1.4fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
   align-items: center;
   min-height: 280px;
@@ -7647,7 +7647,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   margin-bottom: 1.25rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1250px) {
   .comparison-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -7901,6 +7901,15 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 .sidebar-collapsed .sidebar-toggle-btn svg {
   transform: rotate(180deg);
+}
+
+/* --- Large Desktop Screens Max-Width Constraint --- */
+@media (min-width: 1600px) {
+  .page-view {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 
