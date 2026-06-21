@@ -119,6 +119,12 @@
             </button>
           </li>
           <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-architecture" data-target="view-architecture">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span class="nav-text">Architecture Hub</span>
+            </button>
+          </li>
+          <li class="nav-item">
             <button class="nav-btn" id="btn-nav-gcc" data-target="view-gcc">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
               <span class="nav-text">GCC Directory</span>
@@ -154,6 +160,10 @@
         <button class="mobile-nav-tab" data-target="view-spark-hub" id="mbn-spark">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           <span>Spark Hub</span>
+        </button>
+        <button class="mobile-nav-tab" data-target="view-architecture" id="mbn-architecture">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Arch Hub</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-gcc" id="mbn-gcc">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -3397,6 +3407,85 @@ WHEN NOT MATCHED THEN
                 <!-- Injected dynamically -->
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. ENTERPRISE DATA ARCHITECTURE HUB -->
+      <section class="page-view hidden" id="view-architecture">
+        <header class="page-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div>
+              <h2 class="page-title">Enterprise Data Architecture Hub</h2>
+              <p class="page-subtitle">Master advanced data modeling, storage tiering, real-time streaming, and LLM orchestration at scale.</p>
+            </div>
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="prep-hub-content-container">
+          <div id="view-architecture-search" class="prep-hub-subview-always">
+            
+            <div class="prep-section-header reveal-on-scroll">
+              <div class="prep-section-header-icon">🏗️</div>
+              <div class="prep-section-header-content">
+                <h3 class="prep-section-header-title gradient-text">Architecture Q&A Explorer</h3>
+                <p class="prep-section-header-desc">Search and filter 2,400+ expert-level architecture Q&As across 16 core enterprise domains.</p>
+              </div>
+            </div>
+
+            <!-- Horizontal Filter Stack -->
+            <div class="qa-hfilter-stack reveal-on-scroll">
+              <!-- Search Input & Difficulty Selector -->
+              <div class="qa-hfilter-row" style="gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <div class="qa-search-wrapper" style="flex: 1; min-width: 200px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input type="text" class="qa-search-input" id="architecture-search-input" placeholder="Search architecture concepts, code patterns, gotchas...">
+                </div>
+                
+                <div class="qa-chips-scroll" id="architecture-difficulty-selector" style="flex: none;">
+                  <button class="qa-sidebar-btn active" data-difficulty="ALL">
+                    <span>All Levels</span>
+                    <span class="qa-btn-count-badge" id="arch-count-diff-all">0</span>
+                  </button>
+                  <button class="qa-sidebar-btn" data-difficulty="EASY">
+                    <span class="qa-pill-dot" style="color:#22c55e;background:#22c55e;"></span>
+                    <span>Easy</span>
+                    <span class="qa-btn-count-badge" id="arch-count-diff-easy">0</span>
+                  </button>
+                  <button class="qa-sidebar-btn" data-difficulty="MEDIUM">
+                    <span class="qa-pill-dot" style="color:#3b82f6;background:#3b82f6;"></span>
+                    <span>Medium</span>
+                    <span class="qa-btn-count-badge" id="arch-count-diff-medium">0</span>
+                  </button>
+                  <button class="qa-sidebar-btn" data-difficulty="HARD">
+                    <span class="qa-pill-dot" style="color:#f97316;background:#f97316;"></span>
+                    <span>Hard</span>
+                    <span class="qa-btn-count-badge" id="arch-count-diff-hard">0</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Horizontal scroll for 16 topics + ALL -->
+              <div class="qa-hfilter-row" style="margin-bottom: 0.5rem;">
+                <div class="qa-chips-scroll topics-scrollbar" id="architecture-topic-selector" style="width: 100%; padding-bottom: 4px;">
+                  <!-- Dynamically populated in app.js -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Count display -->
+            <div class="qa-results-meta reveal-on-scroll" style="margin-bottom: 1.25rem;">
+              <span class="qa-results-count" id="architecture-match-count">Showing 0 matching questions</span>
+            </div>
+
+            <!-- Q&A List Container -->
+            <div class="qa-results-container" id="architecture-search-results">
+              <!-- Dynamically populated -->
+            </div>
+
           </div>
         </div>
       </section>

@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "python3 scripts/compile_db.py",
-    "test": "node tests/test_ui.js && node tests/test_dom.js && node tests/test_portal.js && node tests/test_explainer.js && node tests/test_cheatsheet.js && node tests/test_personalised.js && node tests/test_concepts.js && node tests/test_gcc.js && node tests/test_sparksql.js && node tests/test_sidebar.js",
+    "test": "node tests/test_ui.js && node tests/test_dom.js && node tests/test_portal.js && node tests/test_explainer.js && node tests/test_cheatsheet.js && node tests/test_personalised.js && node tests/test_concepts.js && node tests/test_gcc.js && node tests/test_sparksql.js && node tests/test_sidebar.js && node tests/test_architecture.js",
     "deploy": "npx vercel --prod",
     "deploy:preview": "npx vercel"
   },

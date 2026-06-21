@@ -87,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
     activePracticeCategory: 'ALL',
     expandedPracticeSections: {},
     
+    // Architecture Hub State
+    activeArchitectureTopic: 'ALL',
+    activeArchitectureDifficulty: 'ALL',
+    expandedArchitectureSections: {},
+    architectureSectionLimits: {},
+    
     // Concept Explainer State
     activeExplainerDifficulty: 'ALL',
     activeExplainerCategory: 'ALL',
@@ -201,7 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'mssql': 'data_mssql.js?v=1.0.2',
     'pyspark': 'data_pyspark.js?v=1.0.2',
     'sparksql': 'data_sparksql.js?v=1.0.2',
-    'personalised': 'data_personalised.js?v=1.5.0'
+    'personalised': 'data_personalised.js?v=1.5.0',
+    'architecture': 'data_architecture.js?v=1.0.0'
   };
 
   const DATASET_GLOBALS = {
@@ -212,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'mssql': 'MSSQL_DATA',
     'pyspark': 'PYSPARK_DATA',
     'sparksql': 'SPARKSQL_DATA',
-    'personalised': 'PERSONALISED_QUESTIONS'
+    'personalised': 'PERSONALISED_QUESTIONS',
+    'architecture': 'ARCHITECTURE_DATA'
   };
 
   function ensureDatasetsLoaded(keys) {
@@ -477,6 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (viewId === 'view-prep-hub') {
       return ['fabric_pbi', 'general', 'personalised', 'python', 'mssql', 'pyspark', 'sparksql'];
     }
+    if (viewId === 'view-architecture') return ['architecture'];
     return [];
   }
 
@@ -599,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let initialView = 'view-concepts';
     const hash = window.location.hash;
     const validViews = ['view-prep-hub', 'view-spark-hub', 'view-gcc', 'view-concepts', 'view-cheatsheet',
-                        'view-personalised', 'view-general-de', 'view-practice', 'view-explainer', 'view-spark', 'view-pyspark', 'view-unified-search'];
+                        'view-personalised', 'view-general-de', 'view-practice', 'view-explainer', 'view-spark', 'view-pyspark', 'view-unified-search', 'view-architecture'];
     if (hash && (document.getElementById(hash.substring(1)) || validViews.includes(hash.substring(1)))) {
       initialView = hash.substring(1);
     } else {
@@ -629,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initConcepts();
       initCheatsheet();
       initPersonalised();
+      initArchitectureHub();
       updateUnifiedSearchCounts();
 
       if (initialView === 'view-prep-hub') {
@@ -970,6 +980,8 @@ document.addEventListener('DOMContentLoaded', () => {
           targetSubTabId = localStorage.getItem('interview_prep_active_spark_subtab') || 'view-spark';
         }
         switchSparkHubSubTab(targetSubTabId);
+      } else if (actualTargetViewId === 'view-architecture') {
+        renderArchitectureHub();
       }
       
       // Scroll back to top on view switch, unless navigating to a specific sub-tab inside Prep Hub or Spark Hub
@@ -4777,6 +4789,418 @@ document.addEventListener('DOMContentLoaded', () => {
 
       DOM.prephub.unifiedSearchContainer.appendChild(sectionWrapper);
     });
+  }
+
+  // --- ENTERPRISE DATA ARCHITECTURE HUB IMPLEMENTATION ---
+  
+  function renderArchitectureHub(resetResults = true) {
+    const searchInput = document.getElementById('architecture-search-input');
+    const resultsContainer = document.getElementById('architecture-search-results');
+    const matchCountDisplay = document.getElementById('architecture-match-count');
+    const difficultySelector = document.getElementById('architecture-difficulty-selector');
+    const topicSelector = document.getElementById('architecture-topic-selector');
+
+    if (!resultsContainer) return;
+
+    if (resetResults) {
+      state.architectureSectionLimits = {};
+    }
+    resultsContainer.innerHTML = '';
+
+    const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    const diffFilter = state.activeArchitectureDifficulty || 'ALL';
+    const topicFilter = state.activeArchitectureTopic || 'ALL';
+
+    const pool = window.ARCHITECTURE_DATA || [];
+
+    // Filter items
+    const filtered = pool.filter(q => {
+      // 1. Text Search Filter
+      const qText = (q.question || '').toLowerCase();
+      const aText = (q.answer || '').toLowerCase();
+      const catText = (q.category || '').toLowerCase();
+      const matchesSearch = !query || qText.includes(query) || aText.includes(query) || catText.includes(query);
+      if (!matchesSearch) return false;
+
+      // 2. Topic Filter
+      if (topicFilter !== 'ALL') {
+        if (q.category !== topicFilter) return false;
+      }
+
+      // 3. Difficulty Filter
+      if (diffFilter !== 'ALL') {
+        if (q.difficulty !== diffFilter) return false;
+      }
+
+      return true;
+    });
+
+    // Update match count display
+    if (matchCountDisplay) {
+      matchCountDisplay.textContent = `Showing ${filtered.length.toLocaleString()} matching questions`;
+    }
+
+    // Populate topic selector chips dynamically if empty
+    if (topicSelector && topicSelector.children.length === 0) {
+      // Get unique topics from pool
+      const uniqueTopics = [...new Set(pool.map(q => q.category))].sort();
+      let chipsHtml = `
+        <button class="topic-chip ${state.activeArchitectureTopic === 'ALL' ? 'active' : ''}" data-topic="ALL">
+          <span>All Topics</span>
+        </button>
+      `;
+      uniqueTopics.forEach(topic => {
+        const isActive = state.activeArchitectureTopic === topic;
+        chipsHtml += `
+          <button class="topic-chip ${isActive ? 'active' : ''}" data-topic="${escapeHTML(topic)}">
+            <span>${escapeHTML(topic)}</span>
+          </button>
+        `;
+      });
+      topicSelector.innerHTML = chipsHtml;
+
+      // Bind click events on chips
+      topicSelector.querySelectorAll('.topic-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          topicSelector.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.activeArchitectureTopic = chip.getAttribute('data-topic');
+          renderArchitectureHub(true);
+        });
+      });
+    }
+
+    // Update difficulty counts
+    updateArchitectureDifficultyCounts(query, topicFilter);
+
+    if (filtered.length === 0) {
+      resultsContainer.innerHTML = `
+        <div class="no-results-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border: 1px dashed var(--card-border); border-radius: 16px;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1.25rem; color: var(--text-secondary); opacity: 0.4;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">No matching questions found</h4>
+          <p style="color: var(--text-secondary); font-size: 0.88rem;">Try adjusting your filters or search keywords.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Group items into categories (topics)
+    const sections = {};
+    filtered.forEach(item => {
+      const topicName = item.category;
+      if (!sections[topicName]) {
+        sections[topicName] = [];
+      }
+      sections[topicName].push(item);
+    });
+
+    const activeSections = Object.keys(sections).sort();
+
+    // If resetResults and activeSections has elements, expand the first one by default
+    if (resetResults && activeSections.length > 0) {
+      state.expandedArchitectureSections = {};
+      state.expandedArchitectureSections[activeSections[0]] = true;
+    }
+
+    let overallIdx = 1;
+
+    activeSections.forEach(sectKey => {
+      const sectItems = sections[sectKey];
+      if (!sectItems || sectItems.length === 0) return;
+
+      const isExpanded = !!state.expandedArchitectureSections[sectKey];
+      const limit = state.architectureSectionLimits[sectKey] || 30;
+
+      // Section Wrapper
+      const sectionWrapper = document.createElement('div');
+      sectionWrapper.className = 'unified-section-wrapper reveal-on-scroll';
+      sectionWrapper.style.marginBottom = '1.25rem';
+      sectionWrapper.style.border = '1px solid var(--card-border)';
+      sectionWrapper.style.borderRadius = '16px';
+      sectionWrapper.style.overflow = 'hidden';
+      sectionWrapper.style.transition = 'all 0.3s ease';
+
+      // Header
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'unified-section-header';
+      headerDiv.style.cursor = 'pointer';
+      headerDiv.style.display = 'flex';
+      headerDiv.style.alignItems = 'center';
+      headerDiv.style.justifyContent = 'space-between';
+      headerDiv.style.padding = '1.1rem 1.5rem';
+      headerDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+      headerDiv.style.transition = 'background 0.2s';
+      
+      headerDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.15rem;">📁</span>
+          <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.02em;">${escapeHTML(sectKey)}</span>
+          <span style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; font-weight: 600;">${sectItems.length}</span>
+        </div>
+        <svg class="section-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease; transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}; color: var(--text-secondary);"><polyline points="6 9 12 15 18 9"/></svg>
+      `;
+
+      sectionWrapper.appendChild(headerDiv);
+
+      // Body (only rendered/expanded if active)
+      const bodyDiv = document.createElement('div');
+      bodyDiv.className = 'unified-section-body';
+      bodyDiv.style.display = isExpanded ? 'block' : 'none';
+      bodyDiv.style.padding = '1.5rem';
+      bodyDiv.style.borderTop = '1px solid var(--card-border)';
+      bodyDiv.style.background = 'rgba(0, 0, 0, 0.1)';
+
+      if (isExpanded) {
+        // Section sub-header controls (counts and expand/collapse pills)
+        const subHeaderDiv = document.createElement('div');
+        subHeaderDiv.className = 'qa-section-controls';
+        subHeaderDiv.style.display = 'flex';
+        subHeaderDiv.style.justifyContent = 'space-between';
+        subHeaderDiv.style.alignItems = 'center';
+        subHeaderDiv.style.marginBottom = '1.25rem';
+        subHeaderDiv.style.padding = '0.5rem 1rem';
+        subHeaderDiv.style.background = 'rgba(255, 255, 255, 0.02)';
+        subHeaderDiv.style.borderRadius = '10px';
+        subHeaderDiv.style.border = '1px solid var(--card-border)';
+        
+        // Count text
+        const countText = document.createElement('span');
+        countText.style.fontSize = '0.8rem';
+        countText.style.fontWeight = '600';
+        countText.style.color = 'var(--text-secondary)';
+        countText.textContent = `Showing ${Math.min(limit, sectItems.length)} of ${sectItems.length} matching questions`;
+        subHeaderDiv.appendChild(countText);
+        
+        // Pill Buttons Container
+        const pillsContainer = document.createElement('div');
+        pillsContainer.style.display = 'flex';
+        pillsContainer.style.gap = '0.5rem';
+        
+        const expandPill = document.createElement('button');
+        expandPill.className = 'control-btn';
+        expandPill.style.padding = '0.3rem 0.6rem';
+        expandPill.style.fontSize = '0.7rem';
+        expandPill.style.borderRadius = '6px';
+        expandPill.style.cursor = 'pointer';
+        expandPill.style.border = '1px solid var(--card-border)';
+        expandPill.style.background = 'rgba(255, 255, 255, 0.02)';
+        expandPill.style.color = 'var(--text-secondary)';
+        expandPill.textContent = 'Expand All';
+        expandPill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.add('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) {
+              body.style.display = 'block';
+              if (body.dataset.rendered === 'false') {
+                const qId = card.dataset.qId;
+                const item = pool.find(qi => qi.id === qId);
+                if (item) {
+                  body.innerHTML = formatMarkdownToHTML(item.answer);
+                  body.dataset.rendered = 'true';
+                }
+              }
+            }
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+          });
+        });
+        
+        const collapsePill = document.createElement('button');
+        collapsePill.className = 'control-btn';
+        collapsePill.style.padding = '0.3rem 0.6rem';
+        collapsePill.style.fontSize = '0.7rem';
+        collapsePill.style.borderRadius = '6px';
+        collapsePill.style.cursor = 'pointer';
+        collapsePill.style.border = '1px solid var(--card-border)';
+        collapsePill.style.background = 'rgba(255, 255, 255, 0.02)';
+        collapsePill.style.color = 'var(--text-secondary)';
+        collapsePill.textContent = 'Collapse All';
+        collapsePill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subGrid.querySelectorAll('.concept-accordion-card').forEach(card => {
+            card.classList.remove('expanded');
+            const body = card.querySelector('.level-card-body');
+            if (body) body.style.display = 'none';
+            const chevron = card.querySelector('.level-chevron');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+          });
+        });
+        
+        pillsContainer.appendChild(expandPill);
+        pillsContainer.appendChild(collapsePill);
+        subHeaderDiv.appendChild(pillsContainer);
+        
+        bodyDiv.appendChild(subHeaderDiv);
+
+        // Render sub-grid
+        const subGrid = document.createElement('div');
+        subGrid.className = 'concepts-grid';
+        bodyDiv.appendChild(subGrid);
+
+        // Slice items
+        const visibleSectItems = sectItems.slice(0, limit);
+        visibleSectItems.forEach(q => {
+          const card = document.createElement('div');
+          card.className = 'concept-accordion-card';
+          card.dataset.qId = q.id;
+          
+          let badgeBg = 'var(--accent)';
+          if (q.difficulty === 'EASY') {
+            badgeBg = '#22c55e';
+          } else if (q.difficulty === 'MEDIUM') {
+            badgeBg = '#3b82f6';
+          } else if (q.difficulty === 'HARD') {
+            badgeBg = '#f97316';
+          }
+
+          const cardHeader = document.createElement('div');
+          cardHeader.className = 'level-card-header';
+          cardHeader.style.cursor = 'pointer';
+          cardHeader.innerHTML = `
+            <div class="level-badge" style="background: ${badgeBg}; color: #fff; font-size: 0.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">${overallIdx++}</div>
+            <div class="level-meta" style="flex: 1; min-width: 0;">
+              <div style="margin-bottom: 4px;">
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">${escapeHTML(q.niche)}</span>
+              </div>
+              <h4 class="level-title" style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary);">${escapeHTML(q.question)}</h4>
+            </div>
+            <svg class="level-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.25s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+          `;
+
+          const cardBody = document.createElement('div');
+          cardBody.className = 'level-card-body';
+          cardBody.style.display = 'none';
+          cardBody.style.borderTop = '1px solid var(--card-border)';
+          cardBody.style.padding = '1.25rem';
+          cardBody.style.background = 'rgba(255, 255, 255, 0.01)';
+          cardBody.dataset.rendered = 'false';
+
+          card.appendChild(cardHeader);
+          card.appendChild(cardBody);
+
+          // Card Expand Toggle
+          cardHeader.addEventListener('click', () => {
+            const isOpen = cardBody.style.display !== 'none';
+            const chevron = cardHeader.querySelector('.level-chevron');
+            if (chevron) {
+              chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+            if (isOpen) {
+              cardBody.style.display = 'none';
+              card.classList.remove('expanded');
+            } else {
+              if (cardBody.dataset.rendered === 'false') {
+                cardBody.innerHTML = formatMarkdownToHTML(q.answer);
+                cardBody.dataset.rendered = 'true';
+              }
+              cardBody.style.display = 'block';
+              card.classList.add('expanded');
+            }
+          });
+
+          subGrid.appendChild(card);
+        });
+
+        // Load More button inside section
+        if (sectItems.length > limit) {
+          const loadMoreWrap = document.createElement('div');
+          loadMoreWrap.style.display = 'flex';
+          loadMoreWrap.style.justifyContent = 'center';
+          loadMoreWrap.style.marginTop = '1.5rem';
+
+          const loadMoreBtn = document.createElement('button');
+          loadMoreBtn.className = 'de-load-more-btn';
+          loadMoreBtn.style.padding = '0.5rem 1.5rem';
+          loadMoreBtn.style.fontSize = '0.85rem';
+          loadMoreBtn.textContent = `Show More Questions (showing ${limit} of ${sectItems.length})`;
+          
+          loadMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.architectureSectionLimits[sectKey] = limit + 30;
+            renderArchitectureHub(false);
+          });
+
+          loadMoreWrap.appendChild(loadMoreBtn);
+          bodyDiv.appendChild(loadMoreWrap);
+        }
+      }
+
+      sectionWrapper.appendChild(bodyDiv);
+
+      // Section Header Click Listener
+      let _sectionToggleTimeout;
+      headerDiv.addEventListener('click', () => {
+        state.expandedArchitectureSections[sectKey] = !state.expandedArchitectureSections[sectKey];
+        clearTimeout(_sectionToggleTimeout);
+        _sectionToggleTimeout = setTimeout(() => renderArchitectureHub(false), 60);
+      });
+
+      resultsContainer.appendChild(sectionWrapper);
+    });
+  }
+
+  function updateArchitectureDifficultyCounts(query, topicFilter) {
+    const pool = window.ARCHITECTURE_DATA || [];
+    const counts = { ALL: 0, EASY: 0, MEDIUM: 0, HARD: 0 };
+
+    pool.forEach(q => {
+      const matchesQuery = !query || 
+                           (q.question || '').toLowerCase().includes(query) || 
+                           (q.answer || '').toLowerCase().includes(query) || 
+                           (q.category || '').toLowerCase().includes(query);
+      if (!matchesQuery) return;
+
+      if (topicFilter !== 'ALL' && q.category !== topicFilter) return;
+
+      counts.ALL++;
+      if (counts[q.difficulty] !== undefined) {
+        counts[q.difficulty]++;
+      }
+    });
+
+    const badgeAll = document.getElementById('arch-count-diff-all');
+    const badgeEasy = document.getElementById('arch-count-diff-easy');
+    const badgeMedium = document.getElementById('arch-count-diff-medium');
+    const badgeHard = document.getElementById('arch-count-diff-hard');
+
+    if (badgeAll) badgeAll.textContent = counts.ALL;
+    if (badgeEasy) badgeEasy.textContent = counts.EASY;
+    if (badgeMedium) badgeMedium.textContent = counts.MEDIUM;
+    if (badgeHard) badgeHard.textContent = counts.HARD;
+  }
+
+  function initArchitectureHub() {
+    setupArchitectureListeners();
+    renderArchitectureHub();
+  }
+
+  function setupArchitectureListeners() {
+    const searchInput = document.getElementById('architecture-search-input');
+    const difficultySelector = document.getElementById('architecture-difficulty-selector');
+
+    if (searchInput) {
+      let _archSearchDebounce;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(_archSearchDebounce);
+        _archSearchDebounce = setTimeout(() => {
+          renderArchitectureHub(true);
+        }, 150);
+      });
+    }
+
+    if (difficultySelector) {
+      const diffBtns = difficultySelector.querySelectorAll('.qa-sidebar-btn');
+      diffBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          diffBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.activeArchitectureDifficulty = btn.getAttribute('data-difficulty') || 'ALL';
+          renderArchitectureHub(true);
+        });
+      });
+    }
   }
 
   function updateUnifiedSearchCounts() {
