@@ -4289,11 +4289,12 @@ pre.code-block {
   line-height: 1.6;
   color: #e2e8f0;
   scrollbar-width: thin;
-  /* Fix M: Prevent code blocks from overflowing card on mobile */
   max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
-  word-break: break-all;
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .theme-light pre.code-block {
@@ -4321,7 +4322,7 @@ pre.code-block::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Ensure no double lines or text wrap on nested code element */
+/* Ensure no double lines — code inherits wrapping from pre parent */
 .code-block code,
 pre.code-block code,
 .code-wrapper pre code {
@@ -4330,8 +4331,9 @@ pre.code-block code,
   padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;
-  word-break: normal !important;
-  white-space: pre !important;
+  word-break: break-word !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
   display: block;
 }
 
