@@ -2796,7 +2796,10 @@ code {
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .level-chevron {
@@ -5414,9 +5417,15 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 /* --- Milestone Cards --- */
 .spark-milestone-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   margin-bottom: 2rem;
+}
+@media (min-width: 600px) {
+  .spark-milestone-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 960px) {
+  .spark-milestone-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 .spark-milestone-card {
@@ -5559,8 +5568,11 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-  align-items: center;
-  min-height: 280px;
+  align-items: stretch;
+  min-height: 200px;
+}
+@media (min-width: 640px) {
+  .spark-sim-grid { grid-template-columns: 1fr 1.2fr 1fr; min-height: 260px; }
 }
 
 .spark-sim-column {
@@ -5768,6 +5780,14 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   align-items: center;
   margin-bottom: 1rem;
 }
+.spark-sim-controls .spark-sim-select {
+  flex: 1;
+  min-width: 0;
+}
+.spark-sim-controls .spark-sim-run-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 
 .spark-sim-select {
   background: rgba(255,255,255,0.05);
@@ -5813,20 +5833,44 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 }
 
 /* --- Memory Allocator Redesign --- */
+
+/* Memory mapper two-column layout: sliders left, chart right on medium+ */
+.spark-memory-mapper-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .spark-memory-mapper-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+}
+
 /* Donut Chart styles */
 .spark-memory-chart-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+@media (min-width: 480px) {
+  .spark-memory-chart-container {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
 }
 
 .spark-memory-pie-chart {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   background: conic-gradient(#ef4444 0% 10%, #7c3aed 10% 45%, #d97706 45% 80%, #0d9488 80% 100%);
   display: flex;
@@ -5836,11 +5880,12 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   flex-shrink: 0;
   border: 1px solid var(--card-border);
   transition: background 0.3s ease;
+  margin: 0 auto;
 }
 
 .spark-memory-pie-center {
-  width: 115px;
-  height: 115px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: var(--card-bg);
   display: flex;
@@ -5852,30 +5897,23 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 }
 
 .spark-memory-chart-container .spark-mem-legend {
-  grid-template-columns: repeat(2, 1fr) !important;
-  flex-grow: 1;
+  flex: 1;
+  min-width: 0;
   width: 100%;
-}
-
-@media (max-width: 900px) {
-  .spark-memory-chart-container {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
 }
 
 .spark-mem-legend {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.6rem;
-  margin-top: 0.5rem;
+  margin-top: 0;
 }
 
 @media (min-width: 640px) {
-  .spark-mem-legend {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .spark-mem-legend { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .spark-mem-legend { grid-template-columns: repeat(4, 1fr); }
 }
 
 .spark-mem-legend-item {
@@ -6326,18 +6364,22 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   grid-template-columns: 1fr;
   gap: 1.5rem;
 }
+@media (min-width: 900px) {
+  .spark-two-col { grid-template-columns: 5fr 4fr; }
+}
 
 @media (min-width: 1024px) {
-  .spark-two-col { grid-template-columns: 5fr 4fr; }
   .spark-sim-grid { grid-template-columns: 1fr 1.4fr 1fr; }
   .spark-hero-icon-cluster { display: block; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .spark-hero-icon-cluster { display: none; }
   .spark-sim-grid { grid-template-columns: 1fr; gap: 0.5rem; }
   .spark-section-card { padding: 1.25rem; }
   .spark-hero-banner { padding: 1.5rem 1.25rem; }
+  .spark-section-title { font-size: 1.15rem; }
+  .spark-hero-title { font-size: clamp(1.3rem, 5vw, 1.8rem); }
 }
 
 /* --- Category filter buttons for lexicon --- */
@@ -6361,16 +6403,18 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 
 /* --- Premium Theme, Layout, and Visual Polish Overrides --- */
 
-/* 1. Responsive Desktop 2-Column Grid for Simulator Layout */
+/* 1. Responsive 2-Column Grid for Simulator Panel + Log */
 #sim-layout-grid {
   display: grid !important;
   grid-template-columns: 1fr;
   gap: 1.25rem;
 }
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   #sim-layout-grid {
     grid-template-columns: 1.8fr 1fr !important;
+    align-items: stretch;
   }
+  .spark-sim-log-panel { height: 100%; }
 }
 
 /* 2. Card Border Radiuses Standardisation */

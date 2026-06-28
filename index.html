@@ -730,88 +730,84 @@
                 </div>
               </div>
 
-              <div style="display:grid; grid-template-columns: 1fr; gap: 2rem;">
-                <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
-
-                  <!-- Sliders -->
-                  <div style="display:grid; grid-template-columns:1fr; gap:0.75rem;">
-                    <div class="spark-slider-group">
-                      <div class="spark-slider-label">
-                        Executor Heap Memory
-                        <span class="spark-slider-value"><span id="lbl-heap-size">16</span> GB</span>
-                      </div>
-                      <input type="range" id="mem-heap-size" min="4" max="64" value="16" oninput="updateMemoryMapper()" style="width:100%; accent-color:#FF6B35;">
-                      <div class="spark-slider-hint">Configures total size allocated per Executor instance (--executor-memory).</div>
+              <div class="spark-memory-mapper-layout">
+                <!-- Sliders -->
+                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                  <div class="spark-slider-group">
+                    <div class="spark-slider-label">
+                      Executor Heap Memory
+                      <span class="spark-slider-value"><span id="lbl-heap-size">16</span> GB</span>
                     </div>
-
-                    <div class="spark-slider-group">
-                      <div class="spark-slider-label">
-                        Unified Pool Fraction <code style="font-size:0.65rem; color:var(--text-secondary);">spark.memory.fraction</code>
-                        <span class="spark-slider-value"><span id="lbl-fraction">0.6</span></span>
-                      </div>
-                      <input type="range" id="mem-fraction" min="20" max="95" value="60" oninput="updateMemoryMapper()" style="width:100%; accent-color:#bc5090;">
-                      <div class="spark-slider-hint">Determines the split between Spark internal execution pools and user space logic.</div>
-                    </div>
-
-                    <div class="spark-slider-group">
-                      <div class="spark-slider-label">
-                        Storage Fraction <code style="font-size:0.65rem; color:var(--text-secondary);">spark.memory.storageFraction</code>
-                        <span class="spark-slider-value"><span id="lbl-storage">0.5</span></span>
-                      </div>
-                      <input type="range" id="mem-storage" min="10" max="90" value="50" oninput="updateMemoryMapper()" style="width:100%; accent-color:#d97706;">
-                      <div class="spark-slider-hint">Protects active cache storage from execution eviction policies.</div>
-                    </div>
+                    <input type="range" id="mem-heap-size" min="4" max="64" value="16" oninput="updateMemoryMapper()" style="width:100%; accent-color:#FF6B35;">
+                    <div class="spark-slider-hint">Configures total size allocated per Executor instance (--executor-memory).</div>
                   </div>
 
-                  <!-- Memory Chart + Legend -->
-                  <div>
-                    <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:0.75rem;">JVM Executor Heap Allocation Map</div>
-                    <div class="spark-memory-chart-container">
-                      <div id="memory-pie-chart" class="spark-memory-pie-chart">
-                        <div class="spark-memory-pie-center">
-                          <span id="lbl-total-heap-center" style="font-size:1.15rem; font-weight:700; color:var(--text-primary);">16 GB</span>
-                          <span style="font-size:0.55rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-top:2px;">Total Heap</span>
-                        </div>
+                  <div class="spark-slider-group">
+                    <div class="spark-slider-label">
+                      Unified Pool Fraction <code style="font-size:0.65rem; color:var(--text-secondary);">spark.memory.fraction</code>
+                      <span class="spark-slider-value"><span id="lbl-fraction">0.6</span></span>
+                    </div>
+                    <input type="range" id="mem-fraction" min="20" max="95" value="60" oninput="updateMemoryMapper()" style="width:100%; accent-color:#bc5090;">
+                    <div class="spark-slider-hint">Determines the split between Spark internal execution pools and user space logic.</div>
+                  </div>
+
+                  <div class="spark-slider-group">
+                    <div class="spark-slider-label">
+                      Storage Fraction <code style="font-size:0.65rem; color:var(--text-secondary);">spark.memory.storageFraction</code>
+                      <span class="spark-slider-value"><span id="lbl-storage">0.5</span></span>
+                    </div>
+                    <input type="range" id="mem-storage" min="10" max="90" value="50" oninput="updateMemoryMapper()" style="width:100%; accent-color:#d97706;">
+                    <div class="spark-slider-hint">Protects active cache storage from execution eviction policies.</div>
+                  </div>
+                </div>
+
+                <!-- Memory Chart + Legend -->
+                <div>
+                  <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:0.75rem;">JVM Executor Heap Allocation Map</div>
+                  <div class="spark-memory-chart-container">
+                    <div id="memory-pie-chart" class="spark-memory-pie-chart">
+                      <div class="spark-memory-pie-center">
+                        <span id="lbl-total-heap-center" style="font-size:1.05rem; font-weight:700; color:var(--text-primary);">16 GB</span>
+                        <span style="font-size:0.52rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-top:2px;">Total Heap</span>
                       </div>
-                      
-                      <!-- Legend -->
-                      <div class="spark-mem-legend" style="flex-grow:1; margin-top:0;">
-                        <div class="spark-mem-legend-item">
-                          <div class="spark-mem-legend-header">
-                            <div class="spark-mem-legend-dot" style="background:#ef4444;"></div>
-                            <div class="spark-mem-legend-label">Reserved</div>
-                          </div>
-                          <div class="spark-mem-legend-value" id="lbl-val-reserved" style="color:#ef4444;">300 MB</div>
-                          <div class="spark-mem-legend-hint">Fixed overhead for internal engine trackers.</div>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div class="spark-mem-legend" style="flex-grow:1; margin-top:0;">
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#ef4444;"></div>
+                          <div class="spark-mem-legend-label">Reserved</div>
                         </div>
-                        <div class="spark-mem-legend-item">
-                          <div class="spark-mem-legend-header">
-                            <div class="spark-mem-legend-dot" style="background:#7c3aed;"></div>
-                            <div class="spark-mem-legend-label">Execution</div>
-                          </div>
-                          <div class="spark-mem-legend-value" id="lbl-val-execution" style="color:#7c3aed;">4.71 GB</div>
-                          <div class="spark-mem-legend-hint">Used for active task data, shuffles, joins, and aggregates.</div>
+                        <div class="spark-mem-legend-value" id="lbl-val-reserved" style="color:#ef4444;">300 MB</div>
+                        <div class="spark-mem-legend-hint">Fixed overhead for internal engine trackers.</div>
+                      </div>
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#7c3aed;"></div>
+                          <div class="spark-mem-legend-label">Execution</div>
                         </div>
-                        <div class="spark-mem-legend-item">
-                          <div class="spark-mem-legend-header">
-                            <div class="spark-mem-legend-dot" style="background:#d97706;"></div>
-                            <div class="spark-mem-legend-label">Storage</div>
-                          </div>
-                          <div class="spark-mem-legend-value" id="lbl-val-storage" style="color:#d97706;">4.71 GB</div>
-                          <div class="spark-mem-legend-hint">Used for RDD cache partitions, broadcasts, and broadcast tables.</div>
+                        <div class="spark-mem-legend-value" id="lbl-val-execution" style="color:#7c3aed;">4.71 GB</div>
+                        <div class="spark-mem-legend-hint">Used for active task data, shuffles, joins, and aggregates.</div>
+                      </div>
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#d97706;"></div>
+                          <div class="spark-mem-legend-label">Storage</div>
                         </div>
-                        <div class="spark-mem-legend-item">
-                          <div class="spark-mem-legend-header">
-                            <div class="spark-mem-legend-dot" style="background:#0d9488;"></div>
-                            <div class="spark-mem-legend-label">User Space</div>
-                          </div>
-                          <div class="spark-mem-legend-value" id="lbl-val-user" style="color:#0d9488;">6.28 GB</div>
-                          <div class="spark-mem-legend-hint">Used for user metadata, customized datasets, and UDF dependencies.</div>
+                        <div class="spark-mem-legend-value" id="lbl-val-storage" style="color:#d97706;">4.71 GB</div>
+                        <div class="spark-mem-legend-hint">Used for RDD cache partitions, broadcasts, and broadcast tables.</div>
+                      </div>
+                      <div class="spark-mem-legend-item">
+                        <div class="spark-mem-legend-header">
+                          <div class="spark-mem-legend-dot" style="background:#0d9488;"></div>
+                          <div class="spark-mem-legend-label">User Space</div>
                         </div>
+                        <div class="spark-mem-legend-value" id="lbl-val-user" style="color:#0d9488;">6.28 GB</div>
+                        <div class="spark-mem-legend-hint">Used for user metadata, customized datasets, and UDF dependencies.</div>
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
@@ -835,9 +831,9 @@
               <div style="padding:1.5rem 2rem;">
                 <!-- Optimizer Tab -->
                 <div id="panel-optimizer" style="display: flex; flex-direction: column; gap: 1rem;">
-                  <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
-                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Optimize a common pipeline bottleneck:</label>
-                    <select id="optimizer-preset" onchange="applyOptimizerPreset()" class="spark-sandbox-select">
+                  <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); flex-shrink:0;">Optimize a common pipeline bottleneck:</label>
+                    <select id="optimizer-preset" onchange="applyOptimizerPreset()" class="spark-sandbox-select" style="flex:1; min-width:200px;">
                       <option value="">-- Choose a Preset Bottleneck --</option>
                       <option value="pyspark-join">Standard Hash Join (Triggers Massive Shuffle)</option>
                       <option value="rdd-groupby">Raw groupByKey (Heavy In-Memory Serialization)</option>
@@ -856,9 +852,9 @@
 
                 <!-- Simulator Tab -->
                 <div id="panel-simulator" style="display: none; flex-direction: column; gap: 1rem;">
-                  <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
-                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Select Production Failure Scenario:</label>
-                    <select id="simulator-preset" onchange="applySimulatorPreset()" class="spark-sandbox-select">
+                  <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); flex-shrink:0;">Select Production Failure Scenario:</label>
+                    <select id="simulator-preset" onchange="applySimulatorPreset()" class="spark-sandbox-select" style="flex:1; min-width:200px;">
                       <option value="">-- Select Outage Scenario --</option>
                       <option value="oom">OutOfMemory Error: GC overhead limit exceeded on worker node</option>
                       <option value="skew">Data Skew: Shuffle stage hangs on a single long-running task</option>
@@ -877,9 +873,9 @@
 
                 <!-- Drafter Tab -->
                 <div id="panel-drafter" style="display: none; flex-direction: column; gap: 1rem;">
-                  <div style="display:grid; grid-template-columns:1fr 2fr; gap:1rem; align-items:center;">
-                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Choose Topic for Book/Blog Draft:</label>
-                    <select id="drafter-preset" onchange="applyDrafterPreset()" class="spark-sandbox-select">
+                  <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+                    <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); flex-shrink:0;">Choose Topic for Book/Blog Draft:</label>
+                    <select id="drafter-preset" onchange="applyDrafterPreset()" class="spark-sandbox-select" style="flex:1; min-width:200px;">
                       <option value="">-- Choose Technical Deep-Dive --</option>
                       <option value="tungsten">Deep-dive: Tungsten CodeGen vs. JVM Object Memory Overhead</option>
                       <option value="aqe">Deep-dive: How AQE Dynamic Coalescing prevents small-file fragmentation</option>
