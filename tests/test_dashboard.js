@@ -151,9 +151,8 @@ setTimeout(() => {
     const newTipText = tipTextEl.textContent;
     console.log("✅ Clicked tip box. Rotated text successfully.");
 
-    // Test 4: Verify navigation redirect buttons
     console.log("Testing launcher redirects...");
-    const conceptsBtn = document.querySelector('.dashboard-launcher-btn[onclick*="view-concepts"]');
+    const conceptsBtn = document.querySelector('[onclick*="switchView(\'view-concepts\')"]');
     if (!conceptsBtn) {
       console.error("❌ Concepts launcher button not found!");
       process.exit(1);
