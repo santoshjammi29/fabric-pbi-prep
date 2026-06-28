@@ -242,12 +242,46 @@ body {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
   flex-grow: 1;
 }
 
 .nav-item {
   width: 100%;
+}
+
+/* "PREP PATH" / "RESEARCH" section labels in sidebar */
+.nav-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  opacity: 0.5;
+  padding: 0.6rem 1rem 0.2rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Step number badge in nav items */
+.nav-step-badge {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+  line-height: 1.4;
+  margin-left: auto;
+}
+.nav-step-easy    { background: rgba(34,197,94,0.12); color: #22c55e; }
+.nav-step-medium  { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.nav-step-hard    { background: rgba(249,115,22,0.12); color: #f97316; }
+.nav-step-architect { background: rgba(168,85,247,0.12); color: #a855f7; }
+.nav-step-gcc     { background: rgba(148,163,184,0.10); color: var(--text-secondary); }
+
+/* Hide step badges in collapsed mode (icon-only sidebar) */
+.sidebar-collapsed .nav-step-badge,
+.sidebar-collapsed .nav-section-label {
+  display: none;
 }
 
 .nav-btn {
@@ -8275,6 +8309,364 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 .dashboard-launcher-card:hover .dashboard-launcher-btn svg {
   transform: translateX(4px);
 }
+
+/* ============================================================
+   INTERVIEW PREP ROADMAP (Dashboard)
+   ============================================================ */
+.roadmap-section {
+  margin-top: 2rem;
+}
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.roadmap-card {
+  display: flex;
+  gap: 0.85rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 1.1rem 1.1rem 1rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  border-left: 3px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+.roadmap-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.roadmap-easy     { border-left-color: #22c55e; }
+.roadmap-easy:hover { box-shadow: 0 8px 24px rgba(34,197,94,0.15); }
+.roadmap-medium   { border-left-color: #3b82f6; }
+.roadmap-medium:hover { box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
+.roadmap-hard     { border-left-color: #f97316; }
+.roadmap-hard:hover { box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
+.roadmap-architect { border-left-color: #a855f7; }
+.roadmap-architect:hover { box-shadow: 0 8px 24px rgba(168,85,247,0.15); }
+.roadmap-gcc      { border-left-color: #94a3b8; }
+
+.roadmap-step-num {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 2rem;
+  text-align: center;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.roadmap-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.roadmap-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.roadmap-card-header svg {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.roadmap-card-body h4 {
+  font-size: 0.975rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+.roadmap-card-body p {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+.roadmap-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.roadmap-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.75;
+}
+.roadmap-arrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.roadmap-card:hover .roadmap-arrow {
+  opacity: 1;
+}
+
+/* Difficulty pills on roadmap cards */
+.roadmap-diff-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+.roadmap-pill-easy     { background: rgba(34,197,94,0.12); color: #22c55e; }
+.roadmap-pill-medium   { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.roadmap-pill-hard     { background: rgba(249,115,22,0.12); color: #f97316; }
+.roadmap-pill-architect { background: rgba(168,85,247,0.12); color: #a855f7; }
+.roadmap-pill-gcc      { background: rgba(148,163,184,0.10); color: #94a3b8; }
+
+/* ============================================================
+   PAGE STEP-NAV FOOTER (← Prev | Next Step →)
+   ============================================================ */
+.page-step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding: 1rem 1.25rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  gap: 1rem;
+}
+.page-step-nav .step-nav-info {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  flex: 1;
+}
+.page-step-nav .step-nav-info strong {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.15rem;
+}
+.step-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--primary);
+  font-family: var(--font-family);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+}
+.step-nav-btn:hover {
+  background: rgba(108, 92, 231, 0.1);
+  border-color: var(--primary);
+  transform: translateX(2px);
+}
+.step-nav-btn.prev:hover { transform: translateX(-2px); }
+
+/* Difficulty progression bar at page top */
+.page-diff-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.diff-bar-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-right: 0.25rem;
+}
+.diff-bar-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.diff-bar-arrow {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+.diff-pill-easy     { background: rgba(34,197,94,0.12); color: #22c55e; }
+.diff-pill-medium   { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.diff-pill-hard     { background: rgba(249,115,22,0.12); color: #f97316; }
+.diff-pill-architect { background: rgba(168,85,247,0.12); color: #a855f7; }
+
+/* ============================================================
+   STUDY MODE (Q&A Prep Hub)
+   ============================================================ */
+.study-mode-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.7rem 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+.study-mode-toggle-bar label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.study-mode-toggle-bar p {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+  flex: 1;
+}
+.study-mode-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.study-mode-switch input { display: none; }
+.study-mode-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.study-mode-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+}
+.study-mode-switch input:checked + .study-mode-slider { background: var(--primary); }
+.study-mode-switch input:checked + .study-mode-slider::before { transform: translateX(18px); }
+
+/* Flashcard study mode container */
+.study-flashcard-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+.study-flashcard-container.active { display: flex; }
+
+.study-flashcard {
+  width: 100%;
+  max-width: 700px;
+  min-height: 260px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+.study-flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  transition: transform 0.5s ease;
+  transform-style: preserve-3d;
+}
+.study-flashcard.flipped .study-flashcard-inner {
+  transform: rotateY(180deg);
+}
+.study-card-front, .study-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.study-card-front {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+.study-card-back {
+  background: linear-gradient(135deg, rgba(108,92,231,0.08) 0%, rgba(108,92,231,0.04) 100%);
+  border: 1px solid rgba(108,92,231,0.2);
+  transform: rotateY(180deg);
+}
+.study-card-front .card-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  margin-top: 1rem;
+}
+.study-card-front .card-q {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.study-card-back .card-a {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+.study-card-category {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: rgba(108,92,231,0.1);
+  color: var(--primary);
+  margin-bottom: 0.85rem;
+}
+.study-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.study-nav-btn {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+.study-nav-btn:hover {
+  background: rgba(108,92,231,0.1);
+  border-color: var(--primary);
+}
+.study-counter {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  min-width: 80px;
+  text-align: center;
+}
+
 
 .dashboard-tip-container {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);

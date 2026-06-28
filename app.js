@@ -6438,5 +6438,93 @@ Your input highlights the need for dynamic optimization of distributed executors
         window.updateMemoryMapper = updateMemoryMapper;
         window.filterLexiconCategory = filterLexiconCategory;
         window.filterLexicon = filterLexicon;
+
+  // ==========================================
+  // STUDY MODE — Flashcard Q&A Practice
+  // ==========================================
+  const studyState = {
+    cards: [],
+    index: 0,
+    flipped: false
+  };
+
+  function initStudyMode() {
+    // Use the currently filtered/loaded questions from state, or fallback to all questions
+    const qs = state.questions && state.questions.length > 0 ? state.questions : [];
+    studyState.cards = qs.filter(q => q.question && q.answer);
+    // Shuffle for variety
+    for (let i = studyState.cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [studyState.cards[i], studyState.cards[j]] = [studyState.cards[j], studyState.cards[i]];
+    }
+    studyState.index = 0;
+    studyState.flipped = false;
+    renderStudyCard();
+  }
+
+  function renderStudyCard() {
+    const card = studyState.cards[studyState.index];
+    const flashcard = document.getElementById('study-flashcard');
+    const qEl = document.getElementById('study-card-question');
+    const aEl = document.getElementById('study-card-answer');
+    const catEl = document.getElementById('study-card-category');
+    const counterEl = document.getElementById('study-counter');
+
+    if (!card || !flashcard) return;
+
+    // Remove flip before updating content
+    flashcard.classList.remove('flipped');
+    studyState.flipped = false;
+
+    // Small delay so card resets visually before new content shows
+    setTimeout(() => {
+      if (qEl) qEl.textContent = card.question || '';
+      if (aEl) aEl.textContent = card.answer || '';
+      if (catEl) catEl.textContent = (card.category || card.domain || 'General').toUpperCase();
+      if (counterEl) counterEl.textContent = `${studyState.index + 1} / ${studyState.cards.length}`;
+    }, 50);
+  }
+
+  function flipStudyCard() {
+    const flashcard = document.getElementById('study-flashcard');
+    if (!flashcard) return;
+    studyState.flipped = !studyState.flipped;
+    flashcard.classList.toggle('flipped', studyState.flipped);
+  }
+
+  function nextStudyCard() {
+    if (studyState.cards.length === 0) return;
+    studyState.index = (studyState.index + 1) % studyState.cards.length;
+    renderStudyCard();
+  }
+
+  function prevStudyCard() {
+    if (studyState.cards.length === 0) return;
+    studyState.index = (studyState.index - 1 + studyState.cards.length) % studyState.cards.length;
+    renderStudyCard();
+  }
+
+  // Wire up study mode toggle
+  const studyToggle = document.getElementById('study-mode-toggle');
+  const studyContainer = document.getElementById('study-flashcard-container');
+  const studyResultsStream = document.querySelector('#view-unified-search .qa-results-stream');
+
+  if (studyToggle) {
+    studyToggle.addEventListener('change', () => {
+      const isStudyMode = studyToggle.checked;
+      if (studyContainer) studyContainer.classList.toggle('active', isStudyMode);
+      if (studyResultsStream) studyResultsStream.style.display = isStudyMode ? 'none' : '';
+      const filterStack = document.querySelector('#view-unified-search .qa-hfilter-stack');
+      if (filterStack) filterStack.style.opacity = isStudyMode ? '0.5' : '1';
+      if (isStudyMode) initStudyMode();
+    });
+  }
+
+  window.flipStudyCard = flipStudyCard;
+  window.nextStudyCard = nextStudyCard;
+  window.prevStudyCard = prevStudyCard;
+  window.initStudyMode = initStudyMode;
+
 });
+
     

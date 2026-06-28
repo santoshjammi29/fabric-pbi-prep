@@ -94,46 +94,71 @@
       
       <nav style="width:100%;">
         <ul class="nav-links">
+          <!-- Home — no step badge -->
           <li class="nav-item">
             <button class="nav-btn active" id="btn-nav-dashboard" data-target="view-dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-              <span class="nav-text">Dashboard</span>
+              <span class="nav-text">Home</span>
             </button>
           </li>
+
+          <!-- PREP PATH divider -->
+          <li class="nav-section-label">PREP PATH</li>
+
+          <!-- ① Key Concepts — Easy (green) -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-concepts" data-target="view-concepts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
               <span class="nav-text">Key Concepts</span>
+              <span class="nav-step-badge nav-step-easy">①</span>
             </button>
           </li>
-          <li class="nav-item">
-            <button class="nav-btn" id="btn-nav-prep-hub" data-target="view-prep-hub">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span class="nav-text">Interview Prep Hub</span>
-            </button>
-          </li>
+
+          <!-- ② Code Practice — Easy-Medium (blue) -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-cheatsheet" data-target="view-cheatsheet">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <span class="nav-text">Code Deepdive</span>
+              <span class="nav-text">Code Practice</span>
+              <span class="nav-step-badge nav-step-medium">②</span>
             </button>
           </li>
+
+          <!-- ③ Spark Engine — Medium (blue) -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-spark" data-target="view-spark-hub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span class="nav-text">Spark Hub</span>
+              <span class="nav-text">Spark Engine</span>
+              <span class="nav-step-badge nav-step-medium">③</span>
             </button>
           </li>
+
+          <!-- ④ Q&A Prep — Hard (orange) -->
+          <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-prep-hub" data-target="view-prep-hub">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span class="nav-text">Q&amp;A Prep Hub</span>
+              <span class="nav-step-badge nav-step-hard">④</span>
+            </button>
+          </li>
+
+          <!-- ⑤ Architecture — Architect (purple) -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-architecture" data-target="view-architecture">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <span class="nav-text">Architecture Hub</span>
+              <span class="nav-step-badge nav-step-architect">⑤</span>
             </button>
           </li>
+
+          <!-- Separator -->
+          <li class="nav-section-label">RESEARCH</li>
+
+          <!-- ⑥ Company Research -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-gcc" data-target="view-gcc">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              <span class="nav-text">GCC Directory</span>
+              <span class="nav-text">Company Research</span>
+              <span class="nav-step-badge nav-step-gcc">⑥</span>
             </button>
           </li>
         </ul>
@@ -147,7 +172,6 @@
       <div class="sidebar-resizer" id="sidebar-resizer" title="Drag to resize sidebar"></div>
     </aside>
 
-    <!-- Mobile Bottom Navigation — all 9 tabs, horizontally scrollable -->
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Main navigation">
       <div class="mobile-nav-scroll">
         <button class="mobile-nav-tab active" data-target="view-dashboard" id="mbn-dashboard">
@@ -156,28 +180,27 @@
         </button>
         <button class="mobile-nav-tab" data-target="view-concepts" id="mbn-concepts">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
-          <span>Key Concepts</span>
+          <span>① Concepts</span>
         </button>
-        <button class="mobile-nav-tab" data-target="view-prep-hub" id="mbn-prep-hub">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span>Prep Hub</span>
-        </button>
-        <!-- Hidden mobile nav tabs for compatibility removed from here -->
         <button class="mobile-nav-tab" data-target="view-cheatsheet" id="mbn-cheatsheet">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>Code Deepdive</span>
+          <span>② Code</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-spark-hub" id="mbn-spark">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Spark Hub</span>
+          <span>③ Spark</span>
+        </button>
+        <button class="mobile-nav-tab" data-target="view-prep-hub" id="mbn-prep-hub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span>④ Q&amp;A</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-architecture" id="mbn-architecture">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>Arch Hub</span>
+          <span>⑤ Arch</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-gcc" id="mbn-gcc">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          <span>GCC Dir.</span>
+          <span>⑥ GCC</span>
         </button>
       </div>
     </nav>
@@ -277,95 +300,116 @@
           </div>
         </div>
 
-        <h3 class="dashboard-section-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="m9 18 6-6-6-6"/></svg>
-          Quick Learning Launchers
-        </h3>
+        <!-- Interview Prep Roadmap -->
+        <div class="roadmap-section">
+          <h3 class="dashboard-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            Your Interview Prep Roadmap
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Follow this path from foundational concepts to architect-level design scenarios. Each step builds on the previous.</p>
 
-        <!-- Launchers Grid -->
-        <div class="dashboard-launcher-grid">
-          <div class="dashboard-launcher-card">
-            <div>
-              <div class="dashboard-launcher-header">
-                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg></span>
-                <h4 class="dashboard-launcher-title">Key Concepts Glossary</h4>
+          <div class="roadmap-grid">
+            <!-- Step 1: Key Concepts (Easy) -->
+            <div class="roadmap-card roadmap-easy" onclick="switchView('view-concepts')" style="cursor:pointer;">
+              <div class="roadmap-step-num">①</div>
+              <div class="roadmap-card-body">
+                <div class="roadmap-card-header">
+                  <span class="roadmap-diff-pill roadmap-pill-easy">Easy</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <h4>Key Concepts</h4>
+                <p>Master foundational definitions, architectural keywords, and core terminology across Fabric, Power BI, SQL, ADF &amp; Databricks.</p>
+                <div class="roadmap-card-footer">
+                  <span class="roadmap-time">📖 Start Here</span>
+                  <span class="roadmap-arrow">Open →</span>
+                </div>
               </div>
-              <p class="dashboard-launcher-desc">Master foundational and advanced terminology across Fabric, Power BI, SQL, ADF, and Databricks. Sorted by easy, medium, and hard difficulty tiers.</p>
             </div>
-            <button class="dashboard-launcher-btn" onclick="switchView('view-concepts')">
-              Open Glossary
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
 
-          <div class="dashboard-launcher-card">
-            <div>
-              <div class="dashboard-launcher-header">
-                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                <h4 class="dashboard-launcher-title">Interview Prep Hub</h4>
+            <!-- Step 2: Code Practice (Medium) -->
+            <div class="roadmap-card roadmap-medium" onclick="switchView('view-cheatsheet')" style="cursor:pointer;">
+              <div class="roadmap-step-num">②</div>
+              <div class="roadmap-card-body">
+                <div class="roadmap-card-header">
+                  <span class="roadmap-diff-pill roadmap-pill-medium">Medium</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h4>Code Practice</h4>
+                <p>Hands-on syntax examples for Python Pandas, MS SQL (T-SQL), PySpark, and Spark SQL — real-world data workloads.</p>
+                <div class="roadmap-card-footer">
+                  <span class="roadmap-time">💻 4 Languages</span>
+                  <span class="roadmap-arrow">Open →</span>
+                </div>
               </div>
-              <p class="dashboard-launcher-desc">Explore over 2,640+ primary core questions, search concepts dynamically, test yourself with domain chips, and practice custom scenarios.</p>
             </div>
-            <button class="dashboard-launcher-btn" onclick="switchView('view-prep-hub')">
-              Launch Prep Hub
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
 
-          <div class="dashboard-launcher-card">
-            <div>
-              <div class="dashboard-launcher-header">
-                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
-                <h4 class="dashboard-launcher-title">Code Deepdive Cheatsheet</h4>
+            <!-- Step 3: Spark Engine (Medium) -->
+            <div class="roadmap-card roadmap-medium" onclick="switchView('view-spark-hub')" style="cursor:pointer;">
+              <div class="roadmap-step-num">③</div>
+              <div class="roadmap-card-body">
+                <div class="roadmap-card-header">
+                  <span class="roadmap-diff-pill roadmap-pill-medium">Medium</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <h4>Spark Engine</h4>
+                <p>Deep-dive into Spark execution pipelines, PySpark optimizations, Spark SQL syntax comparisons, and table optimization rules.</p>
+                <div class="roadmap-card-footer">
+                  <span class="roadmap-time">⚡ Engine Internals</span>
+                  <span class="roadmap-arrow">Open →</span>
+                </div>
               </div>
-              <p class="dashboard-launcher-desc">Deepdive into real-world code implementation syntax examples for Python Pandas and MS SQL Server, conformed to professional data workloads.</p>
             </div>
-            <button class="dashboard-launcher-btn" onclick="switchView('view-cheatsheet')">
-              Explore Syntax
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
 
-          <div class="dashboard-launcher-card">
-            <div>
-              <div class="dashboard-launcher-header">
-                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-                <h4 class="dashboard-launcher-title">Apache Spark & Spark SQL</h4>
+            <!-- Step 4: Q&A Prep Hub (Hard) -->
+            <div class="roadmap-card roadmap-hard" onclick="switchView('view-prep-hub')" style="cursor:pointer;">
+              <div class="roadmap-step-num">④</div>
+              <div class="roadmap-card-body">
+                <div class="roadmap-card-header">
+                  <span class="roadmap-diff-pill roadmap-pill-hard">Hard</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h4>Q&amp;A Prep Hub</h4>
+                <p>Search, filter, and study 2,600+ expert-level interview Q&amp;As. Grouped by difficulty — Easy through Architect. Includes Study Mode.</p>
+                <div class="roadmap-card-footer">
+                  <span class="roadmap-time">❓ 2,600+ Q&amp;As</span>
+                  <span class="roadmap-arrow">Open →</span>
+                </div>
               </div>
-              <p class="dashboard-launcher-desc">Master Spark execution pipelines, configurations, PySpark optimizations, Spark SQL syntax comparisons, and table execution optimization rules.</p>
             </div>
-            <button class="dashboard-launcher-btn" onclick="switchView('view-spark-hub')">
-              Access Spark Hub
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
 
-          <div class="dashboard-launcher-card">
-            <div>
-              <div class="dashboard-launcher-header">
-                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-                <h4 class="dashboard-launcher-title">Enterprise Architecture Hub</h4>
+            <!-- Step 5: Architecture Hub (Architect) -->
+            <div class="roadmap-card roadmap-architect" onclick="switchView('view-architecture')" style="cursor:pointer;">
+              <div class="roadmap-step-num">⑤</div>
+              <div class="roadmap-card-body">
+                <div class="roadmap-card-header">
+                  <span class="roadmap-diff-pill roadmap-pill-architect">Architect</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h4>Architecture Hub</h4>
+                <p>2,400+ advanced design scenarios: Lakehouse, real-time streaming, LLM/RAG pipelines, Terraform IaC, and MPP engine patterns.</p>
+                <div class="roadmap-card-footer">
+                  <span class="roadmap-time">🏗️ 16 Domains</span>
+                  <span class="roadmap-arrow">Open →</span>
+                </div>
               </div>
-              <p class="dashboard-launcher-desc">Browse 2,400+ scenarios spanning Lakehouse, Real-time streaming, MPP engines, IaC (Terraform), vector databases, and LLM/RAG pipelines.</p>
             </div>
-            <button class="dashboard-launcher-btn" onclick="switchView('view-architecture')">
-              Launch Arch Hub
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
 
-          <div class="dashboard-launcher-card">
-            <div>
-              <div class="dashboard-launcher-header">
-                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
-                <h4 class="dashboard-launcher-title">Hyderabad GCC Directory</h4>
+            <!-- Step 6: Company Research -->
+            <div class="roadmap-card roadmap-gcc" onclick="switchView('view-gcc')" style="cursor:pointer;">
+              <div class="roadmap-step-num">⑥</div>
+              <div class="roadmap-card-body">
+                <div class="roadmap-card-header">
+                  <span class="roadmap-diff-pill roadmap-pill-gcc">Research</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <h4>Company Research</h4>
+                <p>Profiles of 55 Global Competency Centers in Hyderabad. Filter by hiring risk tier, sector domain, active tech stacks &amp; addresses.</p>
+                <div class="roadmap-card-footer">
+                  <span class="roadmap-time">🏢 55 GCC Firms</span>
+                  <span class="roadmap-arrow">Open →</span>
+                </div>
               </div>
-              <p class="dashboard-launcher-desc">Detailed profiles of 55 Global Competency Centers in Hyderabad. Filter by hiring risk tier, sector domain, active tech stacks, and address locations.</p>
             </div>
-            <button class="dashboard-launcher-btn" onclick="switchView('view-gcc')">
-              Open GCC Directory
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
           </div>
         </div>
       </section>
@@ -375,18 +419,30 @@
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Interview Prep Hub</h2>
-              <p class="page-subtitle">Your unified center for expert-level data engineering, architecture, and Microsoft Fabric interview prep.</p>
+              <h2 class="page-title">Q&amp;A Prep Hub <span class="nav-step-badge nav-step-hard" style="vertical-align: middle; font-size: 0.7rem;">④ Step</span></h2>
+              <p class="page-subtitle">Search, filter, and study 2,600+ expert interview Q&amp;As — Easy through Architect difficulty. Use Study Mode for flashcard practice.</p>
             </div>
-            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </button>
           </div>
         </header>
 
+        <!-- Difficulty Progression Bar -->
+        <div class="page-diff-bar">
+          <span class="diff-bar-label">Difficulty Path:</span>
+          <span class="diff-bar-pill diff-pill-easy">● Easy</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-medium">● Medium</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-hard">● Hard</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-architect">● Architect</span>
+        </div>
+
         <!-- Horizontal Sub-tab Navigation Chips inside Prep Hub (Hidden for layout consolidation) -->
         <div class="prep-hub-subnav topics-scrollbar" id="prep-hub-subnav" style="display: none !important;">
-          <button class="topic-chip active" data-subtab="view-unified-search">Unified Q&A Search</button>
+          <button class="topic-chip active" data-subtab="view-unified-search">Unified Q&amp;A Search</button>
           <button class="topic-chip" data-subtab="view-personalised">Personalised Prep</button>
           <button class="topic-chip" data-subtab="view-practice">Niche Practice</button>
           <button class="topic-chip" data-subtab="view-explainer">Concept Explainer</button>
@@ -395,14 +451,47 @@
         <!-- Subviews wrapper -->
         <div class="prep-hub-content-container">
 
-          <!-- 1. Unified Q&A Search Subview -->
+          <!-- 1. Unified Q&amp;A Search Subview -->
           <div id="view-unified-search" class="prep-hub-subview">
             
             <div class="prep-section-header reveal-on-scroll">
               <div class="prep-section-header-icon">🔍</div>
               <div class="prep-section-header-content">
-                <h3 class="prep-section-header-title gradient-text">Unified Q&A Search</h3>
+                <h3 class="prep-section-header-title gradient-text">Unified Q&amp;A Search</h3>
                 <p class="prep-section-header-desc">Search, query, and filter across the entire dataset repository of 2,600+ expert-level questions.</p>
+              </div>
+            </div>
+
+            <!-- Study Mode Toggle -->
+            <div class="study-mode-toggle-bar">
+              <label for="study-mode-toggle">
+                🃏 Study Mode
+              </label>
+              <p>Flashcard practice: one question at a time. Click card to reveal answer.</p>
+              <label class="study-mode-switch">
+                <input type="checkbox" id="study-mode-toggle">
+                <span class="study-mode-slider"></span>
+              </label>
+            </div>
+
+            <!-- Study Mode Flashcard View (hidden by default) -->
+            <div class="study-flashcard-container" id="study-flashcard-container">
+              <div class="study-flashcard" id="study-flashcard" onclick="flipStudyCard()">
+                <div class="study-flashcard-inner">
+                  <div class="study-card-front">
+                    <span class="study-card-category" id="study-card-category">Loading...</span>
+                    <div class="card-q" id="study-card-question">Loading question...</div>
+                    <div class="card-hint">👆 Click to reveal answer</div>
+                  </div>
+                  <div class="study-card-back">
+                    <div class="card-a" id="study-card-answer">Answer will appear here</div>
+                  </div>
+                </div>
+              </div>
+              <div class="study-nav-controls">
+                <button class="study-nav-btn" onclick="prevStudyCard()">← Prev</button>
+                <span class="study-counter" id="study-counter">0 / 0</span>
+                <button class="study-nav-btn" onclick="nextStudyCard()">Next →</button>
               </div>
             </div>
 
@@ -522,22 +611,47 @@
           </div>
 
         </div>
+
+        <!-- Step Navigation Footer -->
+        <div class="page-step-nav">
+          <button class="step-nav-btn prev" onclick="switchView('view-spark-hub')">
+            ← ③ Spark Engine
+          </button>
+          <div class="step-nav-info">
+            <strong>Step ④ of ⑥</strong>
+            Practice full Q&amp;As, then master architecture design
+          </div>
+          <button class="step-nav-btn" onclick="switchView('view-architecture')">
+            ⑤ Architecture Hub →
+          </button>
+        </div>
       </section>
       
-      <!-- 4. SPARK GUIDE VIEW -->
-            <!-- 4. SPARK LEARNING & ENGINE HUB VIEW -->
+      <!-- 4. SPARK ENGINE HUB VIEW -->
       <section class="page-view hidden" id="view-spark-hub">
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Spark Learning & Engine Hub</h2>
-              <p class="page-subtitle">Your unified hub for core Apache Spark engine mechanics, visual flow simulations, and an advanced PySpark curriculum.</p>
+              <h2 class="page-title">Spark Engine Hub <span class="nav-step-badge nav-step-medium" style="vertical-align: middle; font-size: 0.7rem;">③ Step</span></h2>
+              <p class="page-subtitle">Unified hub for Apache Spark engine mechanics, flow simulations, PySpark curriculum, and Spark SQL deep-dives.</p>
             </div>
-            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </button>
           </div>
         </header>
+
+        <!-- Difficulty Progression Bar -->
+        <div class="page-diff-bar">
+          <span class="diff-bar-label">Difficulty Path:</span>
+          <span class="diff-bar-pill diff-pill-easy">● Beginner</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-medium">● Intermediate</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-hard">● Advanced</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-architect">● Architect</span>
+        </div>
 
         <!-- Horizontal Sub-tab Navigation Chips inside Spark Hub -->
         <div class="prep-hub-subnav topics-scrollbar" id="spark-hub-subnav" style="margin-bottom: 2rem;">
@@ -3449,14 +3563,24 @@ WHEN NOT MATCHED THEN
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Key Concepts & Definitions</h2>
-              <p class="page-subtitle">Master architectural keywords, definitions, and core concepts sorted by increasing difficulty.</p>
+              <h2 class="page-title">Key Concepts &amp; Definitions <span class="nav-step-badge nav-step-easy" style="vertical-align: middle; font-size: 0.7rem;">① Step</span></h2>
+              <p class="page-subtitle">Master architectural keywords, definitions, and core concepts — sorted by increasing difficulty.</p>
             </div>
-            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </button>
           </div>
         </header>
+
+        <!-- Difficulty Progression Bar -->
+        <div class="page-diff-bar">
+          <span class="diff-bar-label">Difficulty Path:</span>
+          <span class="diff-bar-pill diff-pill-easy">● Easy</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-medium">● Medium</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-hard">● Hard</span>
+        </div>
 
         <!-- Horizontal Filter Stack -->
         <div class="qa-hfilter-stack">
@@ -3496,21 +3620,47 @@ WHEN NOT MATCHED THEN
         <div class="concepts-grid" id="concepts-container">
           <!-- Dynamically loaded concepts will go here -->
         </div>
+
+        <!-- Step Navigation Footer -->
+        <div class="page-step-nav">
+          <button class="step-nav-btn prev" onclick="switchView('view-dashboard')">
+            ← Home
+          </button>
+          <div class="step-nav-info">
+            <strong>Step ① of ⑥</strong>
+            Start with key concepts, then practice code syntax
+          </div>
+          <button class="step-nav-btn" onclick="switchView('view-cheatsheet')">
+            ② Code Practice →
+          </button>
+        </div>
       </section>
 
-      <!-- 9. DE CHEAT SHEET VIEW -->
+      <!-- 9. CODE PRACTICE (DE Cheat Sheet) VIEW -->
       <section class="page-view hidden" id="view-cheatsheet">
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Code Deepdive for DE Languages</h2>
-              <p class="page-subtitle">Interactive, architect-level reference toolkit covering Python, MS SQL, PySpark, and Spark SQL.</p>
+              <h2 class="page-title">Code Practice — DE Languages <span class="nav-step-badge nav-step-medium" style="vertical-align: middle; font-size: 0.7rem;">② Step</span></h2>
+              <p class="page-subtitle">Interactive syntax reference for Python, MS SQL (T-SQL), PySpark, and Spark SQL — real-world data workloads.</p>
             </div>
-            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </button>
           </div>
         </header>
+
+        <!-- Difficulty Progression Bar -->
+        <div class="page-diff-bar">
+          <span class="diff-bar-label">Difficulty Path:</span>
+          <span class="diff-bar-pill diff-pill-easy">● Beginner</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-medium">● Intermediate</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-hard">● Advanced</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-architect">● Architect</span>
+        </div>
 
         <!-- Horizontal Filter Stack -->
         <div class="qa-hfilter-stack">
@@ -3580,6 +3730,20 @@ WHEN NOT MATCHED THEN
             </table>
           </div>
         </div>
+
+        <!-- Step Navigation Footer -->
+        <div class="page-step-nav">
+          <button class="step-nav-btn prev" onclick="switchView('view-concepts')">
+            ← ① Key Concepts
+          </button>
+          <div class="step-nav-info">
+            <strong>Step ② of ⑥</strong>
+            Apply coding syntax, then explore Spark engine internals
+          </div>
+          <button class="step-nav-btn" onclick="switchView('view-spark-hub')">
+            ③ Spark Engine →
+          </button>
+        </div>
       </section>
 
       <!-- 10. ENTERPRISE DATA ARCHITECTURE HUB -->
@@ -3587,14 +3751,26 @@ WHEN NOT MATCHED THEN
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Enterprise Data Architecture Hub</h2>
-              <p class="page-subtitle">Master advanced data modeling, storage tiering, real-time streaming, and LLM orchestration at scale.</p>
+              <h2 class="page-title">Architecture Hub <span class="nav-step-badge nav-step-architect" style="vertical-align: middle; font-size: 0.7rem;">⑤ Step</span></h2>
+              <p class="page-subtitle">Master advanced data modeling, real-time streaming, LLM orchestration, and enterprise-scale architecture scenarios.</p>
             </div>
-            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </button>
           </div>
         </header>
+
+        <!-- Difficulty Progression Bar -->
+        <div class="page-diff-bar">
+          <span class="diff-bar-label">Difficulty Path:</span>
+          <span class="diff-bar-pill diff-pill-easy">● Easy</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-medium">● Medium</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-hard">● Hard</span>
+          <span class="diff-bar-arrow">→</span>
+          <span class="diff-bar-pill diff-pill-architect">● Architect</span>
+        </div>
 
         <div class="prep-hub-content-container">
           <div id="view-architecture-search" class="prep-hub-subview-always">
@@ -3658,6 +3834,20 @@ WHEN NOT MATCHED THEN
             </div>
 
           </div>
+        </div>
+
+        <!-- Step Navigation Footer -->
+        <div class="page-step-nav">
+          <button class="step-nav-btn prev" onclick="switchView('view-prep-hub')">
+            ← ④ Q&amp;A Prep Hub
+          </button>
+          <div class="step-nav-info">
+            <strong>Step ⑤ of ⑥ — Almost Done!</strong>
+            Architect-level complete. Research target companies next.
+          </div>
+          <button class="step-nav-btn" onclick="switchView('view-gcc')">
+            ⑥ Company Research →
+          </button>
         </div>
       </section>
 
