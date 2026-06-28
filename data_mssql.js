@@ -337,7 +337,8 @@ BEGIN
     -- Upsert pattern using MERGE
     MERGE dbo.fact_transactions AS tgt
     USING (
-        SELECT * FROM dbo.stage_transactions
+        SELECT transaction_id, amount_eur, currency, status, transaction_date, customer_id 
+        FROM dbo.stage_transactions
         WHERE batch_date = @batch_date AND source_system = @source_system
     ) AS src
     ON tgt.transaction_id = src.transaction_id
@@ -569,7 +570,7 @@ WHERE status = 'SETTLED'
     level: "intermediate", category: "Data Shaping",
     description: "PIVOT transforms rows to columns, enabling cross-tabulation reports (currencies as columns, dates as rows). UNPIVOT does the reverse — critical for normalizing wide-format source data before ELT loading.",
     code: `-- PIVOT: currencies as columns, date as rows (executive dashboard format)
-SELECT *
+SELECT report_date, [EUR], [GBP], [USD], [CHF], [SEK], [NOK]
 FROM (
     SELECT
         CAST(transaction_date AS DATE) AS report_date,
@@ -593,7 +594,7 @@ SELECT @currencies = STRING_AGG(QUOTENAME(currency), ',')
 FROM (SELECT DISTINCT currency FROM dbo.fact_transactions WHERE status = 'SETTLED') c;
 
 SET @sql = N'
-    SELECT *
+    SELECT report_date, * -- Note: SELECT * used dynamically to auto-bind dynamic column list
     FROM (
         SELECT CAST(transaction_date AS DATE) AS report_date, currency, amount_eur
         FROM dbo.fact_transactions WHERE status = ''SETTLED''
@@ -796,7 +797,8 @@ WHERE customer_id = 'CUST-001'
 ORDER BY SysStartTime;
 
 -- BETWEEN: changes in January 2024
-SELECT * FROM dbo.dim_customers
+SELECT customer_id, customer_name, tier, risk_rating
+FROM dbo.dim_customers
 FOR SYSTEM_TIME BETWEEN '2024-01-01' AND '2024-02-01'
 WHERE customer_id = 'CUST-001';`,
     notes: [
@@ -1087,7 +1089,7 @@ WHERE __$operation IN (2, 4)  -- only INSERT and after-UPDATE
 ORDER BY __$start_lsn;
 
 -- Net changes only: most recent change per transaction_id
-SELECT *
+SELECT transaction_id, amount_eur, currency, status, __$operation -- Note: Specify explicit columns in production
 FROM cdc.fn_cdc_get_net_changes_dbo_fact_transactions(@from_lsn, @to_lsn, 'all');
 
 -- Monitor CDC latency (alert if > 5 minutes behind)

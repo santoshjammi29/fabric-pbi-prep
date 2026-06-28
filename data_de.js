@@ -39,7 +39,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Explain your experience in working with big data technologies like Hadoop and Spark.",
-    "answer": "I have worked extensively with big data technologies like Hadoop and Spark in my previous projects. As a Data Engineer, I have used Hadoop for distributed storage and processing of large datasets. I have experience working with Hadoop Distributed File System (HDFS) for data storage and have implemented data ingestion pipelines using tools like Flume or custom scripts. I have also used Spark for distributed data processing and analytics. In Spark, I have worked with SparkSQL for querying structured data, Spark Streaming for real-time data processing, and Spark MLlib for machine learning tasks. I have used Scala or Python to write Spark code depending on the project requirements. Additionally, I have experience with Spark cluster management frameworks like YARN and Mesos. Overall, my experience with big data technologies has enabled me to handle large-scale data processing and analysis efficiently.",
+    "answer": "I have worked extensively with big data technologies like Hadoop and Spark in my previous projects. As a Data Engineer, I have used Hadoop for distributed storage and processing of large datasets. I have experience working with Hadoop Distributed File System (HDFS) for data storage and have implemented data ingestion pipelines using tools like Azure Event Hubs / Kafka (legacy Flume) or custom scripts. I have also used Spark for distributed data processing and analytics. In Spark, I have worked with SparkSQL for querying structured data, Spark Streaming for real-time data processing, and Spark MLlib for machine learning tasks. I have used Scala or Python to write Spark code depending on the project requirements. Additionally, I have experience with Spark cluster management frameworks like YARN and Kubernetes. Overall, my experience with big data technologies has enabled me to handle large-scale data processing and analysis efficiently.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -50,7 +50,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "Have you worked with cloud-based data platforms like Azure Data Lake or AWS S3? If so, explain your experience and use cases.",
-    "answer": "Yes, I have worked with cloud-based data platforms like Azure Data Lake and AWS S3 in my previous projects. These platforms provide scalable and reliable cloud storage for big data analytics. I have used Azure Data Lake Store to store and analyze large volumes of structured and unstructured data. It offers seamless integration with other Azure services like Azure Data Factory and Azure Databricks. For example, I have built data ingestion pipelines using Azure Data Factory to bring data from on-premises sources into Azure Data Lake. I have also used AWS S3 for cloud-based data storage and have integrated it with AWS Glue for ETL processes. These platforms have provided me with the flexibility to handle large datasets, perform parallel processing, and leverage cloud-based resources for data engineering tasks.",
+    "answer": "Yes, I have worked with cloud-based data platforms like Azure Data Lake and AWS S3 in my previous projects. These platforms provide scalable and reliable cloud storage for big data analytics. I have used Azure Data Lake Storage Gen2 (ADLS Gen2) to store and analyze large volumes of structured and unstructured data. It offers seamless integration with other Azure services like Azure Data Factory and Azure Databricks. For example, I have built data ingestion pipelines using Azure Data Factory to bring data from on-premises sources into Azure Data Lake. I have also used AWS S3 for cloud-based data storage and have integrated it with AWS Glue for ETL processes. These platforms have provided me with the flexibility to handle large datasets, perform parallel processing, and leverage cloud-based resources for data engineering tasks.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -2712,7 +2712,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What are the main features of Apache Spark?",
-    "answer": "Main features of Apache Spark are as follows:\n+ Performance: The key feature of Apache Spark is its Performance. With Apache Spark we can run programs up to 100 times faster than Hadoop MapReduce in memory. On disk we can run it 10 times faster than Hadoop.\n+ Ease of Use: Spark supports Java, Python, R, Scala etc. languages. So it makes it much easier to develop applications for Apache Spark.\n+ Integrated Solution: In Spark we can create an integrated solution that combines the power of SQL, Streaming and data analytics.\n  R+ un Everywhere: Apache Spark can run on many platforms. It can run on Hadoop, Mesos, in Cloud or standalone. It can also connect to many data sources like HDFS, Cassandra, HBase, S3 etc.\n+ Stream Processing: Apache Spark also supports real time stream processing. With real time streaming we can provide real time analytics solutions. This is very useful for real-time data.",
+    "answer": "Main features of Apache Spark are as follows:\n+ Performance: The key feature of Apache Spark is its Performance. With Apache Spark we can run programs up to 100 times faster than Hadoop MapReduce in memory. On disk we can run it 10 times faster than Hadoop.\n+ Ease of Use: Spark supports Java, Python, R, Scala etc. languages. So it makes it much easier to develop applications for Apache Spark.\n+ Integrated Solution: In Spark we can create an integrated solution that combines the power of SQL, Streaming and data analytics.\n  R+ un Everywhere: Apache Spark can run on many platforms. It can run on Hadoop, Kubernetes / Standalone, in Cloud or standalone. It can also connect to many data sources like HDFS, Cassandra, HBase, S3 etc.\n+ Stream Processing: Apache Spark also supports real time stream processing. With real time streaming we can provide real time analytics solutions. This is very useful for real-time data.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -2965,7 +2965,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What are the different deployment modes of Apache Spark?",
-    "answer": "Some popular deployment modes of Apache Spark are as follows:\n+ Amazon EC2: We can use AWS cloud product Elastic Compute Cloud (EC2) to deploy and run a Spark cluster.\n+ Mesos: We can deploy a Spark application in a private cluster by using Apache Mesos.\n+ YARN: We can also deploy Spark on Apache YARN (Hadoop NextGen)\n+ Standalone: This is the mode in which we can start Spark by hand. We can launch standalone cluster manually.",
+    "answer": "Some popular deployment modes of Apache Spark are as follows:\n+ Amazon EC2: We can use AWS cloud product Elastic Compute Cloud (EC2) to deploy and run a Spark cluster.\n+ Kubernetes / Standalone: We can deploy a Spark application in a private cluster by using Apache Kubernetes / Standalone.\n+ YARN: We can also deploy Spark on Apache YARN (Hadoop NextGen)\n+ Standalone: This is the mode in which we can start Spark by hand. We can launch standalone cluster manually.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -2987,7 +2987,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What are the core components of a distributed application in Apache Spark?",
-    "answer": "Core components of a distributed application in Apache Spark are as follows:\n+ Cluster Manager: This is the component responsible for launching executors and drivers on multiple nodes. We can use different types of cluster managers based on our requirements. Some of the common types are Standalone, YARN, Mesos etc.\n+ Driver: This is the main program in Spark that runs the main() function of an application. A Driver program creates the SparkConetxt.\tDriver program listens and accepts incoming connections from its executors. Driver program can schedule tasks on the cluster. It runs closer to worker nodes.\n+ Executor: This is a process on worker node. It is launched on the node to run an application. It can run tasks and use data in memory or disk storage to perform the task.",
+    "answer": "Core components of a distributed application in Apache Spark are as follows:\n+ Cluster Manager: This is the component responsible for launching executors and drivers on multiple nodes. We can use different types of cluster managers based on our requirements. Some of the common types are Standalone, YARN, Kubernetes / Standalone etc.\n+ Driver: This is the main program in Spark that runs the main() function of an application. A Driver program creates the SparkConetxt.\tDriver program listens and accepts incoming connections from its executors. Driver program can schedule tasks on the cluster. It runs closer to worker nodes.\n+ Executor: This is a process on worker node. It is launched on the node to run an application. It can run tasks and use data in memory or disk storage to perform the task.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3042,7 +3042,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What is Spark Streaming?",
-    "answer": "Spark Streaming is a very popular feature of Spark for processing live streams with a large amount of data. Spark Streaming uses Spark API to create a highly scalable, high throughput and fault tolerant system to handle live data streams. Spark Streaming supports ingestion of data from popular sources like- Kafka, Kinesis, Flume etc. We can apply popular functions like map, reduce, join etc on data processed through Spark Streams. The processed data can be written to a file system or sent to databases and live dashboards.",
+    "answer": "Spark Streaming is a very popular feature of Spark for processing live streams with a large amount of data. Spark Streaming uses Spark API to create a highly scalable, high throughput and fault tolerant system to handle live data streams. Spark Streaming supports ingestion of data from popular sources like- Kafka, Kinesis, Azure Event Hubs / Kafka (legacy Flume) etc. We can apply popular functions like map, reduce, join etc on data processed through Spark Streams. The processed data can be written to a file system or sent to databases and live dashboards.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3053,7 +3053,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "How does Spark Streaming work internally?",
-    "answer": "Spark Streams listen to live data streams from various sources. On receiving data, it is divided into small batches that can be handled by Spark engine. These small batches of data are processed by Spark Engine to generate another output stream of resultant data. Internally, Spark uses an abstraction called DStream or discretized stream. A DStream is a continuous stream of data. We can create DStream from Kafka, Flume, Kinesis etc. A DStream is nothing but a sequence of RDDs in Spark. We can apply transformations and actions on this sequence of RDDs to create further RDDs.",
+    "answer": "Spark Streams listen to live data streams from various sources. On receiving data, it is divided into small batches that can be handled by Spark engine. These small batches of data are processed by Spark Engine to generate another output stream of resultant data. Internally, Spark uses an abstraction called DStream (legacy Spark Streaming API) or discretized stream. A DStream (legacy Spark Streaming API) is a continuous stream of data. We can create DStream (legacy Spark Streaming API) from Kafka, Azure Event Hubs / Kafka (legacy Flume), Kinesis etc. A DStream (legacy Spark Streaming API) is nothing but a sequence of RDDs in Spark. We can apply transformations and actions on this sequence of RDDs to create further RDDs.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3097,7 +3097,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "EASY",
     "question": "What are the different types of Cluster Managers in Apache Spark?",
-    "answer": "Main types of Cluster Managers for Apache Spark are as follows:\n+ Standalone: It is a simple cluster manager that is included with Spark. We can start Spark manually by hand in this mode.\n+ Spark\ton Mesos: In this mode, Mesos master replaces Spark master as the cluster manager. When driver creates a job, Mesos will determine which machine will handle the task.\n+ Hadoop YARN: In this setup, Hadoop YARN is used in cluster. There are two modes in this setup. In cluster mode, Spark driver runs inside a master process managed by YARN on cluster. In client mode, the Spark driver runs in the client process and application master is used for requesting resources from YARN.",
+    "answer": "Main types of Cluster Managers for Apache Spark are as follows:\n+ Standalone: It is a simple cluster manager that is included with Spark. We can start Spark manually by hand in this mode.\n+ Spark\ton Kubernetes / Standalone: In this mode, Kubernetes / Standalone master replaces Spark master as the cluster manager. When driver creates a job, Kubernetes / Standalone will determine which machine will handle the task.\n+ Hadoop YARN: In this setup, Hadoop YARN is used in cluster. There are two modes in this setup. In cluster mode, Spark driver runs inside a master process managed by YARN on cluster. In client mode, the Spark driver runs in the client process and application master is used for requesting resources from YARN.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3130,7 +3130,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What is the Checkpointing in Apache Spark?",
-    "answer": "In Spark Streaming, there is a concept of Checkpointing to add resiliency in the application. In case of a failure, a streaming application needs a checkpoint to recover. Due to this Spark provides Checkpointing. There are two types of Checkpointing:\n+ Metadata Checkpointing: Metadata is the configuration information and other information that defines a Streaming application. We can create a Metadata checkpoint for a node to recover from the failure while running the driver application.\t\tMetadata includes\tconfiguration, DStream operations and incomplete batches etc.\n+ Data Checkpointing: In this checkpoint we save RDD to a reliable storage. This is useful\tin stateful transformations where generated RDD depends on RDD   of   previous   batch. There can be a long chain of RDDs in some cases. To avoid such a large recovery time, it is easier to create Data Checkpoint with RDDs at intermediate steps.",
+    "answer": "In Spark Streaming, there is a concept of Checkpointing to add resiliency in the application. In case of a failure, a streaming application needs a checkpoint to recover. Due to this Spark provides Checkpointing. There are two types of Checkpointing:\n+ Metadata Checkpointing: Metadata is the configuration information and other information that defines a Streaming application. We can create a Metadata checkpoint for a node to recover from the failure while running the driver application.\t\tMetadata includes\tconfiguration, DStream (legacy Spark Streaming API) operations and incomplete batches etc.\n+ Data Checkpointing: In this checkpoint we save RDD to a reliable storage. This is useful\tin stateful transformations where generated RDD depends on RDD   of   previous   batch. There can be a long chain of RDDs in some cases. To avoid such a large recovery time, it is easier to create Data Checkpoint with RDDs at intermediate steps.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3338,7 +3338,7 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Is it possible to run Apache Spark on Apache Mesos?",
+    "question": "Is it possible to run Apache Spark on Apache Kubernetes / Standalone?",
     "answer": "Yes.",
     "domain": "Big Data",
     "subdomain": ""
@@ -3360,8 +3360,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What is a DStream?",
-    "answer": "Discretized Stream (DStream) is a sequence of Resilient Distributed Databases that represent a stream of data.",
+    "question": "What is a DStream (legacy Spark Streaming API)?",
+    "answer": "Discretized Stream (DStream (legacy Spark Streaming API)) is a sequence of Resilient Distributed Databases that represent a stream of data.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3581,7 +3581,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "Define Spark Streaming.",
-    "answer": "Spark supports stream processing – an extension to the Spark API , allowing stream processing of live data streams. The data from different sources like Flume, HDFS is streamed and finally processed to file systems, live dashboards and databases. It is similar to batch processing as the input data is divided into streams like batches.",
+    "answer": "Spark supports stream processing – an extension to the Spark API , allowing stream processing of live data streams. The data from different sources like Azure Event Hubs / Kafka (legacy Flume), HDFS is streamed and finally processed to file systems, live dashboards and databases. It is similar to batch processing as the input data is divided into streams like batches.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3735,7 +3735,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "Do you need to install Spark on all nodes of YARN cluster?",
-    "answer": "No, because Spark runs on top of YARN. Spark runs independently from its installation. Spark has some options to use YARN when dispatching jobs to the cluster, rather than its own built-in manager, or Mesos. Further, there are some configurations to run YARN. They include master, deploy-mode, driver-memory, executor-memory, executor-cores, and queue.",
+    "answer": "No, because Spark runs on top of YARN. Spark runs independently from its installation. Spark has some options to use YARN when dispatching jobs to the cluster, rather than its own built-in manager, or Kubernetes / Standalone. Further, there are some configurations to run YARN. They include master, deploy-mode, driver-memory, executor-memory, executor-cores, and queue.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3856,7 +3856,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "EASY",
     "question": "How is Streaming implemented in Spark? Explain with examples.",
-    "answer": "Spark Streaming is used for processing real-time streaming data. Thus it is a useful addition to the core Spark API. It enables high-throughput and fault-tolerant stream processing of live data streams. The fundamental stream unit is DStream which is basically a series of RDDs (Resilient Distributed Datasets) to process the real-time data. The data from different sources like Flume, HDFS is streamed and finally processed to file systems, live dashboards and databases. It is similar to batch processing as the input data is divided into streams like batches.",
+    "answer": "Spark Streaming is used for processing real-time streaming data. Thus it is a useful addition to the core Spark API. It enables high-throughput and fault-tolerant stream processing of live data streams. The fundamental stream unit is DStream (legacy Spark Streaming API) which is basically a series of RDDs (Resilient Distributed Datasets) to process the real-time data. The data from different sources like Azure Event Hubs / Kafka (legacy Flume), HDFS is streamed and finally processed to file systems, live dashboards and databases. It is similar to batch processing as the input data is divided into streams like batches.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -3977,7 +3977,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "EASY",
     "question": "What is Spark Streaming and how is it implemented in Spark?",
-    "answer": "Spark Streaming is one of the most important features provided by Spark. It is nothing but a Spark API extension for supporting stream processing of data from different sources.\nData from sources like Kafka, Kinesis, Flume, etc are processed and pushed to various destinations like databases, dashboards, machine learning APIs, or as simple as file systems. The data is divided into various streams (similar to batches) and is processed accordingly.\nSpark streaming supports highly scalable, fault-tolerant continuous stream processing which is mostly used in cases like fraud detection, website monitoring, website click baits, IoT (Internet of Things) sensors, etc.\nSpark Streaming first divides the data from the data stream into batches of X seconds which are called Dstreams or Discretized Streams. They are internally nothing but a sequence of multiple RDDs. The Spark application does the task of processing these RDDs using various Spark APIs and the results of this processing are again returned as batches. The following diagram explains the workflow of the spark streaming process.",
+    "answer": "Spark Streaming is one of the most important features provided by Spark. It is nothing but a Spark API extension for supporting stream processing of data from different sources.\nData from sources like Kafka, Kinesis, Azure Event Hubs / Kafka (legacy Flume), etc are processed and pushed to various destinations like databases, dashboards, machine learning APIs, or as simple as file systems. The data is divided into various streams (similar to batches) and is processed accordingly.\nSpark streaming supports highly scalable, fault-tolerant continuous stream processing which is mostly used in cases like fraud detection, website monitoring, website click baits, IoT (Internet of Things) sensors, etc.\nSpark Streaming first divides the data from the data stream into batches of X seconds which are called Dstreams or Discretized Streams. They are internally nothing but a sequence of multiple RDDs. The Spark application does the task of processing these RDDs using various Spark APIs and the results of this processing are again returned as batches. The following diagram explains the workflow of the spark streaming process.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4131,7 +4131,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "How is Caching relevant in Spark Streaming?",
-    "answer": "Spark Streaming involves the division of data stream’s data into batches of X seconds called DStreams. These DStreams let the developers cache the data into the memory which can be very useful in case the data of DStream is used for multiple computations. The caching of data can be done using the cache() method or using persist() method by using appropriate persistence levels. The default persistence level value for input streams receiving data over the networks such as Kafka, Flume, etc is set to achieve data replication on 2 nodes to accomplish fault tolerance.\nCaching using cache method:\nval cacheDf = dframe.cache()\nCaching using persist method:\nval persistDf = dframe.persist(StorageLevel.MEMORY_ONLY)\nThe main advantages of caching are:\n+ Cost efficiency: Since Spark computations are expensive, caching helps to achieve reusing of data and this leads to reuse computations which can save the cost of operations.\n+ Time-efficient: The computation reusage leads to saving a lot of time.\n+ More Jobs Achieved: By saving time of computation execution, the worker nodes can perform/execute more jobs.",
+    "answer": "Spark Streaming involves the division of data stream’s data into batches of X seconds called DStreams. These DStreams let the developers cache the data into the memory which can be very useful in case the data of DStream (legacy Spark Streaming API) is used for multiple computations. The caching of data can be done using the cache() method or using persist() method by using appropriate persistence levels. The default persistence level value for input streams receiving data over the networks such as Kafka, Azure Event Hubs / Kafka (legacy Flume), etc is set to achieve data replication on 2 nodes to accomplish fault tolerance.\nCaching using cache method:\nval cacheDf = dframe.cache()\nCaching using persist method:\nval persistDf = dframe.persist(StorageLevel.MEMORY_ONLY)\nThe main advantages of caching are:\n+ Cost efficiency: Since Spark computations are expensive, caching helps to achieve reusing of data and this leads to reuse computations which can save the cost of operations.\n+ Time-efficient: The computation reusage leads to saving a lot of time.\n+ More Jobs Achieved: By saving time of computation execution, the worker nodes can perform/execute more jobs.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4230,7 +4230,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Explain the run time architecture of Spark?",
-    "answer": "The components of the run-time architecture of Spark are as follows:\n+ The Driver – The main() method of the program runs in the driver. The process that runs the user code which creates RDDs performs transformation and action, and also creates SparkContext is called diver. When the Spark Shell is launched, this signifies that we have created a driver program. The application finishes, as the driver terminates. Finally, driver program splits the Spark application into the task and schedules them to run on the executor.\n+ Cluster Manager –  Spark depends on cluster manager to launch executors. In some cases, even the drivers are launched by cluster manager. It is a pluggable component in Spark. On the cluster manager, the Spark scheduler schedules the jobs and action within a spark application in FIFO fashion. Alternatively, the scheduling can also be done in Round Robin fashion. The resources used by a Spark application can also be dynamically adjusted based on the workload. Thus, the application can free unused resources and request them again when there is a demand. This is available on all coarse-grained cluster managers, i.e. standalone mode, YARN mode, and Mesos coarse-grained mode.\n+ The Executors –  Each task in the Spark job runs in the Spark executors. thus, Executors are launched once in the beginning of Spark Application and then they run for the entire lifetime of an application. Even after the failure of Spark executor, the Spark application can continue with ease.\n  There are two main roles of the executors:\n+ Runs the task that makes up the application and returns the result to the driver.\n+ Provide in-memory storage for RDDs that the user program cache.",
+    "answer": "The components of the run-time architecture of Spark are as follows:\n+ The Driver – The main() method of the program runs in the driver. The process that runs the user code which creates RDDs performs transformation and action, and also creates SparkContext is called diver. When the Spark Shell is launched, this signifies that we have created a driver program. The application finishes, as the driver terminates. Finally, driver program splits the Spark application into the task and schedules them to run on the executor.\n+ Cluster Manager –  Spark depends on cluster manager to launch executors. In some cases, even the drivers are launched by cluster manager. It is a pluggable component in Spark. On the cluster manager, the Spark scheduler schedules the jobs and action within a spark application in FIFO fashion. Alternatively, the scheduling can also be done in Round Robin fashion. The resources used by a Spark application can also be dynamically adjusted based on the workload. Thus, the application can free unused resources and request them again when there is a demand. This is available on all coarse-grained cluster managers, i.e. standalone mode, YARN mode, and Kubernetes mode.\n+ The Executors –  Each task in the Spark job runs in the Spark executors. thus, Executors are launched once in the beginning of Spark Application and then they run for the entire lifetime of an application. Even after the failure of Spark executor, the Spark application can continue with ease.\n  There are two main roles of the executors:\n+ Runs the task that makes up the application and returns the result to the driver.\n+ Provide in-memory storage for RDDs that the user program cache.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4372,8 +4372,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What is DStream?",
-    "answer": "DStream is the high-level abstraction provided by Spark Streaming. It represents a continuous stream of data. Thus, DStream is internally a sequence of RDDs. There are two ways to create DStream:\nby using data from different sources such as Kafka, Flume, and Kinesis.\nby applying high-level operations on other DStreams.",
+    "question": "What is DStream (legacy Spark Streaming API)?",
+    "answer": "DStream (legacy Spark Streaming API) is the high-level abstraction provided by Spark Streaming. It represents a continuous stream of data. Thus, DStream (legacy Spark Streaming API) is internally a sequence of RDDs. There are two ways to create DStream (legacy Spark Streaming API):\nby using data from different sources such as Kafka, Azure Event Hubs / Kafka (legacy Flume), and Kinesis.\nby applying high-level operations on other DStreams.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4383,8 +4383,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "EASY",
-    "question": "Explain different transformation on DStream.",
-    "answer": "DStream is a basic abstraction of Spark Streaming. It is a continuous sequence of RDD which represents a continuous stream of data. Like RDD, DStream also supports many transformations which are available on normal Spark RDD. For example, map(func), flatMap(func), filter(func) etc.",
+    "question": "Explain different transformation on DStream (legacy Spark Streaming API).",
+    "answer": "DStream (legacy Spark Streaming API) is a basic abstraction of Spark Streaming. It is a continuous sequence of RDD which represents a continuous stream of data. Like RDD, DStream (legacy Spark Streaming API) also supports many transformations which are available on normal Spark RDD. For example, map(func), flatMap(func), filter(func) etc.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4516,7 +4516,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "Discuss writeahead logging in Apache Spark Streaming.",
-    "answer": "There are two types of failures in any Apache Spark job – Either the driver failure or the worker failure.\nWhen any worker node fails, the executor processes running in that worker node will kill, and the tasks which were scheduled on that worker node will be automatically moved to any of the other running worker nodes, and the tasks will accomplish.\nWhen the driver or master node fails, all of the associated worker nodes running the executors will kill, along with the data in each of the executors’ memory. In the case of files being read from reliable and fault tolerant file systems like HDFS, zero data loss is always guaranteed, as the data is ready to be read anytime from the file system. Checkpointing also ensures fault tolerance in Spark by periodically saving the application data in specific intervals.\nIn the case of Spark Streaming application, zero data loss is not always guaranteed, as the data will buffer in the executors’ memory until they get processed. If the driver fails, all of the executors will kill, with the data in their memory, and the data cannot recover.\nTo overcome this data loss scenario, Write Ahead Logging (WAL) has been introduced in Apache Spark 1.2. With WAL enabled, the intention of the operation is first noted down in a log file, such that if the driver fails and is restarted, the noted operations in that log file can apply to the data. For sources that read streaming data, like Kafka or Flume, receivers will be receiving the data, and those will store in the executor’s memory. With WAL enabled, these received data will also store in the log files.\nWAL can enable by performing the below:\n1. Setting the checkpoint directory, by using streamingContext.checkpoint(path)\n2. Enabling the WAL logging, by setting spark.stream.receiver.WriteAheadLog.enable to True.",
+    "answer": "There are two types of failures in any Apache Spark job – Either the driver failure or the worker failure.\nWhen any worker node fails, the executor processes running in that worker node will kill, and the tasks which were scheduled on that worker node will be automatically moved to any of the other running worker nodes, and the tasks will accomplish.\nWhen the driver or master node fails, all of the associated worker nodes running the executors will kill, along with the data in each of the executors’ memory. In the case of files being read from reliable and fault tolerant file systems like HDFS, zero data loss is always guaranteed, as the data is ready to be read anytime from the file system. Checkpointing also ensures fault tolerance in Spark by periodically saving the application data in specific intervals.\nIn the case of Spark Streaming application, zero data loss is not always guaranteed, as the data will buffer in the executors’ memory until they get processed. If the driver fails, all of the executors will kill, with the data in their memory, and the data cannot recover.\nTo overcome this data loss scenario, Write Ahead Logging (WAL) has been introduced in Apache Spark 1.2. With WAL enabled, the intention of the operation is first noted down in a log file, such that if the driver fails and is restarted, the noted operations in that log file can apply to the data. For sources that read streaming data, like Kafka or Azure Event Hubs / Kafka (legacy Flume), receivers will be receiving the data, and those will store in the executor’s memory. With WAL enabled, these received data will also store in the log files.\nWAL can enable by performing the below:\n1. Setting the checkpoint directory, by using streamingContext.checkpoint(path)\n2. Enabling the WAL logging, by setting spark.stream.receiver.WriteAheadLog.enable to True.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4603,7 +4603,7 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What are the benefits of using Spark With Apache Mesos?",
+    "question": "What are the benefits of using Spark With Apache Kubernetes / Standalone?",
     "answer": "It renders scalable partitioning among various Spark instances and dynamic partitioning between Spark and other big data frameworks.",
     "domain": "Big Data",
     "subdomain": ""
@@ -4615,7 +4615,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What is the Significance of Sliding Window Operation?",
-    "answer": "Sliding Window controls transmission of data packets between various computer networks. Spark Streaming library provides windowed computations where the transformations on RDDs are applied over a sliding window of data. Whenever the window slides, the RDDs that fall within the particular window are combined and operated upon to produce new RDDs of the windowed DStream.",
+    "answer": "Sliding Window controls transmission of data packets between various computer networks. Spark Streaming library provides windowed computations where the transformations on RDDs are applied over a sliding window of data. Whenever the window slides, the RDDs that fall within the particular window are combined and operated upon to produce new RDDs of the windowed DStream (legacy Spark Streaming API).",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4626,7 +4626,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "When running Spark Applications is it necessary to install Spark on all Nodes of Yarn Cluster?",
-    "answer": "Spark need not be installed when running a job under YARN or Mesos because Spark can execute on top of YARN or Mesos clusters without affecting any change to the cluster.",
+    "answer": "Spark need not be installed when running a job under YARN or Kubernetes / Standalone because Spark can execute on top of YARN or Kubernetes / Standalone clusters without affecting any change to the cluster.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4835,7 +4835,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "Explain about Core Components of a distributed Spark Application?",
-    "answer": "Driver: The process that runs the main () method of the program to create RDDs and perform transformations and actions on them.\nExecutor: The worker processes that run the individual tasks of a Spark job.\nCluster Manager: A pluggable component in Spark, to launch Executors and Drivers. The cluster manager allows Spark to run on top of other external managers like Apache Mesos or YARN.",
+    "answer": "Driver: The process that runs the main () method of the program to create RDDs and perform transformations and actions on them.\nExecutor: The worker processes that run the individual tasks of a Spark job.\nCluster Manager: A pluggable component in Spark, to launch Executors and Drivers. The cluster manager allows Spark to run on top of other external managers like Apache Kubernetes / Standalone or YARN.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4922,8 +4922,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What is Dstream in Apache Spark?",
-    "answer": "Dstream stands for Discretized Stream. It is a sequence of Resilient Distributed Database (RDD) representing a continuous stream of data. There are several ways to create Dstream from various sources like HDFS, Apache Flume, Apache Kafka, etc.",
+    "question": "What is DStream (legacy Spark Streaming API) in Apache Spark?",
+    "answer": "DStream (legacy Spark Streaming API) stands for Discretized Stream. It is a sequence of Resilient Distributed Database (RDD) representing a continuous stream of data. There are several ways to create DStream (legacy Spark Streaming API) from various sources like HDFS, Apache Azure Event Hubs / Kafka (legacy Flume), Apache Kafka, etc.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -4945,7 +4945,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "Is it necessary to install Spark on all nodes of the YARN cluster?",
-    "answer": "No. It doesn't seem necessary to install Spark on all YARN cluster nodes because Spark runs on top of the YARN. Apache Spark runs independently from its installation. Spark provides some options to use YARN when dispatching jobs to the cluster, rather than its built-in manager or Mesos. Besides this, there are also some configurations to run YARN, such as master, deploy-mode, driver-memory, executor-memory, executor-cores, and queue.",
+    "answer": "No. It doesn't seem necessary to install Spark on all YARN cluster nodes because Spark runs on top of the YARN. Apache Spark runs independently from its installation. Spark provides some options to use YARN when dispatching jobs to the cluster, rather than its built-in manager or Kubernetes / Standalone. Besides this, there are also some configurations to run YARN, such as master, deploy-mode, driver-memory, executor-memory, executor-cores, and queue.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -5032,8 +5032,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Can we run Apache Spark on Apache Mesos?",
-    "answer": "Yes, we can run Apache Spark on the hardware clusters managed by Mesos.",
+    "question": "Can we run Apache Spark on Apache Kubernetes / Standalone?",
+    "answer": "Yes, we can run Apache Spark on the hardware clusters managed by Kubernetes / Standalone.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -5054,8 +5054,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "How can you connect Spark to Apache Mesos?",
-    "answer": "Follow the steps given below to connect Spark to Apache Mesos:\nConfigure the spark driver program to connect to Mesos.\nSet a path location for the Spark binary package that it can be accessible by Mesos.\nInstall Apache Spark in the same location as that of Apache Mesos and configure the property spark.mesos.executor.home to point to the location where it is installed.",
+    "question": "How does Spark submit jobs to a Kubernetes cluster manager?",
+    "answer": "To run Spark on a Kubernetes cluster, submit applications using the spark-submit CLI. Set the master URL to k8s://https://<k8s-api-server> and configure the container image with spark.kubernetes.container.image. Spark dynamically spins up executor pods inside the cluster namespace, which automatically clean up when execution completes.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -6705,7 +6705,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What does streamtable do?",
-    "answer": "It is query hint to stream a table into memory before running the query. It is a query optimization Technique.",
+    "answer": "The `STREAMTABLE` query hint is used in distributed SQL engines (like Hive or Spark SQL) to optimize join performance. It tells the query compiler to stream the specified table through memory while caching the other joined tables. This minimizes data serialization and network shuffling overhead. In modern cloud architectures like Microsoft Fabric or Databricks, this is largely handled automatically by Adaptive Query Execution (AQE), but manual hints remain useful in legacy Hive migration scenarios.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -6892,7 +6892,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the architecture of Greenplum database?",
-    "answer": "Greenplum database follows a distributed architecture where data and query processing are divided across multiple nodes.",
+    "answer": "Greenplum is a massive parallel processing (MPP) analytical database built on PostgreSQL. It consists of a coordinator node (Master) and multiple segment hosts. The coordinator receives client SQL queries, creates parallel query plans, and distributes work to segments. Each segment host runs an independent PostgreSQL instance and processes its local partition of the data, scaling query speeds linearly with hardware.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -7112,7 +7112,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Greenplum handle query optimization for complex analytical queries?",
-    "answer": "Greenplum uses techniques like cost-based query optimization, statistics collection, and query rewrites to optimize complex analytical queries.",
+    "answer": "Greenplum uses a specialized MPP query optimizer called GPORCA, designed for parallel execution of complex multi-table joins. GPORCA evaluates query plans across segment boundaries, chooses optimal join locations (broadcast vs. redistribution), and generates physical execution plans that run locally on segment hosts to minimize network data transfer overhead.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -7981,7 +7981,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is Bigtable?",
-    "answer": "Bigtable is a distributed, highly scalable, and NoSQL database developed by Google.",
+    "answer": "Bigtable is a highly scalable, distributed NoSQL database designed to handle petabyte-scale structured data across thousands of commodity servers. It stores data as a sparse, multi-dimensional, sorted map indexed by row key, column key, and timestamp. Bigtable does not support relational joins; instead, data is denormalized. It serves as the foundation for Google Cloud services like Cloud Bigtable and inspired HBase in the Hadoop ecosystem.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -7992,7 +7992,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle data storage?",
-    "answer": "Bigtable stores data in a sparse, distributed, and multi-dimensional sorted map.",
+    "answer": "Bigtable partitions data into 'tablets' (ranges of rows), which are stored on Colossus/GFS as SSTable files. Tablet servers serve read/write requests for active tablets, while the Master server coordinates tablet assignments and balances load. Writes are appended to a commit log and buffered in memtable, then periodically flushed to disk as SSTables. Reads merge data from SSTables and the memtable to ensure current state.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8003,7 +8003,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What are the key features of Bigtable?",
-    "answer": "Some key features of Bigtable include scalability, high performance, fault tolerance, and automatic load balancing.",
+    "answer": "Key features of Bigtable include: (1) Linear scalability, where adding nodes increases write throughput linearly. (2) High performance for single-row lookups and scans. (3) Resilient fault tolerance via automatic tablet server failover. (4) Flexible schema-less design, storing arbitrarily formatted columns inside column families. (5) Built-in cell versioning using timestamps for historic change tracking.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8014,7 +8014,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable achieve scalability?",
-    "answer": "Bigtable achieves scalability by partitioning data into tablets, which are distributed across multiple servers.",
+    "answer": "Bigtable achieves horizontal scalability by splitting tables dynamically into tablets (typically 100-200MB ranges of rows). The Master server automatically assigns these tablets to different tablet servers across the cluster based on load. Since SSTables are stored in a shared distributed file system (Colossus), moving a tablet only requires updating metadata in Chubby (ZooKeeper), which takes milliseconds and incurs zero data copying.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8025,7 +8025,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is a tablet in Bigtable?",
-    "answer": "A tablet is a range of rows in a Bigtable that is stored and managed independently by a single server.",
+    "answer": "A tablet in Bigtable is a contiguous range of rows grouped together to balance storage and compute load. Each table consists of multiple tablets distributed across tablet servers. When a tablet grows too large (e.g., exceeds 200MB), it is automatically split into two smaller tablets. This dynamic splitting ensures that data remains evenly distributed across all cluster nodes to avoid hot spots.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8058,7 +8058,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle load balancing?",
-    "answer": "Bigtable automatically redistributes tablets across servers to balance the workload and maintain performance.",
+    "answer": "Bigtable balances load using the Master server, which monitors the load metrics (CPU, RAM, request rate) of all active tablet servers. If a tablet server becomes hot due to a high volume of requests on a specific row key range, the Master splits the tablet and moves the new tablet to a less loaded server. It does this by updating tablet metadata locations, avoiding physical data transfers.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8069,7 +8069,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What consistency model does Bigtable provide?",
-    "answer": "Bigtable provides \"eventual consistency,\" meaning that data may not be immediately consistent across all replicas but will eventually converge.",
+    "answer": "Bigtable guarantees strong consistency at the single-row level. All read and write operations to a single row are serialized and atomic. However, across different tablet servers or in a replicated multi-cluster environment, replication is asynchronous, providing eventual consistency for cross-region reads. There is no multi-row transactional support (no ACID joins).",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8080,7 +8080,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable support structured data?",
-    "answer": "Bigtable stores data as byte arrays, allowing developers to interpret the data in any structured format they desire.",
+    "answer": "Bigtable structures data using column families, which are logical groups of columns that are typically stored and accessed together. Within a column family, columns are created dynamically as byte arrays. Since Bigtable treats all keys and values as raw byte arrays, it supports arbitrary structured formats like JSON, ProtoBuf, or Avro serialized payloads, leaving schema parsing to the client application.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8102,7 +8102,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle schema changes?",
-    "answer": "Bigtable is schema-less, meaning that new columns can be added to the table without affecting existing rows.",
+    "answer": "Bigtable is completely schema-less. Schema changes do not require rebuilding tables or running DDL migration statements. Columns are created on-the-fly during write operations by specifying a column qualifier name within an existing column family. This enables high flexibility in multi-tenant environments, where schema drift or dynamic columns are common.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8124,7 +8124,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle data replication?",
-    "answer": "Bigtable replicates data across multiple data centers to ensure durability and availability in case of failures.",
+    "answer": "Bigtable supports asynchronous multi-region replication to ensure high availability and disaster recovery. Replication is configured at the instance level. When data is written to a cluster, it is committed locally and then replicated asynchronously to other clusters. This allows read requests to failover to secondary regions with minimal latency.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8146,7 +8146,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Does Bigtable support ACID transactions?",
-    "answer": "No, Bigtable does not provide built-in support for ACID transactions.",
+    "answer": "Bigtable does not support multi-row ACID transactions or cross-table joins. It only guarantees strong consistency and atomicity at the single-row level (all mutations to a single row key are atomic). For transactional relational needs, architectures should use Google Cloud Spanner, Azure SQL, or Azure Cosmos DB.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8201,7 +8201,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Big table handle data sharding and distribution?",
-    "answer": "Bigtable automatically shards data by range partitioning the row keys and distributes tablets across multiple servers.",
+    "answer": "Bigtable automatically shards tables into tablets, which are ranges of rows sorted key-wise. These tablets are dynamically distributed across tablet servers by the master node based on access metrics to balance load and throughput.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8212,7 +8212,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the maximum size of a row in Bigtable?",
-    "answer": "The maximum size of a row in Bigtable is 100 MB.",
+    "answer": "While Bigtable can technically store rows up to 100MB, the recommended maximum size of a single row in production is 10MB to prevent read/write latency degradation and GC memory pressure on tablet servers. Large payloads should be stored in cloud storage with references in Bigtable.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8366,7 +8366,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Does Bigtable provide automatic indexing for faster querying?",
-    "answer": "Bigtable does not provide automatic indexing. It relies on appropriate schema design to enable efficient querying.",
+    "answer": "No, Bigtable only indexes data by row keys. There are no secondary indexes. Querying columns without specifying a row key range forces a full table scan, which is highly inefficient. Fast querying relies entirely on designing row keys that group related data contiguously.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8377,7 +8377,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle time-based data, such as event logs?",
-    "answer": "Bigtable uses a timestamp associated with each cell, allowing you to store and query time-series data efficiently.",
+    "answer": "Bigtable is highly suited for time-series and event log data. By designing a row key that ends with a reversed timestamp (e.g. sensor_id#9999999999-timestamp), queries automatically retrieve the most recent events first, optimizing scan operations.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8432,7 +8432,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle time-travel queries?",
-    "answer": "Bigtable allows you to retrieve previous versions of data by specifying a timestamp or a time range in your queries.",
+    "answer": "Bigtable supports querying historical data using cell-level timestamps. Each cell mutation is versioned with a timestamp, allowing clients to query values as of a specific point in time or retrieve a history of mutations within a column family.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8520,7 +8520,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How does Bigtable handle schema evolution?",
-    "answer": "Bigtable accommodates schema evolution by allowing the addition or removal of columns without affecting existing data.",
+    "answer": "Bigtable is completely schema-less. Schema changes do not require rebuilding tables or running DDL migration statements. Columns are created on-the-fly during write operations by specifying a column qualifier name within an existing column family.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8531,7 +8531,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Does Bigtable provide automatic data expiration?",
-    "answer": "No, Bigtable does not provide built-in automatic data expiration. You would need to manage data expiration manually.",
+    "answer": "Bigtable supports automatic data expiration configured at the column family level. Administrators can set garbage collection rules, such as cell age-to-live (TTL) limits or the maximum number of cell versions to keep, which are reclaimed during major compactions.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8597,7 +8597,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Can you explain how Big table handles data access control on a per-row basis?",
-    "answer": "Bigtable integrates with Google Cloud IAM, allowing you to set fine-grained access control policies at the row level.",
+    "answer": "Access control in Bigtable is managed at the Google Cloud project, instance, or table level using IAM roles. It does not natively support row-level permissions; fine-grained access control must be managed in the application layer.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -8652,7 +8652,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Does Bigtable support data replication within a single region?",
-    "answer": "Yes, Bigtable supports data replication within a single region to provide higher availability and durability.",
+    "answer": "Bigtable supports multi-cluster replication asynchronously across geographical regions. This ensures disaster recovery and high availability, though it operates on an eventual consistency model.",
     "domain": "Cloud Platforms",
     "subdomain": ""
   },
@@ -9080,8 +9080,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "HARD",
-    "question": "What is Flume?",
-    "answer": "Flume is a distributed, reliable, and available service for efficiently collecting, aggregating, and moving large amounts of log data. It has a simple and flexible architecture based on streaming data flows. It is robust and fault tolerant with tunable reliability mechanisms and many fail over and recovery mechanisms. It uses a simple extensible data model that allows for online analytic application.",
+    "question": "What is Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Azure Event Hubs / Kafka (legacy Flume) is a distributed, reliable, and available service for efficiently collecting, aggregating, and moving large amounts of log data. It has a simple and flexible architecture based on streaming data flows. It is robust and fault tolerant with tunable reliability mechanisms and many fail over and recovery mechanisms. It uses a simple extensible data model that allows for online analytic application.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9091,8 +9091,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What is Apache Flume?",
-    "answer": "Apache Flume is a distributed, reliable, and available system for efficiently collecting, aggregating and moving large amounts of log data from many different sources to a centralized data source. Review this Flume use case to learn how Mozilla collects and Analyse the Logs using Flume and Hive.\nFlume is a framework for populating Hadoop with data. Agents are populated throughout ones IT infrastructure – inside web servers, application servers and mobile devices, for example – to collect data and integrate it into Hadoop.",
+    "question": "What is Apache Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Apache Azure Event Hubs / Kafka (legacy Flume) is a distributed, reliable, and available system for efficiently collecting, aggregating and moving large amounts of log data from many different sources to a centralized data source. Review this Azure Event Hubs / Kafka (legacy Flume) use case to learn how Mozilla collects and Analyse the Logs using Azure Event Hubs / Kafka (legacy Flume) and Hive.\nAzure Event Hubs / Kafka (legacy Flume) is a framework for populating Hadoop with data. Agents are populated throughout ones IT infrastructure – inside web servers, application servers and mobile devices, for example – to collect data and integrate it into Hadoop.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9102,7 +9102,7 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Which is the reliable channel in Flume to ensure that there is no Data Loss?",
+    "question": "Which is the reliable channel in Azure Event Hubs / Kafka (legacy Flume) to ensure that there is no Data Loss?",
     "answer": "FILE Channel is the most reliable channel among the 3 channels JDBC, FILE and MEMORY.",
     "domain": "Big Data",
     "subdomain": ""
@@ -9113,8 +9113,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "How can Flume be used with Hbase?",
-    "answer": "Apache Flume can be used with HBase using one of the two HBase links:\n+ HBaseSink (org.apache.flume.sink.hbase.HBaseSink) supports secure HBase clusters and also the novel HBase IPC that was introduced in the version HBase 0.96.\n+ AsyncHBaseSink (org.apache.flume.sink.hbase.AsyncHBaseSink) has better performance than HBase sink as it can easily make non-blocking calls to HBase.\n\nWorking of the HBaseSink:\n+ In HBaseSink, a Flume Event is converted into HBase Increments or Puts. Serializer implements the HBaseEventSerializer which is then instantiated when the sink starts. For every event, sink calls the initialize method in the serializer which then translates the Flume Event into HBase increments and puts to be sent to HBase cluster.\nWorking of the AsyncHBaseSink:\n+ AsyncHBaseSink implements the AsyncHBaseEventSerializer. The initialize method is called only once by the sink when it starts. Sink invokes the setEvent method and then makes calls to the getIncrements and getActions methods just similar to HBase sink. When the sink stops, the cleanUp method is called by the serializer.",
+    "question": "How can Azure Event Hubs / Kafka (legacy Flume) be used with Hbase?",
+    "answer": "Apache Azure Event Hubs / Kafka (legacy Flume) can be used with HBase using one of the two HBase links:\n+ HBaseSink (org.apache.flume.sink.hbase.HBaseSink) supports secure HBase clusters and also the novel HBase IPC that was introduced in the version HBase 0.96.\n+ AsyncHBaseSink (org.apache.flume.sink.hbase.AsyncHBaseSink) has better performance than HBase sink as it can easily make non-blocking calls to HBase.\n\nWorking of the HBaseSink:\n+ In HBaseSink, a Azure Event Hubs / Kafka (legacy Flume) Event is converted into HBase Increments or Puts. Serializer implements the HBaseEventSerializer which is then instantiated when the sink starts. For every event, sink calls the initialize method in the serializer which then translates the Azure Event Hubs / Kafka (legacy Flume) Event into HBase increments and puts to be sent to HBase cluster.\nWorking of the AsyncHBaseSink:\n+ AsyncHBaseSink implements the AsyncHBaseEventSerializer. The initialize method is called only once by the sink when it starts. Sink invokes the setEvent method and then makes calls to the getIncrements and getActions methods just similar to HBase sink. When the sink stops, the cleanUp method is called by the serializer.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9125,7 +9125,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What is an Agent?",
-    "answer": "A process that hosts flume components such as sources, channels and sinks, and thus has the ability to receive, store and forward events to their destination.",
+    "answer": "A process that hosts Azure Event Hubs / Kafka (legacy Flume) components such as sources, channels and sinks, and thus has the ability to receive, store and forward events to their destination.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9135,8 +9135,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Is it possible to Leverage Real Time Analysis on the Big Data collected by Flume directly?",
-    "answer": "Data from Flume can be extracted, transformed and loaded in real-time into Apache Solr servers usingMorphlineSolrSink.",
+    "question": "Is it possible to Leverage Real Time Analysis on the Big Data collected by Azure Event Hubs / Kafka (legacy Flume) directly?",
+    "answer": "Data from Azure Event Hubs / Kafka (legacy Flume) can be extracted, transformed and loaded in real-time into Apache Solr servers usingMorphlineSolrSink.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9157,8 +9157,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Explain about the different channel types in Flume and which channel type is faster?",
-    "answer": "The 3 different built in channel types available in Flume are:\n\n+ MEMORY Channel – Events are read from the source into memory and passed to the sink.\n+ JDBC Channel – JDBC Channel stores the events in an embedded Derby database.\n+ FILE Channel –File Channel writes the contents to a file on the file system after reading the event from a source. The file is deleted only after the contents are successfully delivered to the sink.\n\nMEMORY Channel is the fastest channel among the three however has the risk of data loss. The channel that you choose completely depends on the nature of the big data application and the value of each event.",
+    "question": "Explain about the different channel types in Azure Event Hubs / Kafka (legacy Flume) and which channel type is faster?",
+    "answer": "The 3 different built in channel types available in Azure Event Hubs / Kafka (legacy Flume) are:\n\n+ MEMORY Channel – Events are read from the source into memory and passed to the sink.\n+ JDBC Channel – JDBC Channel stores the events in an embedded Derby database.\n+ FILE Channel –File Channel writes the contents to a file on the file system after reading the event from a source. The file is deleted only after the contents are successfully delivered to the sink.\n\nMEMORY Channel is the fastest channel among the three however has the risk of data loss. The channel that you choose completely depends on the nature of the big data application and the value of each event.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9168,8 +9168,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Explain about the replication and multiplexing selectors in Flume?",
-    "answer": "Channel Selectors are used to handle multiple channels. Based on the Flume header value, an event can be written just to a single channel or to multiple channels. If a channel selector is not specified to the source then by default it is the Replicating selector. Using the replicating selector, the same event is written to all the channels in the source’s channels list. Multiplexing channel selector is used when the application has to send different events to different channels.",
+    "question": "Explain about the replication and multiplexing selectors in Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Channel Selectors are used to handle multiple channels. Based on the Azure Event Hubs / Kafka (legacy Flume) header value, an event can be written just to a single channel or to multiple channels. If a channel selector is not specified to the source then by default it is the Replicating selector. Using the replicating selector, the same event is written to all the channels in the source’s channels list. Multiplexing channel selector is used when the application has to send different events to different channels.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9179,8 +9179,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "HARD",
-    "question": "Does Apache Flume provide support for third party Plugins?",
-    "answer": "Most of the data analysts use Apache Flume has plug-in based architecture as it can load data from external sources and transfer it to external destinations.",
+    "question": "Does Apache Azure Event Hubs / Kafka (legacy Flume) provide support for third party Plugins?",
+    "answer": "Most of the data analysts use Apache Azure Event Hubs / Kafka (legacy Flume) has plug-in based architecture as it can load data from external sources and transfer it to external destinations.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9201,7 +9201,7 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Why we are using Flume?",
+    "question": "Why we are using Azure Event Hubs / Kafka (legacy Flume)?",
     "answer": "Most often Hadoop developer use this too to get data from social media sites. Its developed by Cloudera for aggregating and moving very large amount if data. The primary use is to gather log files from different sources and asynchronously persist in the hadoop cluster.",
     "domain": "Big Data",
     "subdomain": ""
@@ -9212,8 +9212,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What is Flumeng?",
-    "answer": "A real time loader for streaming your data into Hadoop. It stores data in HDFS and HBase. You’ll want to get started with FlumeNG, which improves on the original flume.",
+    "question": "What is Azure Event Hubs / Kafka (legacy Flume)ng?",
+    "answer": "A real time loader for streaming your data into Hadoop. It stores data in HDFS and HBase. You’ll want to get started with Azure Event Hubs / Kafka (legacy Flume)NG, which improves on the original flume.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9223,8 +9223,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What are the complicated steps in Flume configurations?",
-    "answer": "Flume can processing streaming data. so if started once, there is no stop/end to the process. asynchronously it can flows data from source to HDFS via agent. First of all agent should know individual components how they are connected to load data. so configuration is trigger to load streaming data. for example consumerkey, consumersecret accessToken and accessTokenSecret are key factor to download data from twitter.",
+    "question": "What are the complicated steps in Azure Event Hubs / Kafka (legacy Flume) configurations?",
+    "answer": "Azure Event Hubs / Kafka (legacy Flume) can processing streaming data. so if started once, there is no stop/end to the process. asynchronously it can flows data from source to HDFS via agent. First of all agent should know individual components how they are connected to load data. so configuration is trigger to load streaming data. for example consumerkey, consumersecret accessToken and accessTokenSecret are key factor to download data from twitter.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9234,8 +9234,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What are Flume core components?",
-    "answer": "Source, Channels and sink are core components in Apache Flume. When Flume source receives event from externalsource, it stores the event in one or multiple channels. Flume channel is temporarily store and keep the event until’s consumed by the Flume sink. It act as Flume repository. Flume Sink removes the event from channel and put into an external repository like HDFS or Move to the next flume.",
+    "question": "What are Azure Event Hubs / Kafka (legacy Flume) core components?",
+    "answer": "Source, Channels and sink are core components in Apache Azure Event Hubs / Kafka (legacy Flume). When Azure Event Hubs / Kafka (legacy Flume) source receives event from externalsource, it stores the event in one or multiple channels. Azure Event Hubs / Kafka (legacy Flume) channel is temporarily store and keep the event until’s consumed by the Azure Event Hubs / Kafka (legacy Flume) sink. It act as Azure Event Hubs / Kafka (legacy Flume) repository. Azure Event Hubs / Kafka (legacy Flume) Sink removes the event from channel and put into an external repository like HDFS or Move to the next flume.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9246,7 +9246,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "MEDIUM",
     "question": "What are the Data Extraction Tools in Hadoop?",
-    "answer": "Sqoop can be used to transfer data between RDBMS and HDFS. Flume can be used to extract the streaming data from social media, web log etc and store it on HDFS.",
+    "answer": "Azure Data Factory (legacy Sqoop) can be used to transfer data between RDBMS and HDFS. Azure Event Hubs / Kafka (legacy Flume) can be used to extract the streaming data from social media, web log etc and store it on HDFS.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9256,8 +9256,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Does Flume provide 100 percents reliability to the Data Flow?",
-    "answer": "Yes, Apache Flume provides end to end reliability because of its transactional approach in data flow.",
+    "question": "Does Azure Event Hubs / Kafka (legacy Flume) provide 100 percents reliability to the Data Flow?",
+    "answer": "Yes, Apache Azure Event Hubs / Kafka (legacy Flume) provides end to end reliability because of its transactional approach in data flow.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9267,8 +9267,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Tell any two Features of Flume?",
-    "answer": "Fume collects data efficiently, aggregate and moves large amount of log data from many different sources to centralized data store.\nFlume is not restricted to log data aggregation and it can transport massive quantity of event data including but not limited to network traffic data, social-media generated data , email message na pretty much any data storage.",
+    "question": "Tell any two Features of Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Fume collects data efficiently, aggregate and moves large amount of log data from many different sources to centralized data store.\nAzure Event Hubs / Kafka (legacy Flume) is not restricted to log data aggregation and it can transport massive quantity of event data including but not limited to network traffic data, social-media generated data , email message na pretty much any data storage.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9289,8 +9289,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Why Flume?",
-    "answer": "Flume is not limited to collect logs from distributed systems, but it is capable of performing other use cases such as\n+ Collecting readings from array of sensors\n+ Collecting impressions from custom apps for an ad network\n+ Collecting readings from network devices in order to monitor their performance.\nFlume is targeted to preserve the reliability, scalability, manageability and extensibility while it serves maximum number of clients with higher QoS",
+    "question": "Why Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Azure Event Hubs / Kafka (legacy Flume) is not limited to collect logs from distributed systems, but it is capable of performing other use cases such as\n+ Collecting readings from array of sensors\n+ Collecting impressions from custom apps for an ad network\n+ Collecting readings from network devices in order to monitor their performance.\nAzure Event Hubs / Kafka (legacy Flume) is targeted to preserve the reliability, scalability, manageability and extensibility while it serves maximum number of clients with higher QoS",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9300,8 +9300,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What is Flume Event?",
-    "answer": "A unit of data with set of string attribute called Flume event. The external source like web-server send events to the source. Internally Flume has inbuilt functionality to understand the source format.\nEach log file is consider as an event. Each event has header and value sectors, which has header information and appropriate value that assign to articular header.",
+    "question": "What is Azure Event Hubs / Kafka (legacy Flume) Event?",
+    "answer": "A unit of data with set of string attribute called Azure Event Hubs / Kafka (legacy Flume) event. The external source like web-server send events to the source. Internally Azure Event Hubs / Kafka (legacy Flume) has inbuilt functionality to understand the source format.\nEach log file is consider as an event. Each event has header and value sectors, which has header information and appropriate value that assign to articular header.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9311,8 +9311,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "How Multi hop agent can be setup in Flume?",
-    "answer": "Avro RPC Bridge mechanism is used to setup Multi-hop agent in Apache Flume.",
+    "question": "How Multi hop agent can be setup in Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Avro RPC Bridge mechanism is used to setup Multi-hop agent in Apache Azure Event Hubs / Kafka (legacy Flume).",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9322,7 +9322,7 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Can Flume can distribute data to multiple destinations?",
+    "question": "Can Azure Event Hubs / Kafka (legacy Flume) can distribute data to multiple destinations?",
     "answer": "Yes. It support multiplexing flow. The event flows from one source to multiple channel and multiple destionations, It is acheived by defining a flow multiplexer.",
     "domain": "Big Data",
     "subdomain": ""
@@ -9344,8 +9344,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "What are the similarities and differences between Apache Flume and Apache Kafka?",
-    "answer": "Flume pushes messages to their destination via its Sinks.With Kafka you need to consume messages from Kafka Broker using a Kafka Consumer API.",
+    "question": "What are the similarities and differences between Apache Azure Event Hubs / Kafka (legacy Flume) and Apache Kafka?",
+    "answer": "Azure Event Hubs / Kafka (legacy Flume) pushes messages to their destination via its Sinks.With Kafka you need to consume messages from Kafka Broker using a Kafka Consumer API.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -9355,8 +9355,8 @@ window.QUESTIONS_DE_DB = [
     "category": "Big Data",
     "niche": "",
     "difficulty": "MEDIUM",
-    "question": "Explain Reliability and Failure Handling in Apache Flume?",
-    "answer": "Flume NG uses channel-based transactions to guarantee reliable message delivery. When a message moves from one agent to another, two transactions are started, one on the agent that delivers the event and the other on the agent that receives the event. In order for the sending agent to commit it’s transaction, it must receive success indication from the receiving agent.\nThe receiving agent only returns a success indication if it’s own transaction commits properly first. This ensures guaranteed delivery semantics between the hops that the flow makes. Figure  below shows a sequence diagram that illustrates the relative scope and duration of the transactions operating within the two interacting agents.",
+    "question": "Explain Reliability and Failure Handling in Apache Azure Event Hubs / Kafka (legacy Flume)?",
+    "answer": "Azure Event Hubs / Kafka (legacy Flume) NG uses channel-based transactions to guarantee reliable message delivery. When a message moves from one agent to another, two transactions are started, one on the agent that delivers the event and the other on the agent that receives the event. In order for the sending agent to commit it’s transaction, it must receive success indication from the receiving agent.\nThe receiving agent only returns a success indication if it’s own transaction commits properly first. This ensures guaranteed delivery semantics between the hops that the flow makes. Figure  below shows a sequence diagram that illustrates the relative scope and duration of the transactions operating within the two interacting agents.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -10819,7 +10819,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How are enums and sets represented internally?",
-    "answer": "As unique integers representing the powers of two, due to storage optimizations.",
+    "answer": "Internally, enums and sets are represented as unique integers mapped to powers of two. An ENUM column stores members as 1-indexed integers (1, 2, 3...) pointing to the catalog values, while a SET column uses bit-wise representation values (1, 2, 4, 8...) to represent multiple selections in a single byte offset, maximizing storage optimization.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -22501,7 +22501,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the Flink programming model?",
-    "answer": "In fact, in one sentence,Source->Transformation->Sink*",
+    "answer": "The Flink programming model is based on stream transformations. It offers core APIs: (1) DataSet API for batch, (2) DataStream API for unbounded streams, and (3) Table & SQL API for relational stream query execution.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -22534,7 +22534,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What are the commonly used operators in Flink?",
-    "answer": "Map operator\nFilter operator\nKeyBy operator\nWindow window",
+    "answer": "Flink operators transform data streams (e.g. map, flatMap, filter, keyBy, reduce, window). Operators are executed in parallel across TaskManagers, and data is exchanged via network channels.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -22765,7 +22765,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is Storage and Streaming in Apache Flink?",
-    "answer": "Flink compose various capacity framework and can devour information from gushing frameworks.The following gushing framework, flink can persue compose information like:\nFLume - Acts as an Aggregation Tool\nHBase - Acts like NoSQL Databse in a Hadoop ecosystem\nHDFS - Helps as Hadoop Distributed File System\nKafka - Helps in distributing messaging queue\nRabbitMQ - Acts as a Messaging queue\nS3 - It is Simple Storage Service from Amazon",
+    "answer": "In Apache Flink, stream processing is decoupled from physical storage layers. Flink can ingest data from real-time stream brokers and write results to diverse systems: (1) Ingestion sources: Azure Event Hubs / Kafka (legacy Flume), RabbitMQ, or Apache Kafka. (2) Target databases: Apache Cassandra, HBase (Hadoop ecosystem), HDFS, AWS S3, or OneLake directories.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -22875,7 +22875,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the command to start Apache Flink Cluster?",
-    "answer": "We can use the following command to start the Apache Flink Cluster.\ncloudduggu@ubuntu:~/flink$ ./bin/start-cluster.sh",
+    "answer": "To start a local Flink cluster, execute the script `./bin/start-cluster.sh` from the Flink installation directory. This initializes a JobManager and a TaskManager instance, accessible via the web UI dashboard at http://localhost:8081.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -23029,7 +23029,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the difference between stream processing and batch processing?",
-    "answer": "In Batch processing, the data is a bounded set of the stream that has a start point and the endpoint, so once the entire data is ingested then only processing starts in batch processing mode. In-stream processing the nature of data is unbounded which means the processing will continue as the data will be received.\nFlink How to ensure accurate one-time consumption\nFlink There are two ways to ensure accurate one-time consumption Flink Mechanism\n1、Checkpoint Mechanism\n2、 Two stage submission mechanism\nCheckpoint Mechanism\nMainly when Flink Turn on Checkpoint When , Will turn out for the Source Insert a barrir, And then this barrir As the data flows all the time , When it comes to an operator , This operator starts to make checkpoint, It's made from barrir The state of the current operator when it comes to the previous time , Write the state to the state backend . And then barrir Flow down , When it flows to keyby perhaps shuffle Operator time , For example, when the data of an operator , Depending on multiple streams , There will be barrir alignment , That is, when all barrir All come to this operator to make checkpoint, Flow in turn , When it flows to sink Operator time , also sink The operator is also finished checkpoint Will send to jobmanager The report checkpoint n Production complete .\nTwo stage submission mechanism\nFlink Provides CheckpointedFunction And CheckpointListener These two interfaces ,CheckpointedFunction There is snapshotState Method , Every time checkpoint Trigger execution method , The cache data is usually put into the State , You can think of it as one hook, This method can be used to achieve pre submission ,CheckpointListyener There is notifyCheckpointComplete Method ,checkpoint Notification method after completion , There are some extra operations that can be done here . for example FLinkKafkaConumerBase Use this to do Kafka offset Submission of , In this method, you can implement the submit operation . stay 2PC If the corresponding process, such as a checkpoint Failure words , that checkpoint It will roll back , No impact on data consistency , So if you're informing checkpoint Success followed by failure , Then it will be in initalizeSate Method to complete the transaction commit , This ensures data consistency . It's mainly based on checkpoint The state file to judge .\nflink and spark difference\nflink It's a similar spark Of “ Open source technology stack ”, Because it also provides batch processing , Flow computation , Figure calculation , Interactive query , Machine learning, etc .flink It's also memory computing , similar spark, But the difference is ,spark The calculation model of is based on RDD, Consider streaming as a special batch process , His DStream In fact, or RDD. and flink Consider batch processing as a special stream computing , But there are two engines in the layer of batch processing and streaming computing , Abstract the DataSet and DataStream.flink It's also very good in performance , Streaming delay ratio spark Less , Can do real flow computing , and spark It can only be a quasi flow calculation . And in batch processing , When the number of iterations gets more ,flink Faster than spark faster , So if flink Come out earlier , Maybe more than what we have now Spark More fire .",
+    "answer": "In Batch processing, the data is a bounded set of the stream that has a start point and the endpoint, so once the entire data is ingested then only processing starts in batch processing mode. In-stream processing the nature of data is unbounded which means the processing will continue as the data will be received.\nFlink How to ensure accurate one-time consumption\nFlink There are two ways to ensure accurate one-time consumption Flink Mechanism\n1、Checkpoint Mechanism\n2、 Two stage submission mechanism\nCheckpoint Mechanism\nMainly when Flink Turn on Checkpoint When , Will turn out for the Source Insert a barrir, And then this barrir As the data flows all the time , When it comes to an operator , This operator starts to make checkpoint, It's made from barrir The state of the current operator when it comes to the previous time , Write the state to the state backend . And then barrir Flow down , When it flows to keyby perhaps shuffle Operator time , For example, when the data of an operator , Depending on multiple streams , There will be barrir alignment , That is, when all barrir All come to this operator to make checkpoint, Flow in turn , When it flows to sink Operator time , also sink The operator is also finished checkpoint Will send to jobmanager The report checkpoint n Production complete .\nTwo stage submission mechanism\nFlink Provides CheckpointedFunction And CheckpointListener These two interfaces ,CheckpointedFunction There is snapshotState Method , Every time checkpoint Trigger execution method , The cache data is usually put into the State , You can think of it as one hook, This method can be used to achieve pre submission ,CheckpointListyener There is notifyCheckpointComplete Method ,checkpoint Notification method after completion , There are some extra operations that can be done here . for example FLinkKafkaConumerBase Use this to do Kafka offset Submission of , In this method, you can implement the submit operation . stay 2PC If the corresponding process, such as a checkpoint Failure words , that checkpoint It will roll back , No impact on data consistency , So if you're informing checkpoint Success followed by failure , Then it will be in initalizeSate Method to complete the transaction commit , This ensures data consistency . It's mainly based on checkpoint The state file to judge .\nflink and spark difference\nflink It's a similar spark Of “ Open source technology stack ”, Because it also provides batch processing , Flow computation , Figure calculation , Interactive query , Machine learning, etc .flink It's also memory computing , similar spark, But the difference is ,spark The calculation model of is based on RDD, Consider streaming as a special batch process , His DStream (legacy Spark Streaming API) In fact, or RDD. and flink Consider batch processing as a special stream computing , But there are two engines in the layer of batch processing and streaming computing , Abstract the DataSet and DataStream.flink It's also very good in performance , Streaming delay ratio spark Less , Can do real flow computing , and spark It can only be a quasi flow calculation . And in batch processing , When the number of iterations gets more ,flink Faster than spark faster , So if flink Come out earlier , Maybe more than what we have now Spark More fire .",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -23040,7 +23040,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What can I do with my state?",
-    "answer": "Flink There are two main ways to use state ：\ncheckpoint Data recovery\nLogical computing",
+    "answer": "In Apache Flink, managed state (like ValueState, ListState, or MapState) is used for two main purposes: (1) Fault-tolerant recovery: Flink periodically saves asynchronous checkpoints of state to a durable store (like HDFS or S3) to restore context during failure events. (2) Stateful computations: Operators access local state dynamically to run aggregations, window joins, and session-based triggers.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -23084,7 +23084,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Flink What are the window functions:",
-    "answer": "Tumbing window\nSilding window\nSession window\nCount winodw",
+    "answer": "Flink supports Tumbling, Sliding, Session, and Global windows. Window functions (like ProcessWindowFunction or ReduceFunction) aggregate data within these time/count boundaries.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -23205,7 +23205,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "At the time of submission How to make parallelism and how to allocate resources?",
-    "answer": "Parallelism based on kafka topic Parallelism of , A degree of parallelism 3 individual G",
+    "answer": "Parallelism in Flink defines the number of parallel tasks executing an operator. It can be set globally, per operator, or at execution time, and is mapped to Slot allocations inside TaskManagers.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -23216,7 +23216,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What's the common stream of API?",
-    "answer": "window join ah cogroup ah map flatmap,async io etc.",
+    "answer": "Apache Flink is a stateful stream processing framework designed for low-latency real-time computations. window join ah cogroup ah map flatmap,async io etc.",
     "domain": "Big Data",
     "subdomain": ""
   },
@@ -24624,7 +24624,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Mention what are the main components of Cassandra data model?",
-    "answer": "The main components of Cassandra Data Model are\n+ Cluster\n+ Keyspace\n+ Column\n+ Column & Family",
+    "answer": "The Cassandra data model consists of Keyspaces (logical containers), Column Families (tables), Columns (key-value pairs), and Rows. Cassandra organizes data across a distributed hash ring using a partitioner.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24646,7 +24646,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Explain what is a Column Family in Cassandra?",
-    "answer": "Column family in Cassandra is referred for a collection of Rows.",
+    "answer": "A Column Family in Apache Cassandra (now referred to as a Table) is a structured metadata schema containing rows and columns. It is mapped to a Memtable in RAM and flushed to disk as immutable SSTable files.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24690,7 +24690,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "List out the other components of Cassandra?",
-    "answer": "The other components of Cassandra are\n+ Node\n+ Data Center\n+ Cluster\n+ Commit log\n+ Mem-table\n+ SSTable\n+ Bloom Filter",
+    "answer": "The Cassandra data model consists of Keyspaces (logical containers), Column Families (tables), Columns (key-value pairs), and Rows. Cassandra organizes data across a distributed hash ring using a partitioner.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24734,7 +24734,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Mention what are the values stored in the Cassandra Column?",
-    "answer": "In Cassandra Column, basically there are three values\n+ Column Name\n+ Value\n+ Time Stamp",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. In Cassandra Column, basically there are three values\n+ Column Name\n+ Value\n+ Time Stamp",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24745,7 +24745,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "How to write a Query in Cassandra?",
-    "answer": "Using CQL (Cassandra Query Language).Cqlsh is used for interacting with database.",
+    "answer": "Cassandra writes are append-only. Mutations are written to a Commit Log on disk for durability and buffered in a Memtable. Once the Memtable is full, it is flushed to disk as an SSTable. Compactions merge SSTables asynchronously.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24756,7 +24756,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Mention when you can use Alter Keyspace?",
-    "answer": "ALTER KEYSPACE can be used to change properties such as the number of replicas and the durable_write of a keyspace.",
+    "answer": "ALTER KEYSPACE in Apache Cassandra is used to modify the replication strategy or durable writes properties of an existing keyspace. This is commonly executed when transitioning from a local SimpleStrategy layout to a multi-datacenter NetworkTopologyStrategy deployment, or when adjusting the replication factor for scale.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24767,7 +24767,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What os Cassandra supports?",
-    "answer": "Windows and Linux.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. Windows and Linux.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24822,7 +24822,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is mandatory while creating a table in Cassandra?",
-    "answer": "While creating a table primary key is mandatory, it is made up of one or more columns of a table.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. While creating a table primary key is mandatory, it is made up of one or more columns of a table.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24855,7 +24855,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Does Cassandra support ACID transactions?",
-    "answer": "Unlike relational databases, Cassandra does not support ACID transactions.",
+    "answer": "Cassandra is designed for high availability and partition tolerance (AP in CAP), so it does not support full ACID transactions. Instead, it uses lightweight transactions (LWT) built on Paxos consensus for row-level serializability.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24866,7 +24866,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Explain how Cassandra writes data?",
-    "answer": "Cassandra writes data in three components\n+ Commitlog write\n+ Memtable write\n+ SStable write",
+    "answer": "Cassandra writes are append-only. Mutations are written to a Commit Log on disk for durability and buffered in a Memtable. Once the Memtable is full, it is flushed to disk as an SSTable. Compactions merge SSTables asynchronously.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -24943,7 +24943,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Define the use of Source Command in Cassandra?",
-    "answer": "Source command is used to execute a file consisting of CQL statements.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. Source command is used to execute a file consisting of CQL statements.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25020,7 +25020,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Can we change Replication Factor on a Live Cluster?",
-    "answer": "Yes, but it will require running repair to alter the replica count of existing data.",
+    "answer": "Yes, you can change the replication factor on a live Cassandra cluster by executing the ALTER KEYSPACE command. However, this change only affects new writes. To ensure that existing rows are copied to the newly assigned replica nodes, you must run the 'nodetool repair' command across all nodes in the cluster.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25086,7 +25086,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Where Cassandra stores its data?",
-    "answer": "Cassandra stores its data in the data dictionary.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. Cassandra stores its data in the data dictionary.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25152,7 +25152,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is node in Cassandra?",
-    "answer": "In Cassandra, node is a place where data is stored.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. In Cassandra, node is a place where data is stored.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25163,7 +25163,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What do you mean by data center in Cassandra?",
-    "answer": "Data center is a complete data of clusters.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. Data center is a complete data of clusters.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25174,7 +25174,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What do you mean by commit log in Cassandra?",
-    "answer": "In Cassandra, commit log is a crash-recovery mechanism. Every write operation is written to the commit log.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. In Cassandra, commit log is a crash-recovery mechanism. Every write operation is written to the commit log.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25185,7 +25185,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What do you mean by column family in Cassandra?",
-    "answer": "Column family is a table in RDMS that contains an ordered collection of rows.",
+    "answer": "A Column Family in Apache Cassandra (now referred to as a Table) is a structured metadata schema containing rows and columns. It is mapped to a Memtable in RAM and flushed to disk as immutable SSTable files.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25196,7 +25196,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What do you mean by consistency in Cassandra?",
-    "answer": "Consistency in Cassandra specifies how to synchronize and up to date a row of Cassandra data and its replicas.",
+    "answer": "Consistency in Cassandra determines the number of replica nodes that must respond to a read or write request for it to succeed. It is configured per query (e.g., ONE, QUORUM, LOCAL_QUORUM) to balance latency and consistency.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25240,7 +25240,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the role of ALTER KEYSPACE?",
-    "answer": "ALTER KEYSPACE is used to change the value of DURABLE_WRITES with its related properties.",
+    "answer": "The primary role of ALTER KEYSPACE is to dynamically alter keyspace properties like DURABLE_WRITES (which determines if updates bypass the commit log) and replication settings (e.g., SimpleStrategy to NetworkTopologyStrategy). It updates the keyspace metadata across the cluster without requiring cluster downtime.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25317,7 +25317,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the usage of void close method?",
-    "answer": "In Cassandra, the void close() method is used to close the current session instance.",
+    "answer": "In the Cassandra Java Driver, the `void close()` method is used to release cluster connections and shut down the session instance. Calling close() ensures that active connection pools, TCP sockets, and executor threads associated with the session are closed cleanly to avoid resource leaks in the application server.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25328,7 +25328,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "Which command is used to start the cqlsh prompt?",
-    "answer": "The cqlsh command is used to start the cqlsh prompt.",
+    "answer": "To start the Cassandra Query Language shell, use the `cqlsh` command in your terminal. This utility connects to a Cassandra node (defaulting to localhost:9042) and provides an interactive command prompt to run CQL commands (DDL/DML queries) against the cluster database.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25339,7 +25339,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is the usage of cqlsh version command?",
-    "answer": "The \"cqlsh-version\" command is used to provide the version of the cqlsh you are using.",
+    "answer": "The `cqlsh --version` command outputs the active version of the Python CQL shell utility and the CQL spec version supported by the server. This is used by administrators to verify driver compatibility and ensure the shell supports the latest query parameters.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25361,7 +25361,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is Kundera in Cassandra?",
-    "answer": "In Cassandra, Kundera is an object-relational mapping (ORM) implementation which is written using Java annotations.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. In Cassandra, Kundera is an object-relational mapping (ORM) implementation which is written using Java annotations.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25372,7 +25372,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What do you mean by Thrift in Cassandra?",
-    "answer": "Thrift is the name of RPC client which is used to communicate with the Cassandra Server.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. Thrift is the name of RPC client which is used to communicate with the Cassandra Server.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
@@ -25383,7 +25383,7 @@ window.QUESTIONS_DE_DB = [
     "niche": "",
     "difficulty": "HARD",
     "question": "What is Hector in Cassandra?",
-    "answer": "Hector was one of the early Cassandra clients. It is an open source project written in Java using the MIT license.",
+    "answer": "Apache Cassandra is a highly scalable distributed NoSQL database designed for high availability and write performance. Hector was one of the early Cassandra clients. It is an open source project written in Java using the MIT license.",
     "domain": "Databases & SQL",
     "subdomain": ""
   },
