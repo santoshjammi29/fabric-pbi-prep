@@ -604,10 +604,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Set initial view from URL hash, fallback to localStorage, or default to concepts
-    let initialView = 'view-concepts';
+    // Set initial view from URL hash, fallback to localStorage, or default to dashboard
+    let initialView = 'view-dashboard';
     const hash = window.location.hash;
-    const validViews = ['view-prep-hub', 'view-spark-hub', 'view-gcc', 'view-concepts', 'view-cheatsheet',
+    const validViews = ['view-dashboard', 'view-prep-hub', 'view-spark-hub', 'view-gcc', 'view-concepts', 'view-cheatsheet',
                         'view-personalised', 'view-general-de', 'view-practice', 'view-explainer', 'view-spark', 'view-pyspark', 'view-unified-search', 'view-architecture'];
     if (hash && (document.getElementById(hash.substring(1)) || validViews.includes(hash.substring(1)))) {
       initialView = hash.substring(1);
@@ -639,6 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initCheatsheet();
       initPersonalised();
       initArchitectureHub();
+      initDashboard();
       updateUnifiedSearchCounts();
 
       if (initialView === 'view-prep-hub') {
@@ -982,6 +983,8 @@ document.addEventListener('DOMContentLoaded', () => {
         switchSparkHubSubTab(targetSubTabId);
       } else if (actualTargetViewId === 'view-architecture') {
         renderArchitectureHub();
+      } else if (actualTargetViewId === 'view-dashboard') {
+        renderDashboard();
       }
       
       // Scroll back to top on view switch, unless navigating to a specific sub-tab inside Prep Hub or Spark Hub
@@ -3239,6 +3242,76 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM_DE.mockActive.classList.add('hidden');
     DOM_DE.mockSummary.classList.add('hidden');
     DOM_DE.mockSetup.classList.remove('hidden');
+  }
+
+  // --- DASHBOARD VIEW IMPLEMENTATION ---
+
+  const ARCHITECT_TIPS = [
+    { title: "Direct Lake Fallback Alert", text: "Direct Lake mode falls back to DirectQuery if the memory footprint of the requested columns exceeds the Fabric capacity limits. Always set up performance alerts to capture fallback triggers." },
+    { title: "Broadcast Hash Join Optimization", text: "In PySpark, broadcast hash joins are enabled by default for tables under 10MB (spark.sql.autoBroadcastJoinThreshold). For larger lookup tables on high-performance nodes, you can manually override this up to 100MB if executors have sufficient overhead." },
+    { title: "Smart Partition Pruning", text: "To prevent expensive full table scans in Spark, partition your tables by columns frequently used in WHERE filters (e.g. transaction_date). Be cautious of over-partitioning, which creates small file bottlenecks." },
+    { title: "VertiPaq Sorting Strategy", text: "Power BI's VertiPaq engine compresses data using run-length encoding (RLE). You can significantly decrease dataset file size and increase query speed by sorting high-cardinality columns prior to ingestion." },
+    { title: "Fabric Delta V-Order Optimization", text: "Microsoft Fabric writes Parquet files using V-Order serialization. This complies with open Parquet specifications but reorganizes internal byte distribution to match Power BI's VertiPaq memory transfer structure." },
+    { title: "Query Folding Validation", text: "When designing ADF pipelines, always verify that your visual Dataflows Gen2 or Power Query transformations fold back into native SQL queries. If query folding breaks, the engine must extract all raw records to memory, slowing execution." },
+    { title: "Dynamic Calculations", text: "Calculated columns are evaluated during data refresh and consume RAM. Measures are evaluated dynamically at query execution time. Always prefer measures for dynamic aggregations to keep memory footprint low." },
+    { title: "Medallion Architecture Governance", text: "To maintain clean schema governance in a Medallion pattern, enforce strict read-only ADLS Gen2 policies for downstream BI users on the Bronze and Silver layers, allowing report queries exclusively on Gold star schemas." },
+    { title: "Tumbling Window Trigger Backfills", text: "In Azure Data Factory, use Tumbling Window triggers instead of Schedule triggers for time-slice pipelines that require self-dependencies and automatic backfilling of historical data." },
+    { title: "Star Schema Performance", text: "Always model Power BI datasets as Star Schemas rather than Snowflake schemas. Snowflake schemas introduce multiple join relationships that degrade VertiPaq engine speed and increase DAX filter context complexity." },
+    { title: "Calculated Table Security Gap", text: "Row-Level Security (RLS) filters applied to base tables do not automatically restrict calculated tables or summarized tables built on top of them. Always re-apply security rules on dependent models." },
+    { title: "Self-hosted Integration Runtime Clustering", text: "You can join up to 4 nodes in a single SHIR cluster for high availability and load balancing. Note that only the first node acts as the gateway for metadata scanning." },
+    { title: "Delta Live Tables Quality Gates", text: "In Databricks, use DLT Expectations (ON VIOLATION DROP ROW or ON VIOLATION FAIL UPDATE) to build declarative data quality check gates directly within ingestion pipelines." },
+    { title: "Vector Database Indexing Trade-offs", text: "When utilizing Pinecone or Milvus in a RAG pipeline, use HNSW (Hierarchical Navigable Small World) indexing for high-speed approximate nearest neighbor search under high query loads, sacrificing small accuracy margins for speed." },
+    { title: "Cosmos DB Multi-Master Writes", text: "Enable Cosmos DB Multi-Region Writes (Multi-Master) to achieve sub-10ms write latency globally. Configure conflict resolution policies (Last Write Wins or Custom Stored Procedures) to handle write collisions." }
+  ];
+
+  function initDashboard() {
+    loadRandomTip();
+    renderDashboard();
+    
+    // Bind programmatic tip box refresh
+    const tipBox = document.getElementById('dashboard-tip-box');
+    if (tipBox) {
+      tipBox.addEventListener('click', loadRandomTip);
+    }
+  }
+
+  function loadRandomTip() {
+    const tipTextEl = document.getElementById('dashboard-tip-content-text');
+    const tipTitleEl = document.querySelector('#dashboard-tip-box h4');
+    if (tipTextEl && tipTitleEl) {
+      const randomIndex = Math.floor(Math.random() * ARCHITECT_TIPS.length);
+      const tip = ARCHITECT_TIPS[randomIndex];
+      tipTitleEl.textContent = "Data Architect Pro Tip: " + tip.title;
+      tipTextEl.textContent = tip.text;
+    }
+  }
+
+  function renderDashboard() {
+    // Dynamically calculate metrics with fallback to conformed hardcoded counts if datasets not loaded yet
+    const counts = {
+      concepts: (window.CONCEPTS_DB && window.CONCEPTS_DB.length) || 112,
+      prepHub: (window.QUESTIONS_DB && window.QUESTIONS_DB.length) || 2640,
+      code: ((window.PYTHON_DATA && window.PYTHON_DATA.length) || 32) + ((window.MSSQL_DATA && window.MSSQL_DATA.length) || 28),
+      spark: ((window.PYSPARK_DATA && window.PYSPARK_DATA.length) || 32) + ((window.SPARKSQL_DATA && window.SPARKSQL_DATA.length) || 36),
+      architecture: (window.ARCHITECTURE_DATA && window.ARCHITECTURE_DATA.length) || 2400,
+      gcc: 55
+    };
+
+    const els = {
+      concepts: document.getElementById('metric-concepts'),
+      prepHub: document.getElementById('metric-prep-hub'),
+      code: document.getElementById('metric-code'),
+      spark: document.getElementById('metric-spark'),
+      architecture: document.getElementById('metric-architecture'),
+      gcc: document.getElementById('metric-gcc')
+    };
+
+    if (els.concepts) els.concepts.textContent = counts.concepts.toLocaleString();
+    if (els.prepHub) els.prepHub.textContent = counts.prepHub.toLocaleString();
+    if (els.code) els.code.textContent = counts.code.toLocaleString();
+    if (els.spark) els.spark.textContent = counts.spark.toLocaleString();
+    if (els.architecture) els.architecture.textContent = counts.architecture.toLocaleString();
+    if (els.gcc) els.gcc.textContent = counts.gcc.toLocaleString();
   }
 
   // --- KEY CONCEPTS & GLOSSARY VIEW IMPLEMENTATION ---
@@ -6338,6 +6411,8 @@ Your input highlights the need for dynamic optimization of distributed executors
         init();
 
         // Expose handlers globally so inline HTML handlers can find them
+        window.switchView = switchView;
+        window.loadRandomTip = loadRandomTip;
         window.switchSandboxTab = switchSandboxTab;
         window.switchLanguageTab = switchLanguageTab;
         window.applyOptimizerPreset = applyOptimizerPreset;

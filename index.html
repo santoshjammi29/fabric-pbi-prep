@@ -95,7 +95,13 @@
       <nav style="width:100%;">
         <ul class="nav-links">
           <li class="nav-item">
-            <button class="nav-btn active" id="btn-nav-concepts" data-target="view-concepts">
+            <button class="nav-btn active" id="btn-nav-dashboard" data-target="view-dashboard">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+              <span class="nav-text">Dashboard</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-concepts" data-target="view-concepts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
               <span class="nav-text">Key Concepts</span>
             </button>
@@ -144,7 +150,11 @@
     <!-- Mobile Bottom Navigation — all 9 tabs, horizontally scrollable -->
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Main navigation">
       <div class="mobile-nav-scroll">
-        <button class="mobile-nav-tab active" data-target="view-concepts" id="mbn-concepts">
+        <button class="mobile-nav-tab active" data-target="view-dashboard" id="mbn-dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>Home</span>
+        </button>
+        <button class="mobile-nav-tab" data-target="view-concepts" id="mbn-concepts">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
           <span>Key Concepts</span>
         </button>
@@ -194,6 +204,171 @@
       </div>
       
 
+
+      <!-- 1. DASHBOARD VIEW -->
+      <section class="page-view" id="view-dashboard">
+        <div class="dashboard-hero">
+          <h2 class="dashboard-hero-title">Microsoft Data Platform Architect Preparation</h2>
+          <p class="dashboard-hero-desc">Welcome to the ultimate learning suite for Microsoft Fabric, Azure Data Factory, Power BI, Spark Databricks, and Modern Data Architecture. Master key definitions, coding practices, and system architecture scenarios at scale.</p>
+        </div>
+
+        <!-- Dynamic Architect Tip Box -->
+        <div class="dashboard-tip-container" id="dashboard-tip-box" onclick="loadRandomTip()" title="Click to rotate tip">
+          <div class="dashboard-tip-bulb">💡</div>
+          <div class="dashboard-tip-content">
+            <h4>Data Architect Pro Tip of the Day</h4>
+            <p class="dashboard-tip-text" id="dashboard-tip-content-text">Loading premium recommendation...</p>
+          </div>
+        </div>
+
+        <h3 class="dashboard-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Interactive Portal Analytics
+        </h3>
+
+        <!-- Metrics Grid -->
+        <div class="dashboard-metrics-grid">
+          <div class="dashboard-metric-card" onclick="switchView('view-concepts')" style="cursor: pointer;">
+            <div class="dashboard-metric-icon">📚</div>
+            <div class="dashboard-metric-info">
+              <span class="dashboard-metric-val" id="metric-concepts">--</span>
+              <span class="dashboard-metric-title">Core Concepts</span>
+            </div>
+          </div>
+          
+          <div class="dashboard-metric-card" onclick="switchView('view-prep-hub')" style="cursor: pointer;">
+            <div class="dashboard-metric-icon">❓</div>
+            <div class="dashboard-metric-info">
+              <span class="dashboard-metric-val" id="metric-prep-hub">--</span>
+              <span class="dashboard-metric-title">Interview Q&As</span>
+            </div>
+          </div>
+
+          <div class="dashboard-metric-card" onclick="switchView('view-cheatsheet')" style="cursor: pointer;">
+            <div class="dashboard-metric-icon">💻</div>
+            <div class="dashboard-metric-info">
+              <span class="dashboard-metric-val" id="metric-code">--</span>
+              <span class="dashboard-metric-title">Coding Sheets</span>
+            </div>
+          </div>
+
+          <div class="dashboard-metric-card" onclick="switchView('view-spark-hub')" style="cursor: pointer;">
+            <div class="dashboard-metric-icon">⚡</div>
+            <div class="dashboard-metric-info">
+              <span class="dashboard-metric-val" id="metric-spark">--</span>
+              <span class="dashboard-metric-title">Spark Scenarios</span>
+            </div>
+          </div>
+
+          <div class="dashboard-metric-card" onclick="switchView('view-architecture')" style="cursor: pointer;">
+            <div class="dashboard-metric-icon">🏗️</div>
+            <div class="dashboard-metric-info">
+              <span class="dashboard-metric-val" id="metric-architecture">--</span>
+              <span class="dashboard-metric-title">Arch Scenarios</span>
+            </div>
+          </div>
+
+          <div class="dashboard-metric-card" onclick="switchView('view-gcc')" style="cursor: pointer;">
+            <div class="dashboard-metric-icon">🏢</div>
+            <div class="dashboard-metric-info">
+              <span class="dashboard-metric-val" id="metric-gcc">--</span>
+              <span class="dashboard-metric-title">GCC Firms</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="dashboard-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="m9 18 6-6-6-6"/></svg>
+          Quick Learning Launchers
+        </h3>
+
+        <!-- Launchers Grid -->
+        <div class="dashboard-launcher-grid">
+          <div class="dashboard-launcher-card">
+            <div>
+              <div class="dashboard-launcher-header">
+                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg></span>
+                <h4 class="dashboard-launcher-title">Key Concepts Glossary</h4>
+              </div>
+              <p class="dashboard-launcher-desc">Master foundational and advanced terminology across Fabric, Power BI, SQL, ADF, and Databricks. Sorted by easy, medium, and hard difficulty tiers.</p>
+            </div>
+            <button class="dashboard-launcher-btn" onclick="switchView('view-concepts')">
+              Open Glossary
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="dashboard-launcher-card">
+            <div>
+              <div class="dashboard-launcher-header">
+                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                <h4 class="dashboard-launcher-title">Interview Prep Hub</h4>
+              </div>
+              <p class="dashboard-launcher-desc">Explore over 2,640+ primary core questions, search concepts dynamically, test yourself with domain chips, and practice custom scenarios.</p>
+            </div>
+            <button class="dashboard-launcher-btn" onclick="switchView('view-prep-hub')">
+              Launch Prep Hub
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="dashboard-launcher-card">
+            <div>
+              <div class="dashboard-launcher-header">
+                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+                <h4 class="dashboard-launcher-title">Code Deepdive Cheatsheet</h4>
+              </div>
+              <p class="dashboard-launcher-desc">Deepdive into real-world code implementation syntax examples for Python Pandas and MS SQL Server, conformed to professional data workloads.</p>
+            </div>
+            <button class="dashboard-launcher-btn" onclick="switchView('view-cheatsheet')">
+              Explore Syntax
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="dashboard-launcher-card">
+            <div>
+              <div class="dashboard-launcher-header">
+                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                <h4 class="dashboard-launcher-title">Apache Spark & Spark SQL</h4>
+              </div>
+              <p class="dashboard-launcher-desc">Master Spark execution pipelines, configurations, PySpark optimizations, Spark SQL syntax comparisons, and table execution optimization rules.</p>
+            </div>
+            <button class="dashboard-launcher-btn" onclick="switchView('view-spark-hub')">
+              Access Spark Hub
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="dashboard-launcher-card">
+            <div>
+              <div class="dashboard-launcher-header">
+                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+                <h4 class="dashboard-launcher-title">Enterprise Architecture Hub</h4>
+              </div>
+              <p class="dashboard-launcher-desc">Browse 2,400+ scenarios spanning Lakehouse, Real-time streaming, MPP engines, IaC (Terraform), vector databases, and LLM/RAG pipelines.</p>
+            </div>
+            <button class="dashboard-launcher-btn" onclick="switchView('view-architecture')">
+              Launch Arch Hub
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="dashboard-launcher-card">
+            <div>
+              <div class="dashboard-launcher-header">
+                <span class="dashboard-launcher-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+                <h4 class="dashboard-launcher-title">Hyderabad GCC Directory</h4>
+              </div>
+              <p class="dashboard-launcher-desc">Detailed profiles of 55 Global Competency Centers in Hyderabad. Filter by hiring risk tier, sector domain, active tech stacks, and address locations.</p>
+            </div>
+            <button class="dashboard-launcher-btn" onclick="switchView('view-gcc')">
+              Open GCC Directory
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
 
       <!-- 2. UNIFIED PREP HUB VIEW -->
       <section class="page-view hidden" id="view-prep-hub">

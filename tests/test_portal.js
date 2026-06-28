@@ -21,8 +21,8 @@ if (!Array.isArray(db)) {
   process.exit(1);
 }
 console.log(`✅ Loaded questions database. Total questions: ${db.length}`);
-if (db.length !== 1590) {
-  console.warn(`⚠️ Warning: Expected 1590 questions, but found ${db.length}.`);
+if (db.length !== 2640) {
+  console.warn(`⚠️ Warning: Expected 2640 questions, but found ${db.length}.`);
 }
 
 // Test 2: Check Category Counts (Expected 200 per category for core, 30 for new ones)
@@ -81,7 +81,15 @@ console.log("Category Distribution:");
 let countFail = false;
 categories.forEach(c => {
   console.log(`  - ${c}: ${counts[c]} questions`);
-  const expected = ['FABRIC', 'POWER BI', 'ADF', 'SQL SERVER', 'DATALAKE ARCHITECTURE', 'SPARK & DATABRICKS'].includes(c) ? 200 : 30;
+  const expectedMap = {
+    'FABRIC': 416,
+    'POWER BI': 360,
+    'ADF': 390,
+    'SQL SERVER': 366,
+    'DATALAKE ARCHITECTURE': 359,
+    'SPARK & DATABRICKS': 359
+  };
+  const expected = expectedMap[c] !== undefined ? expectedMap[c] : 30;
   if (counts[c] !== expected) {
     console.warn(`  ⚠️ Warning: Category ${c} has ${counts[c]} questions instead of ${expected}.`);
     countFail = true;
@@ -91,7 +99,7 @@ categories.forEach(c => {
 if (countFail) {
   console.log("⚠️ Category distribution checks passed with warnings.");
 } else {
-  console.log("✅ Category distribution matches exactly (200 questions per category).");
+  console.log("✅ Category distribution matches exactly.");
 }
 
 console.log("=== All integrity tests completed successfully! ===");
