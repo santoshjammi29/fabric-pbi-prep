@@ -7902,7 +7902,7 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 }
 
 .sidebar-collapsed .sidebar {
-  padding: 1.25rem 0.5rem;
+  padding: 0.75rem 0;
 }
 
 .brand {
@@ -7912,8 +7912,11 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 .sidebar-collapsed .brand {
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  justify-content: center !important;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: none;
+  margin-bottom: 0.5rem;
 }
 
 .brand-text {
@@ -7959,25 +7962,95 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   margin: 0;
 }
 
-/* ---- Sidebar collapse: icon-only mode ---- */
-
-/* Collapsed sidebar — square icon buttons centered */
+/* Collapsed sidebar — icon-only 40×40 buttons, perfectly centered */
 .sidebar-collapsed .nav-btn {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   padding: 0;
-  justify-content: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
   margin: 0 auto;
   border-radius: 10px;
-  /* Remove left accent bar in collapsed mode */
+  box-shadow: none !important;
+  color: var(--text-secondary);
+}
+
+.sidebar-collapsed .nav-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.sidebar-collapsed .nav-btn:hover {
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--primary);
+}
+
+.sidebar-collapsed .nav-btn:hover svg {
+  color: var(--primary);
+}
+
+/* Active icon in collapsed mode — clean tinted square, no glow ring */
+.sidebar-collapsed .nav-btn.active {
+  background: rgba(108, 92, 231, 0.18) !important;
+  color: var(--primary) !important;
   box-shadow: none !important;
 }
 
-/* Active state in collapsed mode — icon glow ring */
-.sidebar-collapsed .nav-btn.active {
-  background: rgba(108, 92, 231, 0.15) !important;
-  box-shadow: 0 0 0 1.5px var(--primary), 0 4px 12px rgba(108, 92, 231, 0.2) !important;
+.sidebar-collapsed .nav-btn.active svg {
+  color: var(--primary) !important;
+}
+
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  color: var(--primary);
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.sidebar-toggle-btn svg {
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.sidebar-collapsed .sidebar-toggle-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0 auto;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-collapsed .sidebar-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+/* Collapsed nav-links: tighten gap, center everything */
+.sidebar-collapsed .nav-links {
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.sidebar-collapsed .nav-item {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .theme-toggle-label {
@@ -8006,44 +8079,16 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   justify-content: center;
 }
 
-.theme-toggle-btn {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  flex-shrink: 0;
-}
-
 .sidebar-collapsed .theme-toggle-btn {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   margin: 0 auto;
 }
 
-.sidebar-toggle-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  flex-shrink: 0;
-}
-
-.sidebar-toggle-btn:hover {
-  color: var(--primary);
-  background: rgba(108, 92, 231, 0.1);
-}
-
-.sidebar-toggle-btn svg {
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
 .sidebar-collapsed .sidebar-toggle-btn {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   margin: 0 auto;
   border-radius: 10px;
