@@ -4913,34 +4913,45 @@ document.addEventListener('DOMContentLoaded', () => {
       matchCountDisplay.textContent = `Showing ${filtered.length.toLocaleString()} matching questions`;
     }
 
-    // Populate topic selector chips dynamically if empty
-    if (topicSelector && topicSelector.children.length === 0) {
-      // Get unique topics from pool
-      const uniqueTopics = [...new Set(pool.map(q => q.category))].sort();
-      let chipsHtml = `
-        <button class="topic-chip ${state.activeArchitectureTopic === 'ALL' ? 'active' : ''}" data-topic="ALL">
-          <span>All Topics</span>
-        </button>
-      `;
-      uniqueTopics.forEach(topic => {
-        const isActive = state.activeArchitectureTopic === topic;
-        chipsHtml += `
-          <button class="topic-chip ${isActive ? 'active' : ''}" data-topic="${escapeHTML(topic)}">
-            <span>${escapeHTML(topic)}</span>
+    // Populate/sync topic selector chips
+    if (topicSelector && pool.length > 0) {
+      const uniqueTopics = [...new Set(pool.map(q => q.category))].filter(Boolean).sort();
+      const expectedCount = uniqueTopics.length + 1; // +1 for "All Topics"
+
+      // Rebuild chips if: none exist, or count doesn't match data (first load race condition)
+      if (topicSelector.children.length !== expectedCount) {
+        let chipsHtml = `
+          <button class="topic-chip ${!state.activeArchitectureTopic || state.activeArchitectureTopic === 'ALL' ? 'active' : ''}" data-topic="ALL">
+            <span>All Topics</span>
           </button>
         `;
-      });
-      topicSelector.innerHTML = chipsHtml;
-
-      // Bind click events on chips
-      topicSelector.querySelectorAll('.topic-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          topicSelector.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-          state.activeArchitectureTopic = chip.getAttribute('data-topic');
-          renderArchitectureHub(true);
+        uniqueTopics.forEach(topic => {
+          const isActive = state.activeArchitectureTopic === topic;
+          chipsHtml += `
+            <button class="topic-chip ${isActive ? 'active' : ''}" data-topic="${escapeHTML(topic)}">
+              <span>${escapeHTML(topic)}</span>
+            </button>
+          `;
         });
-      });
+        topicSelector.innerHTML = chipsHtml;
+
+        // Bind click events on chips
+        topicSelector.querySelectorAll('.topic-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            topicSelector.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            state.activeArchitectureTopic = chip.getAttribute('data-topic');
+            renderArchitectureHub(true);
+          });
+        });
+      } else {
+        // Chips exist — just sync the active state without rebuilding
+        topicSelector.querySelectorAll('.topic-chip').forEach(chip => {
+          const chipTopic = chip.getAttribute('data-topic');
+          const shouldBeActive = chipTopic === (state.activeArchitectureTopic || 'ALL');
+          chip.classList.toggle('active', shouldBeActive);
+        });
+      }
     }
 
     // Update difficulty counts
