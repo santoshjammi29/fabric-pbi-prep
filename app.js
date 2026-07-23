@@ -594,14 +594,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Check scroll position to show scroll to top button
     const mainContent = document.querySelector('.main-content');
+    const updateScrollTopVisibility = () => {
+      if (!DOM.btnScrollToTop) return;
+      const scrollPos = window.pageYOffset || document.documentElement.scrollTop || (mainContent ? mainContent.scrollTop : 0);
+      if (scrollPos > 300) {
+        DOM.btnScrollToTop.classList.remove('hidden');
+      } else {
+        DOM.btnScrollToTop.classList.add('hidden');
+      }
+    };
+    window.addEventListener('scroll', updateScrollTopVisibility, { passive: true });
     if (mainContent) {
-      mainContent.addEventListener('scroll', () => {
-        if (mainContent.scrollTop > 300) {
-          DOM.btnScrollToTop.classList.remove('hidden');
-        } else {
-          DOM.btnScrollToTop.classList.add('hidden');
-        }
-      });
+      mainContent.addEventListener('scroll', updateScrollTopVisibility, { passive: true });
     }
 
     // Set initial view from URL hash, fallback to localStorage, or default to dashboard
@@ -2627,12 +2631,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Scroll to Top Scroll trigger
-    DOM.btnScrollToTop.addEventListener('click', () => {
-      document.querySelector('.main-content').scrollTo({
-        top: 0,
-        behavior: 'smooth'
+    if (DOM.btnScrollToTop) {
+      DOM.btnScrollToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const mc = document.querySelector('.main-content');
+        if (mc) mc.scrollTo({ top: 0, behavior: 'smooth' });
       });
-    });
+    }
 
     // Global copy button event delegation for dynamic code blocks
     document.addEventListener('click', (e) => {
