@@ -474,7 +474,7 @@
               </label>
               <p>Flashcard practice: one question at a time. Click card to reveal answer.</p>
               <label class="study-mode-switch">
-                <input type="checkbox" id="study-mode-toggle">
+                <input type="checkbox" id="study-mode-toggle" aria-label="Toggle flashcard study mode">
                 <span class="study-mode-slider"></span>
               </label>
             </div>
@@ -569,19 +569,19 @@
           <div style="display: none !important;" id="legacy-test-compat-wrapper">
             <!-- 2. Personalised Prep Subview -->
             <div id="view-personalised" class="prep-hub-subview">
-              <input type="text" id="personalised-search">
+              <input type="text" id="personalised-search" aria-label="Search personalised questions">
               <div id="personalised-difficulty-selector"></div>
               <div id="personalised-domain-list"></div>
               <div id="personalised-container"></div>
-              <button id="btn-personalised-expand-all"></button>
-              <button id="btn-personalised-collapse-all"></button>
+              <button id="btn-personalised-expand-all" aria-label="Expand all personalised questions"></button>
+              <button id="btn-personalised-collapse-all" aria-label="Collapse all personalised questions"></button>
               <div id="personalised-match-count"></div>
             </div>
 
             <!-- 3. Niche Practice Subview -->
             <div id="view-practice" class="prep-hub-subview">
               <div id="niche-selection-screen">
-                <input type="text" id="practice-search">
+                <input type="text" id="practice-search" aria-label="Search practice niches">
                 <div id="practice-difficulty-selector"></div>
                 <div id="practice-category-list"></div>
                 <div id="practice-match-count"></div>
@@ -595,19 +595,19 @@
                 <div id="active-practice-category-tag"></div>
                 <p id="active-practice-q-text"></p>
                 <div id="active-practice-a-container">
-                  <div id="answer-overlay"><button id="btn-practice-reveal"></button></div>
+                  <div id="answer-overlay"><button id="btn-practice-reveal" aria-label="Reveal practice answer"></button></div>
                   <div id="active-practice-a-text"></div>
                 </div>
-                <button id="btn-practice-back"></button>
-                <button id="btn-practice-shuffle"></button>
-                <button id="btn-practice-prev"></button>
-                <button id="btn-practice-next"></button>
+                <button id="btn-practice-back" aria-label="Back to practice niches"></button>
+                <button id="btn-practice-shuffle" aria-label="Shuffle practice questions"></button>
+                <button id="btn-practice-prev" aria-label="Previous practice question"></button>
+                <button id="btn-practice-next" aria-label="Next practice question"></button>
               </div>
             </div>
 
             <!-- 4. Concept Explainer Subview -->
             <div id="view-explainer" class="prep-hub-subview">
-              <input type="text" id="explainer-search">
+              <input type="text" id="explainer-search" aria-label="Search concept explainers">
               <div id="explainer-difficulty-selector"></div>
               <div id="explainer-topic-list"></div>
               <div id="explainer-match-count"></div>

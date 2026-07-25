@@ -58,9 +58,10 @@
   --text-secondary-light: #6e6e73;
   --text-secondary-dark: #86868b;
 
-  --blur-radius: 20px;
-  --glass-shadow-light: 0 4px 24px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
-  --glass-shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 1px 2px 0 rgba(255, 255, 255, 0.04);
+  --blur-radius: 32px;
+  --glass-blur: blur(32px) saturate(180%);
+  --glass-shadow-light: inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 8px 24px 0 rgba(0, 0, 0, 0.08);
+  --glass-shadow-dark: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 8px 24px 0 rgba(0, 0, 0, 0.6);
 
   /* Apple System Typography */
   --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -75,11 +76,13 @@
   --warning: #ff9500;
   --danger: #ff3b30;
   --bg-gradient: linear-gradient(180deg, #f5f5f7 0%, #e8e8ed 100%);
-  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-bg: rgba(255, 255, 255, 0.72);
   --card-border: rgba(0, 0, 0, 0.08);
   --text-primary: #1d1d1f;
   --text-secondary: #6e6e73;
-  --glass-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 8px 24px 0 rgba(0, 0, 0, 0.08);
+  --glass-backdrop: blur(32px) saturate(180%);
+  --fallback-surface-bg: rgba(245, 245, 247, 0.96);
   
   /* iPhone Category Palette */
   --cat-pbi: #0071e3;
@@ -96,10 +99,10 @@
   
   /* Helper Surface Colors */
   --item-bg: rgba(0, 113, 227, 0.03);
-  --dialog-bg: #ffffff;
+  --dialog-bg: rgba(255, 255, 255, 0.88);
   --primary-hover: #0077ed;
   --code-bg: rgba(0, 0, 0, 0.04);
-  --blur-overlay-bg: rgba(245, 245, 247, 0.92);
+  --blur-overlay-bg: rgba(245, 245, 247, 0.82);
 }
 
 .theme-dark {
@@ -109,11 +112,13 @@
   --warning: #ff9f0a;
   --danger: #ff453a;
   --bg-gradient: linear-gradient(180deg, #000000 0%, #0c0c0e 50%, #161618 100%);
-  --card-bg: rgba(28, 28, 30, 0.75);
+  --card-bg: rgba(28, 28, 30, 0.65);
   --card-border: rgba(255, 255, 255, 0.12);
   --text-primary: #f5f5f7;
   --text-secondary: #86868b;
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 1px 2px 0 rgba(255, 255, 255, 0.04);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 8px 24px 0 rgba(0, 0, 0, 0.6);
+  --glass-backdrop: blur(32px) saturate(180%);
+  --fallback-surface-bg: rgba(20, 20, 22, 0.96);
   
   /* iPhone Category Palette — Dark Mode */
   --cat-pbi: #2997ff;
@@ -8951,3 +8956,51 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   }
   h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
 }
+
+/* =======================================================================
+   visionOS / iOS 26 "LIQUID GLASS" MATERIAL SYSTEM & FALLBACKS
+   ======================================================================= */
+.glass-surface,
+.sidebar,
+.mobile-top-bar,
+.mobile-bottom-nav,
+.modal-glass-container,
+.unified-search-wrapper,
+.study-mode-toggle-bar,
+.qa-row-card,
+.concept-accordion-card,
+.niche-launcher-card,
+.dashboard-metric-card,
+.spark-sandbox-panel {
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--card-border);
+}
+
+/* Scroll Parallax on Hero Glass (capped strictly at 8px translate) */
+.hero-glass-container,
+.page-header {
+  will-change: transform;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Graceful Fallback for Unsupported Browsers (Non-Chromium/Safari) */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-surface,
+  .sidebar,
+  .mobile-top-bar,
+  .mobile-bottom-nav,
+  .modal-glass-container,
+  .unified-search-wrapper,
+  .study-mode-toggle-bar,
+  .qa-row-card,
+  .concept-accordion-card,
+  .niche-launcher-card,
+  .dashboard-metric-card,
+  .spark-sandbox-panel {
+    background-color: var(--fallback-surface-bg, rgba(245, 245, 247, 0.96)) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
