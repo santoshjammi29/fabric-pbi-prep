@@ -331,6 +331,69 @@
     }
   }
 
+  /* ── 11. HIG Smoothdamp Hero Glass Parallax (-15% scroll delta, capped ±8px) ── */
+  if (!prefersReducedMotion) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        let currentY = 0;
+        let targetY = 0;
+        let isAnimating = false;
+
+        function updateParallax() {
+          currentY += (targetY - currentY) * 0.12;
+          const clampedY = Math.max(-8, Math.min(8, currentY));
+
+          document.querySelectorAll('.hero-glass-container, .page-header').forEach(hero => {
+            hero.style.transform = `translate3d(0, ${clampedY.toFixed(2)}px, 0)`;
+          });
+
+          if (Math.abs(targetY - currentY) > 0.05) {
+            requestAnimationFrame(updateParallax);
+          } else {
+            isAnimating = false;
+          }
+        }
+
+        mainContent.addEventListener('scroll', () => {
+          const scrollTop = mainContent.scrollTop;
+          if (scrollTop < 600) {
+            targetY = -0.15 * scrollTop;
+            if (!isAnimating) {
+              isAnimating = true;
+              requestAnimationFrame(updateParallax);
+            }
+          }
+        }, { passive: true });
+      }
+    });
+  }
+
+  /* ── 12. Tap Feedback Decelerate Spring (Scale 1.0 -> 0.97 over 150ms) ── */
+  if (!prefersReducedMotion) {
+    document.addEventListener('pointerdown', e => {
+      const btn = e.target.closest('button, .control-btn, .nav-item, .topic-chip, .de-diff-chip, .qa-row-card');
+      if (btn) {
+        btn.style.transition = 'transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        btn.style.transform = 'scale(0.97)';
+      }
+    });
+
+    document.addEventListener('pointerup', e => {
+      const btn = e.target.closest('button, .control-btn, .nav-item, .topic-chip, .de-diff-chip, .qa-row-card');
+      if (btn) {
+        btn.style.transform = '';
+      }
+    });
+
+    document.addEventListener('pointercancel', e => {
+      const btn = e.target.closest('button, .control-btn, .nav-item, .topic-chip, .de-diff-chip, .qa-row-card');
+      if (btn) {
+        btn.style.transform = '';
+      }
+    });
+  }
+
   /* ── Expose utility for app.js to call ──────────────────── */
   window.anim = {
     animateNumber,
@@ -345,3 +408,4 @@
   };
 
 })();
+

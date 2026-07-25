@@ -63,28 +63,51 @@
   --glass-shadow-light: inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 8px 24px 0 rgba(0, 0, 0, 0.08);
   --glass-shadow-dark: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 8px 24px 0 rgba(0, 0, 0, 0.6);
 
-  /* Apple System Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-size-base: clamp(0.875rem, 0.8rem + 0.3vw, 1.125rem);
+  /* HIG visionOS / iOS 26 Surface Glass Tokens */
+  --glass-chrome-dark: blur(40px) saturate(180%) rgba(10, 10, 12, 0.65);
+  --glass-chrome-light: blur(40px) saturate(180%) rgba(255, 255, 255, 0.60);
+  --glass-card-dark: blur(24px) saturate(160%) rgba(20, 20, 24, 0.55);
+  --glass-card-light: blur(24px) saturate(160%) rgba(255, 255, 255, 0.70);
+  --glass-modal-dark: blur(32px) saturate(200%) rgba(15, 15, 18, 0.75);
+  --glass-modal-light: blur(32px) saturate(200%) rgba(255, 255, 255, 0.80);
+
+  /* SF Pro System Typography Stack & Fluid Type Rules */
+  --font-family: "SF Pro Display", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 600;
+  --font-body-weight: 400;
+  --font-tracking-heading: 0.03em;
+  --font-tracking-body: -0.01em;
+  --font-tracking-hero: -0.025em;
+  --font-size-base: clamp(0.9375rem, 0.85rem + 0.3vw, 1.05rem);
+  --font-size-heading: clamp(1.75rem, 1.2vw + 1.2rem, 3.5rem);
 }
 
 /* Apple Theme Overrides */
 :root, .theme-light {
   --primary: #0071e3;
   --primary-light: #0071e3;
-  --accent: #34c759;
-  --warning: #ff9500;
-  --danger: #ff3b30;
+  --accent-blue: #3b66e0;  /* -20% glare reduction in light mode */
+  --accent-green: #28cd41;
+  --accent-orange: #ff9500;
+  --accent-red: #ff3b30;
+  --accent: var(--accent-green);
+  --warning: var(--accent-orange);
+  --danger: var(--accent-red);
+  --bg-chrome: #f5f5f7;
   --bg-gradient: linear-gradient(180deg, #f5f5f7 0%, #e8e8ed 100%);
-  --card-bg: rgba(255, 255, 255, 0.72);
+  --surface-card: rgba(255, 255, 255, 0.70);
+  --card-bg: var(--surface-card);
   --card-border: rgba(0, 0, 0, 0.08);
   --text-primary: #1d1d1f;
   --text-secondary: #6e6e73;
+  --glass-chrome: var(--glass-chrome-light);
+  --glass-card: var(--glass-card-light);
+  --glass-modal: var(--glass-modal-light);
   --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 8px 24px 0 rgba(0, 0, 0, 0.08);
   --glass-backdrop: blur(32px) saturate(180%);
   --fallback-surface-bg: rgba(245, 245, 247, 0.96);
   
-  /* iPhone Category Palette */
+  /* Category Palette */
   --cat-pbi: #0071e3;
   --cat-adf: #30b0c7;
   --cat-sql: #ff9500;
@@ -97,7 +120,7 @@
   --cat-viz: #0071e3;
   --cat-gov: #ff9500;
   
-  /* Helper Surface Colors */
+  /* Surface Helpers */
   --item-bg: rgba(0, 113, 227, 0.03);
   --dialog-bg: rgba(255, 255, 255, 0.88);
   --primary-hover: #0077ed;
@@ -106,22 +129,32 @@
 }
 
 .theme-dark {
-  --primary: #2997ff;
-  --primary-light: #2997ff;
-  --accent: #30d158;
-  --warning: #ff9f0a;
-  --danger: #ff453a;
+  --primary: #4f7cff;
+  --primary-light: #4f7cff;
+  --accent-blue: #4f7cff;
+  --accent-green: #30d158;
+  --accent-orange: #ff9f0a;
+  --accent-red: #ff453a;
+  --accent: var(--accent-green);
+  --warning: var(--accent-orange);
+  --danger: var(--accent-red);
+  --bg-chrome: #0a0a0c;
   --bg-gradient: linear-gradient(180deg, #000000 0%, #0c0c0e 50%, #161618 100%);
-  --card-bg: rgba(28, 28, 30, 0.65);
+  --surface-card: rgba(255, 255, 255, 0.06);
+  --card-bg: var(--surface-card);
   --card-border: rgba(255, 255, 255, 0.12);
   --text-primary: #f5f5f7;
   --text-secondary: #86868b;
+  background: #000000;
+  --glass-chrome: var(--glass-chrome-dark);
+  --glass-card: var(--glass-card-dark);
+  --glass-modal: var(--glass-modal-dark);
   --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 8px 24px 0 rgba(0, 0, 0, 0.6);
   --glass-backdrop: blur(32px) saturate(180%);
-  --fallback-surface-bg: rgba(20, 20, 22, 0.96);
+  --fallback-surface-bg: rgba(14, 14, 18, 0.96);
   
-  /* iPhone Category Palette — Dark Mode */
-  --cat-pbi: #2997ff;
+  /* Category Palette — Dark Mode */
+  --cat-pbi: #4f7cff;
   --cat-adf: #64d2ff;
   --cat-sql: #ff9f0a;
   --cat-dl: #ffd60a;
@@ -133,10 +166,10 @@
   --cat-viz: #64d2ff;
   --cat-gov: #ff9f0a;
   
-  /* Helper Surface Colors */
+  /* Surface Helpers */
   --item-bg: rgba(255, 255, 255, 0.04);
   --dialog-bg: #1c1c1e;
-  --primary-hover: #409fff;
+  --primary-hover: #608dff;
   --code-bg: rgba(28, 28, 30, 0.85);
   --blur-overlay-bg: rgba(0, 0, 0, 0.94);
 }
