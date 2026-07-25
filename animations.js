@@ -11,17 +11,31 @@
 
   /* ── 2. IntersectionObserver — Scroll reveal ─────────────── */
   if (!prefersReducedMotion) {
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            revealObserver.unobserve(entry.target); // fire once
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-    );
+    // On desktop, .main-content is the scroll container (not the viewport).
+    // Set root to the content pane so reveals fire as elements scroll into
+    // the pane. On mobile (≤900px) the content pane is not the scroll container,
+    // so we fall back to viewport (root: null).
+    const isMobileView = () => window.innerWidth <= 900;
+    const getRevealRoot = () => isMobileView() ? null : document.querySelector('.main-content');
+
+    let revealObserver = null;
+
+    function createRevealObserver() {
+      const root = getRevealRoot();
+      return new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target); // fire once
+            }
+          });
+        },
+        { root, threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+      );
+    }
+
+    revealObserver = createRevealObserver();
 
     // Observe any existing reveal targets, then watch for new ones via MutationObserver
     function observeRevealTargets(root) {
@@ -47,6 +61,20 @@
     });
 
     mutationObs.observe(document.body, { childList: true, subtree: true });
+
+    // Re-create the observer if the layout mode changes (resize across 900px breakpoint)
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        revealObserver.disconnect();
+        revealObserver = createRevealObserver();
+        // Re-observe any un-revealed elements
+        document.querySelectorAll('.reveal-on-scroll:not(.is-visible), .reveal-scale:not(.is-visible)').forEach(el => {
+          revealObserver.observe(el);
+        });
+      }, 200);
+    }, { passive: true });
   } else {
     // Reduced motion: instantly show all reveal targets
     document.querySelectorAll('.reveal-on-scroll, .reveal-scale').forEach(el => {
@@ -145,6 +173,8 @@
   }
 
   // Observe stat value elements and animate when they enter view
+  // Use .main-content as root on desktop (container-scroll architecture)
+  const statObserverRoot = window.innerWidth > 900 ? document.querySelector('.main-content') : null;
   const statObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -156,7 +186,7 @@
         }
       }
     });
-  }, { threshold: 0.5 });
+  }, { root: statObserverRoot, threshold: 0.5 });
 
   function observeStatValues() {
     document.querySelectorAll('.stat-value[data-raw-value]').forEach(el => {

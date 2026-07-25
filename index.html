@@ -32,8 +32,18 @@
     }
   </style>
 
-  <link rel="stylesheet" href="animations.css?v=1.0">
-  <link rel="stylesheet" href="styles.css?v=1.5.2">
+  <link rel="stylesheet" href="animations.css?v=1.4">
+  <link rel="stylesheet" href="styles.css?v=2.6.0">
+
+
+
+
+
+
+
+
+
+
 
   <!-- Anti-FOUC: apply theme + hide body BEFORE first paint -->
   <script>
@@ -49,6 +59,7 @@
   </script>
 </head>
 <body>
+  <a href="#main-content-anchor" class="skip-link">Skip to main content</a>
 
   <!-- Aurora ambient background -->
   <div class="aurora-bg" aria-hidden="true">
@@ -62,14 +73,14 @@
     <!-- Mobile Top Bar -->
     <header class="mobile-top-bar">
       <div class="mobile-brand">
-        <img src="assets/logo_brand.svg" alt="DP Prep" class="mobile-brand-logo">
+        <img src="assets/logo_brand.svg" alt="Microsoft Data Platform Architect Prep" class="mobile-brand-logo">
         <div class="mobile-brand-text">
           <h2>MS Data Platform</h2>
           <span>Architect Prep</span>
         </div>
       </div>
       <div class="mobile-top-actions">
-        <button class="mobile-theme-btn" id="btn-mobile-theme" aria-label="Toggle theme">☀️</button>
+        <button class="mobile-theme-btn" id="btn-mobile-theme" aria-label="Toggle light and dark theme">☀️</button>
       </div>
     </header>
 
@@ -78,7 +89,7 @@
       <div class="brand" style="justify-content: space-between; width: 100%; min-width: 0; overflow: hidden;">
         <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0; overflow: hidden; flex: 1;">
           <div class="brand-icon">
-            <img src="assets/logo_brand.svg" alt="Microsoft Azure Logo" style="width: 24px; height: 24px; object-fit: contain;">
+            <img src="assets/logo_brand.svg" alt="Microsoft Data Platform Architect Prep Logo" style="width: 24px; height: 24px; object-fit: contain;">
           </div>
           <div class="brand-text">
             <h1>Microsoft Data Platform</h1>
@@ -94,79 +105,69 @@
       
       <nav style="width:100%;">
         <ul class="nav-links">
-          <!-- Home — no step badge -->
+          <!-- Home — Apple SF Symbol House -->
           <li class="nav-item">
             <button class="nav-btn active" id="btn-nav-dashboard" data-target="view-dashboard">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.182V20a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-9.818a1.5 1.5 0 0 0-.528-1.135l-7.5-6.522a1.5 1.5 0 0 0-1.944 0l-7.5 6.522A1.5 1.5 0 0 0 3 10.182z"/></svg>
               <span class="nav-text">Home</span>
             </button>
           </li>
 
-          <!-- PREP PATH divider -->
-          <li class="nav-section-label">PREP PATH</li>
-
-          <!-- ① Key Concepts — Easy (green) -->
+          <!-- ① Key Concepts -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-concepts" data-target="view-concepts">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
               <span class="nav-text">Key Concepts</span>
-              <span class="nav-step-badge nav-step-easy">①</span>
             </button>
           </li>
 
-          <!-- ② Code Practice — Easy-Medium (blue) -->
+          <!-- ② Code Practice -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-cheatsheet" data-target="view-cheatsheet">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               <span class="nav-text">Code Practice</span>
-              <span class="nav-step-badge nav-step-medium">②</span>
             </button>
           </li>
 
-          <!-- ③ Spark Engine — Medium (blue) -->
+          <!-- ③ Spark Engine -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-spark" data-target="view-spark-hub">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               <span class="nav-text">Spark Engine</span>
-              <span class="nav-step-badge nav-step-medium">③</span>
             </button>
           </li>
 
-          <!-- ④ Q&A Prep — Hard (orange) -->
+          <!-- ④ Q&A Prep -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-prep-hub" data-target="view-prep-hub">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
               <span class="nav-text">Q&amp;A Prep Hub</span>
-              <span class="nav-step-badge nav-step-hard">④</span>
             </button>
           </li>
 
-          <!-- ⑤ Architecture — Architect (purple) -->
+          <!-- ⑤ Architecture -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-architecture" data-target="view-architecture">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
               <span class="nav-text">Architecture Hub</span>
-              <span class="nav-step-badge nav-step-architect">⑤</span>
             </button>
           </li>
-
-          <!-- Separator -->
-          <li class="nav-section-label">RESEARCH</li>
 
           <!-- ⑥ Company Research -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-gcc" data-target="view-gcc">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="10" x2="16.01" y2="10"/></svg>
               <span class="nav-text">Company Research</span>
-              <span class="nav-step-badge nav-step-gcc">⑥</span>
             </button>
           </li>
         </ul>
+
+
       </nav>
          <div class="sidebar-footer">
         <div class="theme-toggle-container">
           <span class="theme-toggle-label">Light Theme</span>
-          <button class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Toggle theme">☀️</button>
+          <button class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Toggle light and dark theme">☀️</button>
         </div>
       </div>
       <div class="sidebar-resizer" id="sidebar-resizer" title="Drag to resize sidebar"></div>
@@ -175,39 +176,40 @@
     <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Main navigation">
       <div class="mobile-nav-scroll">
         <button class="mobile-nav-tab active" data-target="view-dashboard" id="mbn-dashboard">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.182V20a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-9.818a1.5 1.5 0 0 0-.528-1.135l-7.5-6.522a1.5 1.5 0 0 0-1.944 0l-7.5 6.522A1.5 1.5 0 0 0 3 10.182z"/></svg>
           <span>Home</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-concepts" id="mbn-concepts">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/><path d="M12 13v4"/></svg>
-          <span>① Concepts</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
+          <span>Concepts</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-cheatsheet" id="mbn-cheatsheet">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>② Code</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Code</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-spark-hub" id="mbn-spark">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>③ Spark</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>Spark</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-prep-hub" id="mbn-prep-hub">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span>④ Q&amp;A</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
+          <span>Q&amp;A</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-architecture" id="mbn-architecture">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>⑤ Arch</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span>Arch</span>
         </button>
         <button class="mobile-nav-tab" data-target="view-gcc" id="mbn-gcc">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          <span>⑥ GCC</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="14" x2="16.01" y2="14"/></svg>
+          <span>GCC</span>
         </button>
       </div>
     </nav>
 
 
+
        <!-- Main Content Area -->
-    <main class="main-content">
+    <main class="main-content" id="main-content-anchor" tabindex="-1">
       <!-- Hidden nav buttons for Puppeteer tests compatibility inside main content -->
       <div class="test-compatibility-wrapper" style="position: absolute; top: 0; left: 0; width: 100px; height: 10px; opacity: 1; pointer-events: auto; z-index: 9999; overflow: visible;">
         <button class="nav-btn" id="btn-nav-explainer" data-target="view-explainer" style="display: block !important; position: absolute !important; top: 0px !important; left: 0px !important; width: 10px !important; height: 10px !important; pointer-events: auto !important; border: none !important; background: transparent !important; padding: 0 !important; margin: 0 !important; transition: none !important; transform: none !important; box-shadow: none !important; opacity: 1 !important; visibility: visible !important; min-width: 0 !important; min-height: 0 !important; font-size: 0px !important; line-height: 0 !important;">Concept Explainer</button>
@@ -252,7 +254,9 @@
         <!-- Metrics Grid -->
         <div class="dashboard-metrics-grid">
           <div class="dashboard-metric-card" onclick="switchView('view-concepts')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">📚</div>
+            <div class="dashboard-metric-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
+            </div>
             <div class="dashboard-metric-info">
               <span class="dashboard-metric-val" id="metric-concepts">--</span>
               <span class="dashboard-metric-title">Core Concepts</span>
@@ -260,7 +264,9 @@
           </div>
           
           <div class="dashboard-metric-card" onclick="switchView('view-prep-hub')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">❓</div>
+            <div class="dashboard-metric-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
+            </div>
             <div class="dashboard-metric-info">
               <span class="dashboard-metric-val" id="metric-prep-hub">--</span>
               <span class="dashboard-metric-title">Interview Q&As</span>
@@ -268,7 +274,9 @@
           </div>
 
           <div class="dashboard-metric-card" onclick="switchView('view-cheatsheet')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">💻</div>
+            <div class="dashboard-metric-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
             <div class="dashboard-metric-info">
               <span class="dashboard-metric-val" id="metric-code">--</span>
               <span class="dashboard-metric-title">Coding Sheets</span>
@@ -276,7 +284,9 @@
           </div>
 
           <div class="dashboard-metric-card" onclick="switchView('view-spark-hub')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">⚡</div>
+            <div class="dashboard-metric-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
             <div class="dashboard-metric-info">
               <span class="dashboard-metric-val" id="metric-spark">--</span>
               <span class="dashboard-metric-title">Spark Scenarios</span>
@@ -284,7 +294,9 @@
           </div>
 
           <div class="dashboard-metric-card" onclick="switchView('view-architecture')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">🏗️</div>
+            <div class="dashboard-metric-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
             <div class="dashboard-metric-info">
               <span class="dashboard-metric-val" id="metric-architecture">--</span>
               <span class="dashboard-metric-title">Arch Scenarios</span>
@@ -292,13 +304,16 @@
           </div>
 
           <div class="dashboard-metric-card" onclick="switchView('view-gcc')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">🏢</div>
+            <div class="dashboard-metric-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="14" x2="16.01" y2="14"/></svg>
+            </div>
             <div class="dashboard-metric-info">
               <span class="dashboard-metric-val" id="metric-gcc">--</span>
               <span class="dashboard-metric-title">GCC Firms</span>
             </div>
           </div>
         </div>
+
 
         <!-- Interview Prep Roadmap -->
         <div class="roadmap-section">
@@ -309,9 +324,8 @@
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Follow this path from foundational concepts to architect-level design scenarios. Each step builds on the previous.</p>
 
           <div class="roadmap-grid">
-            <!-- Step 1: Key Concepts (Easy) -->
+            <!-- Key Concepts (Easy) -->
             <div class="roadmap-card roadmap-easy" onclick="switchView('view-concepts')" style="cursor:pointer;">
-              <div class="roadmap-step-num">①</div>
               <div class="roadmap-card-body">
                 <div class="roadmap-card-header">
                   <span class="roadmap-diff-pill roadmap-pill-easy">Easy</span>
@@ -326,9 +340,8 @@
               </div>
             </div>
 
-            <!-- Step 2: Code Practice (Medium) -->
+            <!-- Code Practice (Medium) -->
             <div class="roadmap-card roadmap-medium" onclick="switchView('view-cheatsheet')" style="cursor:pointer;">
-              <div class="roadmap-step-num">②</div>
               <div class="roadmap-card-body">
                 <div class="roadmap-card-header">
                   <span class="roadmap-diff-pill roadmap-pill-medium">Medium</span>
@@ -343,9 +356,8 @@
               </div>
             </div>
 
-            <!-- Step 3: Spark Engine (Medium) -->
+            <!-- Spark Engine (Medium) -->
             <div class="roadmap-card roadmap-medium" onclick="switchView('view-spark-hub')" style="cursor:pointer;">
-              <div class="roadmap-step-num">③</div>
               <div class="roadmap-card-body">
                 <div class="roadmap-card-header">
                   <span class="roadmap-diff-pill roadmap-pill-medium">Medium</span>
@@ -360,9 +372,8 @@
               </div>
             </div>
 
-            <!-- Step 4: Q&A Prep Hub (Hard) -->
+            <!-- Q&A Prep Hub (Hard) -->
             <div class="roadmap-card roadmap-hard" onclick="switchView('view-prep-hub')" style="cursor:pointer;">
-              <div class="roadmap-step-num">④</div>
               <div class="roadmap-card-body">
                 <div class="roadmap-card-header">
                   <span class="roadmap-diff-pill roadmap-pill-hard">Hard</span>
@@ -377,9 +388,8 @@
               </div>
             </div>
 
-            <!-- Step 5: Architecture Hub (Architect) -->
+            <!-- Architecture Hub (Architect) -->
             <div class="roadmap-card roadmap-architect" onclick="switchView('view-architecture')" style="cursor:pointer;">
-              <div class="roadmap-step-num">⑤</div>
               <div class="roadmap-card-body">
                 <div class="roadmap-card-header">
                   <span class="roadmap-diff-pill roadmap-pill-architect">Architect</span>
@@ -394,9 +404,8 @@
               </div>
             </div>
 
-            <!-- Step 6: Company Research -->
+            <!-- Company Research -->
             <div class="roadmap-card roadmap-gcc" onclick="switchView('view-gcc')" style="cursor:pointer;">
-              <div class="roadmap-step-num">⑥</div>
               <div class="roadmap-card-body">
                 <div class="roadmap-card-header">
                   <span class="roadmap-diff-pill roadmap-pill-gcc">Research</span>
@@ -410,6 +419,7 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -419,7 +429,8 @@
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Q&amp;A Prep Hub <span class="nav-step-badge nav-step-hard" style="vertical-align: middle; font-size: 0.7rem;">④ Step</span></h2>
+              <h2 class="page-title">Q&amp;A Prep Hub</h2>
+
               <p class="page-subtitle">Search, filter, and study 2,600+ expert interview Q&amp;As — Easy through Architect difficulty. Use Study Mode for flashcard practice.</p>
             </div>
             <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
@@ -454,13 +465,7 @@
           <!-- 1. Unified Q&amp;A Search Subview -->
           <div id="view-unified-search" class="prep-hub-subview">
             
-            <div class="prep-section-header reveal-on-scroll">
-              <div class="prep-section-header-icon">🔍</div>
-              <div class="prep-section-header-content">
-                <h3 class="prep-section-header-title gradient-text">Unified Q&amp;A Search</h3>
-                <p class="prep-section-header-desc">Search, query, and filter across the entire dataset repository of 2,600+ expert-level questions.</p>
-              </div>
-            </div>
+
 
             <!-- Study Mode Toggle -->
             <div class="study-mode-toggle-bar">
@@ -476,7 +481,7 @@
 
             <!-- Study Mode Flashcard View (hidden by default) -->
             <div class="study-flashcard-container" id="study-flashcard-container">
-              <div class="study-flashcard" id="study-flashcard" onclick="flipStudyCard()">
+              <div class="study-flashcard" id="study-flashcard" onclick="flipStudyCard()" tabindex="0" role="button" aria-label="Flashcard: click or press Enter or Space to reveal answer" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipStudyCard();}">
                 <div class="study-flashcard-inner">
                   <div class="study-card-front">
                     <span class="study-card-category" id="study-card-category">Loading...</span>
@@ -500,9 +505,9 @@
               <!-- Row 1: Search + Level together -->
               <div class="qa-hfilter-row" style="gap: 0.75rem; flex-wrap: wrap;">
                 <div class="qa-search-wrapper" style="flex: 1; min-width: 200px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                   <input type="text" class="qa-search-input" id="unified-search-input" placeholder="Search keywords, concepts, code...">
                 </div>
+
                 <div class="qa-chips-scroll" id="unified-difficulty-selector" style="flex: none;">
                   <button class="qa-sidebar-btn active" data-difficulty="ALL">
                     <span>All Levels</span>
@@ -612,19 +617,7 @@
 
         </div>
 
-        <!-- Step Navigation Footer -->
-        <div class="page-step-nav">
-          <button class="step-nav-btn prev" onclick="switchView('view-spark-hub')">
-            ← ③ Spark Engine
-          </button>
-          <div class="step-nav-info">
-            <strong>Step ④ of ⑥</strong>
-            Practice full Q&amp;As, then master architecture design
-          </div>
-          <button class="step-nav-btn" onclick="switchView('view-architecture')">
-            ⑤ Architecture Hub →
-          </button>
-        </div>
+
       </section>
       
       <!-- 4. SPARK ENGINE HUB VIEW -->
@@ -632,7 +625,8 @@
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Spark Engine Hub <span class="nav-step-badge nav-step-medium" style="vertical-align: middle; font-size: 0.7rem;">③ Step</span></h2>
+              <h2 class="page-title">Spark Engine Hub</h2>
+
               <p class="page-subtitle">Unified hub for Apache Spark engine mechanics, flow simulations, PySpark curriculum, and Spark SQL deep-dives.</p>
             </div>
             <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
@@ -932,7 +926,7 @@
                 <span class="spark-sandbox-badge">Dynamic Interactive Interface</span>
                 <h3 class="spark-sandbox-title">🧠 Interactive Architectural Sandbox</h3>
                 <p class="spark-sandbox-desc">
-                  Powered by gemini-3.5-flash. Test Spark configurations, write code transformations, and generate drafts for your tech blog or upcoming book.
+                  Powered by AI Intelligence. Test Spark configurations, write code transformations, and generate drafts for your tech blog or upcoming book.
                 </p>
               </div>
 
@@ -1398,7 +1392,7 @@ Dataset&lt;Row&gt; result = df.withColumn("rank", rank().over(windowSpec)).filte
           <div id="view-pyspark" class="spark-hub-subview hidden">
             <div class="pyspark-header-meta" style="margin-top: -1rem; margin-bottom: 1.5rem;">
               <span class="pyspark-version-badge">Spark 3.4 → 4.0</span>
-              <span class="pyspark-level-count">26 Levels · 4 Phases</span>
+              <span class="pyspark-level-count">32 Levels · 4 Phases</span>
             </div>
             
 
@@ -2752,7 +2746,7 @@ WHEN NOT MATCHED THEN
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
               <h2 class="page-title">Hyderabad GCC Directory</h2>
-              <p class="page-subtitle">A comprehensive master directory of 50 flagship Global Capability Centers (GCCs) in Hyderabad, organized by risk tiers.</p>
+              <p class="page-subtitle">A comprehensive master directory of 55 flagship Global Capability Centers (GCCs) in Hyderabad, organized by risk tiers.</p>
             </div>
             <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-concepts').click()" title="Go to Key Concepts" aria-label="Go to Key Concepts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -2791,9 +2785,9 @@ WHEN NOT MATCHED THEN
             <!-- Search Row -->
             <div class="qa-hfilter-row">
               <div class="qa-search-wrapper" style="flex: 1;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <input type="text" class="qa-search-input" id="gcc-search-input" placeholder="Search by company, sector, or justification..." autocomplete="off">
               </div>
+
             </div>
             <!-- Tiers Row -->
             <div class="qa-hfilter-row qa-hfilter-chips-row">
@@ -2841,7 +2835,7 @@ WHEN NOT MATCHED THEN
                   <td class="salary-range">₹25L - ₹36L</td>
                   <td class="justification">Strong regional digital bank hub; consistently scaling local infrastructure.</td>
                   <td>
-                    <a href="https://www.google.com/search?q=https://www.dbs.com/careers/" target="_blank" rel="noopener noreferrer" class="portal-link">
+                    <a href="https://www.dbs.com/careers/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
@@ -3036,7 +3030,7 @@ WHEN NOT MATCHED THEN
                   <td class="salary-range">₹22L - ₹34L</td>
                   <td class="justification">Deeply anchored R&D center; stable industrial cloud/IoT tracking.</td>
                   <td>
-                    <a href="https://www.google.com/search?q=https://careers.bosch.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
+                    <a href="https://careers.bosch.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
@@ -3049,7 +3043,7 @@ WHEN NOT MATCHED THEN
                   <td class="salary-range">₹20L - ₹32L</td>
                   <td class="justification">Stable; focusing heavy capital into next-gen connected mobility software.</td>
                   <td>
-                    <a href="https://www.google.com/search?q=https://www.hyundai.com/in/en/hyundai-story/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
+                    <a href="https://www.hyundai.com/in/en/hyundai-story/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
@@ -3270,7 +3264,7 @@ WHEN NOT MATCHED THEN
                   <td class="salary-range">₹25L - ₹36L</td>
                   <td class="justification">Moderate hiring pace centered on upgrading to cloud data systems.</td>
                   <td>
-                    <a href="https://www.google.com/search?q=https://jobs.thomsonreuters.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
+                    <a href="https://jobs.thomsonreuters.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
@@ -3309,7 +3303,7 @@ WHEN NOT MATCHED THEN
                   <td class="salary-range">₹38L - ₹52L</td>
                   <td class="justification">**Impacted:** Global engineering and cloud divisions saw verified downsizing.</td>
                   <td>
-                    <a href="https://www.google.com/search?q=https://careers.google.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
+                    <a href="https://careers.google.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
@@ -3563,7 +3557,8 @@ WHEN NOT MATCHED THEN
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Key Concepts &amp; Definitions <span class="nav-step-badge nav-step-easy" style="vertical-align: middle; font-size: 0.7rem;">① Step</span></h2>
+              <h2 class="page-title">Key Concepts &amp; Definitions</h2>
+
               <p class="page-subtitle">Master architectural keywords, definitions, and core concepts — sorted by increasing difficulty.</p>
             </div>
             <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
@@ -3587,9 +3582,9 @@ WHEN NOT MATCHED THEN
           <!-- Search Row -->
           <div class="qa-hfilter-row">
             <div class="qa-search-wrapper" style="flex: 1;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               <input type="text" class="qa-search-input" id="concepts-search" placeholder="Search keywords, definitions, or context...">
             </div>
+
           </div>
           <!-- Difficulty Row -->
           <div class="qa-hfilter-row qa-hfilter-chips-row">
@@ -3621,19 +3616,7 @@ WHEN NOT MATCHED THEN
           <!-- Dynamically loaded concepts will go here -->
         </div>
 
-        <!-- Step Navigation Footer -->
-        <div class="page-step-nav">
-          <button class="step-nav-btn prev" onclick="switchView('view-dashboard')">
-            ← Home
-          </button>
-          <div class="step-nav-info">
-            <strong>Step ① of ⑥</strong>
-            Start with key concepts, then practice code syntax
-          </div>
-          <button class="step-nav-btn" onclick="switchView('view-cheatsheet')">
-            ② Code Practice →
-          </button>
-        </div>
+
       </section>
 
       <!-- 9. CODE PRACTICE (DE Cheat Sheet) VIEW -->
@@ -3641,7 +3624,8 @@ WHEN NOT MATCHED THEN
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Code Practice — DE Languages <span class="nav-step-badge nav-step-medium" style="vertical-align: middle; font-size: 0.7rem;">② Step</span></h2>
+              <h2 class="page-title">Code Practice — DE Languages</h2>
+
               <p class="page-subtitle">Interactive syntax reference for Python, MS SQL (T-SQL), PySpark, and Spark SQL — real-world data workloads.</p>
             </div>
             <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
@@ -3667,9 +3651,9 @@ WHEN NOT MATCHED THEN
           <!-- Search Row -->
           <div class="qa-hfilter-row">
             <div class="qa-search-wrapper" style="flex: 1;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               <input type="text" class="qa-search-input" id="cheatsheet-search" placeholder="Search Code Deepdive concepts... (press /)">
             </div>
+
           </div>
           <!-- Levels Row -->
           <div class="qa-hfilter-row qa-hfilter-chips-row">
@@ -3731,19 +3715,7 @@ WHEN NOT MATCHED THEN
           </div>
         </div>
 
-        <!-- Step Navigation Footer -->
-        <div class="page-step-nav">
-          <button class="step-nav-btn prev" onclick="switchView('view-concepts')">
-            ← ① Key Concepts
-          </button>
-          <div class="step-nav-info">
-            <strong>Step ② of ⑥</strong>
-            Apply coding syntax, then explore Spark engine internals
-          </div>
-          <button class="step-nav-btn" onclick="switchView('view-spark-hub')">
-            ③ Spark Engine →
-          </button>
-        </div>
+
       </section>
 
       <!-- 10. ENTERPRISE DATA ARCHITECTURE HUB -->
@@ -3751,7 +3723,8 @@ WHEN NOT MATCHED THEN
         <header class="page-header">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             <div>
-              <h2 class="page-title">Architecture Hub <span class="nav-step-badge nav-step-architect" style="vertical-align: middle; font-size: 0.7rem;">⑤ Step</span></h2>
+              <h2 class="page-title">Architecture Hub</h2>
+
               <p class="page-subtitle">Master advanced data modeling, real-time streaming, LLM orchestration, and enterprise-scale architecture scenarios.</p>
             </div>
             <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
@@ -3775,22 +3748,16 @@ WHEN NOT MATCHED THEN
         <div class="prep-hub-content-container">
           <div id="view-architecture-search" class="prep-hub-subview-always">
             
-            <div class="prep-section-header reveal-on-scroll">
-              <div class="prep-section-header-icon">🏗️</div>
-              <div class="prep-section-header-content">
-                <h3 class="prep-section-header-title gradient-text">Architecture Q&A Explorer</h3>
-                <p class="prep-section-header-desc">Search and filter 2,400+ expert-level architecture Q&As across 16 core enterprise domains.</p>
-              </div>
-            </div>
+
 
             <!-- Horizontal Filter Stack -->
             <div class="qa-hfilter-stack reveal-on-scroll">
               <!-- Search Input & Difficulty Selector -->
               <div class="qa-hfilter-row" style="gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
                 <div class="qa-search-wrapper" style="flex: 1; min-width: 200px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--text-secondary); margin-left: 0.25rem;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                   <input type="text" class="qa-search-input" id="architecture-search-input" placeholder="Search architecture concepts, code patterns, gotchas...">
                 </div>
+
                 
                 <div class="qa-chips-scroll" id="architecture-difficulty-selector" style="flex: none;">
                   <button class="qa-sidebar-btn active" data-difficulty="ALL">
@@ -3836,19 +3803,7 @@ WHEN NOT MATCHED THEN
           </div>
         </div>
 
-        <!-- Step Navigation Footer -->
-        <div class="page-step-nav">
-          <button class="step-nav-btn prev" onclick="switchView('view-prep-hub')">
-            ← ④ Q&amp;A Prep Hub
-          </button>
-          <div class="step-nav-info">
-            <strong>Step ⑤ of ⑥ — Almost Done!</strong>
-            Architect-level complete. Research target companies next.
-          </div>
-          <button class="step-nav-btn" onclick="switchView('view-gcc')">
-            ⑥ Company Research →
-          </button>
-        </div>
+
       </section>
 
 
@@ -3860,7 +3815,7 @@ WHEN NOT MATCHED THEN
       <p>
         Built by <strong class="footer-author">Santosh Jammi</strong> — Senior Data Engineer &rarr; Principal Data Architect
       </p>
-      <p>TCS EU BFSI &bull; LTIMindtree &bull; Infosys &bull; Microsoft Fabric DP-600 &bull; Azure DP-203 &bull; PL-300 &bull; 2,252 Questions</p>
+      <p>TCS EU BFSI &bull; LTIMindtree &bull; Infosys &bull; Microsoft Fabric DP-600 &bull; Azure DP-203 &bull; PL-300 &bull; 2,600+ Questions</p>
       <p class="footer-keywords">
         Medallion Architecture &bull; Delta Lake &bull; GDPR &bull; FinOps &bull; Databricks &bull; Azure Synapse &bull; Microsoft Fabric
       </p>
@@ -3928,6 +3883,17 @@ WHEN NOT MATCHED THEN
       <div class="text-white font-medium text-lg tracking-wider" id="db-loader-text" style="font-family: 'Space Grotesk', sans-serif;">Loading Datasets...</div>
     </div>
   </div>
+
+  <!-- Preload Core Datasets -->
+  <script src="questions.js"></script>
+  <script src="data_architecture.js"></script>
+  <script src="data_concepts.js"></script>
+  <script src="data_de.js"></script>
+  <script src="data_pyspark.js"></script>
+  <script src="data_sparksql.js"></script>
+  <script src="data_mssql.js"></script>
+  <script src="data_python.js"></script>
+  <script src="data_personalised.js"></script>
   <script src="app.js?v=1.5.0"></script>
   <script src="animations.js?v=1.0"></script>
 </body>

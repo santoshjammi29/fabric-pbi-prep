@@ -164,10 +164,10 @@
 
 .reveal-on-scroll {
   opacity: 0;
-  transform: translateY(32px);
+  transform: translateY(12px);
   transition:
-    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-on-scroll.is-visible {
@@ -175,15 +175,16 @@
   transform: translateY(0);
 }
 
-/* Stagger delays for sibling elements */
+/* Stagger delays for sibling elements — snappy 25ms steps */
 .reveal-on-scroll:nth-child(1)  { transition-delay: 0ms; }
-.reveal-on-scroll:nth-child(2)  { transition-delay: 60ms; }
-.reveal-on-scroll:nth-child(3)  { transition-delay: 120ms; }
-.reveal-on-scroll:nth-child(4)  { transition-delay: 180ms; }
-.reveal-on-scroll:nth-child(5)  { transition-delay: 240ms; }
-.reveal-on-scroll:nth-child(6)  { transition-delay: 300ms; }
-.reveal-on-scroll:nth-child(7)  { transition-delay: 360ms; }
-.reveal-on-scroll:nth-child(8)  { transition-delay: 420ms; }
+.reveal-on-scroll:nth-child(2)  { transition-delay: 25ms; }
+.reveal-on-scroll:nth-child(3)  { transition-delay: 50ms; }
+.reveal-on-scroll:nth-child(4)  { transition-delay: 75ms; }
+.reveal-on-scroll:nth-child(5)  { transition-delay: 100ms; }
+.reveal-on-scroll:nth-child(6)  { transition-delay: 125ms; }
+.reveal-on-scroll:nth-child(7)  { transition-delay: 150ms; }
+.reveal-on-scroll:nth-child(8)  { transition-delay: 175ms; }
+
 
 /* Scale variant */
 .reveal-scale {
@@ -227,6 +228,23 @@
   to { opacity: 0; transform: scale(0.98); }
 }
 
+/* ─── 5b. DIALOG BOX ENTRANCE ANIMATION ──────────────────── */
+
+.dialog-overlay:not(.hidden):not([hidden]) .dialog-box {
+  animation: dialogEntrance 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes dialogEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* ─── 6. CARD HOVER — PREMIUM LIFT EFFECT ────────────────── */
 
 .concept-accordion-card,
@@ -241,15 +259,18 @@
     border-color 0.2s ease;
 }
 
-.concept-accordion-card:hover:not(.expanded),
-.stat-card:hover,
-.personalised-card:hover,
-.niche-card:hover {
-  transform: translateY(-4px) scale(1.005);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(108, 92, 231, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+/* Only lift on real pointer devices — prevents accidental layout shifts on touch */
+@media (hover: hover) and (pointer: fine) {
+  .concept-accordion-card:hover:not(.expanded),
+  .stat-card:hover,
+  .personalised-card:hover,
+  .niche-card:hover {
+    transform: translateY(-4px) scale(1.005);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(108, 92, 231, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
 }
 
 /* Active press micro-feedback */
@@ -266,30 +287,7 @@
   position: relative;
   transition:
     background 0.22s ease,
-    color 0.22s ease,
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.nav-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%) scaleY(0);
-  width: 3px;
-  height: 70%;
-  background: var(--primary);
-  border-radius: 0 3px 3px 0;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.nav-item.active::before,
-.nav-item:hover::before {
-  transform: translateY(-50%) scaleY(1);
-}
-
-.nav-item:hover {
-  transform: translateX(3px);
+    color 0.22s ease;
 }
 
 /* ─── 8. FILTER CHIP ANIMATIONS ──────────────────────────── */
@@ -299,17 +297,17 @@
     background 0.18s ease,
     border-color 0.18s ease,
     color 0.18s ease,
-    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.18s ease;
 }
 
 .qa-sidebar-btn:hover:not(.active) {
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .qa-sidebar-btn.active {
-  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: none;
 }
+
 
 .qa-btn-count-badge {
   transition: background 0.2s ease, color 0.2s ease;

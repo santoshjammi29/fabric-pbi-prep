@@ -1,0 +1,76 @@
+{
+  "_description": "Dataset shape snapshot. If this drifts a regression test fails.",
+  "_generated": "2026-07-25T12:37:33.936Z",
+  "questions_js": {
+    "count": 2640,
+    "required_fields": [
+      "id",
+      "question",
+      "answer",
+      "category",
+      "difficulty",
+      "niche"
+    ],
+    "sample_id_prefix": "adf",
+    "categories": [
+      "ADF",
+      "AIRFLOW",
+      "CDC",
+      "CLOUD_DATA",
+      "DAG",
+      "DATALAKE ARCHITECTURE",
+      "DBT",
+      "FABRIC",
+      "FLINK",
+      "INGESTION",
+      "KAFKA",
+      "LAKEHOUSE",
+      "LLM_FRAMEWORKS",
+      "POWER BI",
+      "RAG",
+      "SPARK & DATABRICKS",
+      "SPARK_PYSPARK",
+      "SQL SERVER",
+      "VECTOR_DB"
+    ]
+  },
+  "data_architecture_js": {
+    "count": 2400,
+    "required_fields": [
+      "id",
+      "question",
+      "answer"
+    ]
+  },
+  "data_de_js": {
+    "count": 3499,
+    "required_fields": [
+      "id",
+      "question",
+      "answer"
+    ]
+  },
+  "data_personalised_js": {
+    "count": 50
+  },
+  "data_pyspark_js": {
+    "count": 32
+  },
+  "gcc_directory": {
+    "expected_row_count": 55,
+    "marketing_copy": "55 flagship Global Capability Centers",
+    "footer_copy": "2,600+ Questions"
+  },
+  "study_mode": {
+    "expected_initial_counter_pattern": "1 / N",
+    "placeholder_must_not_appear": "Loading question..."
+  },
+  "sandbox": {
+    "hallucinated_model_names_banned": [
+      "gemini-3.5-flash",
+      "gemini-pro",
+      "gpt-4",
+      "claude-3"
+    ]
+  }
+}

@@ -271,12 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return Promise.all(promises)
       .then(() => {
         repopulateStateQuestions();
-        hideDbLoader();
       })
       .catch(err => {
-        console.error(err);
+        console.warn('Dataset load warning:', err);
+      })
+      .finally(() => {
         hideDbLoader();
-        alert("Failed to load some interview database files. Please check your network connection.");
       });
   }
 
@@ -634,8 +634,9 @@ document.addEventListener('DOMContentLoaded', () => {
       initialView = 'view-spark-hub';
     }
 
-    const needed = getNeededDatasetsForView(initialView, subTab);
+    const needed = ['fabric_pbi', 'architecture', 'concepts', 'general_de', 'pyspark', 'sparksql', 'mssql', 'python', 'personalised'];
     ensureDatasetsLoaded(needed).then(() => {
+      repopulateStateQuestions();
       initExplainer();
       initPractice();
       initGeneralDe();
@@ -644,6 +645,8 @@ document.addEventListener('DOMContentLoaded', () => {
       initPersonalised();
       initArchitectureHub();
       initDashboard();
+      initStudyMode();
+      loadRandomTip();
       updateUnifiedSearchCounts();
 
       if (initialView === 'view-prep-hub') {
@@ -1310,10 +1313,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetResults) {
       state.expandedExplainerSections = {};
       state.explainerLimits = {};
-      if (sortedCats.length > 0) {
+      if (query) {
+        sortedCats.forEach(cat => { state.expandedExplainerSections[cat] = true; });
+      } else if (sortedCats.length > 0) {
         state.expandedExplainerSections[sortedCats[0]] = true;
       }
+    } else if (query) {
+      sortedCats.forEach(cat => { state.expandedExplainerSections[cat] = true; });
     }
+
     
     let overallIdx = 1;
     
@@ -1800,10 +1808,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (resetResults) {
       state.expandedPracticeSections = {};
-      if (sortedCats.length > 0) {
+      if (query) {
+        sortedCats.forEach(cat => { state.expandedPracticeSections[cat] = true; });
+      } else if (sortedCats.length > 0) {
         state.expandedPracticeSections[sortedCats[0]] = true;
       }
+    } else if (query) {
+      sortedCats.forEach(cat => { state.expandedPracticeSections[cat] = true; });
     }
+
     
     sortedCats.forEach(catName => {
       const sectItems = categoriesMap[catName];
@@ -2639,7 +2652,43 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // Automatic clear button handler for all search inputs
+    function initSearchClearButtons() {
+      const searchInputs = document.querySelectorAll('.qa-search-input, .search-input, input[id*="search"]');
+      searchInputs.forEach(input => {
+        const wrapper = input.closest('.qa-search-wrapper, .search-input-wrapper, .de-search-box, .gcc-search-box') || input.parentElement;
+        if (!wrapper || wrapper.querySelector('.search-clear-btn')) return;
+
+        const clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'search-clear-btn';
+        clearBtn.setAttribute('aria-label', 'Clear search');
+        clearBtn.style.display = input.value.trim() ? 'inline-flex' : 'none';
+        clearBtn.innerHTML = '&times;';
+
+        clearBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          input.value = '';
+          clearBtn.style.display = 'none';
+          input.focus();
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+
+        input.addEventListener('input', () => {
+          clearBtn.style.display = input.value.trim() ? 'inline-flex' : 'none';
+        });
+
+        wrapper.appendChild(clearBtn);
+      });
+    }
+
+    // Initialize clear buttons on load & view switches
+    initSearchClearButtons();
+    document.addEventListener('click', () => setTimeout(initSearchClearButtons, 100));
+
     // Global copy button event delegation for dynamic code blocks
+
     document.addEventListener('click', (e) => {
       const copyBtn = e.target.closest('.copy-btn');
       if (!copyBtn) return;
@@ -2973,8 +3022,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const chunk = filtered.slice(0, generalDeState.loadedQuestionsLimit);
+    const chunk = generalDeState.searchQuery ? filtered : filtered.slice(0, generalDeState.loadedQuestionsLimit);
     DOM_DE.questionsContainer.innerHTML = '';
+
 
     const badgeClasses = {
       "Databases & SQL": "badge-sql",
@@ -3400,7 +3450,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (state.conceptsLimit === undefined) state.conceptsLimit = 30;
-    const visible = filtered.slice(0, state.conceptsLimit);
+    const visible = query ? filtered : filtered.slice(0, state.conceptsLimit);
+
 
     visible.forEach(item => {
       const card = document.createElement('div');
@@ -3664,8 +3715,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const items = byLevelFiltered[lvl];
       if (!items || items.length === 0) return;
 
-      const limit = state.cheatsheetLimits[lvl] || 20;
+      const limit = query ? items.length : (state.cheatsheetLimits[lvl] || 20);
       const visibleItems = items.slice(0, limit);
+
 
       // Render Level Section Header
       const levelHeader = document.createElement('div');
@@ -4537,9 +4589,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetResults) {
       state.unifiedSectionLimits = {};
       state.expandedUnifiedSections = {};
-      if (activeSections.length > 0) {
+      if (query) {
+        activeSections.forEach(domName => { state.expandedUnifiedSections[domName] = true; });
+      } else if (activeSections.length > 0) {
         state.expandedUnifiedSections[activeSections[0]] = true;
       }
+    } else if (query) {
+      activeSections.forEach(domName => { state.expandedUnifiedSections[domName] = true; });
     }
 
     let overallIdx = 1;
@@ -4549,7 +4605,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!sectItems || sectItems.length === 0) return;
 
       const isExpanded = !!state.expandedUnifiedSections[sectKey];
-      const limit = state.unifiedSectionLimits[sectKey] || 30;
+      const limit = query ? sectItems.length : (state.unifiedSectionLimits[sectKey] || 30);
+
 
       // Section Wrapper
       const sectionWrapper = document.createElement('div');
@@ -4985,10 +5042,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const activeSections = Object.keys(sections).sort();
 
-    // If resetResults and activeSections has elements, expand the first one by default
+    // If resetResults and activeSections has elements, expand sections
     if (resetResults && activeSections.length > 0) {
       state.expandedArchitectureSections = {};
-      state.expandedArchitectureSections[activeSections[0]] = true;
+      if (query) {
+        activeSections.forEach(s => { state.expandedArchitectureSections[s] = true; });
+      } else {
+        state.expandedArchitectureSections[activeSections[0]] = true;
+      }
+    } else if (query) {
+      activeSections.forEach(s => { state.expandedArchitectureSections[s] = true; });
     }
 
     let overallIdx = 1;
@@ -4998,7 +5061,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!sectItems || sectItems.length === 0) return;
 
       const isExpanded = !!state.expandedArchitectureSections[sectKey];
-      const limit = state.architectureSectionLimits[sectKey] || 30;
+      const limit = query ? sectItems.length : (state.architectureSectionLimits[sectKey] || 30);
+
 
       // Section Wrapper
       const sectionWrapper = document.createElement('div');
@@ -5966,23 +6030,26 @@ Your input highlights the need for dynamic optimization of distributed executors
             let success = false;
             let responseData = null;
 
-            for (let attempt = 0; attempt < 5; attempt++) {
+            for (let attempt = 0; attempt < 2; attempt++) {
                 try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
                     const res = await fetch(endpoint, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
                     if (res.ok) {
                         responseData = await res.json();
                         success = true;
                         break;
                     }
                 } catch (err) {
-                    // Fail-safe retry logic
+                    // Fail-safe fallback logic
                 }
-                await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2;
+                await new Promise(resolve => setTimeout(resolve, 300));
             }
 
             loader.classList.add('hidden');
@@ -6481,13 +6548,10 @@ Your input highlights the need for dynamic optimization of distributed executors
     flashcard.classList.remove('flipped');
     studyState.flipped = false;
 
-    // Small delay so card resets visually before new content shows
-    setTimeout(() => {
-      if (qEl) qEl.textContent = card.question || '';
-      if (aEl) aEl.textContent = card.answer || '';
-      if (catEl) catEl.textContent = (card.category || card.domain || 'General').toUpperCase();
-      if (counterEl) counterEl.textContent = `${studyState.index + 1} / ${studyState.cards.length}`;
-    }, 50);
+    if (qEl) qEl.textContent = card.question || '';
+    if (aEl) aEl.textContent = card.answer || '';
+    if (catEl) catEl.textContent = (card.category || card.domain || 'General').toUpperCase();
+    if (counterEl) counterEl.textContent = `${studyState.index + 1} / ${studyState.cards.length.toLocaleString()}`;
   }
 
   function flipStudyCard() {
