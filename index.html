@@ -498,6 +498,15 @@
                 <span class="study-counter" id="study-counter">0 / 0</span>
                 <button class="study-nav-btn" onclick="nextStudyCard()">Next →</button>
               </div>
+
+              <!-- SM-2 Spaced Repetition Rating Bar -->
+              <div class="sm2-rating-bar" id="sm2-rating-bar" style="margin-top: 0.75rem;">
+                <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); width: 100%; text-align: center; display: block; margin-bottom: 0.25rem;">Rate Recall (SM-2 Spaced Repetition):</span>
+                <button class="sm2-btn sm2-btn-again" onclick="rateSM2Card(1)" aria-label="Again (reset interval)">↺ Again (1d)</button>
+                <button class="sm2-btn sm2-btn-hard" onclick="rateSM2Card(3)" aria-label="Hard (slight delay)">⚡ Hard (2d)</button>
+                <button class="sm2-btn sm2-btn-good" onclick="rateSM2Card(4)" aria-label="Good (standard interval)">✓ Good (4d)</button>
+                <button class="sm2-btn sm2-btn-easy" onclick="rateSM2Card(5)" aria-label="Easy (extended interval)">🚀 Easy (7d)</button>
+              </div>
             </div>
 
             <!-- Horizontal Filter Stack -->
@@ -2755,28 +2764,52 @@ WHEN NOT MATCHED THEN
         </header>
 
         <div class="gcc-content">
-          <!-- Risk Tier Definitions -->
+          <!-- Indicative Compensation Disclaimer Banner -->
+          <div class="gcc-disclaimer-banner" style="background: rgba(0, 113, 227, 0.08); border: 1px solid var(--apple-blue); border-radius: 14px; padding: 0.85rem 1.25rem; margin-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.2rem;">💡</span>
+              <p style="margin: 0; font-size: 0.82rem; color: var(--text-primary); line-height: 1.45;">
+                <strong>Indicative Compensation & Remote Work Disclaimer:</strong> Salary ranges shown across GCC tiers represent estimated market benchmarks (base + variable performance incentives). Actual compensation packages vary by seniority, domain expertise, and remote/hybrid work eligibility.
+              </p>
+            </div>
+          </div>
+
+          <!-- Risk Tier Definitions & Top-in-Demand Skills -->
           <div class="gcc-risk-definitions">
             <div class="gcc-def-card def-low">
               <div class="def-header">
                 <span class="badge-risk badge-risk-low">Low Risk</span>
                 <h4>Highly Insulated</h4>
               </div>
-              <p>Defensive sectors (Pharma, Consumer Goods, Heavy Industrial) or massive BFSI operations that leverage India heavily for cost-arbitrage. They have avoided major layoffs and are actively expanding.</p>
+              <p>Defensive sectors (Pharma, Consumer Goods, Heavy Industrial) or massive BFSI operations that leverage India heavily for cost-arbitrage.</p>
+              <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--card-border);">
+                <strong style="font-size: 0.78rem; color: var(--accent-green); display: block; margin-bottom: 0.35rem;">🔥 Top-in-Demand Skills:</strong>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">PySpark • Fabric OneLake • Direct Lake DAX • SQL Server RLS/OLS • Synapse Link</span>
+              </div>
             </div>
+
             <div class="gcc-def-card def-medium">
               <div class="def-header">
                 <span class="badge-risk badge-risk-med">Medium Risk</span>
                 <h4>Selective Hiring</h4>
               </div>
-              <p>Stable enterprises that have navigated minor global trimmings or attrition-management strategies. They are hiring, but their processes are highly selective or focused strictly on critical cloud migrations.</p>
+              <p>Stable enterprises that have navigated minor global trimmings or attrition-management strategies. They are hiring for critical cloud migrations.</p>
+              <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--card-border);">
+                <strong style="font-size: 0.78rem; color: var(--accent-orange); display: block; margin-bottom: 0.35rem;">🔥 Top-in-Demand Skills:</strong>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">Delta Lake Liquid Clustering • Kafka Streaming • Unity Catalog Governance • dbt DataOps</span>
+              </div>
             </div>
+
             <div class="gcc-def-card def-high">
               <div class="def-header">
                 <span class="badge-risk badge-risk-high">High Risk</span>
                 <h4>Structural Volatility</h4>
               </div>
-              <p>Tech and product giants that executed massive global workforce reductions or ongoing structural changes over the past 2–3 years. Hiring here is lean, highly scrutinized, and prone to sudden strategy shifts.</p>
+              <p>Tech and product giants that executed global workforce reductions. Hiring is highly scrutinized and focused strictly on AI innovation.</p>
+              <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--card-border);">
+                <strong style="font-size: 0.78rem; color: var(--accent-red); display: block; margin-bottom: 0.35rem;">🔥 Top-in-Demand Skills:</strong>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">LLM RAG Orchestration • Vector Databases (pgvector) • Spark AQE Tuning • FinOps Strategy</span>
+              </div>
             </div>
           </div>
 
@@ -3743,6 +3776,137 @@ WHEN NOT MATCHED THEN
           <span class="diff-bar-pill diff-pill-hard">● Hard</span>
           <span class="diff-bar-arrow">→</span>
           <span class="diff-bar-pill diff-pill-architect">● Architect</span>
+        </div>
+
+        <!-- 16-Domain Expandable Accordion Grid -->
+        <div class="arch-domains-grid-wrapper reveal-on-scroll" style="margin-bottom: 1.5rem; background: var(--surface-card); border: 1px solid var(--card-border); border-radius: 18px; padding: 1.25rem; backdrop-filter: var(--glass-card);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <div>
+              <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
+                <span class="visually-hidden">Architecture Domains Grid</span>
+                🏛️ Enterprise Architecture Domains (16 Core Specs)
+              </h3>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">Click any domain to expand core capabilities, key considerations, and production gotchas.</p>
+            </div>
+            <button class="control-btn" onclick="document.querySelectorAll('.arch-domain-card').forEach(c=>c.classList.toggle('expanded'))" aria-label="Toggle all 16 architecture domains" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+              Expand / Collapse All
+            </button>
+          </div>
+
+          <div class="arch-domains-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem;">
+            <!-- Domain 1 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                1. Data Lakehouse & Delta Lake ⚡
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">ACID transactions, time travel, liquid clustering, z-ordering, schema enforcement.</p>
+            </div>
+            <!-- Domain 2 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                2. Real-Time Streaming & Event-Driven 📡
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Structured Streaming, Kafka/Event Hubs, watermarking, exactly-once processing.</p>
+            </div>
+            <!-- Domain 3 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                3. LLM Orchestration & RAG Pipelines 🤖
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">LangChain, LlamaIndex, chunking strategies, vector search indexing, evaluation.</p>
+            </div>
+            <!-- Domain 4 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                4. Unity Catalog & Governance 🔐
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Centralized metastore, lineage, data discovery, attribute-based access control.</p>
+            </div>
+            <!-- Domain 5 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                5. Fabric Capacity & Medallion Design 🔷
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">F-SKUs, OneLake shortcuts, Bronze/Silver/Gold data curation, Direct Lake.</p>
+            </div>
+            <!-- Domain 6 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                6. Data Factory & Pipeline Tuning ⚙️
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">ADF compute sizing, parallelism, failure recovery, dynamic parameterization.</p>
+            </div>
+            <!-- Domain 7 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                7. Power BI & VertiPaq Engine 📊
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">DAX optimization, star schema cardinality tuning, Aggregation tables, DirectLake.</p>
+            </div>
+            <!-- Domain 8 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                8. Spark Core & AQE Optimization 🚀
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Adaptive Query Execution, broadcast joins, skew mitigation, JVM GC tuning.</p>
+            </div>
+            <!-- Domain 9 (NEW) -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                9. Delta Sharing & Open Formats 🌐 (NEW)
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Zero-copy cross-cloud sharing, Apache Iceberg UniForm, token security.</p>
+            </div>
+            <!-- Domain 10 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                10. Security & Network Isolation 🛡️
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Private Endpoints, RLS/OLS, VNet injection, customer-managed keys (CMK).</p>
+            </div>
+            <!-- Domain 11 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                11. Data Mesh & Domain Architectures 🕸️
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Domain-driven data ownership, data-as-a-product, federated governance.</p>
+            </div>
+            <!-- Domain 12 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                12. CI/CD DataOps & Infrastructure as Code 🔄
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Terraform, Azure DevOps / GitHub Actions, dbt-core testing, automated deployments.</p>
+            </div>
+            <!-- Domain 13 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                13. Modern Data Warehouse & Synapse 🏛️
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Dedicated SQL Pools, Synapse Link, result caching, workload management.</p>
+            </div>
+            <!-- Domain 14 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                14. CDC & Database Replication 🔄
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Debezium, SQL Server CDC, log-based CDC, MERGE upsert patterns.</p>
+            </div>
+            <!-- Domain 15 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                15. Vector Databases & AI Indexing 🧠
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">pgvector, Azure AI Search, HNSW indexing, Cosine similarity search.</p>
+            </div>
+            <!-- Domain 16 -->
+            <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; background: var(--card-bg); transition: all 0.2s ease;">
+              <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-primary); cursor: pointer;" onclick="this.parentElement.classList.toggle('expanded')">
+                16. Cost Governance & FinOps Strategy 💰
+              </div>
+              <p style="margin: 0.35rem 0 0 0; font-size: 0.8rem; color: var(--text-secondary);">Auto-termination, spot instances, Fabric capacity smoothing, cost attribution.</p>
+            </div>
+          </div>
         </div>
 
         <div class="prep-hub-content-container">

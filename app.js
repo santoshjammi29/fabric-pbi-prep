@@ -6589,10 +6589,58 @@ Your input highlights the need for dynamic optimization of distributed executors
     });
   }
 
+  function rateSM2Card(quality) {
+    if (studyState.cards.length === 0) return;
+    const card = studyState.cards[studyState.index];
+    if (!card || !card.id) {
+      nextStudyCard();
+      return;
+    }
+
+    let sm2Store = {};
+    try {
+      sm2Store = JSON.parse(localStorage.getItem('sm2_flashcards') || '{}');
+    } catch (e) {}
+
+    const existing = sm2Store[card.id] || { easeFactor: 2.5, interval: 1, repetitions: 0 };
+    let ef = existing.easeFactor || 2.5;
+    let repetitions = existing.repetitions || 0;
+    let interval = existing.interval || 1;
+
+    if (quality < 3) {
+      repetitions = 0;
+      interval = 1;
+    } else {
+      if (repetitions === 0) interval = 1;
+      else if (repetitions === 1) interval = 6;
+      else interval = Math.round(interval * ef);
+
+      if (quality === 5) interval = Math.round(interval * 1.3);
+      repetitions += 1;
+    }
+
+    ef = ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if (ef < 1.3) ef = 1.3;
+
+    sm2Store[card.id] = {
+      easeFactor: Number(ef.toFixed(2)),
+      interval: interval,
+      repetitions: repetitions,
+      nextReviewDate: Date.now() + interval * 86400000
+    };
+
+    try {
+      localStorage.setItem('sm2_flashcards', JSON.stringify(sm2Store));
+    } catch (e) {}
+
+    nextStudyCard();
+  }
+
   window.flipStudyCard = flipStudyCard;
   window.nextStudyCard = nextStudyCard;
   window.prevStudyCard = prevStudyCard;
   window.initStudyMode = initStudyMode;
+  window.rateSM2Card = rateSM2Card;
 
 });
 

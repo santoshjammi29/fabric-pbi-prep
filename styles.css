@@ -18,6 +18,48 @@
   top: 1rem;
 }
 
+/* Accessible Screen Reader Utility */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* SM-2 Spaced Repetition Rating Controls */
+.sm2-rating-bar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.sm2-btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--card-border);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+.sm2-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow);
+}
+.sm2-btn-again { border-color: var(--accent-red); color: var(--accent-red); }
+.sm2-btn-hard { border-color: var(--accent-orange); color: var(--accent-orange); }
+.sm2-btn-good { border-color: var(--accent-blue); color: var(--accent-blue); }
+.sm2-btn-easy { border-color: var(--accent-green); color: var(--accent-green); }
+
 :root {
   /* Apple Signature Palette */
   --apple-blue: #0071e3;
