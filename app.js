@@ -2024,41 +2024,84 @@ document.addEventListener('DOMContentLoaded', () => {
     lang = lang ? lang.trim().toLowerCase() : 'code';
     let langClass = '';
     let langLabel = 'Code';
+    let langIcon = '💻';
+
     if (lang === 'python') {
       langClass = 'python';
       langLabel = 'Python';
+      langIcon = '🐍';
     } else if (lang === 'mssql' || lang === 'sql' || lang === 't-sql' || lang === 'tsql') {
       langClass = 'mssql';
       langLabel = 'T-SQL';
+      langIcon = '🗄️';
     } else if (lang === 'pyspark') {
       langClass = 'pyspark';
       langLabel = 'PySpark';
+      langIcon = '⚡';
     } else if (lang === 'sparksql' || lang === 'spark-sql') {
       langClass = 'sparksql';
       langLabel = 'Spark SQL';
+      langIcon = '📊';
+    } else if (lang === 'scala') {
+      langClass = 'pyspark';
+      langLabel = 'Scala';
+      langIcon = '🔴';
     } else if (lang === 'kql' || lang === 'kusto') {
       langClass = 'mssql';
       langLabel = 'KQL';
+      langIcon = '🔎';
     } else if (lang === 'bash' || lang === 'sh') {
       langClass = 'pyspark';
       langLabel = 'Bash';
+      langIcon = '⚙️';
     } else if (lang) {
       langLabel = lang.toUpperCase();
     }
     
-    return `<div class="code-wrapper ${langClass} my-4">
+    return `<div class="code-wrapper ${langClass} mac-ide-code-block my-4">
       <div class="code-toolbar">
-        <span class="code-lang-badge">${langLabel}</span>
-        <button class="copy-btn" title="Copy code">
+        <div class="mac-window-dots">
+          <span class="mac-dot red"></span>
+          <span class="mac-dot yellow"></span>
+          <span class="mac-dot green"></span>
+        </div>
+        <div class="code-lang-pill">
+          <span class="code-lang-icon">${langIcon}</span>
+          <span class="code-lang-badge">${langLabel}</span>
+        </div>
+        <button class="copy-btn" onclick="copyCodeFromBlock(this)" title="Copy code snippet" aria-label="Copy code snippet">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
           </svg>
-          Copy
+          <span>Copy</span>
         </button>
       </div>
       <pre class="code-block"><code>${code.trim()}</code></pre>
     </div>`;
   }
+
+  function copyCodeFromBlock(btn) {
+    if (!btn) return;
+    const wrapper = btn.closest('.code-wrapper');
+    if (!wrapper) return;
+    const codeEl = wrapper.querySelector('pre code');
+    if (!codeEl) return;
+    const codeText = codeEl.textContent || codeEl.innerText;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(codeText).then(() => {
+        const span = btn.querySelector('span');
+        const originalText = span ? span.textContent : 'Copy';
+        btn.classList.add('copied');
+        if (span) span.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (span) span.textContent = originalText;
+        }, 2000);
+      }).catch(() => {});
+    }
+  }
+  window.copyCodeFromBlock = copyCodeFromBlock;
 
   // Unified markdown parser that handles code blocks, lists, headings, and bold text cleanly
   function formatMarkdownToHTML(text) {
@@ -3772,14 +3815,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="uc-text">${escapeHTML(item.use_case || '')}</div>
               </div>
             </div>
-            <div class="code-wrapper">
+            <div class="code-wrapper ${cardLang} mac-ide-code-block">
               <div class="code-toolbar">
-                <span class="code-lang-badge">${cardLang === 'python' ? 'Python' : cardLang === 'mssql' ? 'T-SQL' : cardLang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
-                <button class="copy-btn" title="Copy code">
+                <div class="mac-window-dots">
+                  <span class="mac-dot red"></span>
+                  <span class="mac-dot yellow"></span>
+                  <span class="mac-dot green"></span>
+                </div>
+                <div class="code-lang-pill">
+                  <span class="code-lang-icon">${cardLang === 'python' ? '🐍' : cardLang === 'mssql' ? '🗄️' : cardLang === 'pyspark' ? '⚡' : '📊'}</span>
+                  <span class="code-lang-badge">${cardLang === 'python' ? 'Python' : cardLang === 'mssql' ? 'T-SQL' : cardLang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                </div>
+                <button class="copy-btn" onclick="copyCodeFromBlock(this)" title="Copy code snippet" aria-label="Copy code snippet">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                   </svg>
-                  Copy
+                  <span>Copy</span>
                 </button>
               </div>
               <pre class="code-block"><code>${highlightedCode}</code></pre>
@@ -3973,7 +4024,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 <p><strong>Enterprise Scenario:</strong> ${lvl.use_case || 'Production Spark SQL use-case.'}</p>
               </div>
-              <pre class="code-block"><code class="language-sql">${escapedCode}</code></pre>
+              <div class="code-wrapper sparksql mac-ide-code-block my-3">
+                <div class="code-toolbar">
+                  <div class="mac-window-dots">
+                    <span class="mac-dot red"></span>
+                    <span class="mac-dot yellow"></span>
+                    <span class="mac-dot green"></span>
+                  </div>
+                  <div class="code-lang-pill">
+                    <span class="code-lang-icon">📊</span>
+                    <span class="code-lang-badge">Spark SQL</span>
+                  </div>
+                  <button class="copy-btn" onclick="copyCodeFromBlock(this)" title="Copy code snippet" aria-label="Copy code snippet">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre class="code-block"><code class="language-sql">${escapedCode}</code></pre>
+              </div>
               <div class="level-mechanics">
                 <h5>Physical Execution &amp; Internal Mechanics</h5>
                 <p>${lvl.description}</p>
@@ -4836,14 +4906,22 @@ document.addEventListener('DOMContentLoaded', () => {
                           <div class="uc-text" style="font-size: 0.88rem; color: var(--text-secondary);">${escapeHTML(q.use_case || '')}</div>
                         </div>
                       </div>
-                      <div class="code-wrapper" style="border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; background: #0b0d19; margin-bottom: 1rem;">
-                        <div class="code-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--card-border); font-size: 0.75rem;">
-                          <span class="code-lang-badge" style="color: var(--text-secondary); font-weight: 600;">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
-                          <button class="copy-btn" title="Copy code" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; font-size: 0.75rem; transition: color 0.2s;">
+                      <div class="code-wrapper ${lang} mac-ide-code-block" style="margin-bottom: 1rem;">
+                        <div class="code-toolbar">
+                          <div class="mac-window-dots">
+                            <span class="mac-dot red"></span>
+                            <span class="mac-dot yellow"></span>
+                            <span class="mac-dot green"></span>
+                          </div>
+                          <div class="code-lang-pill">
+                            <span class="code-lang-icon">${lang === 'python' ? '🐍' : lang === 'mssql' ? '🗄️' : lang === 'pyspark' ? '⚡' : '📊'}</span>
+                            <span class="code-lang-badge">${lang === 'python' ? 'Python' : lang === 'mssql' ? 'T-SQL' : lang === 'pyspark' ? 'PySpark' : 'Spark SQL'}</span>
+                          </div>
+                          <button class="copy-btn" onclick="copyCodeFromBlock(this)" title="Copy code snippet" aria-label="Copy code snippet">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                               <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                             </svg>
-                            Copy
+                            <span>Copy</span>
                           </button>
                         </div>
                         <pre class="code-block" style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; max-height: 400px;"><code class="language-${lang === 'mssql' ? 'sql' : lang}">${highlightedCode}</code></pre>

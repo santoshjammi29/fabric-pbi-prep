@@ -2043,16 +2043,24 @@ body {
   border: 1px solid var(--card-border);
 }
 
-/* Inline Code and Block Code styling */
-code {
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+/* Inline Code pill styling (not inside pre block) */
+code:not(pre code) {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
   font-size: 0.85em;
-  background: var(--code-bg);
-  border: 1px solid var(--card-border);
-  padding: 0.15rem 0.35rem;
+  background: rgba(0, 113, 227, 0.12);
+  border: 1px solid rgba(0, 113, 227, 0.3);
+  padding: 0.15rem 0.45rem;
   border-radius: 6px;
-  color: var(--primary-light);
+  color: #60a5fa;
+  font-weight: 500;
   word-break: break-word;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.theme-light code:not(pre code) {
+  background: rgba(0, 113, 227, 0.08);
+  border-color: rgba(0, 113, 227, 0.25);
+  color: #0284c7;
 }
 
 /* Sync answer container layouts */
@@ -4529,17 +4537,61 @@ code {
   background: var(--card-border);
 }
 .copy-btn.copied {
-  color: var(--beginner) !important;
-  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #56d364 !important;
+  border-color: #2ea043 !important;
+  background: rgba(46, 160, 67, 0.25) !important;
+}
+
+/* Mac OS IDE Code Block Header Controls */
+.mac-window-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mac-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.mac-dot.red { background: #ff5f56; border: 1px solid #e0443e; }
+.mac-dot.yellow { background: #ffbd2e; border: 1px solid #dea123; }
+.mac-dot.green { background: #27c93f; border: 1px solid #1aab29; }
+
+.code-lang-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.code-lang-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+.code-lang-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.mac-ide-code-block {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 pre.code-block {
   margin: 0;
-  padding: 12px 1.25rem;
+  padding: 14px 1.25rem;
   overflow-x: auto;
-  font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
-  font-size: 0.82rem;
-  line-height: 1.6;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+  line-height: 1.65;
   color: #e2e8f0;
   scrollbar-width: thin;
   max-width: 100%;
