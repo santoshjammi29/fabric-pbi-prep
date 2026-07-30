@@ -1,45 +1,59 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE.UNIVERSE — Data Engineering Knowledge Graph</title>
   <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts from Beginner to Architect level.">
 
-  <!-- Inter & JetBrains Mono fonts via Google Fonts -->
+  <!-- Inter & JetBrains Mono fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <!-- D3.js and D3-Force -->
+  <!-- D3.js -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 
   <style>
-    /* Section 3.0 — Color System Tokens */
-    :root {
-      --bg-base:        #07080C;
-      --bg-elevated:    #0B0D14;
-      --bg-overlay:     #11141C;
-      --line:           #15171C;
-      --line-strong:    #1F232C;
-      --text-primary:   #E8EAED;
-      --text-secondary: #9AA0A6;
-      --text-tertiary:  #5F6368;
-      --accent:         #7C9CFF;
-      --accent-soft:    rgba(124, 156, 255, 0.15);
-      --focus-ring:     #7C9CFF;
+    /* Section 3.3 — Complete Theme Tokens */
+    :root, .theme-dark {
+      --bg-base:             #07080C;
+      --bg-elevated:         #0B0D14;
+      --bg-overlay:          #11141C;
+      --line:                #15171C;
+      --line-strong:         #1F232C;
+      --text-primary:        #E8EAED;
+      --text-secondary:      #9AA0A6;
+      --text-tertiary:       #5F6368;
+      --accent:              #7C9CFF;
+      --accent-soft:         rgba(124, 156, 255, 0.15);
+      --focus-ring:          #7C9CFF;
+
+      /* Graph Specific Contrast Contract (§3.3) */
+      --graph-edge:          #2A2F3A;
+      --graph-edge-dim:      #1A1D24;
+      --graph-edge-strong:   #5A6273;
+      --graph-node:          #C5CAD3;
+      --graph-node-l2:       #1A1D24;
+      --graph-node-stroke:   #2F3540;
+      --graph-node-halo:     rgba(124, 156, 255, 0.25);
+      --graph-label:         #E8EAED;
+      --graph-label-bg:      rgba(17, 20, 28, 0.92);
+      --graph-feather:       #7C9CFF;
+      --feather-opacity:     0.38;
+      --feather-blur-std:    1.2;
 
       /* Per-domain tokens */
-      --d1:  #6B8AFF; /* Foundations */
-      --d2:  #5EBDD3; /* Ingestion */
-      --d3:  #B07AFF; /* Storage */
-      --d4:  #E8A565; /* Processing */
-      --d5:  #E879A6; /* Modeling */
-      --d6:  #6FCF97; /* Orchestration */
-      --d7:  #56C7E2; /* Quality */
-      --d8:  #E57B7B; /* Governance */
-      --d9:  #B4D67A; /* Analytics */
-      --d10: #F2C94C; /* Architecture */
+      --d1:  #6B8AFF;
+      --d2:  #5EBDD3;
+      --d3:  #B07AFF;
+      --d4:  #E8A565;
+      --d5:  #E879A6;
+      --d6:  #6FCF97;
+      --d7:  #56C7E2;
+      --d8:  #E57B7B;
+      --d9:  #B4D67A;
+      --d10: #F2C94C;
 
       /* Difficulty tokens */
       --diff-b: #6FCF97;
@@ -47,7 +61,7 @@
       --diff-a: #E8A565;
       --diff-x: #E57B7B;
 
-      /* Section 8.0 — Motion Tokens */
+      /* Motion tokens (§8.0) */
       --ease-out-soft:  cubic-bezier(0.22, 1, 0.36, 1);
       --ease-out-fast:  cubic-bezier(0.32, 0.72, 0, 1);
       --ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
@@ -59,7 +73,33 @@
       --dur-narrative: 800ms;
     }
 
-    /* Global reset */
+    .theme-light {
+      --bg-base:             #FFFFFF;
+      --bg-elevated:         #F5F7FA;
+      --bg-overlay:          #EAEFF5;
+      --line:                #D6DAE3;
+      --line-strong:         #B6BCC9;
+      --text-primary:        #11141C;
+      --text-secondary:      #4A5060;
+      --text-tertiary:       #717888;
+      --accent:              #4F5BFF;
+      --accent-soft:         rgba(79, 91, 255, 0.12);
+      --focus-ring:          #4F5BFF;
+
+      --graph-edge:          #D6DAE3;
+      --graph-edge-dim:      #ECEFF5;
+      --graph-edge-strong:   #9AA3B5;
+      --graph-node:          #4A5060;
+      --graph-node-l2:       #FFFFFF;
+      --graph-node-stroke:   #B6BCC9;
+      --graph-node-halo:     rgba(79, 91, 255, 0.25);
+      --graph-label:         #11141C;
+      --graph-label-bg:      rgba(255, 255, 255, 0.94);
+      --graph-feather:       #4F5BFF;
+      --feather-opacity:     0.28;
+      --feather-blur-std:    1.4;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -67,7 +107,7 @@
     }
 
     body {
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-base);
       color: var(--text-primary);
       height: 100vh;
@@ -78,10 +118,8 @@
       font-size: 0.9375rem;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Focus Visible Styles (Accessibility §13.6) */
     :focus-visible {
       outline: 2px solid var(--focus-ring);
       outline-offset: 2px;
@@ -93,19 +131,14 @@
     }
 
     .mono {
-      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+      font-family: 'JetBrains Mono', monospace;
     }
-
-    /* SVG Filter */
-    svg filter { color-interpolation-filters: sRGB; }
 
     /* ZONE A — GLOBAL CHROME (56px) */
     .zone-a {
       height: 56px;
       width: 100%;
-      background: rgba(11, 13, 20, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--bg-elevated);
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
@@ -136,9 +169,8 @@
       border-radius: 4px;
     }
 
-    /* Center Search Trigger */
     .search-trigger {
-      background: var(--bg-elevated);
+      background: var(--bg-overlay);
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 6px 14px;
@@ -149,12 +181,11 @@
       font-size: 0.8125rem;
       cursor: pointer;
       width: 320px;
-      transition: border-color var(--dur-quick) var(--ease-out-fast), background var(--dur-quick) var(--ease-out-fast);
+      transition: border-color var(--dur-quick) var(--ease-out-fast);
     }
 
     .search-trigger:hover {
       border-color: var(--line-strong);
-      background: var(--bg-overlay);
       color: var(--text-primary);
     }
 
@@ -162,24 +193,22 @@
       margin-left: auto;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.6875rem;
-      background: var(--bg-overlay);
+      background: var(--bg-base);
       border: 1px solid var(--line-strong);
       padding: 2px 6px;
       border-radius: 4px;
       color: var(--text-tertiary);
     }
 
-    /* Right Controls */
     .chrome-controls {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    /* Segmented Control (§6.7) */
     .segmented-control {
       display: flex;
-      background: var(--bg-elevated);
+      background: var(--bg-overlay);
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 2px;
@@ -197,17 +226,14 @@
       transition: color var(--dur-quick) var(--ease-out-fast), background var(--dur-quick) var(--ease-out-fast);
     }
 
-    .segment-btn:hover {
-      color: var(--text-secondary);
-    }
-
+    .segment-btn:hover { color: var(--text-secondary); }
     .segment-btn.active {
-      background: var(--bg-overlay);
+      background: var(--bg-base);
       color: var(--text-primary);
     }
 
     .btn-icon {
-      background: var(--bg-elevated);
+      background: var(--bg-overlay);
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 6px 12px;
@@ -226,7 +252,7 @@
       color: var(--text-primary);
     }
 
-    /* MAIN CONTAINER (ZONE B + ZONE C + ZONE D) */
+    /* MAIN AREA */
     .main-area {
       flex: 1;
       display: flex;
@@ -294,13 +320,7 @@
       border-radius: 1.5px;
     }
 
-    .count-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.6875rem;
-      color: var(--text-tertiary);
-    }
-
-    /* ZONE C — KNOWLEDGE GRAPH CANVAS (SVG) */
+    /* ZONE C — GRAPH CANVAS */
     .zone-c {
       flex: 1;
       position: relative;
@@ -314,32 +334,31 @@
       display: block;
     }
 
-    /* Label Overlay Container (§6.3) */
-    #label-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
+    /* FEATHERS DRIFTING ON WATER MOTION MODEL (§2.0 & §6.0) */
+    .feather {
+      fill: var(--graph-feather);
+      opacity: var(--feather-opacity);
+      will-change: transform;
+      animation: drift var(--drift-dur, 10s) linear infinite, breathe 4.2s ease-in-out infinite;
     }
 
-    .node-label-pill {
-      position: absolute;
-      transform: translate(-50%, -100%);
-      margin-top: -10px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--line-strong);
-      padding: 3px 7px;
-      border-radius: 4px;
-      font-size: 0.65rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      white-space: nowrap;
-      max-width: 160px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      pointer-events: none;
-      transition: opacity var(--dur-quick) var(--ease-out-fast);
+    @keyframes drift {
+      0%   { transform: translate(-40px, 0) rotate(90deg); }
+      50%  { transform: translate(50%, 1.2px) rotate(90deg); }
+      100% { transform: translate(calc(100% + 40px), 0) rotate(90deg); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: calc(var(--feather-opacity) * 0.9); }
+      50%      { opacity: calc(var(--feather-opacity) * 1.3); }
+    }
+
+    /* Prefers Reduced Motion (§2.3 j) */
+    @media (prefers-reduced-motion: reduce) {
+      .feather {
+        animation: none !important;
+        opacity: 0.3 !important;
+      }
     }
 
     /* ZONE D — THE INSPECTOR (360px) */
@@ -360,10 +379,10 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .inspector-header {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    .breadcrumb {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
     }
 
     .inspector-title {
@@ -374,12 +393,7 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-    }
-
-    .breadcrumb {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
+      margin-top: 4px;
     }
 
     .status-pill {
@@ -391,6 +405,8 @@
       font-weight: 500;
       text-transform: uppercase;
       border: 1px solid transparent;
+      margin-top: 6px;
+      display: inline-block;
     }
 
     .pill-diff-b { background: rgba(111, 207, 151, 0.15); color: var(--diff-b); border-color: rgba(111, 207, 151, 0.3); }
@@ -507,7 +523,7 @@
       background: rgba(111, 207, 151, 0.1);
     }
 
-    /* ZONE E — FOOTER / TIMELINE (1 line, 32px) */
+    /* ZONE E — FOOTER / TIMELINE (32px) */
     .zone-e {
       height: 32px;
       width: 100%;
@@ -524,7 +540,7 @@
       flex-shrink: 0;
     }
 
-    /* Command Palette Modal (§6.6) */
+    /* COMMAND PALETTE MODAL */
     .palette-overlay {
       position: fixed;
       inset: 0;
@@ -588,19 +604,11 @@
       transition: background var(--dur-quick) var(--ease-out-fast);
     }
 
-    .palette-row:hover, .palette-row.active {
+    .palette-row:hover {
       background: var(--bg-overlay);
     }
 
-    .palette-row-title {
-      font-size: 0.875rem;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Accessible List View Surface (§13.0) */
+    /* ACCESSIBLE LIST VIEW SURFACE */
     .accessible-list-view {
       position: absolute;
       inset: 0;
@@ -614,29 +622,6 @@
     .accessible-list-view.open {
       display: block;
     }
-
-    /* Media Queries (§2.3) */
-    @media (max-width: 1100px) {
-      .zone-b { display: none; }
-    }
-
-    @media (max-width: 768px) {
-      .zone-d {
-        position: absolute;
-        bottom: 32px;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 50vh;
-        border-left: none;
-        border-top: 1px solid var(--line);
-        transform: translateY(100%);
-      }
-      .zone-d.open {
-        transform: translateY(0);
-      }
-      .search-trigger { width: 180px; }
-    }
   </style>
 </head>
 <body>
@@ -645,7 +630,7 @@
   <header class="zone-a">
     <a href="/" class="wordmark">
       <span>DE.UNIVERSE</span>
-      <span class="version-tag">v0.4.2</span>
+      <span class="version-tag">v0.5.0</span>
     </a>
 
     <!-- Center Search Trigger -->
@@ -665,6 +650,11 @@
         <button class="segment-btn" data-level="X">X</button>
       </div>
 
+      <button class="btn-icon" id="btn-toggle-theme" title="Toggle Theme (Light / Dark)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <span id="theme-btn-label">Theme</span>
+      </button>
+
       <button class="btn-icon" id="btn-toggle-list" title="Toggle Accessible List View (L)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         <span>List</span>
@@ -679,7 +669,7 @@
   <!-- MAIN AREA -->
   <div class="main-area">
 
-    <!-- ZONE B — INDEX PANEL (240px) -->
+    <!-- ZONE B — INDEX PANEL -->
     <aside class="zone-b">
       <div class="index-header">
         <span>Domains</span>
@@ -694,22 +684,29 @@
     <main class="zone-c" id="graph-container">
       <svg id="svg-graph">
         <defs>
+          <!-- Feather Gaussian Blur Filter (§2.3 d & §2.4) -->
+          <filter id="feather-blur">
+            <feGaussianBlur stdDeviation="1.2" />
+          </filter>
+
+          <!-- Node Glow Halo -->
           <filter id="glow-halo" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="4" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
+
         <g id="graph-viewport">
           <g id="edges-layer"></g>
+          <g class="current" id="current-layer"></g> <!-- Layer ABOVE edges for Feathers (§2.3 b) -->
           <g id="nodes-layer"></g>
         </g>
       </svg>
-      <div id="label-overlay"></div>
     </main>
 
-    <!-- ZONE D — THE INSPECTOR (360px) -->
-    <aside class="zone-d" id="inspector-panel" role="region" aria-labelledby="inspector-title">
-      <div class="inspector-section inspector-header">
+    <!-- ZONE D — THE INSPECTOR -->
+    <aside class="zone-d" id="inspector-panel" role="region" aria-labelledby="ins-title">
+      <div class="inspector-section">
         <div class="breadcrumb" id="ins-breadcrumb">Foundations › Architecture › Core</div>
         <div class="inspector-title" id="ins-title">
           <span>DATA ENGINEERING</span>
@@ -756,7 +753,7 @@
 
   </div>
 
-  <!-- ZONE E — FOOTER / TIMELINE (32px) -->
+  <!-- ZONE E — FOOTER / TIMELINE -->
   <footer class="zone-e">
     <div id="visited-history">
       <span>Visited: </span><span id="history-trail" style="color: var(--text-secondary);">root</span>
@@ -766,7 +763,7 @@
     </div>
   </footer>
 
-  <!-- COMMAND PALETTE MODAL (§6.6) -->
+  <!-- COMMAND PALETTE MODAL -->
   <div class="palette-overlay" id="palette-overlay">
     <div class="palette-card">
       <input type="text" id="palette-input" class="palette-input" placeholder="Type concept or domain name..." autocomplete="off">
@@ -776,7 +773,7 @@
     </div>
   </div>
 
-  <!-- ACCESSIBLE LIST VIEW SURFACE (§13.0) -->
+  <!-- ACCESSIBLE LIST VIEW SURFACE -->
   <div class="accessible-list-view" id="accessible-list-view" role="region" aria-label="Accessible Concept List">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
       <h2 style="font-size: 1.5rem; font-weight: 600;">Data Engineering Knowledge Graph — List View</h2>
@@ -819,6 +816,7 @@
     });
 
     const linksList = DATA_GRAPH.links.map(l => ({
+      id: `${l.source}-${l.target}`,
       source: nodesMap.get(l.source),
       target: nodesMap.get(l.target)
     })).filter(l => l.source && l.target);
@@ -848,23 +846,23 @@
       });
     });
 
-    // D3 SVG Graph Setup (§6.1 & §6.2)
+    // D3 SVG Graph Setup
     const svg = d3.select("#svg-graph");
     const container = d3.select("#graph-viewport");
     const edgesLayer = d3.select("#edges-layer");
+    const currentLayer = d3.select("#current-layer"); // Feathers layer ABOVE edges (§2.3 b)
     const nodesLayer = d3.select("#nodes-layer");
 
-    // D3 Zoom Setup (§6.5)
+    // D3 Zoom Setup
     const zoom = d3.zoom()
       .scaleExtent([0.4, 2.5])
       .on("zoom", (event) => {
         container.attr("transform", event.transform);
-        updateLabelOverlayPositions(event.transform);
       });
 
     svg.call(zoom);
 
-    // Run 300 ticks on mount with simulation.stop() after (§6.2)
+    // D3 Simulation
     const simulation = d3.forceSimulation(DATA_GRAPH.nodes)
       .force("link", d3.forceLink(linksList).id(d => d.id).distance(80).strength(0.6))
       .force("charge", d3.forceManyBody().strength(-180).distanceMax(360))
@@ -874,15 +872,15 @@
       .velocityDecay(0.32);
 
     for (let i = 0; i < 300; ++i) simulation.tick();
-    simulation.stop(); // Settled static graph
+    simulation.stop(); // Settled static layout
 
-    // Render SVG Elements once
+    // Render SVG Edges (1px solid lines)
     const linkElements = edgesLayer.selectAll("line")
       .data(linksList)
       .enter()
       .append("line")
       .attr("vector-effect", "non-scaling-stroke")
-      .attr("stroke", "var(--line)")
+      .attr("stroke", "var(--graph-edge)")
       .attr("stroke-width", 1)
       .attr("stroke-opacity", 0.6)
       .attr("x1", d => d.source.x)
@@ -890,6 +888,48 @@
       .attr("x2", d => d.target.x)
       .attr("y2", d => d.target.y);
 
+    // FEATHERS DRIFTING ON WATER MOTION ENGINE (§2.0 & §2.3)
+    let totalFeathers = 0;
+    const FEATHER_CAP = 220;
+
+    linksList.forEach(edge => {
+      const dx = edge.target.x - edge.source.x;
+      const dy = edge.target.y - edge.source.y;
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+      edge.length = len;
+
+      // N feathers based on length (§2.3 c)
+      let numFeathers = len < 60 ? 1 : (len < 120 ? 2 : 3);
+      if (totalFeathers + numFeathers > FEATHER_CAP) numFeathers = 1;
+      totalFeathers += numFeathers;
+      edge.numFeathers = numFeathers;
+    });
+
+    // Render Feathers in <g class="current"> layer ABOVE edges (§2.3 b)
+    linksList.forEach(edge => {
+      const angle = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x);
+      const angleDeg = angle * (180 / Math.PI);
+      const dur = 8 + edge.length * 0.08; // ~22px/sec constant speed (§2.3 e)
+
+      for (let i = 0; i < edge.numFeathers; i++) {
+        const delay = (i / edge.numFeathers) * dur * 0.71; // Irregular deterministic delays (§6.2)
+        
+        // Static parent group placed at edge source point (§2.4)
+        const gParent = currentLayer.append("g")
+          .attr("transform", `translate(${edge.source.x}, ${edge.source.y}) rotate(${angleDeg})`);
+
+        // Feather path soft ellipse filter (§2.3 d)
+        gParent.append("path")
+          .attr("class", "feather")
+          .attr("data-edge-id", edge.id)
+          .attr("d", "M 0 0 Q 12 -1.5 24 0 Q 12 1.5 0 0")
+          .attr("filter", "url(#feather-blur)")
+          .style("--drift-dur", `${dur}s`)
+          .style("animation-delay", `${-delay}s`);
+      }
+    });
+
+    // Render SVG Nodes
     const nodeElements = nodesLayer.selectAll("g")
       .data(DATA_GRAPH.nodes)
       .enter()
@@ -903,15 +943,15 @@
       .on("mouseenter", (event, d) => {
         hoveredNodeId = d.id;
         updateGraphStyles();
-        renderLabelOverlays(d);
+        renderLabelForeignObjects(d);
       })
       .on("mouseleave", () => {
         hoveredNodeId = null;
         updateGraphStyles();
-        clearLabelOverlays();
+        clearLabelForeignObjects();
       });
 
-    // Draw node shapes (§6.3)
+    // Draw node circles (§3.6 & §6.3)
     nodeElements.each(function(d) {
       const g = d3.select(this);
       if (d.level === 0) {
@@ -936,7 +976,6 @@
           .attr("font-size", "11px")
           .attr("font-weight", "600");
       } else if (d.level === 1) {
-        // Level 1 Domain Node
         const color = DOMAIN_TOKENS[d.domain] ? DOMAIN_TOKENS[d.domain].color : 'var(--accent)';
         g.append("circle")
           .attr("r", 10)
@@ -952,24 +991,23 @@
           .attr("font-size", "9.5px")
           .attr("font-weight", "500");
       } else if (d.level === 2) {
-        // Level 2 Sub-domain Node
         const color = DOMAIN_TOKENS[d.domain] ? DOMAIN_TOKENS[d.domain].color : 'var(--accent)';
         g.append("circle")
-          .attr("r", 6)
-          .attr("fill", "var(--bg-elevated)")
+          .attr("r", 8)
+          .attr("fill", "var(--graph-node-l2)")
           .attr("stroke", color)
           .attr("stroke-width", 1.5);
       } else {
-        // Level 3 Concept Node
+        // Default Level-3 Concept Node (r=5px, §3.6 a)
         g.append("circle")
           .attr("class", "concept-circle")
-          .attr("r", 4)
-          .attr("fill", "var(--text-secondary)")
+          .attr("r", 5)
+          .attr("fill", "var(--graph-node)")
           .attr("stroke", "none");
       }
     });
 
-    // Update Styles on Selection/Hover
+    // Update Styles & Feather Highlights on Selection/Hover (§2.3 i & §4.0)
     function updateGraphStyles() {
       nodeElements.each(function(d) {
         const g = d3.select(this);
@@ -982,97 +1020,98 @@
         const domainColor = DOMAIN_TOKENS[d.domain] ? DOMAIN_TOKENS[d.domain].color : 'var(--accent)';
 
         if (isSelected) {
-          circle.attr("r", 6)
+          circle.attr("r", 6.5)
             .attr("fill", domainColor)
             .attr("stroke", "var(--focus-ring)")
             .attr("stroke-width", 2);
         } else if (isHovered) {
-          circle.attr("r", 6)
+          circle.attr("r", 6.5)
             .attr("fill", domainColor)
             .attr("stroke", "var(--bg-base)")
             .attr("stroke-width", 1.5)
             .attr("filter", "url(#glow-halo)");
         } else if (isRead) {
-          circle.attr("r", 4)
-            .attr("fill", "var(--text-secondary)")
+          circle.attr("r", 5)
+            .attr("fill", "var(--graph-node)")
             .attr("stroke", "var(--text-tertiary)")
             .attr("stroke-width", 2)
             .attr("filter", null);
         } else {
-          circle.attr("r", 4)
-            .attr("fill", "var(--text-secondary)")
+          circle.attr("r", 5)
+            .attr("fill", "var(--graph-node)")
             .attr("stroke", "none")
             .attr("filter", null);
         }
       });
 
-      // Edge highlighting (§6.4)
+      // Edge & Feather Highlighting (§2.3 i & §3.5 c)
       linkElements.each(function(l) {
         const edge = d3.select(this);
-        if (hoveredNodeId) {
-          const isRelated = l.source.id === hoveredNodeId || l.target.id === hoveredNodeId;
-          edge.attr("stroke", isRelated ? "var(--text-secondary)" : "var(--line)")
-              .attr("stroke-opacity", isRelated ? 1.0 : 0.15);
+        const isSelectedEdge = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
+        const isHoveredEdge = l.source.id === hoveredNodeId || l.target.id === hoveredNodeId;
+
+        if (isSelectedEdge || isHoveredEdge) {
+          edge.attr("stroke", "var(--graph-edge-strong)").attr("stroke-opacity", 1.0);
         } else {
-          edge.attr("stroke", "var(--line)")
-              .attr("stroke-opacity", 0.6);
+          edge.attr("stroke", "var(--graph-edge)").attr("stroke-opacity", 0.6);
         }
+
+        // Feather brightness response
+        currentLayer.selectAll(`.feather[data-edge-id="${l.id}"]`)
+          .style("opacity", (isSelectedEdge || isHoveredEdge) ? "0.7" : "var(--feather-opacity)");
       });
     }
 
-    // Render HTML Label Overlay for Hovered Node + 1-Hop Neighbors (§6.3)
-    function renderLabelOverlays(hoveredNode) {
-      const overlay = document.getElementById('label-overlay');
-      overlay.innerHTML = '';
-
-      const targetIds = new Set([hoveredNode.id]);
+    // Render HTML ForeignObject Labels (§3.4)
+    function renderLabelForeignObjects(hoveredNode) {
+      clearLabelForeignObjects();
+      
+      const targetNodes = [hoveredNode];
       linksList.forEach(l => {
-        if (l.source.id === hoveredNode.id) targetIds.add(l.target.id);
-        if (l.target.id === hoveredNode.id) targetIds.add(l.source.id);
+        if (l.source.id === hoveredNode.id) targetNodes.push(l.target);
+        if (l.target.id === hoveredNode.id) targetNodes.push(l.source);
       });
 
-      const currentTransform = d3.zoomTransform(svg.node());
+      targetNodes.forEach(node => {
+        if (node.level === 0) return;
+        const gNode = nodeElements.filter(d => d.id === node.id);
+        
+        const fo = gNode.append("foreignObject")
+          .attr("class", "hover-label-fo")
+          .attr("x", -90)
+          .attr("y", -32)
+          .attr("width", 180)
+          .attr("height", 28)
+          .style("pointer-events", "none");
 
-      targetIds.forEach(id => {
-        const node = nodesMap.get(id);
-        if (!node) return;
-        
-        const pill = document.createElement('div');
-        pill.className = 'node-label-pill';
-        pill.innerText = node.name;
-        pill.dataset.nodeId = node.id;
-        
-        const screenX = currentTransform.x + node.x * currentTransform.k;
-        const screenY = currentTransform.y + node.y * currentTransform.k;
-        pill.style.left = screenX + 'px';
-        pill.style.top = screenY + 'px';
-        
-        overlay.appendChild(pill);
+        fo.append("xhtml:div")
+          .style("background", "var(--graph-label-bg)")
+          .style("color", "var(--graph-label)")
+          .style("padding", "4px 8px")
+          .style("border", "1px solid var(--graph-edge)")
+          .style("border-radius", "4px")
+          .style("font-size", "12px")
+          .style("line-height", "1.2")
+          .style("font-weight", "500")
+          .style("white-space", "nowrap")
+          .style("max-width", "180px")
+          .style("overflow", "hidden")
+          .style("text-overflow", "ellipsis")
+          .style("text-align", "center")
+          .style("box-shadow", "0 4px 12px rgba(0,0,0,0.4)")
+          .style("backdrop-filter", "blur(8px)")
+          .text(node.name);
       });
     }
 
-    function updateLabelOverlayPositions(currentTransform) {
-      document.querySelectorAll('.node-label-pill').forEach(pill => {
-        const node = nodesMap.get(pill.dataset.nodeId);
-        if (node) {
-          const screenX = currentTransform.x + node.x * currentTransform.k;
-          const screenY = currentTransform.y + node.y * currentTransform.k;
-          pill.style.left = screenX + 'px';
-          pill.style.top = screenY + 'px';
-        }
-      });
+    function clearLabelForeignObjects() {
+      nodesLayer.selectAll(".hover-label-fo").remove();
     }
 
-    function clearLabelOverlays() {
-      document.getElementById('label-overlay').innerHTML = '';
-    }
-
-    // Center Camera on Node (§9.2)
+    // Camera Center Helper
     function centerCameraOnNode(node) {
       const width = document.getElementById('graph-container').clientWidth;
       const height = document.getElementById('graph-container').clientHeight;
-      
-      // Put target node at 35% from left, 50% vertical
       const targetX = width * 0.35 - node.x * 1.2;
       const targetY = height * 0.5 - node.y * 1.2;
 
@@ -1091,22 +1130,19 @@
         .call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(0.65));
     }
 
-    // Select Node & Render Inspector (§5.0)
+    // Select Node & Render Inspector
     function selectNode(id) {
       selectedNodeId = id;
       const node = nodesMap.get(id);
       if (!node) return;
 
-      // Update visited history
       if (visitedHistory[visitedHistory.length - 1] !== node.id) {
         visitedHistory.push(node.id);
         if (visitedHistory.length > 5) visitedHistory.shift();
         document.getElementById('history-trail').innerText = visitedHistory.map(hId => nodesMap.get(hId)?.name || hId).join(' › ');
       }
 
-      // Populate Inspector
       document.getElementById('ins-title').querySelector('span').innerText = node.name;
-      
       const domainObj = DOMAIN_TOKENS[node.domain];
       const domName = domainObj ? domainObj.name : 'Data Engineering';
       document.getElementById('ins-breadcrumb').innerText = `${domName} › ${node.name}`;
@@ -1117,16 +1153,13 @@
 
       document.getElementById('ins-summary').innerText = node.description;
 
-      // Key Ideas
       document.getElementById('ins-key-ideas').innerHTML = (node.keyConcepts || []).map(kc => `<li class="key-idea-item">${kc}</li>`).join('');
 
-      // Prerequisites Chips
       document.getElementById('ins-prereqs').innerHTML = (node.prerequisites || []).map(pId => {
         const pNode = nodesMap.get(pId);
         return pNode ? `<span class="chip" onclick="selectNode('${pNode.id}'); centerCameraOnNode(nodesMap.get('${pNode.id}'));">${pNode.name}</span>` : '';
       }).join('');
 
-      // Resources & Routes
       const resourcesHTML = (node.resources || []).map(r => `
         <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="resource-row">
           <span>${r.label}</span>
@@ -1141,7 +1174,6 @@
 
       document.getElementById('ins-resources').innerHTML = resourcesHTML;
 
-      // Read button state
       const readBtn = document.getElementById('btn-mark-read');
       if (readNodes.has(id)) {
         readBtn.classList.add('active');
@@ -1153,13 +1185,12 @@
 
       updateGraphStyles();
 
-      // Mobile slide-up
       if (window.innerWidth <= 768) {
         document.getElementById('inspector-panel').classList.add('open');
       }
     }
 
-    // Populate Index Panel (Zone B)
+    // Populate Index Panel
     const indexUl = document.getElementById('index-list');
     Object.keys(DOMAIN_TOKENS).forEach(domId => {
       const dom = DOMAIN_TOKENS[domId];
@@ -1172,7 +1203,7 @@
           <div class="domain-line" style="background: ${dom.color};"></div>
           <span>${dom.name}</span>
         </div>
-        <span class="count-tag">${count}</span>
+        <span class="mono" style="font-size: 0.6875rem; color: var(--text-tertiary);">${count}</span>
       `;
       li.addEventListener('click', () => {
         const targetNode = DATA_GRAPH.nodes.find(n => n.domain === domId && n.level === 1);
@@ -1184,7 +1215,7 @@
       indexUl.appendChild(li);
     });
 
-    // Segmented Difficulty Control (§6.7)
+    // Segmented Difficulty Control
     document.querySelectorAll('.segmented-control .segment-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.segmented-control .segment-btn').forEach(b => b.classList.remove('active'));
@@ -1198,7 +1229,23 @@
       });
     });
 
-    // Command Palette Logic (§6.6)
+    // Theme Toggle Handler (§1.3 & §3.2)
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('theme-dark')) {
+        html.classList.remove('theme-dark');
+        html.classList.add('theme-light');
+        localStorage.setItem('interview_prep_theme', 'light');
+      } else {
+        html.classList.remove('theme-light');
+        html.classList.add('theme-dark');
+        localStorage.setItem('interview_prep_theme', 'dark');
+      }
+      updateGraphStyles();
+    }
+    document.getElementById('btn-toggle-theme').addEventListener('click', toggleTheme);
+
+    // Command Palette Logic
     const paletteOverlay = document.getElementById('palette-overlay');
     const paletteInput = document.getElementById('palette-input');
     const paletteResults = document.getElementById('palette-results');
@@ -1224,7 +1271,7 @@
         li.className = 'palette-row';
         const diffCls = `pill-diff-${m.difficulty.toLowerCase()}`;
         li.innerHTML = `
-          <div class="palette-row-title">
+          <div style="font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
             <span class="status-pill ${diffCls}">${m.difficulty}</span>
             <span>${m.name}</span>
           </div>
@@ -1241,7 +1288,7 @@
 
     paletteInput.addEventListener('input', e => renderPaletteResults(e.target.value));
 
-    // Accessible List View Surface (§13.0)
+    // Accessible List View Surface
     const accessibleView = document.getElementById('accessible-list-view');
     const accessibleUl = document.getElementById('accessible-ul-list');
 
@@ -1288,7 +1335,7 @@
     document.getElementById('btn-toggle-list').addEventListener('click', toggleListView);
     document.getElementById('btn-close-list-view').addEventListener('click', toggleListView);
 
-    // Global Keyboard Shortcuts (§9.1)
+    // Global Keyboard Shortcuts
     window.addEventListener('keydown', e => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -1328,7 +1375,6 @@
       document.getElementById('inspector-panel').classList.remove('open');
     });
 
-    // Mark as read button
     document.getElementById('btn-mark-read').addEventListener('click', () => {
       if (readNodes.has(selectedNodeId)) {
         readNodes.delete(selectedNodeId);
@@ -1339,7 +1385,6 @@
       selectNode(selectedNodeId);
     });
 
-    // Copy link button
     document.getElementById('btn-copy-link').addEventListener('click', () => {
       const url = window.location.origin + window.location.pathname + '#' + selectedNodeId;
       navigator.clipboard.writeText(url);
