@@ -113,6 +113,14 @@
             </button>
           </li>
 
+          <!-- Learning Paths -->
+          <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-paths" data-target="view-paths">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span class="nav-text">Learning Paths</span>
+            </button>
+          </li>
+
           <!-- ① Key Concepts -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-concepts" data-target="view-concepts">
@@ -166,6 +174,14 @@
             <button class="nav-btn" id="btn-nav-gcc" data-target="view-gcc">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="10" x2="16.01" y2="10"/></svg>
               <span class="nav-text">Company Research</span>
+            </button>
+          </li>
+
+          <!-- Account Studio -->
+          <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-account" data-target="view-account">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="nav-text">My Studio</span>
             </button>
           </li>
         </ul>
@@ -745,6 +761,72 @@
           <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">12 Production Architecture Blueprints</h3>
           <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">Interactive Mermaid diagrams with ASCII offline fallbacks, cost bands, and failure-mode analysis.</p>
           <div id="mod-blueprints-container" class="dashboard-grid"></div>
+        </div>
+      </section>
+
+      <!-- LEARNING PATHS VIEW -->
+      <section class="page-view hidden" id="view-paths">
+        <header class="page-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div>
+              <h2 class="page-title">Senior Data Engineering Learning Paths 🎓🧭</h2>
+              <p class="page-subtitle">Structured, week-by-week curriculum from Fabric DP-600 to 32-Week Architecture Mastery with capstone repositories and mock interview rubrics.</p>
+            </div>
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div id="learning-paths-grid" class="paths-grid" style="margin-bottom: 2rem;"></div>
+
+        <!-- Path Detail Overlay / Container -->
+        <div id="path-detail-container" style="display: none; background: var(--surface-card); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem;"></div>
+      </section>
+
+      <!-- ACCOUNT & PROGRESS STUDIO VIEW -->
+      <section class="page-view hidden" id="view-account">
+        <header class="page-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div>
+              <h2 class="page-title">My Progress &amp; Architect Studio 🎯🚀</h2>
+              <p class="page-subtitle">Track your learning streak, mastered topics, saved code snippets, bookmarks, and local progress backup.</p>
+            </div>
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="dashboard-metrics-grid" style="margin-bottom: 1.5rem;">
+          <div class="dashboard-metric-card">
+            <div class="metric-val" id="user-streak-cnt">1 Day</div>
+            <div class="metric-label">Daily Streak 🔥</div>
+          </div>
+          <div class="dashboard-metric-card">
+            <div class="metric-val" id="user-xp-cnt">450 XP</div>
+            <div class="metric-label">Weekly XP ⚡</div>
+          </div>
+          <div class="dashboard-metric-card">
+            <div class="metric-val" id="user-bookmarks-cnt">0</div>
+            <div class="metric-label">Saved Bookmarks 🔖</div>
+          </div>
+          <div class="dashboard-metric-card">
+            <div class="metric-val" id="user-mastery-level">Senior DE</div>
+            <div class="metric-label">Mastery Level 🏅</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
+          <div class="concept-accordion-card" style="padding: 1.25rem;">
+            <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary); font-weight: 700;">🔖 Saved Snippets &amp; Notes</h4>
+            <div id="account-bookmarks-list" style="font-size: 0.85rem; color: var(--text-secondary);">No bookmarks saved yet. Click the bookmark icon on any card to save.</div>
+          </div>
+          <div class="concept-accordion-card" style="padding: 1.25rem;">
+            <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary); font-weight: 700;">⚙️ Data &amp; Local Persistence</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Export your complete progress, flashcard ratings, and bookmarks to JSON for offline backup.</p>
+            <button class="sm2-btn sm2-btn-good" onclick="exportUserDataJSON()">📥 Export Progress (JSON)</button>
+          </div>
         </div>
       </section>
 
@@ -4383,7 +4465,30 @@ WHEN NOT MATCHED THEN
   <script src="data_python.js"></script>
   <script src="data_personalised.js"></script>
   <script src="data_modern_stack.js"></script>
+  <script src="data_paths.js"></script>
   <script src="app.js?v=1.5.0"></script>
   <script src="animations.js?v=1.0"></script>
+
+  <!-- ⌘K Command Palette Modal -->
+  <div id="cmd-palette-modal" class="cmd-modal-overlay" style="display: none;" onclick="closeCommandPalette(event)">
+    <div class="cmd-modal-content">
+      <div class="cmd-input-wrapper">
+        <span style="font-size: 1.1rem; color: var(--brand-indigo);">🔍</span>
+        <input type="text" id="cmd-palette-input" class="cmd-palette-input" placeholder="Type a command, concept, path, simulator, or topic..." oninput="onCommandPaletteInput(this.value)">
+        <span class="kbd-badge">ESC</span>
+      </div>
+      <div id="cmd-results-list" class="cmd-results-list"></div>
+    </div>
+  </div>
+
+  <!-- Persistent Bottom Mini Player -->
+  <div id="bottom-mini-player" class="bottom-mini-player" style="display: none;">
+    <span style="font-size: 1rem; color: var(--brand-indigo);">⚡</span>
+    <div style="flex: 1; min-width: 0;">
+      <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Continue Learning</div>
+      <div id="mini-player-title" class="mini-player-title">1. Microsoft Fabric Analytics Engineer (DP-600)</div>
+    </div>
+    <button id="mini-player-action-btn" class="mini-player-action" onclick="resumeMiniPlayerProgress()">Resume</button>
+  </div>
 </body>
 </html>

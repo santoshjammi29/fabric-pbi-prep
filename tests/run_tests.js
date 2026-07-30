@@ -83,7 +83,8 @@ const UNIT_SUITES = [
   'tests/test_sidebar.js',
   'tests/test_architecture.js',
   'tests/test_dashboard.js',
-  'tests/test_modern_stack.js'
+  'tests/test_modern_stack.js',
+  'tests/test_learning_os.js'
 ];
 
 // ─── sequential runner ────────────────────────────────────────────────────────

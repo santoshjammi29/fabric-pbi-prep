@@ -9280,3 +9280,328 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
   vertical-align: top;
 }
 
+/* ==========================================================================
+   FABRIC & FLOW DESIGN SYSTEM & LEARNING OPERATING SYSTEM TOKENS
+   ========================================================================== */
+
+:root {
+  --brand-indigo: #2B3FFF;
+  --brand-violet: #7C3AED;
+  
+  --diff-easy: #16A34A;
+  --diff-medium: #D97706;
+  --diff-hard: #EA580C;
+  --diff-architect: #DC2626;
+  
+  --accent-vector: #EC4899;
+  --accent-stream: #06B6D4;
+  --accent-ai: #F59E0B;
+  --accent-storage: #0EA5E9;
+
+  --surface-light: #FAFAFB;
+  --surface-dark: #0B0F1A;
+  
+  --border-light: #E5E7EB;
+  --border-dark: #1F2937;
+  
+  --muted-light: #475569;
+  --muted-dark: #94A3B8;
+}
+
+/* 5-Button Mega Top Bar */
+.mega-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.5rem;
+  background: var(--surface-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--card-border);
+  gap: 1rem;
+}
+
+.mega-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mega-menu-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mega-menu-btn:hover, .mega-menu-btn.active {
+  background: rgba(43, 63, 255, 0.1);
+  color: var(--brand-indigo);
+}
+
+.mega-search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mega-search-trigger:hover {
+  border-color: var(--brand-indigo);
+  color: var(--text-primary);
+}
+
+.kbd-badge {
+  background: var(--surface-card);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.7rem;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+/* ⌘K Command Palette Modal */
+.cmd-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.cmd-modal-content {
+  background: var(--surface-card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 650px;
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+}
+
+.cmd-input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--card-border);
+  gap: 0.75rem;
+}
+
+.cmd-palette-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.cmd-results-list {
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cmd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.cmd-item:hover, .cmd-item.selected {
+  background: rgba(43, 63, 255, 0.12);
+  color: var(--brand-indigo);
+}
+
+.cmd-item-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.cmd-item-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Right TOC Rail */
+.right-toc-rail {
+  width: 240px;
+  position: sticky;
+  top: 4.5rem;
+  height: calc(100vh - 6rem);
+  overflow-y: auto;
+  padding: 1rem 0.5rem;
+  border-left: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toc-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.toc-link {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.toc-link:hover, .toc-link.active {
+  color: var(--brand-indigo);
+  border-left-color: var(--brand-indigo);
+  background: rgba(43, 63, 255, 0.06);
+}
+
+/* Persistent Bottom Mini Player */
+.bottom-mini-player {
+  position: fixed;
+  bottom: 1rem;
+  right: 1.5rem;
+  z-index: 900;
+  background: var(--surface-card);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 14px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 420px;
+  transition: all 0.3s ease;
+}
+
+.mini-player-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-player-action {
+  background: var(--brand-indigo);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 6 Learning Modes Tab Bar */
+.learning-mode-tabs {
+  display: flex;
+  gap: 0.35rem;
+  background: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+
+.mode-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.mode-tab-btn.active {
+  background: var(--surface-card);
+  color: var(--brand-indigo);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Learning Path Cards */
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.path-card-v2 {
+  background: var(--surface-card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.path-card-v2:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-indigo);
+  box-shadow: var(--glass-shadow);
+}
+
+@media (max-width: 1024px) {
+  .right-toc-rail {
+    display: none;
+  }
+}
+

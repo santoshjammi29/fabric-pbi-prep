@@ -1006,6 +1006,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderArchitectureHub();
       } else if (actualTargetViewId === 'view-dashboard') {
         renderDashboard();
+      } else if (actualTargetViewId === 'view-paths') {
+        renderLearningPaths();
+      } else if (actualTargetViewId === 'view-account') {
+        renderAccountStudio();
       }
       
       // Scroll back to top on view switch, unless navigating to a specific sub-tab inside Prep Hub or Spark Hub
@@ -6981,6 +6985,186 @@ Your input highlights the need for dynamic optimization of distributed executors
     if (res) res.textContent = `Events lagging > ${mins}m dropped · RocksDB State Size: ~${stateMb} MB`;
   }
 
+  // --- ⌘K COMMAND PALETTE & LEARNING OS FUNCTIONS ---
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openCommandPalette();
+    } else if (e.key === 'Escape') {
+      closeCommandPalette();
+    }
+  });
+
+  function openCommandPalette() {
+    const modal = document.getElementById('cmd-palette-modal');
+    const input = document.getElementById('cmd-palette-input');
+    if (modal) modal.style.display = 'flex';
+    if (input) {
+      input.value = '';
+      input.focus();
+      onCommandPaletteInput('');
+    }
+  }
+
+  function closeCommandPalette(evt) {
+    if (evt && evt.target && evt.target.id !== 'cmd-palette-modal') return;
+    const modal = document.getElementById('cmd-palette-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function resumeMiniPlayerProgress() {
+    switchView('view-paths');
+  }
+
+  function onCommandPaletteInput(query) {
+    const list = document.getElementById('cmd-results-list');
+    if (!list) return;
+    const q = query.toLowerCase().trim();
+
+    const commands = [
+      { title: '⚡ Learning Paths', meta: 'Navigate to 12 Certification & Skill Tracks', action: () => switchView('view-paths') },
+      { title: '📚 Key Concepts Glossary', meta: 'Browse 350+ Senior DE Concepts', action: () => switchView('view-concepts') },
+      { title: '💻 Polyglot Code Matrix', meta: 'Compare Python, PySpark, Spark SQL, DuckDB', action: () => switchView('view-cheatsheet') },
+      { title: '⚙️ Live Simulators', meta: 'Launch 6 Architecture Visualizers', action: () => switchView('view-modern-stack') },
+      { title: '❓ Q&A Prep Hub', meta: 'Search 2,600+ Expert Interview Q&As', action: () => switchView('view-prep-hub') },
+      { title: '🏛️ Architecture Hub', meta: 'Explore 16 Specs & 12 Mermaid Blueprints', action: () => switchView('view-architecture') },
+      { title: '🤖 AI & RAG Stack', meta: 'Study Vector Search & MCP Recipes', action: () => switchView('view-modern-stack') },
+      { title: '🏢 Company Research', meta: 'Search 55+ Hyderabad GCC Firms', action: () => switchView('view-gcc') },
+      { title: '🎯 My Progress Studio', meta: 'View Streak, XP & Bookmarks', action: () => switchView('view-account') }
+    ];
+
+    let items = commands;
+    if (q) {
+      items = commands.filter(c => c.title.toLowerCase().includes(q) || c.meta.toLowerCase().includes(q));
+      if (window.LEARNING_PATHS_DB) {
+        window.LEARNING_PATHS_DB.forEach(p => {
+          if (p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)) {
+            items.push({
+              title: `${p.icon} ${p.title}`,
+              meta: `Path · ${p.weeks} Weeks · ${p.difficulty}`,
+              action: () => { switchView('view-paths'); openPathDetail(p.slug); }
+            });
+          }
+        });
+      }
+    }
+
+    list.innerHTML = items.slice(0, 10).map((item, idx) => `
+      <div class="cmd-item" onclick="executeCmdItem(${idx})">
+        <div>
+          <div class="cmd-item-title">${escapeHTML(item.title)}</div>
+          <div class="cmd-item-meta">${escapeHTML(item.meta)}</div>
+        </div>
+        <span style="font-size: 0.8rem; color: var(--brand-indigo);">↵</span>
+      </div>
+    `).join('');
+
+    window._activeCmdItems = items;
+  }
+
+  function executeCmdItem(idx) {
+    if (window._activeCmdItems && window._activeCmdItems[idx]) {
+      window._activeCmdItems[idx].action();
+      closeCommandPalette();
+    }
+  }
+
+  function renderLearningPaths() {
+    const grid = document.getElementById('learning-paths-grid');
+    if (!grid || !window.LEARNING_PATHS_DB) return;
+
+    grid.innerHTML = window.LEARNING_PATHS_DB.map(path => `
+      <div class="path-card-v2" onclick="openPathDetail('${path.slug}')">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.8rem;">${path.icon}</span>
+            <span class="launcher-badge" style="background: rgba(43, 63, 255, 0.1); color: var(--brand-indigo);">${escapeHTML(path.badge)}</span>
+          </div>
+          <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem 0;">${escapeHTML(path.title)}</h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 1rem;">${escapeHTML(path.description)}</p>
+        </div>
+        <div>
+          <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+            ${path.skills.slice(0, 4).map(s => `<span style="font-size: 0.7rem; background: rgba(0, 113, 227, 0.08); color: var(--apple-blue); padding: 0.15rem 0.45rem; border-radius: 6px;">${escapeHTML(s)}</span>`).join('')}
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-secondary);">
+            <span>⏱️ ${path.weeks} Weeks</span>
+            <span style="font-weight: 700; color: var(--brand-indigo);">View Track →</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPathDetail(slug) {
+    const container = document.getElementById('path-detail-container');
+    if (!container || !window.LEARNING_PATHS_DB) return;
+
+    const path = window.LEARNING_PATHS_DB.find(p => p.slug === slug);
+    if (!path) return;
+
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin: 0;">${path.icon} ${escapeHTML(path.title)}</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">Prerequisites: ${escapeHTML(path.prerequisites)}</p>
+        </div>
+        <button class="sm2-btn" onclick="document.getElementById('path-detail-container').style.display='none'">✕ Close</button>
+      </div>
+      <div class="dashboard-grid" style="margin-bottom: 1.25rem;">
+        ${path.phases.map((phase, idx) => `
+          <div class="concept-accordion-card" style="padding: 1rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-indigo);">${escapeHTML(phase.weeks)}</div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0.25rem 0 0.5rem 0;">${escapeHTML(phase.name)}</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Milestone:</strong> ${escapeHTML(phase.milestone)}</p>
+            <div style="font-size: 0.78rem; color: var(--text-secondary);">
+              ${phase.topics.map(t => `<div>• ${escapeHTML(t)}</div>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="background: rgba(0, 113, 227, 0.06); padding: 1rem; border-radius: 12px; border-left: 4px solid var(--apple-blue);">
+        <h4 style="margin: 0 0 0.35rem 0; font-size: 0.9rem; color: var(--text-primary); font-weight: 700;">🛠️ Starter Repository &amp; Capstone</h4>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 0.5rem 0;">${escapeHTML(path.handsOn.title)} — ${escapeHTML(path.handsOn.description)}</p>
+        <a href="${path.handsOn.repo}" target="_blank" style="font-size: 0.8rem; font-weight: 700; color: var(--apple-blue); text-decoration: none;">Explore Starter Repo →</a>
+      </div>
+    `;
+    container.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function renderAccountStudio() {
+    const list = document.getElementById('account-bookmarks-list');
+    if (!list) return;
+    const bookmarks = JSON.parse(localStorage.getItem('user_bookmarks') || '[]');
+    if (bookmarks.length === 0) {
+      list.innerHTML = 'No bookmarks saved yet. Click the bookmark button on any concept or question to save it.';
+    } else {
+      list.innerHTML = bookmarks.map(b => `
+        <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--card-border);">
+          <strong style="color: var(--text-primary);">${escapeHTML(b.title)}</strong><br>
+          <span style="font-size: 0.78rem; color: var(--text-secondary);">${escapeHTML(b.type)} · Saved</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  function exportUserDataJSON() {
+    const data = {
+      theme: localStorage.getItem('interview_prep_theme'),
+      sm2: JSON.parse(localStorage.getItem('sm2_flashcards') || '{}'),
+      bookmarks: JSON.parse(localStorage.getItem('user_bookmarks') || '[]'),
+      exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `architect_studio_backup_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   window.flipStudyCard = flipStudyCard;
   window.nextStudyCard = nextStudyCard;
   window.prevStudyCard = prevStudyCard;
@@ -6995,6 +7179,16 @@ Your input highlights the need for dynamic optimization of distributed executors
   window.runSparkConfigSim = runSparkConfigSim;
   window.runRagSim = runRagSim;
   window.runWatermarkSim = runWatermarkSim;
+
+  window.openCommandPalette = openCommandPalette;
+  window.closeCommandPalette = closeCommandPalette;
+  window.onCommandPaletteInput = onCommandPaletteInput;
+  window.executeCmdItem = executeCmdItem;
+  window.renderLearningPaths = renderLearningPaths;
+  window.openPathDetail = openPathDetail;
+  window.renderAccountStudio = renderAccountStudio;
+  window.exportUserDataJSON = exportUserDataJSON;
+  window.resumeMiniPlayerProgress = resumeMiniPlayerProgress;
 
 });
 
