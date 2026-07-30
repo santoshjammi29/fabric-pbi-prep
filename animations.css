@@ -56,8 +56,8 @@
 
 /* Pulse glow ring */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4); }
-  50%       { box-shadow: 0 0 0 12px rgba(108, 92, 231, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(52, 199, 89, 0); }
 }
 
 /* Spinning gradient border */
@@ -268,7 +268,7 @@
     transform: translateY(-4px) scale(1.005);
     box-shadow:
       0 12px 40px rgba(0, 0, 0, 0.35),
-      0 0 0 1px rgba(108, 92, 231, 0.25),
+      0 0 0 1px rgba(52, 199, 89, 0.25),
       inset 0 1px 0 rgba(255, 255, 255, 0.07);
   }
 }
@@ -417,8 +417,8 @@
 .qa-search-wrapper:focus-within {
   border-color: var(--primary) !important;
   box-shadow:
-    0 0 0 3px rgba(108, 92, 231, 0.18),
-    0 4px 16px rgba(108, 92, 231, 0.12) !important;
+    0 0 0 3px rgba(52, 199, 89, 0.18),
+    0 4px 16px rgba(52, 199, 89, 0.12) !important;
   transform: none;
 }
 
@@ -602,13 +602,13 @@
 }
 
 .main-content::-webkit-scrollbar-thumb {
-  background: rgba(108, 92, 231, 0.3);
+  background: rgba(52, 199, 89, 0.3);
   border-radius: 99px;
   transition: background 0.2s ease;
 }
 
 .main-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(108, 92, 231, 0.6);
+  background: rgba(52, 199, 89, 0.6);
 }
 
 /* ─── 24. COPY BUTTON FEEDBACK ────────────────────────────── */

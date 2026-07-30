@@ -6883,7 +6883,7 @@ Your input highlights the need for dynamic optimization of distributed executors
           <span class="launcher-badge" style="font-size: 0.72rem;">${c.difficulty}</span>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.75rem 0;">${escapeHTML(c.summary)}</p>
-        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(0, 113, 227, 0.05); padding: 0.65rem 0.85rem; border-radius: 8px; border-left: 3px solid var(--apple-blue);">
+        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(52, 199, 89, 0.12); padding: 0.65rem 0.85rem; border-radius: 8px; border-left: 3px solid #34c759;">
           ${escapeHTML(c.details)}
         </div>
       </div>
@@ -6911,7 +6911,7 @@ Your input highlights the need for dynamic optimization of distributed executors
           <span class="launcher-badge" style="font-size: 0.72rem;">${c.difficulty}</span>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.75rem 0;">${escapeHTML(c.summary)}</p>
-        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(0, 113, 227, 0.05); padding: 0.65rem 0.85rem; border-radius: 8px; border-left: 3px solid var(--apple-blue);">
+        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(52, 199, 89, 0.12); padding: 0.65rem 0.85rem; border-radius: 8px; border-left: 3px solid var(--apple-green);">
           ${escapeHTML(c.details)}
         </div>
       </div>
@@ -6924,7 +6924,7 @@ Your input highlights the need for dynamic optimization of distributed executors
 
     container.innerHTML = window.MODERN_CODE_MATRIX.map(item => `
       <div class="code-wrapper mac-ide-code-block" style="margin-bottom: 1.5rem; padding: 1rem;">
-        <h4 style="color: #60a5fa; font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">❓ ${escapeHTML(item.topic)}</h4>
+        <h4 style="color: var(--apple-green); font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">❓ ${escapeHTML(item.topic)}</h4>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
           <div>
             <span style="font-size: 0.75rem; font-weight: 700; color: #a7f3d0;">🐍 Python (Polars)</span>
@@ -6935,7 +6935,7 @@ Your input highlights the need for dynamic optimization of distributed executors
             <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.pyspark)}</code></pre>
           </div>
           <div>
-            <span style="font-size: 0.75rem; font-weight: 700; color: #60a5fa;">💎 Spark SQL</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--apple-green);">💎 Spark SQL</span>
             <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.sparksql)}</code></pre>
           </div>
           <div>
@@ -6988,7 +6988,7 @@ Your input highlights the need for dynamic optimization of distributed executors
       <div class="concept-accordion-card" style="padding: 1.25rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
           <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">💰 ${escapeHTML(p.title)}</h4>
-          <span class="launcher-badge" style="background: rgba(52, 199, 89, 0.15); color: var(--accent-green); font-size: 0.75rem;">${escapeHTML(p.savings)}</span>
+          <span class="launcher-badge" style="background: rgba(52, 199, 89, 0.15); color: var(--apple-green); font-size: 0.75rem;">${escapeHTML(p.savings)}</span>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">${escapeHTML(p.summary)}</p>
         <pre class="code-block"><code>${escapeHTML(p.code)}</code></pre>
@@ -7008,7 +7008,7 @@ Your input highlights the need for dynamic optimization of distributed executors
         </div>
         <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Cost Estimate:</strong> ${escapeHTML(b.costEstimate)}</p>
         <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
-          ${b.tags.map(t => `<span style="font-size: 0.7rem; background: rgba(0, 113, 227, 0.1); color: var(--apple-blue); padding: 0.15rem 0.45rem; border-radius: 6px;">${escapeHTML(t)}</span>`).join('')}
+          ${b.tags.map(t => `<span style="font-size: 0.7rem; background: rgba(52, 199, 89, 0.1); color: var(--apple-green); padding: 0.15rem 0.45rem; border-radius: 6px;">${escapeHTML(t)}</span>`).join('')}
         </div>
         <pre class="code-block" style="font-family: monospace; font-size: 0.78rem; background: #090d16; color: #a7f3d0; padding: 0.85rem; border-radius: 8px;"><code>${escapeHTML(b.ascii)}</code></pre>
       </div>
@@ -7236,7 +7236,7 @@ Your input highlights the need for dynamic optimization of distributed executors
           <div class="cmd-item-title">${escapeHTML(item.title)}</div>
           <div class="cmd-item-meta">${escapeHTML(item.meta)}</div>
         </div>
-        <span style="font-size: 0.8rem; color: var(--brand-indigo);">↵</span>
+        <span style="font-size: 0.8rem; color: var(--brand-apple-green);">↵</span>
       </div>
     `).join('');
 
@@ -7259,18 +7259,18 @@ Your input highlights the need for dynamic optimization of distributed executors
         <div>
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
             <span style="font-size: 1.8rem;">${path.icon}</span>
-            <span class="launcher-badge" style="background: rgba(43, 63, 255, 0.1); color: var(--brand-indigo);">${escapeHTML(path.badge)}</span>
+            <span class="launcher-badge" style="background: rgba(52, 199, 89, 0.12); color: var(--apple-green);">${escapeHTML(path.badge)}</span>
           </div>
           <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem 0;">${escapeHTML(path.title)}</h3>
           <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 1rem;">${escapeHTML(path.description)}</p>
         </div>
         <div>
           <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
-            ${path.skills.slice(0, 4).map(s => `<span style="font-size: 0.7rem; background: rgba(0, 113, 227, 0.08); color: var(--apple-blue); padding: 0.15rem 0.45rem; border-radius: 6px;">${escapeHTML(s)}</span>`).join('')}
+            ${path.skills.slice(0, 4).map(s => `<span style="font-size: 0.7rem; background: rgba(52, 199, 89, 0.08); color: var(--apple-green); padding: 0.15rem 0.45rem; border-radius: 6px;">${escapeHTML(s)}</span>`).join('')}
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-secondary);">
             <span>⏱️ ${path.weeks} Weeks</span>
-            <span style="font-weight: 700; color: var(--brand-indigo);">View Track →</span>
+            <span style="font-weight: 700; color: var(--apple-green);">View Track →</span>
           </div>
         </div>
       </div>
@@ -7296,7 +7296,7 @@ Your input highlights the need for dynamic optimization of distributed executors
       <div class="dashboard-grid" style="margin-bottom: 1.25rem;">
         ${path.phases.map((phase, idx) => `
           <div class="concept-accordion-card" style="padding: 1rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-indigo);">${escapeHTML(phase.weeks)}</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--apple-green);">${escapeHTML(phase.weeks)}</div>
             <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0.25rem 0 0.5rem 0;">${escapeHTML(phase.name)}</h4>
             <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Milestone:</strong> ${escapeHTML(phase.milestone)}</p>
             <div style="font-size: 0.78rem; color: var(--text-secondary);">
@@ -7305,10 +7305,10 @@ Your input highlights the need for dynamic optimization of distributed executors
           </div>
         `).join('')}
       </div>
-      <div style="background: rgba(0, 113, 227, 0.06); padding: 1rem; border-radius: 12px; border-left: 4px solid var(--apple-blue);">
+      <div style="background: rgba(52, 199, 89, 0.06); padding: 1rem; border-radius: 12px; border-left: 4px solid var(--apple-green);">
         <h4 style="margin: 0 0 0.35rem 0; font-size: 0.9rem; color: var(--text-primary); font-weight: 700;">🛠️ Starter Repository &amp; Capstone</h4>
         <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 0.5rem 0;">${escapeHTML(path.handsOn.title)} — ${escapeHTML(path.handsOn.description)}</p>
-        <a href="${path.handsOn.repo}" target="_blank" style="font-size: 0.8rem; font-weight: 700; color: var(--apple-blue); text-decoration: none;">Explore Starter Repo →</a>
+        <a href="${path.handsOn.repo}" target="_blank" style="font-size: 0.8rem; font-weight: 700; color: var(--apple-green); text-decoration: none;">Explore Starter Repo →</a>
       </div>
     `;
     container.scrollIntoView({ behavior: 'smooth' });
