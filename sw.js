@@ -1,10 +1,23 @@
 // Service Worker for Fabric PBI Prep App
-const CACHE_NAME = 'fabric-pbi-prep-v1.6.0';
+const CACHE_NAME = 'fabric-pbi-prep-v1.7.0';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/styles.css',
+  '/animations.css',
   '/app.js',
+  '/animations.js',
+  '/questions.js',
+  '/data_architecture.js',
+  '/data_concepts.js',
+  '/data_de.js',
+  '/data_pyspark.js',
+  '/data_sparksql.js',
+  '/data_mssql.js',
+  '/data_python.js',
+  '/data_personalised.js',
+  '/data_modern_stack.js',
+  '/data_paths.js',
   '/assets/logo_adf.svg',
   '/assets/logo_brand.svg',
   '/assets/logo_datalake.svg',

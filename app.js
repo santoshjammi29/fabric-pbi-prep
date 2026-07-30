@@ -223,10 +223,138 @@ document.addEventListener('DOMContentLoaded', () => {
     'architecture': 'ARCHITECTURE_DATA'
   };
 
+  // --- CIRCUIT BREAKER PATTERN & REQUEST DEDUPLICATION ---
+  class CircuitBreaker {
+    constructor(threshold = 3, cooldownMs = 10000) {
+      this.threshold = threshold;
+      this.cooldownMs = cooldownMs;
+      this.failureCount = 0;
+      this.state = 'CLOSED'; // 'CLOSED', 'OPEN', 'HALF_OPEN'
+      this.nextAttempt = Date.now();
+    }
+
+    canExecute() {
+      if (this.state === 'CLOSED') return true;
+      if (this.state === 'OPEN') {
+        if (Date.now() >= this.nextAttempt) {
+          this.state = 'HALF_OPEN';
+          return true;
+        }
+        return false;
+      }
+      return true;
+    }
+
+    recordSuccess() {
+      this.failureCount = 0;
+      this.state = 'CLOSED';
+    }
+
+    recordFailure() {
+      this.failureCount++;
+      if (this.failureCount >= this.threshold) {
+        this.state = 'OPEN';
+        this.nextAttempt = Date.now() + this.cooldownMs;
+      }
+    }
+  }
+
+  const datasetBreakers = {};
+  Object.keys(DATASET_GLOBALS).forEach(key => {
+    datasetBreakers[key] = new CircuitBreaker(3, 10000);
+  });
+
+  const inFlightRequests = {};
+
+  // --- SCHEMA VALIDATION & NORMALIZATION ---
+  function validateAndNormalizeRecord(q, datasetKey) {
+    if (!q || typeof q !== 'object') return null;
+    const id = q.id || `q_${Math.random().toString(36).substr(2, 9)}`;
+    const question = q.question || q.term || q.scenario || q.title || 'Untitled Item';
+    const answer = q.answer || q.definition || q.description || q.solution || 'No detailed content available.';
+    const category = q.category || q.topic || q.subdomain || q.domain || 'GENERAL';
+    const difficulty = normalizeDifficulty(q.difficulty);
+    const niche = q.niche || q.subdomain || 'Data Engineering';
+
+    return {
+      ...q,
+      id,
+      question,
+      answer,
+      category,
+      difficulty,
+      niche,
+      sourceDb: datasetKey,
+      categoryLabel: q.categoryLabel || category
+    };
+  }
+
+  function loadScriptWithRetry(key, attemptsLeft = 3) {
+    const globalVarName = DATASET_GLOBALS[key];
+    if (window[globalVarName]) {
+      state.loadedDatasets[key] = true;
+      if (state.datasetErrors) delete state.datasetErrors[key];
+      return Promise.resolve();
+    }
+
+    // Circuit Breaker check
+    const breaker = datasetBreakers[key];
+    if (breaker && !breaker.canExecute()) {
+      console.warn(`Circuit breaker OPEN for dataset ${key}. Skipping fetch attempt.`);
+      if (!state.datasetErrors) state.datasetErrors = {};
+      state.datasetErrors[key] = true;
+      return Promise.reject(new Error(`Circuit breaker open for ${key}`));
+    }
+
+    // Deduplication check
+    if (inFlightRequests[key]) {
+      return inFlightRequests[key];
+    }
+
+    const promise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      const fileBase = (DATASET_FILES[key] || '').split('?')[0];
+      const cacheBust = attemptsLeft < 3 ? `?retry=${Date.now()}` : (DATASET_FILES[key].includes('?') ? '?' + DATASET_FILES[key].split('?')[1] : '');
+      script.src = fileBase + cacheBust;
+      script.async = true;
+
+      // Request Timeout Guard (5000ms max per attempt)
+      const timeoutId = setTimeout(() => {
+        script.onerror(new Error('Request timeout'));
+      }, 5000);
+
+      script.onload = () => {
+        clearTimeout(timeoutId);
+        state.loadedDatasets[key] = true;
+        if (state.datasetErrors) delete state.datasetErrors[key];
+        delete inFlightRequests[key];
+        if (breaker) breaker.recordSuccess();
+        resolve();
+      };
+      script.onerror = () => {
+        clearTimeout(timeoutId);
+        delete inFlightRequests[key];
+        if (attemptsLeft > 1) {
+          setTimeout(() => {
+            loadScriptWithRetry(key, attemptsLeft - 1).then(resolve).catch(reject);
+          }, 300);
+        } else {
+          if (breaker) breaker.recordFailure();
+          if (!state.datasetErrors) state.datasetErrors = {};
+          state.datasetErrors[key] = true;
+          reject(new Error(`Failed to load dataset: ${key}`));
+        }
+      };
+      document.head.appendChild(script);
+    });
+
+    inFlightRequests[key] = promise;
+    return promise;
+  }
+
   function ensureDatasetsLoaded(keys) {
     const toLoad = keys.filter(key => {
       const globalVarName = DATASET_GLOBALS[key];
-      // Mark as loaded if already defined on window (e.g. by unit tests / previous requests)
       if (window[globalVarName]) {
         state.loadedDatasets[key] = true;
       }
@@ -252,28 +380,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showDbLoader(toLoad);
 
-    const promises = toLoad.map(key => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = DATASET_FILES[key];
-        script.async = true;
-        script.onload = () => {
-          state.loadedDatasets[key] = true;
-          resolve();
-        };
-        script.onerror = (err) => {
-          reject(new Error(`Failed to load dataset: ${key}`));
-        };
-        document.head.appendChild(script);
-      });
-    });
+    const promises = toLoad.map(key => loadScriptWithRetry(key, 3));
 
-    return Promise.all(promises)
+    return Promise.allSettled(promises)
       .then(() => {
         repopulateStateQuestions();
       })
       .catch(err => {
         console.warn('Dataset load warning:', err);
+        repopulateStateQuestions();
       })
       .finally(() => {
         hideDbLoader();
@@ -293,25 +408,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return Promise.resolve();
     }
 
-    const promises = toLoad.map(key => {
-      return new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = DATASET_FILES[key];
-        script.async = true;
-        script.onload = () => {
-          state.loadedDatasets[key] = true;
-          resolve();
-        };
-        script.onerror = () => {
-          resolve();
-        };
-        document.head.appendChild(script);
-      });
-    });
+    const promises = toLoad.map(key => loadScriptWithRetry(key, 3));
 
-    return Promise.all(promises).then(() => {
+    return Promise.allSettled(promises).then(() => {
       repopulateStateQuestions();
-      updateUnifiedSearchCounts();
+      if (typeof updateUnifiedSearchCounts === 'function') {
+        updateUnifiedSearchCounts();
+      }
     });
   }
 
@@ -6985,7 +7088,45 @@ Your input highlights the need for dynamic optimization of distributed executors
     if (res) res.textContent = `Events lagging > ${mins}m dropped · RocksDB State Size: ~${stateMb} MB`;
   }
 
-  // --- ⌘K COMMAND PALETTE & LEARNING OS FUNCTIONS ---
+  function resetShuffleSim() {
+    const rows = document.getElementById('sim-shuffle-rows');
+    const skew = document.getElementById('sim-shuffle-skew');
+    if (rows) rows.value = '50';
+    if (skew) skew.value = '1.5';
+    runShuffleSim();
+  }
+
+  function resetTreeSim() {
+    const sel = document.getElementById('sim-tree-catalog');
+    if (sel) sel.value = 'uc';
+    runTreeSim();
+  }
+
+  function resetCostSim() {
+    const tb = document.getElementById('sim-cost-tb');
+    if (tb) tb.value = '10';
+    runCostSim();
+  }
+
+  function resetSparkConfigSim() {
+    const w = document.getElementById('sim-spark-workers');
+    if (w) w.value = '8';
+    runSparkConfigSim();
+  }
+
+  function resetRagSim() {
+    const chunk = document.getElementById('sim-rag-chunk');
+    if (chunk) chunk.value = '512';
+    runRagSim();
+  }
+
+  function resetWatermarkSim() {
+    const wm = document.getElementById('sim-watermark');
+    if (wm) wm.value = '10';
+    runWatermarkSim();
+  }
+
+  // --- ⌘K COMMAND PALETTE & GLOBAL FUZZY SEARCH ---
   window.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
@@ -7006,8 +7147,7 @@ Your input highlights the need for dynamic optimization of distributed executors
     }
   }
 
-  function closeCommandPalette(evt) {
-    if (evt && evt.target && evt.target.id !== 'cmd-palette-modal') return;
+  function closeCommandPalette() {
     const modal = document.getElementById('cmd-palette-modal');
     if (modal) modal.style.display = 'none';
   }
@@ -7020,6 +7160,7 @@ Your input highlights the need for dynamic optimization of distributed executors
     const list = document.getElementById('cmd-results-list');
     if (!list) return;
     const q = query.toLowerCase().trim();
+    const tokens = q.split(/\s+/).filter(Boolean);
 
     const commands = [
       { title: '⚡ Learning Paths', meta: 'Navigate to 12 Certification & Skill Tracks', action: () => switchView('view-paths') },
@@ -7034,14 +7175,54 @@ Your input highlights the need for dynamic optimization of distributed executors
     ];
 
     let items = commands;
-    if (q) {
-      items = commands.filter(c => c.title.toLowerCase().includes(q) || c.meta.toLowerCase().includes(q));
+    if (tokens.length > 0) {
+      items = commands.filter(c => {
+        const text = (c.title + ' ' + c.meta).toLowerCase();
+        return tokens.every(t => text.includes(t));
+      });
+
+      // 1. Questions DB Search
+      if (window.QUESTIONS_DB && window.QUESTIONS_DB.length > 0) {
+        let qMatches = 0;
+        for (let i = 0; i < window.QUESTIONS_DB.length && qMatches < 5; i++) {
+          const item = window.QUESTIONS_DB[i];
+          const text = (item.question + ' ' + (item.answer || '') + ' ' + (item.category || '')).toLowerCase();
+          if (tokens.every(t => text.includes(t))) {
+            qMatches++;
+            items.push({
+              title: `❓ ${item.question}`,
+              meta: `Q&A · ${item.categoryLabel || item.category || 'Prep'} · ${item.difficulty || 'HARD'}`,
+              action: () => { switchView('view-prep-hub'); openDetailsDialog(item.id); }
+            });
+          }
+        }
+      }
+
+      // 2. Concepts Glossary Search
+      if (window.CONCEPTS_DB) {
+        let cMatches = 0;
+        for (let i = 0; i < window.CONCEPTS_DB.length && cMatches < 3; i++) {
+          const c = window.CONCEPTS_DB[i];
+          const text = (c.term + ' ' + (c.definition || '') + ' ' + (c.category || '')).toLowerCase();
+          if (tokens.every(t => text.includes(t))) {
+            cMatches++;
+            items.push({
+              title: `📚 ${c.term}`,
+              meta: `Glossary Concept · ${c.category || 'Concept'} · ${c.difficulty || 'EASY'}`,
+              action: () => { switchView('view-concepts'); }
+            });
+          }
+        }
+      }
+
+      // 3. Learning Paths Search
       if (window.LEARNING_PATHS_DB) {
         window.LEARNING_PATHS_DB.forEach(p => {
-          if (p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)) {
+          const text = (p.title + ' ' + p.description).toLowerCase();
+          if (tokens.every(t => text.includes(t))) {
             items.push({
               title: `${p.icon} ${p.title}`,
-              meta: `Path · ${p.weeks} Weeks · ${p.difficulty}`,
+              meta: `Learning Track · ${p.weeks} Weeks · ${p.difficulty}`,
               action: () => { switchView('view-paths'); openPathDetail(p.slug); }
             });
           }
@@ -7179,6 +7360,12 @@ Your input highlights the need for dynamic optimization of distributed executors
   window.runSparkConfigSim = runSparkConfigSim;
   window.runRagSim = runRagSim;
   window.runWatermarkSim = runWatermarkSim;
+  window.resetShuffleSim = resetShuffleSim;
+  window.resetTreeSim = resetTreeSim;
+  window.resetCostSim = resetCostSim;
+  window.resetSparkConfigSim = resetSparkConfigSim;
+  window.resetRagSim = resetRagSim;
+  window.resetWatermarkSim = resetWatermarkSim;
 
   window.openCommandPalette = openCommandPalette;
   window.closeCommandPalette = closeCommandPalette;

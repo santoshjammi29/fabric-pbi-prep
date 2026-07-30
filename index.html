@@ -308,7 +308,7 @@
           <div class="tip-box-v3-icon">💡</div>
           <div class="tip-box-v3-body">
             <h4 class="tip-box-v3-label">Data Architect Pro Tip of the Day</h4>
-            <p class="tip-box-v3-text" id="dashboard-tip-content-text">Loading premium recommendation...</p>
+            <p class="tip-box-v3-text" id="dashboard-tip-content-text"><span class="skeleton-box skeleton-text" style="width: 80%;"></span></p>
           </div>
         </div>
 
@@ -698,8 +698,9 @@
           <div class="simulator-widget-grid">
             <!-- 1. Shuffle Estimator -->
             <div class="simulator-card">
-              <div class="simulator-header">
+              <div class="simulator-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="simulator-title">1. Shuffle Size &amp; Partition Estimator</span>
+                <button onclick="resetShuffleSim()" style="background: none; border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">↺ Reset</button>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Input Rows (Millions):</span><span class="sim-val" id="sim-shuffle-rows-val">50M</span></div>
@@ -714,8 +715,9 @@
 
             <!-- 2. Delta vs Iceberg Decision Tree -->
             <div class="simulator-card">
-              <div class="simulator-header">
+              <div class="simulator-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="simulator-title">2. Iceberg vs Delta Selector Tree</span>
+                <button onclick="resetTreeSim()" style="background: none; border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">↺ Reset</button>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Primary Catalog:</span></div>
@@ -731,8 +733,9 @@
 
             <!-- 3. Serverless Cost Estimator -->
             <div class="simulator-card">
-              <div class="simulator-header">
+              <div class="simulator-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="simulator-title">3. Serverless Compute Cost Estimator</span>
+                <button onclick="resetCostSim()" style="background: none; border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">↺ Reset</button>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Monthly TB Scanned:</span><span class="sim-val" id="sim-cost-tb-val">10 TB</span></div>
@@ -743,8 +746,9 @@
 
             <!-- 4. Spark Cluster Configurator -->
             <div class="simulator-card">
-              <div class="simulator-header">
+              <div class="simulator-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="simulator-title">4. Spark Cluster Configurator</span>
+                <button onclick="resetSparkConfigSim()" style="background: none; border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">↺ Reset</button>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Worker Nodes:</span><span class="sim-val" id="sim-spark-workers-val">8 Nodes</span></div>
@@ -755,8 +759,9 @@
 
             <!-- 5. RAG Pipeline Diagram Builder -->
             <div class="simulator-card">
-              <div class="simulator-header">
+              <div class="simulator-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="simulator-title">5. RAG Pipeline Builder</span>
+                <button onclick="resetRagSim()" style="background: none; border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">↺ Reset</button>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Chunk Size (Tokens):</span><span class="sim-val" id="sim-rag-chunk-val">512 tokens</span></div>
@@ -767,8 +772,9 @@
 
             <!-- 6. Streaming Watermark Visualizer -->
             <div class="simulator-card">
-              <div class="simulator-header">
+              <div class="simulator-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="simulator-title">6. Watermark Lateness Visualizer</span>
+                <button onclick="resetWatermarkSim()" style="background: none; border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">↺ Reset</button>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Allowed Lateness (Mins):</span><span class="sim-val" id="sim-watermark-val">10 Mins</span></div>
@@ -913,12 +919,12 @@
               <div class="study-flashcard" id="study-flashcard" onclick="flipStudyCard()" tabindex="0" role="button" aria-label="Flashcard: click or press Enter or Space to reveal answer" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipStudyCard();}">
                 <div class="study-flashcard-inner">
                   <div class="study-card-front">
-                    <span class="study-card-category" id="study-card-category">Loading...</span>
-                    <div class="card-q" id="study-card-question">Loading question...</div>
+                    <span class="study-card-category" id="study-card-category"><span class="skeleton-box" style="width: 80px; height: 14px;"></span></span>
+                    <div class="card-q" id="study-card-question"><div class="skeleton-box skeleton-title"></div></div>
                     <div class="card-hint">👆 Click to reveal answer</div>
                   </div>
                   <div class="study-card-back">
-                    <div class="card-a" id="study-card-answer">Answer will appear here</div>
+                    <div class="card-a" id="study-card-answer"><div class="skeleton-box skeleton-text"></div></div>
                   </div>
                 </div>
               </div>

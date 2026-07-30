@@ -56,6 +56,7 @@ async function waitForServer() {
 const UNIT_SUITES = [
   // ① Pure source-level regression guards (fastest — no JSDOM runtime)
   'tests/test_regression_guard.js',
+  'tests/test_data_service.js',
 
   // ② Dataset shape snapshot
   'tests/test_snapshot.js',
