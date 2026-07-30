@@ -1,96 +1,87 @@
-# Data Engineering Universe — Interactive Mindmap Guide
+# DE.UNIVERSE — Editorial Knowledge Graph Documentation
 
-This directory hosts the self-contained interactive **Data Engineering Mindmap** available at route `/data-engineering-mindmap`.
-
-## Overview
-The Mindmap visualizes 250+ concepts across 10 core data engineering domains using a real-time D3 2D force-directed layout with canvas particle edge streams, soft node pulsing, interactive hover glows, difficulty filters (`[B]eginner`, `[I]ntermediate`, `[A]dvanced`, `[X]Architect`), exploration progress tracking, and detailed concept cards.
+## 1. Design Rationale
+`DE.UNIVERSE` (`/data-engineering-mindmap`) is built with an editorial, data-dense, quiet aesthetic inspired by Linear, Stripe Docs, Vercel, and Apple Newsroom. The interface avoids visual clutter, cartoonish colors, bouncy animations, background particle stars, and emojis. Every element uses a strict 12-column grid, 8px vertical rhythm, hairline 1px borders (`#15171C`), and a single desaturated accent (`#7C9CFF`).
 
 ---
 
-## 1. How to Add New Nodes
+## 2. Motion Specification
+- **Easing Tokens**:
+  - `--ease-out-soft`: `cubic-bezier(0.22, 1, 0.36, 1)`
+  - `--ease-out-fast`: `cubic-bezier(0.32, 0.72, 0, 1)`
+  - `--ease-in-out`: `cubic-bezier(0.65, 0, 0.35, 1)`
+- **Duration Tokens**:
+  - `--dur-instant`: `80ms` (colors, opacity)
+  - `--dur-quick`: `180ms` (hover, small UI)
+  - `--dur-base`: `280ms` (panels, inspector slide)
+  - `--dur-emphasis`: `480ms` (camera pan/zoom)
+  - `--dur-narrative`: `800ms` (initial entrance)
+- **Reduced Motion**: `@media (prefers-reduced-motion: reduce)` collapses all motion to 0ms / 120ms fade.
 
-1. Open `build_full_mindmap.py` or edit `data/data_mindmap_taxonomy.json` directly.
-2. Inside `raw_taxonomy`, locate your target domain and sub-domain.
-3. Append a new concept object under `concepts`:
+---
 
-```python
+## 3. How to Add a Node
+1. Edit `data/data_mindmap_taxonomy.json` or update `build_editorial_mindmap.py`.
+2. Add your node definition adhering to summary length rules (28–60 words) and key ideas (3–5 bullets, ≤ 12 words per bullet):
+```json
 {
-    "name": "Apache Iceberg V3",
-    "id": "iceberg-v3",
-    "diff": "A", # B = Beginner, I = Intermediate, A = Advanced, X = Architect
-    "desc": "Next-gen table format features including deletion vectors and row-level lineage.",
-    "why": "Increases write performance and reduces small-file compaction overhead.",
-    "kc": [
-        "Deletion Vectors",
-        "Row-Level Lineage",
-        "Puffin File Metadata",
-        "Branching & Tagging"
-    ],
-    "prereqs": ["storage-table-formats-iceberg-tf"],
-    "resources": [
-        {"label": "Iceberg Spec V3", "url": "https://iceberg.apache.org/spec/"}
-    ],
-    "siteLinks": [
-        {"label": "Lakehouse Architecture", "route": "/lakehouse"}
-    ]
+  "id": "storage-formats-parquet-v3",
+  "name": "Parquet V3 Format",
+  "domain": "storage",
+  "level": 3,
+  "difficulty": "A",
+  "description": "Columnar storage format specification supporting advanced encodings, modular metadata blocks, and zero-copy reads across cloud analytics clusters. Designed for production workloads requiring high throughput.",
+  "whyItMatters": "Slashes storage cost and speeds up query execution.",
+  "keyConcepts": [
+    "Modular Metadata Blocks",
+    "Zero-Copy Buffer Parsing",
+    "Optimized Parquet Encodings"
+  ],
+  "prerequisites": ["storage-formats-parquet"],
+  "resources": [
+    { "label": "Parquet Specification", "url": "https://parquet.apache.org/" }
+  ]
 }
 ```
-
-4. Regenerate the dataset and HTML page:
-```bash
-python3 build_full_mindmap.py
-python3 build_html.py
-```
+3. Re-run `python3 build_editorial_mindmap.py`.
 
 ---
 
-## 2. How to Change Colors
-
-Domain colors are defined in `DOMAINS` array inside `build_full_mindmap.py` and CSS variables in `data-engineering-mindmap.html`:
-
-```python
-DOMAINS = [
-    {"id": "foundations", "name": "DATA FOUNDATIONS", "color": "#4f9eff"},
-    {"id": "ingestion", "name": "DATA INGESTION", "color": "#00d9ff"},
-    {"id": "storage", "name": "DATA STORAGE", "color": "#7c3aed"},
-    ...
-]
+## 4. How to Add a Domain
+1. Add the domain metadata to `DOMAIN_TOKENS` in CSS/JS:
+```js
+'aiops': { name: 'AI & MLOps', color: 'var(--d11)', key: 'd11' }
 ```
-
-To update a color:
-1. Change the hexadecimal hex string (e.g., `#00d9ff` to `#00f0ff`).
-2. Run `python3 build_full_mindmap.py && python3 build_html.py`.
+2. Define domain nodes (`level: 1`) and sub-domains (`level: 2`) in the taxonomy dataset.
+3. Re-run `python3 build_editorial_mindmap.py`.
 
 ---
 
-## 3. How to Add a New Domain
-
-1. Add the domain configuration in `DOMAINS`:
-```python
-{"id": "aiops", "name": "AI & MLOPS", "color": "#ec4899"}
-```
-2. Add a new key under `raw_taxonomy` in `build_full_mindmap.py`:
-```python
-"aiops": [
-    {
-        "name": "Feature Stores", "id": "feature-store", "difficulty": "A",
-        "desc": "Centralized repositories for storing and serving ML features.",
-        "why": "Prevents train/serve skew and enables feature reuse across models.",
-        "concepts": [...]
-    }
-]
-```
-3. Re-run `python3 build_full_mindmap.py && python3 build_html.py`.
+## 5. List View & Accessibility Statement
+- Pressing `L` or clicking the **List** button in the chrome opens the **Accessible List View Surface** (`#accessible-list-view`).
+- Renders an accessible, keyboard-navigable `<ul role="list">` of all 10 domains and 250+ concepts with explicit `aria-label`, `aria-selected`, and `role="region"` attributes.
+- Fulfills **WCAG 2.1 AA** compliance with contrast ratios ≥ 4.5:1 on `--bg-base`.
 
 ---
 
-## 4. How to Wire a New Site Route
-
-When creating a new internal route link inside a concept card (e.g. `/mlops-overview`):
-1. In your node definition, add an entry under `siteLinks`:
-```python
-"siteLinks": [
-    {"label": "MLOps Overview", "route": "/mlops-overview"}
-]
-```
-2. Clicking this button in the right-panel Concept Card navigates directly to that site route on `fabric-pbi-prep.vercel.app`.
+## 6. List of Banned Words & Rationale
+| Banned Word | Rationale |
+|---|---|
+| `powerful` | Subjective marketing word; replace with specific technical attributes like `effective` or `high-throughput`. |
+| `robust` | Overused buzzword; replace with `resilient` or `fault-tolerant`. |
+| `cutting-edge` | Fluff; replace with `modern` or `contemporary`. |
+| `next-gen` | Hype term; replace with `modern` or `versioned`. |
+| `leverage` | Corporate jargon; replace with `use` or `utilize`. |
+| `synergy` | Corporate fluff; replace with `integration` or `interoperability`. |
+| `best-in-class` | Unverifiable marketing claim; replace with `standard`. |
+| `industry-leading` | Promotional hype; replace with `established` or `widely adopted`. |
+| `seamless` | Inaccurate oversimplification; replace with `direct` or `integrated`. |
+| `game-changing` | Hyperbole; replace with `significant` or `pivotal`. |
+| `in today's world` | Filler text; remove entirely. |
+| `in this article` | Meta tutorial noise; remove entirely. |
+| `Let's dive in` | Informal conversational filler; remove entirely. |
+| `In conclusion` | Conversational filler; remove. |
+| `delve into` | Repetitive AI essay trope; replace with `examine` or `analyze`. |
+| `scalable solution` | Generic buzzword; replace with `scalable system` or `distributed architecture`. |
+| `empower` | Promotional fluff; replace with `enable` or `allow`. |
+| `unlock the power` | Cliché marketing phrase; replace with `utilize capabilities`. |
