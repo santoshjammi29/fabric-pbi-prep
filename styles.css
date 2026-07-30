@@ -132,6 +132,10 @@
   --accent-green: #28cd41;
   --accent-orange: #ff9500;
   --accent-red: #ff3b30;
+  --accent-serverless: #7C3AED;
+  --accent-vector: #EC4899;
+  --accent-stream: #06B6D4;
+  --accent-ai: #F59E0B;
   --accent: var(--accent-green);
   --warning: var(--accent-orange);
   --danger: var(--accent-red);
@@ -9129,5 +9133,150 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
     background-color: var(--fallback-surface-bg, rgba(245, 245, 247, 0.96)) !important;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06) !important;
   }
+}
+
+/* Modern Data Stack Hub Styling */
+.modern-subnav-bar {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--card-border);
+  scrollbar-width: thin;
+}
+.modern-subnav-btn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid var(--card-border);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.modern-subnav-btn.active,
+.modern-subnav-btn:hover {
+  background: var(--apple-blue);
+  color: #ffffff;
+  border-color: var(--apple-blue);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+/* Architecture Node Canvas */
+.modern-stack-canvas {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: var(--glass-card);
+}
+.canvas-nodes-flow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+.canvas-node {
+  flex: 1;
+  min-width: 140px;
+  background: var(--surface-card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 1rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25 ease;
+  box-shadow: var(--glass-shadow);
+}
+.canvas-node:hover, .canvas-node.active {
+  transform: translateY(-3px);
+  border-color: var(--apple-blue);
+  box-shadow: 0 8px 24px rgba(0, 113, 227, 0.25);
+}
+.node-icon { font-size: 1.5rem; margin-bottom: 0.35rem; display: block; }
+.node-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.node-tech { font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* Interactive Simulator Widgets */
+.simulator-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.simulator-card {
+  background: var(--surface-card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  backdrop-filter: var(--glass-card);
+}
+.simulator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.simulator-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.sim-range-group { margin-bottom: 0.85rem; }
+.sim-label-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+.sim-val { font-weight: 700; color: var(--apple-blue); }
+.sim-slider {
+  width: 100%;
+  accent-color: var(--apple-blue);
+  cursor: pointer;
+}
+.sim-result-box {
+  background: rgba(0, 113, 227, 0.08);
+  border: 1px solid var(--apple-blue);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin-top: 0.75rem;
+}
+
+/* Polyglot Matrix Table */
+.polyglot-matrix-table-wrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--surface-card);
+  margin-bottom: 1.5rem;
+}
+.polyglot-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.polyglot-matrix-table th {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: var(--text-primary);
+  font-weight: 700;
+  border-bottom: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+.theme-dark .polyglot-matrix-table th {
+  background: rgba(255, 255, 255, 0.05);
+}
+.polyglot-matrix-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-secondary);
+  vertical-align: top;
 }
 

@@ -390,6 +390,20 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // Modern Stack
+    if (window.MODERN_STACK_DB) {
+      window.MODERN_STACK_DB.forEach(q => {
+        qList.push({
+          ...q,
+          db: 'modern_stack',
+          sourceDb: 'modern_stack',
+          sourceLabel: 'Modern Stack',
+          categoryLabel: q.category || 'Modern Stack',
+          difficulty: normalizeDifficulty(q.difficulty)
+        });
+      });
+    }
+
     // 3. General DE
     if (window.QUESTIONS_DE_DB) {
       window.QUESTIONS_DE_DB.forEach(q => {
@@ -6714,11 +6728,273 @@ Your input highlights the need for dynamic optimization of distributed executors
     nextStudyCard();
   }
 
+  // --- MODERN DATA STACK HUB FUNCTIONS ---
+  function switchModernSubtab(tabKey) {
+    const subtabs = ['overview', 'concepts', 'code', 'arch', 'ai', 'cost', 'connectors', 'simulators', 'blueprints'];
+    subtabs.forEach(key => {
+      const btn = document.getElementById(`btn-modsub-${key}`);
+      const panel = document.getElementById(`modsub-view-${key}`);
+      if (btn) btn.classList.toggle('active', key === tabKey);
+      if (panel) panel.style.display = (key === tabKey) ? 'block' : 'none';
+    });
+
+    if (tabKey === 'concepts') renderModernConcepts();
+    else if (tabKey === 'code') renderPolyglotMatrix();
+    else if (tabKey === 'arch') renderModernArchSpecs();
+    else if (tabKey === 'ai') renderModernAiRecipes();
+    else if (tabKey === 'cost') renderModernCostPlaybooks();
+    else if (tabKey === 'blueprints') renderModernBlueprints();
+  }
+
+  function selectCanvasStage(stage) {
+    const nodes = document.querySelectorAll('.canvas-node');
+    nodes.forEach(n => n.classList.remove('active'));
+    
+    const descriptions = {
+      ingest: '<strong>Stage 1: Ingestion Architecture</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">Log-based CDC via Debezium feeding Kafka event stream with schema registry validation and zero data loss guarantee.</span>',
+      store: '<strong>Stage 2: Open Table Storage</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">ACID transactional storage using Delta Lake & Apache Iceberg on S3/ADLS with Z-Ordering and Deletion Vectors.</span>',
+      transform: '<strong>Stage 3: Vectorized Compute Engine</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">Distributed transformations using Spark 4.0 AQE, Databricks C++ Photon engine, and dbt semantic modeling.</span>',
+      serve: '<strong>Stage 4: Polyglot Serving Layer</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">Low-latency queries via Snowflake virtual warehouses, DBSQL Serverless, and zero-copy embedded DuckDB.</span>',
+      ai: '<strong>Stage 5: AI & RAG Orchestration</strong><br><span style="font-size: 0.85rem; color: var(--text-secondary);">Real-time embeddings with Delta Vector Search, Model Context Protocol (MCP) servers, and agentic RAG.</span>'
+    };
+
+    const targetNode = Array.from(nodes).find(n => n.getAttribute('onclick')?.includes(stage));
+    if (targetNode) targetNode.classList.add('active');
+
+    const detailBox = document.getElementById('canvas-stage-detail');
+    if (detailBox && descriptions[stage]) detailBox.innerHTML = descriptions[stage];
+  }
+
+  function renderModernConcepts() {
+    const container = document.getElementById('mod-concepts-container');
+    if (!container || !window.MODERN_CONCEPTS_DB) return;
+
+    container.innerHTML = window.MODERN_CONCEPTS_DB.map(c => `
+      <div class="concept-accordion-card" style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">${escapeHTML(c.title)}</h4>
+          <span class="launcher-badge" style="font-size: 0.72rem;">${c.difficulty}</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.75rem 0;">${escapeHTML(c.summary)}</p>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(0, 113, 227, 0.05); padding: 0.65rem 0.85rem; border-radius: 8px; border-left: 3px solid var(--apple-blue);">
+          ${escapeHTML(c.details)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterModernConcepts() {
+    const input = document.getElementById('mod-concepts-search');
+    if (!input || !window.MODERN_CONCEPTS_DB) return;
+    const q = input.value.toLowerCase().trim();
+
+    const filtered = window.MODERN_CONCEPTS_DB.filter(c => 
+      c.title.toLowerCase().includes(q) || 
+      c.summary.toLowerCase().includes(q) || 
+      c.details.toLowerCase().includes(q)
+    );
+
+    const container = document.getElementById('mod-concepts-container');
+    if (!container) return;
+
+    container.innerHTML = filtered.map(c => `
+      <div class="concept-accordion-card" style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">${escapeHTML(c.title)}</h4>
+          <span class="launcher-badge" style="font-size: 0.72rem;">${c.difficulty}</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.75rem 0;">${escapeHTML(c.summary)}</p>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(0, 113, 227, 0.05); padding: 0.65rem 0.85rem; border-radius: 8px; border-left: 3px solid var(--apple-blue);">
+          ${escapeHTML(c.details)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderPolyglotMatrix() {
+    const container = document.getElementById('polyglot-matrix-container');
+    if (!container || !window.MODERN_CODE_MATRIX) return;
+
+    container.innerHTML = window.MODERN_CODE_MATRIX.map(item => `
+      <div class="code-wrapper mac-ide-code-block" style="margin-bottom: 1.5rem; padding: 1rem;">
+        <h4 style="color: #60a5fa; font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">❓ ${escapeHTML(item.topic)}</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #a7f3d0;">🐍 Python (Polars)</span>
+            <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.python)}</code></pre>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #fde047;">🌀 PySpark</span>
+            <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.pyspark)}</code></pre>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #60a5fa;">💎 Spark SQL</span>
+            <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.sparksql)}</code></pre>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #f472b6;">🦆 DuckDB SQL</span>
+            <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.duckdb)}</code></pre>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderModernArchSpecs() {
+    const container = document.getElementById('mod-arch-specs-container');
+    if (!container || !window.MODERN_SUBDOMAINS) return;
+
+    container.innerHTML = window.MODERN_SUBDOMAINS.map(s => `
+      <div class="arch-domain-card" style="border: 1px solid var(--card-border); border-radius: 14px; padding: 1rem; background: var(--surface-card);">
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">
+          ${s.icon} ${escapeHTML(s.title)}
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.35rem 0 0 0;">Architect-level reference specifications, trade-offs, and serverless component sizing.</p>
+      </div>
+    `).join('');
+  }
+
+  function renderModernAiRecipes() {
+    const container = document.getElementById('mod-ai-recipes-container');
+    if (!container || !window.MODERN_STACK_DB) return;
+
+    const recipes = window.MODERN_STACK_DB.filter(q => q.category === 'AI / LLM Architecture' || q.difficulty === 'ARCHITECT');
+
+    container.innerHTML = recipes.map(r => `
+      <div class="concept-accordion-card" style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">🤖 ${escapeHTML(r.question)}</h4>
+          <span class="launcher-badge" style="font-size: 0.72rem;">${r.difficulty}</span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+          ${formatMarkdownToHTML(r.answer)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderModernCostPlaybooks() {
+    const container = document.getElementById('mod-cost-container');
+    if (!container || !window.MODERN_COST_PLAYBOOKS) return;
+
+    container.innerHTML = window.MODERN_COST_PLAYBOOKS.map(p => `
+      <div class="concept-accordion-card" style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">💰 ${escapeHTML(p.title)}</h4>
+          <span class="launcher-badge" style="background: rgba(52, 199, 89, 0.15); color: var(--accent-green); font-size: 0.75rem;">${escapeHTML(p.savings)}</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">${escapeHTML(p.summary)}</p>
+        <pre class="code-block"><code>${escapeHTML(p.code)}</code></pre>
+      </div>
+    `).join('');
+  }
+
+  function renderModernBlueprints() {
+    const container = document.getElementById('mod-blueprints-container');
+    if (!container || !window.MODERN_BLUEPRINTS_DB) return;
+
+    container.innerHTML = window.MODERN_BLUEPRINTS_DB.map(b => `
+      <div class="concept-accordion-card" style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">🗺️ ${escapeHTML(b.title)}</h4>
+          <span class="launcher-badge" style="font-size: 0.72rem;">${escapeHTML(b.category)}</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Cost Estimate:</strong> ${escapeHTML(b.costEstimate)}</p>
+        <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+          ${b.tags.map(t => `<span style="font-size: 0.7rem; background: rgba(0, 113, 227, 0.1); color: var(--apple-blue); padding: 0.15rem 0.45rem; border-radius: 6px;">${escapeHTML(t)}</span>`).join('')}
+        </div>
+        <pre class="code-block" style="font-family: monospace; font-size: 0.78rem; background: #090d16; color: #a7f3d0; padding: 0.85rem; border-radius: 8px;"><code>${escapeHTML(b.ascii)}</code></pre>
+      </div>
+    `).join('');
+  }
+
+  // Interactive Simulators logic
+  function runShuffleSim() {
+    const rows = parseInt(document.getElementById('sim-shuffle-rows')?.value || '50');
+    const skew = parseFloat(document.getElementById('sim-shuffle-skew')?.value || '1.5');
+    
+    const rowsEl = document.getElementById('sim-shuffle-rows-val');
+    const skewEl = document.getElementById('sim-shuffle-skew-val');
+    if (rowsEl) rowsEl.textContent = `${rows}M`;
+    if (skewEl) skewEl.textContent = `${skew}x`;
+
+    const shuffleGb = (rows * 0.25 * skew).toFixed(1);
+    const partitions = Math.max(16, Math.round(rows * 2));
+
+    const res = document.getElementById('sim-shuffle-result');
+    if (res) res.textContent = `Predicted Shuffle: ~${shuffleGb} GB · Recommended Partitions: ${partitions}`;
+  }
+
+  function runTreeSim() {
+    const cat = document.getElementById('sim-tree-catalog')?.value;
+    const res = document.getElementById('sim-tree-result');
+    if (!res) return;
+
+    if (cat === 'uc') res.textContent = 'Recommendation: Delta Lake native with UniForm Iceberg metadata enabled.';
+    else if (cat === 'snowflake') res.textContent = 'Recommendation: Apache Iceberg Native Tables managed by Snowflake / Polaris Catalog.';
+    else if (cat === 'nessie') res.textContent = 'Recommendation: Apache Iceberg with Project Nessie Git-like branching catalog.';
+    else res.textContent = 'Recommendation: Delta Lake with Direct Lake mode over OneLake shortcuts.';
+  }
+
+  function runCostSim() {
+    const tb = parseInt(document.getElementById('sim-cost-tb')?.value || '10');
+    const tbEl = document.getElementById('sim-cost-tb-val');
+    if (tbEl) tbEl.textContent = `${tb} TB`;
+
+    const bqCost = (tb * 5.0).toFixed(2);
+    const dbsqlCost = (tb * 12.0).toFixed(2);
+
+    const res = document.getElementById('sim-cost-result');
+    if (res) res.textContent = `Estimated Cost: ~$${bqCost} (BigQuery) | ~$${dbsqlCost} (DBSQL Serverless)`;
+  }
+
+  function runSparkConfigSim() {
+    const workers = parseInt(document.getElementById('sim-spark-workers')?.value || '8');
+    const workersEl = document.getElementById('sim-spark-workers-val');
+    if (workersEl) workersEl.textContent = `${workers} Nodes`;
+
+    const cores = workers * 4;
+    const ram = workers * 16;
+    const throughput = (workers * 0.3).toFixed(1);
+
+    const res = document.getElementById('sim-spark-result');
+    if (res) res.textContent = `Total Cores: ${cores} · RAM: ${ram} GB · Max Throughput: ~${throughput} GB/s`;
+  }
+
+  function runRagSim() {
+    const chunk = parseInt(document.getElementById('sim-rag-chunk')?.value || '512');
+    const chunkEl = document.getElementById('sim-rag-chunk-val');
+    if (chunkEl) chunkEl.textContent = `${chunk} tokens`;
+
+    const res = document.getElementById('sim-rag-result');
+    if (res) res.textContent = `Index Density: ${chunk < 500 ? 'High Precision' : 'Broad Context'} · Embed Model: text-embedding-3-small (${chunk} tokens/chunk)`;
+  }
+
+  function runWatermarkSim() {
+    const mins = parseInt(document.getElementById('sim-watermark')?.value || '10');
+    const minsEl = document.getElementById('sim-watermark-val');
+    if (minsEl) minsEl.textContent = `${mins} Mins`;
+
+    const stateMb = (mins * 120).toFixed(0);
+
+    const res = document.getElementById('sim-watermark-result');
+    if (res) res.textContent = `Events lagging > ${mins}m dropped · RocksDB State Size: ~${stateMb} MB`;
+  }
+
   window.flipStudyCard = flipStudyCard;
   window.nextStudyCard = nextStudyCard;
   window.prevStudyCard = prevStudyCard;
   window.initStudyMode = initStudyMode;
   window.rateSM2Card = rateSM2Card;
+  window.switchModernSubtab = switchModernSubtab;
+  window.selectCanvasStage = selectCanvasStage;
+  window.filterModernConcepts = filterModernConcepts;
+  window.runShuffleSim = runShuffleSim;
+  window.runTreeSim = runTreeSim;
+  window.runCostSim = runCostSim;
+  window.runSparkConfigSim = runSparkConfigSim;
+  window.runRagSim = runRagSim;
+  window.runWatermarkSim = runWatermarkSim;
 
 });
 

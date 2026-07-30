@@ -82,7 +82,8 @@ const UNIT_SUITES = [
   'tests/test_sparksql.js',
   'tests/test_sidebar.js',
   'tests/test_architecture.js',
-  'tests/test_dashboard.js'
+  'tests/test_dashboard.js',
+  'tests/test_modern_stack.js'
 ];
 
 // ─── sequential runner ────────────────────────────────────────────────────────

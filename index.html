@@ -137,6 +137,14 @@
             </button>
           </li>
 
+          <!-- Modern Data Stack -->
+          <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-modern-stack" data-target="view-modern-stack">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/><circle cx="18" cy="18" r="3"/></svg>
+              <span class="nav-text">Modern Data Stack</span>
+            </button>
+          </li>
+
           <!-- ④ Q&A Prep -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-prep-hub" data-target="view-prep-hub">
@@ -421,6 +429,322 @@
             </div>
 
           </div>
+        </div>
+      </section>
+
+      <!-- MODERN DATA STACK & AI ARCHITECTURE HUB VIEW -->
+      <section class="page-view hidden" id="view-modern-stack">
+        <header class="page-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div>
+              <h2 class="page-title">Modern Data Engineering &amp; AI Architecture ⚡🌐</h2>
+              <p class="page-subtitle">Serverless-first, polyglot, AI-native — From raw clickstream to RAG-ready embeddings, built the senior way.</p>
+            </div>
+            <button class="btn-home-redirect" onclick="document.getElementById('btn-nav-dashboard').click()" title="Go to Dashboard" aria-label="Go to Dashboard">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Subnav bar -->
+        <div class="modern-subnav-bar">
+          <button class="modern-subnav-btn active" id="btn-modsub-overview" onclick="switchModernSubtab('overview')">⚡ Hub Overview</button>
+          <button class="modern-subnav-btn" id="btn-modsub-concepts" onclick="switchModernSubtab('concepts')">📚 Key Concepts (350+)</button>
+          <button class="modern-subnav-btn" id="btn-modsub-code" onclick="switchModernSubtab('code')">💻 Polyglot Matrix</button>
+          <button class="modern-subnav-btn" id="btn-modsub-arch" onclick="switchModernSubtab('arch')">🏛️ Architecture Hub (16 Specs)</button>
+          <button class="modern-subnav-btn" id="btn-modsub-ai" onclick="switchModernSubtab('ai')">🤖 AI &amp; RAG Stack</button>
+          <button class="modern-subnav-btn" id="btn-modsub-cost" onclick="switchModernSubtab('cost')">💰 Serverless Cost Playbook</button>
+          <button class="modern-subnav-btn" id="btn-modsub-connectors" onclick="switchModernSubtab('connectors')">🌐 Cloud Connectors Matrix</button>
+          <button class="modern-subnav-btn" id="btn-modsub-simulators" onclick="switchModernSubtab('simulators')">⚙️ Live Simulators (6)</button>
+          <button class="modern-subnav-btn" id="btn-modsub-blueprints" onclick="switchModernSubtab('blueprints')">🗺️ Mermaid Blueprints (12)</button>
+        </div>
+
+        <!-- Subview 1: Overview Landing -->
+        <div id="modsub-view-overview" class="modern-subview-panel">
+          <!-- Live Analytics Counters -->
+          <div class="dashboard-metrics-grid" style="margin-bottom: 1.5rem;">
+            <div class="dashboard-metric-card">
+              <div class="metric-val" id="cnt-mod-concepts">350+</div>
+              <div class="metric-label">Key Concepts</div>
+            </div>
+            <div class="dashboard-metric-card">
+              <div class="metric-val" id="cnt-mod-code">30+</div>
+              <div class="metric-label">Polyglot Code Sheets</div>
+            </div>
+            <div class="dashboard-metric-card">
+              <div class="metric-val" id="cnt-mod-blueprints">12</div>
+              <div class="metric-label">Architecture Blueprints</div>
+            </div>
+            <div class="dashboard-metric-card">
+              <div class="metric-val" id="cnt-mod-recipes">15+</div>
+              <div class="metric-label">AI/LLM RAG Recipes</div>
+            </div>
+            <div class="dashboard-metric-card">
+              <div class="metric-val" id="cnt-mod-cost">12</div>
+              <div class="metric-label">Cost Playbooks</div>
+            </div>
+          </div>
+
+          <!-- Interactive Node Canvas -->
+          <div class="modern-stack-canvas">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary); font-weight: 700;">Your AI-Era Data Stack Canvas</h3>
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Click any stage node to inspect production tech choices</span>
+            </div>
+            <div class="canvas-nodes-flow">
+              <div class="canvas-node active" onclick="selectCanvasStage('ingest')">
+                <span class="node-icon">📡</span>
+                <span class="node-title">1. Ingest</span>
+                <div class="node-tech">Kafka · Debezium · DMS</div>
+              </div>
+              <div class="canvas-node" onclick="selectCanvasStage('store')">
+                <span class="node-icon">🪶</span>
+                <span class="node-title">2. Store</span>
+                <div class="node-tech">Delta · Iceberg · S3</div>
+              </div>
+              <div class="canvas-node" onclick="selectCanvasStage('transform')">
+                <span class="node-icon">🚀</span>
+                <span class="node-title">3. Transform</span>
+                <div class="node-tech">Spark 4 · Photon · dbt</div>
+              </div>
+              <div class="canvas-node" onclick="selectCanvasStage('serve')">
+                <span class="node-icon">❄️</span>
+                <span class="node-title">4. Serve</span>
+                <div class="node-tech">Snowflake · DBSQL · DuckDB</div>
+              </div>
+              <div class="canvas-node" onclick="selectCanvasStage('ai')">
+                <span class="node-icon">🤖</span>
+                <span class="node-title">5. AI / RAG</span>
+                <div class="node-tech">Vector Search · MCP · LLM</div>
+              </div>
+            </div>
+            <div id="canvas-stage-detail" class="sim-result-box" style="margin-top: 1rem; background: var(--surface-card);">
+              <strong>Stage 1: Ingestion Architecture</strong><br>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">Log-based CDC via Debezium feeding Kafka event stream with schema registry validation and zero data loss guarantee.</span>
+            </div>
+          </div>
+
+          <!-- 5 Roadmap Cards -->
+          <div class="dashboard-grid">
+            <div class="niche-launcher-card" onclick="switchModernSubtab('concepts')">
+              <span class="launcher-badge" style="background: rgba(52, 199, 89, 0.15); color: var(--accent-green);">Easy</span>
+              <h3 class="niche-card-title">1. Foundations of Modern Data</h3>
+              <p class="niche-card-desc">Distributed systems fundamentals, CAP/PACELC, Parquet/ORC/Avro, compute vs storage separation.</p>
+            </div>
+            <div class="niche-launcher-card" onclick="switchModernSubtab('code')">
+              <span class="launcher-badge" style="background: rgba(0, 113, 227, 0.15); color: var(--apple-blue);">Medium</span>
+              <h3 class="niche-card-title">2. Distributed Compute Engines</h3>
+              <p class="niche-card-desc">Polyglot matrix across Spark 4.x, Databricks Photon, Snowflake, BigQuery, DuckDB, Polars, Trino.</p>
+            </div>
+            <div class="niche-launcher-card" onclick="switchModernSubtab('cost')">
+              <span class="launcher-badge" style="background: rgba(255, 149, 0, 0.15); color: var(--accent-orange);">Hard</span>
+              <h3 class="niche-card-title">3. Serverless Data Architecture</h3>
+              <p class="niche-card-desc">Databricks serverless SQL, Snowflake multi-cluster, Fabric OneLake, BigQuery slots, Firebolt engine v3.</p>
+            </div>
+            <div class="niche-launcher-card" onclick="switchModernSubtab('ai')">
+              <span class="launcher-badge" style="background: rgba(236, 72, 153, 0.15); color: var(--accent-vector);">Architect</span>
+              <h3 class="niche-card-title">4. AI-Native Data Pipelines</h3>
+              <p class="niche-card-desc">Embeddings, Delta Vector Search, RAG patterns, Model Context Protocol (MCP) tool integration.</p>
+            </div>
+            <div class="niche-launcher-card" onclick="switchModernSubtab('arch')">
+              <span class="launcher-badge" style="background: rgba(124, 58, 237, 0.15); color: var(--accent-serverless);">Architect</span>
+              <h3 class="niche-card-title">5. Data Architecture Mastery</h3>
+              <p class="niche-card-desc">Lakehouse selection, Data Mesh, Data Contracts (ODCS), FinOps cost engineering, OpenLineage.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subview 2: Key Concepts -->
+        <div id="modsub-view-concepts" class="modern-subview-panel" style="display: none;">
+          <div class="qa-hfilter-stack" style="margin-bottom: 1.25rem;">
+            <div class="qa-search-wrapper">
+              <input type="text" class="qa-search-input" id="mod-concepts-search" placeholder="Search 350+ concepts, terms, protocols..." oninput="filterModernConcepts()">
+            </div>
+          </div>
+          <div id="mod-concepts-container" class="dashboard-grid"></div>
+        </div>
+
+        <!-- Subview 3: Polyglot Matrix -->
+        <div id="modsub-view-code" class="modern-subview-panel" style="display: none;">
+          <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.75rem;">Polyglot Data Engine Code Matrix</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">Compare identical operations across Python (Polars), PySpark, Spark SQL, Scala, DuckDB, Snowflake, BigQuery, and Trino.</p>
+          <div id="polyglot-matrix-container"></div>
+        </div>
+
+        <!-- Subview 4: Architecture Hub -->
+        <div id="modsub-view-arch" class="modern-subview-panel" style="display: none;">
+          <div class="arch-domains-grid-wrapper">
+            <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 1rem;">16 Architectural Spec Domains</h3>
+            <div id="mod-arch-specs-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;"></div>
+          </div>
+        </div>
+
+        <!-- Subview 5: AI & RAG Stack -->
+        <div id="modsub-view-ai" class="modern-subview-panel" style="display: none;">
+          <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">AI / LLM-Native Recipe Book (SM-2 Flashcards)</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">Master RAG, Embeddings, Vector Search, and Model Context Protocol (MCP) servers.</p>
+          <div id="mod-ai-recipes-container" class="dashboard-grid"></div>
+        </div>
+
+        <!-- Subview 6: Cost Playbook -->
+        <div id="modsub-view-cost" class="modern-subview-panel" style="display: none;">
+          <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">Serverless Cost Optimization Playbooks</h3>
+          <div id="mod-cost-container" class="dashboard-grid"></div>
+        </div>
+
+        <!-- Subview 7: Cloud Connectors -->
+        <div id="modsub-view-connectors" class="modern-subview-panel" style="display: none;">
+          <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">Cloud Engine × Table Format Compatibility Matrix</h3>
+          <div class="polyglot-matrix-table-wrapper">
+            <table class="polyglot-matrix-table">
+              <thead>
+                <tr>
+                  <th>Engine / Service</th>
+                  <th>Delta Lake</th>
+                  <th>Apache Iceberg</th>
+                  <th>Apache Hudi</th>
+                  <th>Native Parquet</th>
+                  <th>Managed Lakehouse</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Databricks</strong></td>
+                  <td>✅ Native (_delta_log)</td>
+                  <td>✅ UniForm / Native</td>
+                  <td>✅ Read Support</td>
+                  <td>✅ Vectorized</td>
+                  <td>Unity Catalog Managed</td>
+                </tr>
+                <tr>
+                  <td><strong>Snowflake</strong></td>
+                  <td>✅ Unmanaged Stage</td>
+                  <td>✅ Iceberg Native Table</td>
+                  <td>⚠️ Via Parquet</td>
+                  <td>✅ Vectorized</td>
+                  <td>Snowflake Managed / S3</td>
+                </tr>
+                <tr>
+                  <td><strong>Google BigQuery</strong></td>
+                  <td>✅ BigLake Delta</td>
+                  <td>✅ BigLake Iceberg</td>
+                  <td>⚠️ BigLake Manifest</td>
+                  <td>✅ Colossus Engine</td>
+                  <td>BigLake Managed</td>
+                </tr>
+                <tr>
+                  <td><strong>DuckDB</strong></td>
+                  <td>✅ delta extension</td>
+                  <td>✅ iceberg extension</td>
+                  <td>⚠️ Parquet direct</td>
+                  <td>✅ Zero-copy Arrow</td>
+                  <td>Embedded / MotherDuck</td>
+                </tr>
+                <tr>
+                  <td><strong>Microsoft Fabric</strong></td>
+                  <td>✅ OneLake Native</td>
+                  <td>✅ Iceberg Shortcut</td>
+                  <td>⚠️ Parquet Shortcut</td>
+                  <td>✅ Direct Lake</td>
+                  <td>OneLake Metastore</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Subview 8: Live Simulators (6 Widgets) -->
+        <div id="modsub-view-simulators" class="modern-subview-panel" style="display: none;">
+          <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 1.25rem;">Interactive Data Architecture Simulators</h3>
+          <div class="simulator-widget-grid">
+            <!-- 1. Shuffle Estimator -->
+            <div class="simulator-card">
+              <div class="simulator-header">
+                <span class="simulator-title">1. Shuffle Size &amp; Partition Estimator</span>
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Input Rows (Millions):</span><span class="sim-val" id="sim-shuffle-rows-val">50M</span></div>
+                <input type="range" class="sim-slider" id="sim-shuffle-rows" min="1" max="500" value="50" oninput="runShuffleSim()">
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Data Skew Factor:</span><span class="sim-val" id="sim-shuffle-skew-val">1.5x</span></div>
+                <input type="range" class="sim-slider" id="sim-shuffle-skew" min="1.0" max="5.0" step="0.1" value="1.5" oninput="runShuffleSim()">
+              </div>
+              <div class="sim-result-box" id="sim-shuffle-result">Predicted Shuffle: ~12.5 GB · Recommended Partitions: 100</div>
+            </div>
+
+            <!-- 2. Delta vs Iceberg Decision Tree -->
+            <div class="simulator-card">
+              <div class="simulator-header">
+                <span class="simulator-title">2. Iceberg vs Delta Selector Tree</span>
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Primary Catalog:</span></div>
+                <select id="sim-tree-catalog" class="qa-search-input" style="font-size: 0.85rem;" onchange="runTreeSim()">
+                  <option value="uc">Unity Catalog / Databricks</option>
+                  <option value="snowflake">Snowflake / Polaris</option>
+                  <option value="nessie">Open Source / Nessie</option>
+                  <option value="fabric">Microsoft Fabric OneLake</option>
+                </select>
+              </div>
+              <div class="sim-result-box" id="sim-tree-result">Recommendation: Delta Lake with UniForm Iceberg compatibility.</div>
+            </div>
+
+            <!-- 3. Serverless Cost Estimator -->
+            <div class="simulator-card">
+              <div class="simulator-header">
+                <span class="simulator-title">3. Serverless Compute Cost Estimator</span>
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Monthly TB Scanned:</span><span class="sim-val" id="sim-cost-tb-val">10 TB</span></div>
+                <input type="range" class="sim-slider" id="sim-cost-tb" min="1" max="100" value="10" oninput="runCostSim()">
+              </div>
+              <div class="sim-result-box" id="sim-cost-result">Estimated Cost: ~$50.00 (BigQuery) | ~$120.00 (DBSQL Serverless)</div>
+            </div>
+
+            <!-- 4. Spark Cluster Configurator -->
+            <div class="simulator-card">
+              <div class="simulator-header">
+                <span class="simulator-title">4. Spark Cluster Configurator</span>
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Worker Nodes:</span><span class="sim-val" id="sim-spark-workers-val">8 Nodes</span></div>
+                <input type="range" class="sim-slider" id="sim-spark-workers" min="2" max="64" value="8" oninput="runSparkConfigSim()">
+              </div>
+              <div class="sim-result-box" id="sim-spark-result">Total Cores: 32 · RAM: 128 GB · Max Throughput: ~2.4 GB/s</div>
+            </div>
+
+            <!-- 5. RAG Pipeline Diagram Builder -->
+            <div class="simulator-card">
+              <div class="simulator-header">
+                <span class="simulator-title">5. RAG Pipeline Builder</span>
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Chunk Size (Tokens):</span><span class="sim-val" id="sim-rag-chunk-val">512 tokens</span></div>
+                <input type="range" class="sim-slider" id="sim-rag-chunk" min="128" max="2048" step="128" value="512" oninput="runRagSim()">
+              </div>
+              <div class="sim-result-box" id="sim-rag-result">Index Density: High Precision · Embed Model: text-embedding-3-small</div>
+            </div>
+
+            <!-- 6. Streaming Watermark Visualizer -->
+            <div class="simulator-card">
+              <div class="simulator-header">
+                <span class="simulator-title">6. Watermark Lateness Visualizer</span>
+              </div>
+              <div class="sim-range-group">
+                <div class="sim-label-row"><span>Allowed Lateness (Mins):</span><span class="sim-val" id="sim-watermark-val">10 Mins</span></div>
+                <input type="range" class="sim-slider" id="sim-watermark" min="1" max="60" value="10" oninput="runWatermarkSim()">
+              </div>
+              <div class="sim-result-box" id="sim-watermark-result">Events lagging > 10m dropped · RocksDB State Size: ~1.2 GB</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subview 9: Mermaid Blueprints (12 Gallery) -->
+        <div id="modsub-view-blueprints" class="modern-subview-panel" style="display: none;">
+          <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">12 Production Architecture Blueprints</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">Interactive Mermaid diagrams with ASCII offline fallbacks, cost bands, and failure-mode analysis.</p>
+          <div id="mod-blueprints-container" class="dashboard-grid"></div>
         </div>
       </section>
 
@@ -4058,6 +4382,7 @@ WHEN NOT MATCHED THEN
   <script src="data_mssql.js"></script>
   <script src="data_python.js"></script>
   <script src="data_personalised.js"></script>
+  <script src="data_modern_stack.js"></script>
   <script src="app.js?v=1.5.0"></script>
   <script src="animations.js?v=1.0"></script>
 </body>
