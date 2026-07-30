@@ -102,10 +102,9 @@
           </svg>
         </button>
       </div>
-      
-      <nav style="width:100%;">
+         <nav style="width:100%;">
         <ul class="nav-links">
-          <!-- Home — Apple SF Symbol House -->
+          <!-- Home -->
           <li class="nav-item">
             <button class="nav-btn active" id="btn-nav-dashboard" data-target="view-dashboard">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.182V20a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-9.818a1.5 1.5 0 0 0-.528-1.135l-7.5-6.522a1.5 1.5 0 0 0-1.944 0l-7.5 6.522A1.5 1.5 0 0 0 3 10.182z"/></svg>
@@ -113,19 +112,15 @@
             </button>
           </li>
 
-          <!-- Learning Paths -->
-          <li class="nav-item">
-            <button class="nav-btn" id="btn-nav-paths" data-target="view-paths">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-              <span class="nav-text">Learning Paths</span>
-            </button>
-          </li>
+          <!-- Group 1: LEARN -->
+          <li class="nav-group-label">Learn</li>
 
           <!-- ① Key Concepts -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-concepts" data-target="view-concepts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
               <span class="nav-text">Key Concepts</span>
+              <span class="nav-diff-pill pill-easy">Easy</span>
             </button>
           </li>
 
@@ -134,6 +129,7 @@
             <button class="nav-btn" id="btn-nav-cheatsheet" data-target="view-cheatsheet">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               <span class="nav-text">Code Practice</span>
+              <span class="nav-diff-pill pill-medium">Medium</span>
             </button>
           </li>
 
@@ -142,6 +138,7 @@
             <button class="nav-btn" id="btn-nav-spark" data-target="view-spark-hub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               <span class="nav-text">Spark Engine</span>
+              <span class="nav-diff-pill pill-medium">Medium</span>
             </button>
           </li>
 
@@ -150,22 +147,31 @@
             <button class="nav-btn" id="btn-nav-modern-stack" data-target="view-modern-stack">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/><circle cx="18" cy="18" r="3"/></svg>
               <span class="nav-text">Modern Data Stack</span>
+              <span class="nav-diff-pill pill-hard">Hard</span>
             </button>
           </li>
+
+          <!-- Group 2: PRACTICE -->
+          <li class="nav-group-label">Practice</li>
 
           <!-- ④ Q&A Prep -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-prep-hub" data-target="view-prep-hub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
               <span class="nav-text">Q&amp;A Prep Hub</span>
+              <span class="nav-diff-pill pill-hard">Hard</span>
             </button>
           </li>
+
+          <!-- Group 3: EXPLORE -->
+          <li class="nav-group-label">Explore</li>
 
           <!-- ⑤ Architecture -->
           <li class="nav-item">
             <button class="nav-btn" id="btn-nav-architecture" data-target="view-architecture">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
               <span class="nav-text">Architecture Hub</span>
+              <span class="nav-diff-pill pill-architect">Architect</span>
             </button>
           </li>
 
@@ -174,6 +180,19 @@
             <button class="nav-btn" id="btn-nav-gcc" data-target="view-gcc">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="10" x2="16.01" y2="10"/></svg>
               <span class="nav-text">Company Research</span>
+              <span class="nav-diff-pill pill-easy">Research</span>
+            </button>
+          </li>
+
+          <!-- Group 4: ACCOUNT -->
+          <li class="nav-group-label">Account</li>
+
+          <!-- Learning Paths -->
+          <li class="nav-item">
+            <button class="nav-btn" id="btn-nav-paths" data-target="view-paths">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span class="nav-text">Learning Paths</span>
+              <span class="nav-diff-pill pill-medium">12 Paths</span>
             </button>
           </li>
 
@@ -185,10 +204,8 @@
             </button>
           </li>
         </ul>
-
-
       </nav>
-         <div class="sidebar-footer">
+      <div class="sidebar-footer">
         <div class="theme-toggle-container">
           <span class="theme-toggle-label">Light Theme</span>
           <button class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Toggle light and dark theme">☀️</button>
@@ -251,199 +268,205 @@
         <button class="mobile-nav-tab" data-target="view-personalised" id="mbn-personalised" style="display: block !important; position: absolute !important; top: 0px !important; left: 45px !important; width: 10px !important; height: 10px !important; pointer-events: auto !important; border: none !important; background: transparent !important; overflow: hidden; font-size: 0px !important; line-height: 0 !important;">Personalised</button>
         <button class="mobile-nav-tab" data-target="view-pyspark" id="mbn-pyspark" style="display: block !important; position: absolute !important; top: 0px !important; left: 60px !important; width: 10px !important; height: 10px !important; pointer-events: auto !important; border: none !important; background: transparent !important; overflow: hidden; font-size: 0px !important; line-height: 0 !important;">PySpark</button>
       </div>
-      
-
 
       <!-- 1. DASHBOARD VIEW -->
       <section class="page-view" id="view-dashboard">
-        <div class="dashboard-hero">
-          <h2 class="dashboard-hero-title">Microsoft Data Platform Architect Preparation</h2>
-          <p class="dashboard-hero-desc">Welcome to the ultimate learning suite for Microsoft Fabric, Azure Data Factory, Power BI, Spark Databricks, and Modern Data Architecture. Master key definitions, coding practices, and system architecture scenarios at scale.</p>
+        <!-- Hero Banner v3 -->
+        <div class="dashboard-hero-v3">
+          <div class="hero-v3-eyebrow">Data Architect Studio · Learning OS</div>
+          <h2 class="hero-v3-title">Microsoft Data Platform Architect Preparation</h2>
+          <p class="hero-v3-subtitle">Master Microsoft Fabric DP-600, Azure DP-203, Databricks Spark, Delta Lake, and Modern Data Architecture with structured concepts, live simulators, and 2,600+ interview Q&amp;As.</p>
+          <div class="hero-v3-creds">
+            <span class="cred-badge">⚡ Fabric DP-600</span>
+            <span class="cred-badge">☁️ Azure DP-203</span>
+            <span class="cred-badge">📊 Power BI PL-300</span>
+            <span class="cred-badge">🔥 Databricks Lakehouse</span>
+            <span class="cred-badge">🤖 AI &amp; RAG Pipelines</span>
+          </div>
+        </div>
+
+        <!-- Continue Learning Band -->
+        <div class="continue-learning-band">
+          <div class="clb-info">
+            <div class="clb-label">Continue Learning</div>
+            <div class="clb-title" id="clb-last-topic">Key Concepts: Lakehouse vs Data Warehouse</div>
+          </div>
+          <div class="clb-progress-wrap">
+            <div class="clb-progress-bar-bg">
+              <div class="clb-progress-bar-fill" style="width: 42%;"></div>
+            </div>
+            <div class="clb-progress-text">Overall Track Completion: 42%</div>
+          </div>
+          <button class="clb-resume-btn" onclick="switchView('view-concepts')">
+            <span>Resume Learning</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
 
         <!-- Dynamic Architect Tip Box -->
-        <div class="dashboard-tip-container" id="dashboard-tip-box" onclick="loadRandomTip()" title="Click to rotate tip">
-          <div class="dashboard-tip-bulb">💡</div>
-          <div class="dashboard-tip-content">
-            <h4>Data Architect Pro Tip of the Day</h4>
-            <p class="dashboard-tip-text" id="dashboard-tip-content-text">Loading premium recommendation...</p>
+        <div class="tip-box-v3" id="dashboard-tip-box" onclick="loadRandomTip()" title="Click to rotate tip">
+          <div class="tip-box-v3-icon">💡</div>
+          <div class="tip-box-v3-body">
+            <h4 class="tip-box-v3-label">Data Architect Pro Tip of the Day</h4>
+            <p class="tip-box-v3-text" id="dashboard-tip-content-text">Loading premium recommendation...</p>
           </div>
         </div>
 
-        <h3 class="dashboard-section-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          Interactive Portal Analytics
-        </h3>
+        <div class="section-divider-v3">
+          <span class="section-divider-v3-text">Portal Analytics</span>
+        </div>
 
-        <!-- Metrics Grid -->
-        <div class="dashboard-metrics-grid">
-          <div class="dashboard-metric-card" onclick="switchView('view-concepts')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
+        <!-- Stat Cards Row v3 -->
+        <div class="stat-cards-row">
+          <div class="stat-card-v3" onclick="switchView('view-concepts')" style="--stat-accent: #16a34a; --stat-icon-bg: rgba(22,163,74,0.1);">
+            <div class="stat-card-icon-v3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>
             </div>
-            <div class="dashboard-metric-info">
-              <span class="dashboard-metric-val" id="metric-concepts">--</span>
-              <span class="dashboard-metric-title">Core Concepts</span>
-            </div>
+            <div class="stat-card-num-v3" id="metric-concepts">--</div>
+            <div class="stat-card-label-v3">Core Concepts</div>
           </div>
           
-          <div class="dashboard-metric-card" onclick="switchView('view-prep-hub')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
+          <div class="stat-card-v3" onclick="switchView('view-prep-hub')" style="--stat-accent: #ea580c; --stat-icon-bg: rgba(234,88,12,0.1);">
+            <div class="stat-card-icon-v3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><circle cx="12" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
             </div>
-            <div class="dashboard-metric-info">
-              <span class="dashboard-metric-val" id="metric-prep-hub">--</span>
-              <span class="dashboard-metric-title">Interview Q&As</span>
-            </div>
+            <div class="stat-card-num-v3" id="metric-prep-hub">--</div>
+            <div class="stat-card-label-v3">Interview Q&amp;As</div>
           </div>
 
-          <div class="dashboard-metric-card" onclick="switchView('view-cheatsheet')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div class="stat-card-v3" onclick="switchView('view-cheatsheet')" style="--stat-accent: #d97706; --stat-icon-bg: rgba(217,119,6,0.1);">
+            <div class="stat-card-icon-v3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </div>
-            <div class="dashboard-metric-info">
-              <span class="dashboard-metric-val" id="metric-code">--</span>
-              <span class="dashboard-metric-title">Coding Sheets</span>
-            </div>
+            <div class="stat-card-num-v3" id="metric-code">--</div>
+            <div class="stat-card-label-v3">Coding Sheets</div>
           </div>
 
-          <div class="dashboard-metric-card" onclick="switchView('view-spark-hub')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <div class="stat-card-v3" onclick="switchView('view-spark-hub')" style="--stat-accent: #ef4444; --stat-icon-bg: rgba(239,68,68,0.1);">
+            <div class="stat-card-icon-v3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             </div>
-            <div class="dashboard-metric-info">
-              <span class="dashboard-metric-val" id="metric-spark">--</span>
-              <span class="dashboard-metric-title">Spark Scenarios</span>
-            </div>
+            <div class="stat-card-num-v3" id="metric-spark">--</div>
+            <div class="stat-card-label-v3">Spark Engine</div>
           </div>
 
-          <div class="dashboard-metric-card" onclick="switchView('view-architecture')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <div class="stat-card-v3" onclick="switchView('view-architecture')" style="--stat-accent: #9333ea; --stat-icon-bg: rgba(147,51,234,0.1);">
+            <div class="stat-card-icon-v3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
-            <div class="dashboard-metric-info">
-              <span class="dashboard-metric-val" id="metric-architecture">--</span>
-              <span class="dashboard-metric-title">Arch Scenarios</span>
-            </div>
+            <div class="stat-card-num-v3" id="metric-architecture">--</div>
+            <div class="stat-card-label-v3">Arch Scenarios</div>
           </div>
 
-          <div class="dashboard-metric-card" onclick="switchView('view-gcc')" style="cursor: pointer;">
-            <div class="dashboard-metric-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="14" x2="16.01" y2="14"/></svg>
+          <div class="stat-card-v3" onclick="switchView('view-gcc')" style="--stat-accent: #0284c7; --stat-icon-bg: rgba(2,132,199,0.1);">
+            <div class="stat-card-icon-v3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="14" x2="16.01" y2="14"/></svg>
             </div>
-            <div class="dashboard-metric-info">
-              <span class="dashboard-metric-val" id="metric-gcc">--</span>
-              <span class="dashboard-metric-title">GCC Firms</span>
-            </div>
+            <div class="stat-card-num-v3" id="metric-gcc">--</div>
+            <div class="stat-card-label-v3">GCC Firms</div>
           </div>
         </div>
 
+        <div class="section-divider-v3">
+          <span class="section-divider-v3-text">Your Guided Curriculum Roadmap</span>
+        </div>
 
-        <!-- Interview Prep Roadmap -->
-        <div class="roadmap-section">
-          <h3 class="dashboard-section-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-            Your Interview Prep Roadmap
-          </h3>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Follow this path from foundational concepts to architect-level design scenarios. Each step builds on the previous.</p>
-
-          <div class="roadmap-grid">
-            <!-- Key Concepts (Easy) -->
-            <div class="roadmap-card roadmap-easy" onclick="switchView('view-concepts')" style="cursor:pointer;">
-              <div class="roadmap-card-body">
-                <div class="roadmap-card-header">
-                  <span class="roadmap-diff-pill roadmap-pill-easy">Easy</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/></svg>
-                </div>
-                <h4>Key Concepts</h4>
-                <p>Master foundational definitions, architectural keywords, and core terminology across Fabric, Power BI, SQL, ADF &amp; Databricks.</p>
-                <div class="roadmap-card-footer">
-                  <span class="roadmap-time">📖 Start Here</span>
-                  <span class="roadmap-arrow">Open →</span>
-                </div>
-              </div>
+        <!-- Roadmap Grid v3 -->
+        <div class="roadmap-grid-v3">
+          <!-- Key Concepts (Easy) -->
+          <div class="roadmap-card-v3 roadmap-v3-easy" onclick="switchView('view-concepts')">
+            <div class="roadmap-v3-top">
+              <span class="roadmap-v3-pill pill-easy">Step 1 · Easy</span>
+              <span class="roadmap-v3-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
             </div>
-
-            <!-- Code Practice (Medium) -->
-            <div class="roadmap-card roadmap-medium" onclick="switchView('view-cheatsheet')" style="cursor:pointer;">
-              <div class="roadmap-card-body">
-                <div class="roadmap-card-header">
-                  <span class="roadmap-diff-pill roadmap-pill-medium">Medium</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                <h4>Code Practice</h4>
-                <p>Hands-on syntax examples for Python Pandas, MS SQL (T-SQL), PySpark, and Spark SQL — real-world data workloads.</p>
-                <div class="roadmap-card-footer">
-                  <span class="roadmap-time">💻 4 Languages</span>
-                  <span class="roadmap-arrow">Open →</span>
-                </div>
-              </div>
+            <h4 class="roadmap-v3-title">Key Concepts</h4>
+            <p class="roadmap-v3-desc">Foundational definitions, architectural keywords, and terminology across Fabric, Power BI, SQL, ADF &amp; Databricks.</p>
+            <div class="roadmap-v3-footer">
+              <span class="roadmap-v3-meta">📖 Start Here</span>
+              <span class="roadmap-v3-arrow">Open →</span>
             </div>
+          </div>
 
-            <!-- Spark Engine (Medium) -->
-            <div class="roadmap-card roadmap-medium" onclick="switchView('view-spark-hub')" style="cursor:pointer;">
-              <div class="roadmap-card-body">
-                <div class="roadmap-card-header">
-                  <span class="roadmap-diff-pill roadmap-pill-medium">Medium</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                </div>
-                <h4>Spark Engine</h4>
-                <p>Deep-dive into Spark execution pipelines, PySpark optimizations, Spark SQL syntax comparisons, and table optimization rules.</p>
-                <div class="roadmap-card-footer">
-                  <span class="roadmap-time">⚡ Engine Internals</span>
-                  <span class="roadmap-arrow">Open →</span>
-                </div>
-              </div>
+          <!-- Code Practice (Medium) -->
+          <div class="roadmap-card-v3 roadmap-v3-medium" onclick="switchView('view-cheatsheet')">
+            <div class="roadmap-v3-top">
+              <span class="roadmap-v3-pill pill-medium">Step 2 · Medium</span>
+              <span class="roadmap-v3-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
             </div>
-
-            <!-- Q&A Prep Hub (Hard) -->
-            <div class="roadmap-card roadmap-hard" onclick="switchView('view-prep-hub')" style="cursor:pointer;">
-              <div class="roadmap-card-body">
-                <div class="roadmap-card-header">
-                  <span class="roadmap-diff-pill roadmap-pill-hard">Hard</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                </div>
-                <h4>Q&amp;A Prep Hub</h4>
-                <p>Search, filter, and study 2,600+ expert-level interview Q&amp;As. Grouped by difficulty — Easy through Architect. Includes Study Mode.</p>
-                <div class="roadmap-card-footer">
-                  <span class="roadmap-time">❓ 2,600+ Q&amp;As</span>
-                  <span class="roadmap-arrow">Open →</span>
-                </div>
-              </div>
+            <h4 class="roadmap-v3-title">Code Practice</h4>
+            <p class="roadmap-v3-desc">Hands-on polyglot syntax for Python Pandas, MS SQL (T-SQL), PySpark, and Spark SQL data workloads.</p>
+            <div class="roadmap-v3-footer">
+              <span class="roadmap-v3-meta">💻 4 Languages</span>
+              <span class="roadmap-v3-arrow">Open →</span>
             </div>
+          </div>
 
-            <!-- Architecture Hub (Architect) -->
-            <div class="roadmap-card roadmap-architect" onclick="switchView('view-architecture')" style="cursor:pointer;">
-              <div class="roadmap-card-body">
-                <div class="roadmap-card-header">
-                  <span class="roadmap-diff-pill roadmap-pill-architect">Architect</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <h4>Architecture Hub</h4>
-                <p>2,400+ advanced design scenarios: Lakehouse, real-time streaming, LLM/RAG pipelines, Terraform IaC, and MPP engine patterns.</p>
-                <div class="roadmap-card-footer">
-                  <span class="roadmap-time">🏗️ 16 Domains</span>
-                  <span class="roadmap-arrow">Open →</span>
-                </div>
-              </div>
+          <!-- Spark Engine (Medium) -->
+          <div class="roadmap-card-v3 roadmap-v3-medium" onclick="switchView('view-spark-hub')">
+            <div class="roadmap-v3-top">
+              <span class="roadmap-v3-pill pill-medium">Step 3 · Medium</span>
+              <span class="roadmap-v3-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </span>
             </div>
-
-            <!-- Company Research -->
-            <div class="roadmap-card roadmap-gcc" onclick="switchView('view-gcc')" style="cursor:pointer;">
-              <div class="roadmap-card-body">
-                <div class="roadmap-card-header">
-                  <span class="roadmap-diff-pill roadmap-pill-gcc">Research</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                </div>
-                <h4>Company Research</h4>
-                <p>Profiles of 55 Global Competency Centers in Hyderabad. Filter by hiring risk tier, sector domain, active tech stacks &amp; addresses.</p>
-                <div class="roadmap-card-footer">
-                  <span class="roadmap-time">🏢 55 GCC Firms</span>
-                  <span class="roadmap-arrow">Open →</span>
-                </div>
-              </div>
+            <h4 class="roadmap-v3-title">Spark Engine</h4>
+            <p class="roadmap-v3-desc">Spark execution pipelines, PySpark optimizations, Spark SQL syntax comparisons, and table rules.</p>
+            <div class="roadmap-v3-footer">
+              <span class="roadmap-v3-meta">⚡ Engine Internals</span>
+              <span class="roadmap-v3-arrow">Open →</span>
             </div>
+          </div>
 
+          <!-- Modern Data Stack (Hard) -->
+          <div class="roadmap-card-v3 roadmap-v3-hard" onclick="switchView('view-modern-stack')">
+            <div class="roadmap-v3-top">
+              <span class="roadmap-v3-pill pill-hard">Step 4 · Hard</span>
+              <span class="roadmap-v3-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/><circle cx="18" cy="18" r="3"/></svg>
+              </span>
+            </div>
+            <h4 class="roadmap-v3-title">Modern Data Stack</h4>
+            <p class="roadmap-v3-desc">Serverless-first, polyglot, AI-native hub: 6 live simulators, 12 Mermaid blueprints &amp; cost playbooks.</p>
+            <div class="roadmap-v3-footer">
+              <span class="roadmap-v3-meta">⚡🌐 Polyglot Matrix</span>
+              <span class="roadmap-v3-arrow">Open →</span>
+            </div>
+          </div>
+
+          <!-- Q&A Prep Hub (Hard) -->
+          <div class="roadmap-card-v3 roadmap-v3-hard" onclick="switchView('view-prep-hub')">
+            <div class="roadmap-v3-top">
+              <span class="roadmap-v3-pill pill-hard">Step 5 · Hard</span>
+              <span class="roadmap-v3-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </span>
+            </div>
+            <h4 class="roadmap-v3-title">Q&amp;A Prep Hub</h4>
+            <p class="roadmap-v3-desc">Search, filter, and study 2,600+ expert-level interview Q&amp;As grouped by difficulty with SM-2 spaced repetition.</p>
+            <div class="roadmap-v3-footer">
+              <span class="roadmap-v3-meta">❓ 2,600+ Q&amp;As</span>
+              <span class="roadmap-v3-arrow">Open →</span>
+            </div>
+          </div>
+
+          <!-- Architecture Hub (Architect) -->
+          <div class="roadmap-card-v3 roadmap-v3-architect" onclick="switchView('view-architecture')">
+            <div class="roadmap-v3-top">
+              <span class="roadmap-v3-pill pill-architect">Step 6 · Architect</span>
+              <span class="roadmap-v3-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+            </div>
+            <h4 class="roadmap-v3-title">Architecture Hub</h4>
+            <p class="roadmap-v3-desc">2,400+ advanced design scenarios: Lakehouse, real-time streaming, LLM/RAG, IaC, and MPP engine patterns.</p>
+            <div class="roadmap-v3-footer">
+              <span class="roadmap-v3-meta">🏗️ 16 Spec Domains</span>
+              <span class="roadmap-v3-arrow">Open →</span>
+            </div>
           </div>
         </div>
       </section>
