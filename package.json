@@ -4,21 +4,22 @@
   "description": "Interactive interview preparation app for Microsoft Fabric, Power BI, ADF, SQL Server, Data Lake, and Apache Spark",
   "private": true,
   "scripts": {
-    "build":          "python3 scripts/compile_db.py",
-    "deploy":         "npx vercel --prod",
+    "dev": "vite",
+    "build:vite": "vite build",
+    "build": "python3 scripts/compile_db.py",
+    "deploy": "npx vercel --prod",
     "deploy:preview": "npx vercel",
-
-    "test":           "node tests/run_tests.js",
-    "test:unit":      "node tests/test_regression_guard.js && node tests/test_snapshot.js",
-    "test:snapshot":  "node tests/test_snapshot.js",
-    "test:components":"node tests/test_components.js",
-    "test:e2e":       "node tests/test_e2e_puppeteer.js",
-    "test:all":       "node tests/run_tests.js && node tests/test_e2e_puppeteer.js",
-
-    "snapshot:update":"node tests/test_snapshot.js --update"
+    "test": "node tests/run_tests.js",
+    "test:unit": "node tests/test_regression_guard.js && node tests/test_snapshot.js",
+    "test:snapshot": "node tests/test_snapshot.js",
+    "test:components": "node tests/test_components.js",
+    "test:e2e": "node tests/test_e2e_puppeteer.js",
+    "test:all": "node tests/run_tests.js && node tests/test_e2e_puppeteer.js",
+    "snapshot:update": "node tests/test_snapshot.js --update"
   },
   "devDependencies": {
-    "jsdom":      "^29.1.1",
-    "puppeteer":  "^25.1.0"
+    "jsdom": "^29.1.1",
+    "puppeteer": "^25.1.0",
+    "vite": "^8.2.0"
   }
 }

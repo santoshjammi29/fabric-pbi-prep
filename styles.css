@@ -10641,3 +10641,158 @@ mjx-container, .MathJax, .MathJax_Display, .MJX_TEX, mjx-math, .MathJax_Math, .M
 }
 
 
+
+
+/* ==========================================================================
+   PAIN POINT FIXES - All 18 issues resolved (A-R)
+   Applied: 2026-08-01
+   ========================================================================== */
+
+/* FIX A: Unified card padding - all card types normalized to 1.5rem (24px) */
+.simulator-card,
+.learning-path-card,
+.gcc-card,
+.roadmap-card-v3,
+.stat-card-v3,
+.spark-milestone-card,
+.niche-card,
+.arch-scenario-card,
+.concept-card,
+.path-card,
+.path-card-v2 {
+  padding: 1.5rem !important;
+}
+
+/* FIX J: Floating dock - prevent content overlap */
+body {
+  scroll-padding-bottom: 80px;
+}
+.main-content {
+  padding-bottom: 80px;
+}
+@media (max-width: 767px) {
+  .bottom-mini-player {
+    right: 0.75rem;
+    left: 0.75rem;
+    max-width: none;
+    bottom: 4.5rem;
+  }
+}
+
+/* FIX K: WCAG badge-risk - shape + icon + text (not color-only) */
+.badge-risk {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.3em;
+}
+.badge-risk-low::before { content: "CHECK "; font-size: 0.8em; font-weight: 900; }
+.badge-risk-med::before { content: "WARN "; font-size: 0.75em; font-weight: 900; }
+.badge-risk-high::before { content: "HIGH "; font-size: 0.75em; font-weight: 900; }
+
+/* FIX L: Polyglot matrix - responsive collapse */
+@media (max-width: 1023px) {
+  .polyglot-matrix-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .polyglot-matrix-table { min-width: 640px; }
+}
+@media (max-width: 767px) {
+  .polyglot-matrix-table { min-width: 560px; font-size: 0.75rem; }
+  .polyglot-matrix-table th, .polyglot-matrix-table td { padding: 0.5rem 0.65rem; }
+}
+
+/* FIX M: 5-stage pipeline - horizontal scroll instead of wrapping */
+@media (max-width: 767px) {
+  .canvas-nodes-flow {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+    gap: 0.75rem;
+    justify-content: flex-start !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--card-border) transparent;
+  }
+  .canvas-node {
+    flex: 0 0 auto !important;
+    min-width: 120px !important;
+    max-width: 130px;
+  }
+}
+
+/* FIX N: GCC table - card collapse on mobile */
+@media (max-width: 700px) {
+  .gcc-table-wrapper { overflow-x: hidden; }
+  .gcc-table thead { display: none; }
+  .gcc-table, .gcc-table tbody, .gcc-table tr, .gcc-table td {
+    display: block;
+    width: 100%;
+  }
+  .gcc-table tr {
+    background: var(--surface-card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: var(--glass-shadow);
+  }
+  .gcc-table td { padding: 0.25rem 0; border: none; font-size: 0.85rem; }
+  .gcc-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* FIX P: Spacing scale tokens */
+:root {
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+}
+
+/* FIX R: Spark Hub - reconnect to global design system */
+#view-spark-hub .spark-hero-banner {
+  background: var(--surface-card);
+  border: 1px solid var(--card-border);
+  backdrop-filter: var(--glass-card);
+}
+#view-spark-hub .page-header {
+  border-bottom: 1px solid var(--card-border);
+  background: transparent;
+}
+
+/* FIX O: Theme toggle - accessible button */
+.theme-toggle-btn, .mobile-theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--item-bg);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.theme-toggle-btn:hover, .mobile-theme-btn:hover {
+  background: rgba(52, 199, 89, 0.15);
+}
+
+/* WCAG 2.2 - Focus visible everywhere (2.4.11) */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

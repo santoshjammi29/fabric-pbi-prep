@@ -80,7 +80,9 @@
         </div>
       </div>
       <div class="mobile-top-actions">
-        <button class="mobile-theme-btn" id="btn-mobile-theme" aria-label="Toggle light and dark theme">☀️</button>
+        <button class="mobile-theme-btn" id="btn-mobile-theme" aria-label="Toggle light and dark theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
       </div>
     </header>
 
@@ -217,7 +219,9 @@
       <div class="sidebar-footer">
         <div class="theme-toggle-container">
           <span class="theme-toggle-label">Light Theme</span>
-          <button class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Toggle light and dark theme">☀️</button>
+          <button class="theme-toggle-btn" id="btn-theme-toggle" aria-label="Toggle light and dark theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
         </div>
       </div>
       <div class="sidebar-resizer" id="sidebar-resizer" title="Drag to resize sidebar"></div>
@@ -1616,7 +1620,7 @@ spark = SparkSession.builder.appName("ArchitectMatrix").getOrCreate()
 windowSpec = Window.partitionBy("department_id").orderBy(F.col("salary").desc())
 df_ranked = spark.read.parquet("hdfs:///data/employees") \
     .withColumn("rank", F.rank().over(windowSpec)) \
-    .filter(F.col("rank") <= 3)</pre>
+    .filter(F.col("rank") &lt;= 3)</pre>
                     </div>
                     <div id="lang-panel-scala" style="display: none; flex-direction: column; gap: 0.5rem;">
                       <div class="spark-lang-panel-header">
@@ -1845,7 +1849,7 @@ Dataset&lt;Row&gt; result = df.withColumn("rank", rank().over(windowSpec)).filte
           <div id="view-pyspark" class="spark-hub-subview hidden">
             <div class="pyspark-header-meta" style="margin-top: -1rem; margin-bottom: 1.5rem;">
               <span class="pyspark-version-badge">Spark 3.4 → 4.0</span>
-              <span class="pyspark-level-count">32 Levels · 4 Phases</span>
+              <span class="pyspark-level-count" id="pyspark-level-count">32 Levels · 4 Phases</span>
             </div>
             
 
@@ -2795,7 +2799,7 @@ def execute_pipeline(source_df: DataFrame) -&gt; DataFrame:
         <div id="view-sparksql" class="spark-hub-subview hidden">
           <div class="sparksql-header-meta" style="margin-top: -1rem; margin-bottom: 1.5rem;">
             <span class="pyspark-version-badge">Spark 3.4 → 4.0</span>
-            <span class="pyspark-level-count">36 Levels · 4 Phases</span>
+            <span class="pyspark-level-count" id="sparksql-level-count">28 Levels · 4 Phases</span>
           </div>
           
           <div class="sparksql-content">
@@ -3293,12 +3297,12 @@ WHEN NOT MATCHED THEN
               </thead>
               <tbody>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">JPMorgan Chase</td>
-                  <td>Banking / Fintech</td>
-                  <td class="salary-range">₹30L - ₹42L</td>
-                  <td class="justification">Highly insulated; treats India as a primary tech engine. Active cloud expansion.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">JPMorgan Chase</td>
+                  <td data-label="Sector">Banking / Fintech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹30L - ₹42L</td>
+                  <td class="justification" data-label="Stability & Risk">Highly insulated; treats India as a primary tech engine. Active cloud expansion.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.jpmorganchase.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3306,12 +3310,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">DBS Tech India</td>
-                  <td>Banking / BFSI</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Strong regional digital bank hub; consistently scaling local infrastructure.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">DBS Tech India</td>
+                  <td data-label="Sector">Banking / BFSI</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Strong regional digital bank hub; consistently scaling local infrastructure.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.dbs.com/careers/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3319,12 +3323,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Standard Chartered</td>
-                  <td>Banking / BFSI</td>
-                  <td class="salary-range">₹24L - ₹34L</td>
-                  <td class="justification">Steady enterprise cloud migration pipelines; zero major tech layoffs locally.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Standard Chartered</td>
+                  <td data-label="Sector">Banking / BFSI</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Steady enterprise cloud migration pipelines; zero major tech layoffs locally.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.sc.com/en/careers/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3332,12 +3336,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">MassMutual India</td>
-                  <td>Insurance / FinTech</td>
-                  <td class="salary-range">₹24L - ₹36L</td>
-                  <td class="justification">Growing insurance tech hub with a stable, long-term roadmap.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">MassMutual India</td>
+                  <td data-label="Sector">Insurance / FinTech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Growing insurance tech hub with a stable, long-term roadmap.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.massmutualindia.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3345,12 +3349,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">MetLife GCC</td>
-                  <td>Insurance / BFSI</td>
-                  <td class="salary-range">₹23L - ₹34L</td>
-                  <td class="justification">High enterprise stability; predictable back-office cloud operations.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">MetLife GCC</td>
+                  <td data-label="Sector">Insurance / BFSI</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹23L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">High enterprise stability; predictable back-office cloud operations.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.metlife.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3358,12 +3362,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">State Street</td>
-                  <td>Asset Management</td>
-                  <td class="salary-range">₹24L - ₹34L</td>
-                  <td class="justification">Reliable asset management tech pipelines; safe operations footprint.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">State Street</td>
+                  <td data-label="Sector">Asset Management</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Reliable asset management tech pipelines; safe operations footprint.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.statestreet.com/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3371,12 +3375,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Vanguard</td>
-                  <td>Asset Management</td>
-                  <td class="salary-range">₹28L - ₹40L</td>
-                  <td class="justification">Active investment tech hub development; well-capitalized enterprise.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Vanguard</td>
+                  <td data-label="Sector">Asset Management</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹28L - ₹40L</td>
+                  <td class="justification" data-label="Stability & Risk">Active investment tech hub development; well-capitalized enterprise.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.vanguardjobs.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3384,12 +3388,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Invesco</td>
-                  <td>Asset Management</td>
-                  <td class="salary-range">₹24L - ₹35L</td>
-                  <td class="justification">Stable, long-standing structural presence in Hyderabad.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Invesco</td>
+                  <td data-label="Sector">Asset Management</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹35L</td>
+                  <td class="justification" data-label="Stability & Risk">Stable, long-standing structural presence in Hyderabad.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.invesco.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3397,12 +3401,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Novartis</td>
-                  <td>Pharma / Life Sciences</td>
-                  <td class="salary-range">₹24L - ₹35L</td>
-                  <td class="justification">Highly insulated from tech cycles; cloud data groups are operationally critical.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Novartis</td>
+                  <td data-label="Sector">Pharma / Life Sciences</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹35L</td>
+                  <td class="justification" data-label="Stability & Risk">Highly insulated from tech cycles; cloud data groups are operationally critical.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.novartis.com/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3410,12 +3414,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Sanofi</td>
-                  <td>Pharma / Healthcare</td>
-                  <td class="salary-range">₹24L - ₹36L</td>
-                  <td class="justification">Rapidly expanding India data footprint; safe healthcare sector asset.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Sanofi</td>
+                  <td data-label="Sector">Pharma / Healthcare</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Rapidly expanding India data footprint; safe healthcare sector asset.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.sanofi.com/en/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3423,12 +3427,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Eli Lilly</td>
-                  <td>Pharma / Healthcare</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">Expanding aggressively with a heavy focus on cloud automation pipelines.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Eli Lilly</td>
+                  <td data-label="Sector">Pharma / Healthcare</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">Expanding aggressively with a heavy focus on cloud automation pipelines.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.lilly.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3436,12 +3440,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Bristol Myers Squibb</td>
-                  <td>Pharma / Biotech</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Brand-new state-of-the-art center in Hyderabad; high hiring velocity.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Bristol Myers Squibb</td>
+                  <td data-label="Sector">Pharma / Biotech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Brand-new state-of-the-art center in Hyderabad; high hiring velocity.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.bms.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3449,12 +3453,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">PepsiCo GBS</td>
-                  <td>FMCG / Consumer</td>
-                  <td class="salary-range">₹24L - ₹36L</td>
-                  <td class="justification">Highly resilient; global supply chain analytics are heavily centralized here.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">PepsiCo GBS</td>
+                  <td data-label="Sector">FMCG / Consumer</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Highly resilient; global supply chain analytics are heavily centralized here.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.pepsicojobs.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3462,12 +3466,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Costco Wholesale</td>
-                  <td>Retail / E-com</td>
-                  <td class="salary-range">₹25L - ₹37L</td>
-                  <td class="justification">Highly stable traditional retail model; very low historical attrition.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Costco Wholesale</td>
+                  <td data-label="Sector">Retail / E-com</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹37L</td>
+                  <td class="justification" data-label="Stability & Risk">Highly stable traditional retail model; very low historical attrition.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.costco.com/jobs.html" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3475,12 +3479,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">McDonald's Studio</td>
-                  <td>Retail / QSR Tech</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">Dedicated retail-tech investments; insulated from standard software downcycles.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">McDonald's Studio</td>
+                  <td data-label="Sector">Retail / QSR Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">Dedicated retail-tech investments; insulated from standard software downcycles.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.mcdonalds.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3488,12 +3492,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Inspire Brands</td>
-                  <td>Retail / QSR Tech</td>
-                  <td class="salary-range">₹24L - ₹34L</td>
-                  <td class="justification">Steady multi-brand digital growth; growing tech capture center.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Inspire Brands</td>
+                  <td data-label="Sector">Retail / QSR Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Steady multi-brand digital growth; growing tech capture center.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.inspirebrands.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3501,12 +3505,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Bosch Engineering</td>
-                  <td>Automotive / Industrial</td>
-                  <td class="salary-range">₹22L - ₹34L</td>
-                  <td class="justification">Deeply anchored R&D center; stable industrial cloud/IoT tracking.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Bosch Engineering</td>
+                  <td data-label="Sector">Automotive / Industrial</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹22L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Deeply anchored R&D center; stable industrial cloud/IoT tracking.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.bosch.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3514,12 +3518,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Hyundai R&D</td>
-                  <td>Automotive / Industrial</td>
-                  <td class="salary-range">₹20L - ₹32L</td>
-                  <td class="justification">Stable; focusing heavy capital into next-gen connected mobility software.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Hyundai R&D</td>
+                  <td data-label="Sector">Automotive / Industrial</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹20L - ₹32L</td>
+                  <td class="justification" data-label="Stability & Risk">Stable; focusing heavy capital into next-gen connected mobility software.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.hyundai.com/in/en/hyundai-story/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3527,12 +3531,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">ArcelorMittal (AMGBT)</td>
-                  <td>Heavy Industry</td>
-                  <td class="salary-range">₹22L - ₹34L</td>
-                  <td class="justification">Traditional manufacturing sector; tech teams are lean and well-insulated.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">ArcelorMittal (AMGBT)</td>
+                  <td data-label="Sector">Heavy Industry</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹22L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Traditional manufacturing sector; tech teams are lean and well-insulated.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://corporate.arcelormittal.com/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3540,12 +3544,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Heineken</td>
-                  <td>Consumer Goods</td>
-                  <td class="salary-range">₹23L - ₹34L</td>
-                  <td class="justification">Emerging hub in Hyderabad with highly stable growth projections.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Heineken</td>
+                  <td data-label="Sector">Consumer Goods</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹23L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Emerging hub in Hyderabad with highly stable growth projections.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.theheinekencompany.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3553,12 +3557,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">L'Oréal</td>
-                  <td>Consumer Goods</td>
-                  <td class="salary-range">₹24L - ₹35L</td>
-                  <td class="justification">Expanding consumer data analytics frameworks; safe corporate domain.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">L'Oréal</td>
+                  <td data-label="Sector">Consumer Goods</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹35L</td>
+                  <td class="justification" data-label="Stability & Risk">Expanding consumer data analytics frameworks; safe corporate domain.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.loreal.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3566,12 +3570,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">TMUS Global Solutions</td>
-                  <td>Telecom / Wireless</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Telecommunications data infrastructure remains structurally insulated.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">TMUS Global Solutions</td>
+                  <td data-label="Sector">Telecom / Wireless</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Telecommunications data infrastructure remains structurally insulated.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.t-mobile.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3579,12 +3583,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Wells Fargo</td>
-                  <td>Banking / Fintech</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">Managed through global efficiency drives, but local data groups remain net-hirers.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Wells Fargo</td>
+                  <td data-label="Sector">Banking / Fintech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">Managed through global efficiency drives, but local data groups remain net-hirers.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.wellsfargojobs.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3592,12 +3596,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Bank of America</td>
-                  <td>Banking / BFSI</td>
-                  <td class="salary-range">₹26L - ₹37L</td>
-                  <td class="justification">Stable headcounts; relies mostly on natural attrition management rather than cuts.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Bank of America</td>
+                  <td data-label="Sector">Banking / BFSI</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹37L</td>
+                  <td class="justification" data-label="Stability & Risk">Stable headcounts; relies mostly on natural attrition management rather than cuts.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.bankofamerica.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3605,12 +3609,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Barclays</td>
-                  <td>Banking / BFSI</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Minor periodic banking re-alignments; data pipeline hiring stays steady.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Barclays</td>
+                  <td data-label="Sector">Banking / BFSI</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Minor periodic banking re-alignments; data pipeline hiring stays steady.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://search.jobs.barclays/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3618,12 +3622,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">SAP Labs</td>
-                  <td>Enterprise Software</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Global shift toward cloud/AI caused restructuring, but local tech impact was low.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">SAP Labs</td>
+                  <td data-label="Sector">Enterprise Software</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Global shift toward cloud/AI caused restructuring, but local tech impact was low.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.sap.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3631,12 +3635,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Oracle India</td>
-                  <td>Enterprise Software</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">Localized adjustments in older product divisions; cloud infrastructure is safe.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Oracle India</td>
+                  <td data-label="Sector">Enterprise Software</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">Localized adjustments in older product divisions; cloud infrastructure is safe.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.oracle.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3644,12 +3648,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Adobe</td>
-                  <td>Tech / Creative Cloud</td>
-                  <td class="salary-range">₹30L - ₹44L</td>
-                  <td class="justification">Highly selective hiring bar; managed to bypass mass tech layoffs.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Adobe</td>
+                  <td data-label="Sector">Tech / Creative Cloud</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹30L - ₹44L</td>
+                  <td class="justification" data-label="Stability & Risk">Highly selective hiring bar; managed to bypass mass tech layoffs.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.adobe.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3657,12 +3661,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Medtronic</td>
-                  <td>Healthcare / Medical</td>
-                  <td class="salary-range">₹24L - ₹35L</td>
-                  <td class="justification">Navigated corporate cost-containment; local R&D hubs remain stable.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Medtronic</td>
+                  <td data-label="Sector">Healthcare / Medical</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹35L</td>
+                  <td class="justification" data-label="Stability & Risk">Navigated corporate cost-containment; local R&D hubs remain stable.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.medtronic.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3670,12 +3674,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Boeing India</td>
-                  <td>Aerospace / Eng</td>
-                  <td class="salary-range">₹26L - ₹37L</td>
-                  <td class="justification">Subject to global manufacturing bottlenecks; engineering hiring is surgical.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Boeing India</td>
+                  <td data-label="Sector">Aerospace / Eng</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹37L</td>
+                  <td class="justification" data-label="Stability & Risk">Subject to global manufacturing bottlenecks; engineering hiring is surgical.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.boeing.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3683,12 +3687,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Walmart Global Tech</td>
-                  <td>Retail / E-com</td>
-                  <td class="salary-range">₹30L - ₹44L</td>
-                  <td class="justification">Trimmed select non-core global teams; core cloud data platforms remain critical.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Walmart Global Tech</td>
+                  <td data-label="Sector">Retail / E-com</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹30L - ₹44L</td>
+                  <td class="justification" data-label="Stability & Risk">Trimmed select non-core global teams; core cloud data platforms remain critical.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.walmart.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3696,12 +3700,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Target India</td>
-                  <td>Retail / E-com</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">Cautious, steady hiring; functions as a core global innovation asset.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Target India</td>
+                  <td data-label="Sector">Retail / E-com</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">Cautious, steady hiring; functions as a core global innovation asset.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.target.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3709,12 +3713,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Lowe's India</td>
-                  <td>Retail / E-com</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Steady tracking on retail cloud infra; avoiding volatile spikes.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Lowe's India</td>
+                  <td data-label="Sector">Retail / E-com</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Steady tracking on retail cloud infra; avoiding volatile spikes.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://talent.lowes.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3722,12 +3726,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Tesco</td>
-                  <td>Retail / E-com</td>
-                  <td class="salary-range">₹24L - ₹35L</td>
-                  <td class="justification">Cautious but steady retail infrastructure operation.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Tesco</td>
+                  <td data-label="Sector">Retail / E-com</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹35L</td>
+                  <td class="justification" data-label="Stability & Risk">Cautious but steady retail infrastructure operation.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.tesco-careers.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3735,12 +3739,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Thomson Reuters</td>
-                  <td>Legal / Media Tech</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">Moderate hiring pace centered on upgrading to cloud data systems.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Thomson Reuters</td>
+                  <td data-label="Sector">Legal / Media Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Moderate hiring pace centered on upgrading to cloud data systems.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.thomsonreuters.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3748,12 +3752,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">ServiceNow</td>
-                  <td>Technology / SaaS</td>
-                  <td class="salary-range">₹28L - ₹42L</td>
-                  <td class="justification">Strong platform growth; highly selective but fundamentally secure.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">ServiceNow</td>
+                  <td data-label="Sector">Technology / SaaS</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹28L - ₹42L</td>
+                  <td class="justification" data-label="Stability & Risk">Strong platform growth; highly selective but fundamentally secure.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.servicenow.com/careers.html" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3761,12 +3765,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Microsoft IDC ⚠️</td>
-                  <td>Technology / SaaS</td>
-                  <td class="salary-range">₹35L - ₹48L</td>
-                  <td class="justification">**Impacted:** Broad global restructuring rounds; local hiring is extremely lean.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Microsoft IDC ⚠️</td>
+                  <td data-label="Sector">Technology / SaaS</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹35L - ₹48L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Broad global restructuring rounds; local hiring is extremely lean.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.microsoft.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3774,12 +3778,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Google India ⚠️</td>
-                  <td>Technology / Cloud</td>
-                  <td class="salary-range">₹38L - ₹52L</td>
-                  <td class="justification">**Impacted:** Global engineering and cloud divisions saw verified downsizing.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Google India ⚠️</td>
+                  <td data-label="Sector">Technology / Cloud</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹38L - ₹52L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Global engineering and cloud divisions saw verified downsizing.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.google.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3787,12 +3791,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Amazon India (AWS) ⚠️</td>
-                  <td>Technology / E-com</td>
-                  <td class="salary-range">₹34L - ₹46L</td>
-                  <td class="justification">**Impacted:** Multiple significant layoff waves across AWS and corporate operations.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Amazon India (AWS) ⚠️</td>
+                  <td data-label="Sector">Technology / E-com</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹34L - ₹46L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Multiple significant layoff waves across AWS and corporate operations.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.amazon.jobs/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3800,12 +3804,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Salesforce ⚠️</td>
-                  <td>Technology / CRM</td>
-                  <td class="salary-range">₹28L - ₹40L</td>
-                  <td class="justification">**Impacted:** Global headcount reductions (~10%) hit product and integration lines.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Salesforce ⚠️</td>
+                  <td data-label="Sector">Technology / CRM</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹28L - ₹40L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Global headcount reductions (~10%) hit product and integration lines.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.salesforce.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3813,12 +3817,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Intel India ⚠️</td>
-                  <td>Semiconductor / Tech</td>
-                  <td class="salary-range">₹28L - ₹39L</td>
-                  <td class="justification">**Impacted:** Heavy company-wide cost cutting and global workforce downsizings.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Intel India ⚠️</td>
+                  <td data-label="Sector">Semiconductor / Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹28L - ₹39L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Heavy company-wide cost cutting and global workforce downsizings.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.intel.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3826,12 +3830,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Micron Technology ⚠️</td>
-                  <td>Semiconductor / Tech</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">**Impacted:** Vulnerable to severe hardware/memory cycle market drops.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Micron Technology ⚠️</td>
+                  <td data-label="Sector">Semiconductor / Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Vulnerable to severe hardware/memory cycle market drops.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.micron.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3839,12 +3843,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Optum (UnitedHealth)⚠️</td>
-                  <td>Healthcare / BFSI</td>
-                  <td class="salary-range">₹25L - ₹36L</td>
-                  <td class="justification">**Impacted:** Restructuring within its massive technology and optimization sub-units.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Optum (UnitedHealth)⚠️</td>
+                  <td data-label="Sector">Healthcare / BFSI</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹25L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Restructuring within its massive technology and optimization sub-units.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.unitedhealthgroup.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3852,12 +3856,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Goldman Sachs ⚠️</td>
-                  <td>Banking / Fintech</td>
-                  <td class="salary-range">₹32L - ₹45L</td>
-                  <td class="justification">**Impacted:** Active global performance-related role eliminations ("unmapping").</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Goldman Sachs ⚠️</td>
+                  <td data-label="Sector">Banking / Fintech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹32L - ₹45L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Active global performance-related role eliminations ("unmapping").</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.goldmansachs.com/careers/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3865,12 +3869,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">ZF Group / Lifetec ⚠️</td>
-                  <td>Automotive / Industrial</td>
-                  <td class="salary-range">₹22L - ₹33L</td>
-                  <td class="justification">**Impacted:** Massive corporate structural cost-cutting directives issued out of Europe.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">ZF Group / Lifetec ⚠️</td>
+                  <td data-label="Sector">Automotive / Industrial</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹22L - ₹33L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Massive corporate structural cost-cutting directives issued out of Europe.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.zf.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3878,12 +3882,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Fiserv ⚠️</td>
-                  <td>FinTech / Payments</td>
-                  <td class="salary-range">₹23L - ₹34L</td>
-                  <td class="justification">**Impacted:** Post-acquisition operational flattening and team consolidations.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Fiserv ⚠️</td>
+                  <td data-label="Sector">FinTech / Payments</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹23L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Post-acquisition operational flattening and team consolidations.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.fiserv.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3891,12 +3895,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="High Risk">
-                  <td><span class="badge-risk badge-risk-high">High Risk</span></td>
-                  <td class="company-name">Uber Technology ⚠️</td>
-                  <td>Tech / Mobility</td>
-                  <td class="salary-range">₹32L - ₹45L</td>
-                  <td class="justification">**Impacted:** Historically aggressive trims; operates a very lean engineering model.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
+                  <td class="company-name" data-label="Company">Uber Technology ⚠️</td>
+                  <td data-label="Sector">Tech / Mobility</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹32L - ₹45L</td>
+                  <td class="justification" data-label="Stability & Risk">**Impacted:** Historically aggressive trims; operates a very lean engineering model.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.uber.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3904,12 +3908,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Vanguard India</td>
-                  <td>FinTech / Asset Mgmt</td>
-                  <td class="salary-range">₹28L - ₹40L</td>
-                  <td class="justification">Newly launched (late 2025); heavy focus on cloud engineering, analytics, and cybersecurity. Actively growing headcount.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Vanguard India</td>
+                  <td data-label="Sector">FinTech / Asset Mgmt</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹28L - ₹40L</td>
+                  <td class="justification" data-label="Stability & Risk">Newly launched (late 2025); heavy focus on cloud engineering, analytics, and cybersecurity. Actively growing headcount.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.vanguardjobs.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3917,12 +3921,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Novartis GCC</td>
-                  <td>Pharma / Life Sciences</td>
-                  <td class="salary-range">₹24L - ₹35L</td>
-                  <td class="justification">Highly insulated from tech cycles; cloud data groups are operationally critical.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Novartis GCC</td>
+                  <td data-label="Sector">Pharma / Life Sciences</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹35L</td>
+                  <td class="justification" data-label="Stability & Risk">Highly insulated from tech cycles; cloud data groups are operationally critical.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.novartis.com/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3930,12 +3934,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">MSD (Merck) Tech Centre</td>
-                  <td>Pharma / Drug Discovery</td>
-                  <td class="salary-range">₹26L - ₹38L</td>
-                  <td class="justification">New 2025 GTC; building AWS Databricks lakehouse and data observability platforms for drug discovery pipelines.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">MSD (Merck) Tech Centre</td>
+                  <td data-label="Sector">Pharma / Drug Discovery</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹26L - ₹38L</td>
+                  <td class="justification" data-label="Stability & Risk">New 2025 GTC; building AWS Databricks lakehouse and data observability platforms for drug discovery pipelines.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://jobs.merck.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3943,12 +3947,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Low Risk">
-                  <td><span class="badge-risk badge-risk-low">Low Risk</span></td>
-                  <td class="company-name">Regeneron GCC</td>
-                  <td>Biotech / Life Sciences</td>
-                  <td class="salary-range">₹30L - ₹44L</td>
-                  <td class="justification">First international GCC (May 2026); clinical AI &amp; data engineering at 7-10+ yr experience. Highly stable pharma anchor.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-low">Low Risk</span></td>
+                  <td class="company-name" data-label="Company">Regeneron GCC</td>
+                  <td data-label="Sector">Biotech / Life Sciences</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹30L - ₹44L</td>
+                  <td class="justification" data-label="Stability & Risk">First international GCC (May 2026); clinical AI &amp; data engineering at 7-10+ yr experience. Highly stable pharma anchor.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.regeneron.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3956,12 +3960,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">AHEAD</td>
-                  <td>Cloud / Digital Services</td>
-                  <td class="salary-range">₹22L - ₹34L</td>
-                  <td class="justification">Opened 2024; cross-client data engineering on Snowflake, BigQuery, dbt, and GenAI/RAG pipelines. Hiring 4-7+ yr engineers.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">AHEAD</td>
+                  <td data-label="Sector">Cloud / Digital Services</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹22L - ₹34L</td>
+                  <td class="justification" data-label="Stability & Risk">Opened 2024; cross-client data engineering on Snowflake, BigQuery, dbt, and GenAI/RAG pipelines. Hiring 4-7+ yr engineers.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.thinkahead.com/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3969,12 +3973,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Cohere Health GCC</td>
-                  <td>Healthcare / AI Tech</td>
-                  <td class="salary-range">₹24L - ₹36L</td>
-                  <td class="justification">Opened Feb 2026; building healthcare data platforms (EMR, claims) on AWS PySpark. Hires 4-9+ yr data engineers.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Cohere Health GCC</td>
+                  <td data-label="Sector">Healthcare / AI Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹24L - ₹36L</td>
+                  <td class="justification" data-label="Stability & Risk">Opened Feb 2026; building healthcare data platforms (EMR, claims) on AWS PySpark. Hires 4-9+ yr data engineers.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.coherehealth.com/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3982,12 +3986,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">Stolt-Nielsen Digital</td>
-                  <td>Logistics / Maritime Tech</td>
-                  <td class="salary-range">₹20L - ₹32L</td>
-                  <td class="justification">Digital Innovation Centre; Azure Databricks Medallion architecture. 3-10+ yr levels for data and BI engineers.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">Stolt-Nielsen Digital</td>
+                  <td data-label="Sector">Logistics / Maritime Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹20L - ₹32L</td>
+                  <td class="justification" data-label="Stability & Risk">Digital Innovation Centre; Azure Databricks Medallion architecture. 3-10+ yr levels for data and BI engineers.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://www.stolt-nielsen.com/en/careers" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -3995,12 +3999,12 @@ WHEN NOT MATCHED THEN
                   </td>
                 </tr>
                 <tr data-risk="Medium Risk">
-                  <td><span class="badge-risk badge-risk-med">Medium Risk</span></td>
-                  <td class="company-name">isolved (HR Tech GCC)</td>
-                  <td>HR / SaaS / Payroll Tech</td>
-                  <td class="salary-range">₹18L - ₹30L</td>
-                  <td class="justification">Largest US expansion outside the US; .NET/C#, SQL Server, Azure microservices. 1-10+ yr range across all engineering levels.</td>
-                  <td>
+                  <td data-label="Risk Level"><span class="badge-risk badge-risk-med">Medium Risk</span></td>
+                  <td class="company-name" data-label="Company">isolved (HR Tech GCC)</td>
+                  <td data-label="Sector">HR / SaaS / Payroll Tech</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹18L - ₹30L</td>
+                  <td class="justification" data-label="Stability & Risk">Largest US expansion outside the US; .NET/C#, SQL Server, Azure microservices. 1-10+ yr range across all engineering levels.</td>
+                  <td data-label="Jobs Portal">
                     <a href="https://careers.isolvedhcm.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -4441,7 +4445,7 @@ WHEN NOT MATCHED THEN
       <div class="dialog-header">
         <div class="dialog-title-container">
           <span class="dialog-category-tag" id="dialog-category">Fabric</span>
-          <h3 class="dialog-title" id="dialog-q-text">Question detail text goes here</h3>
+          <h3 class="dialog-title" id="dialog-q-text"></h3>
         </div>
         <button class="dialog-close-btn" id="btn-dialog-close" aria-label="Close dialog">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>

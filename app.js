@@ -418,18 +418,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  let _dbLoaderTimer = null;
+
   function showDbLoader(keys) {
-    const overlay = document.getElementById('db-loader-overlay');
-    const textEl = document.getElementById('db-loader-text');
-    if (overlay && textEl) {
-      const labels = keys.map(k => k.replace('_', ' ').toUpperCase());
-      textEl.textContent = `Loading Database: ${labels.join(', ')}...`;
-      overlay.classList.remove('hidden');
-      overlay.style.opacity = '1';
-    }
+    // Fix I: Only show overlay after 300ms to avoid flash on fast/cached loads
+    _dbLoaderTimer = setTimeout(() => {
+      const overlay = document.getElementById('db-loader-overlay');
+      const textEl = document.getElementById('db-loader-text');
+      if (overlay && textEl) {
+        const labels = keys.map(k => k.replace('_', ' ').toUpperCase());
+        textEl.textContent = `Loading: ${labels.join(', ')}...`;
+        overlay.classList.remove('hidden');
+        overlay.style.opacity = '1';
+      }
+    }, 300);
   }
 
   function hideDbLoader() {
+    // Cancel the deferred show if data loaded within 300ms
+    if (_dbLoaderTimer) {
+      clearTimeout(_dbLoaderTimer);
+      _dbLoaderTimer = null;
+    }
     const overlay = document.getElementById('db-loader-overlay');
     if (overlay) {
       overlay.style.opacity = '0';
@@ -1113,6 +1123,20 @@ document.addEventListener('DOMContentLoaded', () => {
         renderLearningPaths();
       } else if (actualTargetViewId === 'view-account') {
         renderAccountStudio();
+      } else if (actualTargetViewId === 'view-modern-stack') {
+        // Fix R: Initialize Modern Data Stack view on navigation
+        // Switch to the overview subtab by default if no other tab is active
+        const activeModSubTab = document.querySelector('.modsub-btn.active');
+        if (!activeModSubTab) {
+          switchModernSubTab('overview');
+        }
+        // Pre-populate blueprints if user has already seen the blueprints tab
+        if (window.MODERN_BLUEPRINTS_DB) {
+          const bpContainer = document.getElementById('mod-blueprints-container');
+          if (bpContainer && !bpContainer.innerHTML.trim()) {
+            renderModernBlueprints();
+          }
+        }
       }
       
       // Scroll back to top on view switch, unless navigating to a specific sub-tab inside Prep Hub or Spark Hub
