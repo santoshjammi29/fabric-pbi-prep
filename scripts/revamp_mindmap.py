@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Revamp Data Engineering Mindmap — Apple-Inspired Jelly Physics & Curved Design:
-- Replace rigid static layout with soft, organic, floating jelly simulation and draggable nodes.
-- Smooth Bezier curved paths (`Q cx,cy x2,y2`) that dynamically re-curve as nodes gently oscillate.
-- Elastic node drag physics: pick up, stretch, and release nodes like soft jelly.
-- Apple Glassmorphism design tokens (backdrop blur, rounded pill badges, smooth spring transitions).
+Revamp Data Engineering Mindmap — Ultra-Slow Soothing Organic Motion:
+- Ultra-slow, calm breathing floating simulation (4x slower time step, viscous damping).
+- Smooth, elegant Bezier curved paths (`Q cx,cy x2,y2`) that gently drift like kelp in calm water.
+- Soft elastic dragging with soothing spring physics.
+- Apple Titanium & Glassmorphism design tokens.
 - Update both data-engineering-mindmap/index.html and data-engineering-mindmap.html.
 """
 
@@ -34,13 +34,13 @@ except Exception as e:
     print(f"Error parsing DATA_GRAPH JSON: {e}")
     exit(1)
 
-apple_jelly_template = """<!DOCTYPE html>
+soothing_template = """<!DOCTYPE html>
 <html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE.UNIVERSE — Data Engineering Knowledge Graph</title>
-  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with smooth curved Apple-style jelly physics.">
+  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with soothing organic curved motion.">
 
   <!-- Inter & JetBrains Mono fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,13 +65,13 @@ apple_jelly_template = """<!DOCTYPE html>
       --accent-soft:         rgba(99, 102, 241, 0.18);
       --focus-ring:          #818CF8;
 
-      --graph-edge:          rgba(148, 163, 184, 0.22);
+      --graph-edge:          rgba(148, 163, 184, 0.20);
       --graph-edge-dim:      rgba(255, 255, 255, 0.04);
       --graph-edge-strong:   #818CF8;
       --graph-node:          #94A3B8;
       --graph-node-l2:       #0F1624;
       --graph-node-stroke:   rgba(255, 255, 255, 0.12);
-      --graph-node-halo:     rgba(99, 102, 241, 0.35);
+      --graph-node-halo:     rgba(99, 102, 241, 0.30);
       --graph-label:         #F8FAFC;
       --graph-label-bg:      rgba(15, 22, 36, 0.88);
       --glass-blur:          blur(20px) saturate(180%);
@@ -110,7 +110,7 @@ apple_jelly_template = """<!DOCTYPE html>
       --accent-soft:         rgba(79, 70, 229, 0.12);
       --focus-ring:          #4F46E5;
 
-      --graph-edge:          rgba(71, 85, 105, 0.22);
+      --graph-edge:          rgba(71, 85, 105, 0.20);
       --graph-edge-dim:      rgba(0, 0, 0, 0.04);
       --graph-edge-strong:   #4F46E5;
       --graph-node:          #475569;
@@ -223,7 +223,7 @@ apple_jelly_template = """<!DOCTYPE html>
       color: var(--text-secondary);
       font-size: 0.8125rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .search-trigger:hover {
@@ -251,7 +251,7 @@ apple_jelly_template = """<!DOCTYPE html>
       color: var(--text-primary);
       cursor: pointer;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .filter-select:hover {
@@ -276,7 +276,7 @@ apple_jelly_template = """<!DOCTYPE html>
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .btn-action:hover {
@@ -348,7 +348,7 @@ apple_jelly_template = """<!DOCTYPE html>
       font-size: 0.8125rem;
       font-weight: 500;
       color: var(--text-secondary);
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .domain-item:hover, .domain-item.active {
@@ -395,26 +395,26 @@ apple_jelly_template = """<!DOCTYPE html>
       display: block;
     }
 
-    /* CURVED CONNECTOR STYLES */
+    /* SOOTHING CURVED CONNECTOR STYLES */
     .graph-edge-path {
       fill: none;
       stroke: var(--graph-edge);
       stroke-width: 1.5px;
-      stroke-opacity: 0.55;
+      stroke-opacity: 0.45;
       stroke-linecap: round;
-      transition: stroke 0.3s ease, stroke-width 0.3s ease, stroke-opacity 0.3s ease;
+      transition: stroke 0.5s ease-out, stroke-width 0.5s ease-out, stroke-opacity 0.5s ease-out;
     }
 
     .graph-edge-path.highlighted {
       stroke: var(--graph-edge-strong);
-      stroke-width: 2.5px;
+      stroke-width: 2.2px;
       stroke-opacity: 0.95;
-      filter: drop-shadow(0 0 8px var(--accent-soft));
+      filter: drop-shadow(0 0 6px var(--accent-soft));
     }
 
-    /* JELLY NODE ANIMATIONS & STYLES */
+    /* SOOTHING NODE TRANSITIONS */
     .node-group {
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .node-group:hover {
@@ -426,7 +426,7 @@ apple_jelly_template = """<!DOCTYPE html>
     }
 
     .concept-circle {
-      transition: r 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.3s ease, stroke 0.3s ease;
+      transition: r 0.4s ease-out, fill 0.4s ease-out, stroke 0.4s ease-out;
     }
 
     /* FLOATING APPLE ZOOM TOOLBAR */
@@ -460,12 +460,12 @@ apple_jelly_template = """<!DOCTYPE html>
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .zoom-btn:hover {
       background: var(--bg-overlay);
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
 
     /* RIGHT INSPECTOR — APPLE GLASS CARD (360px) */
@@ -521,7 +521,7 @@ apple_jelly_template = """<!DOCTYPE html>
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .btn-close-ins:hover {
@@ -619,7 +619,7 @@ apple_jelly_template = """<!DOCTYPE html>
       font-size: 0.75rem;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .prereq-chip:hover {
@@ -645,7 +645,7 @@ apple_jelly_template = """<!DOCTYPE html>
       font-size: 0.8125rem;
       color: var(--text-primary);
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .resource-link:hover {
@@ -671,7 +671,7 @@ apple_jelly_template = """<!DOCTYPE html>
       font-size: 0.8125rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
@@ -720,7 +720,7 @@ apple_jelly_template = """<!DOCTYPE html>
       padding-top: 100px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.3s ease;
     }
 
     .palette-backdrop.open {
@@ -763,7 +763,7 @@ apple_jelly_template = """<!DOCTYPE html>
       justify-content: space-between;
       border-bottom: 1px solid var(--line);
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: background 0.2s ease;
     }
 
     .palette-item:hover, .palette-item.active {
@@ -1023,17 +1023,18 @@ apple_jelly_template = """<!DOCTYPE html>
 
     svg.call(zoom);
 
-    // D3 CONTINUOUS JELLY PHYSICS SIMULATION
+    // D3 CONTINUOUS ULTRA-SLOW SOOTHING ORGANIC SIMULATION
     const simulation = d3.forceSimulation(DATA_GRAPH.nodes)
-      .force("link", d3.forceLink(linksList).id(d => d.id).distance(95).strength(0.45))
-      .force("charge", d3.forceManyBody().strength(-200).distanceMax(450))
-      .force("center", d3.forceCenter(0, 0).strength(0.04))
-      .force("collide", d3.forceCollide(d => (d.level === 0 ? 40 : (d.level === 1 ? 26 : 14))).strength(0.7))
-      .alphaDecay(0.006)   // Slow decay for smooth continuous jelly float
-      .alphaTarget(0.015);  // Keeps gentle floating oscillation alive!
+      .force("link", d3.forceLink(linksList).id(d => d.id).distance(100).strength(0.35))
+      .force("charge", d3.forceManyBody().strength(-160).distanceMax(420))
+      .force("center", d3.forceCenter(0, 0).strength(0.03))
+      .force("collide", d3.forceCollide(d => (d.level === 0 ? 42 : (d.level === 1 ? 28 : 16))).strength(0.6))
+      .velocityDecay(0.48)  // Smooth viscous damping for soothing, fluid movement
+      .alphaDecay(0.01)     // Soft, gradual decay
+      .alphaTarget(0.006);  // Ultra-gentle continuous breathing motion
 
     // Warm up initial layout
-    for (let i = 0; i < 150; ++i) simulation.tick();
+    for (let i = 0; i < 160; ++i) simulation.tick();
 
     // HELPER: CALCULATE SMOOTH CURVED BEZIER PATH (Apple-Style Curves)
     function calcCurvedPath(d) {
@@ -1045,7 +1046,7 @@ apple_jelly_template = """<!DOCTYPE html>
       // Calculate smooth midpoint control point for organic curvature
       const mx = (d.source.x + d.target.x) / 2;
       const my = (d.source.y + d.target.y) / 2;
-      const offset = Math.min(dr * 0.18, 40);
+      const offset = Math.min(dr * 0.16, 36);
       const cx = mx - (dy / dr) * offset;
       const cy = my + (dx / dr) * offset;
       return `M ${d.source.x},${d.source.y} Q ${cx},${cy} ${d.target.x},${d.target.y}`;
@@ -1060,10 +1061,10 @@ apple_jelly_template = """<!DOCTYPE html>
       .attr("vector-effect", "non-scaling-stroke")
       .attr("d", calcCurvedPath);
 
-    // ELASTIC JELLY DRAG BEHAVIOR
+    // ELASTIC SOOTHING DRAG BEHAVIOR
     const dragBehavior = d3.drag()
       .on("start", (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.2).restart();
+        if (!event.active) simulation.alphaTarget(0.12).restart();
         d.fx = d.x;
         d.fy = d.y;
       })
@@ -1072,7 +1073,7 @@ apple_jelly_template = """<!DOCTYPE html>
         d.fy = event.y;
       })
       .on("end", (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.015);
+        if (!event.active) simulation.alphaTarget(0.006);
         d.fx = null;
         d.fy = null;
       });
@@ -1098,22 +1099,22 @@ apple_jelly_template = """<!DOCTYPE html>
         updateGraphStyles();
       });
 
-    // TICK HANDLER FOR LIVE JELLY OSCILLATION & DYNAMIC CURVES
+    // TICK HANDLER FOR ULTRA-SLOW ORGANIC FLOATING & DYNAMIC CURVES
     simulation.on("tick", () => {
-      const time = Date.now() * 0.0012;
+      const time = Date.now() * 0.00035; // Ultra-slow calm breathing time step
 
-      // Soft sine-wave jelly oscillation for unpinned nodes
+      // Ultra-gentle organic float for unpinned nodes
       DATA_GRAPH.nodes.forEach((d, i) => {
         if (d.level > 0 && !d.fx) {
-          d.vx += Math.sin(time + i * 0.6) * 0.04;
-          d.vy += Math.cos(time + i * 0.8) * 0.04;
+          d.vx += Math.sin(time + i * 0.4) * 0.006;
+          d.vy += Math.cos(time + i * 0.6) * 0.006;
         }
       });
 
       // Position node groups
       nodeElements.attr("transform", d => `translate(${d.x},${d.y})`);
 
-      // Re-curve edges dynamically as nodes wobble!
+      // Re-curve edges dynamically as nodes gently float
       linkElements.attr("d", calcCurvedPath);
     });
 
@@ -1559,11 +1560,11 @@ apple_jelly_template = """<!DOCTYPE html>
 # Write to data-engineering-mindmap/index.html
 target_file_1 = os.path.join(base_dir, 'data-engineering-mindmap', 'index.html')
 with open(target_file_1, 'w', encoding='utf-8') as f:
-    f.write(apple_jelly_template)
+    f.write(soothing_template)
 
 # Write to data-engineering-mindmap.html
 target_file_2 = os.path.join(base_dir, 'data-engineering-mindmap.html')
 with open(target_file_2, 'w', encoding='utf-8') as f:
-    f.write(apple_jelly_template)
+    f.write(soothing_template)
 
-print("Successfully applied jelly physics & Apple curved design to mindmap!")
+print("Successfully applied ultra-slow soothing organic motion to mindmap!")
