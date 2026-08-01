@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Revamp Data Engineering Mindmap — Apple-Inspired Curved Design:
-- Replace straight lines with smooth, organic, curved Bezier paths (`Q cx,cy x2,y2`).
-- Apple Titanium & Glassmorphism design tokens (backdrop blur, rounded pill badges, smooth spring transitions).
-- Keep 0 graphics/cartoons/feathers (clean, editorial, data-dense Apple aesthetic).
+Revamp Data Engineering Mindmap — Apple-Inspired Jelly Physics & Curved Design:
+- Replace rigid static layout with soft, organic, floating jelly simulation and draggable nodes.
+- Smooth Bezier curved paths (`Q cx,cy x2,y2`) that dynamically re-curve as nodes gently oscillate.
+- Elastic node drag physics: pick up, stretch, and release nodes like soft jelly.
+- Apple Glassmorphism design tokens (backdrop blur, rounded pill badges, smooth spring transitions).
 - Update both data-engineering-mindmap/index.html and data-engineering-mindmap.html.
 """
 
@@ -33,13 +34,13 @@ except Exception as e:
     print(f"Error parsing DATA_GRAPH JSON: {e}")
     exit(1)
 
-apple_curved_template = """<!DOCTYPE html>
+apple_jelly_template = """<!DOCTYPE html>
 <html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE.UNIVERSE — Data Engineering Knowledge Graph</title>
-  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with smooth curved Apple-style architecture connections.">
+  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with smooth curved Apple-style jelly physics.">
 
   <!-- Inter & JetBrains Mono fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -399,7 +400,7 @@ apple_curved_template = """<!DOCTYPE html>
       fill: none;
       stroke: var(--graph-edge);
       stroke-width: 1.5px;
-      stroke-opacity: 0.5;
+      stroke-opacity: 0.55;
       stroke-linecap: round;
       transition: stroke 0.3s ease, stroke-width 0.3s ease, stroke-opacity 0.3s ease;
     }
@@ -408,7 +409,24 @@ apple_curved_template = """<!DOCTYPE html>
       stroke: var(--graph-edge-strong);
       stroke-width: 2.5px;
       stroke-opacity: 0.95;
-      filter: drop-shadow(0 0 6px var(--accent-soft));
+      filter: drop-shadow(0 0 8px var(--accent-soft));
+    }
+
+    /* JELLY NODE ANIMATIONS & STYLES */
+    .node-group {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .node-group:hover {
+      cursor: grab;
+    }
+
+    .node-group:active {
+      cursor: grabbing;
+    }
+
+    .concept-circle {
+      transition: r 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.3s ease, stroke 0.3s ease;
     }
 
     /* FLOATING APPLE ZOOM TOOLBAR */
@@ -1005,16 +1023,17 @@ apple_curved_template = """<!DOCTYPE html>
 
     svg.call(zoom);
 
-    // D3 Simulation
+    // D3 CONTINUOUS JELLY PHYSICS SIMULATION
     const simulation = d3.forceSimulation(DATA_GRAPH.nodes)
-      .force("link", d3.forceLink(linksList).id(d => d.id).distance(95).strength(0.5))
-      .force("charge", d3.forceManyBody().strength(-220).distanceMax(450))
-      .force("center", d3.forceCenter(0, 0).strength(0.05))
-      .force("collide", d3.forceCollide(d => (d.level === 0 ? 40 : (d.level === 1 ? 26 : 14))))
-      .alphaDecay(0.025);
+      .force("link", d3.forceLink(linksList).id(d => d.id).distance(95).strength(0.45))
+      .force("charge", d3.forceManyBody().strength(-200).distanceMax(450))
+      .force("center", d3.forceCenter(0, 0).strength(0.04))
+      .force("collide", d3.forceCollide(d => (d.level === 0 ? 40 : (d.level === 1 ? 26 : 14))).strength(0.7))
+      .alphaDecay(0.006)   // Slow decay for smooth continuous jelly float
+      .alphaTarget(0.015);  // Keeps gentle floating oscillation alive!
 
-    for (let i = 0; i < 300; ++i) simulation.tick();
-    simulation.stop(); // Pre-computed layout
+    // Warm up initial layout
+    for (let i = 0; i < 150; ++i) simulation.tick();
 
     // HELPER: CALCULATE SMOOTH CURVED BEZIER PATH (Apple-Style Curves)
     function calcCurvedPath(d) {
@@ -1041,13 +1060,31 @@ apple_curved_template = """<!DOCTYPE html>
       .attr("vector-effect", "non-scaling-stroke")
       .attr("d", calcCurvedPath);
 
-    // Render Nodes Group
+    // ELASTIC JELLY DRAG BEHAVIOR
+    const dragBehavior = d3.drag()
+      .on("start", (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.2).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      })
+      .on("drag", (event, d) => {
+        d.fx = event.x;
+        d.fy = event.y;
+      })
+      .on("end", (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.015);
+        d.fx = null;
+        d.fy = null;
+      });
+
+    // Render Nodes Group with Drag Physics
     const nodeElements = nodesLayer.selectAll("g")
       .data(DATA_GRAPH.nodes)
       .enter()
       .append("g")
+      .attr("class", "node-group")
       .attr("transform", d => `translate(${d.x},${d.y})`)
-      .attr("cursor", "pointer")
+      .call(dragBehavior)
       .on("click", (event, d) => {
         selectNode(d.id);
         centerCameraOnNode(d);
@@ -1060,6 +1097,25 @@ apple_curved_template = """<!DOCTYPE html>
         hoveredNodeId = null;
         updateGraphStyles();
       });
+
+    // TICK HANDLER FOR LIVE JELLY OSCILLATION & DYNAMIC CURVES
+    simulation.on("tick", () => {
+      const time = Date.now() * 0.0012;
+
+      // Soft sine-wave jelly oscillation for unpinned nodes
+      DATA_GRAPH.nodes.forEach((d, i) => {
+        if (d.level > 0 && !d.fx) {
+          d.vx += Math.sin(time + i * 0.6) * 0.04;
+          d.vy += Math.cos(time + i * 0.8) * 0.04;
+        }
+      });
+
+      // Position node groups
+      nodeElements.attr("transform", d => `translate(${d.x},${d.y})`);
+
+      // Re-curve edges dynamically as nodes wobble!
+      linkElements.attr("d", calcCurvedPath);
+    });
 
     // Render Node SVG Shapes & Clean Labels
     nodeElements.each(function(d) {
@@ -1141,12 +1197,12 @@ apple_curved_template = """<!DOCTYPE html>
         const domainColor = DOMAIN_TOKENS[d.domain] ? DOMAIN_TOKENS[d.domain].color : 'var(--accent)';
 
         if (isSelected) {
-          circle.attr("r", 7.5)
+          circle.attr("r", 8)
             .attr("fill", domainColor)
             .attr("stroke", "var(--focus-ring)")
             .attr("stroke-width", 2.5);
         } else if (isHovered) {
-          circle.attr("r", 7.5)
+          circle.attr("r", 8)
             .attr("fill", domainColor)
             .attr("stroke", "var(--bg-base)")
             .attr("stroke-width", 1.5)
@@ -1503,11 +1559,11 @@ apple_curved_template = """<!DOCTYPE html>
 # Write to data-engineering-mindmap/index.html
 target_file_1 = os.path.join(base_dir, 'data-engineering-mindmap', 'index.html')
 with open(target_file_1, 'w', encoding='utf-8') as f:
-    f.write(apple_curved_template)
+    f.write(apple_jelly_template)
 
 # Write to data-engineering-mindmap.html
 target_file_2 = os.path.join(base_dir, 'data-engineering-mindmap.html')
 with open(target_file_2, 'w', encoding='utf-8') as f:
-    f.write(apple_curved_template)
+    f.write(apple_jelly_template)
 
-print("Successfully applied Apple-style curved design to mindmap!")
+print("Successfully applied jelly physics & Apple curved design to mindmap!")
