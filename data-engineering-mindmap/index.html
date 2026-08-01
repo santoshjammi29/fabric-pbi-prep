@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE.UNIVERSE — Data Engineering Knowledge Graph</title>
-  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with soothing organic curved motion.">
+  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with immersive collapsible sidebars and soothing organic curved motion.">
 
   <!-- Inter & JetBrains Mono fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,10 +132,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
+      padding: 0 20px;
       z-index: 100;
       flex-shrink: 0;
-      gap: 16px;
+      gap: 12px;
       box-shadow: var(--glass-shadow);
     }
 
@@ -170,9 +170,9 @@
     .header-center {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex: 1;
-      max-width: 620px;
+      max-width: 600px;
     }
 
     .search-trigger {
@@ -225,7 +225,7 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn-action {
@@ -243,9 +243,10 @@
       transition: all 0.3s ease;
     }
 
-    .btn-action:hover {
+    .btn-action:hover, .btn-action.active {
       border-color: var(--line-strong);
       color: var(--text-primary);
+      background: var(--accent-soft);
       transform: translateY(-1px);
     }
 
@@ -267,7 +268,7 @@
       overflow: hidden;
     }
 
-    /* LEFT SIDEBAR — APPLE GLASS NAV (260px) */
+    /* LEFT SIDEBAR — APPLE GLASS NAV (260px) WITH COLLAPSIBLE TRANSITION */
     .sidebar-left {
       width: 260px;
       background: var(--bg-elevated);
@@ -279,6 +280,12 @@
       z-index: 10;
       flex-shrink: 0;
       box-shadow: var(--glass-shadow);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), margin-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-left.collapsed {
+      margin-left: -260px;
+      pointer-events: none;
     }
 
     .sidebar-header {
@@ -359,6 +366,47 @@
       display: block;
     }
 
+    /* FLOATING EDGE TOGGLE DOCK BUTTONS */
+    .edge-dock-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      width: 26px;
+      height: 52px;
+      background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--line-strong);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .edge-dock-btn.left-edge {
+      left: 0;
+      border-radius: 0 12px 12px 0;
+      border-left: none;
+    }
+
+    .edge-dock-btn.right-edge {
+      right: 0;
+      border-radius: 12px 0 0 12px;
+      border-right: none;
+    }
+
+    .edge-dock-btn:hover {
+      background: var(--bg-overlay);
+      color: var(--text-primary);
+      width: 32px;
+    }
+
     /* SOOTHING CURVED CONNECTOR STYLES */
     .graph-edge-path {
       fill: none;
@@ -409,30 +457,10 @@
       z-index: 20;
       padding: 4px;
       gap: 2px;
+      transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .zoom-btn {
-      width: 36px;
-      height: 36px;
-      background: transparent;
-      border: none;
-      border-radius: 50%;
-      color: var(--text-primary);
-      font-size: 1.125rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-
-    .zoom-btn:hover {
-      background: var(--bg-overlay);
-      transform: scale(1.08);
-    }
-
-    /* RIGHT INSPECTOR — APPLE GLASS CARD (360px) */
+    /* RIGHT INSPECTOR — APPLE GLASS CARD (360px) WITH COLLAPSIBLE TRANSITION */
     .inspector-panel {
       width: 360px;
       background: var(--bg-elevated);
@@ -445,6 +473,12 @@
       flex-shrink: 0;
       overflow-y: auto;
       box-shadow: var(--glass-shadow);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .inspector-panel.collapsed {
+      margin-right: -360px;
+      pointer-events: none;
     }
 
     .inspector-header {
@@ -799,6 +833,20 @@
     </div>
 
     <div class="header-actions">
+      <button class="btn-action" id="btn-toggle-left" title="Toggle Domains Sidebar (⌘[)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        <span>Domains</span>
+      </button>
+
+      <button class="btn-action" id="btn-toggle-right" title="Toggle Inspector Panel (⌘])">
+        <span>Inspector</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <button class="btn-action" id="btn-toggle-fullscreen" title="Full Screen Immersive View (⌘F)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+
       <div class="progress-pill" id="read-progress-pill">0 / 250 Read (0%)</div>
 
       <button class="btn-action" id="btn-reset-view" title="Reset Camera View">
@@ -815,10 +863,10 @@
   <!-- MAIN AREA -->
   <main class="app-main">
     <!-- LEFT SIDEBAR -->
-    <aside class="sidebar-left">
+    <aside class="sidebar-left" id="sidebar-left">
       <div class="sidebar-header">
         <span>Domains Navigator</span>
-        <span class="mono" id="sidebar-total-badge">10 Domains</span>
+        <button class="btn-close-ins" id="btn-close-sidebar-left" title="Collapse Sidebar">‹</button>
       </div>
       <ul class="domain-list" id="domain-index-list">
         <!-- Dynamically rendered -->
@@ -827,6 +875,10 @@
 
     <!-- GRAPH CANVAS -->
     <section class="graph-viewport-container" id="graph-container">
+      <!-- FLOATING EDGE TOGGLE DOCK BUTTONS -->
+      <button class="edge-dock-btn left-edge" id="floating-toggle-left" title="Expand Domains Navigator (⌘[)">›</button>
+      <button class="edge-dock-btn right-edge" id="floating-toggle-right" title="Expand Inspector Panel (⌘])">‹</button>
+
       <svg id="svg-graph">
         <defs>
           <filter id="glow-halo" x="-50%" y="-50%" width="200%" height="200%">
@@ -854,7 +906,7 @@
         <div class="breadcrumb" id="ins-breadcrumb">Data Engineering › Architecture</div>
         <div class="node-title-row">
           <h2 class="node-title" id="ins-title">DATA ENGINEERING</h2>
-          <button class="btn-close-ins" id="btn-close-inspector" title="Close Panel">✕</button>
+          <button class="btn-close-ins" id="btn-close-inspector" title="Collapse Panel">✕</button>
         </div>
         <div class="badge-row">
           <span class="diff-badge diff-x" id="ins-diff-badge">ARCHITECT</span>
@@ -908,7 +960,7 @@
       <span class="history-trail" id="visited-trail">root</span>
     </div>
     <div>
-      <span>Shortcuts: ⌘K (Search) · R (Reset View) · L (List View) · Esc (Close)</span>
+      <span>Shortcuts: ⌘K (Search) · ⌘[ (Domains) · ⌘] (Inspector) · ⌘F (Fullscreen) · R (Reset)</span>
     </div>
   </footer>
 
@@ -1221,11 +1273,68 @@
         .call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(0.7));
     }
 
+    // SIDEBAR & INSPECTOR COLLAPSIBLE TOGGLE LOGIC
+    const sidebarLeft = document.getElementById('sidebar-left');
+    const inspectorPanel = document.getElementById('inspector-panel');
+    const floatingToggleLeft = document.getElementById('floating-toggle-left');
+    const floatingToggleRight = document.getElementById('floating-toggle-right');
+    const btnToggleLeft = document.getElementById('btn-toggle-left');
+    const btnToggleRight = document.getElementById('btn-toggle-right');
+    const btnToggleFullscreen = document.getElementById('btn-toggle-fullscreen');
+
+    function toggleLeftSidebar(forceState) {
+      const isCollapsed = forceState !== undefined ? forceState : !sidebarLeft.classList.contains('collapsed');
+      sidebarLeft.classList.toggle('collapsed', isCollapsed);
+      btnToggleLeft.classList.toggle('active', !isCollapsed);
+      floatingToggleLeft.style.display = isCollapsed ? 'flex' : 'none';
+
+      setTimeout(resetGraphView, 350);
+    }
+
+    function toggleRightPanel(forceState) {
+      const isCollapsed = forceState !== undefined ? forceState : !inspectorPanel.classList.contains('collapsed');
+      inspectorPanel.classList.toggle('collapsed', isCollapsed);
+      btnToggleRight.classList.toggle('active', !isCollapsed);
+      floatingToggleRight.style.display = isCollapsed ? 'flex' : 'none';
+
+      // Update zoom toolbar position
+      const zoomToolbar = document.querySelector('.zoom-toolbar');
+      if (zoomToolbar) zoomToolbar.style.right = isCollapsed ? '24px' : '384px';
+
+      setTimeout(resetGraphView, 350);
+    }
+
+    function toggleFullscreenMode() {
+      const bothCollapsed = sidebarLeft.classList.contains('collapsed') && inspectorPanel.classList.contains('collapsed');
+      if (bothCollapsed) {
+        toggleLeftSidebar(false);
+        toggleRightPanel(false);
+        btnToggleFullscreen.classList.remove('active');
+      } else {
+        toggleLeftSidebar(true);
+        toggleRightPanel(true);
+        btnToggleFullscreen.classList.add('active');
+      }
+    }
+
+    document.getElementById('btn-close-sidebar-left').addEventListener('click', () => toggleLeftSidebar(true));
+    document.getElementById('btn-close-inspector').addEventListener('click', () => toggleRightPanel(true));
+    floatingToggleLeft.addEventListener('click', () => toggleLeftSidebar(false));
+    floatingToggleRight.addEventListener('click', () => toggleRightPanel(false));
+    btnToggleLeft.addEventListener('click', () => toggleLeftSidebar());
+    btnToggleRight.addEventListener('click', () => toggleRightPanel());
+    btnToggleFullscreen.addEventListener('click', () => toggleFullscreenMode());
+
     // Select Node & Render Inspector Panel
     function selectNode(id) {
       selectedNodeId = id;
       const node = nodesMap.get(id);
       if (!node) return;
+
+      // Auto expand inspector if collapsed on node click
+      if (inspectorPanel.classList.contains('collapsed')) {
+        toggleRightPanel(false);
+      }
 
       // Update visited history
       if (visitedHistory[visitedHistory.length - 1] !== node.id) {
@@ -1462,6 +1571,15 @@
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         openPalette();
+      } else if (e.key === '[' || (e.metaKey && e.key === '[')) {
+        e.preventDefault();
+        toggleLeftSidebar();
+      } else if (e.key === ']' || (e.metaKey && e.key === ']')) {
+        e.preventDefault();
+        toggleRightPanel();
+      } else if ((e.metaKey || e.ctrlKey) && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        toggleFullscreenMode();
       } else if (e.key === 'Escape') {
         closePalette();
         document.getElementById('list-view-overlay').classList.remove('open');
