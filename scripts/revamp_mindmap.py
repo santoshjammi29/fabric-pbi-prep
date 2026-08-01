@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Revamp Data Engineering Mindmap:
-- Remove all graphics, feather animations, SVG blur filters, and currentLayer elements.
-- Create an editorial, data-dense, clean, high-contrast, interactive mindmap interface.
-- Provide full dark/light theme support, domain filters, difficulty filters, keyboard shortcuts, and inspector.
+Revamp Data Engineering Mindmap — Apple-Inspired Curved Design:
+- Replace straight lines with smooth, organic, curved Bezier paths (`Q cx,cy x2,y2`).
+- Apple Titanium & Glassmorphism design tokens (backdrop blur, rounded pill badges, smooth spring transitions).
+- Keep 0 graphics/cartoons/feathers (clean, editorial, data-dense Apple aesthetic).
 - Update both data-engineering-mindmap/index.html and data-engineering-mindmap.html.
 """
 
@@ -33,13 +33,13 @@ except Exception as e:
     print(f"Error parsing DATA_GRAPH JSON: {e}")
     exit(1)
 
-revamped_template = """<!DOCTYPE html>
+apple_curved_template = """<!DOCTYPE html>
 <html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE.UNIVERSE — Data Engineering Knowledge Graph</title>
-  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts from Beginner to Architect level.">
+  <meta name="description" content="Editorial, data-dense interactive knowledge graph covering 250+ data engineering concepts with smooth curved Apple-style architecture connections.">
 
   <!-- Inter & JetBrains Mono fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,54 +51,56 @@ revamped_template = """<!DOCTYPE html>
 
   <style>
     :root, .theme-dark {
-      --bg-base:             #090D16;
-      --bg-elevated:         #0E1424;
-      --bg-overlay:          #151C30;
-      --line:                #1E273D;
-      --line-strong:         #2A3654;
-      --text-primary:        #F1F5F9;
+      --bg-base:             #080C14;
+      --bg-elevated:         rgba(15, 22, 36, 0.75);
+      --bg-overlay:          rgba(24, 34, 54, 0.80);
+      --line:                rgba(255, 255, 255, 0.08);
+      --line-strong:         rgba(255, 255, 255, 0.16);
+      --text-primary:        #F8FAFC;
       --text-secondary:      #94A3B8;
       --text-tertiary:       #64748B;
       --accent:              #6366F1;
       --accent-hover:        #4F46E5;
-      --accent-soft:         rgba(99, 102, 241, 0.15);
+      --accent-soft:         rgba(99, 102, 241, 0.18);
       --focus-ring:          #818CF8;
 
-      --graph-edge:          #2A3654;
-      --graph-edge-dim:      #141B2D;
-      --graph-edge-strong:   #6366F1;
+      --graph-edge:          rgba(148, 163, 184, 0.22);
+      --graph-edge-dim:      rgba(255, 255, 255, 0.04);
+      --graph-edge-strong:   #818CF8;
       --graph-node:          #94A3B8;
-      --graph-node-l2:       #0E1424;
-      --graph-node-stroke:   #2A3654;
-      --graph-node-halo:     rgba(99, 102, 241, 0.25);
-      --graph-label:         #F1F5F9;
-      --graph-label-bg:      rgba(14, 20, 36, 0.94);
+      --graph-node-l2:       #0F1624;
+      --graph-node-stroke:   rgba(255, 255, 255, 0.12);
+      --graph-node-halo:     rgba(99, 102, 241, 0.35);
+      --graph-label:         #F8FAFC;
+      --graph-label-bg:      rgba(15, 22, 36, 0.88);
+      --glass-blur:          blur(20px) saturate(180%);
+      --glass-shadow:        0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
       /* Domain Palette */
-      --d-foundations:  #3B82F6;
-      --d-ingestion:    #06B6D4;
-      --d-storage:      #8B5CF6;
-      --d-processing:   #F59E0B;
-      --d-modeling:     #EC4899;
-      --d-orchestration:#10B981;
-      --d-quality:      #14B8A6;
-      --d-governance:   #EF4444;
-      --d-analytics:    #84CC16;
-      --d-architecture: #F97316;
+      --d-foundations:  #38BDF8;
+      --d-ingestion:    #22D3EE;
+      --d-storage:      #A78BFA;
+      --d-processing:   #FBBF24;
+      --d-modeling:     #F472B6;
+      --d-orchestration:#34D399;
+      --d-quality:      #2DD4BF;
+      --d-governance:   #F87171;
+      --d-analytics:    #A3E635;
+      --d-architecture: #FB923C;
 
       /* Difficulty Tokens */
-      --diff-b: #10B981;
-      --diff-i: #3B82F6;
-      --diff-a: #F59E0B;
-      --diff-x: #EF4444;
+      --diff-b: #34D399;
+      --diff-i: #38BDF8;
+      --diff-a: #FBBF24;
+      --diff-x: #F87171;
     }
 
     .theme-light {
-      --bg-base:             #FFFFFF;
-      --bg-elevated:         #F8FAFC;
-      --bg-overlay:          #F1F5F9;
-      --line:                #E2E8F0;
-      --line-strong:         #CBD5E1;
+      --bg-base:             #F8FAFC;
+      --bg-elevated:         rgba(255, 255, 255, 0.82);
+      --bg-overlay:          rgba(241, 245, 249, 0.88);
+      --line:                rgba(0, 0, 0, 0.08);
+      --line-strong:         rgba(0, 0, 0, 0.16);
       --text-primary:        #0F172A;
       --text-secondary:      #475569;
       --text-tertiary:       #64748B;
@@ -107,15 +109,17 @@ revamped_template = """<!DOCTYPE html>
       --accent-soft:         rgba(79, 70, 229, 0.12);
       --focus-ring:          #4F46E5;
 
-      --graph-edge:          #CBD5E1;
-      --graph-edge-dim:      #F1F5F9;
+      --graph-edge:          rgba(71, 85, 105, 0.22);
+      --graph-edge-dim:      rgba(0, 0, 0, 0.04);
       --graph-edge-strong:   #4F46E5;
       --graph-node:          #475569;
       --graph-node-l2:       #FFFFFF;
-      --graph-node-stroke:   #CBD5E1;
+      --graph-node-stroke:   rgba(0, 0, 0, 0.12);
       --graph-node-halo:     rgba(79, 70, 229, 0.25);
       --graph-label:         #0F172A;
-      --graph-label-bg:      rgba(255, 255, 255, 0.95);
+      --graph-label-bg:      rgba(255, 255, 255, 0.92);
+      --glass-blur:          blur(20px) saturate(180%);
+      --glass-shadow:        0 8px 32px 0 rgba(0, 0, 0, 0.08);
     }
 
     * {
@@ -125,7 +129,7 @@ revamped_template = """<!DOCTYPE html>
     }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-base);
       color: var(--text-primary);
       height: 100vh;
@@ -152,19 +156,22 @@ revamped_template = """<!DOCTYPE html>
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* TOP BAR / NAVIGATION (56px) */
+    /* TOP BAR — APPLE GLASS HEADER (56px) */
     .header-bar {
       height: 56px;
       width: 100%;
       background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 24px;
       z-index: 100;
       flex-shrink: 0;
       gap: 16px;
+      box-shadow: var(--glass-shadow);
     }
 
     .brand-section {
@@ -178,7 +185,7 @@ revamped_template = """<!DOCTYPE html>
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.875rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       color: var(--text-primary);
       display: flex;
       align-items: center;
@@ -190,8 +197,8 @@ revamped_template = """<!DOCTYPE html>
       color: var(--accent);
       background: var(--accent-soft);
       border: 1px solid rgba(99, 102, 241, 0.3);
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 2px 10px;
+      border-radius: 9999px;
       font-weight: 600;
     }
 
@@ -200,22 +207,22 @@ revamped_template = """<!DOCTYPE html>
       align-items: center;
       gap: 12px;
       flex: 1;
-      max-width: 600px;
+      max-width: 620px;
     }
 
     .search-trigger {
       flex: 1;
       background: var(--bg-overlay);
       border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 6px 14px;
+      border-radius: 9999px;
+      padding: 6px 16px;
       display: flex;
       align-items: center;
       gap: 10px;
       color: var(--text-secondary);
       font-size: 0.8125rem;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .search-trigger:hover {
@@ -229,21 +236,21 @@ revamped_template = """<!DOCTYPE html>
       font-size: 0.6875rem;
       background: var(--bg-base);
       border: 1px solid var(--line);
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 2px 8px;
+      border-radius: 9999px;
       color: var(--text-tertiary);
     }
 
     .filter-select {
       background: var(--bg-overlay);
       border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 6px 10px;
+      border-radius: 9999px;
+      padding: 6px 14px;
       font-size: 0.8125rem;
       color: var(--text-primary);
       cursor: pointer;
       outline: none;
-      transition: border-color 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .filter-select:hover {
@@ -253,14 +260,14 @@ revamped_template = """<!DOCTYPE html>
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .btn-action {
       background: var(--bg-overlay);
       border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 6px 12px;
+      border-radius: 9999px;
+      padding: 6px 14px;
       font-size: 0.8125rem;
       font-weight: 500;
       color: var(--text-secondary);
@@ -268,12 +275,13 @@ revamped_template = """<!DOCTYPE html>
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .btn-action:hover {
       border-color: var(--line-strong);
       color: var(--text-primary);
+      transform: translateY(-1px);
     }
 
     .progress-pill {
@@ -282,8 +290,8 @@ revamped_template = """<!DOCTYPE html>
       color: var(--text-secondary);
       background: var(--bg-overlay);
       border: 1px solid var(--line);
-      padding: 4px 10px;
-      border-radius: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
     }
 
     /* MAIN CONTAINER */
@@ -294,19 +302,22 @@ revamped_template = """<!DOCTYPE html>
       overflow: hidden;
     }
 
-    /* LEFT SIDEBAR — DOMAIN INDEX (260px) */
+    /* LEFT SIDEBAR — APPLE GLASS NAV (260px) */
     .sidebar-left {
       width: 260px;
       background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border-right: 1px solid var(--line);
       display: flex;
       flex-direction: column;
       z-index: 10;
       flex-shrink: 0;
+      box-shadow: var(--glass-shadow);
     }
 
     .sidebar-header {
-      padding: 14px 16px;
+      padding: 16px 20px;
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
@@ -322,24 +333,27 @@ revamped_template = """<!DOCTYPE html>
       flex: 1;
       overflow-y: auto;
       list-style: none;
+      padding: 8px;
     }
 
     .domain-item {
-      padding: 10px 16px;
+      padding: 8px 12px;
+      margin-bottom: 2px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--line);
+      border-radius: 8px;
       cursor: pointer;
       font-size: 0.8125rem;
       font-weight: 500;
       color: var(--text-secondary);
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .domain-item:hover, .domain-item.active {
       background: var(--bg-overlay);
       color: var(--text-primary);
+      transform: translateX(2px);
     }
 
     .domain-label {
@@ -353,6 +367,7 @@ revamped_template = """<!DOCTYPE html>
       height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      box-shadow: 0 0 8px currentColor;
     }
 
     .domain-count {
@@ -361,8 +376,8 @@ revamped_template = """<!DOCTYPE html>
       color: var(--text-tertiary);
       background: var(--bg-base);
       border: 1px solid var(--line);
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 2px 8px;
+      border-radius: 9999px;
     }
 
     /* CENTER CANVAS */
@@ -379,19 +394,39 @@ revamped_template = """<!DOCTYPE html>
       display: block;
     }
 
-    /* FLOATING ZOOM CONTROLS */
+    /* CURVED CONNECTOR STYLES */
+    .graph-edge-path {
+      fill: none;
+      stroke: var(--graph-edge);
+      stroke-width: 1.5px;
+      stroke-opacity: 0.5;
+      stroke-linecap: round;
+      transition: stroke 0.3s ease, stroke-width 0.3s ease, stroke-opacity 0.3s ease;
+    }
+
+    .graph-edge-path.highlighted {
+      stroke: var(--graph-edge-strong);
+      stroke-width: 2.5px;
+      stroke-opacity: 0.95;
+      filter: drop-shadow(0 0 6px var(--accent-soft));
+    }
+
+    /* FLOATING APPLE ZOOM TOOLBAR */
     .zoom-toolbar {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
+      bottom: 24px;
+      right: 24px;
       display: flex;
       flex-direction: column;
       background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-radius: 9999px;
+      box-shadow: var(--glass-shadow);
       z-index: 20;
-      overflow: hidden;
+      padding: 4px;
+      gap: 2px;
     }
 
     .zoom-btn {
@@ -399,39 +434,39 @@ revamped_template = """<!DOCTYPE html>
       height: 36px;
       background: transparent;
       border: none;
-      border-bottom: 1px solid var(--line);
+      border-radius: 50%;
       color: var(--text-primary);
-      font-size: 1rem;
+      font-size: 1.125rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s ease;
-    }
-
-    .zoom-btn:last-child {
-      border-bottom: none;
+      transition: all 0.2s ease;
     }
 
     .zoom-btn:hover {
       background: var(--bg-overlay);
+      transform: scale(1.1);
     }
 
-    /* RIGHT SIDEBAR — INSPECTOR PANEL (360px) */
+    /* RIGHT INSPECTOR — APPLE GLASS CARD (360px) */
     .inspector-panel {
       width: 360px;
       background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border-left: 1px solid var(--line);
       display: flex;
       flex-direction: column;
       z-index: 10;
       flex-shrink: 0;
       overflow-y: auto;
+      box-shadow: var(--glass-shadow);
     }
 
     .inspector-header {
-      padding: 20px;
+      padding: 24px;
       border-bottom: 1px solid var(--line);
     }
 
@@ -439,7 +474,7 @@ revamped_template = """<!DOCTYPE html>
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
       color: var(--text-tertiary);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .node-title-row {
@@ -450,51 +485,58 @@ revamped_template = """<!DOCTYPE html>
     }
 
     .node-title {
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.01em;
       color: var(--text-primary);
     }
 
     .btn-close-ins {
-      background: transparent;
-      border: none;
+      background: var(--bg-overlay);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
       color: var(--text-tertiary);
-      font-size: 1.125rem;
+      font-size: 0.875rem;
       cursor: pointer;
-      padding: 2px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
     }
 
     .btn-close-ins:hover {
       color: var(--text-primary);
+      border-color: var(--line-strong);
     }
 
     .badge-row {
       display: flex;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .diff-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.6875rem;
       font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
       text-transform: uppercase;
       border: 1px solid transparent;
     }
 
-    .diff-b { background: rgba(16, 185, 129, 0.15); color: var(--diff-b); border-color: rgba(16, 185, 129, 0.3); }
-    .diff-i { background: rgba(59, 130, 246, 0.15); color: var(--diff-i); border-color: rgba(59, 130, 246, 0.3); }
-    .diff-a { background: rgba(245, 158, 11, 0.15); color: var(--diff-a); border-color: rgba(245, 158, 11, 0.3); }
-    .diff-x { background: rgba(239, 68, 68, 0.15); color: var(--diff-x); border-color: rgba(239, 68, 68, 0.3); }
+    .diff-b { background: rgba(52, 211, 153, 0.15); color: var(--diff-b); border-color: rgba(52, 211, 153, 0.3); }
+    .diff-i { background: rgba(56, 189, 248, 0.15); color: var(--diff-i); border-color: rgba(56, 189, 248, 0.3); }
+    .diff-a { background: rgba(251, 191, 36, 0.15); color: var(--diff-a); border-color: rgba(251, 191, 36, 0.3); }
+    .diff-x { background: rgba(248, 113, 113, 0.15); color: var(--diff-x); border-color: rgba(248, 113, 113, 0.3); }
 
     .inspector-body {
-      padding: 20px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
 
     .section-title {
@@ -503,29 +545,30 @@ revamped_template = """<!DOCTYPE html>
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--text-tertiary);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .summary-text {
       font-size: 0.875rem;
-      line-height: 1.6;
+      line-height: 1.65;
       color: var(--text-secondary);
     }
 
     .callout-box {
       background: var(--bg-overlay);
       border-left: 3px solid var(--accent);
-      border-radius: 0 6px 6px 0;
-      padding: 12px;
+      border-radius: 0 10px 10px 0;
+      padding: 14px;
       font-size: 0.8125rem;
       color: var(--text-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .concept-bullets {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .concept-bullet-item {
@@ -533,35 +576,38 @@ revamped_template = """<!DOCTYPE html>
       color: var(--text-secondary);
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 10px;
     }
 
     .concept-bullet-item::before {
       content: "•";
       color: var(--accent);
       font-weight: bold;
+      font-size: 1.1rem;
+      line-height: 1;
     }
 
     .prereq-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 8px;
     }
 
     .prereq-chip {
       background: var(--bg-overlay);
       border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 4px 8px;
+      border-radius: 9999px;
+      padding: 5px 12px;
       font-size: 0.75rem;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .prereq-chip:hover {
       border-color: var(--accent);
       color: var(--text-primary);
+      transform: translateY(-1px);
     }
 
     .link-list {
@@ -576,17 +622,18 @@ revamped_template = """<!DOCTYPE html>
       justify-content: space-between;
       background: var(--bg-overlay);
       border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 8px 12px;
+      border-radius: 10px;
+      padding: 10px 14px;
       font-size: 0.8125rem;
       color: var(--text-primary);
       text-decoration: none;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .resource-link:hover {
       border-color: var(--accent);
       background: var(--accent-soft);
+      transform: translateY(-1px);
     }
 
     .inspector-actions {
@@ -601,31 +648,36 @@ revamped_template = """<!DOCTYPE html>
       background: var(--accent);
       color: #FFFFFF;
       border: none;
-      border-radius: 6px;
-      padding: 10px;
+      border-radius: 9999px;
+      padding: 12px;
       font-size: 0.8125rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
 
     .btn-complete:hover {
       background: var(--accent-hover);
+      transform: translateY(-1px);
     }
 
     .btn-complete.done {
       background: var(--diff-b);
+      box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
     }
 
     /* FOOTER STATUS BAR (32px) */
     .footer-bar {
       height: 32px;
       background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border-top: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 24px;
       font-size: 0.75rem;
       color: var(--text-tertiary);
       z-index: 100;
@@ -641,8 +693,8 @@ revamped_template = """<!DOCTYPE html>
     .palette-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
       align-items: flex-start;
@@ -650,7 +702,7 @@ revamped_template = """<!DOCTYPE html>
       padding-top: 100px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.15s ease;
+      transition: opacity 0.2s ease;
     }
 
     .palette-backdrop.open {
@@ -659,11 +711,13 @@ revamped_template = """<!DOCTYPE html>
     }
 
     .palette-card {
-      width: 560px;
+      width: 580px;
       background: var(--bg-elevated);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--line-strong);
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      border-radius: 16px;
+      box-shadow: var(--glass-shadow);
       overflow: hidden;
     }
 
@@ -672,7 +726,7 @@ revamped_template = """<!DOCTYPE html>
       background: transparent;
       border: none;
       border-bottom: 1px solid var(--line);
-      padding: 16px 20px;
+      padding: 18px 24px;
       font-size: 1rem;
       color: var(--text-primary);
       outline: none;
@@ -685,7 +739,7 @@ revamped_template = """<!DOCTYPE html>
     }
 
     .palette-item {
-      padding: 12px 20px;
+      padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -726,7 +780,7 @@ revamped_template = """<!DOCTYPE html>
 </head>
 <body>
 
-  <!-- HEADER BAR -->
+  <!-- APPLE GLASS HEADER BAR -->
   <header class="header-bar">
     <a href="/" class="brand-section">
       <span class="brand-title">DE.UNIVERSE <span class="brand-badge">250+ CONCEPTS</span></span>
@@ -794,7 +848,7 @@ revamped_template = """<!DOCTYPE html>
       <svg id="svg-graph">
         <defs>
           <filter id="glow-halo" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feGaussianBlur stdDeviation="4" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
@@ -804,7 +858,7 @@ revamped_template = """<!DOCTYPE html>
         </g>
       </svg>
 
-      <!-- ZOOM TOOLBAR -->
+      <!-- FLOATING APPLE ZOOM TOOLBAR -->
       <div class="zoom-toolbar">
         <button class="zoom-btn" id="btn-zoom-in" title="Zoom In">+</button>
         <button class="zoom-btn" id="btn-zoom-out" title="Zoom Out">−</button>
@@ -904,16 +958,16 @@ revamped_template = """<!DOCTYPE html>
     // DOMAIN MAP TOKENS & COLORS
     const DOMAIN_TOKENS = {
       'root':         { name: 'Root Hub',                    color: '#6366F1' },
-      'foundations':  { name: 'Data Foundations',            color: '#3B82F6' },
-      'ingestion':    { name: 'Data Ingestion',              color: '#06B6D4' },
-      'storage':      { name: 'Data Storage',                color: '#8B5CF6' },
-      'processing':   { name: 'Data Processing',             color: '#F59E0B' },
-      'modeling':     { name: 'Data Modeling',               color: '#EC4899' },
-      'orchestration':{ name: 'Orchestration & Workflow',    color: '#10B981' },
-      'quality':      { name: 'Data Quality & Observability',color: '#14B8A6' },
-      'governance':   { name: 'Data Governance & Security',  color: '#EF4444' },
-      'analytics':    { name: 'Analytics, BI & Activation', color: '#84CC16' },
-      'architecture': { name: 'Architecture, Cloud & DevOps',color: '#F97316' }
+      'foundations':  { name: 'Data Foundations',            color: '#38BDF8' },
+      'ingestion':    { name: 'Data Ingestion',              color: '#22D3EE' },
+      'storage':      { name: 'Data Storage',                color: '#A78BFA' },
+      'processing':   { name: 'Data Processing',             color: '#FBBF24' },
+      'modeling':     { name: 'Data Modeling',               color: '#F472B6' },
+      'orchestration':{ name: 'Orchestration & Workflow',    color: '#34D399' },
+      'quality':      { name: 'Data Quality & Observability',color: '#2DD4BF' },
+      'governance':   { name: 'Data Governance & Security',  color: '#F87171' },
+      'analytics':    { name: 'Analytics, BI & Activation', color: '#A3E635' },
+      'architecture': { name: 'Architecture, Cloud & DevOps',color: '#FB923C' }
     };
 
     // STATE
@@ -953,28 +1007,39 @@ revamped_template = """<!DOCTYPE html>
 
     // D3 Simulation
     const simulation = d3.forceSimulation(DATA_GRAPH.nodes)
-      .force("link", d3.forceLink(linksList).id(d => d.id).distance(90).strength(0.5))
-      .force("charge", d3.forceManyBody().strength(-200).distanceMax(400))
+      .force("link", d3.forceLink(linksList).id(d => d.id).distance(95).strength(0.5))
+      .force("charge", d3.forceManyBody().strength(-220).distanceMax(450))
       .force("center", d3.forceCenter(0, 0).strength(0.05))
-      .force("collide", d3.forceCollide(d => (d.level === 0 ? 36 : (d.level === 1 ? 24 : 12))))
+      .force("collide", d3.forceCollide(d => (d.level === 0 ? 40 : (d.level === 1 ? 26 : 14))))
       .alphaDecay(0.025);
 
     for (let i = 0; i < 300; ++i) simulation.tick();
     simulation.stop(); // Pre-computed layout
 
-    // Render Edges
-    const linkElements = edgesLayer.selectAll("line")
+    // HELPER: CALCULATE SMOOTH CURVED BEZIER PATH (Apple-Style Curves)
+    function calcCurvedPath(d) {
+      const dx = d.target.x - d.source.x;
+      const dy = d.target.y - d.source.y;
+      const dr = Math.sqrt(dx * dx + dy * dy);
+      if (dr === 0) return `M${d.source.x},${d.source.y} L${d.target.x},${d.target.y}`;
+      
+      // Calculate smooth midpoint control point for organic curvature
+      const mx = (d.source.x + d.target.x) / 2;
+      const my = (d.source.y + d.target.y) / 2;
+      const offset = Math.min(dr * 0.18, 40);
+      const cx = mx - (dy / dr) * offset;
+      const cy = my + (dx / dr) * offset;
+      return `M ${d.source.x},${d.source.y} Q ${cx},${cy} ${d.target.x},${d.target.y}`;
+    }
+
+    // Render Edges with Organic Curved Paths
+    const linkElements = edgesLayer.selectAll("path")
       .data(linksList)
       .enter()
-      .append("line")
+      .append("path")
+      .attr("class", "graph-edge-path")
       .attr("vector-effect", "non-scaling-stroke")
-      .attr("stroke", "var(--graph-edge)")
-      .attr("stroke-width", 1.5)
-      .attr("stroke-opacity", 0.6)
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
+      .attr("d", calcCurvedPath);
 
     // Render Nodes Group
     const nodeElements = nodesLayer.selectAll("g")
@@ -1003,7 +1068,7 @@ revamped_template = """<!DOCTYPE html>
 
       if (d.level === 0) {
         g.append("circle")
-          .attr("r", 16)
+          .attr("r", 18)
           .attr("fill", "var(--bg-elevated)")
           .attr("stroke", domainColor)
           .attr("stroke-width", 3);
@@ -1014,19 +1079,19 @@ revamped_template = """<!DOCTYPE html>
           .attr("dy", 4)
           .attr("fill", "var(--text-primary)")
           .attr("font-family", "JetBrains Mono")
-          .attr("font-size", "11px")
+          .attr("font-size", "12px")
           .attr("font-weight", "700");
 
         g.append("text")
           .text("DATA ENGINEERING")
           .attr("text-anchor", "middle")
-          .attr("dy", 32)
+          .attr("dy", 34)
           .attr("fill", "var(--text-primary)")
           .attr("font-size", "12px")
           .attr("font-weight", "700");
       } else if (d.level === 1) {
         g.append("circle")
-          .attr("r", 10)
+          .attr("r", 11)
           .attr("fill", "var(--bg-elevated)")
           .attr("stroke", domainColor)
           .attr("stroke-width", 2.5);
@@ -1034,14 +1099,14 @@ revamped_template = """<!DOCTYPE html>
         g.append("text")
           .text(d.name)
           .attr("text-anchor", "middle")
-          .attr("dy", -16)
+          .attr("dy", -18)
           .attr("fill", "var(--text-primary)")
           .attr("font-family", "Inter")
           .attr("font-size", "10px")
           .attr("font-weight", "600");
       } else if (d.level === 2) {
         g.append("circle")
-          .attr("r", 7)
+          .attr("r", 7.5)
           .attr("fill", "var(--graph-node-l2)")
           .attr("stroke", domainColor)
           .attr("stroke-width", 2);
@@ -1049,7 +1114,7 @@ revamped_template = """<!DOCTYPE html>
         g.append("text")
           .text(d.name)
           .attr("text-anchor", "middle")
-          .attr("dy", -12)
+          .attr("dy", -14)
           .attr("fill", "var(--text-secondary)")
           .attr("font-family", "Inter")
           .attr("font-size", "9px")
@@ -1057,7 +1122,7 @@ revamped_template = """<!DOCTYPE html>
       } else {
         g.append("circle")
           .attr("class", "concept-circle")
-          .attr("r", 5)
+          .attr("r", 5.5)
           .attr("fill", "var(--graph-node)")
           .attr("stroke", "none");
       }
@@ -1076,39 +1141,39 @@ revamped_template = """<!DOCTYPE html>
         const domainColor = DOMAIN_TOKENS[d.domain] ? DOMAIN_TOKENS[d.domain].color : 'var(--accent)';
 
         if (isSelected) {
-          circle.attr("r", 7)
+          circle.attr("r", 7.5)
             .attr("fill", domainColor)
             .attr("stroke", "var(--focus-ring)")
             .attr("stroke-width", 2.5);
         } else if (isHovered) {
-          circle.attr("r", 7)
+          circle.attr("r", 7.5)
             .attr("fill", domainColor)
             .attr("stroke", "var(--bg-base)")
             .attr("stroke-width", 1.5)
             .attr("filter", "url(#glow-halo)");
         } else if (isRead) {
-          circle.attr("r", 5)
+          circle.attr("r", 5.5)
             .attr("fill", "var(--graph-node)")
             .attr("stroke", "var(--diff-b)")
             .attr("stroke-width", 2);
         } else {
-          circle.attr("r", 5)
+          circle.attr("r", 5.5)
             .attr("fill", "var(--graph-node)")
             .attr("stroke", "none")
             .attr("filter", null);
         }
       });
 
-      // Highlight Edges
+      // Highlight Curved Edge Paths
       linkElements.each(function(l) {
         const edge = d3.select(this);
         const isSelectedEdge = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
         const isHoveredEdge = l.source.id === hoveredNodeId || l.target.id === hoveredNodeId;
 
         if (isSelectedEdge || isHoveredEdge) {
-          edge.attr("stroke", "var(--graph-edge-strong)").attr("stroke-opacity", 1.0).attr("stroke-width", 2);
+          edge.classed("highlighted", true);
         } else {
-          edge.attr("stroke", "var(--graph-edge)").attr("stroke-opacity", 0.6).attr("stroke-width", 1.5);
+          edge.classed("highlighted", false);
         }
       });
     }
@@ -1409,7 +1474,7 @@ revamped_template = """<!DOCTYPE html>
     function renderListView() {
       const ul = document.getElementById('list-view-ul');
       ul.innerHTML = DATA_GRAPH.nodes.map(n => `
-        <li style="background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 8px; padding: 16px;">
+        <li style="background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 12px; padding: 16px;">
           <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">${escapeHTML(n.name)}</div>
           <div style="font-size: 0.75rem; color: var(--accent); margin: 4px 0;">${escapeHTML(DOMAIN_TOKENS[n.domain] ? DOMAIN_TOKENS[n.domain].name : n.domain)}</div>
           <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 6px;">${escapeHTML(n.description || '')}</p>
@@ -1438,11 +1503,11 @@ revamped_template = """<!DOCTYPE html>
 # Write to data-engineering-mindmap/index.html
 target_file_1 = os.path.join(base_dir, 'data-engineering-mindmap', 'index.html')
 with open(target_file_1, 'w', encoding='utf-8') as f:
-    f.write(revamped_template)
+    f.write(apple_curved_template)
 
 # Write to data-engineering-mindmap.html
 target_file_2 = os.path.join(base_dir, 'data-engineering-mindmap.html')
 with open(target_file_2, 'w', encoding='utf-8') as f:
-    f.write(revamped_template)
+    f.write(apple_curved_template)
 
-print("Successfully revamped mindmap design and removed all graphics!")
+print("Successfully applied Apple-style curved design to mindmap!")
