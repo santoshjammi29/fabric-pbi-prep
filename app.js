@@ -6948,11 +6948,15 @@ Your input highlights the need for dynamic optimization of distributed executors
 
     container.innerHTML = window.MODERN_CODE_MATRIX.map(item => `
       <div class="code-wrapper mac-ide-code-block" style="margin-bottom: 1.5rem; padding: 1rem;">
-        <h4 style="color: var(--apple-green); font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">❓ ${escapeHTML(item.topic)}</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+        <h4 style="color: var(--primary); font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">❓ ${escapeHTML(item.topic)}</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.85rem;">
           <div>
             <span style="font-size: 0.75rem; font-weight: 700; color: #a7f3d0;">🐍 Python (Polars)</span>
             <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.python)}</code></pre>
+          </div>
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #60a5fa;">🛢️ MS SQL (T-SQL)</span>
+            <pre class="code-block" style="margin-top: 0.25rem;"><code>${escapeHTML(item.mssql || item.sql || '')}</code></pre>
           </div>
           <div>
             <span style="font-size: 0.75rem; font-weight: 700; color: #fde047;">🌀 PySpark</span>

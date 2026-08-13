@@ -155,9 +155,9 @@
 
           <!-- DE Mindmap -->
           <li class="nav-item">
-            <a href="/data-engineering-mindmap" class="nav-btn" style="text-decoration: none;">
+            <a href="/data-engineering-mindmap" target="_blank" rel="noopener noreferrer" class="nav-btn" style="text-decoration: none;" title="External link: opens interactive DE Mindmap graph">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-              <span class="nav-text">DE Mindmap</span>
+              <span class="nav-text">DE Mindmap ↗</span>
               <span class="nav-diff-pill" style="background: rgba(0, 217, 255, 0.2); color: #00d9ff; border: 1px solid #00d9ff;">NEW</span>
             </a>
           </li>
@@ -672,7 +672,7 @@
                   <td><strong>Snowflake</strong></td>
                   <td>✅ Unmanaged Stage</td>
                   <td>✅ Iceberg Native Table</td>
-                  <td>⚠️ Via Parquet</td>
+                  <td>❌ No Native Support (Parquet Only)</td>
                   <td>✅ Vectorized</td>
                   <td>Snowflake Managed / S3</td>
                 </tr>
@@ -680,7 +680,7 @@
                   <td><strong>Google BigQuery</strong></td>
                   <td>✅ BigLake Delta</td>
                   <td>✅ BigLake Iceberg</td>
-                  <td>⚠️ BigLake Manifest</td>
+                  <td>⚠️ BigLake Manifest Only</td>
                   <td>✅ Colossus Engine</td>
                   <td>BigLake Managed</td>
                 </tr>
@@ -688,20 +688,24 @@
                   <td><strong>DuckDB</strong></td>
                   <td>✅ delta extension</td>
                   <td>✅ iceberg extension</td>
-                  <td>⚠️ Parquet direct</td>
+                  <td>⚠️ Parquet Direct Read</td>
                   <td>✅ Zero-copy Arrow</td>
                   <td>Embedded / MotherDuck</td>
                 </tr>
                 <tr>
                   <td><strong>Microsoft Fabric</strong></td>
                   <td>✅ OneLake Native</td>
-                  <td>✅ Iceberg Shortcut</td>
-                  <td>⚠️ Parquet Shortcut</td>
+                  <td>✅ OneLake Native &amp; Shortcuts</td>
+                  <td>⚠️ Read-only Parquet Shortcut</td>
                   <td>✅ Direct Lake</td>
                   <td>OneLake Metastore</td>
                 </tr>
               </tbody>
             </table>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.55rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+              <span>📅 <strong>Last verified:</strong> 2026-08-13</span>
+              <span>📚 <strong>Vendor Sources:</strong> <a href="https://docs.snowflake.com/en/user-guide/tables-iceberg" target="_blank" rel="noopener" style="color:var(--primary);">Snowflake Docs</a> · <a href="https://cloud.google.com/bigquery/docs/biglake-intro" target="_blank" rel="noopener" style="color:var(--primary);">BigQuery BigLake Spec</a> · <a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview" target="_blank" rel="noopener" style="color:var(--primary);">Microsoft OneLake Spec</a></span>
+            </div>
           </div>
         </div>
 
@@ -718,10 +722,12 @@
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Input Rows (Millions):</span><span class="sim-val" id="sim-shuffle-rows-val">50M</span></div>
                 <input type="range" class="sim-slider" id="sim-shuffle-rows" min="1" max="500" value="50" oninput="runShuffleSim()">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary); margin-top:2px;"><span>Min: 1M</span><span>Max: 500M</span></div>
               </div>
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Data Skew Factor:</span><span class="sim-val" id="sim-shuffle-skew-val">1.5x</span></div>
                 <input type="range" class="sim-slider" id="sim-shuffle-skew" min="1.0" max="5.0" step="0.1" value="1.5" oninput="runShuffleSim()">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary); margin-top:2px;"><span>Min: 1.0x</span><span>Max: 5.0x</span></div>
               </div>
               <div class="sim-result-box" id="sim-shuffle-result">Predicted Shuffle: ~12.5 GB · Recommended Partitions: 100</div>
             </div>
@@ -753,6 +759,7 @@
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Monthly TB Scanned:</span><span class="sim-val" id="sim-cost-tb-val">10 TB</span></div>
                 <input type="range" class="sim-slider" id="sim-cost-tb" min="1" max="100" value="10" oninput="runCostSim()">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary); margin-top:2px;"><span>Min: 1 TB</span><span>Max: 100 TB</span></div>
               </div>
               <div class="sim-result-box" id="sim-cost-result">Estimated Cost: ~$50.00 (BigQuery) | ~$120.00 (DBSQL Serverless)</div>
             </div>
@@ -766,6 +773,7 @@
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Worker Nodes:</span><span class="sim-val" id="sim-spark-workers-val">8 Nodes</span></div>
                 <input type="range" class="sim-slider" id="sim-spark-workers" min="2" max="64" value="8" oninput="runSparkConfigSim()">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary); margin-top:2px;"><span>Min: 2 Nodes</span><span>Max: 64 Nodes</span></div>
               </div>
               <div class="sim-result-box" id="sim-spark-result">Total Cores: 32 · RAM: 128 GB · Max Throughput: ~2.4 GB/s</div>
             </div>
@@ -779,6 +787,7 @@
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Chunk Size (Tokens):</span><span class="sim-val" id="sim-rag-chunk-val">512 tokens</span></div>
                 <input type="range" class="sim-slider" id="sim-rag-chunk" min="128" max="2048" step="128" value="512" oninput="runRagSim()">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary); margin-top:2px;"><span>Min: 128 tok</span><span>Max: 2048 tok</span></div>
               </div>
               <div class="sim-result-box" id="sim-rag-result">Index Density: High Precision · Embed Model: text-embedding-3-small</div>
             </div>
@@ -792,6 +801,7 @@
               <div class="sim-range-group">
                 <div class="sim-label-row"><span>Allowed Lateness (Mins):</span><span class="sim-val" id="sim-watermark-val">10 Mins</span></div>
                 <input type="range" class="sim-slider" id="sim-watermark" min="1" max="60" value="10" oninput="runWatermarkSim()">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary); margin-top:2px;"><span>Min: 1m</span><span>Max: 60m</span></div>
               </div>
               <div class="sim-result-box" id="sim-watermark-result">Events lagging > 10m dropped · RocksDB State Size: ~1.2 GB</div>
             </div>
@@ -1557,6 +1567,246 @@
                   </div>
                   <div class="spark-lexicon-term">DAG (Directed Acyclic Graph)</div>
                   <p class="spark-lexicon-def">The logical representation of transformations applied to your source dataset. Spark uses the DAG to rebuild lost partitions and compute physical runtime execution branches efficiently.</p>
+                </div>
+
+                <!-- Term 7 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="broadcast hash join bhj small table replicate shuffle zero">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Join Strategy</span>
+                  </div>
+                  <div class="spark-lexicon-term">Broadcast Hash Join (BHJ)</div>
+                  <p class="spark-lexicon-def">Replicates a small build-side dataset (default &lt;10MB) to every worker executor, eliminating network shuffles entirely during join operations.</p>
+                </div>
+
+                <!-- Term 8 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="catalyst optimizer logical physical plan rule tree">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Query Planner</span>
+                  </div>
+                  <div class="spark-lexicon-term">Catalyst Optimizer</div>
+                  <p class="spark-lexicon-def">Extensible query optimization framework that analyzes Scala/SQL ASTs, applies rule-based optimizations, and builds physical execution plans.</p>
+                </div>
+
+                <!-- Term 9 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="dpp dynamic partition pruning runtime filter join">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Pruning</span>
+                  </div>
+                  <div class="spark-lexicon-term">Dynamic Partition Pruning (DPP)</div>
+                  <p class="spark-lexicon-def">Evaluates filter conditions on dimension tables at runtime and injects dynamic broadcast filters into fact table scans to skip unneeded partition files.</p>
+                </div>
+
+                <!-- Term 10 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="memory" data-keywords="memory manager execution storage fraction unified heap">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#d97706;">🧠 Memory &amp; Storage</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Allocation</span>
+                  </div>
+                  <div class="spark-lexicon-term">Unified Memory Manager</div>
+                  <p class="spark-lexicon-def">Dynamically balances JVM heap memory between execution (shuffles/joins) and storage (caching), allowing execution memory to evict cached blocks when under pressure.</p>
+                </div>
+
+                <!-- Term 11 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="memory" data-keywords="off-heap unsafe memory gc garbage collection pauses">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#d97706;">🧠 Memory &amp; Storage</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Off-Heap</span>
+                  </div>
+                  <div class="spark-lexicon-term">Off-Heap Memory Allocator</div>
+                  <p class="spark-lexicon-def">Allocates raw byte buffers outside the JVM garbage collector using sun.misc.Unsafe, preventing GC pause freezes during multi-gigabyte shuffle operations.</p>
+                </div>
+
+                <!-- Term 12 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="streaming" data-keywords="wal write ahead log fault tolerance streaming exact-once">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#f87171;">📡 Streaming &amp; State</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(239,68,68,0.12); color:#f87171;">Durability</span>
+                  </div>
+                  <div class="spark-lexicon-term">Write-Ahead Log (WAL)</div>
+                  <p class="spark-lexicon-def">Synchronously logs incoming streaming record offsets to reliable storage (S3/ADLS) prior to processing, guaranteeing zero data loss during executor failures.</p>
+                </div>
+
+                <!-- Term 13 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="memory" data-keywords="spill to disk OOM out of memory shuffle buffer">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#d97706;">🧠 Memory &amp; Storage</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Spill Protocol</span>
+                  </div>
+                  <div class="spark-lexicon-term">Spill-to-Disk Protocol</div>
+                  <p class="spark-lexicon-def">Automatically writes in-memory shuffle aggregation tables to local worker scratch disk when memory limits are reached, preventing catastrophic driver/executor OOM crashes.</p>
+                </div>
+
+                <!-- Term 14 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="salting partition skew hot key rebalance">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Skew Fix</span>
+                  </div>
+                  <div class="spark-lexicon-term">Key Salting</div>
+                  <p class="spark-lexicon-def">Appends random integer suffixes (e.g. key_0, key_1) to heavily skewed join keys to split single-straggler tasks evenly across all available cluster slots.</p>
+                </div>
+
+                <!-- Term 15 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="rdd lineage recovery node failure fault tolerant">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Resilience</span>
+                  </div>
+                  <div class="spark-lexicon-term">RDD Lineage Graph</div>
+                  <p class="spark-lexicon-def">Tracks the deterministic chain of transformations used to construct an RDD, enabling instant re-computation of lost partitions without full dataset reloads.</p>
+                </div>
+
+                <!-- Term 16 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="task slot executor cores thread parallel">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Execution Unit</span>
+                  </div>
+                  <div class="spark-lexicon-term">Task Slot</div>
+                  <p class="spark-lexicon-def">The fundamental unit of parallelism inside a Spark executor JVM; each slot runs exactly one partition task concurrently on an allocated CPU core.</p>
+                </div>
+
+                <!-- Term 17 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="coalesce repartition shuffle partition count">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Partitioning</span>
+                  </div>
+                  <div class="spark-lexicon-term">Coalesce vs Repartition</div>
+                  <p class="spark-lexicon-def">Coalesce reduces partition counts by merging adjacent partitions without a full shuffle; Repartition increases or rebalances partitions with a full network shuffle.</p>
+                </div>
+
+                <!-- Term 18 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="vectorized reader parquet SIMD columnar throughput">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Vectorized</span>
+                  </div>
+                  <div class="spark-lexicon-term">Vectorized Parquet Reader</div>
+                  <p class="spark-lexicon-def">Loads 4096 columnar rows into CPU SIMD registers simultaneously, accelerating scan speeds by 10x compared to traditional row-by-row object deserialization.</p>
+                </div>
+
+                <!-- Term 19 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="z-order data skipping delta lake hilbert curve">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Clustering</span>
+                  </div>
+                  <div class="spark-lexicon-term">Z-Ordering &amp; Data Skipping</div>
+                  <p class="spark-lexicon-def">Co-locates multi-dimensional data along space-filling curves in Delta Lake files, allowing query engines to skip 90%+ of files using min/max stats.</p>
+                </div>
+
+                <!-- Term 20 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="delta log acid json checkpoint transaction">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">ACID Metadata</span>
+                  </div>
+                  <div class="spark-lexicon-term">Delta Transaction Log (_delta_log)</div>
+                  <p class="spark-lexicon-def">Ordered sequence of JSON commit files and Parquet checkpoints tracking table state changes, guaranteeing serializable ACID isolation and time travel.</p>
+                </div>
+
+                <!-- Term 21 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="streaming" data-keywords="microbatch continuous processing latency streaming">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#f87171;">📡 Streaming &amp; State</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(239,68,68,0.12); color:#f87171;">Modes</span>
+                  </div>
+                  <div class="spark-lexicon-term">Micro-batching vs Continuous Execution</div>
+                  <p class="spark-lexicon-def">Micro-batching processes stream triggers as small discrete jobs (~100ms latency); Continuous Execution streams records continuously with sub-millisecond latency.</p>
+                </div>
+
+                <!-- Term 22 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="streaming" data-keywords="watermark late data allowed lateness event time">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#f87171;">📡 Streaming &amp; State</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(239,68,68,0.12); color:#f87171;">Event Time</span>
+                  </div>
+                  <div class="spark-lexicon-term">Watermarking Threshold</div>
+                  <p class="spark-lexicon-def">Specifies how long Structured Streaming maintains state for late-arriving events before dropping them and advancing window evaluation boundaries.</p>
+                </div>
+
+                <!-- Term 23 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="memory" data-keywords="broadcast variables read-only lookup table cache">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#d97706;">🧠 Memory &amp; Storage</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Cached Reference</span>
+                  </div>
+                  <div class="spark-lexicon-term">Broadcast Variables</div>
+                  <p class="spark-lexicon-def">Caches a read-only variable on each worker machine once rather than shipping a copy with every task, saving network bandwidth on large lookup tables.</p>
+                </div>
+
+                <!-- Term 24 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="accumulators metrics counter driver sum">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Shared Counter</span>
+                  </div>
+                  <div class="spark-lexicon-term">Spark Accumulators</div>
+                  <p class="spark-lexicon-def">Variables that are only added to through associative and commutative operations, used for efficient parallel counter metrics reported back to driver.</p>
+                </div>
+
+                <!-- Term 25 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="streaming" data-keywords="stateful streaming flatmapgroupswithstate state store">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#f87171;">📡 Streaming &amp; State</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(239,68,68,0.12); color:#f87171;">Custom State</span>
+                  </div>
+                  <div class="spark-lexicon-term">Stateful Streaming Operations</div>
+                  <p class="spark-lexicon-def">Functions like flatMapGroupsWithState that maintain user-defined arbitrary state across micro-batches for sessionization and alert tracking.</p>
+                </div>
+
+                <!-- Term 26 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="memory" data-keywords="checkpointing truncate lineage rdd storage adls">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#d97706;">🧠 Memory &amp; Storage</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Lineage Cut</span>
+                  </div>
+                  <div class="spark-lexicon-term">RDD &amp; Stream Checkpointing</div>
+                  <p class="spark-lexicon-def">Saves DataFrame/RDD contents to reliable storage and cuts its DAG lineage graph to prevent stack overflow errors during recursive or iterative jobs.</p>
+                </div>
+
+                <!-- Term 27 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="narrow wide dependency map filter groupby stage">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Dependencies</span>
+                  </div>
+                  <div class="spark-lexicon-term">Narrow vs Wide Dependencies</div>
+                  <p class="spark-lexicon-def">Narrow dependencies (map, filter) process parent partitions independently within one stage; Wide dependencies (groupBy, join) require shuffles between stages.</p>
+                </div>
+
+                <!-- Term 28 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="spark driver sparkcontext dag scheduler task scheduler">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Coordinator</span>
+                  </div>
+                  <div class="spark-lexicon-term">Spark Driver Node</div>
+                  <p class="spark-lexicon-def">Master process running main(), instantiating SparkSession, converting user code to physical DAG stages, and scheduling tasks to executors.</p>
+                </div>
+
+                <!-- Term 29 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="engine" data-keywords="spark executor worker jvm task cache storage">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#4f9cf9;">⚙️ Core Engine</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(79,156,249,0.12); color:#4f9cf9;">Worker JVM</span>
+                  </div>
+                  <div class="spark-lexicon-term">Spark Executor Process</div>
+                  <p class="spark-lexicon-def">Distributed worker JVM process responsible for executing assigned partition tasks, storing cached data blocks, and reporting heartbeat metrics.</p>
+                </div>
+
+                <!-- Term 30 -->
+                <div class="spark-lexicon-card lexicon-card" data-category="optimization" data-keywords="dynamic allocation autoscaling executors queue load">
+                  <div class="spark-lexicon-meta">
+                    <span class="spark-lex-cat-badge" style="color:#bc5090;">🚀 Optimization</span>
+                    <span class="spark-lex-type-badge" style="background:rgba(34,197,94,0.12); color:#22c55e;">Autoscaling</span>
+                  </div>
+                  <div class="spark-lexicon-term">Dynamic Executor Allocation</div>
+                  <p class="spark-lexicon-def">Automatically requests additional executors when task queues build up and relinquishes idle executors back to cluster resource managers.</p>
                 </div>
 
               </div>
@@ -3213,11 +3463,11 @@ WHEN NOT MATCHED THEN
 
         <div class="gcc-content">
           <!-- Indicative Compensation Disclaimer Banner -->
-          <div class="gcc-disclaimer-banner" style="background: rgba(52, 199, 89, 0.08); border: 1px solid #34c759; border-radius: 14px; padding: 0.85rem 1.25rem; margin-bottom: 1.25rem;">
+          <div class="gcc-disclaimer-banner" style="background: rgba(52, 199, 89, 0.08); border: 1px solid #34c759; border-radius: 14px; padding: 0.95rem 1.35rem; margin-bottom: 1.25rem;">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span style="font-size: 1.2rem;">💡</span>
-              <p style="margin: 0; font-size: 0.82rem; color: var(--text-primary); line-height: 1.45;">
-                <strong>Indicative Compensation & Remote Work Disclaimer:</strong> Salary ranges shown across GCC tiers represent estimated market benchmarks (base + variable performance incentives). Actual compensation packages vary by seniority, domain expertise, and remote/hybrid work eligibility.
+              <span style="font-size: 1.3rem;">⚖️</span>
+              <p style="margin: 0; font-size: 0.82rem; color: var(--text-primary); line-height: 1.5;">
+                <strong>Data Sources &amp; Verification Timestamp (2026-08-13):</strong> Salary ranges shown across GCC tiers represent estimated market benchmarks (base + variable performance incentives) compiled from public career disclosures [Glassdoor 2026-08 | AmbitionBox 2026-08 | LinkedIn Insights 2026-08]. Risk tier classifications are based on documented 2024–2025 industry restructuring reports (TechCrunch / Bloomberg archives) and apply as of 2026-08.
               </p>
             </div>
           </div>
@@ -3768,8 +4018,8 @@ WHEN NOT MATCHED THEN
                   <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
                   <td class="company-name" data-label="Company">Microsoft IDC ⚠️</td>
                   <td data-label="Sector">Technology / SaaS</td>
-                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹35L - ₹48L</td>
-                  <td class="justification" data-label="Stability & Risk">**Impacted:** Broad global restructuring rounds; local hiring is extremely lean.</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹35L - ₹48L <span style="font-size:0.65rem;color:var(--text-secondary);display:block;">[Glassdoor/AmbitionBox 2026-08]</span></td>
+                  <td class="justification" data-label="Stability & Risk"><strong>High Risk (as of 2026-08):</strong> 2024–2025 global Azure/tech restructuring waves [TechCrunch Jan 2024 archive]. Local engineering hiring is focused strictly on specialized AI roles.</td>
                   <td data-label="Jobs Portal">
                     <a href="https://careers.microsoft.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
@@ -3781,8 +4031,8 @@ WHEN NOT MATCHED THEN
                   <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
                   <td class="company-name" data-label="Company">Google India ⚠️</td>
                   <td data-label="Sector">Technology / Cloud</td>
-                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹38L - ₹52L</td>
-                  <td class="justification" data-label="Stability & Risk">**Impacted:** Global engineering and cloud divisions saw verified downsizing.</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹38L - ₹52L <span style="font-size:0.65rem;color:var(--text-secondary);display:block;">[Glassdoor/AmbitionBox 2026-08]</span></td>
+                  <td class="justification" data-label="Stability & Risk"><strong>High Risk (as of 2026-08):</strong> 2024–2025 global engineering &amp; cloud trims [Bloomberg Jan 2024 archive]. Core headcount additions are selectively gated.</td>
                   <td data-label="Jobs Portal">
                     <a href="https://careers.google.com/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
@@ -3794,8 +4044,8 @@ WHEN NOT MATCHED THEN
                   <td data-label="Risk Level"><span class="badge-risk badge-risk-high">High Risk</span></td>
                   <td class="company-name" data-label="Company">Amazon India (AWS) ⚠️</td>
                   <td data-label="Sector">Technology / E-com</td>
-                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹34L - ₹46L</td>
-                  <td class="justification" data-label="Stability & Risk">**Impacted:** Multiple significant layoff waves across AWS and corporate operations.</td>
+                  <td class="salary-range" data-label="Salary (7+ Yrs)">₹34L - ₹46L <span style="font-size:0.65rem;color:var(--text-secondary);display:block;">[Glassdoor/AmbitionBox 2026-08]</span></td>
+                  <td class="justification" data-label="Stability & Risk"><strong>High Risk (as of 2026-08):</strong> 2024–2025 AWS &amp; corporate operational restructuring [Reuters April 2024 archive]. Lean team headcount model.</td>
                   <td data-label="Jobs Portal">
                     <a href="https://www.amazon.jobs/" target="_blank" rel="noopener noreferrer" class="portal-link">
                       Apply
@@ -4427,7 +4677,11 @@ WHEN NOT MATCHED THEN
       <p>
         Built by <strong class="footer-author">Santosh Jammi</strong> — Senior Data Engineer &rarr; Principal Data Architect
       </p>
-      <p>TCS EU BFSI &bull; LTIMindtree &bull; Infosys &bull; Microsoft Fabric DP-600 &bull; Azure DP-203 &bull; PL-300 &bull; 2,600+ Questions</p>
+      <div class="footer-credentials-rows" style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; margin: 0.5rem 0;">
+        <div><strong>Experience:</strong> TCS EU BFSI &bull; LTIMindtree &bull; Infosys</div>
+        <div><strong>Certifications:</strong> Microsoft Fabric DP-600 &bull; Azure DP-203 &bull; Power BI PL-300</div>
+        <div><strong>Library:</strong> 2,600+ Questions &bull; 2,400+ Arch Scenarios &bull; 55 GCC Directory</div>
+      </div>
       <p class="footer-keywords">
         Medallion Architecture &bull; Delta Lake &bull; GDPR &bull; FinOps &bull; Databricks &bull; Azure Synapse &bull; Microsoft Fabric
       </p>

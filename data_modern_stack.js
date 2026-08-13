@@ -365,4 +365,40 @@
     }
   ];
 
+  // 5-Language Polyglot Code Matrix (Python, MS SQL T-SQL, PySpark, Spark SQL, DuckDB SQL)
+  window.MODERN_CODE_MATRIX = [
+    {
+      topic: '1. Window Functions — Dense Rank & Rolling Averages',
+      python: `import polars as pl\ndf.with_columns([\n    pl.col("sales").rank("dense", descending=True).over("dept").alias("rank"),\n    pl.col("sales").mean().rolling(window_size=3).over("dept").alias("roll_avg")\n])`,
+      mssql: `SELECT dept, employee_id, sales,\n  DENSE_RANK() OVER (PARTITION BY dept ORDER BY sales DESC) AS rank,\n  AVG(sales) OVER (PARTITION BY dept ORDER BY sale_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS roll_avg\nFROM dbo.fact_sales;`,
+      pyspark: `from pyspark.sql.window import Window\nimport pyspark.sql.functions as F\n\nw_dept = Window.partitionBy("dept").orderBy(F.col("sales").desc())\nw_roll = Window.partitionBy("dept").orderBy("sale_date").rowsBetween(-2, 0)\n\ndf.withColumn("rank", F.dense_rank().over(w_dept)) \\\n  .withColumn("roll_avg", F.avg("sales").over(w_roll))`,
+      sparksql: `SELECT dept, employee_id, sales,\n  DENSE_RANK() OVER (PARTITION BY dept ORDER BY sales DESC) AS rank,\n  AVG(sales) OVER (PARTITION BY dept ORDER BY sale_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS roll_avg\nFROM delta.\`s3://lakehouse/sales\`;`,
+      duckdb: `SELECT dept, employee_id, sales,\n  DENSE_RANK() OVER (PARTITION BY dept ORDER BY sales DESC) AS rank,\n  AVG(sales) OVER (PARTITION BY dept ORDER BY sale_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS roll_avg\nFROM 's3://lakehouse/sales/*.parquet';`
+    },
+    {
+      topic: '2. Conditional Aggregation & Pivot / Unpivot',
+      python: `import polars as pl\ndf.group_by("region").agg([\n    pl.col("amount").filter(pl.col("status") == "SUCCESS").sum().alias("success_sum"),\n    pl.col("amount").filter(pl.col("status") == "FAILED").sum().alias("failed_sum")\n])`,
+      mssql: `SELECT region,\n  SUM(CASE WHEN status = 'SUCCESS' THEN amount ELSE 0 END) AS success_sum,\n  SUM(CASE WHEN status = 'FAILED' THEN amount ELSE 0 END) AS failed_sum\nFROM dbo.orders\nGROUP BY region;`,
+      pyspark: `df.groupBy("region").agg(\n  F.sum(F.when(F.col("status") == "SUCCESS", F.col("amount")).otherwise(0)).alias("success_sum"),\n  F.sum(F.when(F.col("status") == "FAILED", F.col("amount")).otherwise(0)).alias("failed_sum")\n)`,
+      sparksql: `SELECT region,\n  SUM(CASE WHEN status = 'SUCCESS' THEN amount ELSE 0 END) AS success_sum,\n  SUM(CASE WHEN status = 'FAILED' THEN amount ELSE 0 END) AS failed_sum\nFROM delta_orders\nGROUP BY region;`,
+      duckdb: `SELECT region,\n  SUM(amount) FILTER (WHERE status = 'SUCCESS') AS success_sum,\n  SUM(amount) FILTER (WHERE status = 'FAILED') AS failed_sum\nFROM 's3://warehouse/orders.parquet'\nGROUP BY region;`
+    },
+    {
+      topic: '3. Deduplication & Latest State Selection (SCD Type 1)',
+      python: `import polars as pl\ndf.sort(["customer_id", "updated_at"], descending=[False, True]) \\\n  .unique(subset=["customer_id"], keep="first")`,
+      mssql: `WITH RankedRecords AS (\n  SELECT *,\n    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY updated_at DESC) AS rn\n  FROM dbo.customer_updates\n)\nSELECT * FROM RankedRecords WHERE rn = 1;`,
+      pyspark: `from pyspark.sql.window import Window\n\nw = Window.partitionBy("customer_id").orderBy(F.col("updated_at").desc())\ndf.withColumn("rn", F.row_number().over(w)).filter("rn = 1").drop("rn")`,
+      sparksql: `WITH ranked AS (\n  SELECT *,\n    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY updated_at DESC) AS rn\n  FROM delta_customers\n)\nSELECT * EXCEPT(rn) FROM ranked WHERE rn = 1;`,
+      duckdb: `SELECT DISTINCT ON (customer_id) *\nFROM 's3://lakehouse/customers/*.parquet'\nORDER BY customer_id, updated_at DESC;`
+    },
+    {
+      topic: '4. Date/Time Truncation & Interval Processing',
+      python: `import polars as pl\ndf.with_columns([\n    pl.col("timestamp").dt.truncate("1d").alias("day_start"),\n    (pl.col("timestamp") + pl.duration(days=30)).alias("expires_at")\n])`,
+      mssql: `SELECT \n  DATETRUNC(day, event_time) AS day_start,\n  DATEADD(day, 30, event_time) AS expires_at\nFROM dbo.events;`,
+      pyspark: `df.withColumn("day_start", F.date_trunc("day", "timestamp")) \\\n  .withColumn("expires_at", F.expr("timestamp + INTERVAL 30 DAYS"))`,
+      sparksql: `SELECT \n  DATE_TRUNC('day', timestamp) AS day_start,\n  timestamp + INTERVAL 30 DAYS AS expires_at\nFROM delta_events;`,
+      duckdb: `SELECT \n  DATE_TRUNC('day', timestamp) AS day_start,\n  timestamp + INTERVAL '30 days' AS expires_at\nFROM read_parquet('events.parquet');`
+    }
+  ];
+
 })();
