@@ -10796,3 +10796,38 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   DESIGN SYSTEM 2.0 COMPONENT PRIMITIVES & TOKENS
+   ========================================================================== */
+@import './src/design/globals.css';
+
+.ui-heading-display { font-size: var(--font-size-4xl, 2.5rem); font-weight: 700; font-family: var(--font-family-sans); color: var(--color-text-primary); letter-spacing: -0.025em; }
+.ui-heading-page    { font-size: var(--font-size-3xl, 1.875rem); font-weight: 700; font-family: var(--font-family-sans); color: var(--color-text-primary); letter-spacing: -0.02em; }
+.ui-heading-section { font-size: var(--font-size-2xl, 1.5rem); font-weight: 600; font-family: var(--font-family-sans); color: var(--color-text-primary); letter-spacing: -0.015em; }
+.ui-heading-card    { font-size: var(--font-size-lg, 1.125rem); font-weight: 600; font-family: var(--font-family-sans); color: var(--color-text-primary); }
+
+.ui-card-compact     { padding: var(--space-3, 0.75rem); border-radius: var(--radius-md, 0.5rem); border: 1px solid var(--color-border-subtle, #262626); background: var(--color-surface-raised, #171717); }
+.ui-card-default     { padding: var(--space-4, 1rem); border-radius: var(--radius-lg, 0.75rem); border: 1px solid var(--color-border-subtle, #262626); background: var(--color-surface-raised, #171717); transition: border-color var(--motion-base, 200ms ease); }
+.ui-card-default:hover { border-color: var(--color-border-default, #404040); }
+.ui-card-feature     { padding: var(--space-6, 1.5rem); border-radius: var(--radius-xl, 1rem); border: 1px solid var(--color-border-default, #404040); background: var(--color-surface-raised, #171717); box-shadow: var(--shadow-md); transition: box-shadow var(--motion-base, 200ms ease); }
+.ui-card-feature:hover { box-shadow: var(--shadow-lg); }
+.ui-card-interactive { padding: var(--space-4, 1rem); border-radius: var(--radius-lg, 0.75rem); border: 1px solid var(--color-border-subtle, #262626); background: var(--color-surface-raised, #171717); cursor: pointer; transition: all var(--motion-base, 200ms ease); }
+.ui-card-interactive:hover { border-color: var(--color-primary-500, #3b82f6); box-shadow: var(--shadow-glow); }
+
+.ui-btn-primary   { background: var(--color-primary-500, #3b82f6); color: #ffffff; border: none; box-shadow: var(--shadow-md); }
+.ui-btn-primary:hover { background: var(--color-primary-600, #2563eb); }
+.ui-btn-secondary { background: transparent; color: var(--color-text-primary, #fafafa); border: 1px solid var(--color-border-default, #404040); }
+.ui-btn-secondary:hover { background: var(--color-surface-overlay, #262626); }
+.ui-btn-ghost     { background: transparent; color: var(--color-text-secondary, #a3a3a3); border: none; }
+.ui-btn-ghost:hover { background: var(--color-surface-overlay, #262626); color: var(--color-text-primary, #fafafa); }
+.ui-btn-danger    { background: var(--color-danger-500, #ef4444); color: #ffffff; border: none; }
+.ui-btn-danger:hover { background: #dc2626; }
+
+.ui-badge-neutral { background: var(--color-surface-overlay, #262626); color: var(--color-text-secondary, #a3a3a3); }
+.ui-badge-primary { background: rgba(59, 130, 246, 0.1); color: var(--color-primary-500, #3b82f6); border: 1px solid rgba(59, 130, 246, 0.3); }
+.ui-badge-success { background: var(--color-success-bg, rgba(16, 185, 129, 0.1)); color: var(--color-success-500, #10b981); border: 1px solid rgba(16, 185, 129, 0.3); }
+.ui-badge-warning { background: var(--color-warning-bg, rgba(245, 158, 11, 0.1)); color: var(--color-warning-500, #f59e0b); border: 1px solid rgba(245, 158, 11, 0.3); }
+.ui-badge-danger  { background: var(--color-danger-bg, rgba(239, 68, 68, 0.1)); color: var(--color-danger-500, #ef4444); border: 1px solid rgba(239, 68, 68, 0.3); }
+.ui-badge-info    { background: var(--color-info-bg, rgba(6, 182, 212, 0.1)); color: var(--color-info-500, #06b6d4); border: 1px solid rgba(6, 182, 212, 0.3); }
+

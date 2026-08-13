@@ -1,0 +1,26 @@
+token_name,current_value,usage_count,semantic_role
+--bg-primary,#000000,340,color
+--surface-card,#0f0f12,285,color
+--item-bg,#16161c,210,color
+--text-primary,#f5f5f7,412,color
+--text-secondary,#86868b,380,color
+--card-border,rgba(255 255 255 / 0.1),260,border
+--primary,#0071e3,195,color
+--apple-blue,#0071e3,110,color
+--apple-green,#34c759,95,color
+--apple-purple,#af52de,45,color
+--diff-easy-bg,rgba(22 163 74 / 0.12),85,color
+--diff-easy-color,#16a34a,85,color
+--diff-medium-bg,rgba(217 119 6 / 0.12),90,color
+--diff-medium-color,#d97706,90,color
+--diff-hard-bg,rgba(234 88 12 / 0.12),75,color
+--diff-hard-color,#ea580c,75,color
+--diff-architect-bg,rgba(147 51 234 / 0.12),60,color
+--diff-architect-color,#9333ea,60,color
+--sidebar-width-v3,256px,120,spacing
+--content-max-w,1200px,40,spacing
+--page-padding-v3,clamp(1.25rem 4vw 2.5rem),55,spacing
+--card-radius-v3,12px,180,radius
+--transition-fast,0.15s cubic-bezier(0.4 0 0.2 1),95,motion
+--transition-med,0.25s cubic-bezier(0.4 0 0.2 1),110,motion
+--hero-gradient,linear-gradient(135deg #1e1b4b 0% #312e81 40% #4338ca 70% #2B3FFF 100%),15,color
