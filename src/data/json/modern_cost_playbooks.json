@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Auto-Termination & Warm Pool Cluster Sizing",
+    "savings": "35% - 50% DBU / Credit Reduction",
+    "summary": "Set cluster autosuspend to 10-15 minutes for interactive workloads and use serverless SQL warehouses with instant scaling policies.",
+    "code": "ALTER WAREHOUSE dbsql_wh SET AUTO_SUSPEND = 600 MIN_CLUSTER_COUNT = 1 MAX_CLUSTER_COUNT = 4;"
+  },
+  {
+    "title": "Delta Deletion Vectors vs Full File Compaction",
+    "savings": "60% I/O and Write Reduction",
+    "summary": "Enable Deletion Vectors on high-churn Delta tables to avoid rewriting 500MB Parquet files on single-row updates.",
+    "code": "ALTER TABLE silver.orders SET TBLPROPERTIES ('delta.enableDeletionVectors' = 'true');"
+  }
+]

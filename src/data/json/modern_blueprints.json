@@ -1,0 +1,169 @@
+[
+  {
+    "id": "bp-01",
+    "title": "1. Streaming Lakehouse (Kappa Architecture on Iceberg)",
+    "category": "Streaming & Lakehouse",
+    "costEstimate": "$1,200 - $3,500 / month (Serverless Cluster + S3/ADLS)",
+    "tags": [
+      "Serverless",
+      "Iceberg",
+      "Kafka",
+      "Flink"
+    ],
+    "mermaid": "graph LR\n    A[Kafka / Event Hubs] --> B[Flink / Structured Streaming]\n    B --> C[(Iceberg Bronze)]\n    C --> D[dbt / Spark Transformations]\n    D --> E[(Iceberg Silver & Gold)]\n    E --> F[Trino / Snowflake Query Engine]\n    F --> G[Power BI / Vector RAG Search]",
+    "ascii": "[Kafka] --> [Flink / Spark Streaming] --> [(Iceberg Lakehouse)] --> [Trino/Snowflake] --> [AI & BI]"
+  },
+  {
+    "id": "bp-02",
+    "title": "2. Multi-Cloud Federated Lakehouse (Unity Catalog + Iceberg REST)",
+    "category": "Governance & Federation",
+    "costEstimate": "$2,500 - $8,000 / month",
+    "tags": [
+      "Multi-Cloud",
+      "Unity Catalog",
+      "Iceberg REST",
+      "WIF"
+    ],
+    "mermaid": "graph TD\n    subgraph AWS Region\n        A1[(S3 Bucket)] --> B1[Databricks AWS]\n    end\n    subgraph Azure Region\n        A2[(ADLS Gen2)] --> B2[Databricks Azure]\n    end\n    B1 --> C[Unity Catalog Central Governance]\n    B2 --> C\n    C --> D[Cross-Cloud OpenLineage & ABAC Security]",
+    "ascii": "[AWS S3] + [Azure ADLS] --> [Unity Catalog Governance] --> [Cross-Cloud Query Engine]"
+  },
+  {
+    "id": "bp-03",
+    "title": "3. Agentic RAG Platform with Real-Time Ingest",
+    "category": "AI & LLM Architecture",
+    "costEstimate": "$800 - $2,200 / month",
+    "tags": [
+      "RAG",
+      "Vector Search",
+      "LangGraph",
+      "MCP"
+    ],
+    "mermaid": "graph LR\n    A[Document Stream] --> B[Spark Chunking & Embedding Pipeline]\n    B --> C[(Delta Vector Search Index)]\n    D[User Query] --> E[MCP Agentic Router]\n    E --> C\n    C --> F[RRF Ranker] --> G[LLM Response Generator]",
+    "ascii": "[Docs] --> [Spark Chunker/Embedder] --> [(Vector Index)] <--> [MCP Agent] --> [LLM]"
+  },
+  {
+    "id": "bp-04",
+    "title": "4. CDC Pipeline: Debezium → Kafka → Delta Lake → Vector Index",
+    "category": "CDC & Streaming",
+    "costEstimate": "$1,500 - $4,200 / month",
+    "tags": [
+      "CDC",
+      "Debezium",
+      "Kafka",
+      "Delta Lake"
+    ],
+    "mermaid": "graph LR\n    A[PostgreSQL / MySQL] --> B[Debezium CDC Connector]\n    B --> C[Kafka Event Bus]\n    C --> D[Databricks DLT Pipeline]\n    D --> E[(Delta Silver Layer)]\n    E --> F[Vector Search Index]",
+    "ascii": "[Postgres] --> [Debezium] --> [Kafka] --> [DLT Delta] --> [Vector Search]"
+  },
+  {
+    "id": "bp-05",
+    "title": "5. AI Governance Stack — Unity Catalog + Databricks AI Gateway + Llama Guard",
+    "category": "AI Security & Governance",
+    "costEstimate": "$1,000 - $3,000 / month",
+    "tags": [
+      "AI Security",
+      "Unity Catalog",
+      "Guardrails"
+    ],
+    "mermaid": "graph TD\n    A[Client App] --> B[Databricks AI Gateway]\n    B --> C[Llama Guard Toxicity Filter]\n    C --> D[Unity Catalog Audit & Lineage]\n    D --> E[LLM Foundation Endpoint]",
+    "ascii": "[App] --> [AI Gateway] --> [Llama Guard Filter] --> [Unity Catalog Audit] --> [LLM]"
+  },
+  {
+    "id": "bp-06",
+    "title": "6. Databricks Serverless Mesh — Photon + DABs + Lakeflow Workflows",
+    "category": "Serverless DataOps",
+    "costEstimate": "$2,000 - $6,000 / month",
+    "tags": [
+      "Serverless",
+      "DABs",
+      "Photon",
+      "Lakeflow"
+    ],
+    "mermaid": "graph LR\n    A[Git Repo] --> B[Databricks Asset Bundles - DABs]\n    B --> C[Lakeflow Declarative Pipelines]\n    C --> D[Photon Serverless Compute]\n    D --> E[(OneLake / ADLS Gen2)]",
+    "ascii": "[Git Repo] --> [DABs Deploy] --> [Lakeflow Workflows] --> [Photon Compute] --> [(OneLake)]"
+  },
+  {
+    "id": "bp-07",
+    "title": "7. Snowflake + Snowpark + Iceberg + Dynamic Tables + dbt",
+    "category": "Cloud Warehouse",
+    "costEstimate": "$3,000 - $9,000 / month",
+    "tags": [
+      "Snowflake",
+      "Snowpark",
+      "Iceberg",
+      "dbt"
+    ],
+    "mermaid": "graph LR\n    A[Raw S3 Data] --> B[(Iceberg Tables)]\n    B --> C[Snowpark Python Transformations]\n    C --> D[Snowflake Dynamic Tables]\n    D --> E[dbt Semantic Models]",
+    "ascii": "[S3] --> [(Iceberg)] --> [Snowpark Python] --> [Dynamic Tables] --> [dbt Semantic Layer]"
+  },
+  {
+    "id": "bp-08",
+    "title": "8. DuckDB + Iceberg + Polars Edge Architecture",
+    "category": "Embedded & Edge Analytics",
+    "costEstimate": "$200 - $600 / month",
+    "tags": [
+      "DuckDB",
+      "Polars",
+      "Embedded",
+      "Zero-Copy"
+    ],
+    "mermaid": "graph LR\n    A[Edge Devices / Microservices] --> B[Polars In-Memory Processing]\n    B --> C[(Local DuckDB File / Arrow Memory)]\n    C --> D[Iceberg REST Catalog Sync]",
+    "ascii": "[Edge Logs] --> [Polars Memory Engine] --> [(DuckDB File)] --> [Iceberg REST Sync]"
+  },
+  {
+    "id": "bp-09",
+    "title": "9. Microsoft Fabric + OneLake + AI Foundry End-to-End",
+    "category": "Microsoft Enterprise",
+    "costEstimate": "$1,800 - $5,500 / month",
+    "tags": [
+      "Fabric",
+      "OneLake",
+      "Direct Lake",
+      "AI Foundry"
+    ],
+    "mermaid": "graph LR\n    A[Operational DBs] --> B[Fabric Data Factory]\n    B --> C[(OneLake Delta Lake)]\n    C --> D[Direct Lake Power BI Semantic Model]\n    C --> E[Azure AI Foundry RAG Copilot]",
+    "ascii": "[Operational DBs] --> [Data Factory] --> [(OneLake Delta)] --> [Direct Lake PBI & AI Foundry]"
+  },
+  {
+    "id": "bp-10",
+    "title": "10. Open Source Lakehouse (Iceberg + Nessie + Trino + Spark + Airflow)",
+    "category": "Open Source Stack",
+    "costEstimate": "$1,000 - $3,200 / month",
+    "tags": [
+      "Open Source",
+      "Nessie",
+      "Trino",
+      "Spark"
+    ],
+    "mermaid": "graph LR\n    A[MinIO / S3] --> B[(Iceberg Catalog - Project Nessie)]\n    C[Airflow 3.0] --> D[Spark 4.0 Compute Jobs]\n    D --> B\n    B --> E[Trino Distributed SQL Engine]",
+    "ascii": "[MinIO S3] --> [(Nessie Iceberg Catalog)] <--> [Spark 4.0 / Airflow] <--> [Trino SQL]"
+  },
+  {
+    "id": "bp-11",
+    "title": "11. MCP Server Catalog — Model Context Protocol Backed by Lakehouse",
+    "category": "AI Orchestration",
+    "costEstimate": "$500 - $1,800 / month",
+    "tags": [
+      "MCP",
+      "Anthropic",
+      "Vector Search",
+      "SQL Tool"
+    ],
+    "mermaid": "graph LR\n    A[AI Client / Claude] --> B[MCP Protocol Gateway]\n    B --> C[Vector Search MCP Tool]\n    B --> D[Spark SQL Query MCP Tool]\n    C --> E[(Delta Vector Store)]\n    D --> F[(Delta Gold Tables)]",
+    "ascii": "[AI Client] --> [MCP Gateway] --> [Vector Tool & SQL Tool] --> [(Delta Lakehouse)]"
+  },
+  {
+    "id": "bp-12",
+    "title": "12. Hybrid Sovereign Cloud Lakehouse (GDPR & Data Sovereignty Rules)",
+    "category": "Sovereignty & Security",
+    "costEstimate": "$4,000 - $12,000 / month",
+    "tags": [
+      "Sovereignty",
+      "GDPR",
+      "Clean Rooms",
+      "EU Region"
+    ],
+    "mermaid": "graph TD\n    subgraph EU Sovereign Vault\n        A1[(ADLS EU German Region)] --> B1[EU Isolated Databricks]\n    end\n    subgraph Global Analytics\n        A2[(US S3 Anonymized)] --> B2[Global Warehouse]\n    end\n    B1 --> C[Databricks Clean Rooms & Pseudonymizer]\n    C --> B2",
+    "ascii": "[EU Sovereign Region] --> [Clean Rooms & Anonymizer] --> [Global Analytics Warehouse]"
+  }
+]

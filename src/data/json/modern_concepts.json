@@ -1,0 +1,114 @@
+[
+  {
+    "id": "mc-01",
+    "title": "CAP & PACELC Theorem in Modern Data Stores",
+    "subdomain": "dist-sys",
+    "difficulty": "HARD",
+    "summary": "In a network partition (P), trade off Availability (A) vs Consistency (C). PACELC extends this: Else (E), trade off Latency (L) vs Consistency (C).",
+    "details": "CAP applies during network partitions. PACELC handles normal operation: if no partition, choose between Latency and Consistency. Distributed warehouses like Snowflake prioritize strong consistency (C) while streaming engines like Kafka tune replica acks (acks=all vs acks=1) for latency vs safety."
+  },
+  {
+    "id": "mc-02",
+    "title": "Parquet Vectorized Decoding & Predicate Pushdown",
+    "subdomain": "storage-formats",
+    "difficulty": "MEDIUM",
+    "summary": "SIMD-accelerated column decoding combined with metadata-driven row group skipping via min/max stats.",
+    "details": "Parquet files store min/max statistics per row group and column chunk. Engines like Photon or DuckDB read row group metadata to skip non-matching chunks before loading data, and use SIMD vector instructions to decode dictionary-encoded values directly into CPU registers."
+  },
+  {
+    "id": "mc-03",
+    "title": "Apache Iceberg Hidden Partitioning & Manifest List Architecture",
+    "subdomain": "storage-formats",
+    "difficulty": "HARD",
+    "summary": "Decouples table partitioning from physical directory structures, avoiding hive-style column path rewrites.",
+    "details": "Iceberg uses a tree of metadata files: snapshot -> manifest list -> manifest files -> data files. Partition transforms (hours, days, bucket, truncate) are tracked in metadata, allowing queries to prune partitions without requiring users to supply explicit partition columns in WHERE clauses."
+  },
+  {
+    "id": "mc-04",
+    "title": "Spark 4.0 AQE Dynamic Shuffle Coalescing & Skew Join Mitigation",
+    "subdomain": "compute-engines",
+    "difficulty": "HARD",
+    "summary": "Runtime query plan adjustments based on actual shuffle statistics collected during stage execution.",
+    "details": "Adaptive Query Execution (AQE) dynamically merges small post-shuffle partitions into optimal 64MB–128MB tasks, converts sort-merge joins to broadcast hash joins when build-side stats drop below threshold, and splits skewed partitions into sub-partitions to prevent single-straggler tasks."
+  },
+  {
+    "id": "mc-05",
+    "title": "Databricks Serverless Compute & Photon Vectorized C++ Engine",
+    "subdomain": "serverless-arch",
+    "difficulty": "ARCHITECT",
+    "summary": "Instant-on, fully managed C++ query engine separating cluster provisioning from SQL execution.",
+    "details": "Databricks Serverless SQL delegates cluster lifecycle management to a warm pool. Photon, a native C++ engine, bypasses JVM GC overhead by executing vectorized operations over columnar memory layouts (Arrow/UnsafeRow) using hardware-level SIMD instructions."
+  },
+  {
+    "id": "mc-06",
+    "title": "Structured Streaming Watermarking & Allowed Lateness",
+    "subdomain": "streaming-cdc",
+    "difficulty": "HARD",
+    "summary": "Threshold specifying how far event-time can lag behind maximum observed event-time before data is dropped.",
+    "details": "Watermarks track maximum event time seen minus delay threshold. State for windows older than (max_event_time - watermark) is safely garbage collected from state stores (HDFS/RocksDB), enforcing state bounds in continuous aggregations."
+  },
+  {
+    "id": "mc-07",
+    "title": "Delta Lake Deletion Vectors (DV) vs Copy-on-Write (CoW)",
+    "subdomain": "lakehouse-formats",
+    "difficulty": "HARD",
+    "summary": "Bitmaps indicating soft-deleted rows without rewriting 500MB Parquet files on every UPDATE/DELETE statement.",
+    "details": "CoW rewrites the entire Parquet file when a single row changes. Deletion Vectors write small standalone inline or sidecar bitmap files marking row positions as deleted, deferring physical file compaction until OPTIMIZE / VACUUM runs."
+  },
+  {
+    "id": "mc-08",
+    "title": "Data Mesh Federated Governance & Data Product Contracts (ODCS)",
+    "subdomain": "data-mesh",
+    "difficulty": "ARCHITECT",
+    "summary": "Domain-owned data products bound by machine-readable contracts defining schemas, SLAs, and semantics.",
+    "details": "Data contracts (using Open Data Contract Standard - ODCS) define input/output schemas, freshness SLAs, quality expectations, and access roles. CI/CD pipelines run automated contract validation tests before merging domain code."
+  },
+  {
+    "id": "mc-09",
+    "title": "Unity Catalog 3-Level Namespace & Attribute-Based Access Control (ABAC)",
+    "subdomain": "security-gov",
+    "difficulty": "ARCHITECT",
+    "summary": "Centralized catalog.schema.table hierarchy enforcing uniform row/column-level security across multi-cloud clusters.",
+    "details": "Unity Catalog replaces legacy Hive metastores with a catalog.schema.table namespace. Tag-based ABAC policies automatically mask sensitive columns (e.g. PII, SSN) across Spark, Databricks SQL, and Python without duplicating grant statements."
+  },
+  {
+    "id": "mc-10",
+    "title": "Apache Airflow 3.0 Asset-Driven Scheduling & Deferrable Operators",
+    "subdomain": "orchestration",
+    "difficulty": "MEDIUM",
+    "summary": "Event-driven DAG execution based on data dataset updates alongside non-blocking async task execution.",
+    "details": "Airflow 3.0 replaces traditional cron execution with Asset triggers (e.g. Asset(\"s3://bucket/raw/\")). Deferrable operators release worker slots to Triggerer processes while waiting for external jobs (EMR, Databricks, Snowflake) to complete."
+  },
+  {
+    "id": "mc-11",
+    "title": "FinOps DBU/Credit Allocation & Query Result Cache Reuse",
+    "subdomain": "finops",
+    "difficulty": "ARCHITECT",
+    "summary": "Granular cloud data warehouse cost tracking paired with deterministic query result caching.",
+    "details": "FinOps attributes cloud compute meters (Databricks DBUs, Snowflake Credits, BigQuery Slots) to cost centers using workload tags. Query result caching reuses pre-computed outputs when underlying data files have not changed."
+  },
+  {
+    "id": "mc-12",
+    "title": "Databricks Asset Bundles (DABs) & Declarative DataOps Pipelines",
+    "subdomain": "devops-dataops",
+    "difficulty": "HARD",
+    "summary": "Infrastructure-as-Code for data pipelines defining jobs, DLT pipelines, and permissions in YAML.",
+    "details": "DABs allow engineers to version control data infrastructure in Git. Running `databricks bundle deploy -e prod` compiles resources into Terraform or REST API payloads to provision environments reproducibly."
+  },
+  {
+    "id": "mc-13",
+    "title": "Model Context Protocol (MCP) & Lakehouse RAG Vector Search",
+    "subdomain": "ai-llm-native",
+    "difficulty": "ARCHITECT",
+    "summary": "Open protocol connecting LLMs directly to enterprise vector indexes and real-time SQL tools.",
+    "details": "MCP provides a standardized JSON-RPC interface allowing AI agents (like Claude or Gemini) to query Delta Vector Search indexes, invoke Spark jobs, and read Unity Catalog lineage securely without custom API wrappers."
+  },
+  {
+    "id": "mc-14",
+    "title": "OpenLineage & Spark UI DAG Task Skew Diagnostics",
+    "subdomain": "observability",
+    "difficulty": "MEDIUM",
+    "summary": "Automated extraction of end-to-end data lineage coupled with Spark History task distribution analysis.",
+    "details": "OpenLineage emits real-time execution events (input datasets, output schemas, job durations) to platforms like Marquez or Atlan. Spark UI task metrics identify data skew when 99th percentile task duration severely exceeds median duration."
+  }
+]

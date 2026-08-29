@@ -1,0 +1,52 @@
+{
+  "ai": {
+    "glyph": "🤖",
+    "label": "LLM / AI",
+    "color": "var(--accent-ai, #F59E0B)"
+  },
+  "serverless": {
+    "glyph": "🌐",
+    "label": "Serverless",
+    "color": "var(--accent-serverless, #7C3AED)"
+  },
+  "cdc": {
+    "glyph": "🔄",
+    "label": "CDC",
+    "color": "var(--accent-green, #34C759)"
+  },
+  "vector": {
+    "glyph": "🧠",
+    "label": "Vector DB",
+    "color": "var(--accent-vector, #EC4899)"
+  },
+  "stream": {
+    "glyph": "📡",
+    "label": "Streaming",
+    "color": "var(--accent-stream, #06B6D4)"
+  },
+  "iac": {
+    "glyph": "🏗",
+    "label": "IaC / DataOps",
+    "color": "var(--apple-blue, #0071E3)"
+  },
+  "iceberg": {
+    "glyph": "🪶",
+    "label": "Iceberg",
+    "color": "#60A5FA"
+  },
+  "delta": {
+    "glyph": "🪺",
+    "label": "Delta Lake",
+    "color": "#F97316"
+  },
+  "duckdb": {
+    "glyph": "🦆",
+    "label": "DuckDB",
+    "color": "#FACC15"
+  },
+  "photon": {
+    "glyph": "⚡",
+    "label": "Photon",
+    "color": "#A855F7"
+  }
+}

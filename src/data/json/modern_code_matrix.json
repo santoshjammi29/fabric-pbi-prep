@@ -1,0 +1,35 @@
+[
+  {
+    "topic": "Read Parquet / Delta with Schema & Pushdown",
+    "python": "import polars as pl\ndf = pl.read_parquet(\"s3://lake/silver/*.parquet\", use_pyarrow=True)",
+    "pyspark": "df = spark.read.format(\"delta\").option(\"readChangeFeed\", \"true\").load(\"s3://lake/silver/orders\")",
+    "sparksql": "SELECT * FROM delta.`s3://lake/silver/orders` WHERE order_date >= '2026-01-01';",
+    "scala": "val df = spark.read.format(\"delta\").option(\"versionAsOf\", 12).load(\"s3://lake/silver/orders\")",
+    "duckdb": "SELECT * FROM read_parquet('s3://lake/silver/*.parquet') WHERE amount > 500;",
+    "snowflake": "SELECT * FROM @my_s3_stage/orders/ (FILE_FORMAT => 'PARQUET_FORMAT') WHERE $1:amount > 500;",
+    "bigquery": "SELECT * FROM `project.dataset.orders` WHERE _PARTITIONDATE >= '2026-01-01';",
+    "trino": "SELECT * FROM delta.sales.orders WHERE year = 2026 AND amount > 500;"
+  },
+  {
+    "topic": "Window Functions (Rank & Running Total)",
+    "python": "df.with_columns(pl.col(\"sales\").sum().over(\"region\").alias(\"region_total\"))",
+    "pyspark": "w = Window.partitionBy(\"region\").orderBy(col(\"sales\").desc())\ndf = df.withColumn(\"rk\", rank().over(w))",
+    "sparksql": "SELECT customer_id, amount, RANK() OVER (PARTITION BY region ORDER BY amount DESC) as rk FROM orders;",
+    "scala": "val w = Window.partitionBy(\"region\").orderBy($\"amount\".desc)\nval ranked = df.withColumn(\"rk\", rank().over(w))",
+    "duckdb": "SELECT customer_id, amount, SUM(amount) OVER (PARTITION BY region ORDER BY order_date) as run_tot FROM orders;",
+    "snowflake": "SELECT customer_id, amount, DENSE_RANK() OVER (PARTITION BY region ORDER BY amount DESC) as rk FROM orders;",
+    "bigquery": "SELECT customer_id, amount, SUM(amount) OVER (PARTITION BY region ORDER BY order_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM orders;",
+    "trino": "SELECT customer_id, amount, ROW_NUMBER() OVER (PARTITION BY region ORDER BY order_date DESC) as rn FROM orders;"
+  },
+  {
+    "topic": "MERGE INTO Upsert (Delta / Iceberg / Snowflake)",
+    "python": "# Polars join-update pattern\ndf_target.join(df_source, on=\"id\", how=\"left\")",
+    "pyspark": "target.alias(\"t\").merge(source.alias(\"s\"), \"t.id = s.id\") \\\n  .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()",
+    "sparksql": "MERGE INTO silver.customers t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET *\nWHEN NOT MATCHED THEN INSERT *;",
+    "scala": "target.as(\"t\").merge(source.as(\"s\"), \"t.id = s.id\")\n  .whenMatched().updateAll().whenNotMatched().insertAll().execute()",
+    "duckdb": "-- DuckDB upsert via ON CONFLICT\nINSERT INTO customers SELECT * FROM updates ON CONFLICT(id) DO UPDATE SET name=EXCLUDED.name;",
+    "snowflake": "MERGE INTO customers t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET t.name = s.name\nWHEN NOT MATCHED THEN INSERT (id, name) VALUES (s.id, s.name);",
+    "bigquery": "MERGE `project.dataset.customers` t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET t.updated_at = CURRENT_TIMESTAMP()\nWHEN NOT MATCHED THEN INSERT ROW;",
+    "trino": "MERGE INTO iceberg.db.customers t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET name = s.name\nWHEN NOT MATCHED THEN INSERT VALUES (s.id, s.name);"
+  }
+]

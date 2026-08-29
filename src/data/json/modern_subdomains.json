@@ -1,0 +1,72 @@
+[
+  {
+    "id": "dist-sys",
+    "title": "1. Distributed Systems Fundamentals",
+    "icon": "⚡"
+  },
+  {
+    "id": "storage-formats",
+    "title": "2. Storage Formats & Open Table Formats",
+    "icon": "🪶"
+  },
+  {
+    "id": "compute-engines",
+    "title": "3. Distributed Compute Engines",
+    "icon": "🚀"
+  },
+  {
+    "id": "serverless-arch",
+    "title": "4. Serverless Data Architecture",
+    "icon": "🌐"
+  },
+  {
+    "id": "streaming-cdc",
+    "title": "5. Streaming & Event-Driven CDC",
+    "icon": "📡"
+  },
+  {
+    "id": "lakehouse-formats",
+    "title": "6. Lakehouse & Open Formats",
+    "icon": "🪺"
+  },
+  {
+    "id": "data-mesh",
+    "title": "7. Data Mesh & Federated Architecture",
+    "icon": "🕸️"
+  },
+  {
+    "id": "security-gov",
+    "title": "8. Security, Governance & Lineage",
+    "icon": "🔐"
+  },
+  {
+    "id": "orchestration",
+    "title": "9. Orchestration & Workflows",
+    "icon": "⚙️"
+  },
+  {
+    "id": "finops",
+    "title": "10. FinOps & Cost Engineering",
+    "icon": "💰"
+  },
+  {
+    "id": "devops-dataops",
+    "title": "11. DevOps & DataOps",
+    "icon": "🏗️"
+  },
+  {
+    "id": "ai-llm-native",
+    "title": "12. AI / LLM-Native Data Engineering",
+    "icon": "🤖"
+  },
+  {
+    "id": "observability",
+    "title": "13. Observability & Quality",
+    "icon": "👁️"
+  },
+  {
+    "id": "modern-patterns",
+    "title": "14. Modern Architecture Patterns",
+    "icon": "🏛️"
+  }
+]

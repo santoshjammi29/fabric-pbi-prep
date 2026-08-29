@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ms-qa-01",
+    "level": 1,
+    "difficulty": "EASY",
+    "category": "Distributed Systems",
+    "question": "What is the primary trade-off highlighted by the CAP theorem in distributed storage?",
+    "answer": "In a distributed data store during a network partition (P), you must choose between **Consistency (C)** (every read receives the most recent write or an error) and **Availability (A)** (every non-failing node returns a non-error response without guarantee of latest write).\n\n```python\n# Conceptual CAP check in distributed nodes\ndef read_record(node, key):\n    if node.is_partitioned():\n        # CAP Trade-off: Return stale data (AP) or throw error (CP)\n        raise PartitionError(\"Node isolated - CP enforced\")\n    return node.storage.get(key)\n```",
+    "py_code": "def read_record(node, key):\n    if node.is_partitioned():\n        raise PartitionError(\"CP Mode: Isolated node rejects write\")\n    return node.storage.get(key)",
+    "sql_code": "-- Snowflake Strong Consistency Session Setting\nALTER SESSION SET STRICT_JSON_OUTPUT = TRUE;",
+    "pyspark_code": "# PySpark enforcing consistency via checkpointing\ndf.writeStream.option(\"checkpointLocation\", \"s3://chk/\").start()",
+    "scala_code": "val df = spark.readStream.option(\"checkpointLocation\", \"s3://chk/\").load()"
+  },
+  {
+    "id": "ms-qa-02",
+    "level": 4,
+    "difficulty": "MEDIUM",
+    "category": "Storage Formats",
+    "question": "How do Apache Iceberg Manifest Lists enable fast query pruning compared to Hive-style directory scanning?",
+    "answer": "Iceberg stores statistics (min/max values, null counts, partition bounds) for every data file inside **Manifest Files**, which are indexed by a **Manifest List** file. During query planning, Trino or Spark evaluates the WHERE clause against the Manifest List in memory, pruning non-matching files in milliseconds without issuing thousands of file LIST calls to S3/ADLS.\n\n```sql\n-- Trino querying Iceberg metadata directly\nSELECT * FROM \"db\".\"table$manifests\";\n```",
+    "py_code": "import pyiceberg\ntable = catalog.load_table(\"db.events\")\nscan = table.scan(row_filter=\"event_date >= '2026-01-01'\")",
+    "sql_code": "SELECT * FROM iceberg_db.events$snapshots WHERE committed_at >= CURRENT_TIMESTAMP() - INTERVAL '7' DAY;",
+    "pyspark_code": "spark.read.format(\"iceberg\").load(\"db.events\").filter(\"event_date >= '2026-01-01'\")",
+    "scala_code": "spark.read.table(\"db.events\").filter($\"event_date\" >= \"2026-01-01\")"
+  },
+  {
+    "id": "ms-qa-03",
+    "level": 8,
+    "difficulty": "HARD",
+    "category": "Compute Engines",
+    "question": "Explain how Databricks Photon optimizes vectorized memory layouts and SIMD CPU execution.",
+    "answer": "Photon is written in native C++ and replaces the JVM execution engine for supported query operators. It processes data in column-oriented memory batches (using Arrow-like vectors) and utilizes CPU **SIMD (Single Instruction, Multiple Data)** instructions to execute filters, projections, and aggregations across multiple data elements in a single CPU clock cycle.\n\n```sql\n-- Enable Photon engine explicitly in DBSQL\nSET spark.databricks.photon.enabled = true;\n```",
+    "py_code": "# PySpark running over Photon engine\ndf.selectExpr(\"id\", \"amount * 1.18 as gross_total\").filter(\"gross_total > 1000\")",
+    "sql_code": "SELECT id, amount * 1.18 AS gross_total FROM orders WHERE amount * 1.18 > 1000;",
+    "pyspark_code": "df.filter(\"amount > 1000\").select(\"id\", \"amount\")",
+    "scala_code": "df.filter($\"amount\" > 1000).select($\"id\", $\"amount\")"
+  },
+  {
+    "id": "ms-qa-04",
+    "level": 12,
+    "difficulty": "ARCHITECT",
+    "category": "AI / LLM Architecture",
+    "question": "Architect an enterprise RAG pipeline combining Structured Streaming, Delta Vector Search, and Model Context Protocol (MCP).",
+    "answer": "1. **Ingestion**: Debezium captures document updates from PostgreSQL into Kafka.\n2. **Transformation**: Spark Structured Streaming extracts text, generates sliding-window chunks, and computes embeddings using OpenAI `text-embedding-3-small`.\n3. **Indexing**: Chunks are appended to a Delta Lake Gold table synchronized with a Databricks Delta Vector Search Index.\n4. **Serving**: An MCP (Model Context Protocol) Server exposes a `search_knowledge_base` tool. When an AI Agent invokes the tool, MCP executes a hybrid search (BM25 + Dense Cosine) and returns context to the LLM.\n\n```python\n# MCP Server Tool Implementation\n@mcp.tool()\ndef search_knowledge_base(query: str, top_k: int = 5):\n    results = vector_index.similarity_search(query=query, num_results=top_k)\n    return [{\"content\": r.page_content, \"score\": r.score} for r in results]\n```",
+    "py_code": "from mcp.server.fastmcp import FastMCP\nmcp = FastMCP(\"Lakehouse-RAG\")\n@mcp.tool()\ndef search_lakehouse(query: str):\n    return vector_search_client.search(index_name=\"gold.docs_idx\", query_text=query)",
+    "sql_code": "SELECT VECTOR_SEARCH('gold.docs_idx', 'What is CAP theorem?', 5);",
+    "pyspark_code": "df.writeStream.format(\"delta\").option(\"checkpointLocation\", \"s3://chk/vector\").table(\"gold.document_embeddings\")",
+    "scala_code": "val query = spark.readStream.table(\"silver.documents\").writeStream.table(\"gold.embeddings\")"
+  }
+]
