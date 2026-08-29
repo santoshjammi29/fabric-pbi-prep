@@ -1,0 +1,92 @@
+name: CI — Regression Guard
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # JOB 1: Unit + Component tests  (target: < 30 s)
+  # ──────────────────────────────────────────────────────────────────────────
+  unit-and-component:
+    name: Unit & Component Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run regression guard (source-level)
+        run: node tests/test_regression_guard.js
+
+      - name: Run snapshot validator
+        run: node tests/test_snapshot.js
+
+      - name: Run layout & theme audits
+        run: |
+          node tests/test_layout_scroll.js
+          node tests/test_search_theme.js
+
+      - name: Run deep integrity audit
+        run: node tests/test_audit.js
+
+      - name: Run component rendering tests
+        run: node tests/test_components.js
+
+      - name: Run comprehensive QA audit
+        run: node tests/test_qa_comprehensive_audit.js
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # JOB 2: E2E browser tests  (target: < 2 min)
+  # ──────────────────────────────────────────────────────────────────────────
+  e2e:
+    name: E2E Browser Tests (Puppeteer)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium system deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
+            libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+            libgbm1 libasound2 fonts-liberation
+
+      - name: Start local HTTP server
+        run: python3 -m http.server 8080 &
+        working-directory: ${{ github.workspace }}
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 20); do
+            curl -s http://localhost:8080 > /dev/null && echo "Server ready" && break
+            sleep 0.5
+          done
+
+      - name: Run Puppeteer E2E tests
+        run: node tests/test_e2e_puppeteer.js
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'false'
