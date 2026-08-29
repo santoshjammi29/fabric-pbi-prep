@@ -427,3 +427,228 @@ body {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* ═══════════════════════════════════════════════════════
+   LIGHT THEME ACCESSIBILITY & CONTRAST OVERRIDES
+   Ensures WCAG AAA / AA compliance for all colored text,
+   badges, pills, cards, and interactive elements.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Light Mode High-Contrast Text Tokens ─────────── */
+.light .text-purple-400,
+.light .text-purple-300 {
+  color: #6b21a8 !important; /* purple-800: 7.8:1 contrast on white */
+}
+
+.light .text-blue-400,
+.light .text-blue-300 {
+  color: #1d4ed8 !important; /* blue-700: 6.2:1 contrast on white */
+}
+
+.light .text-green-400,
+.light .text-green-300 {
+  color: #15803d !important; /* green-700: 5.1:1 contrast on white */
+}
+
+.light .text-emerald-400,
+.light .text-emerald-300 {
+  color: #047857 !important; /* emerald-700 */
+}
+
+.light .text-orange-400,
+.light .text-orange-300 {
+  color: #c2410c !important; /* orange-700: 4.8:1 contrast on white */
+}
+
+.light .text-amber-400,
+.light .text-amber-300 {
+  color: #b45309 !important; /* amber-700: 5.3:1 contrast on white */
+}
+
+.light .text-yellow-400,
+.light .text-yellow-300 {
+  color: #a16207 !important; /* yellow-700 */
+}
+
+.light .text-red-400,
+.light .text-red-300 {
+  color: #b91c1c !important; /* red-700: 6.1:1 contrast on white */
+}
+
+.light .text-pink-400,
+.light .text-pink-300 {
+  color: #be185d !important; /* pink-700: 5.6:1 contrast on white */
+}
+
+.light .text-cyan-400,
+.light .text-cyan-300 {
+  color: #0e7490 !important; /* cyan-700: 5.2:1 contrast on white */
+}
+
+.light .text-sky-400,
+.light .text-sky-300 {
+  color: #0369a1 !important; /* sky-700 */
+}
+
+.light .text-indigo-400,
+.light .text-indigo-300 {
+  color: #4338ca !important; /* indigo-700 */
+}
+
+.light .text-slate-400 {
+  color: #475569 !important; /* slate-600 */
+}
+
+.light .text-slate-300 {
+  color: #334155 !important; /* slate-700 */
+}
+
+.light .text-gray-400 {
+  color: #4b5563 !important; /* gray-600 */
+}
+
+.light .text-zinc-400 {
+  color: #52525b !important; /* zinc-600 */
+}
+
+/* ── Light Mode Pill & Badge Backgrounds ──────────── */
+.light .bg-purple-500\/10,
+.light .bg-purple-500\/20 {
+  background-color: #f3e8ff !important; /* soft purple tint */
+}
+
+.light .bg-blue-500\/10,
+.light .bg-blue-500\/20 {
+  background-color: #dbeafe !important; /* soft blue tint */
+}
+
+.light .bg-green-500\/10,
+.light .bg-green-500\/20 {
+  background-color: #dcfce7 !important; /* soft green tint */
+}
+
+.light .bg-orange-500\/10,
+.light .bg-orange-500\/20 {
+  background-color: #ffedd5 !important; /* soft orange tint */
+}
+
+.light .bg-amber-500\/10,
+.light .bg-amber-500\/20 {
+  background-color: #fef3c7 !important; /* soft amber tint */
+}
+
+.light .bg-red-500\/10,
+.light .bg-red-500\/20 {
+  background-color: #fee2e2 !important; /* soft red tint */
+}
+
+.light .bg-pink-500\/10,
+.light .bg-pink-500\/20 {
+  background-color: #fce7f3 !important; /* soft pink tint */
+}
+
+.light .bg-cyan-500\/10,
+.light .bg-cyan-500\/20 {
+  background-color: #cffafe !important; /* soft cyan tint */
+}
+
+.light .bg-sky-500\/10,
+.light .bg-sky-500\/20 {
+  background-color: #e0f2fe !important; /* soft sky tint */
+}
+
+/* ── Light Mode Pill & Badge Borders ──────────────── */
+.light .border-purple-500\/20,
+.light .border-purple-500\/30 {
+  border-color: #d8b4fe !important;
+}
+
+.light .border-blue-500\/20,
+.light .border-blue-500\/30 {
+  border-color: #bfdbfe !important;
+}
+
+.light .border-green-500\/20,
+.light .border-green-500\/30 {
+  border-color: #bbf7d0 !important;
+}
+
+.light .border-orange-500\/20,
+.light .border-orange-500\/30 {
+  border-color: #fed7aa !important;
+}
+
+.light .border-amber-500\/20,
+.light .border-amber-500\/30 {
+  border-color: #fde68a !important;
+}
+
+.light .border-red-500\/20,
+.light .border-red-500\/30 {
+  border-color: #fecaca !important;
+}
+
+.light .border-pink-500\/20,
+.light .border-pink-500\/30 {
+  border-color: #fbcfe8 !important;
+}
+
+.light .border-cyan-500\/20,
+.light .border-cyan-500\/30 {
+  border-color: #a5f3fc !important;
+}
+
+/* ── Light Mode Category Capsules & Cards ─────────── */
+.light .category-capsule-active {
+  background: #f3e8ff !important;
+  color: #6b21a8 !important;
+  border: 1px solid #c084fc !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.12) !important;
+}
+
+.light .category-capsule-idle {
+  background: #ffffff !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.light .category-capsule-idle:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light .magazine-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.light .magazine-card:hover {
+  border-color: #a855f7 !important;
+  box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .magazine-card-featured {
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 40%, #f0f9ff 100%) !important;
+  border-color: #d8b4fe !important;
+}
+
+.light .section-divider span {
+  color: #475569 !important;
+  font-weight: 800;
+}
+
+.light .section-divider::before,
+.light .section-divider::after {
+  background: #e2e8f0 !important;
+}
+
+/* ── Code Blocks in Light Mode ────────────────────── */
+.light .code-block,
+.light pre.code-block,
+.light pre {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}

@@ -45,7 +45,7 @@ export function RoadmapGrid() {
       description: "Serverless-first, AI-native modern architectural patterns.",
       meta: "Fabric, Databricks",
       icon: Cloud,
-      href: "/modern-data-stack",
+      href: "/modern-stack",
     },
     {
       step: 5,
