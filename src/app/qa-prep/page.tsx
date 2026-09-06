@@ -189,10 +189,10 @@ export default function QaPrepPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-orange-400">{allQuestions.length}</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Questions Bank</div>
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 shrink-0">
+            <div className="px-3.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl sm:text-2xl font-bold text-orange-400">{allQuestions.length}</div>
+              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Questions Bank</div>
             </div>
             <button
               onClick={() => {
@@ -200,7 +200,7 @@ export default function QaPrepPage() {
                 setIsCardFlipped(false);
               }}
               className={cn(
-                "px-5 py-3 rounded-2xl border text-sm font-semibold transition-all flex items-center gap-2 shadow-lg",
+                "px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl border text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-lg",
                 isStudyMode
                   ? "bg-purple-600 text-white border-purple-500 shadow-purple-500/20"
                   : "bg-[var(--surface-2)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--surface-3)]"

@@ -42,6 +42,7 @@ export function CommandPalette() {
     () => [
       { id: "nav-home", title: "Home Dashboard", category: "Navigation", icon: Sparkles, href: "/", badge: "Main" },
       { id: "nav-concepts", title: "Key Concepts (350+ Terms)", category: "Navigation", icon: BookOpen, href: "/concepts", badge: "Easy" },
+      { id: "nav-python", title: "Python Hub (Data Engineering & Architect)", category: "Navigation", icon: FileCode2, href: "/python", badge: "NEW" },
       { id: "nav-code", title: "Code Practice (PySpark, SQL, Python)", category: "Navigation", icon: FileCode2, href: "/code-practice", badge: "Polyglot" },
       { id: "nav-spark", title: "Spark Engine & Simulator", category: "Navigation", icon: Zap, href: "/spark-engine", badge: "Internals" },
       { id: "nav-modern", title: "Modern Data Stack & AI Architecture", category: "Navigation", icon: Layers, href: "/modern-stack", badge: "Hard" },
@@ -117,7 +118,7 @@ export function CommandPalette() {
     [router]
   );
 
-  // Keyboard shortcut listener
+  // Keyboard shortcut listener & custom event trigger for mobile
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -129,8 +130,16 @@ export function CommandPalette() {
       }
     };
 
+    const handleCustomOpen = () => {
+      setIsOpen(true);
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("open-command-palette", handleCustomOpen);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("open-command-palette", handleCustomOpen);
+    };
   }, [isOpen]);
 
   // Arrow key navigation inside modal

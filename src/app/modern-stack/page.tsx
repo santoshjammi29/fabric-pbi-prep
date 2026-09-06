@@ -176,7 +176,7 @@ export default function ModernStackPage() {
             </div>
 
             {/* Nodes Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {canvasStages.map((stage, idx) => {
                 const isSelected = selectedCanvasStage === idx;
                 return (
@@ -658,7 +658,7 @@ export default function ModernStackPage() {
           <h3 className="text-lg font-bold text-[var(--foreground)]">
             Cloud Engine × Table Format Compatibility Matrix
           </h3>
-          <table className="w-full text-xs text-left border-collapse">
+          <table className="w-full text-xs text-left border-collapse min-w-[640px]">
             <thead>
               <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
                 <th className="py-3 px-4 font-semibold">Engine / Service</th>

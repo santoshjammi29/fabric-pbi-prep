@@ -47,15 +47,15 @@ const ItemCard = React.memo(function ItemCard({
       )}
       onClick={() => onToggle(item.id)}
     >
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex-1">
-          <h3 className="font-medium text-[var(--foreground)]">{item.title}</h3>
-          <p className="text-sm text-[var(--muted-foreground)] truncate">{item.category}</p>
+      <div className="p-4 flex items-center justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-[var(--foreground)] truncate sm:whitespace-normal">{item.title}</h3>
+          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] truncate">{item.category}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <span
             className={cn(
-              "px-2 py-0.5 text-xs rounded",
+              "px-2 py-0.5 text-[10px] sm:text-xs rounded font-medium",
               levelBadges[item.level].bg,
               levelBadges[item.level].text,
               levelBadges[item.level].border,
@@ -63,9 +63,23 @@ const ItemCard = React.memo(function ItemCard({
           >
             {item.level}
           </span>
-          <button onClick={e => onBookmark(item.id, e)}>{bookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}</button>
-          <button onClick={e => onCopy(item.code, item.id, e)}>{copied ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}</button>
-          <ChevronDown size={20} className={cn("transform transition-transform", isExpanded ? "rotate-180" : "rotate-0")} />
+          <button
+            onClick={e => onBookmark(item.id, e)}
+            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+            title={bookmarked ? "Remove Bookmark" : "Save Bookmark"}
+          >
+            {bookmarked ? <BookmarkCheck size={17} className="text-amber-400" /> : <Bookmark size={17} />}
+          </button>
+          <button
+            onClick={e => onCopy(item.code, item.id, e)}
+            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+            title="Copy Code"
+          >
+            {copied ? <Check size={17} className="text-green-400" /> : <Copy size={17} />}
+          </button>
+          <div className="p-1.5 text-[var(--muted-foreground)]">
+            <ChevronDown size={18} className={cn("transform transition-transform", isExpanded ? "rotate-180 text-purple-400" : "rotate-0")} />
+          </div>
         </div>
       </div>
       <AnimatePresence>
@@ -208,17 +222,19 @@ export default function PythonHub() {
             onChange={handleSearchChange}
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] max-w-full">
           {(["ALL", "beginner", "intermediate", "advanced", "architect"] as const).map(lvl => (
             <button
               key={lvl}
               onClick={() => handleLevelClick(lvl)}
               className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-medium border",
-                selectedLevel === lvl ? "bg-purple-600/15 border-purple-500/50 text-purple-300" : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)]",
+                "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 capitalize",
+                selectedLevel === lvl
+                  ? "bg-purple-600 text-white shadow-md font-semibold"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]",
               )}
             >
-              {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+              {lvl === "ALL" ? "All Levels" : lvl}
             </button>
           ))}
         </div>

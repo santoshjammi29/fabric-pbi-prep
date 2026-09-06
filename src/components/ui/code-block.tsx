@@ -184,7 +184,7 @@ export function CodeBlock({
       {/* Top Header Bar */}
       <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-[#121824] border-b border-[#1e2638] text-xs select-none">
         {/* Left: macOS Dots + File Info */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
           <div className="flex items-center gap-1.5 shrink-0 opacity-80 group-hover/code-block:opacity-100 transition-opacity">
             <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] border border-[#e0443e] inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] border border-[#dea123] inline-block" />
@@ -193,7 +193,7 @@ export function CodeBlock({
 
           <div className="h-3.5 w-[1px] bg-slate-700/50 shrink-0 hidden sm:block" />
 
-          <div className="flex items-center gap-2 font-mono text-[11px] truncate">
+          <div className="flex items-center gap-2 font-mono text-[11px] truncate min-w-0">
             <Terminal size={12} className={cn("shrink-0", langConfig.color)} />
             <span className="text-slate-200 font-semibold truncate">{displayFilename}</span>
             <span

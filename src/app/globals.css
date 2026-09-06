@@ -448,6 +448,14 @@ body {
   display: none;
 }
 
+/* Safe Area Insets for iOS & mobile viewport devices */
+.safe-area-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+.safe-area-pt {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
 /* ═══════════════════════════════════════════════════════
    LIGHT THEME ACCESSIBILITY & CONTRAST OVERRIDES
    Ensures WCAG AAA / AA compliance for all colored text,

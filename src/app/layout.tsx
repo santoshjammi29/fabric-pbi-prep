@@ -77,7 +77,7 @@ export default function RootLayout({
               {/* Page content */}
               <main
                 id="main-content"
-                className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
+                className="flex-1 overflow-y-auto px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10"
                 tabIndex={-1}
               >
                 <div className="mx-auto max-w-7xl">{children}</div>

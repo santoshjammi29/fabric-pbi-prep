@@ -198,18 +198,18 @@ function ConceptsContent() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-green-400">{conceptsDb.length}</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Terms Curated</div>
+          <div className="grid grid-cols-3 sm:flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl sm:text-2xl font-bold text-green-400">{conceptsDb.length}</div>
+              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Terms</div>
             </div>
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-blue-400">{pythonData.length}</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Python Topics</div>
+            <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl sm:text-2xl font-bold text-blue-400">{pythonData.length}</div>
+              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Python</div>
             </div>
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-purple-400">{categories.length - 1}</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Categories</div>
+            <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl sm:text-2xl font-bold text-purple-400">{categories.length - 1}</div>
+              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Categories</div>
             </div>
           </div>
         </div>
