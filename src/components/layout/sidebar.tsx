@@ -9,6 +9,7 @@ import {
   Home,
   BookOpen,
   Code2,
+  FileCode2,
   Zap,
   Layers,
   Globe,

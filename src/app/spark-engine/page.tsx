@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pysparkData } from "@/data";
+import { CodeBlock } from "@/components/ui/code-block";
 
 type SparkSubtab = "architecture" | "simulator" | "memory" | "curriculum" | "lexicon";
 
@@ -694,9 +695,12 @@ export default function SparkEnginePage() {
                           <strong>Enterprise Scenario:</strong> {item.use_case}
                         </div>
                       )}
-                      <pre className="code-block m-0">
-                        <code>{item.code}</code>
-                      </pre>
+                      <CodeBlock
+                        code={item.code}
+                        language="pyspark"
+                        filename={`${item.id}.py`}
+                        badge="PySpark Execution"
+                      />
                       {item.notes && item.notes.length > 0 && (
                         <div className="space-y-1">
                           <span className="font-bold text-[var(--foreground)]">Execution Mechanics:</span>

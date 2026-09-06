@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { pythonData } from "@/data";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
+import { CodeBlock } from "@/components/ui/code-block";
 
 const levelBadges: Record<CodeLevel, { bg: string; text: string; border: string }> = {
   beginner: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -76,7 +77,7 @@ const ItemCard = React.memo(function ItemCard({
             className="px-4 pb-4 text-sm text-[var(--muted-foreground)] border-t border-[var(--border)] bg-[var(--surface-2)]"
           >
             <p className="mb-2"><strong>Description:</strong> {item.description}</p>
-            <pre className="bg-[#090d13] p-3 rounded-md overflow-x-auto mb-2"><code>{item.code}</code></pre>
+            <CodeBlock code={item.code} language="python" />
             {item.notes?.length && (
               <ul className="list-disc list-inside mb-2">
                 {item.notes.map((n, i) => (<li key={i}>{n}</li>))}

@@ -18,6 +18,7 @@ import {
   modernBlueprintsDb,
   modernCostPlaybooks,
 } from "@/data";
+import { CodeBlock } from "@/components/ui/code-block";
 
 type ModernSubtab =
   | "overview"
@@ -570,12 +571,13 @@ export default function ModernStackPage() {
                   { lang: "Snowflake", code: item.snowflake },
                   { lang: "BigQuery", code: item.bigquery },
                 ].map((col) => (
-                  <div key={col.lang} className="p-3.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5">
-                    <span className="text-[11px] font-bold text-purple-300">{col.lang}</span>
-                    <pre className="text-[11px] font-mono text-slate-300 overflow-x-auto bg-[#090d13] p-2.5 rounded-xl border border-white/5">
-                      <code>{col.code}</code>
-                    </pre>
-                  </div>
+                  <CodeBlock
+                    key={col.lang}
+                    code={col.code}
+                    language={col.lang.toLowerCase().includes("python") || col.lang.toLowerCase().includes("pyspark") ? "python" : "sql"}
+                    filename={col.lang}
+                    showLineNumbers={false}
+                  />
                 ))}
               </div>
             </div>
@@ -631,9 +633,12 @@ export default function ModernStackPage() {
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">{item.summary}</p>
-              <pre className="code-block m-0">
-                <code>{item.code}</code>
-              </pre>
+              <CodeBlock
+                code={item.code}
+                language="sql"
+                filename={`${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.sql`}
+                badge={item.savings}
+              />
             </div>
           ))}
         </div>

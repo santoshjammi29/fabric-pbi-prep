@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { pysparkData, sparksqlData, mssqlData, pythonData } from "@/data";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
+import { CodeBlock } from "@/components/ui/code-block";
 
 type LanguageKey = "pyspark" | "sparksql" | "mssql" | "python";
 
@@ -383,34 +384,13 @@ export default function CodePracticePage() {
                         </div>
                       )}
 
-                      {/* Code Block Terminal */}
-                      <div className="relative group/code">
-                        <div className="flex items-center justify-between px-4 py-2 bg-[#090d13] rounded-t-xl border border-b-0 border-white/10 text-xs text-slate-400">
-                          <div className="flex items-center gap-2 font-mono">
-                            <Terminal size={14} className="text-purple-400" />
-                            <span>{languageConfigs[activeLang].name.toLowerCase().replace(/\s+/g, "_")}.snippet</span>
-                          </div>
-                          <button
-                            onClick={(e) => copyCode(item.code, item.id, e)}
-                            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-slate-300 transition-colors"
-                          >
-                            {copiedId === item.id ? (
-                              <>
-                                <Check size={12} className="text-green-400" />
-                                <span>Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={12} />
-                                <span>Copy Code</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        <pre className="code-block rounded-t-none border-white/10 m-0">
-                          <code>{item.code}</code>
-                        </pre>
-                      </div>
+                      {/* Modern Code Block */}
+                      <CodeBlock
+                        code={item.code}
+                        language={activeLang}
+                        filename={`${item.id}.${activeLang === "sparksql" || activeLang === "mssql" ? "sql" : "py"}`}
+                        badge={languageConfigs[activeLang].name}
+                      />
 
                       {/* Performance / Best Practice Notes */}
                       {item.notes && item.notes.length > 0 && (

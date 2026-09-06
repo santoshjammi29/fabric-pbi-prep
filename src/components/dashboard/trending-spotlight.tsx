@@ -11,6 +11,7 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CodeBlock } from "@/components/ui/code-block";
 
 export function TrendingSpotlight() {
   const [copied, setCopied] = useState(false);
@@ -102,26 +103,16 @@ clean_df = cdc_df.withColumn("rn", row_number().over(window_spec)) \\
         {/* Card 2: Code Snippet of the Day */}
         <div className="magazine-card p-6 flex flex-col justify-between space-y-4">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-                <FileCode2 size={13} /> PySpark Pattern
-              </span>
-              <button
-                onClick={copySnippet}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[10px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
-              >
-                {copied ? <Check size={11} className="text-green-400" /> : <Copy size={11} />}
-                <span>{copied ? "Copied" : "Copy"}</span>
-              </button>
-            </div>
-
             <h4 className="text-sm font-bold text-[var(--foreground)]">
               CDC Stream Deduplication with Partition Window
             </h4>
 
-            <pre className="code-block text-[11px] p-3 rounded-xl m-0 overflow-x-auto bg-[#090d13] border border-white/5">
-              <code>{snippetCode}</code>
-            </pre>
+            <CodeBlock
+              code={snippetCode}
+              language="pyspark"
+              filename="cdc_dedup.py"
+              badge="PySpark Pattern"
+            />
           </div>
 
           <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between text-xs">
