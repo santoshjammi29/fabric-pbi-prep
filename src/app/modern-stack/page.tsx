@@ -11,12 +11,18 @@ import {
   Terminal,
   Bot,
   FileCode2,
+  ChevronDown,
+  CheckCircle2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   modernCodeMatrix,
   modernBlueprintsDb,
   modernCostPlaybooks,
+  modernStackDb,
+  pythonData,
 } from "@/data";
 import { CodeBlock } from "@/components/ui/code-block";
 
@@ -28,7 +34,8 @@ type ModernSubtab =
   | "blueprints"
   | "ai"
   | "cost"
-  | "compatibility";
+  | "compatibility"
+  | "python";
 
 export default function ModernStackPage() {
   const [activeTab, setActiveTab] = useState<ModernSubtab>("overview");
@@ -130,6 +137,7 @@ export default function ModernStackPage() {
           { id: "ai", label: "🤖 AI & RAG Stack", icon: Bot },
           { id: "cost", label: "💰 Cost Optimization Playbook", icon: Flame },
           { id: "compatibility", label: "🌐 Cloud × Table Matrix", icon: Table },
+          { id: "python", label: "🐍 Python for Modern Stack", icon: FileCode2 },
         ].map((tab) => {
           const Icon = tab.icon;
           const isSelected = activeTab === tab.id;
@@ -698,6 +706,193 @@ export default function ModernStackPage() {
               </tr>
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* 8. PYTHON FOR MODERN STACK */}
+      {activeTab === "python" && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          {/* Section Intro */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-lg">
+                🐍
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[var(--foreground)]">Python for Modern Data Stacks</h3>
+                <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+                  Python implementations across lakehouse, distributed computing, and AI-native pipelines.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 text-center">
+              <div className="px-4 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="text-lg font-bold text-blue-400">{modernStackDb.filter(q => q.py_code?.trim()).length}</div>
+                <div className="text-[10px] text-[var(--muted-foreground)]">Modern Stack Q&A with Python</div>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="text-lg font-bold text-green-400">{modernCodeMatrix.length}</div>
+                <div className="text-[10px] text-[var(--muted-foreground)]">Polyglot Matrix Entries</div>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="text-lg font-bold text-purple-400">{pythonData.filter(p => ['Delta Lake', 'Distributed Computing', 'Streaming', 'Architecture', 'Data Patterns', 'Performance'].includes(p.category)).length}</div>
+                <div className="text-[10px] text-[var(--muted-foreground)]">DE Python Patterns</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Modern Stack Q&A with Python Code */}
+          <div className="space-y-4">
+            <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
+              <Terminal size={18} className="text-blue-400" />
+              Modern Stack Interview Q&A · Python Solutions
+            </h3>
+            {modernStackDb.filter(q => q.py_code?.trim()).map((q) => (
+              <div key={q.id} className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden">
+                <div className="p-5 space-y-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                      {q.category}
+                    </span>
+                    <span className={cn(
+                      "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                      q.difficulty === "HARD" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" :
+                      q.difficulty === "ARCHITECT" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
+                      "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                    )}>
+                      {q.difficulty}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-[var(--foreground)]">{q.question}</h4>
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{q.answer.slice(0, 300)}{q.answer.length > 300 ? "..." : ""}</p>
+                </div>
+
+                <div className="border-t border-[var(--border)] p-4 bg-[var(--surface-2)] space-y-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {q.py_code?.trim() && (
+                      <CodeBlock
+                        code={q.py_code}
+                        language="python"
+                        filename="solution.py"
+                        badge="Python"
+                        showLineNumbers
+                      />
+                    )}
+                    {q.pyspark_code?.trim() && (
+                      <CodeBlock
+                        code={q.pyspark_code}
+                        language="python"
+                        filename="pyspark_solution.py"
+                        badge="PySpark"
+                        showLineNumbers
+                      />
+                    )}
+                  </div>
+                  {q.sql_code?.trim() && (
+                    <CodeBlock
+                      code={q.sql_code}
+                      language="sql"
+                      filename="query.sql"
+                      badge="SQL"
+                      showLineNumbers={false}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Polyglot Matrix – Python Focus */}
+          <div className="space-y-4">
+            <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
+              <FileCode2 size={18} className="text-green-400" />
+              Polyglot Engine Matrix · Python vs Others
+            </h3>
+            {modernCodeMatrix.map((item, idx) => (
+              <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
+                <h4 className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+                  <Sparkles size={14} className="text-purple-400" />
+                  {item.topic}
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <CodeBlock
+                    code={item.python}
+                    language="python"
+                    filename="Python (Polars)"
+                    badge="Python"
+                    showLineNumbers={false}
+                  />
+                  <CodeBlock
+                    code={item.pyspark}
+                    language="python"
+                    filename="PySpark"
+                    badge="PySpark"
+                    showLineNumbers={false}
+                  />
+                  <CodeBlock
+                    code={item.duckdb}
+                    language="sql"
+                    filename="DuckDB"
+                    badge="DuckDB"
+                    showLineNumbers={false}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* DE Python Patterns from pythonData */}
+          {(() => {
+            const deCategories = ['Delta Lake', 'Distributed Computing', 'Streaming', 'Architecture', 'Data Patterns', 'Performance', 'FinOps', 'Observability', 'Governance'];
+            const deItems = pythonData.filter(p => deCategories.includes(p.category));
+            if (deItems.length === 0) return null;
+            return (
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
+                  <Layers size={18} className="text-cyan-400" />
+                  Python Data Engineering Patterns ({deItems.length})
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {deItems.map((item) => {
+                    const lvlColor = item.level === 'architect' ? 'text-purple-400 bg-purple-500/10 border-purple-500/20'
+                      : item.level === 'advanced' ? 'text-orange-400 bg-orange-500/10 border-orange-500/20'
+                      : item.level === 'intermediate' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
+                      : 'text-green-400 bg-green-500/10 border-green-500/20';
+                    return (
+                      <div key={item.id} className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden">
+                        <div className="p-5 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-semibold text-cyan-400 tracking-wide uppercase">
+                              {item.category}
+                            </span>
+                            <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", lvlColor)}>
+                              {item.level}
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-[var(--foreground)]">{item.title}</h4>
+                          <p className="text-xs text-[var(--muted-foreground)] line-clamp-2">{item.description}</p>
+                        </div>
+                        <div className="border-t border-[var(--border)] p-4 bg-[var(--surface-2)]">
+                          <CodeBlock
+                            code={item.code}
+                            language="python"
+                            filename={`${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 35)}.py`}
+                            showLineNumbers
+                          />
+                          {item.use_case && (
+                            <p className="mt-3 text-xs text-[var(--muted-foreground)] flex items-start gap-1.5">
+                              <span className="shrink-0">🎯</span>
+                              <span>{item.use_case}</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

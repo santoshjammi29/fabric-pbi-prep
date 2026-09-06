@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -15,11 +15,14 @@ import {
   Sparkles,
   Filter,
   Layers,
+  FileCode2,
+  Terminal,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { conceptsDb } from "@/data";
-import { Concept, Difficulty } from "@/types/data";
+import { conceptsDb, pythonData } from "@/data";
+import { Concept, Difficulty, CodeSheetItem, CodeLevel } from "@/types/data";
+import { CodeBlock } from "@/components/ui/code-block";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -28,16 +31,33 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
   ARCHITECT: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
 };
 
+const levelBadges: Record<CodeLevel, { bg: string; text: string; border: string }> = {
+  beginner: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
+  intermediate: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" },
+  advanced: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/20" },
+  architect: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
+};
+
+type ViewMode = "concepts" | "python";
+
 function ConceptsContent() {
   const searchParams = useSearchParams();
   const initialTerm = searchParams.get("term") || "";
 
+  const [viewMode, setViewMode] = useState<ViewMode>("concepts");
   const [searchQuery, setSearchQuery] = useState(initialTerm);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Python tab state
+  const [pyLevel, setPyLevel] = useState<string>("ALL");
+  const [pyCategory, setPyCategory] = useState<string>("ALL");
+  const [pyExpandedId, setPyExpandedId] = useState<string | null>(null);
+  const [pyPage, setPyPage] = useState(1);
+  const pyPageSize = 10;
 
   // Load bookmarks from localStorage
   useEffect(() => {
@@ -107,6 +127,58 @@ function ConceptsContent() {
     });
   }, [searchQuery, selectedCategory, selectedDifficulty]);
 
+  // Python tab – distinct categories
+  const pyCategories = useMemo(() => {
+    const cats = new Set<string>();
+    pythonData.forEach((c) => {
+      if (c.category) cats.add(c.category);
+    });
+    return ["ALL", ...Array.from(cats).sort()];
+  }, []);
+
+  // Python tab – filtered items
+  const filteredPython = useMemo(() => {
+    return pythonData.filter((item) => {
+      if (pyLevel !== "ALL" && item.level !== pyLevel) return false;
+      if (pyCategory !== "ALL" && item.category !== pyCategory) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          item.title.toLowerCase().includes(q) ||
+          (item.description?.toLowerCase().includes(q) ?? false) ||
+          (item.code?.toLowerCase().includes(q) ?? false) ||
+          (item.category?.toLowerCase().includes(q) ?? false)
+        );
+      }
+      return true;
+    });
+  }, [searchQuery, pyLevel, pyCategory]);
+
+  const pyPaginated = useMemo(() => {
+    const start = (pyPage - 1) * pyPageSize;
+    return filteredPython.slice(start, start + pyPageSize);
+  }, [filteredPython, pyPage]);
+
+  const pyTotalPages = Math.max(1, Math.ceil(filteredPython.length / pyPageSize));
+
+  const copyCode = useCallback((code: string, id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    toast.success("Code copied to clipboard!");
+    setTimeout(() => setCopiedId(null), 2000);
+  }, []);
+
+  const togglePyBookmark = useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBookmarks(prev => {
+      const updated = prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id];
+      try { localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated)); } catch {}
+      if (prev.includes(id)) toast.info("Bookmark removed"); else toast.success("Saved to bookmarks");
+      return updated;
+    });
+  }, []);
+
   return (
     <div className="space-y-8 pb-20">
       {/* Page Header */}
@@ -132,6 +204,10 @@ function ConceptsContent() {
               <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Terms Curated</div>
             </div>
             <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-2xl font-bold text-blue-400">{pythonData.length}</div>
+              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Python Topics</div>
+            </div>
+            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div className="text-2xl font-bold text-purple-400">{categories.length - 1}</div>
               <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Categories</div>
             </div>
@@ -139,242 +215,538 @@ function ConceptsContent() {
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="space-y-4">
-        {/* Search row */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search
-              size={18}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search 110+ concepts (e.g., Lakehouse, ACID, Direct Lake, Tungsten, Lineage)..."
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          {/* Difficulty filter chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
-            {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
-              <button
-                key={diff}
-                onClick={() => setSelectedDifficulty(diff)}
-                className={cn(
-                  "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
-                  selectedDifficulty === diff
-                    ? "bg-purple-600 text-white shadow-md font-semibold"
-                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                )}
-              >
-                {diff === "ALL" ? "All Levels" : diff}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Category chips scroll */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-            <Filter size={12} /> Domain:
-          </span>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
-                selectedCategory === cat
-                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm font-semibold"
-                  : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-              )}
-            >
-              {cat === "ALL" ? "⚡ All Domains" : cat}
-            </button>
-          ))}
-        </div>
+      {/* View Mode Toggle */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <button
+          onClick={() => setViewMode("concepts")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
+            viewMode === "concepts"
+              ? "bg-green-600 text-white shadow-lg shadow-green-500/20"
+              : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
+          )}
+        >
+          <BookOpen size={16} />
+          <span>📚 Key Concepts ({conceptsDb.length})</span>
+        </button>
+        <button
+          onClick={() => setViewMode("python")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
+            viewMode === "python"
+              ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+              : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
+          )}
+        >
+          <FileCode2 size={16} />
+          <span>🐍 Python Coding ({pythonData.length})</span>
+        </button>
       </div>
 
-      {/* Results Header Count */}
-      <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-        <span>
-          Showing <strong className="text-[var(--foreground)]">{filteredConcepts.length}</strong> concepts
-        </span>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setExpandedId(expandedId ? null : filteredConcepts[0]?.id || null)}
-            className="hover:text-[var(--foreground)] font-medium transition-colors"
-          >
-            {expandedId ? "Collapse All" : "Quick Preview"}
-          </button>
-        </div>
-      </div>
-
-      {/* Concepts Grid / List */}
-      {filteredConcepts.length === 0 ? (
-        <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
-          <Layers size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
-          <h3 className="text-base font-semibold text-[var(--foreground)]">No matching concepts found</h3>
-          <p className="text-xs text-[var(--muted-foreground)] mt-1 max-w-sm mx-auto">
-            Try adjusting your search keywords or switching category filters.
-          </p>
-          <button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedCategory("ALL");
-              setSelectedDifficulty("ALL");
-            }}
-            className="mt-4 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
-          >
-            Reset Filters
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredConcepts.map((concept, index) => {
-            const isExpanded = expandedId === concept.id;
-            const isBookmarked = bookmarks.includes(concept.id);
-            const diffStyle = difficultyColors[concept.difficulty] || difficultyColors.MEDIUM;
-
-            return (
-              <motion.div
-                key={concept.id}
-                layout
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
-                className={cn(
-                  "rounded-2xl border transition-all duration-200 overflow-hidden",
-                  isExpanded
-                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
-                    : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+      {/* ============== CONCEPTS VIEW ============== */}
+      {viewMode === "concepts" && (
+        <>
+          {/* Filter & Search Bar */}
+          <div className="space-y-4">
+            {/* Search row */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search
+                  size={18}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search 110+ concepts (e.g., Lakehouse, ACID, Direct Lake, Tungsten, Lineage)..."
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
+                  >
+                    Clear
+                  </button>
                 )}
-              >
-                {/* Concept Header Card */}
-                <div
-                  onClick={() => setExpandedId(isExpanded ? null : concept.id)}
-                  className="p-5 cursor-pointer select-none space-y-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
-                          {concept.category}
-                        </span>
-                        <span
-                          className={cn(
-                            "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
-                            diffStyle.bg,
-                            diffStyle.text,
-                            diffStyle.border
-                          )}
-                        >
-                          {concept.difficulty}
-                        </span>
-                      </div>
-                      <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight">
-                        {concept.term}
-                      </h3>
-                    </div>
+              </div>
 
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        onClick={(e) => toggleBookmark(concept.id, e)}
-                        className={cn(
-                          "p-2 rounded-xl transition-colors",
-                          isBookmarked
-                            ? "text-amber-400 bg-amber-400/10"
-                            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                        )}
-                        title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
-                      >
-                        {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-                      </button>
+              {/* Difficulty filter chips */}
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+                {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
+                  <button
+                    key={diff}
+                    onClick={() => setSelectedDifficulty(diff)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
+                      selectedDifficulty === diff
+                        ? "bg-purple-600 text-white shadow-md font-semibold"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                    )}
+                  >
+                    {diff === "ALL" ? "All Levels" : diff}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                      <button
-                        onClick={(e) => copyDefinition(concept, e)}
-                        className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
-                        title="Copy Definition"
-                      >
-                        {copiedId === concept.id ? (
-                          <Check size={16} className="text-green-400" />
-                        ) : (
-                          <Copy size={16} />
-                        )}
-                      </button>
-
-                      <div className="p-2 text-[var(--muted-foreground)]">
-                        <ChevronDown
-                          size={16}
-                          className={cn(
-                            "transition-transform duration-300",
-                            isExpanded && "rotate-180 text-purple-400"
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Summary Definition */}
-                  <p className="text-xs sm:text-sm text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
-                    {concept.definition}
-                  </p>
-                </div>
-
-                {/* Expanded Details Body */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="border-t border-[var(--border)] px-5 py-4 bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm"
-                    >
-                      {/* Deep-dive Explanation */}
-                      <div className="space-y-1.5">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
-                          <Sparkles size={13} className="text-purple-400" />
-                          Architectural Deep Dive
-                        </h4>
-                        <p className="text-[var(--foreground)] opacity-90 leading-relaxed">
-                          {concept.explanation}
-                        </p>
-                      </div>
-
-                      {/* Key Architectural Takeaways */}
-                      {concept.keyPoints && concept.keyPoints.length > 0 && (
-                        <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                            Core Takeaways:
-                          </h4>
-                          <ul className="space-y-1.5">
-                            {concept.keyPoints.map((point, ki) => (
-                              <li key={ki} className="flex items-start gap-2 text-[var(--muted-foreground)]">
-                                <CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" />
-                                <span className="leading-snug">{point}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </motion.div>
+            {/* Category chips scroll */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+                <Filter size={12} /> Domain:
+              </span>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
+                    selectedCategory === cat
+                      ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm font-semibold"
+                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
                   )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
+                >
+                  {cat === "ALL" ? "⚡ All Domains" : cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results Header Count */}
+          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
+            <span>
+              Showing <strong className="text-[var(--foreground)]">{filteredConcepts.length}</strong> concepts
+            </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setExpandedId(expandedId ? null : filteredConcepts[0]?.id || null)}
+                className="hover:text-[var(--foreground)] font-medium transition-colors"
+              >
+                {expandedId ? "Collapse All" : "Quick Preview"}
+              </button>
+            </div>
+          </div>
+
+          {/* Concepts Grid / List */}
+          {filteredConcepts.length === 0 ? (
+            <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
+              <Layers size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
+              <h3 className="text-base font-semibold text-[var(--foreground)]">No matching concepts found</h3>
+              <p className="text-xs text-[var(--muted-foreground)] mt-1 max-w-sm mx-auto">
+                Try adjusting your search keywords or switching category filters.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("ALL");
+                  setSelectedDifficulty("ALL");
+                }}
+                className="mt-4 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredConcepts.map((concept, index) => {
+                const isExpanded = expandedId === concept.id;
+                const isBookmarked = bookmarks.includes(concept.id);
+                const diffStyle = difficultyColors[concept.difficulty] || difficultyColors.MEDIUM;
+
+                return (
+                  <motion.div
+                    key={concept.id}
+                    layout
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
+                    className={cn(
+                      "rounded-2xl border transition-all duration-200 overflow-hidden",
+                      isExpanded
+                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
+                        : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                    )}
+                  >
+                    {/* Concept Header Card */}
+                    <div
+                      onClick={() => setExpandedId(isExpanded ? null : concept.id)}
+                      className="p-5 cursor-pointer select-none space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                              {concept.category}
+                            </span>
+                            <span
+                              className={cn(
+                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                                diffStyle.bg,
+                                diffStyle.text,
+                                diffStyle.border
+                              )}
+                            >
+                              {concept.difficulty}
+                            </span>
+                          </div>
+                          <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight">
+                            {concept.term}
+                          </h3>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={(e) => toggleBookmark(concept.id, e)}
+                            className={cn(
+                              "p-2 rounded-xl transition-colors",
+                              isBookmarked
+                                ? "text-amber-400 bg-amber-400/10"
+                                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                            )}
+                            title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
+                          >
+                            {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                          </button>
+
+                          <button
+                            onClick={(e) => copyDefinition(concept, e)}
+                            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                            title="Copy Definition"
+                          >
+                            {copiedId === concept.id ? (
+                              <Check size={16} className="text-green-400" />
+                            ) : (
+                              <Copy size={16} />
+                            )}
+                          </button>
+
+                          <div className="p-2 text-[var(--muted-foreground)]">
+                            <ChevronDown
+                              size={16}
+                              className={cn(
+                                "transition-transform duration-300",
+                                isExpanded && "rotate-180 text-purple-400"
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Summary Definition */}
+                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                        {concept.definition}
+                      </p>
+                    </div>
+
+                    {/* Expanded Details Body */}
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="border-t border-[var(--border)] px-5 py-4 bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm"
+                        >
+                          {/* Deep-dive Explanation */}
+                          <div className="space-y-1.5">
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
+                              <Sparkles size={13} className="text-purple-400" />
+                              Architectural Deep Dive
+                            </h4>
+                            <p className="text-[var(--foreground)] opacity-90 leading-relaxed">
+                              {concept.explanation}
+                            </p>
+                          </div>
+
+                          {/* Key Architectural Takeaways */}
+                          {concept.keyPoints && concept.keyPoints.length > 0 && (
+                            <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                                Core Takeaways:
+                              </h4>
+                              <ul className="space-y-1.5">
+                                {concept.keyPoints.map((point, ki) => (
+                                  <li key={ki} className="flex items-start gap-2 text-[var(--muted-foreground)]">
+                                    <CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" />
+                                    <span className="leading-snug">{point}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ============== PYTHON CODING VIEW ============== */}
+      {viewMode === "python" && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          {/* Python Filters */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search
+                  size={18}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setPyPage(1); }}
+                  placeholder="Search Python topics (e.g., decorators, generators, pandas, delta lake)..."
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 transition-all"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => { setSearchQuery(""); setPyPage(1); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* Level filter */}
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+                {["ALL", "beginner", "intermediate", "advanced", "architect"].map((lvl) => (
+                  <button
+                    key={lvl}
+                    onClick={() => { setPyLevel(lvl); setPyPage(1); }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
+                      pyLevel === lvl
+                        ? "bg-blue-600 text-white shadow-md font-semibold"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                    )}
+                  >
+                    {lvl === "ALL" ? "All Levels" : lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Category chips */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+                <Filter size={12} /> Domain:
+              </span>
+              {pyCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => { setPyCategory(cat); setPyPage(1); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
+                    pyCategory === cat
+                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-sm font-semibold"
+                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
+                  )}
+                >
+                  {cat === "ALL" ? "🐍 All Categories" : cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results Count */}
+          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
+            <span>
+              Showing <strong className="text-[var(--foreground)]">{filteredPython.length}</strong> Python topics
+              {filteredPython.length > pyPageSize && (
+                <span className="ml-1">(Page {pyPage} of {pyTotalPages})</span>
+              )}
+            </span>
+          </div>
+
+          {/* Python Cards */}
+          {filteredPython.length === 0 ? (
+            <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
+              <Terminal size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
+              <h3 className="text-base font-semibold text-[var(--foreground)]">No matching Python topics found</h3>
+              <p className="text-xs text-[var(--muted-foreground)] mt-1 max-w-sm mx-auto">
+                Try adjusting your search or level/category filters.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setPyLevel("ALL");
+                  setPyCategory("ALL");
+                  setPyPage(1);
+                }}
+                className="mt-4 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors"
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pyPaginated.map((item, index) => {
+                const isExpanded = pyExpandedId === item.id;
+                const isBookmarked = bookmarks.includes(item.id);
+                const lvlStyle = levelBadges[item.level] || levelBadges.intermediate;
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.3) }}
+                    className={cn(
+                      "rounded-2xl border transition-all duration-200 overflow-hidden",
+                      isExpanded
+                        ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xl"
+                        : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                    )}
+                  >
+                    {/* Card Header */}
+                    <div
+                      onClick={() => setPyExpandedId(isExpanded ? null : item.id)}
+                      className="p-5 cursor-pointer select-none space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-semibold text-blue-400 tracking-wide uppercase">
+                              {item.category}
+                            </span>
+                            <span
+                              className={cn(
+                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                                lvlStyle.bg,
+                                lvlStyle.text,
+                                lvlStyle.border
+                              )}
+                            >
+                              {item.level}
+                            </span>
+                          </div>
+                          <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight">
+                            {item.title}
+                          </h3>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={(e) => togglePyBookmark(item.id, e)}
+                            className={cn(
+                              "p-2 rounded-xl transition-colors",
+                              isBookmarked
+                                ? "text-amber-400 bg-amber-400/10"
+                                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                            )}
+                            title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
+                          >
+                            {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                          </button>
+
+                          <button
+                            onClick={(e) => copyCode(item.code, item.id, e)}
+                            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                            title="Copy Code"
+                          >
+                            {copiedId === item.id ? (
+                              <Check size={16} className="text-green-400" />
+                            ) : (
+                              <Copy size={16} />
+                            )}
+                          </button>
+
+                          <div className="p-2 text-[var(--muted-foreground)]">
+                            <ChevronDown
+                              size={16}
+                              className={cn(
+                                "transition-transform duration-300",
+                                isExpanded && "rotate-180 text-blue-400"
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    {/* Expanded Code & Details */}
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="border-t border-[var(--border)] px-5 py-4 bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm"
+                        >
+                          <CodeBlock
+                            code={item.code}
+                            language="python"
+                            filename={`${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40)}.py`}
+                            showLineNumbers
+                          />
+
+                          {item.notes && item.notes.length > 0 && (
+                            <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                                📝 Notes:
+                              </h4>
+                              <ul className="space-y-1.5">
+                                {item.notes.map((note, ni) => (
+                                  <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
+                                    <CheckCircle2 size={14} className="text-blue-400 mt-0.5 shrink-0" />
+                                    <span className="leading-snug">{note}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {item.use_case && (
+                            <div className="pt-2 border-t border-[var(--border)]">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] mb-1">
+                                🎯 Use Case:
+                              </h4>
+                              <p className="text-[var(--foreground)] opacity-90 leading-relaxed">{item.use_case}</p>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Python Pagination */}
+          {filteredPython.length > pyPageSize && (
+            <div className="flex justify-center items-center gap-4 mt-4">
+              <button
+                onClick={() => setPyPage(p => Math.max(p - 1, 1))}
+                disabled={pyPage === 1}
+                className={cn("px-3 py-1.5 rounded-xl border text-sm", pyPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-[var(--surface-2)]")}
+              >
+                Previous
+              </button>
+              <span className="text-sm">Page {pyPage} of {pyTotalPages}</span>
+              <button
+                onClick={() => setPyPage(p => Math.min(p + 1, pyTotalPages))}
+                disabled={pyPage === pyTotalPages}
+                className={cn("px-3 py-1.5 rounded-xl border text-sm", pyPage === pyTotalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-[var(--surface-2)]")}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -388,4 +760,3 @@ export default function ConceptsPage() {
     </React.Suspense>
   );
 }
-
