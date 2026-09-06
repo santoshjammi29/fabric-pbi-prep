@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   BookOpen,
-  FileCode2,
+  Code2,
   Zap,
   Layers,
   Globe,
@@ -48,6 +48,7 @@ const navGroups: NavGroup[] = [
       { label: "Spark Engine", href: "/spark-engine", icon: Zap, pill: { text: "Medium", variant: "medium" } },
       { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, pill: { text: "Hard", variant: "hard" } },
       { label: "DE Mindmap", href: "/mindmap", icon: Globe, pill: { text: "NEW", variant: "new" } },
+      { label: "Python Hub", href: "/python", icon: Code2, pill: { text: "NEW", variant: "new" } },
     ],
   },
   {
