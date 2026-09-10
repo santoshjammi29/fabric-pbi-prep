@@ -682,44 +682,45 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════
-   ROLLING TICKER — Mosaic Gradient Marquee
-   Smooth continuous right-to-left scroll animation.
-   Duration is set per-instance via CSS custom property
-   or defaults to 90s for a leisurely, readable pace.
+   ROLLING TICKER — Apple-style unhurried marquee
+   Linear, continuous, right-to-left. Duration controlled
+   via --ticker-duration CSS custom property on the element.
+   Default: 320s — calm and easy to read, like a stock
+   ticker on Apple TV or a news footer on apple.com.
    ═══════════════════════════════════════════════════════ */
 
 @keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
 }
 
 .ticker-track {
   display: flex;
   align-items: center;
   white-space: nowrap;
-  /* Width must be large enough for doubled content — 'max-content' works perfectly */
   width: max-content;
-  animation: ticker-scroll var(--ticker-duration, 180s) linear infinite;
+  /* linear — Apple never uses ease for continuous motion */
+  animation: ticker-scroll var(--ticker-duration, 320s) linear infinite;
+  /* GPU-composited — no layout repaints */
   will-change: transform;
+  transform: translateZ(0);
 }
 
-/* Pause on hover for readability */
+/* Gentle pause on hover — lets the user click a link */
 .ticker-track:hover {
   animation-play-state: paused;
 }
 
-/* Respect reduced-motion preference */
+/* Honour reduced-motion: show as a static scrollable row */
 @media (prefers-reduced-motion: reduce) {
   .ticker-track {
     animation: none;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
-/* Light mode: stronger edge fade uses white background */
-.light .ticker-edge-left {
-  background: linear-gradient(to right, #f8fafc 0%, transparent 100%);
-}
-.light .ticker-edge-right {
-  background: linear-gradient(to left, #f8fafc 0%, transparent 100%);
+/* Light mode: edge fades use the page background colour */
+.light .ticker-track ~ div {
+  /* overridden inline — no extra rule needed */
 }
