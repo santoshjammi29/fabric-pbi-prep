@@ -22,7 +22,7 @@ export function HeroBanner() {
         </h1>
 
         <p className="text-lg text-slate-400 max-w-2xl leading-relaxed">
-          Fabric DP-600, Azure DP-203, Databricks, Delta Lake, 2,600+ Q&As
+          Fabric DP-600, Azure DP-203, Databricks, Delta Lake, 6,100+ Q&As
         </p>
 
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4">

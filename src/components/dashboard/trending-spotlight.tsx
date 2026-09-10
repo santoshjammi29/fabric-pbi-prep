@@ -76,15 +76,15 @@ clean_df = cdc_df.withColumn("rn", row_number().over(window_spec)) \\
           <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between">
             <button
               onClick={() => setIsAnswerRevealed(!isAnswerRevealed)}
-              className="text-xs font-semibold text-purple-400 hover:text-purple-300 transition-colors"
+              className="min-h-[44px] px-3 py-2 -ml-3 inline-flex items-center text-xs font-semibold text-purple-400 hover:text-purple-300 rounded-lg hover:bg-purple-500/10 active:scale-95 transition-all touch-manipulation cursor-pointer"
             >
               {isAnswerRevealed ? "Hide Solution" : "Reveal Solution →"}
             </button>
             <Link
               href="/qa-prep"
-              className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              className="min-h-[44px] px-3 py-2 -mr-3 inline-flex items-center text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] rounded-lg hover:bg-white/5 active:scale-95 transition-all touch-manipulation"
             >
-              Practice 2,600+ Q&amp;As
+              Practice 6,100+ Q&amp;As
             </Link>
           </div>
         </div>
@@ -152,7 +152,7 @@ clean_df = cdc_df.withColumn("rn", row_number().over(window_spec)) \\
           <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between">
             <Link
               href="/modern-stack#simulators"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-400 hover:text-green-300"
+              className="min-h-[44px] px-3 py-2 -ml-3 inline-flex items-center gap-1.5 text-xs font-semibold text-green-400 hover:text-green-300 rounded-lg hover:bg-green-500/10 active:scale-95 transition-all touch-manipulation"
             >
               <span>Launch 6 Simulators</span>
               <ArrowRight size={13} />

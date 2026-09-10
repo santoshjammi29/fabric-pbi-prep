@@ -487,11 +487,13 @@ export default function SparkEnginePage() {
             <div className="space-y-5 p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
               {/* Heap Size */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
+                <label htmlFor="spark-heap-size" className="flex items-center justify-between text-xs sm:text-sm font-semibold cursor-pointer">
                   <span className="text-[var(--foreground)]">Executor Heap Memory (--executor-memory)</span>
                   <span className="font-mono text-purple-400 font-bold">{heapSize} GB</span>
-                </div>
+                </label>
                 <input
+                  id="spark-heap-size"
+                  name="heapSize"
                   type="range"
                   min={4}
                   max={64}
@@ -499,6 +501,11 @@ export default function SparkEnginePage() {
                   value={heapSize}
                   onChange={(e) => setHeapSize(Number(e.target.value))}
                   className="w-full accent-purple-500"
+                  aria-label="Executor heap memory in gigabytes"
+                  aria-valuemin={4}
+                  aria-valuemax={64}
+                  aria-valuenow={heapSize}
+                  aria-valuetext={`${heapSize} gigabytes heap memory`}
                 />
                 <div className="text-[11px] text-[var(--muted-foreground)]">
                   Total JVM memory allocated per container.
@@ -507,11 +514,13 @@ export default function SparkEnginePage() {
 
               {/* Memory Fraction */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
+                <label htmlFor="spark-mem-fraction" className="flex items-center justify-between text-xs sm:text-sm font-semibold cursor-pointer">
                   <span className="text-[var(--foreground)]">spark.memory.fraction</span>
                   <span className="font-mono text-blue-400 font-bold">{memFraction}</span>
-                </div>
+                </label>
                 <input
+                  id="spark-mem-fraction"
+                  name="memFraction"
                   type="range"
                   min={0.2}
                   max={0.9}
@@ -519,6 +528,11 @@ export default function SparkEnginePage() {
                   value={memFraction}
                   onChange={(e) => setMemFraction(Number(e.target.value))}
                   className="w-full accent-blue-500"
+                  aria-label="Spark memory fraction"
+                  aria-valuemin={0.2}
+                  aria-valuemax={0.9}
+                  aria-valuenow={memFraction}
+                  aria-valuetext={`Memory fraction ${memFraction}`}
                 />
                 <div className="text-[11px] text-[var(--muted-foreground)]">
                   Fraction of usable heap dedicated to Spark internal execution &amp; caching.
@@ -527,11 +541,13 @@ export default function SparkEnginePage() {
 
               {/* Storage Fraction */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
+                <label htmlFor="spark-storage-fraction" className="flex items-center justify-between text-xs sm:text-sm font-semibold cursor-pointer">
                   <span className="text-[var(--foreground)]">spark.memory.storageFraction</span>
                   <span className="font-mono text-green-400 font-bold">{storageFraction}</span>
-                </div>
+                </label>
                 <input
+                  id="spark-storage-fraction"
+                  name="storageFraction"
                   type="range"
                   min={0.1}
                   max={0.9}
@@ -539,6 +555,11 @@ export default function SparkEnginePage() {
                   value={storageFraction}
                   onChange={(e) => setStorageFraction(Number(e.target.value))}
                   className="w-full accent-green-500"
+                  aria-label="Spark storage fraction"
+                  aria-valuemin={0.1}
+                  aria-valuemax={0.9}
+                  aria-valuenow={storageFraction}
+                  aria-valuetext={`Storage fraction ${storageFraction}`}
                 />
                 <div className="text-[11px] text-[var(--muted-foreground)]">
                   Immune storage margin protected from eviction by active execution shuffles.

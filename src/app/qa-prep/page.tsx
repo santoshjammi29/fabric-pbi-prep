@@ -184,14 +184,14 @@ export default function QaPrepPage() {
               Architect Q&amp;A Prep Hub
             </h1>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Study 2,600+ vetted technical interview questions across Fabric, Azure DP-203, Databricks Spark,
+              Study 6,100+ vetted technical interview questions across Fabric, Azure DP-203, Databricks Spark,
               and Distributed System Architecture with interactive SM-2 spaced repetition flashcards.
             </p>
           </div>
 
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 shrink-0">
             <div className="px-3.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl sm:text-2xl font-bold text-orange-400">{allQuestions.length}</div>
+              <div className="text-xl sm:text-2xl font-bold text-orange-400">{allQuestions.length.toLocaleString()}</div>
               <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Questions Bank</div>
             </div>
             <button
@@ -346,7 +346,7 @@ export default function QaPrepPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  placeholder="Search 2,600+ questions (e.g., Delta log, CDC, Shuffling, Direct Lake, RLS)..."
+                  placeholder="Search 6,100+ questions (e.g., Delta log, CDC, Shuffling, Direct Lake, RLS)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (
@@ -512,31 +512,35 @@ export default function QaPrepPage() {
 
                         <div className="flex items-center gap-1 shrink-0">
                           <button
+                            type="button"
                             onClick={(e) => toggleBookmark(q.id, e)}
                             className={cn(
-                              "p-2 rounded-xl transition-colors",
+                              "min-h-[44px] min-w-[44px] p-2.5 rounded-xl transition-colors flex items-center justify-center touch-manipulation cursor-pointer",
                               isBookmarked
                                 ? "text-amber-400 bg-amber-400/10"
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                             )}
                             title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
+                            aria-label={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
-                            {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                            {isBookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
                           </button>
 
                           <button
+                            type="button"
                             onClick={(e) => copyQnA(q, e)}
-                            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                            className="min-h-[44px] min-w-[44px] p-2.5 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center justify-center touch-manipulation cursor-pointer"
                             title="Copy Q&A"
+                            aria-label="Copy question and answer to clipboard"
                           >
                             {copiedId === q.id ? (
-                              <Check size={16} className="text-green-400" />
+                              <Check size={18} className="text-green-400" />
                             ) : (
-                              <Copy size={16} />
+                              <Copy size={18} />
                             )}
                           </button>
 
-                          <div className="p-2 text-[var(--muted-foreground)]">
+                          <div className="min-h-[44px] min-w-[44px] p-2.5 flex items-center justify-center text-[var(--muted-foreground)]">
                             <ChevronDown
                               size={16}
                               className={cn(

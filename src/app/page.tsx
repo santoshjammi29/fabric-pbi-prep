@@ -1,4 +1,5 @@
 import { EditorialHero } from "@/components/dashboard/editorial-hero";
+import { HeroQuickStart } from "@/components/dashboard/hero-quick-start";
 import { TopicCapsules } from "@/components/dashboard/topic-capsules";
 import { TrendingSpotlight } from "@/components/dashboard/trending-spotlight";
 import { ContinueLearning } from "@/components/dashboard/continue-learning";
@@ -19,16 +20,19 @@ function SectionDivider({ text }: { text: string }) {
 export default function DashboardPage() {
   return (
     <div className="space-y-10 pb-24 lg:pb-12">
-      {/* 1. Category Capsule Navigation (SitePoint style) */}
-      <TopicCapsules />
-
-      {/* 2. Mosaic Gradient Rolling Ticker — all topics across the database */}
-      <RollingTicker />
-
-      {/* 3. Editorial Magazine Hero Split (Noupe style) */}
+      {/* 1. Editorial Magazine Hero Split */}
       <EditorialHero />
 
-      {/* 4. Daily Curated Spotlight (Noupe middle section) */}
+      {/* 2. Clear Guided Onboarding Bar: 'New to the Platform? Start Here' */}
+      <HeroQuickStart />
+
+      {/* 3. Mosaic Gradient Rolling Ticker — all topics across the database */}
+      <RollingTicker />
+
+      {/* 4. Category Capsule Navigation (Architecture Focus) */}
+      <TopicCapsules />
+
+      {/* 5. Daily Curated Spotlight (Scenario, Code, Simulator) */}
       <TrendingSpotlight />
 
       {/* 4. Continue Learning & Tip of Day */}

@@ -42,7 +42,7 @@ export function TopicCapsules() {
           Explore by Architecture Focus
         </span>
         <Link href="/qa-prep" className="text-purple-400 hover:underline font-medium">
-          View all 2,600+ Questions &rarr;
+          View all 6,100+ Questions &rarr;
         </Link>
       </div>
 

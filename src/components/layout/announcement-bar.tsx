@@ -22,7 +22,7 @@ export function AnnouncementBar() {
           </span>
           <p className="truncate font-medium text-slate-300 text-[11px] sm:text-xs">
             <strong className="text-white">Microsoft Fabric DP-600 &amp; Spark 4.0 Architecture Bank</strong>{" "}
-            <span className="hidden md:inline text-slate-400">— 2,600+ vetted scenario Q&amp;As, 6 simulators &amp; polyglot sheets.</span>
+            <span className="hidden md:inline text-slate-400">— 6,100+ vetted scenario Q&amp;As, 6 simulators &amp; polyglot sheets.</span>
           </p>
           <Link
             href="/qa-prep"

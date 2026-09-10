@@ -221,13 +221,13 @@ export function CodeBlock({
             title={lineNumbersEnabled ? "Hide line numbers" : "Show line numbers"}
             aria-label="Toggle line numbers"
             className={cn(
-              "p-1 sm:px-1.5 py-1 rounded-md transition-all text-[11px] font-mono flex items-center gap-1",
+              "min-h-[36px] sm:min-h-[30px] px-2 py-1.5 rounded-lg transition-all text-xs font-mono flex items-center gap-1.5 touch-manipulation cursor-pointer",
               lineNumbersEnabled
                 ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80"
             )}
           >
-            <AlignLeft size={12} />
+            <AlignLeft size={13} />
             <span className="hidden sm:inline text-[10px]">#</span>
           </button>
 
@@ -238,30 +238,31 @@ export function CodeBlock({
             title={isWrap ? "Disable wrap (scroll)" : "Enable word wrap"}
             aria-label="Toggle word wrap"
             className={cn(
-              "p-1 sm:px-1.5 py-1 rounded-md transition-all text-[11px] flex items-center gap-1",
+              "min-h-[36px] sm:min-h-[30px] px-2.5 py-1.5 rounded-lg transition-all text-xs flex items-center gap-1.5 touch-manipulation cursor-pointer",
               isWrap
                 ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80"
             )}
           >
-            <WrapText size={12} />
-            <span className="hidden sm:inline text-[10px]">Wrap</span>
+            <WrapText size={13} />
+            <span className="hidden sm:inline text-[11px]">Wrap</span>
           </button>
 
           {/* Copy Button */}
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/15 active:scale-95 text-slate-100 text-[11px] font-medium border border-white/10 shadow-sm transition-all"
+            aria-label="Copy code to clipboard"
+            className="min-h-[36px] sm:min-h-[32px] flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 active:scale-95 text-slate-100 text-xs font-semibold border border-white/15 shadow-sm transition-all touch-manipulation cursor-pointer"
           >
             {copied ? (
               <>
-                <Check size={12} className="text-emerald-400" />
+                <Check size={13} className="text-emerald-400" />
                 <span className="text-emerald-300 font-semibold">Copied</span>
               </>
             ) : (
               <>
-                <Copy size={12} className="text-slate-300" />
+                <Copy size={13} className="text-slate-300" />
                 <span>Copy</span>
               </>
             )}

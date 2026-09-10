@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Layers,
   Sparkles,
@@ -35,6 +35,46 @@ type ModernSubtab =
 
 export default function ModernStackPage() {
   const [activeTab, setActiveTab] = useState<ModernSubtab>("overview");
+
+  const handleTabChange = useCallback((tabId: ModernSubtab) => {
+    setActiveTab(tabId);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${tabId}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    const syncTabFromLocation = () => {
+      const hash = window.location.hash.replace("#", "").toLowerCase();
+      const params = new URLSearchParams(window.location.search);
+      const queryTab = params.get("tab")?.toLowerCase();
+      const target = hash || queryTab;
+
+      const validTabs: ModernSubtab[] = [
+        "overview",
+        "concepts",
+        "matrix",
+        "simulators",
+        "blueprints",
+        "ai",
+        "cost",
+        "compatibility",
+        "python",
+      ];
+
+      if (target && validTabs.includes(target as ModernSubtab)) {
+        setActiveTab(target as ModernSubtab);
+        setTimeout(() => {
+          const el = document.getElementById(target);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 50);
+      }
+    };
+
+    syncTabFromLocation();
+    window.addEventListener("hashchange", syncTabFromLocation);
+    return () => window.removeEventListener("hashchange", syncTabFromLocation);
+  }, []);
 
   // Interactive Canvas Stage
   const [selectedCanvasStage, setSelectedCanvasStage] = useState<number>(0);
@@ -140,7 +180,7 @@ export default function ModernStackPage() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as ModernSubtab)}
+              onClick={() => handleTabChange(tab.id as ModernSubtab)}
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
                 isSelected
@@ -157,7 +197,7 @@ export default function ModernStackPage() {
 
       {/* 1. OVERVIEW & CANVAS */}
       {activeTab === "overview" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div id="overview" className="space-y-6 animate-in fade-in duration-300">
           {/* Interactive Stack Flow Canvas */}
           <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6">
             <div className="flex items-center justify-between">
@@ -213,7 +253,7 @@ export default function ModernStackPage() {
           {/* Quick Launch Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div
-              onClick={() => setActiveTab("simulators")}
+              onClick={() => handleTabChange("simulators")}
               className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-3"
             >
               <div className="w-10 h-10 rounded-2xl bg-green-500/10 text-green-400 flex items-center justify-center font-bold text-lg">
@@ -226,7 +266,7 @@ export default function ModernStackPage() {
             </div>
 
             <div
-              onClick={() => setActiveTab("blueprints")}
+              onClick={() => handleTabChange("blueprints")}
               className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-3"
             >
               <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg">
@@ -239,7 +279,7 @@ export default function ModernStackPage() {
             </div>
 
             <div
-              onClick={() => setActiveTab("matrix")}
+              onClick={() => handleTabChange("matrix")}
               className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-3"
             >
               <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg">
@@ -256,7 +296,7 @@ export default function ModernStackPage() {
 
       {/* 2. 6 LIVE SIMULATORS */}
       {activeTab === "simulators" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+        <div id="simulators" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
           {/* Simulator 1: Shuffle Estimator */}
           <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
             <div className="space-y-4">
@@ -277,26 +317,35 @@ export default function ModernStackPage() {
 
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-medium">
+                  <label htmlFor="sim-shuffle-rows" className="flex justify-between text-xs font-medium cursor-pointer">
                     <span>Input Rows (Millions):</span>
                     <span className="font-bold text-purple-400">{shuffleRows}M</span>
-                  </div>
+                  </label>
                   <input
+                    id="sim-shuffle-rows"
+                    name="shuffleRows"
                     type="range"
                     min={1}
                     max={500}
                     value={shuffleRows}
                     onChange={(e) => setShuffleRows(Number(e.target.value))}
                     className="w-full accent-purple-500"
+                    aria-label="Input rows in millions"
+                    aria-valuemin={1}
+                    aria-valuemax={500}
+                    aria-valuenow={shuffleRows}
+                    aria-valuetext={`${shuffleRows} million rows`}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-medium">
+                  <label htmlFor="sim-shuffle-skew" className="flex justify-between text-xs font-medium cursor-pointer">
                     <span>Data Skew Factor:</span>
                     <span className="font-bold text-orange-400">{shuffleSkew}x</span>
-                  </div>
+                  </label>
                   <input
+                    id="sim-shuffle-skew"
+                    name="shuffleSkew"
                     type="range"
                     min={1.0}
                     max={5.0}
@@ -304,6 +353,11 @@ export default function ModernStackPage() {
                     value={shuffleSkew}
                     onChange={(e) => setShuffleSkew(Number(e.target.value))}
                     className="w-full accent-orange-500"
+                    aria-label="Data skew factor multiplier"
+                    aria-valuemin={1.0}
+                    aria-valuemax={5.0}
+                    aria-valuenow={shuffleSkew}
+                    aria-valuetext={`${shuffleSkew}x multiplier`}
                   />
                 </div>
               </div>
@@ -324,49 +378,55 @@ export default function ModernStackPage() {
           <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
-                  2. Table Format Tree
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                  2. Table Format Selector
                 </span>
-                <button
-                  onClick={() => setTreeCatalog("uc")}
-                  className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                >
+                <button onClick={() => setTreeCatalog("uc")} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-medium">Primary Metastore / Ecosystem:</label>
-                <select
-                  value={treeCatalog}
-                  onChange={(e) => setTreeCatalog(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--foreground)] outline-none"
-                >
-                  <option value="uc">Databricks / Unity Catalog</option>
-                  <option value="snowflake">Snowflake / Polaris Catalog</option>
-                  <option value="nessie">Open Source / Apache Nessie</option>
-                  <option value="fabric">Microsoft Fabric OneLake</option>
-                </select>
+              <div className="space-y-3">
+                <label className="text-xs font-medium block">Select Target Enterprise Catalog:</label>
+                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                  {[
+                    { id: "uc", label: "Unity Catalog" },
+                    { id: "polaris", label: "Polaris" },
+                    { id: "glue", label: "AWS Glue" },
+                  ].map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setTreeCatalog(c.id)}
+                      className={cn(
+                        "py-1.5 text-[11px] font-semibold rounded-lg transition-all",
+                        treeCatalog === c.id
+                          ? "bg-purple-600 text-white shadow-sm"
+                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                      )}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-blue-500/20 text-xs space-y-1">
-              <div className="text-blue-300 font-bold">Recommendation:</div>
+            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-cyan-500/20 text-xs space-y-1.5">
+              <div className="text-cyan-300 font-bold">Architect Recommendation:</div>
               <div className="text-[var(--foreground)]">
-                {treeCatalog === "uc" && "Delta Lake with UniForm Iceberg metadata generation."}
-                {treeCatalog === "snowflake" && "Apache Iceberg with Snowflake-managed Iceberg Tables."}
-                {treeCatalog === "nessie" && "Apache Iceberg via REST Catalog with Git-like branches."}
-                {treeCatalog === "fabric" && "Delta Lake with Fabric OneLake shortcuts."}
+                {treeCatalog === "uc" && "Format: Delta Lake with UniForm enabled. Automatic iceberg metadata allows cross-querying from Snowflake & Fabric Direct Lake."}
+                {treeCatalog === "polaris" && "Format: Apache Iceberg v2. Native REST catalog integration across Snowflake, Trino, and Databricks external locations."}
+                {treeCatalog === "glue" && "Format: Apache Iceberg or Delta Lake. Ensure Glue Data Catalog crawler sync or Athena engine v3 is provisioned."}
               </div>
             </div>
           </div>
 
-          {/* Simulator 3: Serverless Cost Estimator */}
+          {/* Simulator 3: Serverless Storage vs Scan Cost */}
           <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-green-400 uppercase tracking-wider">
-                  3. Serverless Cost Estimator
+                  3. Query Scan Cost Estimator
                 </span>
                 <button onClick={() => setCostTb(10)} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
@@ -374,17 +434,24 @@ export default function ModernStackPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
+                <label htmlFor="sim-cost-tb" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Monthly TB Scanned:</span>
                   <span className="font-bold text-green-400">{costTb} TB</span>
-                </div>
+                </label>
                 <input
+                  id="sim-cost-tb"
+                  name="costTb"
                   type="range"
                   min={1}
                   max={100}
                   value={costTb}
                   onChange={(e) => setCostTb(Number(e.target.value))}
                   className="w-full accent-green-500"
+                  aria-label="Monthly lakehouse storage scanned in terabytes"
+                  aria-valuemin={1}
+                  aria-valuemax={100}
+                  aria-valuenow={costTb}
+                  aria-valuetext={`${costTb} terabytes scanned`}
                 />
               </div>
             </div>
@@ -413,11 +480,13 @@ export default function ModernStackPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
+                <label htmlFor="sim-spark-workers" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Worker Nodes (4 cores/node):</span>
                   <span className="font-bold text-amber-400">{sparkWorkers} Nodes</span>
-                </div>
+                </label>
                 <input
+                  id="sim-spark-workers"
+                  name="sparkWorkers"
                   type="range"
                   min={2}
                   max={64}
@@ -425,6 +494,11 @@ export default function ModernStackPage() {
                   value={sparkWorkers}
                   onChange={(e) => setSparkWorkers(Number(e.target.value))}
                   className="w-full accent-amber-500"
+                  aria-label="Number of worker nodes in cluster"
+                  aria-valuemin={2}
+                  aria-valuemax={64}
+                  aria-valuenow={sparkWorkers}
+                  aria-valuetext={`${sparkWorkers} worker nodes`}
                 />
               </div>
             </div>
@@ -453,11 +527,13 @@ export default function ModernStackPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
+                <label htmlFor="sim-rag-chunk" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Chunk Size (Tokens):</span>
                   <span className="font-bold text-pink-400">{ragChunk} tokens</span>
-                </div>
+                </label>
                 <input
+                  id="sim-rag-chunk"
+                  name="ragChunk"
                   type="range"
                   min={128}
                   max={2048}
@@ -465,6 +541,11 @@ export default function ModernStackPage() {
                   value={ragChunk}
                   onChange={(e) => setRagChunk(Number(e.target.value))}
                   className="w-full accent-pink-500"
+                  aria-label="Vector search chunk size in tokens"
+                  aria-valuemin={128}
+                  aria-valuemax={2048}
+                  aria-valuenow={ragChunk}
+                  aria-valuetext={`${ragChunk} tokens per chunk`}
                 />
               </div>
             </div>
@@ -493,17 +574,24 @@ export default function ModernStackPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
+                <label htmlFor="sim-watermark" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Allowed Lateness (Minutes):</span>
                   <span className="font-bold text-red-400">{watermarkMins} Mins</span>
-                </div>
+                </label>
                 <input
+                  id="sim-watermark"
+                  name="watermarkMins"
                   type="range"
                   min={1}
                   max={60}
                   value={watermarkMins}
                   onChange={(e) => setWatermarkMins(Number(e.target.value))}
                   className="w-full accent-red-500"
+                  aria-label="Streaming watermark threshold in minutes"
+                  aria-valuemin={1}
+                  aria-valuemax={60}
+                  aria-valuenow={watermarkMins}
+                  aria-valuetext={`${watermarkMins} minutes allowed lateness`}
                 />
               </div>
             </div>
@@ -523,7 +611,7 @@ export default function ModernStackPage() {
 
       {/* 3. 12 BLUEPRINTS GALLERY */}
       {activeTab === "blueprints" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+        <div id="blueprints" className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
           {modernBlueprintsDb.map((bp) => (
             <div key={bp.id} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
@@ -558,31 +646,18 @@ export default function ModernStackPage() {
 
       {/* 4. POLYGLOT MATRIX */}
       {activeTab === "matrix" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div id="matrix" className="space-y-6 animate-in fade-in duration-300">
           {modernCodeMatrix.map((item, idx) => (
             <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
-              <h3 className="text-lg font-bold text-[var(--foreground)] flex items-center gap-2">
-                <Terminal size={18} className="text-purple-400" />
+              <h4 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2">
+                <Sparkles size={16} className="text-purple-400" />
                 {item.topic}
-              </h3>
+              </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {[
-                  { lang: "Python (Polars)", code: item.python },
-                  { lang: "PySpark", code: item.pyspark },
-                  { lang: "Spark SQL", code: item.sparksql },
-                  { lang: "DuckDB", code: item.duckdb },
-                  { lang: "Snowflake", code: item.snowflake },
-                  { lang: "BigQuery", code: item.bigquery },
-                ].map((col) => (
-                  <CodeBlock
-                    key={col.lang}
-                    code={col.code}
-                    language={col.lang.toLowerCase().includes("python") || col.lang.toLowerCase().includes("pyspark") ? "python" : "sql"}
-                    filename={col.lang}
-                    showLineNumbers={false}
-                  />
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <CodeBlock code={item.python} language="python" filename="Python (Polars)" badge="Polars" showLineNumbers={false} />
+                <CodeBlock code={item.pyspark} language="python" filename="PySpark DataFrame" badge="PySpark" showLineNumbers={false} />
+                <CodeBlock code={item.duckdb} language="sql" filename="DuckDB SQL" badge="DuckDB" showLineNumbers={false} />
               </div>
             </div>
           ))}
@@ -591,7 +666,7 @@ export default function ModernStackPage() {
 
       {/* 5. AI & RAG STACK */}
       {activeTab === "ai" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+        <div id="ai" className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
           {[
             {
               title: "Delta Vector Search & Embedding Sync",
@@ -627,7 +702,7 @@ export default function ModernStackPage() {
 
       {/* 6. COST PLAYBOOKS */}
       {activeTab === "cost" && (
-        <div className="space-y-4 animate-in fade-in duration-300">
+        <div id="cost" className="space-y-4 animate-in fade-in duration-300">
           {modernCostPlaybooks.map((item, idx) => (
             <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
               <div className="flex items-center justify-between">
@@ -650,7 +725,7 @@ export default function ModernStackPage() {
 
       {/* 7. CLOUD TABLE COMPATIBILITY */}
       {activeTab === "compatibility" && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 overflow-x-auto animate-in fade-in duration-300">
+        <div id="compatibility" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 overflow-x-auto animate-in fade-in duration-300">
           <h3 className="text-lg font-bold text-[var(--foreground)]">
             Cloud Engine × Table Format Compatibility Matrix
           </h3>
@@ -707,7 +782,7 @@ export default function ModernStackPage() {
 
       {/* 8. PYTHON FOR MODERN STACK */}
       {activeTab === "python" && (
-        <div className="space-y-8 animate-in fade-in duration-300">
+        <div id="python" className="space-y-8 animate-in fade-in duration-300">
           {/* Section Intro */}
           <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div className="flex items-center gap-3">

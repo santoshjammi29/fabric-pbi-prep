@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useInView, useSpring, useTransform } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { BookOpen, MessageSquare, FileCode2, Zap, Layers, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,24 +26,49 @@ const colorMap = {
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-  
-  const spring = useSpring(0, { duration: 2000, bounce: 0 });
-  const display = useTransform(spring, (current) => Math.floor(current) + suffix);
+  const isInView = useInView(ref, { once: true, margin: "0px" });
+  const [displayValue, setDisplayValue] = useState<number>(0);
 
   useEffect(() => {
-    if (isInView) {
-      spring.set(value);
+    if (!isInView) {
+      // Immediate fallback timer if not intersecting or in tests
+      const timer = setTimeout(() => setDisplayValue(value), 400);
+      return () => clearTimeout(timer);
     }
-  }, [isInView, spring, value]);
 
-  return <motion.span ref={ref}>{display}</motion.span>;
+    let startTime: number | null = null;
+    let animationFrameId: number;
+    const duration = 1200;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setDisplayValue(Math.floor(easeOut * value));
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step);
+      } else {
+        setDisplayValue(value);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isInView, value]);
+
+  return (
+    <span ref={ref} className="tabular-nums">
+      {(displayValue > 0 ? displayValue : value).toLocaleString()}{suffix}
+    </span>
+  );
 }
 
 export function StatCards() {
   const stats: StatCardProps[] = [
-    { title: "Core Concepts", value: 350, suffix: "+", icon: BookOpen, href: "/concepts", accent: "green" },
-    { title: "Interview Q&As", value: 2600, suffix: "+", icon: MessageSquare, href: "/qa-prep", accent: "orange" },
+    { title: "Core Concepts", value: 112, suffix: "+", icon: BookOpen, href: "/concepts", accent: "green" },
+    { title: "Interview Q&As", value: 6100, suffix: "+", icon: MessageSquare, href: "/qa-prep", accent: "orange" },
     { title: "Coding Sheets", value: 120, suffix: "+", icon: FileCode2, href: "/code-practice", accent: "amber" },
     { title: "Spark Engine", value: 85, suffix: "+", icon: Zap, href: "/spark-engine", accent: "red" },
     { title: "Arch Scenarios", value: 2400, suffix: "+", icon: Layers, href: "/architecture", accent: "purple" },

@@ -56,7 +56,7 @@ export function ArchitectDigest() {
               <ShieldCheck size={14} className="text-purple-600 dark:text-purple-400" /> No Spam Guarantee
             </span>
             <span className="flex items-center gap-1.5">
-              <BookOpen size={14} className="text-blue-600 dark:text-blue-400" /> 2,600+ Q&amp;A Archive
+              <BookOpen size={14} className="text-blue-600 dark:text-blue-400" /> 6,100+ Q&amp;A Archive
             </span>
           </div>
         </div>
