@@ -680,3 +680,46 @@ body {
   color: #f8fafc !important;
   border-color: #334155 !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   ROLLING TICKER — Mosaic Gradient Marquee
+   Smooth continuous right-to-left scroll animation.
+   Duration is set per-instance via CSS custom property
+   or defaults to 90s for a leisurely, readable pace.
+   ═══════════════════════════════════════════════════════ */
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  /* Width must be large enough for doubled content — 'max-content' works perfectly */
+  width: max-content;
+  animation: ticker-scroll var(--ticker-duration, 90s) linear infinite;
+  will-change: transform;
+}
+
+/* Pause on hover for readability */
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    overflow-x: auto;
+  }
+}
+
+/* Light mode: stronger edge fade uses white background */
+.light .ticker-edge-left {
+  background: linear-gradient(to right, #f8fafc 0%, transparent 100%);
+}
+.light .ticker-edge-right {
+  background: linear-gradient(to left, #f8fafc 0%, transparent 100%);
+}

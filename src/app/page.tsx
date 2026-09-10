@@ -6,6 +6,7 @@ import { TipOfDay } from "@/components/dashboard/tip-of-day";
 import { StatCards } from "@/components/dashboard/stat-cards";
 import { RoadmapGrid } from "@/components/dashboard/roadmap-grid";
 import { ArchitectDigest } from "@/components/dashboard/architect-digest";
+import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 
 function SectionDivider({ text }: { text: string }) {
   return (
@@ -21,10 +22,13 @@ export default function DashboardPage() {
       {/* 1. Category Capsule Navigation (SitePoint style) */}
       <TopicCapsules />
 
-      {/* 2. Editorial Magazine Hero Split (Noupe style) */}
+      {/* 2. Mosaic Gradient Rolling Ticker — all topics across the database */}
+      <RollingTicker />
+
+      {/* 3. Editorial Magazine Hero Split (Noupe style) */}
       <EditorialHero />
 
-      {/* 3. Daily Curated Spotlight (Noupe middle section) */}
+      {/* 4. Daily Curated Spotlight (Noupe middle section) */}
       <TrendingSpotlight />
 
       {/* 4. Continue Learning & Tip of Day */}
