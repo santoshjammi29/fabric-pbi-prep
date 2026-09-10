@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { RollingTicker } from '@/components/dashboard/rolling-ticker'
 
 // Mock next/link since we're in jsdom

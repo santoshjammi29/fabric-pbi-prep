@@ -4,17 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   MessageSquare,
-  FileCode2,
   Calculator,
   ArrowRight,
-  Copy,
-  Check,
 } from "lucide-react";
-import { toast } from "sonner";
 import { CodeBlock } from "@/components/ui/code-block";
 
 export function TrendingSpotlight() {
-  const [copied, setCopied] = useState(false);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
   const snippetCode = `from pyspark.sql import Window
@@ -28,12 +23,6 @@ clean_df = cdc_df.withColumn("rn", row_number().over(window_spec)) \\
                  .filter(col("rn") == 1) \\
                  .drop("rn")`;
 
-  const copySnippet = () => {
-    navigator.clipboard.writeText(snippetCode);
-    setCopied(true);
-    toast.success("Snippet copied to clipboard!");
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <section className="space-y-4">

@@ -10,7 +10,6 @@ import {
   Bookmark,
   BookmarkCheck,
   ChevronDown,
-  Terminal,
   Lightbulb,
   Briefcase,
   Layers,

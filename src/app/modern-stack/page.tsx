@@ -11,10 +11,6 @@ import {
   Terminal,
   Bot,
   FileCode2,
-  ChevronDown,
-  CheckCircle2,
-  Copy,
-  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {

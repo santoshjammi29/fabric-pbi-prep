@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
-import { Copy, Check, Terminal, WrapText, AlignLeft, Sparkles } from "lucide-react";
+import { Copy, Check, Terminal, WrapText, AlignLeft } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 

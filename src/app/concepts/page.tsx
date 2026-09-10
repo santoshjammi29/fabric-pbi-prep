@@ -21,7 +21,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { conceptsDb, pythonData } from "@/data";
-import { Concept, Difficulty, CodeSheetItem, CodeLevel } from "@/types/data";
+import { Concept, Difficulty, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {

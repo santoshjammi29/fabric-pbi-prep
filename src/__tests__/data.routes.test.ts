@@ -69,7 +69,7 @@ describe('Route Integrity — learningPathsDb links', () => {
 
 describe('Route Integrity — modernBlueprintsDb links', () => {
   it('all blueprint links target /modern-stack', () => {
-    modernBlueprintsDb.forEach(bp => {
+    modernBlueprintsDb.forEach(() => {
       const href = '/modern-stack'
       expect(routeIsValid(href)).toBe(true)
     })
