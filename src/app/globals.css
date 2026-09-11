@@ -112,48 +112,57 @@ body {
 /* ═══ SCROLLBAR (Cross-browser: WebKit, Blink, Firefox) ═══ */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(139, 92, 246, 0.35) transparent;
+  scrollbar-color: rgba(168, 85, 247, 0.55) rgba(255, 255, 255, 0.04);
 }
 
 *:hover {
-  scrollbar-color: rgba(139, 92, 246, 0.65) transparent;
+  scrollbar-color: rgba(168, 85, 247, 0.85) rgba(255, 255, 255, 0.06);
 }
 
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(139, 92, 246, 0.35);
+  background-color: rgba(168, 85, 247, 0.55);
   border-radius: 9999px;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   background-clip: padding-box;
   transition: background-color 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(139, 92, 246, 0.7);
+  background-color: rgba(168, 85, 247, 0.85);
+}
+
+.light ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .light ::-webkit-scrollbar-thumb {
-  background-color: rgba(124, 58, 237, 0.3);
+  background-color: rgba(124, 58, 237, 0.5);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .light ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(124, 58, 237, 0.65);
+  background-color: rgba(124, 58, 237, 0.85);
 }
 
 .light * {
-  scrollbar-color: rgba(124, 58, 237, 0.3) transparent;
+  scrollbar-color: rgba(124, 58, 237, 0.5) rgba(0, 0, 0, 0.03);
 }
 
 .light *:hover {
-  scrollbar-color: rgba(124, 58, 237, 0.65) transparent;
+  scrollbar-color: rgba(124, 58, 237, 0.85) rgba(0, 0, 0, 0.05);
 }
 
 /* ═══ FOCUS STYLES (Accessibility) ═══ */
@@ -297,54 +306,73 @@ body {
   top: 0;
 }
 
-/* ═══ AURORA BACKGROUND ═══ */
+/* ═══ AURORA BACKGROUND (Apple-style calm ambient glow) ═══ */
+@keyframes aurora-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .aurora-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  animation: aurora-fade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .aurora-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  animation: aurora-float 20s ease-in-out infinite;
+  filter: blur(75px);
+  opacity: 0.12;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  animation: aurora-float 42s ease-in-out infinite;
+}
+
+.light .aurora-orb {
+  opacity: 0.06;
+  filter: blur(65px);
 }
 
 .aurora-orb-1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, #8b5cf6, transparent 70%);
-  top: -200px;
-  left: -100px;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, #8b5cf6, transparent 65%);
+  top: -150px;
+  left: -80px;
 }
 
 .aurora-orb-2 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #3b82f6, transparent 70%);
-  bottom: -200px;
-  right: -100px;
-  animation-delay: -7s;
-}
-
-.aurora-orb-3 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, #06b6d4, transparent 70%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #3b82f6, transparent 65%);
+  bottom: -150px;
+  right: -80px;
   animation-delay: -14s;
 }
 
+.aurora-orb-3 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, #06b6d4, transparent 65%);
+  top: 45%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  animation-delay: -28s;
+}
+
 @keyframes aurora-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(24px, -20px, 0) scale(1.03);
+  }
+  66% {
+    transform: translate3d(-18px, 16px, 0) scale(0.97);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

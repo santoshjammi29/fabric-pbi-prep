@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import { ScrollProgressBar } from '@/components/layout/scroll-progress-bar'
+import { ScrollBackToTop } from '@/components/layout/scroll-back-to-top'
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -60,3 +61,59 @@ describe('ScrollProgressBar Component', () => {
     expect(bar.getAttribute('aria-valuenow')).toBe('50')
   })
 })
+
+describe('ScrollBackToTop Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    window.scrollY = 0
+    if (document.documentElement) {
+      document.documentElement.scrollTop = 0
+    }
+  })
+
+  it('renders a button with accessible label and is initially hidden', () => {
+    render(<ScrollBackToTop />)
+    const btn = screen.getByRole('button', { name: /Scroll back to top/i })
+    expect(btn).toBeDefined()
+    expect(btn.className).toContain('opacity-0')
+    expect(btn.className).toContain('pointer-events-none')
+  })
+
+  it('becomes visible when main-content scrolls past threshold', async () => {
+    const container = document.createElement('div')
+    container.id = 'main-content'
+    Object.defineProperty(container, 'scrollTop', { value: 350, writable: true, configurable: true })
+    document.body.appendChild(container)
+
+    render(<ScrollBackToTop />)
+
+    await act(async () => {
+      container.dispatchEvent(new Event('scroll'))
+    })
+
+    const btn = screen.getByRole('button', { name: /Scroll back to top/i })
+    expect(btn.className).toContain('opacity-100')
+    expect(btn.className).toContain('pointer-events-auto')
+
+    document.body.removeChild(container)
+  })
+
+  it('triggers smooth scroll to top when clicked', async () => {
+    const container = document.createElement('div')
+    container.id = 'main-content'
+    const scrollToMock = vi.fn()
+    container.scrollTo = scrollToMock
+    document.body.appendChild(container)
+
+    render(<ScrollBackToTop />)
+    const btn = screen.getByRole('button', { name: /Scroll back to top/i })
+
+    await act(async () => {
+      btn.click()
+    })
+
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
+    document.body.removeChild(container)
+  })
+})
+

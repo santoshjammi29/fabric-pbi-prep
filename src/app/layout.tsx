@@ -6,6 +6,7 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
+import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
 import { CommandPalette } from "@/components/command-palette";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -93,6 +94,9 @@ export default function RootLayout({
 
               {/* Mobile bottom nav */}
               <MobileNav />
+
+              {/* Floating Scroll Back to Top button */}
+              <ScrollBackToTop />
             </div>
           </div>
 

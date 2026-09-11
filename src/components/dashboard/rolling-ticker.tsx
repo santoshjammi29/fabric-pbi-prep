@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   conceptsDb,
@@ -151,13 +151,10 @@ function Sep() {
 }
 
 /* ─── Main Component ─────────────────────────────────────────────────── */
-export function RollingTicker() {
-  const [items, setItems] = useState<TickerItem[]>(() => buildTickerItems(42));
+const STATIC_TICKER_ITEMS = buildTickerItems(42);
 
-  useEffect(() => {
-    const seed = Math.floor(Math.random() * 1_000_000);
-    setItems(buildTickerItems(seed));
-  }, []);
+export function RollingTicker() {
+  const [items] = useState<TickerItem[]>(STATIC_TICKER_ITEMS);
 
   // Triple the array so the loop always has plenty of content to fill wide screens
   const tripled = useMemo(() => [...items, ...items, ...items], [items]);
