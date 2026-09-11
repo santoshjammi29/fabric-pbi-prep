@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { questionsDb, questionsDeDb } from "@/data";
+import { questionsDb, questionsDeDb, getStandardizedDomain } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
 
@@ -128,11 +128,8 @@ export default function QaPrepPage() {
         return false;
       }
       if (selectedDomain !== "ALL") {
-        const cat = (q.category || "").toUpperCase();
-        const niche = (q.niche || "").toUpperCase();
-        const dom = (q.domain || "").toUpperCase();
-        const target = selectedDomain.toUpperCase();
-        if (!cat.includes(target) && !niche.includes(target) && !dom.includes(target)) {
+        const domain = getStandardizedDomain(q);
+        if (domain !== selectedDomain) {
           return false;
         }
       }

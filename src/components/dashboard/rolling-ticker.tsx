@@ -193,10 +193,10 @@ export function RollingTicker() {
           }}
         />
 
-        {/* Scrolling track — smooth, readable Apple speed (65s) */}
+        {/* Scrolling track — smooth, calm Apple speed (140s) */}
         <div
           className="ticker-track flex items-center py-2"
-          style={{ "--ticker-duration": "65s" } as React.CSSProperties}
+          style={{ "--ticker-duration": "140s" } as React.CSSProperties}
         >
           {tripled.map((item, idx) => {
             const [pill, text] = item.color.split("|");
