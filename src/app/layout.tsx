@@ -4,6 +4,8 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { RollingTicker } from "@/components/dashboard/rolling-ticker";
+import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
 import { CommandPalette } from "@/components/command-palette";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -49,6 +51,9 @@ export default function RootLayout({
       <body className="min-h-dvh">
 
         <ThemeProvider>
+          {/* Top scroll progress indicator across all interfaces */}
+          <ScrollProgressBar />
+
           {/* Skip link for accessibility */}
           <a href="#main-content" className="skip-link">
             Skip to main content
@@ -73,6 +78,9 @@ export default function RootLayout({
 
               {/* Top Announcement Bar (SitePoint/Noupe style) */}
               <AnnouncementBar />
+
+              {/* Rolling Ticker — visible across all pages and layouts */}
+              <RollingTicker />
 
               {/* Page content */}
               <main

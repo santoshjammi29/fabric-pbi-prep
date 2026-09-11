@@ -7,7 +7,6 @@ import { TipOfDay } from "@/components/dashboard/tip-of-day";
 import { StatCards } from "@/components/dashboard/stat-cards";
 import { RoadmapGrid } from "@/components/dashboard/roadmap-grid";
 import { ArchitectDigest } from "@/components/dashboard/architect-digest";
-import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 
 function SectionDivider({ text }: { text: string }) {
   return (
@@ -26,10 +25,7 @@ export default function DashboardPage() {
       {/* 2. Clear Guided Onboarding Bar: 'New to the Platform? Start Here' */}
       <HeroQuickStart />
 
-      {/* 3. Mosaic Gradient Rolling Ticker — all topics across the database */}
-      <RollingTicker />
-
-      {/* 4. Category Capsule Navigation (Architecture Focus) */}
+      {/* 3. Category Capsule Navigation (Architecture Focus) */}
       <TopicCapsules />
 
       {/* 5. Daily Curated Spotlight (Scenario, Code, Simulator) */}

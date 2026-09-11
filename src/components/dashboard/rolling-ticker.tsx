@@ -164,12 +164,7 @@ export function RollingTicker() {
 
   return (
     <div
-      className="relative w-full overflow-hidden"
-      style={{
-        // Apple-style: very subtle frosted strip, no heavy border
-        background: "transparent",
-        padding: "2px 0",
-      }}
+      className="relative w-full overflow-hidden border-b border-border/30 bg-background/40 backdrop-blur-sm"
       aria-label="Topics rolling ticker"
     >
       {/* Left fade — subtle on mobile, wider on desktop */}
