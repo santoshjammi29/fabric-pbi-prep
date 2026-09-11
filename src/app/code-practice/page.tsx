@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileCode2,
@@ -13,12 +14,15 @@ import {
   Lightbulb,
   Briefcase,
   Layers,
+  BookOpen,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { pysparkData, sparksqlData, mssqlData, pythonData } from "@/data";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { recordLastTopic } from "@/lib/user-progress";
 
 type LanguageKey = "pyspark" | "sparksql" | "mssql" | "python";
 
@@ -90,6 +94,12 @@ export default function CodePracticePage() {
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `?db=${lang}`);
     }
+    recordLastTopic({
+      title: `${languageConfigs[lang].name} Syntax & Code Sheets`,
+      href: `/code-practice?db=${lang}`,
+      category: "Polyglot Code Hub",
+      progress: 45,
+    });
   };
 
   // Load bookmarks
@@ -110,10 +120,19 @@ export default function CodePracticePage() {
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
+      const targetItem = languageConfigs[activeLang].data.find((item) => item.id === id);
+      if (targetItem) {
+        recordLastTopic({
+          title: targetItem.title,
+          href: `/code-practice?db=${activeLang}`,
+          category: `${languageConfigs[activeLang].name} Practice`,
+          progress: 60,
+        });
+      }
       if (bookmarks.includes(id)) {
         toast.info("Bookmark removed");
       } else {
-        toast.success("Saved code sheet to bookmarks");
+        toast.success("Saved code sheet to bookmarks in My Studio");
       }
     } catch {
       // ignore
@@ -215,6 +234,66 @@ export default function CodePracticePage() {
             </button>
           );
         })}
+      </div>
+
+      {/* 4-Layer Integrated Domain Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Link
+          href={`/concepts?term=${activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark"}`}
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <BookOpen size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">
+              {activeLang === "mssql" ? "T-SQL Definitions" : activeLang === "pyspark" ? "PySpark Core" : "Engine Concepts"}
+            </div>
+          </div>
+        </Link>
+
+        <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 font-bold">
+            <FileCode2 size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Active</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate">
+              {languageConfigs[activeLang].data.length} Templates Active
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href={`/qa-prep?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark")}`}
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
+              Related Interview Q&As
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href={`/architecture?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : "Spark")}`}
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">
+              System Scenarios
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Search & Level Filters */}

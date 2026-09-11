@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,12 +18,14 @@ import {
   Layers,
   FileCode2,
   Terminal,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { conceptsDb, pythonData } from "@/data";
 import { Concept, Difficulty, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { recordLastTopic } from "@/lib/user-progress";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -77,6 +80,15 @@ function ConceptsContent() {
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
+      const targetC = conceptsDb.find((c) => c.id === id);
+      if (targetC) {
+        recordLastTopic({
+          title: `Concept: ${targetC.term}`,
+          href: `/concepts?term=${encodeURIComponent(targetC.term)}`,
+          category: "Core Concepts Hub",
+          progress: 50,
+        });
+      }
       if (bookmarks.includes(id)) {
         toast.info("Bookmark removed");
       } else {
@@ -241,6 +253,66 @@ function ConceptsContent() {
           <FileCode2 size={16} />
           <span>🐍 Python Coding ({pythonData.length})</span>
         </button>
+      </div>
+
+      {/* 4-Layer Integrated Domain Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="p-3.5 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-green-500/20 text-green-300 flex items-center justify-center shrink-0 font-bold">
+            <BookOpen size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-green-400">Layer 1 · Concepts Active</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate">
+              {conceptsDb.length} Core Topics
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href="/code-practice"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+            <FileCode2 size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Practice</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-300">
+              120+ Coding Sheets
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/qa-prep"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
+              6,100+ Interview Questions
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/architecture"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">
+              2,400+ Scenarios
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* ============== CONCEPTS VIEW ============== */}

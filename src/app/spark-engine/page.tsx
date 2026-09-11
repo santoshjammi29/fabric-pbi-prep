@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import Link from "next/link";
 import {
   Zap,
   Cpu,
@@ -11,10 +12,13 @@ import {
   ChevronDown,
   ShieldCheck,
   Search,
+  MessageSquare,
+  FileCode2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pysparkData } from "@/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { recordLastTopic } from "@/lib/user-progress";
 
 type SparkSubtab = "architecture" | "simulator" | "memory" | "curriculum" | "lexicon";
 
@@ -84,6 +88,19 @@ export default function SparkEnginePage() {
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `#${tabId}`);
     }
+    const tabLabels: Record<SparkSubtab, string> = {
+      architecture: "Spark 4.0 Engine Architecture",
+      simulator: "Spark Physical Execution Simulator",
+      memory: "Tungsten Memory Mapper",
+      curriculum: "32-Level PySpark Curriculum",
+      lexicon: "Spark Architect's Lexicon",
+    };
+    recordLastTopic({
+      title: tabLabels[tabId] || "Spark Engine Hub",
+      href: `/spark-engine#${tabId}`,
+      category: "Spark Engine Hub",
+      progress: 50,
+    });
   }, []);
 
   useEffect(() => {
@@ -231,6 +248,61 @@ export default function SparkEnginePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 4-Layer Integrated Domain Taxonomy */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Link
+          href="/concepts?term=Spark"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <BookOpen size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">Spark Definitions</div>
+          </div>
+        </Link>
+
+        <Link
+          href="/code-practice?db=pyspark"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+            <FileCode2 size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-300">PySpark & SQL Sheets</div>
+          </div>
+        </Link>
+
+        <Link
+          href="/qa-prep?q=Spark"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">Spark Interview Bank</div>
+          </div>
+        </Link>
+
+        <Link
+          href="/architecture?q=Spark"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">Cluster & FinOps Specs</div>
+          </div>
+        </Link>
       </div>
 
       {/* Subtab Navigation Chips */}

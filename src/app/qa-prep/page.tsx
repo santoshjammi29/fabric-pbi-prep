@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { questionsDb, questionsDeDb } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
+import { recordLastTopic } from "@/lib/user-progress";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -44,6 +45,31 @@ export default function QaPrepPage() {
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Sync URL parameters on initial load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const qParam = params.get("q") || params.get("search");
+    const domainParam = params.get("domain") || params.get("category");
+    const diffParam = params.get("difficulty");
+    const studyParam = params.get("study");
+
+    if (qParam) setSearchQuery(qParam);
+    if (domainParam) {
+      const found = STANDARDIZED_DOMAINS.find(
+        (d) => d.toLowerCase() === domainParam.toLowerCase() || domainParam.toLowerCase().includes(d.toLowerCase())
+      );
+      if (found) setSelectedDomain(found);
+      else setSearchQuery(domainParam);
+    }
+    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+      setSelectedDifficulty(diffParam.toUpperCase());
+    }
+    if (studyParam === "true" || studyParam === "1") {
+      setIsStudyMode(true);
+    }
+  }, []);
 
   // Combine datasets
   const allQuestions: Question[] = useMemo(() => {
@@ -68,6 +94,14 @@ export default function QaPrepPage() {
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
+      const targetQ = allQuestions.find((q) => q.id === id);
+      if (targetQ) {
+        recordLastTopic({
+          title: targetQ.question.length > 55 ? targetQ.question.slice(0, 55) + "..." : targetQ.question,
+          href: `/qa-prep?q=${encodeURIComponent(targetQ.question.slice(0, 30))}`,
+          category: "Interview Q&A Hub",
+        });
+      }
       if (bookmarks.includes(id)) {
         toast.info("Bookmark removed");
       } else {
@@ -122,8 +156,19 @@ export default function QaPrepPage() {
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        const targetQ = allQuestions.find((q) => q.id === id);
+        if (targetQ) {
+          recordLastTopic({
+            title: targetQ.question.length > 55 ? targetQ.question.slice(0, 55) + "..." : targetQ.question,
+            href: `/qa-prep?q=${encodeURIComponent(targetQ.question.slice(0, 30))}`,
+            category: "Interview Q&A Hub",
+          });
+        }
+      }
       return next;
     });
   };
@@ -140,8 +185,30 @@ export default function QaPrepPage() {
   const rateStudyCard = useCallback((quality: number) => {
     toast.success(`Rated recall quality (${quality}/5). Interval updated via SM-2 algorithm.`);
     setIsCardFlipped(false);
+
+    try {
+      const savedData = localStorage.getItem("dataprep_userdata");
+      const current = savedData ? JSON.parse(savedData) : { reviewedCount: 0, xp: 0 };
+      const nextData = {
+        ...current,
+        reviewedCount: (current.reviewedCount || 0) + 1,
+        xp: (current.xp || 0) + 25,
+        lastActive: new Date().toISOString(),
+      };
+      localStorage.setItem("dataprep_userdata", JSON.stringify(nextData));
+
+      const card = filteredQuestions[studyIndex];
+      if (card) {
+        recordLastTopic({
+          title: card.question.length > 55 ? card.question.slice(0, 55) + "..." : card.question,
+          href: `/qa-prep?study=true`,
+          category: "SM-2 Flashcard Mode",
+        });
+      }
+    } catch {}
+
     setStudyIndex((prev) => (prev + 1) % (filteredQuestions.length || 1));
-  }, [filteredQuestions.length]);
+  }, [filteredQuestions, studyIndex]);
 
   // Keyboard navigation for study mode
   useEffect(() => {

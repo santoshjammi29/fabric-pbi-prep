@@ -1,6 +1,7 @@
 import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { EditorialHero } from "@/components/dashboard/editorial-hero";
 import { HeroQuickStart } from "@/components/dashboard/hero-quick-start";
+import { ExperienceLevelSwitcher } from "@/components/dashboard/experience-level-switcher";
 import { TopicCapsules } from "@/components/dashboard/topic-capsules";
 import { TrendingSpotlight } from "@/components/dashboard/trending-spotlight";
 import { ContinueLearning } from "@/components/dashboard/continue-learning";
@@ -29,13 +30,16 @@ export default function DashboardPage() {
       {/* 3. Clear Guided Onboarding Bar: 'New to the Platform? Start Here' */}
       <HeroQuickStart />
 
-      {/* 3. Category Capsule Navigation (Architecture Focus) */}
+      {/* 4. 4-Tier Interactive Experience Level Switcher */}
+      <ExperienceLevelSwitcher />
+
+      {/* 5. Category Capsule Navigation (Architecture Focus) */}
       <TopicCapsules />
 
-      {/* 5. Daily Curated Spotlight (Scenario, Code, Simulator) */}
+      {/* 6. Daily Curated Spotlight (Scenario, Code, Simulator) */}
       <TrendingSpotlight />
 
-      {/* 4. Continue Learning & Tip of Day */}
+      {/* 7. Continue Learning & Tip of Day */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ContinueLearning />
@@ -45,15 +49,15 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 5. Portal Analytics */}
+      {/* 8. Portal Analytics */}
       <SectionDivider text="Portal Analytics & Live Question Banks" />
       <StatCards />
 
-      {/* 6. Guided Curriculum Roadmap */}
+      {/* 9. Guided Curriculum Roadmap */}
       <SectionDivider text="Your Guided Curriculum Roadmap" />
       <RoadmapGrid />
 
-      {/* 7. Architect Digest Subscription (SitePoint & Noupe callout box) */}
+      {/* 10. Architect Digest Subscription (SitePoint & Noupe callout box) */}
       <ArchitectDigest />
     </div>
   );

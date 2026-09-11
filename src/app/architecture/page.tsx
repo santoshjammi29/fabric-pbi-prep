@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Layers,
@@ -12,11 +13,15 @@ import {
   ChevronDown,
   Sparkles,
   Filter,
+  BookOpen,
+  FileCode2,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { architectureData } from "@/data";
 import { ArchitectureQuestion, Difficulty } from "@/types/data";
+import { recordLastTopic } from "@/lib/user-progress";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -34,6 +39,21 @@ export default function ArchitectureHubPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const pageSize = 25;
+
+  // Sync URL parameters on initial load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const qParam = params.get("q") || params.get("search");
+    const catParam = params.get("category");
+    const diffParam = params.get("difficulty");
+
+    if (qParam) setSearchQuery(qParam);
+    if (catParam) setSelectedCategory(catParam);
+    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+      setSelectedDifficulty(diffParam.toUpperCase());
+    }
+  }, []);
 
   // Load bookmarks
   useEffect(() => {
@@ -53,6 +73,15 @@ export default function ArchitectureHubPage() {
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
+      const targetItem = architectureData.find((item) => item.id === id);
+      if (targetItem) {
+        recordLastTopic({
+          title: targetItem.question.length > 55 ? targetItem.question.slice(0, 55) + "..." : targetItem.question,
+          href: `/architecture?q=${encodeURIComponent(targetItem.question.slice(0, 30))}`,
+          category: "Architecture Hub",
+          progress: 60,
+        });
+      }
       if (bookmarks.includes(id)) {
         toast.info("Bookmark removed");
       } else {
@@ -109,8 +138,20 @@ export default function ArchitectureHubPage() {
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        const targetItem = architectureData.find((item) => item.id === id);
+        if (targetItem) {
+          recordLastTopic({
+            title: targetItem.question.length > 55 ? targetItem.question.slice(0, 55) + "..." : targetItem.question,
+            href: `/architecture?q=${encodeURIComponent(targetItem.question.slice(0, 30))}`,
+            category: "Architecture Hub",
+            progress: 60,
+          });
+        }
+      }
       return next;
     });
   };
@@ -142,6 +183,66 @@ export default function ArchitectureHubPage() {
             <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div className="text-xl sm:text-2xl font-bold text-blue-400">{categories.length - 1}</div>
               <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Spec Domains</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4-Layer Integrated Domain Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Link
+          href="/concepts"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <BookOpen size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">
+              Foundational Paradigms
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/code-practice"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+            <FileCode2 size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Practice</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-300">
+              Polyglot Templates
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/qa-prep"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
+              6,100+ Interview Questions
+            </div>
+          </div>
+        </Link>
+
+        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 font-bold">
+            <Layers size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture Active</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate">
+              {architectureData.length} Scenarios
             </div>
           </div>
         </div>
