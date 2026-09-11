@@ -11,6 +11,8 @@ import {
   Bot,
   ShieldCheck,
   Code2,
+  Globe,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,9 +24,12 @@ interface Topic {
 }
 
 const topics: Topic[] = [
-  { id: "all", label: "⚡ All 8 Domains", icon: Sparkles, href: "/qa-prep" },
+  { id: "all", label: "⚡ All 11 Modules", icon: Sparkles, href: "/qa-prep" },
+  { id: "python", label: "🐍 Python DE Hub", icon: Code2, href: "/python" },
+  { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator, href: "/modern-stack#simulators" },
   { id: "fabric", label: "Fabric & OneLake", icon: Database, href: "/concepts?term=Fabric" },
   { id: "spark", label: "Spark 4.0 Internals", icon: Flame, href: "/spark-engine" },
+  { id: "mindmap", label: "🗺️ DE Mindmap", icon: Globe, href: "/mindmap" },
   { id: "lakehouse", label: "Delta & Iceberg", icon: Layers, href: "/modern-stack" },
   { id: "code", label: "Polyglot Practice", icon: Code2, href: "/code-practice" },
   { id: "ai", label: "AI & Vector RAG", icon: Bot, href: "/modern-stack#ai" },

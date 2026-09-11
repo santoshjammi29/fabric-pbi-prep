@@ -43,7 +43,7 @@ const navGroups: NavGroup[] = [
   {
     title: "Learn & Code",
     items: [
-      { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "Easy", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
+      { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "112 Terms", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
       { label: "Python Hub", href: "/python", icon: Code2, badge: "NEW", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
       { label: "Code Practice", href: "/code-practice", icon: FileCode2, badge: "Medium", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
       { label: "Spark Engine", href: "/spark-engine", icon: Zap, badge: "Medium", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
@@ -52,9 +52,16 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    title: "Interactive Tools & Simulators",
+    items: [
+      { label: "6 Live Simulators", href: "/modern-stack#simulators", icon: Layers, badge: "Live Tool", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
+      { label: "Spark Physical Simulator", href: "/spark-engine#simulator", icon: Zap, badge: "Physical", badgeColor: "bg-red-500/10 text-red-400 border-red-500/20" },
+    ],
+  },
+  {
     title: "Practice & Scenarios",
     items: [
-      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, badge: "2.6k Qs", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, badge: "6.1k Qs", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
       { label: "Architecture Hub", href: "/architecture", icon: Layers, badge: "Architect", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
       { label: "Company Research", href: "/company-research", icon: Building2, badge: "GCC", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
     ],

@@ -37,7 +37,7 @@ clean_df = cdc_df.withColumn("rn", row_number().over(window_spec)) \\
         </div>
         <Link
           href="/qa-prep"
-          className="text-xs font-semibold text-purple-400 hover:text-purple-300 hidden sm:flex items-center gap-1"
+          className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 shrink-0 p-1.5 rounded-lg hover:bg-purple-500/10 transition-colors"
         >
           <span>View All Q&amp;As</span>
           <ArrowRight size={13} />

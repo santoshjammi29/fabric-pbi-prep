@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Zap,
   Cpu,
@@ -78,6 +78,42 @@ const lexiconTerms: LexiconTerm[] = [
 
 export default function SparkEnginePage() {
   const [activeTab, setActiveTab] = useState<SparkSubtab>("architecture");
+
+  const handleTabChange = useCallback((tabId: SparkSubtab) => {
+    setActiveTab(tabId);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${tabId}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    const syncTabFromLocation = () => {
+      const hash = window.location.hash.replace("#", "").toLowerCase();
+      const params = new URLSearchParams(window.location.search);
+      const queryTab = params.get("tab")?.toLowerCase();
+      const target = hash || queryTab;
+
+      const validTabs: SparkSubtab[] = [
+        "architecture",
+        "simulator",
+        "memory",
+        "curriculum",
+        "lexicon",
+      ];
+
+      if (target && validTabs.includes(target as SparkSubtab)) {
+        setActiveTab(target as SparkSubtab);
+        setTimeout(() => {
+          const el = document.getElementById(target);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 50);
+      }
+    };
+
+    syncTabFromLocation();
+    window.addEventListener("hashchange", syncTabFromLocation);
+    return () => window.removeEventListener("hashchange", syncTabFromLocation);
+  }, []);
 
   // Simulator State
   const [flowType, setFlowType] = useState<"narrow" | "wide" | "broadcast" | "aggregation">("narrow");
@@ -211,7 +247,7 @@ export default function SparkEnginePage() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as SparkSubtab)}
+              onClick={() => handleTabChange(tab.id as SparkSubtab)}
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
                 isSelected
@@ -228,7 +264,7 @@ export default function SparkEnginePage() {
 
       {/* 1. ENGINE ARCHITECTURE VIEW */}
       {activeTab === "architecture" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div id="architecture" className="space-y-6 animate-in fade-in duration-300">
           {/* 3 Milestones */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
@@ -307,7 +343,7 @@ export default function SparkEnginePage() {
 
       {/* 2. PHYSICAL SIMULATOR VIEW */}
       {activeTab === "simulator" && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
+        <div id="simulator" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
@@ -469,7 +505,7 @@ export default function SparkEnginePage() {
 
       {/* 3. TUNGSTEN MEMORY MAPPER VIEW */}
       {activeTab === "memory" && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
+        <div id="memory" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
               <Calculator size={14} /> Tungsten &amp; Unified Memory
@@ -644,7 +680,7 @@ export default function SparkEnginePage() {
 
       {/* 4. PYSPARK CURRICULUM VIEW */}
       {activeTab === "curriculum" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div id="curriculum" className="space-y-6 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h3 className="text-xl font-bold text-[var(--foreground)]">
@@ -743,7 +779,7 @@ export default function SparkEnginePage() {
 
       {/* 5. ARCHITECT'S LEXICON VIEW */}
       {activeTab === "lexicon" && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
+        <div id="lexicon" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-purple-400">

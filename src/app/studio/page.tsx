@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   User,
   Flame,
@@ -14,7 +15,16 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
-import { conceptsDb, questionsDb } from "@/data";
+import {
+  conceptsDb,
+  questionsDb,
+  questionsDeDb,
+  architectureData,
+  pythonData,
+  pysparkData,
+  sparksqlData,
+  mssqlData,
+} from "@/data";
 
 interface StudioUserData {
   streak: number;
@@ -34,7 +44,7 @@ export default function StudioPage() {
   });
 
   const [bookmarkedItems, setBookmarkedItems] = useState<
-    Array<{ id: string; title: string; type: "concept" | "question" }>
+    Array<{ id: string; title: string; type: string; href: string }>
   >([]);
 
   // Load user data & bookmarks
@@ -50,18 +60,50 @@ export default function StudioPage() {
         setUserData((prev) => ({ ...prev, bookmarks: bmList }));
       }
 
-      // Resolve bookmarked items
-      const resolved: Array<{ id: string; title: string; type: "concept" | "question" }> = [];
+      // Resolve bookmarked items across all databases
+      const resolved: Array<{ id: string; title: string; type: string; href: string }> = [];
       bmList.forEach((id) => {
         const c = conceptsDb.find((item) => item.id === id);
         if (c) {
-          resolved.push({ id: c.id, title: c.term, type: "concept" });
+          resolved.push({ id: c.id, title: c.term, type: "concept", href: `/concepts?term=${encodeURIComponent(c.term)}` });
           return;
         }
         const q = questionsDb.find((item) => item.id === id);
         if (q) {
-          resolved.push({ id: q.id, title: q.question, type: "question" });
+          resolved.push({ id: q.id, title: q.question, type: "q&a", href: "/qa-prep" });
+          return;
         }
+        const de = questionsDeDb.find((item) => item.id === id);
+        if (de) {
+          resolved.push({ id: de.id, title: de.question, type: "de q&a", href: "/qa-prep" });
+          return;
+        }
+        const arch = architectureData.find((item) => item.id === id);
+        if (arch) {
+          resolved.push({ id: arch.id, title: arch.question, type: "scenario", href: "/architecture" });
+          return;
+        }
+        const py = pythonData.find((item) => item.id === id);
+        if (py) {
+          resolved.push({ id: py.id, title: py.title, type: "python", href: "/python" });
+          return;
+        }
+        const psp = pysparkData.find((item) => item.id === id);
+        if (psp) {
+          resolved.push({ id: psp.id, title: psp.title, type: "pyspark", href: "/code-practice?db=pyspark" });
+          return;
+        }
+        const ssql = sparksqlData.find((item) => item.id === id);
+        if (ssql) {
+          resolved.push({ id: ssql.id, title: ssql.title, type: "spark sql", href: "/code-practice?db=sparksql" });
+          return;
+        }
+        const msql = mssqlData.find((item) => item.id === id);
+        if (msql) {
+          resolved.push({ id: msql.id, title: msql.title, type: "t-sql", href: "/code-practice?db=mssql" });
+          return;
+        }
+        resolved.push({ id, title: `Saved Item (${id})`, type: "saved", href: "/studio" });
       });
       setBookmarkedItems(resolved);
     } catch {
@@ -232,14 +274,19 @@ export default function StudioPage() {
               {bookmarkedItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 text-xs sm:text-sm transition-all group"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                  <Link
+                    href={item.href}
+                    className="flex items-center gap-2.5 min-w-0 pr-2 flex-1 hover:text-purple-300 transition-colors"
+                  >
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 uppercase shrink-0">
                       {item.type}
                     </span>
-                    <span className="font-semibold text-[var(--foreground)] truncate">{item.title}</span>
-                  </div>
+                    <span className="font-semibold text-[var(--foreground)] group-hover:text-purple-300 transition-colors truncate">
+                      {item.title}
+                    </span>
+                  </Link>
                   <button
                     onClick={() => removeBookmark(item.id)}
                     className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"

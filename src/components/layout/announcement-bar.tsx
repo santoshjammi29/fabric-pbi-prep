@@ -35,7 +35,7 @@ export function AnnouncementBar() {
 
         <button
           onClick={() => setIsVisible(false)}
-          className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0 hidden sm:flex"
+          className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0 flex items-center justify-center touch-manipulation"
           aria-label="Close banner"
         >
           <X size={14} />

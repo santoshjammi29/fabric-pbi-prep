@@ -172,16 +172,16 @@ export function RollingTicker() {
       }}
       aria-label="Topics rolling ticker"
     >
-      {/* Left fade — wide, soft */}
+      {/* Left fade — subtle on mobile, wider on desktop */}
       <div
-        className="absolute inset-y-0 left-0 z-10 w-28 pointer-events-none"
+        className="absolute inset-y-0 left-0 z-10 w-8 sm:w-16 lg:w-28 pointer-events-none"
         style={{
           background: "linear-gradient(to right, var(--background, #0a0a14) 30%, transparent 100%)",
         }}
       />
       {/* Right fade */}
       <div
-        className="absolute inset-y-0 right-0 z-10 w-28 pointer-events-none"
+        className="absolute inset-y-0 right-0 z-10 w-8 sm:w-16 lg:w-28 pointer-events-none"
         style={{
           background: "linear-gradient(to left, var(--background, #0a0a14) 30%, transparent 100%)",
         }}

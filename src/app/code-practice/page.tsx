@@ -67,6 +67,31 @@ export default function CodePracticePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
+  // Synchronize language tab from URL search parameter (?db=) or hash (#...)
+  useEffect(() => {
+    const syncTab = () => {
+      const params = new URLSearchParams(window.location.search);
+      const dbParam = params.get("db")?.toLowerCase();
+      const hashParam = window.location.hash.replace("#", "").toLowerCase();
+      const target = (dbParam || hashParam) as LanguageKey;
+      const validLangs: LanguageKey[] = ["pyspark", "sparksql", "mssql", "python"];
+      if (target && validLangs.includes(target)) {
+        setActiveLang(target);
+      }
+    };
+    syncTab();
+    window.addEventListener("hashchange", syncTab);
+    return () => window.removeEventListener("hashchange", syncTab);
+  }, []);
+
+  const handleLangChange = (lang: LanguageKey) => {
+    setActiveLang(lang);
+    setExpandedId(null);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `?db=${lang}`);
+    }
+  };
+
   // Load bookmarks
   useEffect(() => {
     try {
@@ -165,10 +190,7 @@ export default function CodePracticePage() {
           return (
             <button
               key={key}
-              onClick={() => {
-                setActiveLang(key);
-                setExpandedId(null);
-              }}
+              onClick={() => handleLangChange(key)}
               className={cn(
                 "flex items-center gap-3 p-3.5 rounded-2xl border transition-all text-left group",
                 isSelected

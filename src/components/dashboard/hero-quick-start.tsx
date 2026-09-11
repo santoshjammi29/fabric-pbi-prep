@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Compass, Sparkles, MessageSquare, Cpu } from "lucide-react";
+import { ArrowRight, Compass, Sparkles, MessageSquare, Cpu, Code2 } from "lucide-react";
 
 export function HeroQuickStart() {
   return (
@@ -43,12 +43,12 @@ export function HeroQuickStart() {
           </div>
         </div>
 
-        {/* 3 Quick-Choice Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-2">
-          {/* Card 1 */}
+        {/* 4 Quick-Choice Cards Across All Core Tracks */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-2">
+          {/* Card 1: Concepts */}
           <Link
             href="/concepts"
-            className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
+            className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-green-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
           >
             <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-400 flex items-center justify-center shrink-0 font-bold">
               <Sparkles size={18} />
@@ -56,7 +56,7 @@ export function HeroQuickStart() {
             <div className="space-y-1 min-w-0">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Step 1 · 112 Topics</span>
-                <span className="text-xs text-[var(--muted-foreground)] group-hover:text-purple-400 transition-colors">→</span>
+                <span className="text-xs text-[var(--muted-foreground)] group-hover:text-green-400 transition-colors">→</span>
               </div>
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">Core Concepts Hub</h3>
               <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
@@ -65,7 +65,47 @@ export function HeroQuickStart() {
             </div>
           </Link>
 
-          {/* Card 2 */}
+          {/* Card 2: Python DE Hub (NEW) */}
+          <Link
+            href="/python"
+            className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-cyan-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
+          >
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0 font-bold">
+              <Code2 size={18} />
+            </div>
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Code-First · NEW</span>
+                <span className="text-xs text-[var(--muted-foreground)] group-hover:text-cyan-400 transition-colors">→</span>
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">Python DE Hub</h3>
+              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                Foundations to Principal Architect patterns with copyable code snippets.
+              </p>
+            </div>
+          </Link>
+
+          {/* Card 3: Live Simulators */}
+          <Link
+            href="/modern-stack#simulators"
+            className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
+          >
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0 font-bold">
+              <Cpu size={18} />
+            </div>
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Interactive</span>
+                <span className="text-xs text-[var(--muted-foreground)] group-hover:text-purple-400 transition-colors">→</span>
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">6 Live Simulators</h3>
+              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                Model Spark shuffles, query costs, cluster resources, and RAG chunks.
+              </p>
+            </div>
+          </Link>
+
+          {/* Card 4: Q&A Prep Hub */}
           <Link
             href="/qa-prep"
             className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
@@ -81,26 +121,6 @@ export function HeroQuickStart() {
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">Interview Prep Hub</h3>
               <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
                 Practice interview questions with SM-2 spaced repetition flashcards.
-              </p>
-            </div>
-          </Link>
-
-          {/* Card 3 */}
-          <Link
-            href="/modern-stack#simulators"
-            className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-cyan-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
-          >
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0 font-bold">
-              <Cpu size={18} />
-            </div>
-            <div className="space-y-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Step 4 · Interactive</span>
-                <span className="text-xs text-[var(--muted-foreground)] group-hover:text-cyan-400 transition-colors">→</span>
-              </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">6 Live Simulators</h3>
-              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
-                Model Spark shuffle sizes, query costs, cluster resources, and RAG chunks.
               </p>
             </div>
           </Link>

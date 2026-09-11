@@ -62,7 +62,7 @@ export function EditorialHero() {
               </span>
               <Link
                 href="/concepts?term=Direct%20Lake"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-all shadow-md group-hover:shadow-purple-500/25 ml-2"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-semibold text-xs transition-all shadow-md group-hover:shadow-purple-500/25 ml-auto sm:ml-2 touch-manipulation min-h-[36px]"
               >
                 <span>Read Guide</span>
                 <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
