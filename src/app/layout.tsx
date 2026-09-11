@@ -4,7 +4,6 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
 import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
 import { CommandPalette } from "@/components/command-palette";
@@ -79,9 +78,6 @@ export default function RootLayout({
 
               {/* Top Announcement Bar (SitePoint/Noupe style) */}
               <AnnouncementBar />
-
-              {/* Rolling Ticker — visible across all pages and layouts */}
-              <RollingTicker />
 
               {/* Page content */}
               <main

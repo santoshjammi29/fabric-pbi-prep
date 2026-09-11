@@ -161,68 +161,82 @@ export function RollingTicker() {
 
   return (
     <div
-      className="relative w-full overflow-hidden border-b border-border/30 bg-background/40 backdrop-blur-sm"
+      className="relative w-full overflow-hidden rounded-2xl border border-purple-500/25 bg-gradient-to-r from-purple-950/20 via-[var(--surface-1)] to-blue-950/20 shadow-sm backdrop-blur-md flex items-center p-1.5"
       aria-label="Topics rolling ticker"
     >
-      {/* Left fade — subtle on mobile, wider on desktop */}
-      <div
-        className="absolute inset-y-0 left-0 z-10 w-8 sm:w-16 lg:w-28 pointer-events-none"
-        style={{
-          background: "linear-gradient(to right, var(--background, #0a0a14) 30%, transparent 100%)",
-        }}
-      />
-      {/* Right fade */}
-      <div
-        className="absolute inset-y-0 right-0 z-10 w-8 sm:w-16 lg:w-28 pointer-events-none"
-        style={{
-          background: "linear-gradient(to left, var(--background, #0a0a14) 30%, transparent 100%)",
-        }}
-      />
+      {/* Live Badge Pill on Left */}
+      <div className="flex items-center shrink-0 z-20 pl-2 pr-2 py-1">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/35 text-[11px] font-bold uppercase tracking-wider shrink-0 shadow-sm">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+          </span>
+          <span className="hidden sm:inline">Live Topics</span>
+          <span className="sm:hidden">Live</span>
+        </div>
+      </div>
 
-      {/* Scrolling track — Apple uses consistent, unhurried speed */}
-      <div
-        className="ticker-track flex items-center py-3"
-        style={{ "--ticker-duration": "320s" } as React.CSSProperties}
-      >
-        {tripled.map((item, idx) => {
-          const [pill, text] = item.color.split("|");
-          return (
-            <span key={`${item.label}-${idx}`} className="inline-flex items-center shrink-0">
-              <Link
-                href={item.href}
-                tabIndex={-1}
-                className="inline-flex items-center shrink-0 transition-all duration-500"
-                style={{
-                  background: pill,
-                  color: text,
-                  border: `1px solid ${text}30`,
-                  borderRadius: "999px",
-                  padding: "5px 14px",
-                  fontSize: "12.5px",
-                  fontWeight: 500,
-                  letterSpacing: "0.012em",
-                  lineHeight: "1.4",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                  whiteSpace: "nowrap",
-                  cursor: "pointer",
-                  // Apple: no drop-shadow, just a subtle inner glow via border
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.opacity = "1";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.opacity = "";
-                  (e.currentTarget as HTMLElement).style.transform = "";
-                }}
-              >
-                {item.label}
-              </Link>
-              <Sep />
-            </span>
-          );
-        })}
+      {/* Ticker Container with edge fades */}
+      <div className="relative flex-1 overflow-hidden">
+        {/* Left fade */}
+        <div
+          className="absolute inset-y-0 left-0 z-10 w-8 sm:w-16 pointer-events-none"
+          style={{
+            background: "linear-gradient(to right, var(--surface-1, #0a0a14) 20%, transparent 100%)",
+          }}
+        />
+        {/* Right fade */}
+        <div
+          className="absolute inset-y-0 right-0 z-10 w-8 sm:w-16 pointer-events-none"
+          style={{
+            background: "linear-gradient(to left, var(--surface-1, #0a0a14) 20%, transparent 100%)",
+          }}
+        />
+
+        {/* Scrolling track — smooth, readable Apple speed (65s) */}
+        <div
+          className="ticker-track flex items-center py-2"
+          style={{ "--ticker-duration": "65s" } as React.CSSProperties}
+        >
+          {tripled.map((item, idx) => {
+            const [pill, text] = item.color.split("|");
+            return (
+              <span key={`${item.label}-${idx}`} className="inline-flex items-center shrink-0">
+                <Link
+                  href={item.href}
+                  tabIndex={-1}
+                  className="inline-flex items-center shrink-0 transition-all duration-300"
+                  style={{
+                    background: pill,
+                    color: text,
+                    border: `1px solid ${text}35`,
+                    borderRadius: "999px",
+                    padding: "4px 13px",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    letterSpacing: "0.012em",
+                    lineHeight: "1.4",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    whiteSpace: "nowrap",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.opacity = "1";
+                    (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.opacity = "";
+                    (e.currentTarget as HTMLElement).style.transform = "";
+                  }}
+                >
+                  {item.label}
+                </Link>
+                <Sep />
+              </span>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

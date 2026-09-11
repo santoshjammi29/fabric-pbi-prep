@@ -1,3 +1,4 @@
+import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { EditorialHero } from "@/components/dashboard/editorial-hero";
 import { HeroQuickStart } from "@/components/dashboard/hero-quick-start";
 import { TopicCapsules } from "@/components/dashboard/topic-capsules";
@@ -18,11 +19,14 @@ function SectionDivider({ text }: { text: string }) {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-10 pb-24 lg:pb-12">
-      {/* 1. Editorial Magazine Hero Split */}
+    <div className="space-y-8 pb-24 lg:pb-12">
+      {/* 1. Horizontal Scrolling Bar at the very top of the home page */}
+      <RollingTicker />
+
+      {/* 2. Editorial Magazine Hero Split */}
       <EditorialHero />
 
-      {/* 2. Clear Guided Onboarding Bar: 'New to the Platform? Start Here' */}
+      {/* 3. Clear Guided Onboarding Bar: 'New to the Platform? Start Here' */}
       <HeroQuickStart />
 
       {/* 3. Category Capsule Navigation (Architecture Focus) */}
