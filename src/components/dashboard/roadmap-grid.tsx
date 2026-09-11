@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen, FileCode2, Zap, Cloud, MessageSquare, Layers, Star } from "lucide-react";
+import { ArrowRight, BookOpen, Code2, Zap, MessageSquare, Layers, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   EXPERIENCE_TIERS,
@@ -49,11 +49,11 @@ export function RoadmapGrid() {
     {
       step: 2,
       difficulty: "Medium",
-      title: "Code Practice",
-      description: "Hands-on polyglot syntax for PySpark, Spark SQL, T-SQL, and Pandas/Polars.",
-      meta: "120+ sheets",
-      icon: FileCode2,
-      href: "/code-practice",
+      title: "Python Hub",
+      description: "Foundational to Principal Architect Python, Pandas, Polars, and optimization patterns.",
+      meta: "75+ patterns",
+      icon: Code2,
+      href: "/python",
     },
     {
       step: 3,
@@ -68,9 +68,9 @@ export function RoadmapGrid() {
       step: 4,
       difficulty: "Hard",
       title: "Modern Data Stack",
-      description: "Serverless-first, AI-native modern architectural patterns with 6 interactive simulators.",
+      description: "Multi-cloud, AI-native architectural patterns and platforms.",
       meta: "Fabric, Databricks",
-      icon: Cloud,
+      icon: Layers,
       href: "/modern-stack",
     },
     {

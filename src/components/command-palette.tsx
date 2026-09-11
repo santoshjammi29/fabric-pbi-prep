@@ -64,7 +64,7 @@ export function CommandPalette() {
 
   // Dynamic items from datasets
   const dynamicItems: CommandItem[] = useMemo(() => {
-    const conceptItems: CommandItem[] = conceptsDb.slice(0, 50).map((c) => ({
+    const conceptItems: CommandItem[] = conceptsDb.map((c) => ({
       id: `concept-${c.id}`,
       title: `${c.term} (${c.category})`,
       category: "Concepts",

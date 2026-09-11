@@ -36,39 +36,39 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    title: "",
+    title: "Portal",
     items: [
       { label: "Home", href: "/", icon: Home },
+      { label: "Learning Paths", href: "/learning-paths", icon: Compass, pill: { text: "The Map", variant: "info" } },
     ],
   },
   {
-    title: "Learn",
+    title: "Knowledge Base",
     items: [
-      { label: "Key Concepts", href: "/concepts", icon: BookOpen, pill: { text: "Easy", variant: "easy" } },
-      { label: "Code Practice", href: "/code-practice", icon: FileCode2, pill: { text: "Medium", variant: "medium" } },
-      { label: "Spark Engine", href: "/spark-engine", icon: Zap, pill: { text: "Medium", variant: "medium" } },
-      { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, pill: { text: "Hard", variant: "hard" } },
-      { label: "DE Mindmap", href: "/mindmap", icon: Globe, pill: { text: "NEW", variant: "new" } },
-      { label: "Python Hub", href: "/python", icon: Code2, pill: { text: "NEW", variant: "new" } },
+      { label: "Key Concepts", href: "/concepts", icon: BookOpen, pill: { text: "Foundations", variant: "easy" } },
+      { label: "Python Hub", href: "/python", icon: Code2, pill: { text: "Core", variant: "new" } },
+      { label: "Spark Engine", href: "/spark-engine", icon: Zap, pill: { text: "Internal", variant: "medium" } },
+      { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, pill: { text: "Multi-Cloud", variant: "hard" } },
+      { label: "DE Mindmap", href: "/mindmap", icon: Globe, pill: { text: "Visual", variant: "new" } },
     ],
   },
   {
-    title: "Practice",
+    title: "Architectural Mastery",
     items: [
-      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, pill: { text: "Hard", variant: "hard" } },
+      { label: "Architecture Hub", href: "/architecture", icon: Layers, pill: { text: "Principal", variant: "architect" } },
+      { label: "Code Practice", href: "/code-practice", icon: FileCode2, pill: { text: "Advanced", variant: "medium" } },
     ],
   },
   {
-    title: "Explore",
+    title: "Interview & Prep",
     items: [
-      { label: "Architecture Hub", href: "/architecture", icon: Layers, pill: { text: "Architect", variant: "architect" } },
-      { label: "Company Research", href: "/company-research", icon: Building2, pill: { text: "Research", variant: "easy" } },
+      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, pill: { text: "High Stakes", variant: "hard" } },
+      { label: "Company Research", href: "/company-research", icon: Building2, pill: { text: "Strategic", variant: "easy" } },
     ],
   },
   {
-    title: "Account",
+    title: "Studio",
     items: [
-      { label: "Learning Paths", href: "/learning-paths", icon: Compass, pill: { text: "12 Paths", variant: "info" } },
       { label: "My Studio", href: "/studio", icon: User },
     ],
   },
@@ -102,6 +102,7 @@ export function Sidebar() {
   };
 
   const isActive = (href: string) => {
+    if (!pathname) return false;
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };

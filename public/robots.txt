@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fabric-pbi-prep.vercel.app/sitemap.xml
