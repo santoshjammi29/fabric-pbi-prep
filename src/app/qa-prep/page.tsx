@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { questionsDb, questionsDeDb, getStandardizedDomain } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
+import { AnswerRenderer } from "@/components/ui/answer-renderer";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -323,8 +324,8 @@ export default function QaPrepPage() {
                   <div className="text-xs font-semibold text-green-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles size={14} /> Architect Answer:
                   </div>
-                  <div className="text-sm text-[var(--foreground)] leading-relaxed whitespace-pre-line max-h-[300px] overflow-y-auto pr-2">
-                    {currentStudyCard.answer}
+                  <div className="text-sm text-[var(--foreground)] leading-relaxed max-h-[360px] overflow-y-auto pr-2">
+                    <AnswerRenderer text={currentStudyCard.answer} compact />
                   </div>
                 </div>
               )}
@@ -631,8 +632,8 @@ export default function QaPrepPage() {
                             <Zap size={14} />
                             <span>Principal Architect Explanation:</span>
                           </div>
-                          <div className="text-[var(--foreground)] leading-relaxed whitespace-pre-line space-y-2 opacity-95">
-                            {q.answer}
+                          <div className="pt-2">
+                            <AnswerRenderer text={q.answer} />
                           </div>
                         </motion.div>
                       )}

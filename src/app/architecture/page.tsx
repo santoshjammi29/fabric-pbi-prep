@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { architectureData } from "@/data";
 import { ArchitectureQuestion, Difficulty } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
+import { AnswerRenderer } from "@/components/ui/answer-renderer";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -466,8 +467,8 @@ export default function ArchitectureHubPage() {
                         <Sparkles size={14} className="text-purple-400" />
                         <span>Principal Architect Blueprint:</span>
                       </div>
-                      <div className="text-[var(--foreground)] leading-relaxed whitespace-pre-line opacity-95">
-                        {item.answer}
+                      <div className="pt-2">
+                        <AnswerRenderer text={item.answer} />
                       </div>
                     </motion.div>
                   )}
