@@ -48,7 +48,7 @@ export function TipOfDay() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="text-xs sm:text-sm text-slate-300 leading-relaxed m-0"
+                className="text-xs sm:text-sm text-slate-300 [.light_&]:text-slate-700 leading-relaxed m-0"
               >
                 {TIPS[currentIndex]}
               </motion.p>

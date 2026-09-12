@@ -83,7 +83,7 @@ export function ContinueLearning() {
           </Link>
           <Link
             href="/studio"
-            className="inline-flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors text-center"
+            className="inline-flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 [.light_&]:bg-slate-100 [.light_&]:hover:bg-slate-200 [.light_&]:text-slate-700 px-4 py-3 text-xs font-semibold transition-colors text-center"
             title="View personal bookmarks and progress in My Studio"
           >
             Studio

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
 
 /* ═══════════════════════════════════════════════════════
    DESIGN TOKENS — FAANG-Grade Design System
@@ -22,7 +23,10 @@
 }
 
 /* ── Dark Theme (default) ─────────────────────────── */
-:root {
+:root,
+.dark,
+html.dark {
+  color-scheme: dark;
   --background: #0A0A0B;
   --foreground: #f0f0f5;
   --card: #161618;
@@ -73,7 +77,9 @@
 }
 
 /* ── Light Theme ──────────────────────────────────── */
-.light {
+.light,
+html.light {
+  color-scheme: light;
   --background: #f8f8fc;
   --foreground: #1a1a2e;
   --card: #ffffff;
@@ -103,6 +109,24 @@
 }
 
 /* ═══ BASE STYLES ═══ */
+html {
+  background-color: #0A0A0B;
+  color: #f0f0f5;
+  color-scheme: dark;
+}
+
+html.dark {
+  background-color: #0A0A0B;
+  color: #f0f0f5;
+  color-scheme: dark;
+}
+
+html.light {
+  background-color: #f8f8fc;
+  color: #1a1a2e;
+  color-scheme: light;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

@@ -11,10 +11,10 @@ import {
 import { useUserStore } from "@/store/useUserStore";
 
 const difficultyColors = {
-  Easy: "text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/40 border-green-200 dark:border-green-800",
-  Medium: "text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800",
-  Hard: "text-orange-700 bg-orange-100 dark:text-orange-300 dark:bg-orange-900/40 border-orange-200 dark:border-orange-800",
-  Architect: "text-purple-700 bg-purple-100 dark:text-purple-300 dark:bg-purple-900/40 border-purple-200 dark:border-purple-800",
+  Easy: "text-green-300 bg-green-900/40 border-green-800 dark:text-green-300 dark:bg-green-900/40 dark:border-green-800 [.light_&]:text-green-700 [.light_&]:bg-green-100 [.light_&]:border-green-200",
+  Medium: "text-blue-300 bg-blue-900/40 border-blue-800 dark:text-blue-300 dark:bg-blue-900/40 dark:border-blue-800 [.light_&]:text-blue-700 [.light_&]:bg-blue-100 [.light_&]:border-blue-200",
+  Hard: "text-orange-300 bg-orange-900/40 border-orange-800 dark:text-orange-300 dark:bg-orange-900/40 dark:border-orange-800 [.light_&]:text-orange-700 [.light_&]:bg-orange-100 [.light_&]:border-orange-200",
+  Architect: "text-purple-300 bg-purple-900/40 border-purple-800 dark:text-purple-300 dark:bg-purple-900/40 dark:border-purple-800 [.light_&]:text-purple-700 [.light_&]:bg-purple-100 [.light_&]:border-purple-200",
 };
 
 export function RoadmapGrid() {

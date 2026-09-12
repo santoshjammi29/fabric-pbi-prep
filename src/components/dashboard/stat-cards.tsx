@@ -16,12 +16,12 @@ interface StatCardProps {
 }
 
 const colorMap = {
-  green: "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800/50",
-  orange: "text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800/50",
-  amber: "text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800/50",
-  red: "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-800/50",
-  purple: "text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800/50",
-  sky: "text-sky-600 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 border-sky-200 dark:border-sky-800/50",
+  green: "text-green-400 bg-green-900/30 border-green-800/50 dark:text-green-400 dark:bg-green-900/30 dark:border-green-800/50 [.light_&]:text-green-600 [.light_&]:bg-green-100 [.light_&]:border-green-200",
+  orange: "text-orange-400 bg-orange-900/30 border-orange-800/50 dark:text-orange-400 dark:bg-orange-900/30 dark:border-orange-800/50 [.light_&]:text-orange-600 [.light_&]:bg-orange-100 [.light_&]:border-orange-200",
+  amber: "text-amber-400 bg-amber-900/30 border-amber-800/50 dark:text-amber-400 dark:bg-amber-900/30 dark:border-amber-800/50 [.light_&]:text-amber-600 [.light_&]:bg-amber-100 [.light_&]:border-amber-200",
+  red: "text-red-400 bg-red-900/30 border-red-800/50 dark:text-red-400 dark:bg-red-900/30 dark:border-red-800/50 [.light_&]:text-red-600 [.light_&]:bg-red-100 [.light_&]:border-red-200",
+  purple: "text-purple-400 bg-purple-900/30 border-purple-800/50 dark:text-purple-400 dark:bg-purple-900/30 dark:border-purple-800/50 [.light_&]:text-purple-600 [.light_&]:bg-purple-100 [.light_&]:border-purple-200",
+  sky: "text-sky-400 bg-sky-900/30 border-sky-800/50 dark:text-sky-400 dark:bg-sky-900/30 dark:border-sky-800/50 [.light_&]:text-sky-600 [.light_&]:bg-sky-100 [.light_&]:border-sky-200",
 };
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
@@ -78,10 +78,10 @@ export function StatCards() {
         return (
           <Link key={stat.title} href={stat.href} className="block group">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.4 }}
+              transition={{ delay: i * 0.05, duration: 0.3 }}
               className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)] p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
             >
               <div className={cn("mb-4 inline-flex rounded-xl p-2.5 border", colorMap[stat.accent])}>

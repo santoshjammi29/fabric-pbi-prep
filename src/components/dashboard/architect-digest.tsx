@@ -27,36 +27,36 @@ export function ArchitectDigest() {
   };
 
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-purple-950/70 dark:via-[#111126] dark:to-blue-950/70 border border-purple-200 dark:border-purple-500/30 p-8 sm:p-10 isolate shadow-sm dark:shadow-none">
+    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950/70 via-[#111126] to-blue-950/70 border border-purple-500/30 [.light_&]:from-purple-50 [.light_&]:via-white [.light_&]:to-blue-50 [.light_&]:border-purple-200 p-8 sm:p-10 isolate shadow-sm dark:shadow-none">
       {/* Ambient background glow */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/10 dark:bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/20 [.light_&]:bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/20 [.light_&]:bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-8">
         <div className="space-y-3 max-w-xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-800 dark:text-purple-300 text-xs font-bold border border-purple-200 dark:border-purple-500/30 uppercase tracking-wider">
-            <Sparkles size={13} className="text-purple-600 dark:text-purple-400" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 [.light_&]:bg-purple-100 [.light_&]:text-purple-800 [.light_&]:border-purple-200 text-xs font-bold uppercase tracking-wider">
+            <Sparkles size={13} className="text-purple-400 [.light_&]:text-purple-600" />
             <span>Weekly Architect Digest</span>
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+          <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white [.light_&]:text-slate-900 leading-tight">
             Level Up from Senior Engineer to Principal Architect
           </h3>
 
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 [.light_&]:text-slate-600 leading-relaxed">
             Get curated weekly production blueprints, deep-dive Lakehouse trade-offs, and FAANG interview
             rubrics delivered directly with zero spam.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-300 pt-1">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-300 [.light_&]:text-slate-600 pt-1">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-emerald-600 dark:text-green-400" /> 100% Free Forever
+              <CheckCircle2 size={14} className="text-green-400 [.light_&]:text-emerald-600" /> 100% Free Forever
             </span>
             <span className="flex items-center gap-1.5">
-              <ShieldCheck size={14} className="text-purple-600 dark:text-purple-400" /> No Spam Guarantee
+              <ShieldCheck size={14} className="text-purple-400 [.light_&]:text-purple-600" /> No Spam Guarantee
             </span>
             <span className="flex items-center gap-1.5">
-              <BookOpen size={14} className="text-blue-600 dark:text-blue-400" /> 6,100+ Q&amp;A Archive
+              <BookOpen size={14} className="text-blue-400 [.light_&]:text-blue-600" /> 6,100+ Q&amp;A Archive
             </span>
           </div>
         </div>

@@ -63,9 +63,17 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
+      style={{ colorScheme: "dark", backgroundColor: "#0A0A0B" }}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark h-full antialiased bg-[#0A0A0B] text-[#f0f0f5]`}
     >
-      <body className="min-h-dvh">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-dvh bg-[#0A0A0B] text-[#f0f0f5]">
 
         <ThemeProvider>
           {/* Top scroll progress indicator across all interfaces */}
