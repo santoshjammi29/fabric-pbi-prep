@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { Shuffle } from "lucide-react";
 import { toast } from "sonner";
@@ -199,6 +199,11 @@ export function RollingTicker() {
 
   // Triple the array so the loop always has plenty of content to fill wide screens
   const tripled = useMemo(() => [...items, ...items, ...items], [items]);
+
+  // Refresh topics on client mount (every page refresh)
+  useEffect(() => {
+    setItems(buildTickerItems());
+  }, []);
 
   const handleShuffle = useCallback(() => {
     setIsShuffling(true);

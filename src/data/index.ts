@@ -370,3 +370,5 @@ export function getDatasetCounts(): DatasetCounts {
     totalQuestions: unified.length,
   };
 }
+
+export * from './home-dynamic-topics';
