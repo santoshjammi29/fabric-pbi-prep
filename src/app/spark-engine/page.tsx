@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { pysparkData } from "@/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { recordLastTopic } from "@/lib/user-progress";
 
 type SparkSubtab = "architecture" | "simulator" | "memory" | "curriculum" | "lexicon";
@@ -148,7 +149,16 @@ export default function SparkEnginePage() {
 
   // Curriculum State
   const [selectedPhase, setSelectedPhase] = useState<number | "all">("all");
-  const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
+  const [expandedLevels, setExpandedLevels] = useState<Set<string>>(new Set());
+
+  const toggleLevelExpand = useCallback((id: string) => {
+    setExpandedLevels((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   // Simulator Flow Definitions
   const simFlowDetails = {
@@ -782,22 +792,44 @@ export default function SparkEnginePage() {
             </div>
           </div>
 
+          {/* Curriculum Meta Action Bar */}
+          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
+            <span>
+              Showing <strong className="text-[var(--foreground)]">{pysparkData.length}</strong> curriculum modules
+            </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setExpandedLevels(new Set(pysparkData.map((i) => i.id)))}
+                className="hover:text-[var(--foreground)] font-medium transition-colors"
+              >
+                Expand All
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setExpandedLevels(new Set())}
+                className="hover:text-[var(--foreground)] font-medium transition-colors"
+              >
+                Collapse All
+              </button>
+            </div>
+          </div>
+
           {/* Curriculum items */}
           <div className="space-y-4">
             {pysparkData.map((item, index) => {
-              const isExpanded = expandedLevel === item.id;
+              const isExpanded = expandedLevels.has(item.id);
               return (
                 <div
                   key={item.id}
                   className={cn(
-                    "rounded-2xl border transition-all overflow-hidden",
+                    "rounded-2xl border transition-all duration-200 overflow-hidden",
                     isExpanded
-                      ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
+                      ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
                       : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)]"
                   )}
                 >
                   <div
-                    onClick={() => setExpandedLevel(isExpanded ? null : item.id)}
+                    onClick={() => toggleLevelExpand(item.id)}
                     className="p-5 cursor-pointer flex items-center justify-between gap-3 select-none"
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -813,35 +845,33 @@ export default function SparkEnginePage() {
                     </div>
                     <ChevronDown
                       size={16}
-                      className={cn("text-[var(--muted-foreground)] transition-transform", isExpanded && "rotate-180 text-purple-400")}
+                      className={cn("text-[var(--muted-foreground)] transition-transform duration-200 shrink-0", isExpanded && "rotate-180 text-purple-400")}
                     />
                   </div>
 
-                  {isExpanded && (
-                    <div className="p-5 border-t border-[var(--border)] bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm">
-                      {item.use_case && (
-                        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200">
-                          <strong>Enterprise Scenario:</strong> {item.use_case}
-                        </div>
-                      )}
-                      <CodeBlock
-                        code={item.code}
-                        language="pyspark"
-                        filename={`${item.id}.py`}
-                        badge="PySpark Execution"
-                      />
-                      {item.notes && item.notes.length > 0 && (
-                        <div className="space-y-1">
-                          <span className="font-bold text-[var(--foreground)]">Execution Mechanics:</span>
-                          <ul className="list-disc pl-5 space-y-1 text-[var(--muted-foreground)]">
-                            {item.notes.map((n, i) => (
-                              <li key={i}>{n}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                    {item.use_case && (
+                      <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200">
+                        <strong>Enterprise Scenario:</strong> {item.use_case}
+                      </div>
+                    )}
+                    <CodeBlock
+                      code={item.code}
+                      language="pyspark"
+                      filename={`${item.id}.py`}
+                      badge="PySpark Execution"
+                    />
+                    {item.notes && item.notes.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="font-bold text-[var(--foreground)]">Execution Mechanics:</span>
+                        <ul className="list-disc pl-5 space-y-1 text-[var(--muted-foreground)]">
+                          {item.notes.map((n, i) => (
+                            <li key={i}>{n}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </SmoothAccordion>
                 </div>
               );
             })}

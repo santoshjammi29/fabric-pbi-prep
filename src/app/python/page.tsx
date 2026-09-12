@@ -37,18 +37,10 @@ const ItemCard = React.memo(function ItemCard({
   bookmarked: boolean;
 }) {
   return (
-    <motion.div
-      layout="position"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{
-        layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
-        opacity: { duration: 0.2 },
-      }}
+    <div
       className={cn(
-        "border rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-colors",
-        isExpanded ? "border-purple-500 bg-[var(--surface-1)]" : "border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)]",
+        "border rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-all duration-200",
+        isExpanded ? "border-purple-500/50 bg-[var(--surface-1)] shadow-sm" : "border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)]",
       )}
       onClick={() => onToggle(item.id)}
     >
@@ -100,14 +92,14 @@ const ItemCard = React.memo(function ItemCard({
         )}
         {item.use_case && <p className="text-xs text-purple-300 pt-1 border-t border-[var(--border)]"><strong className="text-purple-200">Use‑case:</strong> {item.use_case}</p>}
       </SmoothAccordion>
-    </motion.div>
+    </div>
   );
 });
 
 export default function PythonHub() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevel, setSelectedLevel] = useState<string>("ALL");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [page, setPage] = useState(1);
@@ -180,7 +172,12 @@ export default function PythonHub() {
   }, []);
 
   const handleExpand = useCallback((id: string) => {
-    setExpandedId(prev => (prev === id ? null : id));
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }, []);
 
   return (
@@ -245,13 +242,36 @@ export default function PythonHub() {
         </div>
       </div>
 
+      {/* Results Header Action Bar */}
+      <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
+        <span>
+          Showing <strong className="text-[var(--foreground)]">{paginated.length}</strong> of{" "}
+          <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> Python tutorials
+        </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setExpandedIds(new Set(paginated.map((i) => i.id)))}
+            className="hover:text-[var(--foreground)] font-medium transition-colors"
+          >
+            Expand All
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setExpandedIds(new Set())}
+            className="hover:text-[var(--foreground)] font-medium transition-colors"
+          >
+            Collapse All
+          </button>
+        </div>
+      </div>
+
       {/* List */}
       <div className="space-y-4">
         {paginated.map(item => (
           <ItemCard
             key={item.id}
             item={item}
-            isExpanded={expandedId === item.id}
+            isExpanded={expandedIds.has(item.id)}
             onToggle={handleExpand}
             onCopy={copyCode}
             onBookmark={toggleBookmark}

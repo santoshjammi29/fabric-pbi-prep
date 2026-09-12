@@ -31,4 +31,23 @@ describe('SmoothAccordion component', () => {
     expect(container.querySelector('.custom-wrapper')).toBeDefined()
     expect(container.querySelector('.custom-inner')).toBeDefined()
   })
+
+  it('renders multiple accordions open simultaneously without interference', () => {
+    render(
+      <div>
+        <SmoothAccordion isOpen={true}>
+          <div>Card 1 Content</div>
+        </SmoothAccordion>
+        <SmoothAccordion isOpen={true}>
+          <div>Card 2 Content</div>
+        </SmoothAccordion>
+        <SmoothAccordion isOpen={false}>
+          <div>Card 3 Hidden</div>
+        </SmoothAccordion>
+      </div>
+    )
+    expect(screen.getByText('Card 1 Content')).toBeDefined()
+    expect(screen.getByText('Card 2 Content')).toBeDefined()
+    expect(screen.queryByText('Card 3 Hidden')).toBeNull()
+  })
 })

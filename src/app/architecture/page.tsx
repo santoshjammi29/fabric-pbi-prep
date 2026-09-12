@@ -381,19 +381,12 @@ export default function ArchitectureHubPage() {
             const diffStyle = difficultyColors[item.difficulty] || difficultyColors.ARCHITECT;
 
             return (
-              <motion.div
+              <div
                 key={item.id}
-                layout="position"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
-                  opacity: { duration: 0.2 },
-                }}
                 className={cn(
-                  "rounded-2xl border transition-colors duration-200 overflow-hidden",
+                  "rounded-2xl border transition-all duration-200 overflow-hidden",
                   isExpanded
-                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
+                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                 )}
               >
@@ -473,7 +466,7 @@ export default function ArchitectureHubPage() {
                     <AnswerRenderer text={item.answer} />
                   </div>
                 </SmoothAccordion>
-              </motion.div>
+              </div>
             );
           })}
 

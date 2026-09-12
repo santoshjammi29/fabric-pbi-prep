@@ -52,16 +52,34 @@ function ConceptsContent() {
   const [searchQuery, setSearchQuery] = useState(initialTerm);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Python tab state
   const [pyLevel, setPyLevel] = useState<string>("ALL");
   const [pyCategory, setPyCategory] = useState<string>("ALL");
-  const [pyExpandedId, setPyExpandedId] = useState<string | null>(null);
+  const [pyExpandedIds, setPyExpandedIds] = useState<Set<string>>(new Set());
   const [pyPage, setPyPage] = useState(1);
   const pyPageSize = 10;
+
+  const toggleConceptExpand = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const togglePyExpand = useCallback((id: string) => {
+    setPyExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   // Load bookmarks from localStorage
   useEffect(() => {
@@ -401,10 +419,17 @@ function ConceptsContent() {
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setExpandedId(expandedId ? null : filteredConcepts[0]?.id || null)}
+                onClick={() => setExpandedIds(new Set(filteredConcepts.map((c) => c.id)))}
                 className="hover:text-[var(--foreground)] font-medium transition-colors"
               >
-                {expandedId ? "Collapse All" : "Quick Preview"}
+                Expand All
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setExpandedIds(new Set())}
+                className="hover:text-[var(--foreground)] font-medium transition-colors"
+              >
+                Collapse All
               </button>
             </div>
           </div>
@@ -431,30 +456,23 @@ function ConceptsContent() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredConcepts.map((concept, index) => {
-                const isExpanded = expandedId === concept.id;
+                const isExpanded = expandedIds.has(concept.id);
                 const isBookmarked = bookmarks.includes(concept.id);
                 const diffStyle = difficultyColors[concept.difficulty] || difficultyColors.MEDIUM;
 
                 return (
-                  <motion.div
+                  <div
                     key={concept.id}
-                    layout="position"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
-                      opacity: { duration: 0.2 },
-                    }}
                     className={cn(
-                      "rounded-2xl border transition-colors duration-200 overflow-hidden",
+                      "rounded-2xl border transition-all duration-200 overflow-hidden",
                       isExpanded
-                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
+                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                     )}
                   >
                     {/* Concept Header Card */}
                     <div
-                      onClick={() => setExpandedId(isExpanded ? null : concept.id)}
+                      onClick={() => toggleConceptExpand(concept.id)}
                       className="p-5 cursor-pointer select-none space-y-3"
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -553,7 +571,7 @@ function ConceptsContent() {
                         </div>
                       )}
                     </SmoothAccordion>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -638,6 +656,21 @@ function ConceptsContent() {
                 <span className="ml-1">(Page {pyPage} of {pyTotalPages})</span>
               )}
             </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setPyExpandedIds(new Set(pyPaginated.map((i) => i.id)))}
+                className="hover:text-[var(--foreground)] font-medium transition-colors"
+              >
+                Expand All
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setPyExpandedIds(new Set())}
+                className="hover:text-[var(--foreground)] font-medium transition-colors"
+              >
+                Collapse All
+              </button>
+            </div>
           </div>
 
           {/* Python Cards */}
@@ -663,30 +696,23 @@ function ConceptsContent() {
           ) : (
             <div className="space-y-4">
               {pyPaginated.map((item, index) => {
-                const isExpanded = pyExpandedId === item.id;
+                const isExpanded = pyExpandedIds.has(item.id);
                 const isBookmarked = bookmarks.includes(item.id);
                 const lvlStyle = levelBadges[item.level] || levelBadges.intermediate;
 
                 return (
-                  <motion.div
+                  <div
                     key={item.id}
-                    layout="position"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
-                      opacity: { duration: 0.2 },
-                    }}
                     className={cn(
-                      "rounded-2xl border transition-colors duration-200 overflow-hidden",
+                      "rounded-2xl border transition-all duration-200 overflow-hidden",
                       isExpanded
-                        ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xl"
+                        ? "bg-[var(--surface-1)] border-blue-500/40 shadow-sm"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                     )}
                   >
                     {/* Card Header */}
                     <div
-                      onClick={() => setPyExpandedId(isExpanded ? null : item.id)}
+                      onClick={() => togglePyExpand(item.id)}
                       className="p-5 cursor-pointer select-none space-y-3"
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -788,7 +814,7 @@ function ConceptsContent() {
                         </div>
                       )}
                     </SmoothAccordion>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>

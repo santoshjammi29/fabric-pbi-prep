@@ -28,10 +28,13 @@ export function SmoothAccordion({
             opacity: 1,
             transition: {
               height: {
-                duration: 0.35,
-                ease: [0.04, 0.62, 0.23, 0.98],
+                duration: 0.22,
+                ease: [0.16, 1, 0.3, 1],
               },
-              opacity: { duration: 0.22, delay: 0.04 },
+              opacity: {
+                duration: 0.18,
+                ease: "easeOut",
+              },
             },
           }}
           exit={{
@@ -39,10 +42,13 @@ export function SmoothAccordion({
             opacity: 0,
             transition: {
               height: {
-                duration: 0.25,
-                ease: [0.04, 0.62, 0.23, 0.98],
+                duration: 0.18,
+                ease: [0.16, 1, 0.3, 1],
               },
-              opacity: { duration: 0.15 },
+              opacity: {
+                duration: 0.12,
+                ease: "easeIn",
+              },
             },
           }}
           className={cn(

@@ -68,7 +68,7 @@ export default function CodePracticePage() {
   const [activeLang, setActiveLang] = useState<LanguageKey>("pyspark");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevel, setSelectedLevel] = useState<string>("ALL");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
@@ -91,7 +91,7 @@ export default function CodePracticePage() {
 
   const handleLangChange = (lang: LanguageKey) => {
     setActiveLang(lang);
-    setExpandedId(null);
+    setExpandedIds(new Set());
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `?db=${lang}`);
     }
@@ -100,6 +100,15 @@ export default function CodePracticePage() {
       href: `/code-practice?db=${lang}`,
       category: "Polyglot Code Hub",
       progress: 45,
+    });
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
     });
   };
 
@@ -348,16 +357,26 @@ export default function CodePracticePage() {
       </div>
 
       {/* Count summary */}
+      {/* Count summary & Actions */}
       <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
         <span>
           Showing <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> coding templates
         </span>
-        <button
-          onClick={() => setExpandedId(expandedId ? null : filteredItems[0]?.id || null)}
-          className="hover:text-[var(--foreground)] font-medium transition-colors"
-        >
-          {expandedId ? "Collapse All" : "Quick Preview"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setExpandedIds(new Set(filteredItems.map((i) => i.id)))}
+            className="hover:text-[var(--foreground)] font-medium transition-colors"
+          >
+            Expand All
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setExpandedIds(new Set())}
+            className="hover:text-[var(--foreground)] font-medium transition-colors"
+          >
+            Collapse All
+          </button>
+        </div>
       </div>
 
       {/* Code Templates Stream */}
@@ -381,30 +400,23 @@ export default function CodePracticePage() {
       ) : (
         <div className="space-y-4">
           {filteredItems.map((item, index) => {
-            const isExpanded = expandedId === item.id;
+            const isExpanded = expandedIds.has(item.id);
             const isBookmarked = bookmarks.includes(item.id);
             const levelStyle = levelBadges[item.level] || levelBadges.intermediate;
 
             return (
-              <motion.div
+              <div
                 key={item.id}
-                layout="position"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
-                  opacity: { duration: 0.2 },
-                }}
                 className={cn(
-                  "rounded-2xl border transition-colors duration-200 overflow-hidden",
+                  "rounded-2xl border transition-all duration-200 overflow-hidden",
                   isExpanded
-                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
+                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                 )}
               >
                 {/* Header */}
                 <div
-                  onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                  onClick={() => toggleExpand(item.id)}
                   className="p-5 cursor-pointer select-none space-y-2"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -513,7 +525,7 @@ export default function CodePracticePage() {
                     </div>
                   )}
                 </SmoothAccordion>
-              </motion.div>
+              </div>
             );
           })}
         </div>
