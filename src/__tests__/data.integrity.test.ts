@@ -39,6 +39,24 @@ describe('Data Integrity — conceptsDb', () => {
     const unique = new Set(terms)
     expect(unique.size).toBe(terms.length)
   })
+  it('has ARCHITECT-level concepts in every category', () => {
+    const categories = Array.from(new Set(conceptsDb.map(c => c.category)))
+    expect(categories.length).toBeGreaterThanOrEqual(7)
+    categories.forEach(cat => {
+      const architectItems = conceptsDb.filter(c => c.category === cat && c.difficulty === 'ARCHITECT')
+      expect(architectItems.length, `Expected ARCHITECT concepts for category ${cat}`).toBeGreaterThanOrEqual(1)
+    })
+  })
+  it('every category has representations across all 4 difficulty levels', () => {
+    const categories = Array.from(new Set(conceptsDb.map(c => c.category)))
+    const levels = ['EASY', 'MEDIUM', 'HARD', 'ARCHITECT']
+    categories.forEach(cat => {
+      levels.forEach(lvl => {
+        const count = conceptsDb.filter(c => c.category === cat && c.difficulty === lvl).length
+        expect(count, `Expected ${lvl} concepts for category ${cat}`).toBeGreaterThanOrEqual(1)
+      })
+    })
+  })
 })
 
 describe('Data Integrity — questionsDb (Fabric & PBI)', () => {

@@ -48,16 +48,24 @@ export default function QaPrepPage() {
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Combine datasets
+  const allQuestions: Question[] = useMemo(() => {
+    return [...questionsDb, ...questionsDeDb];
+  }, []);
+
   // Sync URL parameters on initial load
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    const idParam = params.get("id");
     const qParam = params.get("q") || params.get("search");
     const domainParam = params.get("domain") || params.get("category");
     const diffParam = params.get("difficulty");
     const studyParam = params.get("study");
 
-    if (qParam) setSearchQuery(qParam);
+    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+      setSelectedDifficulty(diffParam.toUpperCase());
+    }
     if (domainParam) {
       const found = STANDARDIZED_DOMAINS.find(
         (d) => d.toLowerCase() === domainParam.toLowerCase() || domainParam.toLowerCase().includes(d.toLowerCase())
@@ -65,18 +73,26 @@ export default function QaPrepPage() {
       if (found) setSelectedDomain(found);
       else setSearchQuery(domainParam);
     }
-    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
-      setSelectedDifficulty(diffParam.toUpperCase());
-    }
     if (studyParam === "true" || studyParam === "1") {
       setIsStudyMode(true);
     }
-  }, []);
 
-  // Combine datasets
-  const allQuestions: Question[] = useMemo(() => {
-    return [...questionsDb, ...questionsDeDb];
-  }, []);
+    if (idParam || qParam) {
+      const matched = allQuestions.find(
+        (q) => (idParam && q.id === idParam) || (qParam && q.question.toLowerCase().includes(qParam.toLowerCase()))
+      );
+      if (matched) {
+        setSearchQuery(matched.question);
+        setExpandedIds(new Set([matched.id]));
+        setTimeout(() => {
+          const el = document.getElementById(`question-${matched.id}`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      } else if (qParam) {
+        setSearchQuery(qParam);
+      }
+    }
+  }, [allQuestions]);
 
   // Load bookmarks
   useEffect(() => {
@@ -545,6 +561,7 @@ export default function QaPrepPage() {
                 return (
                   <div
                     key={q.id}
+                    id={`question-${q.id}`}
                     className={cn(
                       "rounded-2xl border transition-all duration-200 overflow-hidden",
                       isExpanded

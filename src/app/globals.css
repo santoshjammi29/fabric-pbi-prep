@@ -757,7 +757,7 @@ body {
   white-space: nowrap;
   width: max-content;
   /* linear — Apple never uses ease for continuous motion */
-  animation: ticker-scroll var(--ticker-duration, 65s) linear infinite;
+  animation: ticker-scroll var(--ticker-duration, 300s) linear infinite;
   /* GPU-composited — no layout repaints */
   will-change: transform;
   transform: translateZ(0);

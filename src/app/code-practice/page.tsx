@@ -72,16 +72,49 @@ export default function CodePracticePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
-  // Synchronize language tab from URL search parameter (?db=) or hash (#...)
+  // Synchronize language tab and item target from URL search parameter (?db=, ?id=, ?q=) or hash (#...)
   useEffect(() => {
     const syncTab = () => {
       const params = new URLSearchParams(window.location.search);
       const dbParam = params.get("db")?.toLowerCase();
       const hashParam = window.location.hash.replace("#", "").toLowerCase();
-      const target = (dbParam || hashParam) as LanguageKey;
+      const idParam = params.get("id");
+      const qParam = params.get("q") || params.get("search");
+
+      let targetLang = (dbParam || hashParam) as LanguageKey;
       const validLangs: LanguageKey[] = ["pyspark", "sparksql", "mssql", "python"];
-      if (target && validLangs.includes(target)) {
-        setActiveLang(target);
+
+      // If id is provided, discover its language dataset
+      if (idParam) {
+        for (const l of validLangs) {
+          if (languageConfigs[l].data.some((item) => item.id === idParam)) {
+            targetLang = l;
+            break;
+          }
+        }
+      }
+
+      if (targetLang && validLangs.includes(targetLang)) {
+        setActiveLang(targetLang);
+      }
+
+      if (idParam || qParam) {
+        const targetData = targetLang && validLangs.includes(targetLang)
+          ? languageConfigs[targetLang].data
+          : pysparkData;
+        const matched = targetData.find(
+          (item) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
+        );
+        if (matched) {
+          setSearchQuery(matched.title);
+          setExpandedIds(new Set([matched.id]));
+          setTimeout(() => {
+            const el = document.getElementById(`code-${matched.id}`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        } else if (qParam) {
+          setSearchQuery(qParam);
+        }
       }
     };
     syncTab();
@@ -407,6 +440,7 @@ export default function CodePracticePage() {
             return (
               <div
                 key={item.id}
+                id={`code-${item.id}`}
                 className={cn(
                   "rounded-2xl border transition-all duration-200 overflow-hidden",
                   isExpanded

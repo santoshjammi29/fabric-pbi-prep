@@ -81,6 +81,39 @@ function ConceptsContent() {
     });
   }, []);
 
+  // Sync URL parameters on initial load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const termParam = params.get("term");
+    const idParam = params.get("id");
+    const diffParam = params.get("difficulty");
+    const catParam = params.get("category");
+
+    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+      setSelectedDifficulty(diffParam.toUpperCase());
+    }
+    if (catParam) {
+      setSelectedCategory(catParam);
+    }
+
+    if (idParam || termParam) {
+      const matched = conceptsDb.find(
+        (c) => (idParam && c.id === idParam) || (termParam && c.term.toLowerCase() === termParam.toLowerCase())
+      );
+      if (matched) {
+        setSearchQuery(matched.term);
+        setExpandedIds(new Set([matched.id]));
+        setTimeout(() => {
+          const el = document.getElementById(`concept-${matched.id}`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      } else if (termParam) {
+        setSearchQuery(termParam);
+      }
+    }
+  }, []);
+
   // Load bookmarks from localStorage
   useEffect(() => {
     try {
@@ -358,7 +391,7 @@ function ConceptsContent() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search 110+ concepts (e.g., Lakehouse, ACID, Direct Lake, Tungsten, Lineage)..."
+                  placeholder="Search 140+ concepts (e.g., Lakehouse, ACID, Direct Lake, Tungsten, Lineage)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (
@@ -463,6 +496,7 @@ function ConceptsContent() {
                 return (
                   <div
                     key={concept.id}
+                    id={`concept-${concept.id}`}
                     className={cn(
                       "rounded-2xl border transition-all duration-200 overflow-hidden",
                       isExpanded

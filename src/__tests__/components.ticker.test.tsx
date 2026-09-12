@@ -100,4 +100,19 @@ describe('RollingTicker component', () => {
     const overlays = container.querySelectorAll('[style*="linear-gradient"]')
     expect(overlays.length).toBeGreaterThanOrEqual(2)
   })
+
+  it('ticker track has duration set to 300s for calm, unhurried pacing', () => {
+    const { container } = render(<RollingTicker />)
+    const track = container.querySelector('.ticker-track') as HTMLElement
+    expect(track).not.toBeNull()
+    expect(track.style.getPropertyValue('--ticker-duration')).toBe('300s')
+  })
+
+  it('Q&A and Architecture links link to exact item with query parameters', () => {
+    render(<RollingTicker />)
+    const qaLink = screen.getAllByRole('link').find(l => l.getAttribute('href')?.startsWith('/qa-prep?id='))
+    expect(qaLink).toBeDefined()
+    const archLink = screen.getAllByRole('link').find(l => l.getAttribute('href')?.startsWith('/architecture?id='))
+    expect(archLink).toBeDefined()
+  })
 })

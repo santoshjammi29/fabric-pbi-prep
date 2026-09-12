@@ -62,12 +62,17 @@ export default function ModernStackPage() {
         "python",
       ];
 
-      if (target && validTabs.includes(target as ModernSubtab)) {
-        setActiveTab(target as ModernSubtab);
+      if (queryTab && validTabs.includes(queryTab as ModernSubtab)) {
+        setActiveTab(queryTab as ModernSubtab);
+      } else if (hash && validTabs.includes(hash as ModernSubtab)) {
+        setActiveTab(hash as ModernSubtab);
+      }
+
+      if (hash) {
         setTimeout(() => {
-          const el = document.getElementById(target);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 50);
+          const el = document.getElementById(hash);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 200);
       }
     };
 
@@ -613,7 +618,7 @@ export default function ModernStackPage() {
       {activeTab === "blueprints" && (
         <div id="blueprints" className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
           {modernBlueprintsDb.map((bp) => (
-            <div key={bp.id} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
+            <div key={bp.id} id={`bp-${bp.id}`} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">

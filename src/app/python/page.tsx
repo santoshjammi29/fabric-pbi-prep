@@ -38,6 +38,7 @@ const ItemCard = React.memo(function ItemCard({
 }) {
   return (
     <div
+      id={`python-${item.id}`}
       className={cn(
         "border rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-all duration-200",
         isExpanded ? "border-purple-500/50 bg-[var(--surface-1)] shadow-sm" : "border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)]",
@@ -104,6 +105,35 @@ export default function PythonHub() {
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const pageSize = 10;
+
+  // Sync URL parameters on initial load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get("id");
+    const qParam = params.get("q") || params.get("search");
+    const levelParam = params.get("level");
+
+    if (levelParam && ["ALL", "BEGINNER", "INTERMEDIATE", "ADVANCED", "ARCHITECT"].includes(levelParam.toUpperCase())) {
+      setSelectedLevel(levelParam.toLowerCase());
+    }
+
+    if (idParam || qParam) {
+      const matched = pythonData.find(
+        (item) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
+      );
+      if (matched) {
+        setSearchQuery(matched.title);
+        setExpandedIds(new Set([matched.id]));
+        setTimeout(() => {
+          const el = document.getElementById(`python-${matched.id}`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      } else if (qParam) {
+        setSearchQuery(qParam);
+      }
+    }
+  }, []);
 
   // Load bookmarks once
   useEffect(() => {

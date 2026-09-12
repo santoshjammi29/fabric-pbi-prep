@@ -65,39 +65,39 @@ function buildTickerItems(seed: number): TickerItem[] {
 
   // Key concepts — pick 10 spread evenly
   pick(conceptsDb.filter(c => c.term), 10).forEach(c =>
-    raw.push({ label: c.term, href: `/concepts?term=${encodeURIComponent(c.term)}` })
+    raw.push({ label: c.term, href: `/concepts?term=${encodeURIComponent(c.term)}&id=${c.id}` })
   );
 
   // Q&A questions — pick 6 from general
   pick(questionsDb.filter(q => q.question), 6).forEach(q => {
     const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
-    raw.push({ label, href: "/qa-prep" });
+    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
   });
 
   // DE questions — pick 4
   pick(questionsDeDb.filter(q => q.question), 4).forEach(q => {
     const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
-    raw.push({ label, href: "/qa-prep" });
+    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
   });
 
   // Architecture — pick 5
   pick(architectureData.filter(a => a.question), 5).forEach(a => {
     const label = a.question.length > 48 ? a.question.slice(0, 48).trim() + "…" : a.question;
-    raw.push({ label, href: "/architecture" });
+    raw.push({ label, href: `/architecture?id=${a.id}&q=${encodeURIComponent(a.question.slice(0, 45))}` });
   });
 
   // Code sheets — pick 3 from each engine
   pick(pysparkData.filter(p => p.title), 3).forEach(p =>
-    raw.push({ label: `PySpark · ${p.title}`, href: "/code-practice?db=pyspark" })
+    raw.push({ label: `PySpark · ${p.title}`, href: `/code-practice?db=pyspark&id=${p.id}&q=${encodeURIComponent(p.title)}` })
   );
   pick(sparksqlData.filter(s => s.title), 3).forEach(s =>
-    raw.push({ label: `Spark SQL · ${s.title}`, href: "/code-practice?db=sparksql" })
+    raw.push({ label: `Spark SQL · ${s.title}`, href: `/code-practice?db=sparksql&id=${s.id}&q=${encodeURIComponent(s.title)}` })
   );
   pick(mssqlData.filter(m => m.title), 3).forEach(m =>
-    raw.push({ label: `T-SQL · ${m.title}`, href: "/code-practice?db=mssql" })
+    raw.push({ label: `T-SQL · ${m.title}`, href: `/code-practice?db=mssql&id=${m.id}&q=${encodeURIComponent(m.title)}` })
   );
   pick(pythonData.filter(p => p.title), 3).forEach(p =>
-    raw.push({ label: `Python · ${p.title}`, href: "/code-practice?db=python" })
+    raw.push({ label: `Python · ${p.title}`, href: `/python?id=${p.id}&q=${encodeURIComponent(p.title)}` })
   );
 
   // Learning paths — all (usually 12)
@@ -107,12 +107,12 @@ function buildTickerItems(seed: number): TickerItem[] {
 
   // Blueprints — pick 4
   pick(modernBlueprintsDb.filter(b => b.title), 4).forEach(b =>
-    raw.push({ label: b.title, href: "/modern-stack" })
+    raw.push({ label: b.title, href: `/modern-stack?tab=blueprints#bp-${b.id}` })
   );
 
   // Modern concepts — pick 3
   pick(modernConceptsDb.filter(m => m.title), 3).forEach(m =>
-    raw.push({ label: m.title, href: "/modern-stack" })
+    raw.push({ label: m.title, href: `/modern-stack?tab=concepts#${m.id}` })
   );
 
   // Curated page spotlights
@@ -121,11 +121,11 @@ function buildTickerItems(seed: number): TickerItem[] {
     { label: "Data Engineering Mindmap",     href: "/mindmap" },
     { label: "Company Research Hub",         href: "/company-research" },
     { label: "Python Data Engineering",      href: "/python" },
-    { label: "Medallion Architecture",       href: "/concepts?term=Medallion%20Architecture" },
-    { label: "Delta Lake Deep Dive",         href: "/concepts?term=Delta%20Lake" },
-    { label: "Microsoft Fabric Lakehouse",   href: "/concepts?term=Microsoft%20Fabric" },
-    { label: "Real-Time Streaming Design",   href: "/architecture" },
-    { label: "Unity Catalog Setup",          href: "/modern-stack" },
+    { label: "Medallion Architecture",       href: "/concepts?term=Medallion%20Architecture&id=lakehouse-medallion-architecture" },
+    { label: "Delta Lake Deep Dive",         href: "/concepts?term=Delta%20Lake&id=spark-delta-lake" },
+    { label: "Microsoft Fabric Lakehouse",   href: "/concepts?term=Microsoft%20Fabric&id=fabric-onelake-overview" },
+    { label: "Real-Time Streaming Design",   href: "/architecture?id=arch-databricks-lakehouse-easy-3&q=Change%20Data%20Feed" },
+    { label: "Unity Catalog Setup",          href: "/concepts?term=Unity%20Catalog&id=spark-unity-catalog" },
     { label: "GCC Big4 Interview Prep",      href: "/company-research" },
     { label: "My Learning Studio",           href: "/studio" },
   ];
@@ -193,10 +193,10 @@ export function RollingTicker() {
           }}
         />
 
-        {/* Scrolling track — smooth, calm Apple speed (140s) */}
+        {/* Scrolling track — smooth, calm Apple speed (300s) */}
         <div
           className="ticker-track flex items-center py-2"
-          style={{ "--ticker-duration": "140s" } as React.CSSProperties}
+          style={{ "--ticker-duration": "300s" } as React.CSSProperties}
         >
           {tripled.map((item, idx) => {
             const [pill, text] = item.color.split("|");

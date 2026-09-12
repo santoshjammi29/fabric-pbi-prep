@@ -46,14 +46,30 @@ export default function ArchitectureHubPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    const idParam = params.get("id");
     const qParam = params.get("q") || params.get("search");
     const catParam = params.get("category");
     const diffParam = params.get("difficulty");
 
-    if (qParam) setSearchQuery(qParam);
     if (catParam) setSelectedCategory(catParam);
     if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
       setSelectedDifficulty(diffParam.toUpperCase());
+    }
+
+    if (idParam || qParam) {
+      const matched = architectureData.find(
+        (item) => (idParam && item.id === idParam) || (qParam && item.question.toLowerCase().includes(qParam.toLowerCase()))
+      );
+      if (matched) {
+        setSearchQuery(matched.question);
+        setExpandedIds(new Set([matched.id]));
+        setTimeout(() => {
+          const el = document.getElementById(`arch-${matched.id}`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      } else if (qParam) {
+        setSearchQuery(qParam);
+      }
     }
   }, []);
 
@@ -383,6 +399,7 @@ export default function ArchitectureHubPage() {
             return (
               <div
                 key={item.id}
+                id={`arch-${item.id}`}
                 className={cn(
                   "rounded-2xl border transition-all duration-200 overflow-hidden",
                   isExpanded

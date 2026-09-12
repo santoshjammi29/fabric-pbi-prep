@@ -1454,5 +1454,369 @@
       "Involves setting alerts, compute auto-pause, and storage compaction schedules.",
       "Encourages engineering teams to design cost-conscious queries and pipelines."
     ]
+  },
+  {
+    "id": "fabric-cu-smoothing",
+    "term": "Fabric Capacity Unit (CU) Smoothing & Throttling",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The mathematical governor algorithm Microsoft Fabric uses to distribute interactive and background computational spikes over 24-hour moving averages.",
+    "explanation": "Microsoft Fabric decouples instantaneous compute spikes from billing by automatically smoothing CU consumption. Background jobs (such as Spark notebook execution and Data Factory dataflows) are averaged over 24-hour sliding windows, while interactive operations (such as Power BI Direct Lake queries and SQL Analytics endpoints) are smoothed over 5-minute windows. If total cumulative consumption exceeds 100% capacity threshold, Fabric initiates proactive throttling (delaying operations) followed by rejection of new requests. Architects must structure workloads with capacity metrics telemetry to avoid blocking production BI workloads.",
+    "keyPoints": [
+      "Background jobs are smoothed over 24-hour sliding windows; interactive queries are evaluated over 5-minute windows.",
+      "Throttling stages progress from latency delays to hard rejection once cumulative capacity debt surpasses recovery thresholds.",
+      "Proactive workload isolation across multiple dedicated F-SKU capacities prevents ad-hoc data science pipelines from degrading executive dashboards."
+    ]
+  },
+  {
+    "id": "fabric-direct-lake-fallback",
+    "term": "Direct Lake Fallback & V-Order Columnar Optimization",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The in-memory columnar caching architecture where Power BI VertiPaq reads Delta Parquet directly without translation, and the architectural gates that prevent DirectQuery fallback.",
+    "explanation": "Direct Lake represents a paradigm shift where the Power BI VertiPaq engine pages Delta Parquet data directly from OneLake storage into memory without DAX-to-SQL query translation or data import refreshes. However, if table row counts exceed the F-SKU memory limits, if complex Row-Level Security (RLS) is applied on the SQL Analytics endpoint, or if Delta logs contain uncompacted transactions, Fabric triggers silent 'fallback' to DirectQuery mode, degrading performance by 10x to 50x. Architects enforce V-Order sorting during Gold Delta writes to optimize dictionary compression and ensure zero fallback events.",
+    "keyPoints": [
+      "Eliminates traditional Import scheduled refresh latencies and DirectQuery translation overhead.",
+      "Silent fallback to DirectQuery occurs if model size exceeds SKU RAM limits, view definitions are queried, or RLS is enforced at SQL layer.",
+      "V-Order columnar sorting must be enforced during upstream Spark/Warehouse writes to optimize dictionary encoding for sub-second VertiPaq paging."
+    ]
+  },
+  {
+    "id": "fabric-onelake-mesh",
+    "term": "OneLake Data Mesh & Domain Governance Boundaries",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The multi-workspace decentralized domain architecture partitioning OneLake into autonomous product domains with automated governance gates.",
+    "explanation": "Implementing Data Mesh in Microsoft Fabric requires establishing organizational domain boundaries (e.g., Supply Chain, Core Banking, Marketing Analytics) mapped to dedicated workspaces. Each domain team publishes Certified Data Products (Delta tables, semantic models) into OneLake. Downstream consumer domains consume these authoritative products via zero-copy OneLake Shortcuts, completely bypassing cross-region network egress and eliminating data replication while enforcing domain-level role-based access control (RBAC).",
+    "keyPoints": [
+      "Establishes decentralized domain ownership while maintaining unified global metadata discovery via OneLake catalog.",
+      "Certified and Promoted endorsement workflows distinguish production-grade enterprise data products from experimental artifacts.",
+      "OneLake Shortcuts allow cross-domain consumption with zero file duplication and zero cross-capacity egress charges."
+    ]
+  },
+  {
+    "id": "fabric-git-cicd",
+    "term": "Fabric Declarative Git Integration & ALM Pipelines",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The enterprise Application Lifecycle Management (ALM) framework integrating Fabric workspaces with Git repositories and multi-stage deployment pipelines.",
+    "explanation": "Enterprise Fabric governance requires strict separation of Development, Test, and Production environments. Workspace items (Notebooks, Lakehouses, Semantic Models, Reports) are serialized into declarative JSON/YAML definitions in Azure DevOps or GitHub. Deployment pipelines apply environment rules to dynamically rewrite Lakehouse shortcut targets, database connection strings, and credential references upon promotion, while automated pull request gates run regression tests via the Fabric REST API.",
+    "keyPoints": [
+      "Serializes workspace artifacts into version-controlled Git branches, enabling branching, code review, and automated rollbacks.",
+      "Deployment pipeline parameter rules automatically re-point Lakehouse shortcuts to production storage without manual script edits.",
+      "Fabric REST API webhooks enable fully automated continuous integration (CI) and continuous delivery (CD) orchestration."
+    ]
+  },
+  {
+    "id": "pbi-composite-hybrid",
+    "term": "Composite Models & Hybrid Table Partitioning",
+    "category": "POWER BI",
+    "difficulty": "ARCHITECT",
+    "definition": "Multi-tiered storage engine architecture combining Import, DirectQuery, and Dual storage modes in a single enterprise semantic model.",
+    "explanation": "Enterprise reporting architectures require balancing blazing in-memory DAX speeds for billions of historical rows with real-time freshness for current transactions. Hybrid Tables divide a single fact table into physical partitions: historical years reside in compressed VertiPaq in-memory storage, recent weeks utilize incremental refresh, and the current day/hour queries live source tables via DirectQuery. Concurrently, Dual storage dimensions dynamically switch between Import and DirectQuery to avoid expensive cross-source memory thrashing.",
+    "keyPoints": [
+      "Combines blazing VertiPaq in-memory speed for historical records with real-time DirectQuery for sub-second current transactions.",
+      "Dual storage mode allows dimension tables to bridge Import and DirectQuery fact tables without triggering cross-island performance penalties.",
+      "User-defined aggregations intercept high-level executive queries and serve them directly from memory, shielding source databases."
+    ]
+  },
+  {
+    "id": "pbi-ols-dynamic-rls",
+    "term": "Object-Level Security (OLS) & Dynamic RLS at Scale",
+    "category": "POWER BI",
+    "difficulty": "ARCHITECT",
+    "definition": "Fine-grained security architecture enforcing dynamic row filters and complete column/table metadata obfuscation across enterprise user bases.",
+    "explanation": "Architecting security for global enterprises requires enforcing strict multi-tenant data boundaries within a single shared semantic model. Object-Level Security (OLS) hides sensitive financial columns and salary tables entirely from unauthorized report authors and consumers (preventing errors in visual metadata). Dynamic Row-Level Security (RLS) utilizes USERPRINCIPALNAME() combined with cached entitlement bridge tables and DAX LOOKUPVALUE patterns to enforce country/department security without creating duplicate reports or models.",
+    "keyPoints": [
+      "OLS completely hides table and column metadata; unauthorized consumers cannot see column names even via XMLA endpoints.",
+      "Dynamic RLS evaluates USERPRINCIPALNAME() against security mapping tables to enforce row isolation with a single shared report.",
+      "High-cardinality bidirectional security filters must be strictly avoided to prevent severe Storage Engine query plan bottlenecks."
+    ]
+  },
+  {
+    "id": "pbi-vertipaq-optimization",
+    "term": "VertiPaq Engine Columnar Compression & Cardinality Reduction",
+    "category": "POWER BI",
+    "difficulty": "ARCHITECT",
+    "definition": "Low-level memory optimization strategies governing dictionary encoding, Run-Length Encoding (RLE), and bit-packing in the VertiPaq engine.",
+    "explanation": "The VertiPaq engine achieves 10x-50x compression by storing data column-by-column rather than row-by-row. Memory footprint is directly determined by column cardinality (number of distinct values) rather than total row count. Architects optimize enterprise models by splitting high-cardinality datetimes into separate Date and Time keys, removing auto-generated datetime hierarchies, optimizing surrogate keys, and auditing dictionary sizes with DAX Studio to slash RAM consumption from 50GB down to under 8GB.",
+    "keyPoints": [
+      "Column cardinality directly dictates dictionary size; high-cardinality columns consume 80%+ of total semantic model memory.",
+      "Formula Engine (FE) is single-threaded; Storage Engine (SE) is multi-threaded, columnar, and orders of magnitude faster.",
+      "Splitting high-precision timestamp columns into separate Date and Time attributes reduces distinct value combinations exponentially."
+    ]
+  },
+  {
+    "id": "pbi-xmla-governance",
+    "term": "XMLA Endpoint Governance & Large Dataset Storage Format",
+    "category": "POWER BI",
+    "difficulty": "ARCHITECT",
+    "definition": "Programmatic semantic model manipulation, automated partition management, and scale-out architecture via XMLA read/write endpoints.",
+    "explanation": "Enterprise BI architectures leverage the XMLA read/write endpoint to treat Power BI datasets as fully governed Analysis Services tabular models. Enabling Large Dataset Storage Format allows models to expand beyond standard 10GB limits to hundreds of gigabytes by leveraging specialized distributed memory paging. External developer tools (Tabular Editor, DAX Studio, Python TOM) automate partition-level processing, calculate table dependencies, and enforce automated best-practice rules (BPA) in CI/CD pipelines.",
+    "keyPoints": [
+      "XMLA read/write enables programmatic deployment, partition refreshes, and metadata linting using Tabular Editor and DevOps pipelines.",
+      "Large Dataset Storage Format removes the standard 10GB PBIX file limit, scaling enterprise semantic models to 400GB+.",
+      "Granular partition processing refreshes only modified daily partitions, slashing capacity compute costs by 90%."
+    ]
+  },
+  {
+    "id": "adf-metadata-driven-engine",
+    "term": "Metadata-Driven Dynamic ETL Framework Architecture",
+    "category": "ADF",
+    "difficulty": "ARCHITECT",
+    "definition": "Universal pipeline architecture orchestrating thousands of heterogeneous table ingestions dynamically using database control tables and parameterized activities.",
+    "explanation": "Rather than authoring hundreds of static pipelines for every database table, architects construct a metadata-driven ingestion framework. A centralized control table in SQL/Delta defines source connection strings, extract queries, incremental watermark columns, target OneLake paths, and partition schemes. A single ADF master pipeline queries this metadata table, iterates over active datasets concurrently, and passes runtime parameters into generic copy and notebook activities, reducing maintenance overhead by 95%.",
+    "keyPoints": [
+      "A single generic pipeline handles hundreds of source tables via dynamic runtime parameter injection.",
+      "Watermark metadata tracking guarantees precise delta extraction without hardcoded date filter logic.",
+      "Execution telemetry logging captures row counts, duration, and error codes into centralized audit tables for operational observability."
+    ]
+  },
+  {
+    "id": "adf-idempotency-concurrency",
+    "term": "ADF Pipeline Idempotency & Concurrency Governance",
+    "category": "ADF",
+    "difficulty": "ARCHITECT",
+    "definition": "Fault-tolerant orchestration patterns ensuring pipeline retries produce identical results without data duplication, race conditions, or connection pool exhaustion.",
+    "explanation": "Distributed data pipelines must be designed for inevitable transient failures. Idempotency guarantees that executing a pipeline multiple times against the same batch produces the exact same destination state. Architects achieve this by implementing atomic staging table partition swaps, Delta Lake MERGE operations with deduplication hashes, and strict ForEach concurrency batching to avoid exhausting source relational database connection pools during parallel micro-batch extractions.",
+    "keyPoints": [
+      "Idempotent write semantics ensure transient network retries never generate duplicate rows in destination lakehouse tables.",
+      "Batch concurrency throttling prevents parallel pipeline threads from overwhelming OLTP source database connection pools.",
+      "Checkpoint restartability enables failed pipeline runs to resume from the point of failure rather than re-extracting completed stages."
+    ]
+  },
+  {
+    "id": "adf-shir-ha-cluster",
+    "term": "Self-Hosted Integration Runtime (SHIR) High-Availability Clustering",
+    "category": "ADF",
+    "difficulty": "ARCHITECT",
+    "definition": "Scalable multi-node agent topology linking cloud data factories to on-premises enterprise networks with automated failover and dynamic load balancing.",
+    "explanation": "For mission-critical hybrid data integration, a single Self-Hosted Integration Runtime (SHIR) VM represents a single point of failure. Architects configure 4-node active-active SHIR clusters spanning redundant enterprise availability zones. Nodes continuously synchronize credential state using DPAPI and intranet peer gossip protocols. The ADF dispatcher dynamically routes copy activities to nodes based on real-time CPU, RAM, and concurrent job capacity, providing zero pipeline interruption during server patching.",
+    "keyPoints": [
+      "Active-active multi-node clustering ensures zero pipeline downtime if an underlying on-premises server or VM fails.",
+      "Local credential encryption leverages DPAPI and peer synchronization protocols without exposing secrets to cloud logs.",
+      "Dynamic load balancing assigns heavy extraction jobs to nodes with highest available memory and CPU thread capacity."
+    ]
+  },
+  {
+    "id": "sql-alwayson-ag-dr",
+    "term": "Always On Availability Groups Multi-Subnet Disaster Recovery",
+    "category": "SQL SERVER",
+    "difficulty": "ARCHITECT",
+    "definition": "Enterprise database clustering architecture providing zero-data-loss synchronous local commit and cross-region asynchronous disaster recovery with automated client failover.",
+    "explanation": "Mission-critical enterprise SQL architectures deploy Always On Availability Groups across multi-datacenter or hybrid cloud topologies. Synchronous commit replicas ensure zero Recovery Point Objective (RPO) within the primary datacenter, while asynchronous replicas in a secondary region provide Recovery Time Objective (RTO) under 15 minutes during catastrophic outages. Architects enforce MultiSubnetFailover=True in connection strings to enable parallel multi-IP DNS resolution for instantaneous application reconnection.",
+    "keyPoints": [
+      "MultiSubnetFailover=True in application connection strings enables parallel DNS queries for near-instantaneous post-failover reconnects.",
+      "Cloud Witness in Azure storage acts as an impartial quorum vote, completely eliminating split-brain risks across twin datacenters.",
+      "Read-only routing lists automatically steer heavy reporting and ETL queries to secondary replicas, protecting primary OLTP IOPS."
+    ]
+  },
+  {
+    "id": "sql-partition-switching",
+    "term": "Partition Switching & Staging Architecture for High-Volume Ingestion",
+    "category": "SQL SERVER",
+    "difficulty": "ARCHITECT",
+    "definition": "Metadata-only table partition modification enabling millions of ingested rows to be swapped into a production table in under 10 milliseconds with zero write locks.",
+    "explanation": "Traditional row-by-row batch inserts into multi-billion-row tables generate catastrophic transaction log bloat and table lock contention. Architects design partition-aligned architectures where daily/monthly data is loaded and fully indexed inside an empty, structurally identical staging table. Executing ALTER TABLE ... SWITCH PARTITION executes a pointer-only swap in the database engine system catalog, making massive datasets instantly live in production with zero I/O copying.",
+    "keyPoints": [
+      "Metadata-only operation: catalog pointers swap in under 10ms with zero data copying or row-by-row transaction logging.",
+      "Staging tables must exactly match production schema, partition boundaries, filegroups, constraints, and index alignment.",
+      "Completely eliminates production write lock contention during massive overnight warehouse load windows."
+    ]
+  },
+  {
+    "id": "sql-columnstore-segment",
+    "term": "Columnstore Segment Elimination & Memory Grant Governance",
+    "category": "SQL SERVER",
+    "difficulty": "ARCHITECT",
+    "definition": "Low-level columnar storage engine optimization governing rowgroup health, min/max metadata dictionary pruning, and query memory grants.",
+    "explanation": "Clustered Columnstore Indexes provide 10x compression and 100x query acceleration for analytical workloads. High performance relies on 'Segment Elimination', where the SQL query engine inspects rowgroup metadata (Min/Max values) to completely skip reading unneeded segments from disk. Architects monitor rowgroup health (avoiding compressed rowgroups smaller than 1,000,000 rows) and configure Resource Governor Workload Groups to allocate optimal query memory grants without starving transactional workloads.",
+    "keyPoints": [
+      "Segment elimination inspects min/max column metadata to bypass reading irrelevant disk blocks entirely.",
+      "Rowgroups achieve optimal compression and vectorization when populated near the theoretical maximum of 1,048,576 rows.",
+      "Resource Governor memory grant limits prevent rogue ad-hoc analytical queries from starving OLTP worker threads."
+    ]
+  },
+  {
+    "id": "sql-temporal-tables",
+    "term": "Temporal Tables & Point-In-Time Bi-Temporal Auditing",
+    "category": "SQL SERVER",
+    "difficulty": "ARCHITECT",
+    "definition": "System-versioned relational table architecture automatically recording the full history of data modifications with UTC period start/end timestamps.",
+    "explanation": "Regulatory compliance (GDPR, SOX, HIPAA) mandates comprehensive, tamper-evident audit trails of all master data modifications. System-Versioned Temporal Tables automatically archive modified or deleted rows into a dedicated historical table with engine-managed SYSTEM_TIME period columns. Architects utilize FOR SYSTEM_TIME AS OF queries to reconstruct exact historical state at any historical moment, and enforce retention policies with partition switching to archive cold history.",
+    "keyPoints": [
+      "Database engine natively and immutably manages historical row versions during all standard UPDATE and DELETE operations.",
+      "FOR SYSTEM_TIME AS OF T-SQL syntax enables point-in-time state reconstruction for financial reconciliation and forensics.",
+      "Historical tables can be partitioned and compressed using Clustered Columnstore to minimize long-term storage overhead."
+    ]
+  },
+  {
+    "id": "delta-liquid-clustering",
+    "term": "Delta Lake Liquid Clustering vs Z-Order Architecture",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "Next-generation flexible data layout algorithm in Delta Lake replacing static directory partitioning and manual Z-Order optimization.",
+    "explanation": "Traditional Hive-style directory partitioning (e.g., /year=/month=/) suffers from cardinality traps: too many partitions produce millions of tiny files, while too few partitions degrade query pruning. Z-Order indexing helps but suffers from dimensionality decay beyond 3-4 columns and requires expensive full-table rewrites. Delta Lake Liquid Clustering eliminates static folder hierarchies, enabling dynamic incremental clustering along flexible clustering keys that can be redefined without rewriting historical data.",
+    "keyPoints": [
+      "Clustering keys can be redefined at any time without requiring massive historical dataset re-writes or downtime.",
+      "Prevents small-file proliferation and data skew common with traditional high-cardinality directory partitioning schemes.",
+      "Supports continuous, incremental clustering during standard write transactions, slashing compute overhead compared to Z-Order."
+    ]
+  },
+  {
+    "id": "delta-occ-conflicts",
+    "term": "Delta Lake Optimistic Concurrency Control (OCC) & Conflict Resolution",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "ACID transaction coordination protocol managing concurrent multi-engine writes on distributed object storage without centralized locking servers.",
+    "explanation": "Delta Lake achieves full ACID transactions on top of cloud object storage (ADLS Gen2, S3) using Optimistic Concurrency Control (OCC). Each transaction writes new Parquet files and attempts to atomically commit a new JSON log entry in _delta_log using cloud PUT-if-absent primitives. If another writer committed first, Delta validates whether the two operations touched conflicting files or partitions. Architects structure partition keys and retry policies to eliminate ConcurrentAppendExceptions during high-frequency streaming writes.",
+    "keyPoints": [
+      "Atomic commit protocol records intended changes in ordered _delta_log JSON files using cloud object storage conditional writes.",
+      "Partition-level write isolation allows concurrent writers to commit to distinct partitions simultaneously with zero lock contention.",
+      "Exponential backoff retry algorithms prevent transient concurrent modification errors in distributed micro-batch streaming pipelines."
+    ]
+  },
+  {
+    "id": "datalake-tiering-economics",
+    "term": "Data Lake Storage Tiering Lifecycle & Zero-Egress Economics",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "Cost-optimization architectural model moving petabyte-scale lakehouse data across Hot, Cool, Cold, and Archive storage tiers based on query access SLAs.",
+    "explanation": "Managing multi-petabyte data platforms requires balancing storage capacity costs against read/write transaction fees. While Cool and Cold storage tiers offer substantially lower $/GB/month storage rates, they charge significant read transaction surcharges. Prematurely moving frequently queried Delta tables to Cool storage can actually increase total cloud bills. Architects calculate the breakeven access curve and automate lifecycle rules that archive historical snapshot parquet files while retaining current Delta tables in Hot storage.",
+    "keyPoints": [
+      "Cool/Cold storage tiers charge higher read transaction and data retrieval fees; premature tiering can inflate cloud spend.",
+      "Archive storage requires hours of asynchronous rehydration before Parquet data can be queried by Spark or SQL compute engines.",
+      "Automated lifecycle management rules archive vacuumed tombstone files and historical Delta logs based on lastAccessed telemetry."
+    ]
+  },
+  {
+    "id": "lambda-vs-kappa-arch",
+    "term": "Lambda vs Kappa Architecture in Modern Cloud Platforms",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "The fundamental architectural paradigm choice between dual-stream/batch processing pipelines (Lambda) versus unified stream-first real-time platforms (Kappa).",
+    "explanation": "Historically, Lambda architecture maintained two separate codebases: a fast streaming layer (Storm/Kafka) for real-time alerts, and a batch layer (Hadoop/Spark) for authoritative overnight reconciliation. This caused severe code duplication and reporting discrepancies. Modern Kappa architecture leverages unified streaming engines (Spark Structured Streaming, Flink) and ACID storage (Delta Lake, Apache Iceberg) to treat all data as an immutable stream, processing both historical backfills and real-time events through a single unified codebase.",
+    "keyPoints": [
+      "Lambda architecture forces maintenance of two distinct codebases across speed and batch layers, leading to metric discrepancies.",
+      "Kappa architecture processes both real-time telemetry and historical replays through a single unified streaming codebase.",
+      "Modern ACID lakehouse storage formats (Delta Lake, Iceberg) provide the snapshot isolation necessary to make Kappa architecture production-grade."
+    ]
+  },
+  {
+    "id": "spark-aqe-deep-dive",
+    "term": "Adaptive Query Execution (AQE) Runtime Optimization",
+    "category": "SPARK & DATABRICKS",
+    "difficulty": "ARCHITECT",
+    "definition": "Dynamic query re-optimization framework in Apache Spark inspecting physical shuffle statistics at stage boundaries to re-plan execution plans on the fly.",
+    "explanation": "Traditional query planners generate static execution plans before running a query, frequently misestimating intermediate data sizes after complex joins and filters. Adaptive Query Execution (AQE) dynamically re-plans the physical query during stage boundaries based on actual runtime shuffle metrics. AQE delivers three critical optimizations: (1) Dynamically coalescing tiny shuffle partitions into optimal ~128MB tasks, (2) Dynamically switching Sort-Merge Join to Broadcast Hash Join if filtered tables fit memory, and (3) Dynamically splitting skewed partitions.",
+    "keyPoints": [
+      "Inspects actual post-shuffle partition sizes at runtime stage boundaries, eliminating static spark.sql.shuffle.partitions guesswork.",
+      "Dynamically converts Sort-Merge Joins to lightning-fast Broadcast Hash Joins when post-filtered dataset sizes fall below broadcast thresholds.",
+      "Detects and automatically splits skewed partitions into multiple parallel sub-tasks, eliminating trailing zombie tasks."
+    ]
+  },
+  {
+    "id": "spark-memory-management",
+    "term": "Spark Memory Management: Off-Heap, Storage vs Execution Dynamics",
+    "category": "SPARK & DATABRICKS",
+    "difficulty": "ARCHITECT",
+    "definition": "The internal physical memory layout of a Spark JVM executor governed by UnifiedMemoryManager and Project Tungsten.",
+    "explanation": "Understanding Spark memory allocation is essential for diagnosing Out-Of-Memory (OOM) exceptions and GC pauses. Executor memory is divided into: Reserved Memory (300MB), User Memory (40% of remaining, for user data structures), and Spark Unified Memory (60%, shared between Storage and Execution). Under unified management, Execution memory (joins, sorts, shuffles) can forcibly evict Storage memory (cached DataFrames) to disk. However, Storage can never evict active Execution memory. Project Tungsten off-heap memory bypasses JVM garbage collection entirely using raw C-style memory pointers.",
+    "keyPoints": [
+      "Execution memory (joins, aggregations, shuffles) takes absolute priority and can forcibly evict cached Storage memory to disk.",
+      "Storage memory (cached RDDs and DataFrames) is borrowing-only and can never evict active Execution memory.",
+      "Project Tungsten off-heap memory manages binary data off the JVM heap, completely avoiding costly Java Garbage Collection pauses."
+    ]
+  },
+  {
+    "id": "spark-streaming-checkpointing",
+    "term": "Structured Streaming Checkpointing & Exactly-Once Semantics",
+    "category": "SPARK & DATABRICKS",
+    "difficulty": "ARCHITECT",
+    "definition": "End-to-end fault tolerance mechanism guaranteeing each incoming stream event is processed and written to sink storage exactly once, even through cluster crashes.",
+    "explanation": "Achieving end-to-end exactly-once processing requires coordinated guarantees across the entire streaming pipeline: (1) A replayable source (e.g., Kafka with committed offsets), (2) A deterministic, stateful processing engine (Spark Structured Streaming), and (3) An idempotent or transactional sink (Delta Lake). Spark writes micro-batch offset ranges into a Write-Ahead Log (WAL) inside the checkpoint directory before task execution. If an executor or driver crashes, the recovery manager replays the exact uncommitted offset range, guaranteeing zero message loss and zero duplicates.",
+    "keyPoints": [
+      "Write-Ahead Log (WAL) in checkpoint directory records planned micro-batch offsets to persistent storage prior to execution.",
+      "State store versioning preserves stateful aggregations (e.g., watermarked sliding windows) across cluster restart events.",
+      "True exactly-once requires three unified components: replayable source, deterministic engine, and transactional/idempotent sink."
+    ]
+  },
+  {
+    "id": "spark-data-skew-remediation",
+    "term": "Spark Data Skew Remediation: Salting & Isolated Broadcast Patterns",
+    "category": "SPARK & DATABRICKS",
+    "difficulty": "ARCHITECT",
+    "definition": "Algorithmic architectural strategies to balance severely uneven data distributions across Spark cluster worker cores during shuffle-intensive joins.",
+    "explanation": "Data skew occurs when an overwhelming percentage of dataset rows share the exact same join key (e.g., NULL values, default customer IDs, or a dominant country code). During a shuffle join, all rows for that key hash to a single executor partition, resulting in 99 worker cores sitting idle while 1 overloaded core processes for hours until hitting OOM. Architects remediate skew using two primary techniques: (1) Key Salting (appending a random 1..N suffix to skewed keys and replicating dimension rows N times), and (2) Isolating the skewed key into a separate Broadcast Hash Join.",
+    "keyPoints": [
+      "Identified in the Spark UI when the 99th percentile task takes 100x longer than the median task in a shuffle stage.",
+      "Key Salting distributes hot-key rows across N separate partitions, converting a single serial bottleneck into N parallel tasks.",
+      "Filtering out null or default surrogate keys prior to join operations prevents unnecessary shuffle hashing across worker nodes."
+    ]
+  },
+  {
+    "id": "de-scd4-scd6-architecture",
+    "term": "SCD Type 4 vs Type 6 Enterprise Dimensional Architecture",
+    "category": "GENERAL DE",
+    "difficulty": "ARCHITECT",
+    "definition": "Advanced Kimball dimensional modeling strategies designed to handle rapid historical attribute tracking without explosive row duplication or query degradation.",
+    "explanation": "Standard Slowly Changing Dimension (SCD) Type 2 creates a new record for every attribute modification, causing dimensional table row counts to explode when attributes change frequently. SCD Type 4 solves this by maintaining a compact 'Current' dimension table while offloading all historical changes to a dedicated 'History' table. SCD Type 6 ('1 + 2 + 3 = 6') embeds current, prior, and historical attributes within the same row, enabling analysts to query both current state and point-in-time historical state without complex table joins.",
+    "keyPoints": [
+      "SCD Type 4 prevents the primary dimension table from bloating when tracking high-frequency attribute modifications.",
+      "SCD Type 6 combines Type 1 (overwrite), Type 2 (historical row), and Type 3 (prior column) into a single versatile schema.",
+      "Surrogate keys guarantee historical immutability across source system natural key reassignments and re-parenting."
+    ]
+  },
+  {
+    "id": "de-outbox-pattern",
+    "term": "Transactional Outbox Pattern & CDC Event Streaming",
+    "category": "GENERAL DE",
+    "difficulty": "ARCHITECT",
+    "definition": "Resilient microservice-to-lakehouse event streaming architecture ensuring relational database mutations and message bus publishing succeed atomically.",
+    "explanation": "When an application updates a database and publishes an event to Apache Kafka, dual-write failures inevitably occur if the network crashes between the two actions. The Transactional Outbox Pattern solves this by writing the event payload directly into an 'Outbox' table inside the exact same local ACID database transaction. A Change Data Capture (CDC) engine (such as Debezium or Azure SQL CDC) reads the database transaction log and streams the events to Kafka with guaranteed at-least-once delivery and zero data loss.",
+    "keyPoints": [
+      "Eliminates dual-write data inconsistencies between relational transactional databases and distributed message brokers.",
+      "Relies on local database ACID transactions; completely eliminates the latency and operational complexity of distributed 2PC.",
+      "Change Data Capture (CDC) streams events asynchronously by reading transaction logs without imposing application query overhead."
+    ]
+  },
+  {
+    "id": "de-finops-unit-economics",
+    "term": "FinOps for Cloud Data Platforms: Unit Economics & Governance",
+    "category": "GENERAL DE",
+    "difficulty": "ARCHITECT",
+    "definition": "Strategic financial engineering framework measuring cloud data platform expenditure against business revenue drivers and automated cost reclamation.",
+    "explanation": "Enterprise cloud platforms can incur runaway infrastructure bills if compute is unconstrained. FinOps establishes operational and financial accountability by calculating unit economics (e.g., compute cost per query, cost per pipeline run, cost per active customer). Architects enforce automated cost controls: idle cluster auto-termination (15-minute aggressive timeouts), ephemeral dev/test environments provisioned via Terraform, automated storage compaction to eliminate unneeded versions, and real-time anomaly alerting on billing spikes.",
+    "keyPoints": [
+      "Maps infrastructure compute costs directly to business value streams (cost per customer, cost per analytical report).",
+      "Aggressive automated idle cluster termination rules prevent abandoned interactive compute from incurring overnight charges.",
+      "Automated VACUUM schedules and storage lifecycle management eliminate petabytes of orphaned transaction log snapshots."
+    ]
+  },
+  {
+    "id": "adf-managed-pe-architecture",
+    "term": "ADF Managed Private Endpoint Provisioning & Timeout Bypass",
+    "category": "ADF",
+    "difficulty": "ARCHITECT",
+    "definition": "Enterprise network security architecture managing lifecycle, approval protocols, and timeout bypass for private endpoints inside ADF Managed Virtual Networks.",
+    "explanation": "When provisioning Managed Private Endpoints within an ADF Managed Virtual Network, operations can transition to 'Private Endpoint Provisioning Failed' due to target resource limit exhaustion, subscription resource provider quotas, or subnet IP depletion. If allocation hangs, Azure imposes a 20-minute resource allocation timeout. Architects bypass this by pre-creating shared private links, orchestrating automated REST API deletion/re-creation to release managed locks, and deploying Self-Hosted IRs across transit VNets as a zero-downtime fallback route.",
+    "keyPoints": [
+      "Pre-creation and validation of private endpoints prevents pipeline stalls caused by Azure 20-minute allocation timeouts.",
+      "Automated REST API scripts release locks on failed private endpoints to enable instant re-try without human intervention.",
+      "Dedicated subnets and shared private link models isolate high-frequency ingestion pipelines from target IP exhaustion."
+    ]
+  },
+  {
+    "id": "de-data-contract-governance",
+    "term": "Data Contract Enforcement Engine & Semantic Versioning",
+    "category": "GENERAL DE",
+    "difficulty": "ARCHITECT",
+    "definition": "Automated CI/CD governance architecture enforcing schema backward-compatibility, semantic versioning, and dead-letter quarantine between microservices and lakehouses.",
+    "explanation": "Data Contract enforcement moves governance left by treating data as a first-class product. Schemas are defined in Git repositories using JSON Schema, Protobuf, or Avro. Upstream application pull requests trigger automated CI linting; any breaking change (e.g., column drop, rename, or type change) is blocked before merge. In the data ingestion stream, an enforcement engine validates payloads in real-time, routing compliant events to Bronze Delta tables while shunting non-compliant events into quarantine dead-letter queues with automated alerting.",
+    "keyPoints": [
+      "Enforces semantic versioning (Major.Minor.Patch) on event streams to prevent breaking downstream analytical models.",
+      "Automated CI/CD schema regression testing blocks upstream transactional code deployments that violate contracts.",
+      "Real-time streaming validation quarantines malformed payloads into dead-letter queues without crashing the ingestion engine."
+    ]
   }
 ]
