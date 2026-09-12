@@ -56,6 +56,9 @@ function ConceptsContent() {
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
   // Python tab state
   const [pyLevel, setPyLevel] = useState<string>("ALL");
   const [pyCategory, setPyCategory] = useState<string>("ALL");
@@ -63,11 +66,56 @@ function ConceptsContent() {
   const [pyPage, setPyPage] = useState(1);
   const pyPageSize = 10;
 
+  const handleViewModeChange = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", mode);
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, []);
+
+  const handleCategoryChange = useCallback((cat: string) => {
+    setSelectedCategory(cat);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (cat === "ALL") url.searchParams.delete("category");
+      else url.searchParams.set("category", cat);
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, []);
+
+  const handleDifficultyChange = useCallback((diff: string) => {
+    setSelectedDifficulty(diff);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (diff === "ALL") url.searchParams.delete("difficulty");
+      else url.searchParams.set("difficulty", diff);
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, []);
+
   const toggleConceptExpand = useCallback((id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          if (url.searchParams.get("card") === id || url.searchParams.get("id") === id) {
+            url.searchParams.delete("card");
+            url.searchParams.delete("id");
+            window.history.replaceState(null, "", url.toString());
+          }
+        }
+      } else {
+        next.add(id);
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.set("card", id);
+          window.history.replaceState(null, "", url.toString());
+        }
+      }
       return next;
     });
   }, []);
@@ -81,39 +129,57 @@ function ConceptsContent() {
     });
   }, []);
 
-  // Sync URL parameters on initial load
+  // Sync URL parameters on initial load & popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const termParam = params.get("term");
-    const idParam = params.get("id");
-    const diffParam = params.get("difficulty");
-    const catParam = params.get("category");
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab")?.toLowerCase();
+      const termParam = params.get("term");
+      const cardParam = params.get("card") || params.get("id");
+      const diffParam = params.get("difficulty");
+      const catParam = params.get("category");
 
-    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
-      setSelectedDifficulty(diffParam.toUpperCase());
-    }
-    if (catParam) {
-      setSelectedCategory(catParam);
-    }
-
-    if (idParam || termParam) {
-      const matched = conceptsDb.find(
-        (c) => (idParam && c.id === idParam) || (termParam && c.term.toLowerCase() === termParam.toLowerCase())
-      );
-      if (matched) {
-        if (!diffParam) setSelectedDifficulty("ALL");
-        if (!catParam) setSelectedCategory("ALL");
-        setSearchQuery(matched.term);
-        setExpandedIds(new Set([matched.id]));
-        setTimeout(() => {
-          const el = document.getElementById(`concept-${matched.id}`);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 300);
-      } else if (termParam) {
-        setSearchQuery(termParam);
+      if (tabParam === "python") {
+        setViewMode("python");
+      } else if (tabParam === "concepts") {
+        setViewMode("concepts");
       }
-    }
+
+      if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+        setSelectedDifficulty(diffParam.toUpperCase());
+      }
+      if (catParam) {
+        setSelectedCategory(catParam);
+      }
+
+      if (cardParam || termParam) {
+        const matched = conceptsDb.find(
+          (c) => (cardParam && c.id === cardParam) || (termParam && c.term.toLowerCase() === termParam.toLowerCase())
+        );
+        if (matched) {
+          if (!diffParam) setSelectedDifficulty("ALL");
+          if (!catParam) setSelectedCategory("ALL");
+          setSearchQuery(matched.term);
+          setExpandedIds(new Set([matched.id]));
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
+            const el = document.getElementById(`concept-${matched.id}`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        } else if (termParam) {
+          setSearchQuery(termParam);
+        }
+      }
+    };
+
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => {
+      window.removeEventListener("popstate", syncFromUrl);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
   }, []);
 
   // Load bookmarks from localStorage
@@ -166,7 +232,8 @@ function ConceptsContent() {
     navigator.clipboard.writeText(text);
     setCopiedId(concept.id);
     toast.success("Copied concept definition to clipboard");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   };
 
   // Get distinct categories
@@ -239,7 +306,8 @@ function ConceptsContent() {
     navigator.clipboard.writeText(code);
     setCopiedId(id);
     toast.success("Code copied to clipboard!");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   }, []);
 
   const togglePyBookmark = useCallback((id: string, e: React.MouseEvent) => {
@@ -292,7 +360,7 @@ function ConceptsContent() {
       {/* View Mode Toggle */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
-          onClick={() => setViewMode("concepts")}
+          onClick={() => handleViewModeChange("concepts")}
           className={cn(
             "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
             viewMode === "concepts"
@@ -304,7 +372,7 @@ function ConceptsContent() {
           <span>📚 Key Concepts ({conceptsDb.length})</span>
         </button>
         <button
-          onClick={() => setViewMode("python")}
+          onClick={() => handleViewModeChange("python")}
           className={cn(
             "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
             viewMode === "python"
@@ -411,7 +479,7 @@ function ConceptsContent() {
                 {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
                   <button
                     key={diff}
-                    onClick={() => setSelectedDifficulty(diff)}
+                    onClick={() => handleDifficultyChange(diff)}
                     className={cn(
                       "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
                       selectedDifficulty === diff
@@ -433,7 +501,7 @@ function ConceptsContent() {
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => handleCategoryChange(cat)}
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
                     selectedCategory === cat

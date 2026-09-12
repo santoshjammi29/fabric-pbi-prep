@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
 import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
 import { CommandPalette } from "@/components/command-palette";
@@ -110,7 +111,10 @@ export default function RootLayout({
                 className="flex-1 overflow-y-auto px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10"
                 tabIndex={-1}
               >
-                <div className="mx-auto max-w-7xl">{children}</div>
+                <div className="mx-auto max-w-7xl">
+                  <Breadcrumbs />
+                  {children}
+                </div>
               </main>
 
               {/* Mobile bottom nav */}

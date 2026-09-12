@@ -30,11 +30,42 @@ export function ExperienceLevelSwitcher() {
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tierParam = params.get("tier");
+      if (tierParam) {
+        const tierKey = (
+          tierParam === "1"
+            ? "beginner"
+            : tierParam === "2"
+            ? "associate"
+            : tierParam === "3"
+            ? "senior"
+            : tierParam === "4"
+            ? "staff_architect"
+            : tierParam
+        ) as ExperienceTier;
+        if (EXPERIENCE_TIERS[tierKey]) {
+          setExperienceTier(tierKey);
+          return;
+        }
+      }
+    }
     const stored = getStoredExperienceTier();
     if (stored && stored !== activeTier) {
       setExperienceTier(stored);
     }
   }, []);
+
+  const handleSelectTier = (tierKey: ExperienceTier) => {
+    setExperienceTier(tierKey);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      const tierNum = tierKey === "beginner" ? "1" : tierKey === "associate" ? "2" : tierKey === "senior" ? "3" : "4";
+      url.searchParams.set("tier", tierNum);
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
 
   const config = EXPERIENCE_TIERS[activeTier] || EXPERIENCE_TIERS.associate;
 
@@ -90,7 +121,7 @@ export function ExperienceLevelSwitcher() {
               return (
                 <button
                   key={tierKey}
-                  onClick={() => setExperienceTier(tierKey)}
+                  onClick={() => handleSelectTier(tierKey)}
                   className={cn(
                     "relative px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer z-10",
                     isSelected

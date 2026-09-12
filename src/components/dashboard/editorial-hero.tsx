@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Sparkles,
@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   getRandomHeroSelection,
-  getNextRefreshSeed,
+  getDeterministicDailySeed,
 } from "@/data/home-dynamic-topics";
 
 const ICON_MAP = {
@@ -75,14 +75,18 @@ const THEME_STYLES = {
 };
 
 export function EditorialHero() {
-  // SSR fallback with initial seed 42 to prevent any hydration mismatch
-  const [data, setData] = useState(() => getRandomHeroSelection(42));
+  // Deterministic daily seed guarantees 100% identical SSR and Client hydration render (zero flash)
+  const [data, setData] = useState(() => getRandomHeroSelection(getDeterministicDailySeed()));
   const [isShuffling, setIsShuffling] = useState(false);
+  const shuffleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // On client mount (every page refresh), draw guaranteed different topics
+  // Memory leak cleanup: ensure timers are canceled on component unmount
   useEffect(() => {
-    const seed = getNextRefreshSeed();
-    setData(getRandomHeroSelection(seed));
+    return () => {
+      if (shuffleTimerRef.current) {
+        clearTimeout(shuffleTimerRef.current);
+      }
+    };
   }, []);
 
   const handleManualShuffle = useCallback(() => {
@@ -92,7 +96,8 @@ export function EditorialHero() {
     toast.success("Shuffled featured editorial guides across platform topics", {
       duration: 1800,
     });
-    setTimeout(() => setIsShuffling(false), 400);
+    if (shuffleTimerRef.current) clearTimeout(shuffleTimerRef.current);
+    shuffleTimerRef.current = setTimeout(() => setIsShuffling(false), 400);
   }, []);
 
   const { featured, secondary } = data;

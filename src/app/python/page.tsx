@@ -106,35 +106,49 @@ export default function PythonHub() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  // Sync URL parameters on initial load
+  const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Sync URL parameters on initial load & popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const idParam = params.get("id");
-    const qParam = params.get("q") || params.get("search");
-    const levelParam = params.get("level");
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const idParam = params.get("card") || params.get("id");
+      const qParam = params.get("q") || params.get("search");
+      const levelParam = params.get("level");
 
-    if (levelParam && ["ALL", "BEGINNER", "INTERMEDIATE", "ADVANCED", "ARCHITECT"].includes(levelParam.toUpperCase())) {
-      setSelectedLevel(levelParam.toLowerCase());
-    }
-
-    if (idParam || qParam) {
-      const matched = pythonData.find(
-        (item) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
-      );
-      if (matched) {
-        if (!levelParam) setSelectedLevel("ALL");
-        setPage(1);
-        setSearchQuery(matched.title);
-        setExpandedIds(new Set([matched.id]));
-        setTimeout(() => {
-          const el = document.getElementById(`python-${matched.id}`);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 300);
-      } else if (qParam) {
-        setSearchQuery(qParam);
+      if (levelParam && ["ALL", "BEGINNER", "INTERMEDIATE", "ADVANCED", "ARCHITECT"].includes(levelParam.toUpperCase())) {
+        setSelectedLevel(levelParam.toLowerCase());
       }
-    }
+
+      if (idParam || qParam) {
+        const matched = pythonData.find(
+          (item) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
+        );
+        if (matched) {
+          if (!levelParam) setSelectedLevel("ALL");
+          setPage(1);
+          setSearchQuery(matched.title);
+          setExpandedIds(new Set([matched.id]));
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
+            const el = document.getElementById(`python-${matched.id}`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        } else if (qParam) {
+          setSearchQuery(qParam);
+        }
+      }
+    };
+
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => {
+      window.removeEventListener("popstate", syncFromUrl);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
   }, []);
 
   // Load bookmarks once
@@ -166,7 +180,8 @@ export default function PythonHub() {
     navigator.clipboard.writeText(code);
     setCopiedId(id);
     toast.success("Code copied to clipboard!");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   }, []);
 
   const filteredItems = useMemo(() => {

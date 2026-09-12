@@ -833,16 +833,25 @@ function createLCG(seed: number) {
 }
 
 /**
+ * Deterministic daily seed based on UTC date (e.g. 20260913)
+ * Guarantees 100% identical render between Server (SSR) and Client (Hydration)
+ */
+export function getDeterministicDailySeed(): number {
+  const d = new Date();
+  return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+}
+
+/**
  * Get guaranteed different seed on every browser page refresh
  */
 export function getNextRefreshSeed(): number {
   if (typeof window === "undefined") {
-    return 42; // Deterministic SSR seed
+    return getDeterministicDailySeed();
   }
 
   try {
     const KEY = "fabric_prep_home_refresh_seed";
-    const current = Number(sessionStorage.getItem(KEY) || Date.now());
+    const current = Number(sessionStorage.getItem(KEY) || getDeterministicDailySeed());
     const nextSeed = (current * 16807 + 1013904223) % 2147483647;
     sessionStorage.setItem(KEY, String(nextSeed));
     return nextSeed;

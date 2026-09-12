@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   MessageSquare,
@@ -14,19 +14,23 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { cn } from "@/lib/utils";
 import {
   getRandomSpotlightSelection,
-  getNextRefreshSeed,
+  getDeterministicDailySeed,
 } from "@/data/home-dynamic-topics";
 
 export function TrendingSpotlight() {
-  // SSR fallback with initial seed 42 to prevent any hydration mismatch
-  const [data, setData] = useState(() => getRandomSpotlightSelection(42));
+  // Deterministic daily seed guarantees 100% identical SSR and Client hydration render (zero flash)
+  const [data, setData] = useState(() => getRandomSpotlightSelection(getDeterministicDailySeed()));
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [isShuffling, setIsShuffling] = useState(false);
+  const shuffleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // On client mount (every page refresh), draw guaranteed different spotlight cards
+  // Memory leak cleanup: ensure timers are canceled on component unmount
   useEffect(() => {
-    const seed = getNextRefreshSeed();
-    setData(getRandomSpotlightSelection(seed));
+    return () => {
+      if (shuffleTimerRef.current) {
+        clearTimeout(shuffleTimerRef.current);
+      }
+    };
   }, []);
 
   const handleManualShuffle = useCallback(() => {
@@ -37,7 +41,8 @@ export function TrendingSpotlight() {
     toast.success("Shuffled scenario, code snippet, and simulator of the day", {
       duration: 1800,
     });
-    setTimeout(() => setIsShuffling(false), 400);
+    if (shuffleTimerRef.current) clearTimeout(shuffleTimerRef.current);
+    shuffleTimerRef.current = setTimeout(() => setIsShuffling(false), 400);
   }, []);
 
   const { scenario, snippet, simulator } = data;

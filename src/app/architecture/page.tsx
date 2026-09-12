@@ -42,38 +42,51 @@ export default function ArchitectureHubPage() {
   const [page, setPage] = useState(1);
   const pageSize = 25;
 
-  // Sync URL parameters on initial load
+  const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Sync URL parameters on initial load & popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const idParam = params.get("id");
-    const qParam = params.get("q") || params.get("search");
-    const catParam = params.get("category");
-    const diffParam = params.get("difficulty");
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const cardParam = params.get("card") || params.get("id");
+      const qParam = params.get("q") || params.get("search");
+      const catParam = params.get("category");
+      const diffParam = params.get("difficulty");
 
-    if (catParam) setSelectedCategory(catParam);
-    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
-      setSelectedDifficulty(diffParam.toUpperCase());
-    }
-
-    if (idParam || qParam) {
-      const matched = architectureData.find(
-        (item) => (idParam && item.id === idParam) || (qParam && item.question.toLowerCase().includes(qParam.toLowerCase()))
-      );
-      if (matched) {
-        if (!diffParam) setSelectedDifficulty("ALL");
-        if (!catParam) setSelectedCategory("ALL");
-        setPage(1);
-        setSearchQuery(matched.question);
-        setExpandedIds(new Set([matched.id]));
-        setTimeout(() => {
-          const el = document.getElementById(`arch-${matched.id}`);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 300);
-      } else if (qParam) {
-        setSearchQuery(qParam);
+      if (catParam) setSelectedCategory(catParam);
+      if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+        setSelectedDifficulty(diffParam.toUpperCase());
       }
-    }
+
+      if (cardParam || qParam) {
+        const matched = architectureData.find(
+          (item) => (cardParam && item.id === cardParam) || (qParam && item.question.toLowerCase().includes(qParam.toLowerCase()))
+        );
+        if (matched) {
+          if (!diffParam) setSelectedDifficulty("ALL");
+          if (!catParam) setSelectedCategory("ALL");
+          setPage(1);
+          setExpandedIds(new Set([matched.id]));
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
+            const el = document.getElementById(`arch-${matched.id}`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        } else if (qParam) {
+          setSearchQuery(qParam);
+        }
+      }
+    };
+
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => {
+      window.removeEventListener("popstate", syncFromUrl);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
   }, []);
 
   // Load bookmarks
@@ -125,7 +138,30 @@ export default function ArchitectureHubPage() {
     navigator.clipboard.writeText(text);
     setCopiedId(item.id);
     toast.success("Scenario copied to clipboard");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleDifficultyChange = (diff: string) => {
+    setSelectedDifficulty(diff);
+    setPage(1);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (diff === "ALL") url.searchParams.delete("difficulty");
+      else url.searchParams.set("difficulty", diff);
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    setPage(1);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (cat === "ALL") url.searchParams.delete("category");
+      else url.searchParams.set("category", cat);
+      window.history.replaceState(null, "", url.toString());
+    }
   };
 
   // Distinct categories
@@ -167,13 +203,26 @@ export default function ArchitectureHubPage() {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          if (url.searchParams.get("card") === id || url.searchParams.get("id") === id) {
+            url.searchParams.delete("card");
+            url.searchParams.delete("id");
+            window.history.replaceState(null, "", url.toString());
+          }
+        }
       } else {
         next.add(id);
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.set("card", id);
+          window.history.replaceState(null, "", url.toString());
+        }
         const targetItem = architectureData.find((item) => item.id === id);
         if (targetItem) {
           recordLastTopic({
             title: targetItem.question.length > 55 ? targetItem.question.slice(0, 55) + "..." : targetItem.question,
-            href: `/architecture?q=${encodeURIComponent(targetItem.question.slice(0, 30))}`,
+            href: `/architecture?card=${encodeURIComponent(targetItem.id)}`,
             category: "Architecture Hub",
             progress: 60,
           });
@@ -308,10 +357,7 @@ export default function ArchitectureHubPage() {
             {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
               <button
                 key={diff}
-                onClick={() => {
-                  setSelectedDifficulty(diff);
-                  setPage(1);
-                }}
+                onClick={() => handleDifficultyChange(diff)}
                 className={cn(
                   "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
                   selectedDifficulty === diff
@@ -333,10 +379,7 @@ export default function ArchitectureHubPage() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => {
-                setSelectedCategory(cat);
-                setPage(1);
-              }}
+              onClick={() => handleCategoryChange(cat)}
               className={cn(
                 "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
                 selectedCategory === cat

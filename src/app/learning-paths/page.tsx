@@ -22,8 +22,25 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
 
 function LearningPathsContent() {
   const searchParams = useSearchParams();
-  const initialId = searchParams.get("id") || null;
+  const initialId = searchParams.get("card") || searchParams.get("id") || null;
   const [selectedPathId, setSelectedPathId] = useState<string | null>(initialId || learningPathsDb[0]?.id || null);
+
+  React.useEffect(() => {
+    const cardOrId = searchParams.get("card") || searchParams.get("id");
+    if (cardOrId && learningPathsDb.some((p) => p.id === cardOrId)) {
+      setSelectedPathId(cardOrId);
+    }
+  }, [searchParams]);
+
+  const handleSelectPath = React.useCallback((id: string) => {
+    setSelectedPathId(id);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("card", id);
+      url.searchParams.set("id", id);
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, []);
 
   const selectedPath: LearningPath | undefined = useMemo(() => {
     return learningPathsDb.find((p) => p.id === selectedPathId) || learningPathsDb[0];
@@ -66,7 +83,7 @@ function LearningPathsContent() {
           return (
             <button
               key={path.id}
-              onClick={() => setSelectedPathId(path.id)}
+              onClick={() => handleSelectPath(path.id)}
               className={cn(
                 "p-4 rounded-2xl border text-left transition-all space-y-3 flex flex-col justify-between group",
                 isSelected

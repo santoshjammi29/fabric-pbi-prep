@@ -72,13 +72,16 @@ export default function CodePracticePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
+  const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
   // Synchronize language tab and item target from URL search parameter (?db=, ?id=, ?q=) or hash (#...)
   useEffect(() => {
     const syncTab = () => {
       const params = new URLSearchParams(window.location.search);
       const dbParam = params.get("db")?.toLowerCase();
       const hashParam = window.location.hash.replace("#", "").toLowerCase();
-      const idParam = params.get("id");
+      const idParam = params.get("card") || params.get("id");
       const qParam = params.get("q") || params.get("search");
 
       let targetLang = (dbParam || hashParam) as LanguageKey;
@@ -109,7 +112,8 @@ export default function CodePracticePage() {
           setSelectedLevel("ALL");
           setSearchQuery(matched.title);
           setExpandedIds(new Set([matched.id]));
-          setTimeout(() => {
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
             const el = document.getElementById(`code-${matched.id}`);
             if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
           }, 300);
@@ -120,7 +124,13 @@ export default function CodePracticePage() {
     };
     syncTab();
     window.addEventListener("hashchange", syncTab);
-    return () => window.removeEventListener("hashchange", syncTab);
+    window.addEventListener("popstate", syncTab);
+    return () => {
+      window.removeEventListener("hashchange", syncTab);
+      window.removeEventListener("popstate", syncTab);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
   }, []);
 
   const handleLangChange = (lang: LanguageKey) => {
@@ -195,7 +205,8 @@ export default function CodePracticePage() {
     navigator.clipboard.writeText(code);
     setCopiedId(id);
     toast.success("Code copied to clipboard!");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   };
 
   const currentDataset = useMemo(() => {

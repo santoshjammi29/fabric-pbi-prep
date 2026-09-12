@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Zap,
@@ -83,11 +83,31 @@ const lexiconTerms: LexiconTerm[] = [
 
 export default function SparkEnginePage() {
   const [activeTab, setActiveTab] = useState<SparkSubtab>("architecture");
+  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const simTimersRef = useRef<NodeJS.Timeout[]>([]);
+
+  const clearSimTimers = useCallback(() => {
+    simTimersRef.current.forEach((t: NodeJS.Timeout) => clearTimeout(t));
+    simTimersRef.current = [];
+  }, []);
+
+  // Simulator State
+  const [flowType, setFlowType] = useState<"narrow" | "wide" | "broadcast" | "aggregation">("narrow");
+  const [simStep, setSimStep] = useState(0);
+  const [isSimRunning, setIsSimRunning] = useState(false);
+
+  // Memory Allocator State
+  const [heapSize, setHeapSize] = useState(16);
+  const [memFraction, setMemFraction] = useState(0.6);
+  const [storageFraction, setStorageFraction] = useState(0.5);
 
   const handleTabChange = useCallback((tabId: SparkSubtab) => {
     setActiveTab(tabId);
     if (typeof window !== "undefined") {
-      window.history.replaceState(null, "", `#${tabId}`);
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tabId);
+      url.hash = tabId;
+      window.history.replaceState(null, "", url.toString());
     }
     const tabLabels: Record<SparkSubtab, string> = {
       architecture: "Spark 4.0 Engine Architecture",
@@ -98,17 +118,30 @@ export default function SparkEnginePage() {
     };
     recordLastTopic({
       title: tabLabels[tabId] || "Spark Engine Hub",
-      href: `/spark-engine#${tabId}`,
+      href: `/spark-engine?tab=${tabId}#${tabId}`,
       category: "Spark Engine Hub",
       progress: 50,
     });
   }, []);
+
+  const handleFlowTypeChange = useCallback((type: "narrow" | "wide" | "broadcast" | "aggregation") => {
+    setFlowType(type);
+    setSimStep(0);
+    clearSimTimers();
+    setIsSimRunning(false);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("flow", type);
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, [clearSimTimers]);
 
   useEffect(() => {
     const syncTabFromLocation = () => {
       const hash = window.location.hash.replace("#", "").toLowerCase();
       const params = new URLSearchParams(window.location.search);
       const queryTab = params.get("tab")?.toLowerCase();
+      const queryFlow = params.get("flow")?.toLowerCase();
       const target = hash || queryTab;
 
       const validTabs: SparkSubtab[] = [
@@ -121,27 +154,28 @@ export default function SparkEnginePage() {
 
       if (target && validTabs.includes(target as SparkSubtab)) {
         setActiveTab(target as SparkSubtab);
-        setTimeout(() => {
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+        scrollTimerRef.current = setTimeout(() => {
           const el = document.getElementById(target);
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 50);
+      }
+
+      if (queryFlow && ["narrow", "wide", "broadcast", "aggregation"].includes(queryFlow)) {
+        setFlowType(queryFlow as "narrow" | "wide" | "broadcast" | "aggregation");
       }
     };
 
     syncTabFromLocation();
     window.addEventListener("hashchange", syncTabFromLocation);
-    return () => window.removeEventListener("hashchange", syncTabFromLocation);
-  }, []);
-
-  // Simulator State
-  const [flowType, setFlowType] = useState<"narrow" | "wide" | "broadcast" | "aggregation">("narrow");
-  const [simStep, setSimStep] = useState(0);
-  const [isSimRunning, setIsSimRunning] = useState(false);
-
-  // Memory Allocator State
-  const [heapSize, setHeapSize] = useState(16);
-  const [memFraction, setMemFraction] = useState(0.6);
-  const [storageFraction, setStorageFraction] = useState(0.5);
+    window.addEventListener("popstate", syncTabFromLocation);
+    return () => {
+      window.removeEventListener("hashchange", syncTabFromLocation);
+      window.removeEventListener("popstate", syncTabFromLocation);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      clearSimTimers();
+    };
+  }, [clearSimTimers]);
 
   // Lexicon Search State
   const [lexiconQuery, setLexiconQuery] = useState("");
@@ -197,13 +231,15 @@ export default function SparkEnginePage() {
   };
 
   const runSimulation = () => {
+    clearSimTimers();
     setIsSimRunning(true);
     setSimStep(1);
-    setTimeout(() => setSimStep(2), 700);
-    setTimeout(() => {
+    const t1 = setTimeout(() => setSimStep(2), 700);
+    const t2 = setTimeout(() => {
       setSimStep(3);
       setIsSimRunning(false);
     }, 1500);
+    simTimersRef.current.push(t1, t2);
   };
 
   // Memory Calculations
@@ -442,10 +478,7 @@ export default function SparkEnginePage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <select
                 value={flowType}
-                onChange={(e) => {
-                  setFlowType(e.target.value as any);
-                  setSimStep(0);
-                }}
+                onChange={(e) => handleFlowTypeChange(e.target.value as any)}
                 className="px-4 py-2.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm font-semibold text-[var(--foreground)] outline-none"
               >
                 <option value="narrow">Narrow Dependency (Map/Filter)</option>

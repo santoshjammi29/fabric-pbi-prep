@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Shuffle } from "lucide-react";
 import { toast } from "sonner";
@@ -100,35 +100,40 @@ function shuffleArray<T>(arr: T[], rng?: () => number): T[] {
   return a;
 }
 
-/* ─── Build a diverse ~65-item pool drawn across 6k+ database ───────── */
+/* ─── Build a diverse unique item pool drawn across 6k+ database sorted by relevance ───────── */
 export function buildTickerItems(seed?: number): TickerItem[] {
   const rng = seed !== undefined ? createLCG(seed) : undefined;
   const raw: Omit<TickerItem, "color">[] = [];
 
-  // 1. Key Concepts (140 concepts in database) — sample 10
-  sampleItems(conceptsDb.filter((c) => c.term), 10, rng).forEach((c) =>
+  // 1. Key Concepts (140 concepts in database) — sample 12
+  sampleItems(conceptsDb.filter((c) => c.term), 12, rng).forEach((c) =>
     raw.push({ label: c.term, href: `/concepts?term=${encodeURIComponent(c.term)}&id=${c.id}` })
   );
 
-  // 2. Fabric & Power BI Q&A (2,640 questions in database) — sample 16
-  sampleItems(questionsDb.filter((q) => q.question), 16, rng).forEach((q) => {
-    const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
-    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
-  });
-
-  // 3. General Data Engineering Q&A (3,499 questions in database) — sample 14
-  sampleItems(questionsDeDb.filter((q) => q.question), 14, rng).forEach((q) => {
-    const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
-    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
-  });
-
-  // 4. Enterprise Architecture Scenarios (2,400 scenarios in database) — sample 12
-  sampleItems(architectureData.filter((a) => a.question), 12, rng).forEach((a) => {
+  // 2. Enterprise Architecture Scenarios (2,400 scenarios in database) — sample 14
+  sampleItems(architectureData.filter((a) => a.question), 14, rng).forEach((a) => {
     const label = a.question.length > 48 ? a.question.slice(0, 48).trim() + "…" : a.question;
     raw.push({ label, href: `/architecture?id=${a.id}&q=${encodeURIComponent(a.question.slice(0, 45))}` });
   });
 
-  // 5. Polyglot Code Sheets (PySpark, Spark SQL, T-SQL, Python)
+  // 3. Learning Paths (12 curricula)
+  sampleItems(learningPathsDb.filter((lp) => lp.title), 4, rng).forEach((lp) =>
+    raw.push({ label: lp.title, href: `/learning-paths?id=${lp.id}` })
+  );
+
+  // 4. Fabric & Power BI Q&A (2,640 questions in database) — sample 12
+  sampleItems(questionsDb.filter((q) => q.question), 12, rng).forEach((q) => {
+    const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
+    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
+  });
+
+  // 5. General Data Engineering Q&A (3,499 questions in database) — sample 10
+  sampleItems(questionsDeDb.filter((q) => q.question), 10, rng).forEach((q) => {
+    const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
+    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
+  });
+
+  // 6. Polyglot Code Sheets (PySpark, Spark SQL, T-SQL, Python)
   sampleItems(pysparkData.filter((p) => p.title), 2, rng).forEach((p) =>
     raw.push({ label: `PySpark · ${p.title}`, href: `/code-practice?db=pyspark&id=${p.id}&q=${encodeURIComponent(p.title)}` })
   );
@@ -142,11 +147,6 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     raw.push({ label: `Python · ${p.title}`, href: `/python?id=${p.id}&q=${encodeURIComponent(p.title)}` })
   );
 
-  // 6. Learning Paths (12 curricula)
-  sampleItems(learningPathsDb.filter((lp) => lp.title), 2, rng).forEach((lp) =>
-    raw.push({ label: lp.title, href: `/learning-paths?id=${lp.id}` })
-  );
-
   // 7. Architectural Blueprints & Modern Concepts
   sampleItems(modernBlueprintsDb.filter((b) => b.title), 2, rng).forEach((b) =>
     raw.push({ label: b.title, href: `/modern-stack?tab=blueprints#bp-${b.id}` })
@@ -155,7 +155,12 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     raw.push({ label: m.title, href: `/modern-stack?tab=concepts#${m.id}` })
   );
 
-  // 8. Spotlights
+  // 8. Learning Paths
+  sampleItems(learningPathsDb.filter((lp) => lp.title), 3, rng).forEach((lp) =>
+    raw.push({ label: lp.title, href: `/learning-paths?id=${lp.id}` })
+  );
+
+  // 9. Spotlights
   const spotlights: Omit<TickerItem, "color">[] = [
     { label: "Spark Engine Simulator",       href: "/spark-engine" },
     { label: "Data Engineering Mindmap",     href: "/mindmap" },
@@ -166,14 +171,38 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     { label: "Microsoft Fabric Lakehouse",   href: "/concepts?term=Microsoft%20Fabric&id=fabric-onelake-overview" },
     { label: "Real-Time Streaming Design",   href: "/architecture?id=arch-databricks-lakehouse-easy-3&q=Change%20Data%20Feed" },
     { label: "Unity Catalog Setup",          href: "/concepts?term=Unity%20Catalog&id=spark-unity-catalog" },
-    { label: "GCC Big4 Interview Prep",      href: "/company-research" },
-    { label: "My Learning Studio",           href: "/studio" },
   ];
   sampleItems(spotlights, 3, rng).forEach((sp) => raw.push(sp));
 
-  // Shuffle, slice to 65 max, then assign colours
-  const shuffled = shuffleArray(raw, rng).slice(0, 65);
-  return shuffled.map((item, idx) => ({
+  // Deduplicate items strictly by normalized label and destination href
+  const seenLabels = new Set<string>();
+  const seenHrefs = new Set<string>();
+  const uniqueItems: Omit<TickerItem, "color">[] = [];
+
+  for (const item of raw) {
+    const normLabel = item.label.toLowerCase().trim();
+    const normHref = item.href.toLowerCase().trim();
+    if (!seenLabels.has(normLabel) && !seenHrefs.has(normHref)) {
+      seenLabels.add(normLabel);
+      seenHrefs.add(normHref);
+      uniqueItems.push(item);
+    }
+  }
+
+  // Sort by domain relevance (Key Concepts -> Architecture -> Curricula -> Modern Stack -> Code -> Q&A)
+  const getRelevance = (item: Omit<TickerItem, "color">): number => {
+    if (item.href.startsWith("/concepts")) return 100;
+    if (item.href.startsWith("/architecture")) return 90;
+    if (item.href.startsWith("/learning-paths")) return 80;
+    if (item.href.startsWith("/spark-engine")) return 75;
+    if (item.href.startsWith("/modern-stack")) return 70;
+    if (item.href.startsWith("/code-practice") || item.href.startsWith("/python")) return 60;
+    return 50;
+  };
+
+  const sorted = uniqueItems.sort((a, b) => getRelevance(b) - getRelevance(a)).slice(0, 50);
+
+  return sorted.map((item, idx) => ({
     ...item,
     color: APPLE_COLORS[idx % APPLE_COLORS.length].pill + "|" + APPLE_COLORS[idx % APPLE_COLORS.length].text,
   }));
@@ -191,29 +220,32 @@ function Sep() {
 }
 
 /* ─── Main Component ─────────────────────────────────────────────────── */
-const STATIC_TICKER_ITEMS = buildTickerItems(42);
+const STATIC_TICKER_ITEMS = buildTickerItems(20260913);
 
 export function RollingTicker() {
   const [items, setItems] = useState<TickerItem[]>(STATIC_TICKER_ITEMS);
   const [isShuffling, setIsShuffling] = useState(false);
+  const shuffleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Triple the array so the loop always has plenty of content to fill wide screens
-  const tripled = useMemo(() => [...items, ...items, ...items], [items]);
-
-  // Refresh topics on client mount (every page refresh)
+  // Memory leak cleanup: clear timer on unmount
   useEffect(() => {
-    setItems(buildTickerItems());
+    return () => {
+      if (shuffleTimerRef.current) {
+        clearTimeout(shuffleTimerRef.current);
+      }
+    };
   }, []);
 
   const handleShuffle = useCallback(() => {
     setIsShuffling(true);
-    // Draw fresh random sample from 6,000+ database
+    // Draw fresh random sample from 6,000+ database with deduplication and relevance sorting
     const fresh = buildTickerItems();
     setItems(fresh);
     toast.success("Shuffled live topics from 6,000+ question database", {
       duration: 1800,
     });
-    setTimeout(() => {
+    if (shuffleTimerRef.current) clearTimeout(shuffleTimerRef.current);
+    shuffleTimerRef.current = setTimeout(() => {
       setIsShuffling(false);
     }, 500);
   }, []);
@@ -269,12 +301,12 @@ export function RollingTicker() {
           }}
         />
 
-        {/* Scrolling track — smooth, calm Apple speed (300s) */}
+        {/* Scrolling track — renders unique items exactly once, sorted by relevance */}
         <div
           className="ticker-track flex items-center py-2"
           style={{ "--ticker-duration": "300s" } as React.CSSProperties}
         >
-          {tripled.map((item, idx) => {
+          {items.map((item, idx) => {
             const [pill, text] = item.color.split("|");
             return (
               <span key={`${item.label}-${idx}`} className="inline-flex items-center shrink-0">

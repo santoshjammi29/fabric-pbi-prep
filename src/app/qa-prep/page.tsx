@@ -48,53 +48,66 @@ export default function QaPrepPage() {
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
   // Combine datasets
   const allQuestions: Question[] = useMemo(() => {
     return [...questionsDb, ...questionsDeDb];
   }, []);
 
-  // Sync URL parameters on initial load
+  // Sync URL parameters on initial load & popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const idParam = params.get("id");
-    const qParam = params.get("q") || params.get("search");
-    const domainParam = params.get("domain") || params.get("category");
-    const diffParam = params.get("difficulty");
-    const studyParam = params.get("study");
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const cardParam = params.get("card") || params.get("id");
+      const qParam = params.get("q") || params.get("search");
+      const domainParam = params.get("domain") || params.get("category");
+      const diffParam = params.get("difficulty");
+      const studyParam = params.get("study");
 
-    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
-      setSelectedDifficulty(diffParam.toUpperCase());
-    }
-    if (domainParam) {
-      const found = STANDARDIZED_DOMAINS.find(
-        (d) => d.toLowerCase() === domainParam.toLowerCase() || domainParam.toLowerCase().includes(d.toLowerCase())
-      );
-      if (found) setSelectedDomain(found);
-      else setSearchQuery(domainParam);
-    }
-    if (studyParam === "true" || studyParam === "1") {
-      setIsStudyMode(true);
-    }
-
-    if (idParam || qParam) {
-      const matched = allQuestions.find(
-        (q) => (idParam && q.id === idParam) || (qParam && q.question.toLowerCase().includes(qParam.toLowerCase()))
-      );
-      if (matched) {
-        if (!diffParam) setSelectedDifficulty("ALL");
-        if (!domainParam) setSelectedDomain("ALL");
-        setPage(1);
-        setSearchQuery(matched.question);
-        setExpandedIds(new Set([matched.id]));
-        setTimeout(() => {
-          const el = document.getElementById(`question-${matched.id}`);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 300);
-      } else if (qParam) {
-        setSearchQuery(qParam);
+      if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
+        setSelectedDifficulty(diffParam.toUpperCase());
       }
-    }
+      if (domainParam) {
+        const found = STANDARDIZED_DOMAINS.find(
+          (d) => d.toLowerCase() === domainParam.toLowerCase() || domainParam.toLowerCase().includes(d.toLowerCase())
+        );
+        if (found) setSelectedDomain(found);
+        else setSearchQuery(domainParam);
+      }
+      if (studyParam === "true" || studyParam === "1") {
+        setIsStudyMode(true);
+      }
+
+      if (cardParam || qParam) {
+        const matched = allQuestions.find(
+          (q) => (cardParam && q.id === cardParam) || (qParam && q.question.toLowerCase().includes(qParam.toLowerCase()))
+        );
+        if (matched) {
+          if (!diffParam) setSelectedDifficulty("ALL");
+          if (!domainParam) setSelectedDomain("ALL");
+          setPage(1);
+          setExpandedIds(new Set([matched.id]));
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
+            const el = document.getElementById(`question-${matched.id}`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        } else if (qParam) {
+          setSearchQuery(qParam);
+        }
+      }
+    };
+
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => {
+      window.removeEventListener("popstate", syncFromUrl);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
   }, [allQuestions]);
 
   // Load bookmarks
@@ -146,7 +159,8 @@ export default function QaPrepPage() {
     navigator.clipboard.writeText(text);
     setCopiedId(q.id);
     toast.success("Question & Answer copied!");
-    setTimeout(() => setCopiedId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   };
 
   // Filtered dataset

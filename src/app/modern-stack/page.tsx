@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Layers,
   Sparkles,
@@ -35,11 +35,15 @@ type ModernSubtab =
 
 export default function ModernStackPage() {
   const [activeTab, setActiveTab] = useState<ModernSubtab>("overview");
+  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleTabChange = useCallback((tabId: ModernSubtab) => {
     setActiveTab(tabId);
     if (typeof window !== "undefined") {
-      window.history.replaceState(null, "", `#${tabId}`);
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tabId);
+      url.hash = tabId;
+      window.history.replaceState(null, "", url.toString());
     }
   }, []);
 
@@ -69,7 +73,8 @@ export default function ModernStackPage() {
       }
 
       if (hash) {
-        setTimeout(() => {
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+        scrollTimerRef.current = setTimeout(() => {
           const el = document.getElementById(hash);
           if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
         }, 200);
@@ -78,7 +83,12 @@ export default function ModernStackPage() {
 
     syncTabFromLocation();
     window.addEventListener("hashchange", syncTabFromLocation);
-    return () => window.removeEventListener("hashchange", syncTabFromLocation);
+    window.addEventListener("popstate", syncTabFromLocation);
+    return () => {
+      window.removeEventListener("hashchange", syncTabFromLocation);
+      window.removeEventListener("popstate", syncTabFromLocation);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    };
   }, []);
 
   // Interactive Canvas Stage
