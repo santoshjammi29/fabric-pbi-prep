@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ═══════════════════════════════════════════════════════
    DESIGN TOKENS — FAANG-Grade Design System
    Microsoft Data Platform Architect Prep
@@ -250,8 +252,8 @@ body {
 }
 
 .magazine-card-featured {
-  background: linear-gradient(145deg, #111124 0%, #171730 100%);
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: linear-gradient(145deg, #141417 0%, #1A1A1E 100%);
+  border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .light .magazine-card-featured {
@@ -318,7 +320,7 @@ body {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  animation: aurora-fade-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 1;
 }
 
 .aurora-orb {

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { pythonData } from "@/data";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 
 const levelBadges: Record<CodeLevel, { bg: string; text: string; border: string }> = {
   beginner: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -37,13 +38,17 @@ const ItemCard = React.memo(function ItemCard({
 }) {
   return (
     <motion.div
-      layout
+      layout="position"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
+      transition={{
+        layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
+        opacity: { duration: 0.2 },
+      }}
       className={cn(
-        "border rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow",
-        isExpanded ? "border-purple-500" : "border-[var(--border)]",
+        "border rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-colors",
+        isExpanded ? "border-purple-500 bg-[var(--surface-1)]" : "border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)]",
       )}
       onClick={() => onToggle(item.id)}
     >
@@ -82,25 +87,19 @@ const ItemCard = React.memo(function ItemCard({
           </div>
         </div>
       </div>
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            className="px-4 pb-4 text-sm text-[var(--muted-foreground)] border-t border-[var(--border)] bg-[var(--surface-2)]"
-          >
-            <p className="mb-2"><strong>Description:</strong> {item.description}</p>
-            <CodeBlock code={item.code} language="python" />
-            {item.notes?.length && (
-              <ul className="list-disc list-inside mb-2">
-                {item.notes.map((n, i) => (<li key={i}>{n}</li>))}
-              </ul>
-            )}
-            {item.use_case && <p><strong>Use‑case:</strong> {item.use_case}</p>}
-          </motion.div>
+      <SmoothAccordion isOpen={isExpanded} innerClassName="p-4 space-y-3 text-sm text-[var(--foreground)]">
+        <p><strong className="text-white">Description:</strong> <span className="text-slate-300">{item.description}</span></p>
+        <CodeBlock code={item.code} language="python" />
+        {item.notes && item.notes.length > 0 && (
+          <div className="space-y-1">
+            <strong className="text-white text-xs uppercase tracking-wider">Tuning Notes:</strong>
+            <ul className="list-disc list-inside text-xs text-slate-300 space-y-1">
+              {item.notes.map((n, i) => (<li key={i}>{n}</li>))}
+            </ul>
+          </div>
         )}
-      </AnimatePresence>
+        {item.use_case && <p className="text-xs text-purple-300 pt-1 border-t border-[var(--border)]"><strong className="text-purple-200">Use‑case:</strong> {item.use_case}</p>}
+      </SmoothAccordion>
     </motion.div>
   );
 });

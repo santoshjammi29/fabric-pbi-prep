@@ -102,10 +102,10 @@ export function RoadmapGrid() {
             <Link key={item.step} href={item.href} className="block group">
               <div
                 className={cn(
-                  "flex flex-col h-full rounded-2xl border bg-white dark:bg-slate-900 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden",
+                  "flex flex-col h-full rounded-2xl border bg-[var(--surface-1)] hover:bg-[var(--surface-2)] p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden",
                   isRecommended
-                    ? "border-purple-500/50 shadow-sm ring-1 ring-purple-500/20 dark:bg-gradient-to-b dark:from-purple-950/15 dark:to-slate-900"
-                    : "border-slate-200 dark:border-slate-800"
+                    ? "border-purple-500/50 shadow-sm ring-1 ring-purple-500/20 bg-gradient-to-b from-purple-950/20 to-[var(--surface-1)]"
+                    : "border-[var(--border)] hover:border-[var(--border-hover)]"
                 )}
               >
                 {/* Recommended Badge Ribbon */}
@@ -122,7 +122,7 @@ export function RoadmapGrid() {
                     Step {item.step} · {item.difficulty}
                   </span>
                   {!isRecommended && (
-                    <Icon className="h-6 w-6 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                    <Icon className="h-6 w-6 text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors" />
                   )}
                   {isRecommended && (
                     <Icon className="h-6 w-6 text-purple-400 transition-colors" />
@@ -130,24 +130,24 @@ export function RoadmapGrid() {
                 </div>
 
                 <div className="flex-1 space-y-3">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
                     <span>{item.title}</span>
                   </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-500 dark:text-slate-400">
+                <div className="mt-6 pt-6 border-t border-[var(--border)] flex items-center justify-between text-sm">
+                  <span className="font-medium text-[var(--muted-foreground)]">
                     {item.meta}
                   </span>
                   <span
                     className={cn(
                       "inline-flex items-center font-semibold transition-colors",
                       isRecommended
-                        ? "text-purple-600 dark:text-purple-400 group-hover:text-purple-700"
-                        : "text-blue-600 dark:text-blue-400 group-hover:text-blue-700"
+                        ? "text-purple-400 group-hover:text-purple-300"
+                        : "text-blue-400 group-hover:text-blue-300"
                     )}
                   >
                     Open <ArrowRight className="ml-1 h-4 w-4" />

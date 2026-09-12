@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { conceptsDb, pythonData } from "@/data";
 import { Concept, Difficulty, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { recordLastTopic } from "@/lib/user-progress";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
@@ -437,12 +438,15 @@ function ConceptsContent() {
                 return (
                   <motion.div
                     key={concept.id}
-                    layout
+                    layout="position"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
+                    transition={{
+                      layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
+                      opacity: { duration: 0.2 },
+                    }}
                     className={cn(
-                      "rounded-2xl border transition-all duration-200 overflow-hidden",
+                      "rounded-2xl border transition-colors duration-200 overflow-hidden",
                       isExpanded
                         ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -520,45 +524,35 @@ function ConceptsContent() {
                     </div>
 
                     {/* Expanded Details Body */}
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="border-t border-[var(--border)] px-5 py-4 bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm"
-                        >
-                          {/* Deep-dive Explanation */}
-                          <div className="space-y-1.5">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
-                              <Sparkles size={13} className="text-purple-400" />
-                              Architectural Deep Dive
-                            </h4>
-                            <p className="text-[var(--foreground)] opacity-90 leading-relaxed">
-                              {concept.explanation}
-                            </p>
-                          </div>
+                    <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                      {/* Deep-dive Explanation */}
+                      <div className="space-y-1.5">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
+                          <Sparkles size={13} className="text-purple-400" />
+                          Architectural Deep Dive
+                        </h4>
+                        <p className="text-[var(--foreground)] opacity-90 leading-relaxed">
+                          {concept.explanation}
+                        </p>
+                      </div>
 
-                          {/* Key Architectural Takeaways */}
-                          {concept.keyPoints && concept.keyPoints.length > 0 && (
-                            <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                                Core Takeaways:
-                              </h4>
-                              <ul className="space-y-1.5">
-                                {concept.keyPoints.map((point, ki) => (
-                                  <li key={ki} className="flex items-start gap-2 text-[var(--muted-foreground)]">
-                                    <CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" />
-                                    <span className="leading-snug">{point}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </motion.div>
+                      {/* Key Architectural Takeaways */}
+                      {concept.keyPoints && concept.keyPoints.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                            Core Takeaways:
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {concept.keyPoints.map((point, ki) => (
+                              <li key={ki} className="flex items-start gap-2 text-[var(--muted-foreground)]">
+                                <CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" />
+                                <span className="leading-snug">{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       )}
-                    </AnimatePresence>
+                    </SmoothAccordion>
                   </motion.div>
                 );
               })}
@@ -676,12 +670,15 @@ function ConceptsContent() {
                 return (
                   <motion.div
                     key={item.id}
-                    layout
+                    layout="position"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.3) }}
+                    transition={{
+                      layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
+                      opacity: { duration: 0.2 },
+                    }}
                     className={cn(
-                      "rounded-2xl border transition-all duration-200 overflow-hidden",
+                      "rounded-2xl border transition-colors duration-200 overflow-hidden",
                       isExpanded
                         ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xl"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -758,49 +755,39 @@ function ConceptsContent() {
                     </div>
 
                     {/* Expanded Code & Details */}
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="border-t border-[var(--border)] px-5 py-4 bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm"
-                        >
-                          <CodeBlock
-                            code={item.code}
-                            language="python"
-                            filename={`${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40)}.py`}
-                            showLineNumbers
-                          />
+                    <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                      <CodeBlock
+                        code={item.code}
+                        language="python"
+                        filename={`${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40)}.py`}
+                        showLineNumbers
+                      />
 
-                          {item.notes && item.notes.length > 0 && (
-                            <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                                📝 Notes:
-                              </h4>
-                              <ul className="space-y-1.5">
-                                {item.notes.map((note, ni) => (
-                                  <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
-                                    <CheckCircle2 size={14} className="text-blue-400 mt-0.5 shrink-0" />
-                                    <span className="leading-snug">{note}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {item.use_case && (
-                            <div className="pt-2 border-t border-[var(--border)]">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] mb-1">
-                                🎯 Use Case:
-                              </h4>
-                              <p className="text-[var(--foreground)] opacity-90 leading-relaxed">{item.use_case}</p>
-                            </div>
-                          )}
-                        </motion.div>
+                      {item.notes && item.notes.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                            📝 Notes:
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {item.notes.map((note, ni) => (
+                              <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
+                                <CheckCircle2 size={14} className="text-blue-400 mt-0.5 shrink-0" />
+                                <span className="leading-snug">{note}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       )}
-                    </AnimatePresence>
+
+                      {item.use_case && (
+                        <div className="pt-2 border-t border-[var(--border)]">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] mb-1">
+                            🎯 Use Case:
+                          </h4>
+                          <p className="text-[var(--foreground)] opacity-90 leading-relaxed">{item.use_case}</p>
+                        </div>
+                      )}
+                    </SmoothAccordion>
                   </motion.div>
                 );
               })}

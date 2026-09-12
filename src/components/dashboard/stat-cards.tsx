@@ -82,16 +82,16 @@ export function StatCards() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.4 }}
-              className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)] p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
             >
               <div className={cn("mb-4 inline-flex rounded-xl p-2.5 border", colorMap[stat.accent])}>
                 <Icon className="h-5 w-5" />
               </div>
               <div className="space-y-1">
-                <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                <div className="text-2xl font-bold text-[var(--foreground)]">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                <div className="text-sm font-medium text-[var(--muted-foreground)]">
                   {stat.title}
                 </div>
               </div>

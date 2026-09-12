@@ -101,7 +101,7 @@ export function ExperienceLevelSwitcher() {
                   {isSelected && (
                     <motion.div
                       layoutId="activeTierPill"
-                      className="absolute inset-0 bg-white dark:bg-slate-800 rounded-xl shadow-md border border-[var(--border)] -z-10"
+                      className="absolute inset-0 bg-[var(--surface-3)] rounded-xl shadow-md border border-[var(--border-hover)] -z-10"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}

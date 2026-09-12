@@ -23,6 +23,7 @@ import { architectureData } from "@/data";
 import { ArchitectureQuestion, Difficulty } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
 import { AnswerRenderer } from "@/components/ui/answer-renderer";
+import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -382,12 +383,15 @@ export default function ArchitectureHubPage() {
             return (
               <motion.div
                 key={item.id}
-                layout
+                layout="position"
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: Math.min(index * 0.015, 0.2) }}
+                transition={{
+                  layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
+                  opacity: { duration: 0.2 },
+                }}
                 className={cn(
-                  "rounded-2xl border transition-all duration-200 overflow-hidden",
+                  "rounded-2xl border transition-colors duration-200 overflow-hidden",
                   isExpanded
                     ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -460,25 +464,15 @@ export default function ArchitectureHubPage() {
                 </div>
 
                 {/* Expanded Answer */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="border-t border-[var(--border)] p-5 bg-[var(--surface-2)] space-y-3 text-xs sm:text-sm"
-                    >
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300">
-                        <Sparkles size={14} className="text-purple-400" />
-                        <span>Principal Architect Blueprint:</span>
-                      </div>
-                      <div className="pt-2">
-                        <AnswerRenderer text={item.answer} />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-3 text-xs sm:text-sm">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300">
+                    <Sparkles size={14} className="text-purple-400" />
+                    <span>Principal Architect Blueprint:</span>
+                  </div>
+                  <div className="pt-2">
+                    <AnswerRenderer text={item.answer} />
+                  </div>
+                </SmoothAccordion>
               </motion.div>
             );
           })}

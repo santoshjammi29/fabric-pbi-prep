@@ -27,16 +27,19 @@ export function TipOfDay() {
   return (
     <div
       onClick={nextTip}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-200/50 dark:border-amber-900/50 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-6 transition-all hover:shadow-md h-full flex flex-col justify-center"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-500/20 bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-amber-500/30 p-6 transition-all hover:shadow-md h-full flex flex-col justify-center"
     >
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/50 p-3 text-amber-600 dark:text-amber-400 transition-transform group-hover:scale-110 group-hover:rotate-12">
-          <Lightbulb className="h-6 w-6" />
+        <div className="flex-shrink-0 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3 text-amber-400 transition-transform group-hover:scale-110 group-hover:rotate-12">
+          <Lightbulb className="h-5 w-5" />
         </div>
         <div className="flex-1 space-y-2 overflow-hidden">
-          <h3 className="font-semibold text-amber-900 dark:text-amber-300">
-            Data Architect Pro Tip of the Day
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-xs sm:text-sm text-[var(--foreground)] uppercase tracking-wider">
+              Data Architect Pro Tip
+            </h3>
+            <span className="text-[10px] font-mono text-amber-400/80">Click for next</span>
+          </div>
           <div className="relative min-h-[4rem] flex items-center">
             <AnimatePresence mode="wait">
               <motion.p
@@ -45,7 +48,7 @@ export function TipOfDay() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="text-sm text-amber-800/80 dark:text-amber-200/80 leading-relaxed m-0"
+                className="text-xs sm:text-sm text-slate-300 leading-relaxed m-0"
               >
                 {TIPS[currentIndex]}
               </motion.p>

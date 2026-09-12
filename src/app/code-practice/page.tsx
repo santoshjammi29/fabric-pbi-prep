@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { pysparkData, sparksqlData, mssqlData, pythonData } from "@/data";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
+import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { recordLastTopic } from "@/lib/user-progress";
 
 type LanguageKey = "pyspark" | "sparksql" | "mssql" | "python";
@@ -387,12 +388,15 @@ export default function CodePracticePage() {
             return (
               <motion.div
                 key={item.id}
-                layout
+                layout="position"
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
+                transition={{
+                  layout: { duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] },
+                  opacity: { duration: 0.2 },
+                }}
                 className={cn(
-                  "rounded-2xl border transition-all duration-200 overflow-hidden",
+                  "rounded-2xl border transition-colors duration-200 overflow-hidden",
                   isExpanded
                     ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xl"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -469,56 +473,46 @@ export default function CodePracticePage() {
                 </div>
 
                 {/* Expanded Code & Notes Body */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="border-t border-[var(--border)] p-5 bg-[var(--surface-2)] space-y-4 text-xs sm:text-sm"
-                    >
-                      {/* Use Case Scenario */}
-                      {item.use_case && (
-                        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2.5">
-                          <Briefcase size={16} className="text-purple-400 mt-0.5 shrink-0" />
-                          <div className="space-y-0.5">
-                            <span className="font-bold text-[11px] uppercase tracking-wider text-purple-300">
-                              Enterprise Scenario:
-                            </span>
-                            <p className="text-xs text-purple-200/90 leading-relaxed">{item.use_case}</p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Modern Code Block */}
-                      <CodeBlock
-                        code={item.code}
-                        language={activeLang}
-                        filename={`${item.id}.${activeLang === "sparksql" || activeLang === "mssql" ? "sql" : "py"}`}
-                        badge={languageConfigs[activeLang].name}
-                      />
-
-                      {/* Performance / Best Practice Notes */}
-                      {item.notes && item.notes.length > 0 && (
-                        <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
-                            <Lightbulb size={14} className="text-amber-400" />
-                            Architectural Tuning Notes:
-                          </h4>
-                          <ul className="space-y-1.5">
-                            {item.notes.map((note, ni) => (
-                              <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
-                                <span className="text-amber-400 font-bold">•</span>
-                                <span className="leading-snug">{note}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </motion.div>
+                <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                  {/* Use Case Scenario */}
+                  {item.use_case && (
+                    <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2.5">
+                      <Briefcase size={16} className="text-purple-400 mt-0.5 shrink-0" />
+                      <div className="space-y-0.5">
+                        <span className="font-bold text-[11px] uppercase tracking-wider text-purple-300">
+                          Enterprise Scenario:
+                        </span>
+                        <p className="text-xs text-purple-200/90 leading-relaxed">{item.use_case}</p>
+                      </div>
+                    </div>
                   )}
-                </AnimatePresence>
+
+                  {/* Modern Code Block */}
+                  <CodeBlock
+                    code={item.code}
+                    language={activeLang}
+                    filename={`${item.id}.${activeLang === "sparksql" || activeLang === "mssql" ? "sql" : "py"}`}
+                    badge={languageConfigs[activeLang].name}
+                  />
+
+                  {/* Performance / Best Practice Notes */}
+                  {item.notes && item.notes.length > 0 && (
+                    <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
+                        <Lightbulb size={14} className="text-amber-400" />
+                        Architectural Tuning Notes:
+                      </h4>
+                      <ul className="space-y-1.5">
+                        {item.notes.map((note, ni) => (
+                          <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
+                            <span className="text-amber-400 font-bold">•</span>
+                            <span className="leading-snug">{note}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </SmoothAccordion>
               </motion.div>
             );
           })}

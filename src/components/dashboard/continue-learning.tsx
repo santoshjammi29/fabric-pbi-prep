@@ -32,10 +32,10 @@ export function ContinueLearning() {
   const displayProgress = isClient ? Math.max(topic.progress, stats.masteryPercentage) : 15;
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm transition-all hover:shadow-md">
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 shadow-sm transition-all hover:shadow-md">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div className="flex-1 space-y-3 w-full">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400">
             <BookOpen className="h-4 w-4" />
             <span>{topic.category}</span>
             {stats.bookmarksCount > 0 && (
@@ -46,26 +46,26 @@ export function ContinueLearning() {
             )}
           </div>
 
-          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-snug">
+          <h3 className="text-lg sm:text-xl font-bold text-[var(--foreground)] leading-snug">
             {topic.title}
           </h3>
 
           <div className="space-y-1.5 w-full max-w-md">
-            <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+            <div className="flex items-center justify-between text-xs font-medium text-[var(--muted-foreground)]">
               <span className="flex items-center gap-1">
                 <Sparkles className="h-3.5 w-3.5 text-purple-400" />
                 Milestone Mastery
               </span>
               <span>{displayProgress}%</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-[var(--surface-3)] overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-700 ease-out"
                 style={{ width: `${displayProgress}%` }}
               />
             </div>
             {stats.reviewedCount > 0 && (
-              <div className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
+              <div className="text-[11px] text-[var(--muted-foreground)] flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3 text-green-500" />
                 <span>{stats.reviewedCount} questions & scenarios mastered</span>
               </div>
