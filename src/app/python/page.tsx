@@ -123,6 +123,8 @@ export default function PythonHub() {
         (item) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
       );
       if (matched) {
+        if (!levelParam) setSelectedLevel("ALL");
+        setPage(1);
         setSearchQuery(matched.title);
         setExpandedIds(new Set([matched.id]));
         setTimeout(() => {

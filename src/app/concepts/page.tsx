@@ -102,6 +102,8 @@ function ConceptsContent() {
         (c) => (idParam && c.id === idParam) || (termParam && c.term.toLowerCase() === termParam.toLowerCase())
       );
       if (matched) {
+        if (!diffParam) setSelectedDifficulty("ALL");
+        if (!catParam) setSelectedCategory("ALL");
         setSearchQuery(matched.term);
         setExpandedIds(new Set([matched.id]));
         setTimeout(() => {

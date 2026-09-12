@@ -61,6 +61,9 @@ export default function ArchitectureHubPage() {
         (item) => (idParam && item.id === idParam) || (qParam && item.question.toLowerCase().includes(qParam.toLowerCase()))
       );
       if (matched) {
+        if (!diffParam) setSelectedDifficulty("ALL");
+        if (!catParam) setSelectedCategory("ALL");
+        setPage(1);
         setSearchQuery(matched.question);
         setExpandedIds(new Set([matched.id]));
         setTimeout(() => {

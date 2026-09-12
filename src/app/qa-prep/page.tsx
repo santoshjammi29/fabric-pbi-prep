@@ -82,6 +82,9 @@ export default function QaPrepPage() {
         (q) => (idParam && q.id === idParam) || (qParam && q.question.toLowerCase().includes(qParam.toLowerCase()))
       );
       if (matched) {
+        if (!diffParam) setSelectedDifficulty("ALL");
+        if (!domainParam) setSelectedDomain("ALL");
+        setPage(1);
         setSearchQuery(matched.question);
         setExpandedIds(new Set([matched.id]));
         setTimeout(() => {

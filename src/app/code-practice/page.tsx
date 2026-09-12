@@ -106,6 +106,7 @@ export default function CodePracticePage() {
           (item) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
         );
         if (matched) {
+          setSelectedLevel("ALL");
           setSearchQuery(matched.title);
           setExpandedIds(new Set([matched.id]));
           setTimeout(() => {

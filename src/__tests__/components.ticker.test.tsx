@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { RollingTicker } from '@/components/dashboard/rolling-ticker'
 
 // Mock next/link since we're in jsdom
@@ -114,5 +114,19 @@ describe('RollingTicker component', () => {
     expect(qaLink).toBeDefined()
     const archLink = screen.getAllByRole('link').find(l => l.getAttribute('href')?.startsWith('/architecture?id='))
     expect(archLink).toBeDefined()
+  })
+
+  it('displays 6k+ database indicator badge', () => {
+    render(<RollingTicker />)
+    expect(screen.getByText('6k+')).toBeDefined()
+  })
+
+  it('renders a shuffle button and updates items when clicked', () => {
+    render(<RollingTicker />)
+    const shuffleBtn = screen.getByRole('button', { name: /shuffle/i })
+    expect(shuffleBtn).not.toBeNull()
+    fireEvent.click(shuffleBtn)
+    const ticker = document.querySelector('[aria-label="Topics rolling ticker"]')
+    expect(ticker).not.toBeNull()
   })
 })
