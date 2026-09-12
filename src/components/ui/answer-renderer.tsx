@@ -65,14 +65,22 @@ const markdownComponents = {
     return <p className="leading-relaxed my-1.5 text-slate-200">{children}</p>;
   },
   ul({ children }: { children?: React.ReactNode }) {
-    return <ul className="space-y-1.5 my-2">{children}</ul>;
+    return (
+      <ul className="space-y-2 my-2.5 list-disc list-outside pl-5 marker:text-purple-400">
+        {children}
+      </ul>
+    );
   },
   ol({ children }: { children?: React.ReactNode }) {
-    return <ol className="space-y-2 my-2 list-decimal list-inside">{children}</ol>;
+    return (
+      <ol className="space-y-3 my-2.5 list-decimal list-outside pl-5 marker:text-purple-400 marker:font-semibold">
+        {children}
+      </ol>
+    );
   },
   li({ children }: { children?: React.ReactNode }) {
     return (
-      <li className="text-slate-200 leading-relaxed text-xs sm:text-sm">
+      <li className="text-slate-200 leading-relaxed text-xs sm:text-sm [&>p:first-child]:inline [&>p+p]:block [&>p+p]:mt-1.5 [&>p]:my-0">
         {children}
       </li>
     );

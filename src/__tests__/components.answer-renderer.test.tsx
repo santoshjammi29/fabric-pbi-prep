@@ -57,4 +57,29 @@ p = Producer({'bootstrap.servers': 'localhost:9092'})
     expect(screen.getByText(/confluent_kafka/)).toBeDefined();
     expect(screen.getByText(/localhost/)).toBeDefined();
   });
+
+  it('renders numbered lists inline without dropping paragraphs onto separate lines', () => {
+    const looseListMarkdown = `1. Conditions for Failure: The target resource has private endpoint limit exhaustion.
+
+2. Timeouts: Azure allocates up to 20 minutes for private endpoint provisioning.
+
+3. Bypassing the Timeout: Pre-create and validate private endpoints before scheduling.`;
+
+    const { container } = render(<AnswerRenderer text={looseListMarkdown} />);
+    const ol = container.querySelector('ol');
+    expect(ol).toBeDefined();
+    expect(ol?.className).toContain('list-outside');
+    expect(ol?.className).toContain('pl-5');
+
+    const lis = container.querySelectorAll('li');
+    expect(lis.length).toBe(3);
+    lis.forEach((li) => {
+      expect(li.className).toContain('[&>p:first-child]:inline');
+      expect(li.className).toContain('[&>p]:my-0');
+    });
+
+    expect(screen.getByText(/Conditions for Failure/)).toBeDefined();
+    expect(screen.getByText(/Timeouts/)).toBeDefined();
+    expect(screen.getByText(/Bypassing the Timeout/)).toBeDefined();
+  });
 });
