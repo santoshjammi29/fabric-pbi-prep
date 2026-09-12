@@ -1,0 +1,577 @@
+[
+  {
+    "id": "T8-S3-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "NVMe Direct I/O Bypass in External Shuffle Services: Eliminating Page Cache Eviction Storms during 100 TB Shuffles",
+    "question": "A distributed compute cluster with 500 worker nodes executes a massive 100 TB distributed shuffle stage. The cluster runs an External Shuffle Service (ESS) where map tasks spill sorted partition files to local PCIe Gen4 NVMe storage. Standard JVM shuffle writers use buffered streams writing to the Linux Virtual File System (VFS). As hundreds of concurrent mapper tasks write gigabytes of partition data simultaneously, dirty pages in the Linux OS page cache surge past `vm.dirty_ratio` (20%), triggering synchronous direct page writeback. The Linux page eviction scanner (`kswapd`) aggressively purges cached blocks used by live query execution and container cgroups. When reducers begin fetching shuffle blocks over 100GbE networks, read requests miss the page cache and hammer the NVMe drives with concurrent random reads. NVMe queue depths hit 256, storage controllers overheat and throttle throughput by 80%, and shuffle fetch wait times jump from 50ms to 22,000ms, triggering executor heartbeat lost timeouts.",
+    "layers": {
+      "application": "Compute engine shuffle manager partitions, serializes, and spills intermediate map outputs into composite data and index files.",
+      "systems": "Linux kernel page cache writeback throttling (`vm.dirty_background_ratio`, `dirty_ratio`), Direct I/O (`O_DIRECT`) bypass of VFS page cache, asynchronous I/O syscalls (`io_uring`).",
+      "physical": "PCIe Gen4 x4 NVMe SSD read/write IOPS saturation, flash controller thermal throttling, NAND write amplification under mixed random read/write workloads."
+    },
+    "negative_constraints": [
+      "Cannot hold the entire 100 TB shuffle dataset in worker DRAM (hardware memory capacity is strictly bounded to 256 GB per node).",
+      "Cannot configure `sync()` on every write, as synchronous fsync would collapse disk write throughput to under 50 MB/s."
+    ],
+    "technical_depth_rationale": "Demands advanced systems engineering mastery over Linux kernel memory management, page cache bypass mechanisms, asynchronous block I/O (`io_uring`/Direct I/O), and NVMe storage controller physical behavior.",
+    "expected_solution_path": "Implement an Asynchronous Direct I/O Shuffle Writer utilizing `io_uring` and `O_DIRECT`: bypass the Linux page cache entirely for both writing spilled shuffle files and reading blocks for remote reducers. Group small partition records into 2MB aligned in-memory buffers before issuing asynchronous vectorized block writes (`io_uring_prep_writev`), completely eliminating page cache dirty page storms and preserving DRAM for executor task execution. On the shuffle fetch server, serve remote block requests via `io_uring` direct NVMe reads coupled with zero-copy network socket transfers, maintaining predictable NVMe queue depths ($QD \\le 32$) and stable 100GbE wire speeds.",
+    "failure_mode": "Catastrophic page cache thrashing, direct reclaim OS CPU spikes, NVMe controller thermal throttling, cascaded executor heartbeat loss, and entire job restart loops."
+  },
+  {
+    "id": "T8-S2-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "Small Disk Write Amplification in Hash Shuffle Partitioning: 4KB Random Writes vs 2MB Buffered Sequential Spills",
+    "question": "A distributed data processing engine executes a wide aggregation query across 4,000 shuffle partitions using Hash-Based Shuffle. A mapper task with 200 MB of allocated memory processes 20,000,000 incoming rows. Under naive hash partitioning, the mapper opens 4,000 individual disk file handles (or internal partition buffers) and flushes records as they arrive. Because the mapper memory is divided across 4,000 partitions, each partition buffer has only 50 KB of memory before flushing to disk. The operating system is flooded with thousands of concurrent 4 KB - 8 KB unaligned disk write operations. Storage metrics show physical disk write amplification jumping to 26x: the SSD flash controller executes continuous read-modify-write cycles and NAND block erasures. Disk latency spikes from 80$\\mu$s to 45ms, and mapper task execution time increases from 4 minutes to 85 minutes.",
+    "layers": {
+      "application": "Shuffle partition writer buffering strategy: Sort-Based Shuffle vs Hash-Based Shuffle partition bucket allocation.",
+      "systems": "Linux file descriptor exhaustion, VFS inode locking, small random disk writes thrashing the OS block layer and I/O scheduler queues.",
+      "physical": "NAND flash memory page size (typically 16KB) and block erase size (typically 4MB-8MB); read-modify-write penalties and Flash Translation Layer (FTL) wear."
+    },
+    "negative_constraints": [
+      "Cannot decrease the partition count below 4,000 (downstream reducers would exceed memory limits and crash with OOM).",
+      "Cannot allocate more RAM to the mapper tasks (constrained by multi-tenant container quotas)."
+    ],
+    "technical_depth_rationale": "Analyzes the physics of NAND flash memory, Flash Translation Layer (FTL) write amplification, file descriptor management, and sort-based vs hash-based shuffle memory mechanics.",
+    "expected_solution_path": "Transition from Hash-Based Shuffle to Sort-Based Shuffle with Single-File Consolidation: instead of maintaining 4,000 open file handles, write all partitions into a single append-only data file accompanied by a lightweight 64-bit index file. The mapper sorts records in memory by partition ID using an in-memory pointer array (`PartitionedAppendOnlyMap` or radix sort). When the memory threshold is reached, spill sorted runs to disk in large, contiguous 2MB-4MB sequential blocks aligned to SSD flash erase block boundaries. At the end of the map task, merge the sorted on-disk spills into a single consolidated shuffle file, reducing file descriptor count to 2 and eliminating small-block write amplification.",
+    "failure_mode": "Severe SSD write amplification, premature flash drive wearout, file descriptor exhaustion (`EMFILE: Too many open files`), and 20x query execution slowdown."
+  },
+  {
+    "id": "T8-S2-C3-DFM",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-FM"
+    },
+    "title": "Cloud VM Ephemeral NVMe Burst Credit Exhaustion and IOPS Throttling in Multi-Stage Spark Shuffles",
+    "question": "A massive 12-stage Apache Spark ETL pipeline runs on AWS EC2 `r5b` / `i3en` cloud instances using local instance store NVMe volumes for shuffle spill storage. During Stage 4 (a massive 40-table join), mapper tasks burst 45,000 IOPS per instance to local NVMe volumes. The cloud instances provide a baseline storage performance of 15,000 IOPS with a burst allowance of up to 60,000 IOPS driven by a leaky-bucket credit system. 25 minutes into the shuffle stage, the instance burst credit balance drops to zero. The cloud hypervisor abruptly throttles instance storage IOPS down to the 15,000 baseline. Disk I/O wait on all worker nodes jumps from 4% to 88%. Subsequent shuffle fetch requests time out (`FetchFailedException`), triggering Spark stage retry logic. The retried stages attempt to write the exact same shuffle data, consuming the remaining credits instantly and locking the pipeline in an unrecoverable retry cascade.",
+    "layers": {
+      "application": "Spark DAG stage retry semantics: when shuffle fetch fails repeatedly, the DAG scheduler invalidates prior stages and recomputes mappers.",
+      "systems": "Cloud hypervisor virtualization layer I/O throttling, kernel block device queue backlog, and driver heartbeat timers.",
+      "physical": "Cloud VM virtualization storage rate-limiters (AWS Nitro / Azure Hyper-V storage credit buckets), PCIe virtualization throughput caps."
+    },
+    "negative_constraints": [
+      "Cannot switch to ultra-expensive dedicated bare-metal instances with uncapped local NVMe due to enterprise cloud budget restrictions.",
+      "Cannot disable stage retries (necessary for fault tolerance against spot instance terminations)."
+    ],
+    "technical_depth_rationale": "Demands deep operational and architectural knowledge of cloud infrastructure virtualization quotas, burst bucket mechanics, and DAG scheduler cascading retry loops.",
+    "expected_solution_path": "Implement proactive I/O rate shaping and disaggregated remote shuffle offloading: Deploy a disaggregated Remote Shuffle Service (e.g., Apache Celeborn or Apache Uniffle) to decouple shuffle storage from compute nodes. Celeborn clusters aggregate shuffle writes across a dedicated pool of storage nodes with dedicated NVMe arrays. In local Spark configurations, tune `spark.shuffle.file.buffer=1m` and `spark.reducer.maxSizeInFlight=128m` to maximize I/O request size and minimize total IOPS. Configure client-side rate limiters in the shuffle manager to cap write IOPS strictly below the cloud VM's continuous baseline threshold (15,000 IOPS), preventing burst credit depletion and eliminating stage retries.",
+    "failure_mode": "Perpetual DAG stage retry death spiral, wasted cloud compute spend, zero pipeline forward progress, and SLA breach on core business reporting."
+  },
+  {
+    "id": "T8-S3-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "TCP Incast Collapse during 5,000-Executor Synchronized Reducer Fetch Stages",
+    "question": "A distributed query engine with 5,000 mapper executors completes a map phase. At the transition to the reduce stage, all 5,000 reducer tasks simultaneously issue HTTP/TCP fetch requests to retrieve their respective partition blocks from the same cluster worker nodes. A single worker node hosting critical shuffle blocks receives synchronized inbound TCP data bursts from 2,000 reducers simultaneously ($M \\to 1$ communication). The shallow packet memory buffers (32 MB shared buffer) of the Top-of-Rack (ToR) network switch are overwhelmed in less than 2 milliseconds. The switch drops 40% of incoming TCP packets. Standard Linux TCP cubic congestion control interprets the packet loss as severe congestion, slashes its congestion window ($cwnd$) to 1 MSS (Maximum Segment Size), and enters exponential backoff with Retransmission Timeouts (RTO) of 200ms to 3,000ms. Shuffle fetch throughput drops from 90 Gbps to 150 Mbps\u2014a catastrophic TCP Incast collapse.",
+    "layers": {
+      "application": "Distributed shuffle client fetch scheduling: synchronized barrier completion leads to simultaneous all-to-one fetch patterns.",
+      "systems": "Linux TCP stack congestion control (Cubic vs BBR vs DCTCP), socket buffer auto-tuning (`tcp_rmem`, `tcp_wmem`), TCP Minimum RTO (`TCP_RTO_MIN`).",
+      "physical": "Top-of-Rack (ToR) switch shared packet buffer capacity (32MB across 48 ports = ~680KB per port under contention); physical wire propagation delay."
+    },
+    "negative_constraints": [
+      "Cannot replace data center physical network switches with multi-gigabyte buffer hardware (cost-prohibitive).",
+      "Cannot execute reducers sequentially (would destroy query parallel execution latency)."
+    ],
+    "technical_depth_rationale": "Exposes the classic distributed networking physics problem of TCP Incast in many-to-one communication, switch packet buffer exhaustion, and microsecond-level congestion control.",
+    "expected_solution_path": "Desynchronize and rate-shape reducer fetch requests: 1) In the shuffle client, implement Randomized Jitter and Staggered Fetch Scheduling: introduce randomized exponential backoff and limit concurrent in-flight fetch requests per node (`spark.reducer.maxReqsInFlight=32`, `maxBlocksInFlightPerAddress=8`). 2) Enable Data Center TCP (DCTCP) or BBR with Explicit Congestion Notification (ECN) on host Linux kernels and switches: configure switch ECN marking thresholds at shallow queue depths ($20\\mu$s buffer occupancy) so senders reduce transmission rates smoothly before packet drops occur. 3) Reduce Linux TCP Minimum RTO (`tcp_rto_min=5ms`) via routing table attributes to accelerate recovery from unavoidable packet drops.",
+    "failure_mode": "Complete network fabric throughput collapse (99% bandwidth loss), multi-minute shuffle fetch stalls, timeout disconnections, and massive query execution delays."
+  },
+  {
+    "id": "T8-S2-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "Explicit Congestion Notification and DCTCP Buffer Sizing in Shuffle Switching Fabrics",
+    "question": "A private cloud data center deploys a 100GbE spine-leaf switching fabric to support high-throughput distributed analytical shuffles. To combat micro-burst packet loss, the network engineering team deploys Data Center TCP (DCTCP) with Explicit Congestion Notification (ECN) enabled across all leaf switches. The switch configuration sets a static Random Early Detection (RED) ECN marking threshold at $K = 500$ KB. However, during all-to-all shuffle exchanges where hundreds of worker nodes transmit full 100GbE line-rate bursts, the switch queue depth repeatedly surges past 500 KB to the physical buffer limit (12 MB), dropping packets and reverting connections to standard TCP loss recovery. Conversely, when the team lowers the threshold to $K = 65$ KB, throughput drops by 45% because benign bursty traffic gets marked prematurely, causing senders to throttle their congestion windows unnecessarily.",
+    "layers": {
+      "application": "Analytical query engine shuffle transport layer (Netty epoll TCP client/server).",
+      "systems": "Linux DCTCP kernel module (`tcp_dctcp`), ECN IP header marking (`CE` bits), socket buffer pacing.",
+      "physical": "Network switch packet memory architectures (dynamic buffer allocation pools), switch queue occupancy monitoring, and round-trip propagation time (RTT $\\approx 10-20\\mu$s)."
+    },
+    "negative_constraints": [
+      "Cannot replace standard TCP with proprietary non-routable fabrics.",
+      "Cannot tolerate packet drops during peak shuffle stages."
+    ],
+    "technical_depth_rationale": "Demands mathematical and systems mastery of queueing theory in high-speed switching fabrics, DCTCP feedback dynamics, and optimal ECN marking thresholds ($K \\approx \\frac{1}{7} \\cdot C \\cdot RTT$).",
+    "expected_solution_path": "Calculate and deploy dynamic ECN marking thresholds based on fabric Bandwidth-Delay Product (BDP): For a 100Gbps fabric with an average RTT of $15\\mu$s, $BDP = 100\\times 10^9 \\times 15 \\times 10^{-6} = 187.5$ KB. Set the DCTCP marking threshold $K$ dynamically using switch Weighted RED (WRED) between $1.0 \\times BDP$ and $1.5 \\times BDP$ ($\u0007pprox 180$ KB to $280$ KB). Enable dynamic shared buffer pools (e.g. Broadcom Alpha tuning) on leaf switches to dynamically allocate unreserved buffer space to bursty shuffle ports. Pair with Linux kernel FQ (Fair Queueing) packet scheduler (`tc qdisc add dev eth0 root fq pacing`) to pace packet transmission smoothly and eliminate micro-bursts.",
+    "failure_mode": "Switch buffer overrun packet drops, oscillating congestion windows, severe network underutilization, and erratic shuffle stage durations."
+  },
+  {
+    "id": "T8-S3-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "Top-of-Rack Switch Oversubscription and Bisection Bandwidth Saturation during All-to-All Shuffles",
+    "question": "An enterprise cluster hosts 1,000 data nodes across 25 server racks (40 nodes per rack). Each node is connected via 25GbE to a Top-of-Rack (ToR) switch (aggregate downlink bandwidth = 1,000 Gbps). However, each ToR switch has only four 100GbE uplink ports to the spine network (aggregate uplink bandwidth = 400 Gbps), creating a 2.5:1 network oversubscription ratio. A massive distributed join executes an all-to-all shuffle phase where partition keys are uniformly distributed across the entire 1,000-node cluster. Consequently, 96% of shuffle data must traverse the ToR uplinks to reach nodes in other racks. The 400 Gbps ToR uplinks saturate at 100% capacity within 3 seconds, while inter-rack packets suffer 60ms buffer queue delays and massive tail packet drops. Intra-rack mapper-to-reducer traffic sharing the same switch is starved, collapsing overall cluster compute efficiency.",
+    "layers": {
+      "application": "Cluster resource manager (YARN/Kubernetes) and query scheduler task placement logic: unawareness of physical network topology.",
+      "systems": "Linux routing table ECMP (Equal-Cost Multi-Path) hashing across uplink ports, network socket timeout configurations.",
+      "physical": "Spine-leaf network bisection bandwidth constraints, ToR uplink oversubscription ratio (2.5:1), optical transceiver thermal limits."
+    },
+    "negative_constraints": [
+      "Cannot replace the physical network architecture with a non-blocking 1:1 bisection bandwidth fabric (would require multi-million dollar switch upgrades).",
+      "Cannot restrict queries to only process data residing on a single rack."
+    ],
+    "technical_depth_rationale": "Explores the fundamental physical constraints of data center network topology, bisection bandwidth limits, and rack-aware distributed task scheduling algorithms.",
+    "expected_solution_path": "Implement Network-Topology-Aware Two-Tier Hierarchical Shuffle: 1) Configure the query scheduler with full datacenter rack topology awareness (`RackResolver`). 2) Implement Hierarchical Shuffle Partitioning: instead of executing an unconstrained all-to-all shuffle, mappers perform a local intra-rack pre-aggregation or partition bucket consolidation. A designated rack-level shuffle proxy or local reducer aggregates intermediate data within the rack before sending a single consolidated stream across the oversubscribed ToR uplinks to destination racks, reducing cross-rack network traffic by up to 70%. 3) Schedule join-dependent stages preferentially within the same rack or adjacent leaf domains using locality-aware task placement.",
+    "failure_mode": "ToR switch uplink buffer exhaustion, severe cross-rack packet loss, multi-hour shuffle stage gridlock, and complete failure of SLA-bound distributed pipelines."
+  },
+  {
+    "id": "T8-S3-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "RoCEv2 Priority Flow Control Deadlocks and Congestion Tree Propagation in RDMA Shuffles",
+    "question": "A next-generation GPU and big data compute cluster deploys RDMA over Converged Ethernet (RoCEv2) across 200GbE Mellanox ConnectX-6 NICs to accelerate distributed shuffles. To provide the lossless network fabric required by RoCEv2, the network team configures Priority Flow Control (PFC - IEEE 802.1Qbb) on priority class 3. During an intensive all-to-all shuffle exchange, a single slow worker node experiences transient memory stall, preventing its NIC from draining its receive ring buffer. The node's NIC asserts a PFC PAUSE frame upstream to its leaf switch port. The leaf switch buffer fills and propagates PFC PAUSE frames upstream to the spine switches. The spine switches in turn transmit PFC PAUSE frames to all other leaf switches. Within 120 milliseconds, a PFC Congestion Tree propagates through the entire data center switching fabric, halting all traffic across the entire enterprise cluster\u2014including unrelated real-time databases and Kubernetes control planes\u2014in a catastrophic PFC Deadlock.",
+    "layers": {
+      "application": "RDMA-accelerated shuffle engine (e.g. Spark RDMA or Ray direct object transfers) using Queue Pairs (RC QP) for zero-copy memory transfers.",
+      "systems": "RoCEv2 transport layer, kernel InfiniBand subsystem (`ib_core`, `mlx5_ib`), PFC frame emission rules.",
+      "physical": "Ethernet switch ingress buffer thresholds, PFC PAUSE frame generation latency, and lossless link pause propagation dynamics."
+    },
+    "negative_constraints": [
+      "Cannot tolerate dropped packets in RDMA RC mode (packet loss triggers expensive InfiniBand hardware Go-Back-N retransmission cascades).",
+      "Cannot revert to standard TCP without giving up the 4x throughput and zero-CPU advantages of RDMA."
+    ],
+    "technical_depth_rationale": "Demands deep microarchitectural and network fabric mastery over RDMA lossless transport physics, PFC pause propagation, Head-of-Line (HoL) blocking, and deadlocks in Ethernet fabrics.",
+    "expected_solution_path": "Deploy Congestion Notification Packets (CNP) with Data Center Quantized Congestion Notification (DCQCN) and PFC Watchdogs: 1) Configure switch-level ECN marking thresholds below the PFC trigger threshold. When queues begin building, switches mark ECN bits in packet headers; destination NICs generate CNP packets back to source NICs, which dynamically rate-throttle their transmission rates BEFORE switch buffers fill and trigger PFC PAUSE frames. 2) Configure a strict PFC Watchdog on all switch ports: if a port remains paused for more than a bounded threshold (e.g., $100\\mu$s), the watchdog forcibly drops the paused queue and transitions to loss recovery, preventing global congestion tree propagation. 3) Isolate shuffle RDMA traffic to a dedicated DSCP priority class separate from cluster control and storage traffic.",
+    "failure_mode": "Datacenter-wide lossless fabric freeze, complete cluster deadlock, dropping of mission-critical control traffic, and multi-hour network outage."
+  },
+  {
+    "id": "T8-S3-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "DPU and SmartNIC Hardware Offload for Shuffle Packet Sorting, Zero-Copy Ring Buffers, and Scatter-Gather DMA",
+    "question": "A massive petabyte-scale analytics engine runs on high-density servers equipped with NVIDIA BlueField-2 SmartNIC/DPUs (8 ARM Cortex-A72 cores, 16 GB onboard DRAM, PCIe Gen4 x16 host connection, dual 100GbE ports). The host x86 CPUs spend 45% of total query runtime serializing, partitioning, sorting, and packaging shuffle blocks into network buffers. The engineering team implements a DPU-accelerated shuffle offload: mappers stream raw columnar record chunks over PCIe directly into DPU onboard memory, expecting the DPU ARM cores to partition, sort, and transmit packets directly across the network. However, benchmarks show that shuffle throughput drops by 50% compared to host-only execution. Profiling reveals that the DPU's 8 low-power ARM cores are completely overwhelmed trying to perform radix sorting on millions of records, while PCIe host-to-DPU DMA transaction overhead saturates the local PCIe link.",
+    "layers": {
+      "application": "Query execution engine shuffle manager offloading partition sorting kernels to external accelerator devices.",
+      "systems": "DOCA (Data Center Infrastructure-on-a-Chip) runtime memory mapping, Linux kernel PCIe DMA ring descriptors, host-to-device interrupt synchronization.",
+      "physical": "Host PCIe Gen4 x16 bus bandwidth limits, DPU ARM Cortex-A72 single-thread compute limitations vs host 64-core AMD EPYC compute power."
+    },
+    "negative_constraints": [
+      "Cannot replace DPU hardware with more powerful host CPUs (hardware already procured and deployed in data center).",
+      "Cannot run sorting algorithms on the DPU that require heavy branch-intensive single-thread execution."
+    ],
+    "technical_depth_rationale": "High-level systems architecture evaluation of heterogeneous compute partitioning: understanding the precise architectural boundaries where SmartNIC/DPU hardware accelerators excel (DMA, packet framing, network pacing) vs where host CPUs must retain compute (sorting, compute-heavy transformations).",
+    "expected_solution_path": "Re-architect the Compute-Offload Division of Labor: Retain partition sorting and compute-heavy serialization on host x86 CPU cores, which possess massive SIMD vector registers and high single-thread IPC. Offload only the network I/O, packet serialization, and memory buffer management to the DPU. Specifically, host mappers write sorted partition blocks into host DRAM; the DPU utilizes Scatter-Gather DMA engines to pull partition blocks directly from host memory across PCIe, assemble network packets in DPU zero-copy ring buffers, and transmit them directly over 100GbE with hardware line-rate pacing and DCTCP congestion control. This frees 40% of host CPU cycles while fully utilizing DPU silicon for line-rate network transport.",
+    "failure_mode": "Severe 50% query throughput degradation, DPU ARM core saturation, PCIe bus bottlenecks, and wasted multi-million dollar SmartNIC infrastructure investment."
+  },
+  {
+    "id": "T8-S2-C3-DFM",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-FM"
+    },
+    "title": "Runtime Adaptive Shuffle Partition Coalescing: Dynamic Target Size Heuristics under Skewed Upstream Output",
+    "question": "A distributed SQL engine processes unpredictable user queries over exabyte datasets. The engine sets a high default shuffle partition count (e.g., `spark.sql.shuffle.partitions=8000`) to prevent out-of-memory crashes on massive queries. When a selective filter predicate (`WHERE event_date = '2026-09-12' AND country = 'LI'`) drops 99.9% of upstream data, the map stage outputs only 120 MB of data across the 8,000 shuffle partitions (averaging 15 KB per partition). The query engine attempts to launch 8,000 tiny reducer tasks. Task scheduling overhead, JVM thread initialization, and cluster scheduler RPCs completely dominate execution: launching 8,000 tasks takes 45 seconds, while the actual computation takes 12 milliseconds. The cluster scheduler queue becomes backlogged, starving other enterprise workloads.",
+    "layers": {
+      "application": "Query execution engine runtime plan optimization (Adaptive Query Execution - AQE), stage statistic collection, and dynamic shuffle partition coalescing.",
+      "systems": "Distributed cluster scheduler (K8s/YARN) RPC handling, task launch overhead, JVM thread scheduling.",
+      "physical": "Network round-trips for task dispatch, executor memory allocation churn for thousands of short-lived task contexts."
+    },
+    "negative_constraints": [
+      "Cannot require end-users or data engineers to manually tune shuffle partition counts per query.",
+      "Cannot coalesce partitions too aggressively into a single reducer that could exceed executor memory limits if upstream estimates are wrong."
+    ],
+    "technical_depth_rationale": "Analyzes the mechanics of dynamic query plan mutation, runtime stage statistics aggregation, and mathematical optimization of partition coalescing boundaries.",
+    "expected_solution_path": "Implement Runtime Adaptive Shuffle Partition Coalescing: At the completion of the map stage, the driver aggregates physical partition size metrics emitted by all map tasks. If total shuffle data size is small, coalesce contiguous small shuffle partitions into unified reducer partitions targeting an optimal compressed size (e.g., `advisoryPartitionSizeInBytes=64MB` to `128MB`). In this scenario, 8,000 15 KB partitions are coalesced into a single 120 MB reducer task, reducing task scheduling overhead by 99.98% and collapsing stage execution time from 45 seconds to under 1 second. Pair with a minimum partition count floor to maintain baseline core parallelism for downstream operators.",
+    "failure_mode": "Cluster scheduler paralysis from task launch storms, massive resource scheduling waste, multi-minute query latency overhead on tiny data slices."
+  },
+  {
+    "id": "T8-S3-C3-DSE",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-SE"
+    },
+    "title": "Skewed Partition Dynamic Splitting via Salting Keys and Range Boundary Binary Search without Data Loss",
+    "question": "A distributed join operation combines a 50 TB transaction fact table with a 500 GB merchant dimension table. The join key (`merchant_id`) exhibits extreme Zipfian skew: Merchant ID `0001` (a global e-commerce marketplace) accounts for 35% of all transactions (17.5 TB of data). The query planner distributes shuffle partitions across 1,000 reducers. 999 reducers process an average of 32.5 GB and complete within 3 minutes. However, Reducer 42 (assigned Merchant ID `0001`) receives 17.5 TB of data. Reducer 42's local NVMe disk fills to 100%, triggering massive disk spilling, GC thrashing, and eventually failing with `ExecutorLostFailure: Container killed by YARN for exceeding memory limits`. The job retries Reducer 42 on another node, which crashes again, leaving 999 nodes idling for hours waiting for a single failed reducer.",
+    "layers": {
+      "application": "Distributed hash join partitioning and skew handling: Join key distribution skew creating massive straggler tasks.",
+      "systems": "Executor heap memory allocation, disk spill management, container resource watchdog memory limits.",
+      "physical": "Single-node NVMe storage capacity and memory bus saturation under localized multi-terabyte shuffle processing."
+    },
+    "negative_constraints": [
+      "Cannot eliminate the hot merchant key from the business transaction dataset.",
+      "Cannot increase single-executor container memory to 18 TB (physical server limits are 512 GB RAM)."
+    ],
+    "technical_depth_rationale": "Demands advanced algorithmic and systems design for dynamic runtime skew detection, key salting, partition splitting, and asymmetric join re-planning.",
+    "expected_solution_path": "Implement Dynamic Runtime Skew Splitting and Key Salting: 1) During map stage metric collection, detect skewed partitions whose size exceeds $N \\times$ the median partition size (e.g. partition size $> 5 \\times$ median). 2) For the skewed partition (Merchant `0001`), the engine automatically splits the large partition into $M$ smaller sub-partitions (e.g. 500 sub-partitions of 35 GB each) by injecting a synthetic random salt key `salt = hash(row) % M`. 3) For the matching merchant dimension table, the engine replicates (broadcasts) the single merchant record across all $M$ salt buckets: `merchant_id_salted = (merchant_id, 0..M-1)`. 4) Join execution occurs in parallel across 500 independent reducers without skew, eliminating the straggler task completely.",
+    "failure_mode": "Single-node OOM crash loops, cluster resource starvation, infinite job duration, and failure of mission-critical corporate financial reporting."
+  },
+  {
+    "id": "T8-S2-C3-DFM",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-FM"
+    },
+    "title": "Dynamic Broadcast Hash Join Promotion at Runtime: Memory Threshold Breaches and OOM Executor Kills",
+    "question": "A distributed SQL engine features an adaptive optimization rule that promotes a Sort-Merge Join (SMJ) to a Broadcast Hash Join (BHJ) at runtime if the post-filter size of a joined table falls below `broadcastThreshold = 100MB`. An upstream filter predicate reduces a 1 TB table to an estimated 85 MB based on catalog statistics. The query engine cancels the shuffle stage and broadcasts the 85 MB dataset to all 1,000 worker executors. However, the catalog statistics were collected on compressed Parquet data on disk. When the 85 MB of compressed Parquet data is deserialized into Java objects in memory on each executor, it expands by 12x into a 1.02 GB uncompressed in-memory hash table. On 400 executor nodes with tight container memory overhead limits (configured with 1 GB memory overhead), the sudden allocation of 1.02 GB off-heap hash table memory triggers the Linux kernel / Kubernetes cgroup OOM Killer, terminating 40% of the cluster executors simultaneously.",
+    "layers": {
+      "application": "Cost-based query optimizer size estimation heuristics: disk storage byte size vs in-memory deserialized object footprint.",
+      "systems": "Kubernetes container cgroup memory limits (`memory.max`), JVM off-heap memory allocation, GC pause times during large hash table builds.",
+      "physical": "Physical DRAM exhaustion on worker nodes, CPU cache misses during massive hash table probe phases."
+    },
+    "negative_constraints": [
+      "Cannot double container RAM allocations across all 1,000 nodes (would double cloud infrastructure costs).",
+      "Cannot permanently disable Broadcast Hash Joins (BHJ is critical for sub-second small-table lookup queries)."
+    ],
+    "technical_depth_rationale": "Highlights the dangerous discrepancy between compressed on-disk storage sizes and uncompressed in-memory data representations, and the instability of naive dynamic broadcast promotion.",
+    "expected_solution_path": "Reformulate Broadcast Promotion Thresholds based on In-Memory Deserialization Estimates: 1) Differentiate strictly between on-disk compressed physical bytes and estimated in-memory logical bytes using column-level schema weights and average string width statistics. 2) Implement Adaptive Broadcast Safety Gates: during broadcast preparation on the driver/coordinator, monitor the actual deserialized byte size of the broadcast relation. If the in-memory size crosses a conservative safety threshold (e.g. 50% of executor overhead limit), immediately abort the broadcast promotion and fallback gracefully to an Adaptive Sort-Merge Join or Shuffled Hash Join. 3) Utilize compact columnar off-heap formats (e.g., Apache Arrow RecordBatches) for broadcast tables rather than raw JVM object-graph hash tables, reducing memory expansion from 12x to under 1.2x.",
+    "failure_mode": "Cluster-wide simultaneous executor OOM terminations, mass task failure, cascading stage retries, and total query failure."
+  },
+  {
+    "id": "T8-S3-C3-DSE",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-SE"
+    },
+    "title": "Apache Celeborn and Uniffle Disaggregated Remote Shuffle Service Coordinator Failures and In-Flight Partition Recovery",
+    "question": "An exabyte-scale data infrastructure transitions from local node shuffle storage to a Disaggregated Remote Shuffle Service (Apache Celeborn / Uniffle) across 300 dedicated shuffle worker nodes. The architecture relies on a centralized Master/Coordinator to track partition allocations and worker health. During a peak production window with 50,000 concurrent map tasks streaming shuffle blocks, the active Celeborn Master node experiences a power supply failure. While the Raft standby Master successfully takes over leadership within 3 seconds, in-flight partition location metadata for 8,000 active stages was held in ephemeral memory buffers on the failed master and had not been persisted to the consensus log. Consequently, the new Master returns `PartitionLocationNotFound` to thousands of reducer tasks. Reducers fail their fetches, triggering massive stage invalidation and re-execution across 10,000 compute worker nodes, causing a 2-hour platform-wide cluster freeze.",
+    "layers": {
+      "application": "Disaggregated shuffle client protocol: partition assignment, block pushing, and fetch location resolution.",
+      "systems": "Remote shuffle coordinator high-availability state machine (Raft consensus log), in-memory partition metadata caching, heartbeat lease timeouts.",
+      "physical": "Hardware server power failure, network RPC storm upon coordinator failover."
+    },
+    "negative_constraints": [
+      "Cannot synchronously write every single partition block registration to a distributed disk log (would throttle map task ingestion throughput by 80%).",
+      "Cannot revert to local node shuffle storage (compute nodes run diskless on ephemeral spot instances)."
+    ],
+    "technical_depth_rationale": "Demands architectural mastery over disaggregated compute-storage architectures, distributed metadata consensus, lease coordination, and soft-state recovery in remote shuffle services.",
+    "expected_solution_path": "Implement a Soft-State Self-Announcing Partition Registry in the Remote Shuffle Architecture: 1) Treat partition location metadata on the Coordinator as soft state rather than hard state. The authoritative record of which shuffle worker hosts which partition blocks resides on the Shuffle Workers themselves. 2) When a newly elected Master assumes leadership, it immediately enters a 10-second 'Re-Sync Window' during which all 300 shuffle workers re-announce their active partition allocations and registered file chunks via bulk heartbeat RPCs. 3) Compute clients cache partition locations locally: if the master fails, clients continue pushing and fetching directly to known worker nodes without querying the master. The master is consulted only for initial allocation and worker failure recovery.",
+    "failure_mode": "Global stage re-computation storms, total cluster network saturation, failure of thousands of concurrent analytics queries, and prolonged infrastructure downtime."
+  },
+  {
+    "id": "T8-S3-C3-DHW",
+    "domain": "Distributed Shuffle Bottlenecks & Network Fabric Topology",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "Resilient Shuffle Block Fetch Retries vs Full Stage Re-Computation: Isolating Corrupted Frames via CRC32C",
+    "question": "In an exabyte-scale analytics cluster running 15,000 tasks across an untrusted cloud networking fabric, silent data corruption occurs: a degraded Top-of-Rack network switch develops a faulty ASIC that intermittently flips bits in transit without corrupting Ethernet FCS frames (checksum offload re-computes valid FCS on corrupt packets). When a reducer receives a 128 MB shuffle block, decompression fails with `DataCorruptionException: Corrupted block detected`. The standard compute engine error handling interprets this as a fatal shuffle fetch failure, invalidates the entire upstream map stage (2,500 mapper tasks), and schedules a complete re-execution of the map stage. The re-executed map tasks transmit through the same degraded switch, fail again, and trigger another full stage re-computation. The cluster enters an infinite stage-retry loop, burning 50,000 CPU hours while achieving zero progress.",
+    "layers": {
+      "application": "DAG scheduler stage failure recovery policies: discriminating between transient transport corruption and permanent data loss.",
+      "systems": "Hardware-accelerated checksum verification (SSE4.2 / AVX-512 `CRC32C` instructions), chunked block framing, and fine-grained sub-task retry protocols.",
+      "physical": "Network switch ASIC bit flips, PCIe TLP bus transmission errors, and silent data corruption (SDC) in transit."
+    },
+    "negative_constraints": [
+      "Cannot rely on Ethernet CRC32 alone (NIC hardware offload masks in-switch memory corruption).",
+      "Cannot accept corrupted data into analytical query results (strict data integrity mandate)."
+    ],
+    "technical_depth_rationale": "Explores the systems engineering principles of silent data corruption (SDC) detection, fine-grained sub-block checksum verification, and resilient fault isolation without full DAG rollback.",
+    "expected_solution_path": "Implement Fine-Grained Chunked Checksums and Surgical Block Retries: 1) Divide 128 MB shuffle blocks into independent 64 KB micro-chunks, each tagged with an end-to-end CRC32C checksum computed in software before NIC transmission. 2) Upon receiving data, the reducer verifies CRC32C checksums in hardware using SIMD instructions (`_mm_crc32_u64`). If a checksum mismatch is detected, do NOT trigger a fatal `FetchFailedException` or invalidate the upstream map task. 3) Instead, issue a surgical micro-chunk fetch retry request targeting the specific corrupted 64 KB block, alternating the network route or requesting from an alternative replica. Only if repeated surgical retries across independent network paths fail should the single mapper task (not the entire stage) be re-executed.",
+    "failure_mode": "Silent data corruption entering enterprise business ledgers, infinite DAG re-computation loops, massive waste of cloud compute resources, and pipeline failure."
+  },
+  {
+    "id": "T9-S3-C3-DSE",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-SE"
+    },
+    "title": "Directed Acyclic Graph Metric Aggregation Pathing: Resolving Cyclic Dependency Locks in Composable Semantic Models",
+    "question": "An enterprise semantic layer (e.g. Cube.dev / dbt Semantic Layer / MetricFlow) models 4,000 enterprise business metrics across finance, sales, marketing, and logistics. Complex composable metrics (such as Customer Lifetime Value to Customer Acquisition Cost ratio: $LTV / CAC$, and Net Retention Rate) are constructed by referencing lower-level atomic metrics and derived dimension attributes. A cross-functional engineering team introduces a new marketing attribution metric that inadvertently references an account-level revenue forecast metric, which in turn references marketing-influenced pipeline pipeline metrics. The semantic compiler builds the internal Directed Acyclic Graph (DAG) for metric compilation. The cycle-detection validator fails due to transitive alias resolution across disparate namespace files. When an executive dashboard issues a SQL generation request spanning these metrics, the compiler's topological sort enters an infinite recursion loop, exhausting the JVM call stack (`StackOverflowError`) and crashing the semantic layer gateway.",
+    "layers": {
+      "application": "Semantic model expression parsing, metric dependency resolution, and dynamic SQL query generation from high-level business definitions.",
+      "systems": "Compiler AST traversal, Tarjan's strongly connected components algorithm, dependency graph topological sorting, memory limits on graph evaluation.",
+      "physical": "CPU core saturation on infinite compiler recursive loops; thread stack memory exhaustion."
+    },
+    "negative_constraints": [
+      "Cannot prohibit composable metrics (composable metrics are the core value proposition of the enterprise semantic layer).",
+      "Cannot require manual SQL joins to be written by end-users or dashboards."
+    ],
+    "technical_depth_rationale": "Demands advanced graph theory mastery, compiler design principles, topological dependency sorting, and cycle detection invariants in multi-tenant metric engines.",
+    "expected_solution_path": "Implement Automated Static Semantic Graph Validation using Tarjan's Strongly Connected Components (SCC) Algorithm: During semantic model compilation (at CI/CD deploy time, not at runtime query execution), parse all metric definitions into a formal mathematical directed graph $G = (V, E)$. Execute Tarjan's SCC algorithm or Johnson's cycle-finding algorithm to identify any closed cycles ($C > 1$). If a cyclic dependency is detected, reject the model compilation with an explicit error trace highlighting the exact dependency path ($M_A \\to M_B \\to M_C \\to M_A$). For runtime query generation, implement a bounded-depth topological sort with an explicit recursion depth limit (e.g. max depth 32) and cycle guard sets, ensuring compile-time safety and deterministic query generation.",
+    "failure_mode": "Semantic layer gateway crash (`StackOverflowError`), complete outage of corporate executive BI dashboards, and unresolvable metric calculation discrepancies."
+  },
+  {
+    "id": "T9-S2-C3-DSE",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-SE"
+    },
+    "title": "Fan-Out and Chasm Trap Multi-Fact Join Semantic Disambiguation: Eliminating Cartesian Products across Conformed Dimensions",
+    "question": "A healthcare enterprise analytics semantic layer models two distinct business processes: `Fact_Inpatient_Visits` (one row per hospital admission) and `Fact_Lab_Orders` (one row per lab test ordered), both related to a shared conformed dimension `Dim_Patient` (one-to-many from Patient to Visits, and one-to-many from Patient to Lab Orders). A business analyst queries total visit costs and total lab test charges grouped by patient state. The naive semantic query generator translates this into a single SQL query joining `Dim_Patient` to `Fact_Inpatient_Visits` and `Fact_Lab_Orders` in a single query block (`FROM Dim_Patient P LEFT JOIN Fact_Inpatient_Visits V ON ... LEFT JOIN Fact_Lab_Orders L ON ...`). A classic 'Chasm Trap' occurs: patients with 5 visits and 10 lab orders produce 50 Cartesian product rows. Financial metrics are multiplied by 10x for visit costs and by 5x for lab charges, resulting in a false $140,000,000 revenue inflation reported to the corporate board.",
+    "layers": {
+      "application": "Semantic engine query planner multi-fact join resolution: detecting Chasm Traps (multi-fact joins over shared dimension) and Fan-Out Traps.",
+      "systems": "Relational algebra transformation, subquery aggregation pushdown, outer join coalescing.",
+      "physical": "Massive memory expansion from Cartesian products in query execution engines; CPU cycles wasted aggregating duplicate rows."
+    },
+    "negative_constraints": [
+      "Cannot force business users to understand relational join pitfalls or manually write complex subqueries.",
+      "Cannot denormalize all fact tables into a single monolithic flat table (data volume exceeds 500 TB and update cadences differ)."
+    ],
+    "technical_depth_rationale": "Evaluates foundational data modeling and semantic layer architecture: resolving Chasm and Fan-Out traps through automated query split-and-stitch planning and relational algebra invariants.",
+    "expected_solution_path": "Implement Automatic Multi-Fact Query Splitting and Stitching: When the semantic query planner detects a query referencing multiple fact tables sharing a conformed dimension, it must strictly forbid joining the fact tables directly. Instead, the planner must automatically split the query into independent subqueries: 1) Subquery 1 aggregates `Fact_Inpatient_Visits` grouped by the shared dimension key (`patient_state`). 2) Subquery 2 aggregates `Fact_Lab_Orders` grouped by the same dimension key. 3) The outer query performs a Full Outer Join on the pre-aggregated subquery results on the dimension key: `SELECT COALESCE(S1.state, S2.state), S1.total_visit_cost, S2.total_lab_charges FROM Subquery1 S1 FULL OUTER JOIN Subquery2 S2 ON S1.state = S2.state`. This preserves mathematical correctness and eliminates Cartesian multiplication.",
+    "failure_mode": "Catastrophic multi-million dollar corporate financial reporting errors, massive Cartesian product memory blowups crashing query engines, and loss of trust in enterprise data."
+  },
+  {
+    "id": "T9-S3-C3-DFM",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-FM"
+    },
+    "title": "Dynamic Metric Pre-Aggregation and Materialized Rollup Routing based on AST Group-By Granularity",
+    "question": "An interactive consumer-facing telemetry dashboard serves 10,000 queries per second over 50 billion IoT device events. The underlying semantic layer maintains multiple pre-aggregated materialized rollups: a 1-minute rollup table, a 1-hour rollup table, and a daily rollup table. When an incoming dashboard query requests average CPU utilization over a 30-day window grouped by hour, the semantic engine's query router analyzes the query Abstract Syntax Tree (AST). However, the routing engine evaluates only simple table name matches and misses that the requested metric (`AVG(cpu_utilization)`) is non-additive ($AVG(A, B) \\ne AVG(AVG(A), AVG(B))$). The router routes the query to the daily rollup table and averages the pre-calculated daily averages, producing mathematically invalid results. When reconfigured to query raw data to avoid mathematical errors, query latency jumps from 15ms to 18,000ms, bringing the data warehouse to its knees.",
+    "layers": {
+      "application": "Semantic layer query acceleration, metric additivity classification (Additive, Semi-Additive, Non-Additive), and AST rewrite rules.",
+      "systems": "Materialized view matching algorithms, OLAP query routing, intermediate aggregate representation.",
+      "physical": "Data warehouse I/O and compute saturation when queries bypass rollups to scan raw exabyte tables."
+    },
+    "negative_constraints": [
+      "Cannot scan raw un-aggregated data for high-QPS interactive dashboards (warehouse compute cost would exceed $500,000/month).",
+      "Cannot tolerate mathematically incorrect aggregated averages in customer reports."
+    ],
+    "technical_depth_rationale": "Demands exact mathematical knowledge of aggregation algebra, additive vs non-additive metric decomposition, and AST-driven materialized view selection.",
+    "expected_solution_path": "Implement Algebraic Metric Decomposition and Lattice-Based Rollup Routing: Decompose non-additive metrics into algebraic components: rewrite `AVG(x)` as `SUM(x) / COUNT(x)` in all materialized rollups. Store both `sum_val` and `count_val` in the rollups (which are both strictly additive). The semantic router inspects the query AST: matching the group-by time bucket (`hour`) to the lowest rollup granularity in the OLAP lattice that satisfies the query (the 1-hour rollup). The router rewrites the SQL to compute `SUM(sum_val) / SUM(count_val)` from the 1-hour rollup table, guaranteeing 100% mathematical precision while achieving sub-20ms query response times and reducing warehouse scan volume by 99.8%.",
+    "failure_mode": "Mathematically corrupted customer metrics, loss of enterprise client contracts, or massive cloud warehouse compute overspend."
+  },
+  {
+    "id": "T9-S3-C3-DSE",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-SE"
+    },
+    "title": "Graph-of-Thought Schema Pruning for 10,000-Column Enterprise Catalogs in LLM Context Windows",
+    "question": "An enterprise deploying generative AI agents builds a Natural Language to SQL (NL-to-SQL) engine over a global enterprise data warehouse with 800 tables and 10,000 columns. When a user asks: 'What was the quarter-over-quarter growth in enterprise SaaS gross margins for the EMEA region in Q3 2026?', the naive prompt construction pipeline extracts the entire schema DDL (exceeding 450,000 tokens) and attempts to pass it to the LLM context window. The request exceeds the LLM context limit or incurs severe prompt-processing latency ($>12$ seconds) and cost. When the team uses simple keyword search (BM25) to prune tables, the search retrieves the `saas_marketing_leads` and `emea_travel_expenses` tables but omits the core `financial_general_ledger` table because the word 'margin' did not appear in its technical column names (`rev_sub_acct_amt`, `cogs_alloc_amt`). The LLM generates hallucinated SQL joining non-existent columns.",
+    "layers": {
+      "application": "LLM agent context assembly, schema grounding, prompt engineering, and semantic catalog search.",
+      "systems": "Knowledge Graph construction over data catalogs, graph centrality algorithms, token budget management.",
+      "physical": "LLM inference GPU memory consumption, prompt processing latency (Time-to-First-Token - TTFT)."
+    },
+    "negative_constraints": [
+      "Cannot dump the entire 450,000-token schema into the LLM prompt.",
+      "Cannot rely on naive lexical keyword matching to find semantically relevant financial columns."
+    ],
+    "technical_depth_rationale": "Drills into the state-of-the-art intersection of enterprise knowledge graphs, graph-based schema pruning, semantic vector search, and context optimization for agentic AI.",
+    "expected_solution_path": "Implement a Graph-of-Thought (GoT) Schema Pruning Pipeline: 1) Model the entire warehouse catalog as a Property Knowledge Graph where nodes represent Tables, Columns, Metrics, and Business Terms, and edges represent Foreign Keys, Join Paths, Lineage, and Semantic Synonyms. 2) When a natural language prompt arrives, extract entity mentions and business concepts using a lightweight NER model; perform dense embedding retrieval to identify seed nodes in the Knowledge Graph. 3) Execute Personalized PageRank or Steiner Tree traversal from the seed nodes to extract the minimal connected subgraph connecting the queried concepts, business metrics, and underlying join paths. 4) Format only this pruned subgraph (typically 4-6 tables, $<3,000$ tokens) as structured DDL with sample values and foreign keys into the LLM prompt, achieving 98% schema accuracy with sub-second TTFT.",
+    "failure_mode": "Severe LLM hallucinations, generated SQL referencing imaginary tables/columns, query syntax execution failures, and complete failure of enterprise AI assistant initiatives."
+  },
+  {
+    "id": "T9-S2-C3-DSE",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-SE"
+    },
+    "title": "Few-Shot In-Context Retrieval with Vector Semantic Distance over Dynamic Multi-Dialect SQL Repositories",
+    "question": "An AI SQL generation platform serves data analysts across Snowflake, Google BigQuery, and Databricks. The platform maintains a repository of 50,000 validated, high-performing historical SQL queries to serve as few-shot in-context examples for LLM generation. When an analyst asks for a complex rolling-window cohort retention analysis in Snowflake SQL, the retrieval engine queries the repository using vector cosine similarity over query descriptions. The top-3 retrieved few-shot examples contain valid logic but are written in BigQuery SQL (using `DATE_DIFF`, `STRUCT`, and `ARRAY_AGG` dialect syntax) and Databricks Spark SQL. The LLM blends dialect syntax, producing an invalid hybrid SQL query containing BigQuery-specific functions that fails immediately on Snowflake with `SQL compilation error: Unknown function DATE_DIFF`.",
+    "layers": {
+      "application": "Few-shot in-context learning selection, multi-dialect SQL translation, and prompt contextualization.",
+      "systems": "Vector database indexing (HNSW/IVF-PQ) with metadata filtering; dialect AST parsing and validation.",
+      "physical": "Vector search latency overhead, GPU LLM generation wasted cycles on rejected queries."
+    },
+    "negative_constraints": [
+      "Cannot train or fine-tune separate custom LLMs for every SQL dialect (prohibitive training and hosting costs).",
+      "Cannot allow non-executable dialect errors to be returned to end-users."
+    ],
+    "technical_depth_rationale": "Explores the technical intricacies of multi-dialect retrieval-augmented generation (RAG), vector metadata filtering invariants, and dialect-specific prompt curation.",
+    "expected_solution_path": "Implement Dialect-Partitioned Vector Retrieval with Abstract Syntax Tree (AST) Validation Gates: 1) Index few-shot SQL examples in a vector database with strict metadata tags (`dialect: snowflake`, `target_schema`, `complexity_level`, `syntax_fingerprint`). 2) When retrieving few-shot examples, apply Single-Stage Metadata Pre-Filtering: restrict candidate vector retrieval strictly to queries matching the user's active connection dialect (`dialect = 'snowflake'`). 3) Before delivering the generated SQL to the user, route the LLM output through a dialect-specific AST parser (e.g. `sqlglot` configured for Snowflake). If parse errors or invalid functions are detected, trigger an automated iterative self-correction loop: pass the dialect compilation error message back to the LLM with the valid Snowflake function specification for immediate correction.",
+    "failure_mode": "Syntax error execution failures, dialect hallucination, user frustration, and failure of automated data analytics pipelines."
+  },
+  {
+    "id": "T9-S3-C3-DRG",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-RG"
+    },
+    "title": "Deterministic AST Syntax and Semantic Validation Gates for LLM-Generated SQL before Execution",
+    "question": "A production autonomous AI agent has read/write privileges to execute analytical queries on an enterprise cloud data warehouse. In response to an ambiguous natural language request ('Clean up customer records where status is inactive'), the LLM generates a catastrophic SQL command: `DELETE FROM customers WHERE status = 'inactive' OR customer_id IS NOT NULL`. Because the LLM hallucinated an `OR` condition, the query would wipe out the entire production customer database of 40,000,000 records. Furthermore, another query generates an unconstrained 8-table Cartesian cross-join without `WHERE` or `LIMIT` clauses, which would run for 14 hours and incur an estimated $80,000 cloud warehouse compute bill. The organization urgently requires an automated, deterministic security and cost validation gate between LLM generation and database execution.",
+    "layers": {
+      "application": "AI agent safety boundaries, SQL AST parsing, query safety classification, and policy enforcement.",
+      "systems": "Warehouse query compilation rules, transaction isolation, cost-based optimizer query plan evaluation.",
+      "physical": "Protection against catastrophic database wipeout and runaway cloud infrastructure billing."
+    },
+    "negative_constraints": [
+      "Cannot rely on LLM self-policing (LLMs cannot guarantee deterministic safety invariants).",
+      "Cannot block legitimate complex analytical queries from human-approved workflows."
+    ],
+    "technical_depth_rationale": "Demands rigorous design of deterministic validation gates, AST security auditing, static query cost estimation, and sandboxed AI execution boundaries.",
+    "expected_solution_path": "Implement a Deterministic AST Semantic Validation Firewall: 1) Intercept all LLM-generated SQL queries before submission to the database. Parse the SQL into an Abstract Syntax Tree using a formal grammar parser (e.g. Apache Calcite or SQLGlot). 2) Enforce Hard Security Gates: reject any non-SELECT statements (`DELETE`, `DROP`, `ALTER`, `TRUNCATE`, `UPDATE`) unless explicitly permitted by an authorized administrative workflow. 3) Enforce Semantic Safety Rules on the AST: verify that all `SELECT` queries have bounded Cartesian join checks, enforce mandatory partition filter predicates on large historical tables, and inject a strict `LIMIT 1000` clause if omitted. 4) Issue an `EXPLAIN` query plan to the warehouse: inspect estimated bytes scanned; if estimated cost exceeds a budget threshold (e.g. >$50), require explicit human-in-the-loop approval before execution.",
+    "failure_mode": "Catastrophic data loss from accidental deletion, multi-thousand-dollar cloud billing spikes, and severe enterprise security vulnerability."
+  },
+  {
+    "id": "T9-S2-C3-DFM",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-FM"
+    },
+    "title": "High-Frequency Model Context Protocol (MCP) Tool Execution: Backpressure, Connection Pooling, and Rate Throttling",
+    "question": "An autonomous multi-agent financial research system deploys 500 AI agents interacting via the Model Context Protocol (MCP) to analyze real-time market data. Each agent decomposes research tasks into sub-queries, invoking MCP analytical tools (`query_market_depth`, `fetch_order_book`, `execute_risk_model`) across distributed data microservices. Under a market volatility event, the 500 agents concurrently trigger 80,000 tool execution RPCs per second over JSON-RPC / HTTP/2. The backend data microservices experience severe TCP connection pool exhaustion, database connection pool starvation, and memory leaks from unreleased Netty direct byte buffers. P99 tool execution latency surges from 12ms to 16,000ms. Agents time out, retry aggressively, and amplify the RPC storm by 5x, completely paralyzing the real-time financial telemetry infrastructure.",
+    "layers": {
+      "application": "Model Context Protocol (MCP) client tool invocation loops, agent task orchestration, and recursive retry logic.",
+      "systems": "HTTP/2 multiplexing, JSON-RPC serialization, TCP connection pooling, server-side admission control and token-bucket rate limiting.",
+      "physical": "Network switch packet drop buffers, CPU context switching on high-concurrency microservice thread pools."
+    },
+    "negative_constraints": [
+      "Cannot disable agent tool execution during high-volatility market events (when AI analysis is most critical).",
+      "Cannot deploy infinite database connection pools (backend database is hardware-constrained to 2,000 active connections)."
+    ],
+    "technical_depth_rationale": "Demands systems mastery over the Model Context Protocol (MCP) architecture, high-concurrency RPC multiplexing, backpressure propagation, and cooperative admission control.",
+    "expected_solution_path": "Implement an MCP Gateway Admission Controller with Token-Bucket Rate Limiting and Asynchronous Tool Pipelining: 1) Deploy an intermediate MCP Gateway proxy that terminates client HTTP/2 connections and enforces tenant-level hierarchical token-bucket rate limiting. 2) Implement Reactive Backpressure: when backend microservice response times or connection pool queues exceed 80% capacity, the gateway transmits standardized JSON-RPC backpressure signals (`HTTP 429 / RateLimitExceeded` with `Retry-After` headers and backoff hints) directly to the calling agent framework, causing agents to pause tool submission. 3) Implement Request Coalescing (Deduplication): if multiple agents issue identical tool calls (`fetch_order_book(AAPL)` within a 50ms window), coalesce them into a single backend RPC and broadcast the result to all callers.",
+    "failure_mode": "Backend microservice crash, database connection starvation, cascading agent failure, and complete blindness of automated financial risk systems."
+  },
+  {
+    "id": "T9-S2-C3-DFM",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-FM"
+    },
+    "title": "Stateful Context Window Compaction via Semantic Summarization and Numerical Parameter Preservation",
+    "question": "A long-running conversational data analysis agent assists executives in exploring an exabyte enterprise warehouse over multi-day sessions. As the conversation progresses through 80 turns of questions, SQL executions, and tabular outputs, the accumulated context reaches 180,000 tokens, approaching the model's 200k context window limit. Standard naive context truncation policies (sliding window, dropping the oldest 50% of messages) discard critical earlier context, such as user-defined metric definitions ('Assume gross margin excludes amortization'), currency conversions, and target fiscal quarter constraints established in Turn 1. The agent begins generating contradictory queries that violate the foundational assumptions established at the beginning of the session. When the team tests generic LLM summarization, the summarizer rounds numerical constraints (e.g. converting '$14,285,714.28' to 'around $14 million'), corrupting financial calculations.",
+    "layers": {
+      "application": "Agent session state management, prompt memory architectures (Short-Term vs Long-Term vs Working Memory).",
+      "systems": "Token budget allocation, semantic entity extraction, structured state store vs unstructured text history.",
+      "physical": "GPU memory usage and inference latency scaling linearly with prompt context length."
+    },
+    "negative_constraints": [
+      "Cannot allow the context window to exceed token limits or incur $10+ per-turn API costs.",
+      "Cannot tolerate any loss or rounding of numerical parameters, business logic assumptions, or user-defined constraints."
+    ],
+    "technical_depth_rationale": "Analyzes the frontier of agentic AI state management, structured context compaction, and exact semantic parameter preservation across long-horizon interactions.",
+    "expected_solution_path": "Implement a Dual-Tier Structured Context Memory Architecture: 1) Separate the conversational state into an Unstructured Conversational Buffer (last 10 turns) and a Structured Working State Schema (a deterministic JSON entity store). 2) Extract and persist all user-defined constraints, numerical constants, filter parameters, and metric overrides into the Structured Working State Schema using strict deterministic entity extraction (e.g. Pydantic models). 3) When conversational history exceeds 70% of the token budget, execute Semantic Context Compaction: compact intermediate query results and chat banter into a dense narrative summary, while injecting the exact, uncorrupted Structured Working State Schema as a system message. Numerical values remain bit-exact and immutable, while token usage is reduced by 85%.",
+    "failure_mode": "Financial calculation corruption, contradictory AI reasoning, catastrophic loss of executive trust, and ballooning LLM inference costs."
+  },
+  {
+    "id": "T9-S3-C3-DRG",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-RG"
+    },
+    "title": "Entitlement Token Propagation and Dynamic Vector Metadata Pre-Filtering for Multi-Tenant RAG",
+    "question": "A multi-tenant enterprise Knowledge Retrieval (RAG) system indexes 50,000,000 confidential corporate documents (board minutes, M&A filings, HR records, engineering IP) across 5,000 tenant organizations in a shared HNSW vector index. Under zero-trust security mandates, a user querying the system must NEVER retrieve or observe even a snippet of a document they lack explicit permission to view. The team initially implements Post-Filtering: the vector engine retrieves the top-100 nearest neighbor document chunks globally, and an application authorization layer checks the user's OAuth/SAML entitlement tokens, discarding unauthorized results. However, for users querying sensitive topics with strict access controls, 99 of the top-100 nearest neighbor vectors belong to restricted documents and are discarded. The user receives only 1 document (or zero results), even though thousands of authorized documents exist deeper in the index\u2014a catastrophic Security Filtering Recall Collapse.",
+    "layers": {
+      "application": "Enterprise identity propagation (OAuth2 / OIDC / ABAC), vector similarity search, and RAG prompt synthesis.",
+      "systems": "Vector index filtering mechanics: Pre-Filtering vs In-Filtering (iterative graph filtering) vs Post-Filtering; Access Control List (ACL) bitset evaluation.",
+      "physical": "Memory bandwidth consumption on ACL verification, CPU vector distance computation wasted on inaccessible documents."
+    },
+    "negative_constraints": [
+      "Cannot deploy 5,000 isolated physical vector databases for every tenant (cost and operational nightmare).",
+      "Cannot leak unauthorized document existence through side-channel query timing or truncated results."
+    ],
+    "technical_depth_rationale": "Deep exploration of vector database search algorithms under extreme security constraints, comparing Pre-Filtering, Post-Filtering, and Single-Stage In-Graph Filtering.",
+    "expected_solution_path": "Implement Single-Stage In-Graph Filtered Vector Search with Compressed Roaring Bitmap ACLs: 1) Encode document access control lists as compressed 64-bit integer Roaring Bitmaps stored alongside vector postings. 2) Propagate the user's cryptographically signed Entitlement Token into the vector search engine. At query time, expand user permissions into an allowed document ID bitmap. 3) Execute Single-Stage In-Graph Filtering (Iterative Filtered HNSW): during graph traversal, evaluate candidate nodes against the entitlement bitmap BEFORE inserting them into the candidate priority queue or exploring their neighbors. If a neighbor fails the entitlement check, bypass it and continue exploring alternative graph edges until exactly $K$ authorized nearest neighbors are discovered, achieving 100% recall with zero data leakage.",
+    "failure_mode": "Catastrophic data breach (confidential M&A documents exposed to unauthorized employees), or complete recall collapse where users receive zero search results."
+  },
+  {
+    "id": "T9-S2-C3-DRG",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S2",
+      "complexity": "C3",
+      "dimension": "D-RG"
+    },
+    "title": "Dynamic SQL AST Predicate Rewriting for Row-Level Security and Tenant Isolation Injection",
+    "question": "A multi-tenant SaaS analytics platform allows corporate clients to submit arbitrary custom SQL queries against a shared 100 TB lakehouse data warehouse. To guarantee strict tenant data isolation, queries must only access rows belonging to the requesting user's `organization_id` and assigned geographic divisions. The initial implementation relied on client-side prompt instructions and string concatenation (`sql = sql + \" AND organization_id = '\" + org_id + \"'\"`). An advanced user crafts a SQL query containing a subquery with a `UNION ALL` clause and an outer `WHERE` condition: `SELECT * FROM financial_records WHERE status = 'PAID' UNION ALL SELECT * FROM audit_log`. The string-concatenated predicate attaches only to the final `WHERE` clause, leaving the primary `financial_records` table completely unfiltered. The user successfully extracts competitor financial data across all tenants.",
+    "layers": {
+      "application": "Multi-tenant authorization, SQL query rewriting, and tenant boundary enforcement.",
+      "systems": "SQL AST parsing, scope resolution, subquery expression rewriting, and database query compilation.",
+      "physical": "Prevention of cross-tenant data leakage and regulatory compliance violations."
+    },
+    "negative_constraints": [
+      "Cannot restrict users to predefined, non-custom queries (custom SQL reporting is a core product requirement).",
+      "Cannot rely on string concatenation or regular expressions to inject security filters."
+    ],
+    "technical_depth_rationale": "Demands exhaustive mastery of SQL Abstract Syntax Tree (AST) manipulation, relational algebra scope resolution, and deterministic security enforcement against SQL injection and bypass attacks.",
+    "expected_solution_path": "Implement a Deterministic AST Security Visitor Rewriter using a formal SQL parser (e.g. Apache Calcite or SQLGlot): 1) Parse the incoming SQL into a complete AST. 2) Traverse every `TableScan` / `FROM` / `JOIN` node in the entire query tree, including all nested subqueries, Common Table Expressions (CTEs), derived tables, and `UNION` branches. 3) For every referenced multi-tenant table, programmatically inject an inescapable boolean conjunction `organization_id = :authenticated_org_id` and division filter directly into the table's logical scan condition. 4) Wrap the final validated AST in an isolated read-only transaction context with session-level RLS policies enforced at the database kernel layer as a defense-in-depth guarantee.",
+    "failure_mode": "Catastrophic cross-tenant data leak, massive GDPR/SOC2 security compliance breach, and complete loss of enterprise platform certification."
+  },
+  {
+    "id": "T9-S3-C3-DRG",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-RG"
+    },
+    "title": "Differential Privacy Laplace Noise Injection and Privacy Budget Accounting in Aggregate Metric Queries",
+    "question": "A national healthcare research data platform allows academic institutions to execute statistical aggregation queries over 20,000,000 patient electronic health records. To comply with HIPAA and GDPR research exemptions, the platform enforces $(\\epsilon, \\delta)$-Differential Privacy (DP). When researchers query small cohorts (e.g., 'Count patients diagnosed with rare condition X in ZIP code 94102'), malicious attackers issue targeted differencing queries ($Q_1$: Count all patients in ZIP 94102 with condition X; $Q_2$: Count all patients in ZIP 94102 EXCEPT Patient John Doe with condition X; $Q_1 - Q_2$ reveals John Doe's diagnosis). The platform implements Laplace mechanism noise injection. However, naive implementation adds independent noise per query without tracking cumulative privacy budget exhaustion across multi-query sessions. A rogue researcher issues 10,000 repeated queries, averages out the injected zero-mean Laplace noise ($E[\\text{noise}] = 0$), and reconstructs private medical records with 99.8% statistical certainty.",
+    "layers": {
+      "application": "Statistical query engine, differential privacy budget tracking, and privacy loss accounting.",
+      "systems": "Global Differential Privacy mechanism (Laplace / Gaussian), Renyi Differential Privacy (RDP) composition accounting, user session state tracking.",
+      "physical": "Cryptographically secure pseudo-random number generator (CSPRNG) hardware entropy consumption during noise generation."
+    },
+    "negative_constraints": [
+      "Cannot return completely un-noised raw aggregates (violates international health privacy regulations).",
+      "Cannot inject so much noise that population-level epidemiological research trends are rendered statistically useless."
+    ],
+    "technical_depth_rationale": "Demands deep mathematical comprehension of Differential Privacy theory, Laplace/Gaussian mechanisms, sensitivity analysis ($L_1/L_2$ global sensitivity), and privacy budget composition theorems.",
+    "expected_solution_path": "Implement Global Sensitivity Analysis and Cumulative Privacy Budget Accounting via Renyi Differential Privacy (RDP): 1) Calculate the exact $L_1$ sensitivity $\\Delta S$ of each aggregation query (for a count query, $\\Delta S = 1$; for sum queries, enforce strict column value clamping $[L, U]$ so $\\Delta S = U - L$). 2) Inject Laplace noise drawn from $Laplace(0, \\frac{\\Delta S}{\\epsilon})$ using a cryptographically secure random number generator (CSPRNG). 3) Maintain an immutable, persistent Privacy Budget Ledger per researcher/organization tracking cumulative privacy loss $\\epsilon_{total}$. Use advanced composition theorems (Renyi Differential Privacy / Moments Accountant) to track budget expenditure across queries. 4) When a user's cumulative budget hits $\\epsilon_{max} = 1.0$, immediately block all subsequent queries targeting that cohort. Cache and return identical noisy answers for identical repeated queries to eliminate averaging attacks.",
+    "failure_mode": "De-anonymization of individual medical patient records, federal HIPAA violation sanctions, multi-million dollar class-action lawsuits, and immediate research shutdown."
+  },
+  {
+    "id": "T9-S3-C3-DHW",
+    "domain": "Semantic Data Layering, Metric Engines & Agentic AI",
+    "coordinate": {
+      "scale": "S3",
+      "complexity": "C3",
+      "dimension": "D-HW"
+    },
+    "title": "Vector-Graph Hybrid Traversal: Parallelizing Cypher Multi-Hop Joins and AVX-512 Cosine Distance Pruning",
+    "question": "A financial anti-fraud investigation engine executes real-time graph-vector queries over a property graph containing 500,000,000 entities (Accounts, Devices, IP Addresses, Transactions) and 2,000,000,000 edges. Each account node also has a 512-dimensional behavioral embedding vector. A fraud detection query executes a 3-hop Cypher traversal (`MATCH (a:Account)-[:TRANSFERRED*1..3]->(b:Account)`) to identify transaction rings, while simultaneously evaluating vector cosine similarity between account behavioral embeddings to detect coordinated syndicate behavior. The naive query engine executes the graph traversal first, returning 450,000 candidate paths, and then iteratively computes 512-dimensional cosine similarity on each pair using scalar CPU math. The query takes 38 seconds, exceeding the 500ms payment authorization timeout. When the team inverts execution to search vectors first, the vector index returns thousands of accounts that have zero structural graph connection, wasting memory.",
+    "layers": {
+      "application": "Graph query languages (Cypher/Gremlin) integrated with dense vector similarity metrics for hybrid AI graph reasoning.",
+      "systems": "Graph adjacency list memory representation (Compressed Sparse Row - CSR), SIMD vectorization intrinsics, hybrid query planning.",
+      "physical": "CPU L1/L2 cache locality, AVX-512 vector execution units (FMA), DDR5 memory bandwidth during pointer-chasing graph walks."
+    },
+    "negative_constraints": [
+      "Cannot evaluate graph hops and vector similarity as disconnected independent stages (both structural connectivity and behavioral similarity are required).",
+      "Cannot exceed the 500ms real-time fraud scoring latency SLA."
+    ],
+    "technical_depth_rationale": "High-level systems architecture and microarchitectural design: fusing pointer-chasing graph traversal with compute-intensive SIMD vector math into a single pipelined execution kernel.",
+    "expected_solution_path": "Implement Interleaved Graph-Vector Pipelining with AVX-512 SIMD Vectorized Pruning: 1) Represent the graph topology in memory using Compressed Sparse Row (CSR) arrays aligned to 64-byte cache lines for high prefetch efficiency. 2) Store 512-dimensional embeddings contiguously in memory quantized to FP16 or INT8 (SQ8). 3) As the graph engine explores outgoing edges at each hop, do NOT materialize intermediate paths. Instead, immediately issue AVX-512 Fused Multiply-Add (FMA) instructions (`_mm512_fmadd_ps`) to compute cosine distance against the target behavioral embedding. If the cosine distance exceeds the similarity threshold (e.g. cosine distance $> 0.35$), prune the graph branch immediately at Hop 1, eliminating 99% of downstream graph path expansions. This fuses vector filtering directly into the graph traversal loop, cutting latency from 38 seconds to 42 milliseconds.",
+    "failure_mode": "Fraud detection SLA breach, financial transaction authorization timeouts, unauthorized fraudulent funds transfers, and multi-million dollar theft."
+  }
+]
