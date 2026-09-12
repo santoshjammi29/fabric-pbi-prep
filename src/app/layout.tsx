@@ -8,7 +8,20 @@ import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
 import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
 import { CommandPalette } from "@/components/command-palette";
 import { Toaster } from "sonner";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -33,7 +46,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a14" },
+    { media: "(prefers-color-scheme: dark)", color: "#0A0A0B" },
     { media: "(prefers-color-scheme: light)", color: "#f8f8fc" },
   ],
   width: "device-width",
@@ -47,7 +60,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full antialiased">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
       <body className="min-h-dvh">
 
         <ThemeProvider>

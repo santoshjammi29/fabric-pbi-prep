@@ -21,31 +21,31 @@
 
 /* ── Dark Theme (default) ─────────────────────────── */
 :root {
-  --background: #0a0a14;
+  --background: #0A0A0B;
   --foreground: #f0f0f5;
-  --card: #12121e;
+  --card: #161618;
   --card-foreground: #f0f0f5;
-  --card-hover: #1a1a2e;
-  --muted: #1e1e32;
+  --card-hover: #1c1c20;
+  --muted: #1a1a1f;
   --muted-foreground: #8888a0;
   --border: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.15);
-  --accent: #8b5cf6;
+  --accent: #3B82F6;
   --accent-foreground: #ffffff;
-  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
+  --accent-gradient: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%);
   
-  /* Surface layers */
-  --surface-0: #0a0a14;
-  --surface-1: #0f0f1a;
-  --surface-2: #12121e;
-  --surface-3: #1a1a2e;
-  --surface-4: #222240;
+  /* Surface layers — Obsidian System */
+  --surface-0: #0A0A0B;
+  --surface-1: #161618;
+  --surface-2: #1C1C20;
+  --surface-3: #242429;
+  --surface-4: #2D2D34;
   
   /* Semantic accents */
   --color-easy: #22c55e;
   --color-medium: #3b82f6;
   --color-hard: #f97316;
-  --color-architect: #a855f7;
+  --color-architect: #3b82f6;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
@@ -56,18 +56,18 @@
   --stat-orange: #ea580c;
   --stat-amber: #d97706;
   --stat-red: #ef4444;
-  --stat-purple: #9333ea;
+  --stat-purple: #3b82f6;
   --stat-sky: #0284c7;
   
   /* Glassmorphism */
-  --glass-bg: rgba(15, 15, 26, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-bg: rgba(22, 22, 24, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
+  /* Shadows — Linear/Vercel Muted Style */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
 /* ── Light Theme ──────────────────────────────────── */

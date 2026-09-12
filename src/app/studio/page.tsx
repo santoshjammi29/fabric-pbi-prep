@@ -50,12 +50,28 @@ export default function StudioPage() {
   // Load user data & bookmarks
   useEffect(() => {
     try {
+      let bmList: string[] = [];
       const savedBm = localStorage.getItem("dataprep_bookmarks");
-      const bmList: string[] = savedBm ? JSON.parse(savedBm) : [];
+      if (savedBm) {
+        try {
+          const parsed = JSON.parse(savedBm);
+          if (Array.isArray(parsed)) {
+            bmList = parsed.filter((x): x is string => typeof x === "string");
+          }
+        } catch {}
+      }
 
       const savedData = localStorage.getItem("dataprep_userdata");
       if (savedData) {
-        setUserData(JSON.parse(savedData));
+        try {
+          const parsedData = JSON.parse(savedData);
+          if (parsedData && typeof parsedData === "object") {
+            setUserData({
+              ...parsedData,
+              bookmarks: Array.isArray(parsedData.bookmarks) ? parsedData.bookmarks : bmList,
+            });
+          }
+        } catch {}
       } else {
         setUserData((prev) => ({ ...prev, bookmarks: bmList }));
       }

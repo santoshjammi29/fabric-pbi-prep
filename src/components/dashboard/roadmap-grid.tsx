@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import {
   EXPERIENCE_TIERS,
   ExperienceTier,
-  getStoredExperienceTier,
 } from "@/lib/user-progress";
+import { useUserStore } from "@/store/useUserStore";
 
 const difficultyColors = {
   Easy: "text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/40 border-green-200 dark:border-green-800",
@@ -18,23 +18,8 @@ const difficultyColors = {
 };
 
 export function RoadmapGrid() {
-  const [activeTier, setActiveTier] = useState<ExperienceTier>("associate");
-
-  useEffect(() => {
-    setActiveTier(getStoredExperienceTier());
-
-    const handleTierUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<{ tier: ExperienceTier }>;
-      if (customEvent.detail?.tier) {
-        setActiveTier(customEvent.detail.tier);
-      }
-    };
-
-    window.addEventListener("dataprep:tier-updated", handleTierUpdate);
-    return () => window.removeEventListener("dataprep:tier-updated", handleTierUpdate);
-  }, []);
-
-  const tierConfig = EXPERIENCE_TIERS[activeTier];
+  const activeTier = useUserStore((s) => s.experienceTier);
+  const tierConfig = EXPERIENCE_TIERS[activeTier] || EXPERIENCE_TIERS.associate;
 
   const steps = [
     {

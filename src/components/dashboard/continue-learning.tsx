@@ -3,65 +3,31 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Sparkles, CheckCircle2, Bookmark } from "lucide-react";
-import {
-  getLastTopic,
-  getMasteryStats,
-  getStoredExperienceTier,
-  LastTopicData,
-} from "@/lib/user-progress";
+import { useUserStore } from "@/store/useUserStore";
+import { getLastTopic, getStoredExperienceTier } from "@/lib/user-progress";
 
 export function ContinueLearning() {
-  const [topic, setTopic] = useState<LastTopicData>({
-    title: "Key Concepts: Lakehouse vs Data Warehouse",
-    href: "/concepts?term=Lakehouse",
-    category: "Core Concepts Hub",
-    progress: 15,
-  });
-
-  const [stats, setStats] = useState({
-    reviewedCount: 0,
-    bookmarksCount: 0,
-    masteryPercentage: 15,
-    xp: 0,
-  });
-
   const [isClient, setIsClient] = useState(false);
+  const activeTier = getStoredExperienceTier();
+  const topic = getLastTopic(activeTier);
+  const bookmarks = useUserStore((s) => s.bookmarks);
+  const userData = useUserStore((s) => s.userData);
 
   useEffect(() => {
     setIsClient(true);
-
-    const refresh = () => {
-      const activeTier = getStoredExperienceTier();
-      const currentTopic = getLastTopic(activeTier);
-      const currentStats = getMasteryStats();
-      setTopic(currentTopic);
-      setStats(currentStats);
-    };
-
-    refresh();
-
-    const handleTopicUpdate = () => refresh();
-    const handleTierUpdate = () => refresh();
-    const handleStorage = (e: StorageEvent) => {
-      if (
-        e.key?.startsWith("dataprep_") ||
-        e.key === "interview_prep_progress" ||
-        e.key === "user_bookmarks"
-      ) {
-        refresh();
-      }
-    };
-
-    window.addEventListener("dataprep:topic-updated", handleTopicUpdate);
-    window.addEventListener("dataprep:tier-updated", handleTierUpdate);
-    window.addEventListener("storage", handleStorage);
-
-    return () => {
-      window.removeEventListener("dataprep:topic-updated", handleTopicUpdate);
-      window.removeEventListener("dataprep:tier-updated", handleTierUpdate);
-      window.removeEventListener("storage", handleStorage);
-    };
   }, []);
+
+  const bookmarksCount = bookmarks.length;
+  const reviewedCount = userData.reviewedCount;
+  const xp = userData.xp;
+  const masteryPercentage = Math.min(100, Math.max(5, Math.round((reviewedCount / 120) * 100)));
+
+  const stats = {
+    reviewedCount,
+    bookmarksCount,
+    masteryPercentage,
+    xp,
+  };
 
   const displayProgress = isClient ? Math.max(topic.progress, stats.masteryPercentage) : 15;
 

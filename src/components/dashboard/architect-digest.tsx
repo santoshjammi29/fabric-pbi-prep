@@ -65,19 +65,21 @@ export function ArchitectDigest() {
         <div className="w-full md:w-80 shrink-0 p-5 rounded-2xl bg-white/90 dark:bg-black/40 border border-slate-200 dark:border-white/10 shadow-md dark:shadow-none backdrop-blur-xl space-y-3">
           {!isSubscribed ? (
             <form onSubmit={handleSubscribe} className="space-y-3">
-              <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              <label htmlFor="digest-email" className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
                 Subscribe for Weekly Cheat Sheets:
-              </div>
+              </label>
               <div className="relative">
                 <Mail
                   size={15}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400"
                 />
                 <input
+                  id="digest-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="architect@company.com"
+                  aria-label="Email address for weekly cheat sheets"
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-xs text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:border-purple-500 transition-all"
                   required
                 />

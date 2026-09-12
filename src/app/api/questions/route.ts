@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
 import { getUnifiedQuestions } from "@/data";
+import { UnifiedQuestion } from "@/types/data";
+
+// Module-level cached unified questions to eliminate repeated flattening across requests
+let cachedQuestions: UnifiedQuestion[] | null = null;
+
+function getCachedUnifiedQuestions(): UnifiedQuestion[] {
+  if (!cachedQuestions) {
+    cachedQuestions = getUnifiedQuestions();
+  }
+  return cachedQuestions;
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,7 +20,7 @@ export async function GET(request: Request) {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "25", 10);
 
-  const allQuestions = getUnifiedQuestions();
+  const allQuestions = getCachedUnifiedQuestions();
 
   const filtered = allQuestions.filter((item) => {
     if (difficulty !== "ALL" && item.difficulty !== difficulty) {

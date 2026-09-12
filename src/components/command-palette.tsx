@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import {
   Search,
   BookOpen,
@@ -11,6 +12,7 @@ import {
   MessageSquare,
   Building2,
   Compass,
+  GraduationCap,
   User,
   ExternalLink,
   Sparkles,
@@ -52,6 +54,7 @@ export function CommandPalette() {
       { id: "nav-arch", title: "Architecture Hub (2,400+ Scenarios)", category: "Navigation", icon: Cpu, href: "/architecture", badge: "Architect" },
       { id: "nav-gcc", title: "Company Research (GCC Profiles)", category: "Navigation", icon: Building2, href: "/company-research", badge: "Enterprise" },
       { id: "nav-paths", title: "Learning Paths (12 Structured Tracks)", category: "Navigation", icon: Compass, href: "/learning-paths", badge: "Curriculum" },
+      { id: "nav-diagnostic", title: "Diagnostic Assessment (10-Q Architecture Evaluation)", category: "Navigation", icon: GraduationCap, href: "/diagnostic", badge: "10-Q" },
       { id: "nav-studio", title: "My Studio & Progress", category: "Navigation", icon: User, href: "/studio", badge: "Account" },
       
       // Simulators
@@ -172,6 +175,9 @@ export function CommandPalette() {
     setSelectedIndex(0);
   }, [filteredItems]);
 
+  const modalRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(modalRef, isOpen, () => setIsOpen(false));
+
   if (!isOpen) {
     return (
       <button
@@ -194,8 +200,14 @@ export function CommandPalette() {
       onClick={(e) => {
         if (e.target === e.currentTarget) setIsOpen(false);
       }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Command Palette"
     >
-      <div className="w-full max-w-2xl bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div
+        ref={modalRef}
+        className="w-full max-w-2xl bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+      >
         {/* Search Input Bar */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border)] bg-[var(--surface-2)]">
           <Search size={18} className="text-purple-400 shrink-0" />
@@ -204,6 +216,7 @@ export function CommandPalette() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search concepts, blueprints, simulators, topics, routes (⌘K)..."
+            aria-label="Search concepts, blueprints, simulators, topics, and routes"
             className="flex-1 bg-transparent text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none"
             autoFocus
           />

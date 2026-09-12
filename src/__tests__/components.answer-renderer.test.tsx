@@ -54,7 +54,7 @@ p = Producer({'bootstrap.servers': 'localhost:9092'})
     render(<AnswerRenderer text={rawMarkdown} />);
 
     expect(screen.getByText(/Kafka partitions/i)).toBeDefined();
-    expect(screen.getByText('confluent_kafka')).toBeDefined();
-    expect(screen.getByText('localhost')).toBeDefined();
+    expect(screen.getByText(/confluent_kafka/)).toBeDefined();
+    expect(screen.getByText(/localhost/)).toBeDefined();
   });
 });

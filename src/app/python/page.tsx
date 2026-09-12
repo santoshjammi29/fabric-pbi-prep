@@ -118,16 +118,22 @@ export default function PythonHub() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("dataprep_bookmarks");
-      if (saved) setBookmarks(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarks(parsed.filter((x): x is string => typeof x === "string"));
+        }
+      }
     } catch {}
   }, []);
 
   const toggleBookmark = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setBookmarks(prev => {
-      const updated = prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id];
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const updated = safePrev.includes(id) ? safePrev.filter(b => b !== id) : [...safePrev, id];
       try { localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated)); } catch {}
-      if (prev.includes(id)) toast.info("Bookmark removed"); else toast.success("Saved code sheet to bookmarks");
+      if (safePrev.includes(id)) toast.info("Bookmark removed"); else toast.success("Saved code sheet to bookmarks");
       return updated;
     });
   }, []);

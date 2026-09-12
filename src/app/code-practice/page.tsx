@@ -106,7 +106,12 @@ export default function CodePracticePage() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("dataprep_bookmarks");
-      if (saved) setBookmarks(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarks(parsed.filter((x): x is string => typeof x === "string"));
+        }
+      }
     } catch {
       // ignore
     }
@@ -114,9 +119,11 @@ export default function CodePracticePage() {
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = bookmarks.includes(id)
-      ? bookmarks.filter((b) => b !== id)
-      : [...bookmarks, id];
+    const safeBm = Array.isArray(bookmarks) ? bookmarks : [];
+    const isCurrentlyBookmarked = safeBm.includes(id);
+    const updated = isCurrentlyBookmarked
+      ? safeBm.filter((b) => b !== id)
+      : [...safeBm, id];
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
@@ -129,7 +136,7 @@ export default function CodePracticePage() {
           progress: 60,
         });
       }
-      if (bookmarks.includes(id)) {
+      if (isCurrentlyBookmarked) {
         toast.info("Bookmark removed");
       } else {
         toast.success("Saved code sheet to bookmarks in My Studio");

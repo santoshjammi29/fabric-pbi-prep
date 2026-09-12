@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import ReactMarkdown from "react-markdown";
 import {
   Layers,
   Code2,
@@ -23,100 +24,67 @@ interface ParsedPhase {
   rawContent: string;
 }
 
-// Helper to format inline bold text and code spans
-function renderFormattedText(text: string) {
-  if (!text) return null;
-
-  const parts: React.ReactNode[] = [];
-  let remaining = text;
-  let key = 0;
-
-  while (remaining.length > 0) {
-    const codeMatch = remaining.match(/`([^`]+)`/);
-    const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
-    const italicMatch = remaining.match(/(?<!\*)\*([^*]+)\*(?!\*)/);
-
-    const matches = [
-      codeMatch ? { type: "code", index: codeMatch.index!, length: codeMatch[0].length, content: codeMatch[1] } : null,
-      boldMatch ? { type: "bold", index: boldMatch.index!, length: boldMatch[0].length, content: boldMatch[1] } : null,
-      italicMatch ? { type: "italic", index: italicMatch.index!, length: italicMatch[0].length, content: italicMatch[1] } : null,
-    ].filter(Boolean).sort((a, b) => a!.index - b!.index);
-
-    if (matches.length === 0) {
-      parts.push(remaining);
-      break;
-    }
-
-    const first = matches[0]!;
-    if (first.index > 0) {
-      parts.push(remaining.substring(0, first.index));
-    }
-
-    if (first.type === "code") {
-      parts.push(
-        <code
-          key={`code-${key++}`}
-          className="px-1.5 py-0.5 mx-0.5 rounded bg-[#1e2638] text-purple-300 font-mono text-[11px] sm:text-[12px] border border-purple-500/20"
-        >
-          {first.content}
-        </code>
-      );
-    } else if (first.type === "bold") {
-      parts.push(
-        <strong key={`bold-${key++}`} className="font-semibold text-[var(--foreground)] opacity-100">
-          {first.content}
-        </strong>
-      );
-    } else if (first.type === "italic") {
-      parts.push(
-        <em key={`italic-${key++}`} className="italic text-slate-300">
-          {first.content}
-        </em>
+// Markdown component renderers for AST-based parsing
+const markdownComponents = {
+  pre({ children }: { children?: React.ReactNode }) {
+    return <>{children}</>;
+  },
+  code({
+    className,
+    children,
+    ...props
+  }: {
+    className?: string;
+    children?: React.ReactNode;
+  }) {
+    const match = /language-(\w+)/.exec(className || "");
+    if (match) {
+      const lang = match[1];
+      const codeString = String(children || "").replace(/\n$/, "");
+      return (
+        <CodeBlock
+          code={codeString}
+          language={lang}
+          filename={`${lang}_impl.${lang === "sql" ? "sql" : "py"}`}
+        />
       );
     }
-
-    remaining = remaining.substring(first.index + first.length);
-  }
-
-  return <>{parts}</>;
-}
-
-interface ContentSegment {
-  type: "text" | "code";
-  content: string;
-  language?: string;
-}
-
-function parseSegments(raw: string): ContentSegment[] {
-  const segments: ContentSegment[] = [];
-  const regex = /```(\w*)\n([\s\S]*?)```/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(raw)) !== null) {
-    if (match.index > lastIndex) {
-      const textBefore = raw.substring(lastIndex, match.index).trim();
-      if (textBefore) {
-        segments.push({ type: "text", content: textBefore });
-      }
-    }
-    segments.push({
-      type: "code",
-      language: match[1] || "python",
-      content: match[2].trimEnd(),
-    });
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < raw.length) {
-    const textAfter = raw.substring(lastIndex).trim();
-    if (textAfter) {
-      segments.push({ type: "text", content: textAfter });
-    }
-  }
-
-  return segments;
-}
+    return (
+      <code
+        className="px-1.5 py-0.5 mx-0.5 rounded bg-[#161618] text-blue-300 font-mono text-[11px] sm:text-[12px] border border-slate-800"
+        {...props}
+      >
+        {children}
+      </code>
+    );
+  },
+  strong({ children }: { children?: React.ReactNode }) {
+    return <strong className="font-semibold text-white">{children}</strong>;
+  },
+  p({ children }: { children?: React.ReactNode }) {
+    return <p className="leading-relaxed my-1.5 text-slate-200">{children}</p>;
+  },
+  ul({ children }: { children?: React.ReactNode }) {
+    return <ul className="space-y-1.5 my-2">{children}</ul>;
+  },
+  ol({ children }: { children?: React.ReactNode }) {
+    return <ol className="space-y-2 my-2 list-decimal list-inside">{children}</ol>;
+  },
+  li({ children }: { children?: React.ReactNode }) {
+    return (
+      <li className="text-slate-200 leading-relaxed text-xs sm:text-sm">
+        {children}
+      </li>
+    );
+  },
+  blockquote({ children }: { children?: React.ReactNode }) {
+    return (
+      <blockquote className="border-l-2 border-blue-500 pl-3.5 py-1.5 my-2.5 bg-blue-500/[0.06] rounded-r-xl text-slate-300 text-xs sm:text-sm">
+        {children}
+      </blockquote>
+    );
+  },
+};
 
 export function AnswerRenderer({ text, className, compact = false }: AnswerRendererProps) {
   const cleanText = useMemo(() => (text || "").trim(), [text]);
@@ -140,7 +108,11 @@ export function AnswerRenderer({ text, className, compact = false }: AnswerRende
   }, [cleanText]);
 
   if (phases.length === 0) {
-    return <GeneralMarkdownRenderer text={cleanText} className={className} compact={compact} />;
+    return (
+      <div className={cn("space-y-3 text-xs sm:text-sm leading-relaxed", className)}>
+        <ReactMarkdown components={markdownComponents}>{cleanText}</ReactMarkdown>
+      </div>
+    );
   }
 
   return (
@@ -159,17 +131,17 @@ function PhaseCard({ phase, compact }: { phase: ParsedPhase; compact?: boolean }
     switch (phaseNum) {
       case 1:
         return {
-          icon: <Layers size={15} className="text-purple-400 shrink-0" />,
-          badge: "PHASE 1 · CORE ARCHITECTURE & SYSTEM DESIGN",
-          badgeColor: "text-purple-400 bg-purple-500/10 border-purple-500/30",
-          cardBorder: "border-purple-500/20 bg-[#121622]/90",
+          icon: <Layers size={15} className="text-blue-400 shrink-0" />,
+          badge: "PHASE 1 · CORE ARCHITECTURE & DESIGN",
+          badgeColor: "text-blue-400 bg-blue-500/10 border-blue-500/30",
+          cardBorder: "border-slate-800 bg-[#161618]",
         };
       case 2:
         return {
-          icon: <Code2 size={15} className="text-sky-400 shrink-0" />,
+          icon: <Code2 size={15} className="text-emerald-400 shrink-0" />,
           badge: "PHASE 2 · PRODUCTION IMPLEMENTATION & MECHANICS",
-          badgeColor: "text-sky-400 bg-sky-500/10 border-sky-500/30",
-          cardBorder: "border-sky-500/20 bg-[#0f172a]/90",
+          badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+          cardBorder: "border-slate-800 bg-[#161618]",
         };
       case 3:
       default:
@@ -177,22 +149,20 @@ function PhaseCard({ phase, compact }: { phase: ParsedPhase; compact?: boolean }
           icon: <ShieldAlert size={15} className="text-amber-400 shrink-0" />,
           badge: "PHASE 3 · HARDENING, EDGE CASES & REMEDIATION",
           badgeColor: "text-amber-400 bg-amber-500/10 border-amber-500/30",
-          cardBorder: "border-amber-500/20 bg-[#17141f]/90",
+          cardBorder: "border-slate-800 bg-[#161618]",
         };
     }
   }, [phaseNum]);
 
-  const segments = useMemo(() => parseSegments(rawContent), [rawContent]);
-
   return (
     <div
       className={cn(
-        "rounded-2xl border p-4 sm:p-5 transition-all shadow-lg backdrop-blur-sm",
+        "rounded-2xl border p-4 sm:p-5 transition-all shadow-sm backdrop-blur-sm",
         theme.cardBorder,
         compact && "p-3 sm:p-3.5 space-y-2.5"
       )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-white/[0.08]">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2 min-w-0">
           {theme.icon}
           <span className="font-bold text-xs sm:text-sm tracking-wide text-white truncate">
@@ -211,44 +181,21 @@ function PhaseCard({ phase, compact }: { phase: ParsedPhase; compact?: boolean }
 
       <div className="pt-2 space-y-3">
         {phaseNum === 3 ? (
-          <Phase3HardeningBody content={rawContent} compact={compact} />
+          <Phase3HardeningBody content={rawContent} />
         ) : (
-          segments.map((seg, idx) => {
-            if (seg.type === "code") {
-              return (
-                <div key={idx} className="my-3">
-                  <CodeBlock
-                    code={seg.content}
-                    language={seg.language || "python"}
-                    filename={`${seg.language || "snippet"}_impl.${seg.language === "sql" ? "sql" : "py"}`}
-                    className="shadow-xl"
-                  />
-                </div>
-              );
-            }
-
-            return (
-              <div key={idx} className="space-y-2 text-[var(--foreground)] opacity-90 leading-relaxed">
-                <TextContentRenderer text={seg.content} />
-              </div>
-            );
-          })
+          <ReactMarkdown components={markdownComponents}>{rawContent}</ReactMarkdown>
         )}
       </div>
     </div>
   );
 }
 
-function Phase3HardeningBody({ content, compact }: { content: string; compact?: boolean }) {
+function Phase3HardeningBody({ content }: { content: string }) {
   const lines = content.split("\n").map((l) => l.trim()).filter(Boolean);
   const bulletItems = lines.filter((l) => l.startsWith("-") || l.startsWith("*"));
 
   if (bulletItems.length === 0) {
-    return (
-      <div className="space-y-2 text-[var(--foreground)] opacity-90 leading-relaxed">
-        <TextContentRenderer text={content} />
-      </div>
-    );
+    return <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>;
   }
 
   return (
@@ -256,9 +203,9 @@ function Phase3HardeningBody({ content, compact }: { content: string; compact?: 
       {lines.map((line, idx) => {
         if (!line.startsWith("-") && !line.startsWith("*")) {
           return (
-            <p key={idx} className="text-xs sm:text-sm text-[var(--foreground)] opacity-85 leading-relaxed">
-              {renderFormattedText(line)}
-            </p>
+            <div key={idx} className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+              <ReactMarkdown components={markdownComponents}>{line}</ReactMarkdown>
+            </div>
           );
         }
 
@@ -274,105 +221,22 @@ function Phase3HardeningBody({ content, compact }: { content: string; compact?: 
           >
             <div className="flex items-start gap-2">
               <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
-              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                {renderFormattedText(mainPart.trim())}
+              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed flex-1">
+                <ReactMarkdown components={markdownComponents}>{mainPart.trim()}</ReactMarkdown>
               </div>
             </div>
 
             {remediationPart && (
               <div className="ml-5 mt-1.5 pt-1.5 border-t border-amber-500/15 flex items-start gap-1.5 text-[11px] sm:text-xs text-emerald-300">
                 <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
-                <div>
+                <div className="flex-1">
                   <span className="font-semibold text-emerald-400 uppercase tracking-wider text-[10px] mr-1">
                     Mitigation:
                   </span>
-                  {renderFormattedText(remediationPart.trim())}
+                  <ReactMarkdown components={markdownComponents}>{remediationPart.trim()}</ReactMarkdown>
                 </div>
               </div>
             )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function TextContentRenderer({ text }: { text: string }) {
-  const paragraphs = text.split("\n\n").filter(Boolean);
-
-  return (
-    <>
-      {paragraphs.map((para, pIdx) => {
-        const lines = para.split("\n").map((l) => l.trim()).filter(Boolean);
-        const isOrderedList = lines.length > 1 && lines.every((l) => /^\d+[\.)]\s/.test(l));
-
-        if (isOrderedList) {
-          return (
-            <div key={pIdx} className="space-y-2 my-2">
-              {lines.map((line, lIdx) => {
-                const match = line.match(/^(\d+)[\.)]\s*(.*)$/);
-                const num = match ? match[1] : `${lIdx + 1}`;
-                const rest = match ? match[2] : line;
-
-                return (
-                  <div key={lIdx} className="flex items-start gap-2.5">
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-mono font-bold shrink-0 mt-0.5">
-                      {num}
-                    </span>
-                    <div className="flex-1 text-xs sm:text-sm text-[var(--foreground)] opacity-95 leading-relaxed">
-                      {renderFormattedText(rest)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        }
-
-        return (
-          <p key={pIdx} className="text-xs sm:text-sm text-[var(--foreground)] opacity-90 leading-relaxed">
-            {lines.map((l, lIdx) => (
-              <React.Fragment key={lIdx}>
-                {renderFormattedText(l)}
-                {lIdx < lines.length - 1 && <br />}
-              </React.Fragment>
-            ))}
-          </p>
-        );
-      })}
-    </>
-  );
-}
-
-function GeneralMarkdownRenderer({
-  text,
-  className,
-  compact,
-}: {
-  text: string;
-  className?: string;
-  compact?: boolean;
-}) {
-  const segments = useMemo(() => parseSegments(text), [text]);
-
-  return (
-    <div className={cn("space-y-3 text-xs sm:text-sm", className)}>
-      {segments.map((seg, idx) => {
-        if (seg.type === "code") {
-          return (
-            <div key={idx} className="my-2.5">
-              <CodeBlock
-                code={seg.content}
-                language={seg.language || "python"}
-                filename={`${seg.language || "code"}_snippet.${seg.language === "sql" ? "sql" : "py"}`}
-              />
-            </div>
-          );
-        }
-
-        return (
-          <div key={idx} className="space-y-2 text-[var(--foreground)] leading-relaxed">
-            <TextContentRenderer text={seg.content} />
           </div>
         );
       })}

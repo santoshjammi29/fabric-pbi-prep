@@ -60,7 +60,12 @@ export default function ArchitectureHubPage() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("dataprep_bookmarks");
-      if (saved) setBookmarks(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarks(parsed.filter((x): x is string => typeof x === "string"));
+        }
+      }
     } catch {
       // ignore
     }
@@ -68,9 +73,10 @@ export default function ArchitectureHubPage() {
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = bookmarks.includes(id)
-      ? bookmarks.filter((b) => b !== id)
-      : [...bookmarks, id];
+    const safeBm = Array.isArray(bookmarks) ? bookmarks : [];
+    const updated = safeBm.includes(id)
+      ? safeBm.filter((b) => b !== id)
+      : [...safeBm, id];
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));

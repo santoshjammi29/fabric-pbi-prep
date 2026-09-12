@@ -66,7 +66,12 @@ function ConceptsContent() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("dataprep_bookmarks");
-      if (saved) setBookmarks(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarks(parsed.filter((x): x is string => typeof x === "string"));
+        }
+      }
     } catch {
       // ignore
     }
@@ -74,9 +79,11 @@ function ConceptsContent() {
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = bookmarks.includes(id)
-      ? bookmarks.filter((b) => b !== id)
-      : [...bookmarks, id];
+    const safeBm = Array.isArray(bookmarks) ? bookmarks : [];
+    const isCurrentlyBookmarked = safeBm.includes(id);
+    const updated = isCurrentlyBookmarked
+      ? safeBm.filter((b) => b !== id)
+      : [...safeBm, id];
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
@@ -89,7 +96,7 @@ function ConceptsContent() {
           progress: 50,
         });
       }
-      if (bookmarks.includes(id)) {
+      if (isCurrentlyBookmarked) {
         toast.info("Bookmark removed");
       } else {
         toast.success("Bookmark saved to My Studio");
@@ -184,9 +191,10 @@ function ConceptsContent() {
   const togglePyBookmark = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setBookmarks(prev => {
-      const updated = prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id];
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const updated = safePrev.includes(id) ? safePrev.filter(b => b !== id) : [...safePrev, id];
       try { localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated)); } catch {}
-      if (prev.includes(id)) toast.info("Bookmark removed"); else toast.success("Saved to bookmarks");
+      if (safePrev.includes(id)) toast.info("Bookmark removed"); else toast.success("Saved to bookmarks");
       return updated;
     });
   }, []);

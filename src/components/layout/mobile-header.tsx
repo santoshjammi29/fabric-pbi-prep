@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import {
   Sun,
   Moon,
@@ -80,6 +81,9 @@ export function MobileHeader() {
   const [mounted, setMounted] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(drawerRef, drawerOpen, () => setDrawerOpen(false));
 
   useEffect(() => {
     setMounted(true);
@@ -182,7 +186,13 @@ export function MobileHeader() {
           />
 
           {/* Drawer Content */}
-          <div className="relative w-[85%] max-w-sm bg-[var(--surface-1)] border-r border-[var(--border)] h-full flex flex-col justify-between shadow-2xl z-10 animate-in slide-in-from-left duration-250">
+          <div
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation drawer"
+            className="relative w-[85%] max-w-sm bg-[var(--surface-1)] border-r border-[var(--border)] h-full flex flex-col justify-between shadow-2xl z-10 animate-in slide-in-from-left duration-250"
+          >
             {/* Drawer Header */}
             <div className="flex items-center justify-between h-14 px-4 border-b border-[var(--border)]">
               <div className="flex items-center gap-2.5">

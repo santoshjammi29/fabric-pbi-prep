@@ -11,6 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { learningPathsDb } from "@/data";
 import { LearningPath, Difficulty } from "@/types/data";
+import { DecisionLedger } from "@/components/learning-paths/decision-ledger";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -98,10 +99,13 @@ function LearningPathsContent() {
               </div>
 
               <div className="flex items-center justify-between text-[11px] text-[var(--muted-foreground)] pt-2 border-t border-[var(--border)]">
-                <span className="flex items-center gap-1">
-                  <Calendar size={12} /> {path.weeks} Weeks
+                <span className="flex items-center gap-1.5">
+                  <Calendar size={13} className="shrink-0 text-[var(--muted-foreground)]" />
+                  <span>{path.weeks} Weeks</span>
                 </span>
-                <span className="font-semibold text-purple-400">{path.examQsCount} Q&As</span>
+                <span className="font-semibold text-purple-400">
+                  {path.examQsCount ? `${path.examQsCount} Q&As` : `${path.phases.length} Phases`}
+                </span>
               </div>
             </button>
           );
@@ -112,27 +116,33 @@ function LearningPathsContent() {
       {selectedPath && (
         <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-8 animate-in fade-in duration-300">
           {/* Path Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[var(--border)]">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl">{selectedPath.icon}</span>
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-[var(--border)]">
+            <div className="space-y-3 max-w-3xl">
+              <div className="flex items-start sm:items-center gap-3">
+                <span className="text-3xl shrink-0 p-2 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">{selectedPath.icon}</span>
+                <div className="space-y-1">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[var(--foreground)] tracking-tight">
                     {selectedPath.title}
                   </h2>
-                  <span className="text-xs text-purple-400 font-semibold uppercase tracking-wider">
-                    {selectedPath.badge} · {selectedPath.weeks} Weeks Total
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-purple-400 font-semibold uppercase tracking-wider bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                      {selectedPath.badge}
+                    </span>
+                    <span className="text-xs text-[var(--muted-foreground)]">•</span>
+                    <span className="text-xs text-purple-300 font-medium">
+                      {selectedPath.weeks} Weeks Curriculum
+                    </span>
+                  </div>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] max-w-3xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
                 {selectedPath.description}
               </p>
             </div>
 
             <div className="px-5 py-3 rounded-2xl bg-[var(--surface-2)] border border-purple-500/30 shrink-0 text-center">
               <div className="text-xs font-semibold text-[var(--muted-foreground)]">Target Outcome</div>
-              <div className="text-sm font-bold text-purple-300 mt-0.5">{selectedPath.capstone}</div>
+              <div className="text-sm font-bold text-purple-300 mt-1">{selectedPath.capstone}</div>
             </div>
           </div>
 
@@ -165,14 +175,14 @@ function LearningPathsContent() {
                   key={phase.name}
                   className="p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-3"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
                         {pi + 1}
                       </span>
-                      <h5 className="text-sm font-bold text-[var(--foreground)]">{phase.name}</h5>
+                      <h5 className="text-sm font-bold text-[var(--foreground)] tracking-tight">{phase.name}</h5>
                     </div>
-                    <span className="text-xs font-semibold text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 self-start sm:self-auto">
+                    <span className="text-xs font-semibold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20 shrink-0 self-start sm:self-auto">
                       {phase.weeks}
                     </span>
                   </div>
@@ -214,6 +224,9 @@ function LearningPathsContent() {
               </div>
             </div>
           )}
+
+          {/* Architecture Decision Record (ADR) Ledger */}
+          <DecisionLedger />
         </div>
       )}
     </div>

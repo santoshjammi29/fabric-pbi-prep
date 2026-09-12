@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Building2,
   Compass,
+  GraduationCap,
   User,
   Sun,
   Moon,
@@ -40,6 +41,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Home", href: "/", icon: Home },
       { label: "Learning Paths", href: "/learning-paths", icon: Compass, pill: { text: "The Map", variant: "info" } },
+      { label: "Diagnostic Exam", href: "/diagnostic", icon: GraduationCap, pill: { text: "10-Q", variant: "new" } },
     ],
   },
   {

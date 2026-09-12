@@ -81,7 +81,12 @@ export default function QaPrepPage() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("dataprep_bookmarks");
-      if (saved) setBookmarks(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarks(parsed.filter((x): x is string => typeof x === "string"));
+        }
+      }
     } catch {
       // ignore
     }
@@ -89,9 +94,11 @@ export default function QaPrepPage() {
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = bookmarks.includes(id)
-      ? bookmarks.filter((b) => b !== id)
-      : [...bookmarks, id];
+    const safeBm = Array.isArray(bookmarks) ? bookmarks : [];
+    const isCurrentlyBookmarked = safeBm.includes(id);
+    const updated = isCurrentlyBookmarked
+      ? safeBm.filter((b) => b !== id)
+      : [...safeBm, id];
     setBookmarks(updated);
     try {
       localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
@@ -103,7 +110,7 @@ export default function QaPrepPage() {
           category: "Interview Q&A Hub",
         });
       }
-      if (bookmarks.includes(id)) {
+      if (isCurrentlyBookmarked) {
         toast.info("Bookmark removed");
       } else {
         toast.success("Saved to bookmarks in My Studio");
@@ -576,8 +583,11 @@ export default function QaPrepPage() {
                         </div>
 
                         <div className="flex items-center gap-1 shrink-0">
-                          <button
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.9 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             onClick={(e) => toggleBookmark(q.id, e)}
                             className={cn(
                               "min-h-[44px] min-w-[44px] p-2.5 rounded-xl transition-colors flex items-center justify-center touch-manipulation cursor-pointer",
@@ -589,10 +599,13 @@ export default function QaPrepPage() {
                             aria-label={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
                             {isBookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-                          </button>
+                          </motion.button>
 
-                          <button
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.9 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             onClick={(e) => copyQnA(q, e)}
                             className="min-h-[44px] min-w-[44px] p-2.5 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center justify-center touch-manipulation cursor-pointer"
                             title="Copy Q&A"
@@ -603,7 +616,7 @@ export default function QaPrepPage() {
                             ) : (
                               <Copy size={18} />
                             )}
-                          </button>
+                          </motion.button>
 
                           <div className="min-h-[44px] min-w-[44px] p-2.5 flex items-center justify-center text-[var(--muted-foreground)]">
                             <ChevronDown
