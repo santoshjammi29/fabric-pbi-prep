@@ -169,13 +169,13 @@ export default function GuidedLearningPage() {
                 <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 bg-gradient-to-br shadow-sm", topic.gradient)}>
                   {topic.icon}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex items-center gap-1.5">
                   <h3 className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors truncate">
                     {topic.label}
                   </h3>
-                  <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5 truncate">
+                  <span className="text-[10px] text-[var(--muted-foreground)] shrink-0">
                     {totalItems} items
-                  </p>
+                  </span>
                 </div>
               </div>
             );
@@ -209,44 +209,42 @@ export default function GuidedLearningPage() {
             className="space-y-4"
           >
             {/* Stats strip */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs">
-              <div className="text-[var(--muted-foreground)]">
+            <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-[var(--muted-foreground)]">
+              <div>
                 {totalItemsCount} items · {getTopicCounts(selectedTopic).concepts} concepts · {getTopicCounts(selectedTopic).qa} Q&As · {getTopicCounts(selectedTopic).arch} architecture · Est. {Math.round(estTimeMins/60)}h {estTimeMins%60}m
               </div>
               
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-purple-400 font-semibold">{pctComplete}%</span>
-                  <div className="h-1 w-24 bg-[var(--surface-3)] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-purple-500 transition-all duration-150 ease-out"
-                      style={{ width: `${pctComplete}%` }}
-                    />
-                  </div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-400 font-semibold">{pctComplete}%</span>
+                <div className="h-1 w-24 bg-[var(--surface-3)] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-purple-500 transition-all duration-150 ease-out"
+                    style={{ width: `${pctComplete}%` }}
+                  />
                 </div>
               </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-center gap-2">
-              <div className="relative w-full sm:w-auto sm:flex-1">
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none w-full">
+              <div className="relative shrink-0 w-32 sm:w-48">
                 <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter journey items..."
-                  className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all duration-150"
+                  className="w-full pl-8 pr-2 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all duration-150"
                 />
               </div>
 
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none w-full sm:w-auto">
+              <div className="flex items-center gap-1 shrink-0">
                 {["ALL", "concept", "qa", "architecture"].map((type) => (
                   <button
                     key={type}
                     onClick={() => setSelectedType(type)}
                     className={cn(
-                      "px-2.5 py-1 rounded-md text-[10px] font-medium transition-all duration-150 shrink-0 capitalize",
+                      "px-2 py-0.5 rounded text-[10px] font-medium transition-all duration-150 shrink-0 capitalize",
                       selectedType === type
                         ? "bg-[var(--surface-3)] text-[var(--foreground)] shadow-sm font-semibold"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -257,15 +255,15 @@ export default function GuidedLearningPage() {
                 ))}
               </div>
 
-              <div className="hidden sm:block w-px h-4 bg-[var(--border)] mx-1" />
+              <div className="w-px h-3 bg-[var(--border)] mx-1 shrink-0" />
 
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none w-full sm:w-auto">
+              <div className="flex items-center gap-1 shrink-0">
                 {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
                   <button
                     key={diff}
                     onClick={() => setSelectedDifficulty(diff)}
                     className={cn(
-                      "px-2.5 py-1 rounded-md text-[10px] font-medium transition-all duration-150 shrink-0",
+                      "px-2 py-0.5 rounded text-[10px] font-medium transition-all duration-150 shrink-0",
                       selectedDifficulty === diff
                         ? "bg-purple-600 text-white shadow-sm font-semibold"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -326,7 +324,7 @@ export default function GuidedLearningPage() {
                                   isCompleted ? "text-purple-400" : "text-[var(--muted-foreground)] hover:text-purple-400"
                                 )}
                               >
-                                {isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                                {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
                               </button>
 
                               <div className="flex items-center gap-1.5 shrink-0">
