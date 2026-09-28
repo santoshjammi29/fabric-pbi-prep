@@ -134,62 +134,48 @@ export default function GuidedLearningPage() {
   const estTimeMins = totalItemsCount * 2;
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
       {/* Topic Selector Grid */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
-        <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400 mb-3">
-            <GraduationCap size={14} />
-            <span>Learning Journeys</span>
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-4 sm:p-6 isolate">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] font-semibold text-purple-400 mb-2">
+              <GraduationCap size={12} />
+              <span className="uppercase tracking-wider">Learning Journeys</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+              Guided Learning Paths
+            </h1>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--foreground)]">
-            Guided Learning Paths
-          </h1>
-          <p className="text-sm text-[var(--muted-foreground)] mt-2">
-            Select a topic to embark on a sequential journey from basic concepts to architectural patterns.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
           {GUIDED_TOPICS.map((topic) => {
             const isActive = selectedTopic === topic.key;
             const counts = getTopicCounts(topic.key);
+            const totalItems = counts.concepts + counts.qa + counts.arch;
             return (
               <div
                 key={topic.key}
                 onClick={() => setSelectedTopic(topic.key)}
+                title={topic.description}
                 className={cn(
-                  "cursor-pointer p-4 rounded-2xl border transition-all duration-300 relative group",
+                  "cursor-pointer p-2.5 rounded-xl border transition-all duration-150 relative group flex items-center gap-3",
                   isActive
-                    ? "bg-[var(--surface-2)] border-purple-500 ring-2 ring-purple-500/30 shadow-lg shadow-purple-500/10"
+                    ? "bg-[var(--surface-2)] border-purple-500 ring-1 ring-purple-500/30 shadow-sm"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 bg-gradient-to-br shadow-sm", topic.gradient)}>
-                    {topic.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                      {topic.label}
-                    </h3>
-                    <p className="text-[11px] text-[var(--muted-foreground)] mt-1 line-clamp-2">
-                      {topic.description}
-                    </p>
-                  </div>
+                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 bg-gradient-to-br shadow-sm", topic.gradient)}>
+                  {topic.icon}
                 </div>
-                <div className="mt-3 flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--surface-3)] text-[var(--muted-foreground)] font-medium">
-                    {counts.concepts} Concepts
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--surface-3)] text-[var(--muted-foreground)] font-medium">
-                    {counts.qa} Q&As
-                  </span>
-                  {counts.arch > 0 && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--surface-3)] text-[var(--muted-foreground)] font-medium">
-                      {counts.arch} Arch
-                    </span>
-                  )}
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors truncate">
+                    {topic.label}
+                  </h3>
+                  <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5 truncate">
+                    {totalItems} items
+                  </p>
                 </div>
               </div>
             );
@@ -201,79 +187,68 @@ export default function GuidedLearningPage() {
         {!selectedTopic ? (
           <motion.div
             key="empty"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.15 }}
+            className="py-12 text-center rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-6"
           >
-            <Layers size={48} className="mx-auto text-[var(--muted-foreground)] mb-4 opacity-30" />
-            <h3 className="text-lg font-semibold text-[var(--foreground)]">Select a Journey to Begin</h3>
-            <p className="text-sm text-[var(--muted-foreground)] mt-2 max-w-md mx-auto">
-              Your guided learning path awaits. Choose any topic from the grid above to start mastering data engineering concepts, one step at a time.
+            <Layers size={32} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-30" />
+            <h3 className="text-base font-semibold text-[var(--foreground)]">Select a Journey to Begin</h3>
+            <p className="text-xs text-[var(--muted-foreground)] mt-2 max-w-sm mx-auto">
+              Choose any topic from the grid above to start mastering data engineering concepts.
             </p>
           </motion.div>
         ) : (
           <motion.div
             key={selectedTopic}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.15 }}
+            className="space-y-4"
           >
             {/* Stats strip */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br shadow-sm" style={{ background: 'var(--surface-2)' }}>
-                  <div className={activeTopicObj?.gradient ? `text-transparent bg-clip-text bg-gradient-to-br ${activeTopicObj.gradient}` : ''}>
-                    {activeTopicObj?.icon}
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-[var(--foreground)]">{activeTopicObj?.label} Journey</h2>
-                  <div className="flex items-center gap-3 text-xs text-[var(--muted-foreground)] mt-1">
-                    <span>{totalItemsCount} items</span>
-                    <span>•</span>
-                    <span>~{Math.round(estTimeMins/60)}h {estTimeMins%60}m to complete</span>
-                  </div>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs">
+              <div className="text-[var(--muted-foreground)]">
+                {totalItemsCount} items · {getTopicCounts(selectedTopic).concepts} concepts · {getTopicCounts(selectedTopic).qa} Q&As · {getTopicCounts(selectedTopic).arch} architecture · Est. {Math.round(estTimeMins/60)}h {estTimeMins%60}m
               </div>
               
-              <div className="flex flex-col items-end gap-1.5 min-w-[120px]">
-                <div className="flex justify-between w-full text-xs font-semibold">
-                  <span className="text-purple-400">{pctComplete}%</span>
-                  <span className="text-[var(--muted-foreground)]">{completedCount} / {totalItemsCount}</span>
-                </div>
-                <div className="h-2 w-full bg-[var(--surface-3)] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-purple-500 transition-all duration-500 ease-out"
-                    style={{ width: `${pctComplete}%` }}
-                  />
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-purple-400 font-semibold">{pctComplete}%</span>
+                  <div className="h-1 w-24 bg-[var(--surface-3)] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-purple-500 transition-all duration-150 ease-out"
+                      style={{ width: `${pctComplete}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <div className="relative w-full sm:w-auto sm:flex-1">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter journey items..."
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+                  className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all duration-150"
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none w-full sm:w-auto">
                 {["ALL", "concept", "qa", "architecture"].map((type) => (
                   <button
                     key={type}
                     onClick={() => setSelectedType(type)}
                     className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 capitalize",
+                      "px-2.5 py-1 rounded-md text-[10px] font-medium transition-all duration-150 shrink-0 capitalize",
                       selectedType === type
-                        ? "bg-[var(--surface-3)] text-[var(--foreground)] shadow-md font-semibold"
+                        ? "bg-[var(--surface-3)] text-[var(--foreground)] shadow-sm font-semibold"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                     )}
                   >
@@ -282,15 +257,17 @@ export default function GuidedLearningPage() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+              <div className="hidden sm:block w-px h-4 bg-[var(--border)] mx-1" />
+
+              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none w-full sm:w-auto">
                 {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
                   <button
                     key={diff}
                     onClick={() => setSelectedDifficulty(diff)}
                     className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
+                      "px-2.5 py-1 rounded-md text-[10px] font-medium transition-all duration-150 shrink-0",
                       selectedDifficulty === diff
-                        ? "bg-purple-600 text-white shadow-md font-semibold"
+                        ? "bg-purple-600 text-white shadow-sm font-semibold"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                     )}
                   >
@@ -301,7 +278,7 @@ export default function GuidedLearningPage() {
             </div>
 
             {/* Stages */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {stages.map((stage) => {
                 const items = itemsByStage[stage.id] || [];
                 if (items.length === 0) return null;
@@ -310,17 +287,17 @@ export default function GuidedLearningPage() {
                 const visibleItems = items.slice(0, pageNum * pageSize);
                 
                 return (
-                  <div key={stage.id} className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
-                      <h3 className={cn("text-base font-bold", stage.color)}>
+                  <div key={stage.id} className="space-y-2">
+                    <div className="flex items-center gap-3 border-b border-[var(--border)] pb-1.5">
+                      <h3 className={cn("text-sm font-bold", stage.color)}>
                         {stage.label}
                       </h3>
-                      <span className="text-xs font-semibold px-2 py-1 rounded-md bg-[var(--surface-2)] text-[var(--muted-foreground)]">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--surface-2)] text-[var(--muted-foreground)]">
                         {items.length} items
                       </span>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                       {visibleItems.map(item => {
                         const isCompleted = completedIds.has(item.id);
                         const isExpanded = expandedIds.has(item.id);
@@ -331,78 +308,73 @@ export default function GuidedLearningPage() {
                           <div
                             key={item.id}
                             className={cn(
-                              "rounded-2xl border transition-all duration-200 overflow-hidden",
+                              "rounded-lg border transition-all duration-150 overflow-hidden",
                               isExpanded
                                 ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
                                 : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)]",
                               isCompleted && !isExpanded && "opacity-60"
                             )}
                           >
-                            <div className="p-4 flex items-start gap-4">
+                            <div 
+                              className="py-1.5 px-3 flex items-center gap-3 cursor-pointer select-none"
+                              onClick={() => toggleExpand(item.id)}
+                            >
                               <button
                                 onClick={(e) => toggleComplete(item.id, e)}
                                 className={cn(
-                                  "mt-1 shrink-0 transition-colors",
+                                  "shrink-0 transition-colors",
                                   isCompleted ? "text-purple-400" : "text-[var(--muted-foreground)] hover:text-purple-400"
                                 )}
                               >
-                                {isCompleted ? <CheckCircle2 size={24} /> : <Circle size={24} />}
+                                {isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
                               </button>
 
-                              <div 
-                                className="flex-1 cursor-pointer select-none"
-                                onClick={() => toggleExpand(item.id)}
-                              >
-                                <div className="flex flex-wrap items-center gap-2 mb-2">
-                                  <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", tStyle.bg, tStyle.text, tStyle.border)}>
-                                    {item.sourceLabel}
-                                  </span>
-                                  <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", diffStyle.bg, diffStyle.text, diffStyle.border)}>
-                                    {item.difficulty}
-                                  </span>
-                                  {item.niche && (
-                                    <span className="text-[10px] font-medium text-[var(--muted-foreground)]">
-                                      • {item.niche}
-                                    </span>
-                                  )}
-                                </div>
-                                
-                                <h4 className={cn(
-                                  "text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight leading-snug",
-                                  isCompleted && !isExpanded && "line-through text-[var(--muted-foreground)]"
-                                )}>
-                                  {item.title}
-                                </h4>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className={cn("text-[9px] font-semibold px-1.5 py-0.5 rounded-sm border uppercase", tStyle.bg, tStyle.text, tStyle.border)}>
+                                  {item.sourceLabel || item.type}
+                                </span>
+                                <span className={cn("text-[9px] font-semibold px-1.5 py-0.5 rounded-sm border uppercase", diffStyle.bg, diffStyle.text, diffStyle.border)}>
+                                  {item.difficulty}
+                                </span>
                               </div>
+                                
+                              <h4 className={cn(
+                                "text-xs font-semibold text-[var(--foreground)] truncate flex-1",
+                                isCompleted && !isExpanded && "line-through text-[var(--muted-foreground)]"
+                              )}>
+                                {item.title}
+                                {item.niche && (
+                                  <span className="text-[10px] font-normal text-[var(--muted-foreground)] ml-2 hidden sm:inline">
+                                    • {item.niche}
+                                  </span>
+                                )}
+                              </h4>
 
-                              <div className="flex items-center gap-2 shrink-0">
+                              <div className="flex items-center gap-1 shrink-0">
                                 <a
                                   href={item.sourceHref}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={e => e.stopPropagation()}
-                                  className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                                  className="p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
                                   title="View in Source"
                                 >
-                                  <ExternalLink size={16} />
+                                  <ExternalLink size={14} />
                                 </a>
-                                <div 
-                                  className="p-2 cursor-pointer flex items-center justify-center text-[var(--muted-foreground)]"
-                                  onClick={() => toggleExpand(item.id)}
-                                >
-                                  <ChevronDown size={16} className={cn("transition-transform duration-300", isExpanded && "rotate-180 text-purple-400")} />
+                                <div className="p-1 flex items-center justify-center text-[var(--muted-foreground)]">
+                                  <ChevronDown size={14} className={cn("transition-transform duration-150", isExpanded && "rotate-180 text-purple-400")} />
                                 </div>
                               </div>
                             </div>
 
-                            <SmoothAccordion isOpen={isExpanded} innerClassName="px-4 pb-4 pt-1 sm:px-14 space-y-3">
+                            <SmoothAccordion isOpen={isExpanded} innerClassName="px-10 pb-3 pt-1 space-y-2">
                               {item.type === 'concept' ? (
-                                <div className="space-y-4">
-                                  <p className="text-sm text-[var(--foreground)] leading-relaxed">
+                                <div className="space-y-3">
+                                  <p className="text-xs text-[var(--foreground)] leading-relaxed">
                                     {item.body}
                                   </p>
                                   {item.keyPoints && item.keyPoints.length > 0 && (
-                                    <ul className="list-disc pl-5 text-sm text-[var(--muted-foreground)] space-y-1">
+                                    <ul className="list-disc pl-4 text-xs text-[var(--muted-foreground)] space-y-1">
                                       {item.keyPoints.map((kp, i) => (
                                         <li key={i}>{kp}</li>
                                       ))}
@@ -410,7 +382,7 @@ export default function GuidedLearningPage() {
                                   )}
                                 </div>
                               ) : (
-                                <div className="text-sm">
+                                <div className="text-xs">
                                   <AnswerRenderer text={item.body} />
                                 </div>
                               )}
@@ -421,12 +393,12 @@ export default function GuidedLearningPage() {
                     </div>
                     
                     {visibleItems.length < items.length && (
-                      <div className="text-center pt-2">
+                      <div className="text-center pt-1">
                         <button
                           onClick={() => setPages(p => ({ ...p, [stage.id]: pageNum + 1 }))}
-                          className="px-4 py-2 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors"
+                          className="px-3 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[10px] font-semibold text-[var(--foreground)] transition-colors"
                         >
-                          Load More ({items.length - visibleItems.length} left in Stage)
+                          Load More ({items.length - visibleItems.length} left)
                         </button>
                       </div>
                     )}
