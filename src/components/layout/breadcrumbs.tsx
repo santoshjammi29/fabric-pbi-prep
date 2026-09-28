@@ -26,6 +26,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/company-research": "Company Research",
   "/studio": "My Learning Studio",
   "/diagnostic": "Skill Diagnostic",
+  "/guided-learning": "Guided Learning",
 };
 
 const SPARK_TABS: Record<string, string> = {

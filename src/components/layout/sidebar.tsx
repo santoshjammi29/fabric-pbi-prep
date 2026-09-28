@@ -21,6 +21,7 @@ import {
   Sun,
   Moon,
   ChevronLeft,
+  BookMarked,
 } from "lucide-react";
 
 interface NavItem {
@@ -52,6 +53,7 @@ const navGroups: NavGroup[] = [
       { label: "Spark Engine", href: "/spark-engine", icon: Zap, pill: { text: "Internal", variant: "medium" } },
       { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, pill: { text: "Multi-Cloud", variant: "hard" } },
       { label: "DE Mindmap", href: "/mindmap", icon: Globe, pill: { text: "Visual", variant: "new" } },
+      { label: "Guided Learning", href: "/guided-learning", icon: BookMarked, pill: { text: "Journey", variant: "new" } },
     ],
   },
   {

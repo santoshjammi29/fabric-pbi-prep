@@ -14,6 +14,7 @@ import {
   Globe,
   User,
   LayoutGrid,
+  BookMarked,
 } from "lucide-react";
 
 // 4 Core tabs on small mobile screens (< 640px)
@@ -35,6 +36,7 @@ const tabletTabs = [
   { label: "Q&A", href: "/qa-prep", icon: MessageSquare },
   { label: "Arch", href: "/architecture", icon: Layers },
   { label: "Mindmap", href: "/mindmap", icon: Globe, isNew: true },
+  { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
   { label: "Studio", href: "/studio", icon: User },
 ];
 
