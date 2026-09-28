@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 
 const TIPS = [
@@ -42,7 +42,7 @@ export function TipOfDay() {
           </div>
           <div className="relative min-h-[4rem] flex items-center">
             <AnimatePresence mode="wait">
-              <motion.p
+              <m.p
                 key={currentIndex}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -51,7 +51,7 @@ export function TipOfDay() {
                 className="text-xs sm:text-sm text-slate-300 [.light_&]:text-slate-700 leading-relaxed m-0"
               >
                 {TIPS[currentIndex]}
-              </motion.p>
+              </m.p>
             </AnimatePresence>
           </div>
         </div>

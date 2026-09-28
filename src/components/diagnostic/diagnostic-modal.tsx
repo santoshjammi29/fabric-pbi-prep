@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
   CheckCircle2,
@@ -350,7 +350,7 @@ export function DiagnosticModal({
 
               {/* Answer Explanation once chosen */}
               {hasSelected && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="p-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.05] space-y-1.5 text-xs sm:text-sm text-slate-300"
@@ -359,7 +359,7 @@ export function DiagnosticModal({
                     <Sparkles size={13} /> Engineering Insight:
                   </div>
                   <p className="leading-relaxed">{currentQ.explanation}</p>
-                </motion.div>
+                </m.div>
               )}
             </div>
           ) : (

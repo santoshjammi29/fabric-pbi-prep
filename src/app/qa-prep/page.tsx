@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from "react";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Search,
   MessageSquare,
@@ -35,6 +35,7 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
 
 export default function QaPrepPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [selectedDomain, setSelectedDomain] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -175,8 +176,8 @@ export default function QaPrepPage() {
           return false;
         }
       }
-      if (searchQuery.trim()) {
-        const term = searchQuery.toLowerCase();
+      if (deferredSearch.trim()) {
+        const term = deferredSearch.toLowerCase();
         const qMatch = q.question.toLowerCase().includes(term);
         const aMatch = q.answer.toLowerCase().includes(term);
         const catMatch = q.category?.toLowerCase().includes(term);
@@ -185,7 +186,7 @@ export default function QaPrepPage() {
       }
       return true;
     });
-  }, [allQuestions, selectedDifficulty, selectedDomain, searchQuery]);
+  }, [allQuestions, selectedDifficulty, selectedDomain, deferredSearch]);
 
   // Paginated slice
   const paginatedQuestions = useMemo(() => {
@@ -614,7 +615,7 @@ export default function QaPrepPage() {
                         </div>
 
                         <div className="flex items-center gap-1 shrink-0">
-                          <motion.button
+                          <m.button
                             type="button"
                             whileHover={{ scale: 1.08 }}
                             whileTap={{ scale: 0.9 }}
@@ -630,9 +631,9 @@ export default function QaPrepPage() {
                             aria-label={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
                             {isBookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-                          </motion.button>
+                          </m.button>
 
-                          <motion.button
+                          <m.button
                             type="button"
                             whileHover={{ scale: 1.08 }}
                             whileTap={{ scale: 0.9 }}
@@ -647,7 +648,7 @@ export default function QaPrepPage() {
                             ) : (
                               <Copy size={18} />
                             )}
-                          </motion.button>
+                          </m.button>
 
                           <div className="min-h-[44px] min-w-[44px] p-2.5 flex items-center justify-center text-[var(--muted-foreground)]">
                             <ChevronDown

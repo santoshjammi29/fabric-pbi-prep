@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Search,
   BookOpen,
@@ -50,6 +50,7 @@ function ConceptsContent() {
 
   const [viewMode, setViewMode] = useState<ViewMode>("concepts");
   const [searchQuery, setSearchQuery] = useState(initialTerm);
+  const deferredSearch = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -254,8 +255,8 @@ function ConceptsContent() {
       if (selectedDifficulty !== "ALL" && c.difficulty !== selectedDifficulty) {
         return false;
       }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+      if (deferredSearch.trim()) {
+        const q = deferredSearch.toLowerCase();
         const termMatch = c.term.toLowerCase().includes(q);
         const defMatch = c.definition.toLowerCase().includes(q);
         const expMatch = c.explanation.toLowerCase().includes(q);
@@ -265,7 +266,7 @@ function ConceptsContent() {
       }
       return true;
     });
-  }, [searchQuery, selectedCategory, selectedDifficulty]);
+  }, [deferredSearch, selectedCategory, selectedDifficulty]);
 
   // Python tab – distinct categories
   const pyCategories = useMemo(() => {
@@ -281,8 +282,8 @@ function ConceptsContent() {
     return pythonData.filter((item) => {
       if (pyLevel !== "ALL" && item.level !== pyLevel) return false;
       if (pyCategory !== "ALL" && item.category !== pyCategory) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+      if (deferredSearch.trim()) {
+        const q = deferredSearch.toLowerCase();
         return (
           item.title.toLowerCase().includes(q) ||
           (item.description?.toLowerCase().includes(q) ?? false) ||
@@ -292,7 +293,7 @@ function ConceptsContent() {
       }
       return true;
     });
-  }, [searchQuery, pyLevel, pyCategory]);
+  }, [deferredSearch, pyLevel, pyCategory]);
 
   const pyPaginated = useMemo(() => {
     const start = (pyPage - 1) * pyPageSize;

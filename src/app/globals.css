@@ -805,3 +805,19 @@ body {
 .light .ticker-track ~ div {
   /* overridden inline — no extra rule needed */
 }
+
+/* content-visibility for all below-fold list items */
+.qa-item, .concept-item, .arch-item, .learning-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+
+/* GPU-accelerate only hover transforms */
+.topic-chip:hover, .nav-item:hover {
+  will-change: transform;
+}
+
+/* Reduce paint costs on scroll */
+.sidebar {
+  contain: layout style;
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { m, useInView } from "framer-motion";
 import { BookOpen, MessageSquare, FileCode2, Zap, Layers, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -77,7 +77,7 @@ export function StatCards() {
         const Icon = stat.icon;
         return (
           <Link key={stat.title} href={stat.href} className="block group">
-            <motion.div
+            <m.div
               initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -95,7 +95,7 @@ export function StatCards() {
                   {stat.title}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </Link>
         );
       })}

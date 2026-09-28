@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useDeferredValue } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Layers,
   Search,
@@ -34,6 +34,7 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
 
 export default function ArchitectureHubPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -182,8 +183,8 @@ export default function ArchitectureHubPage() {
       if (selectedCategory !== "ALL" && item.category !== selectedCategory) {
         return false;
       }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+      if (deferredSearch.trim()) {
+        const q = deferredSearch.toLowerCase();
         const qMatch = item.question.toLowerCase().includes(q);
         const aMatch = item.answer.toLowerCase().includes(q);
         const catMatch = item.category?.toLowerCase().includes(q);
@@ -192,7 +193,7 @@ export default function ArchitectureHubPage() {
       }
       return true;
     });
-  }, [selectedDifficulty, selectedCategory, searchQuery]);
+  }, [selectedDifficulty, selectedCategory, deferredSearch]);
 
   const paginatedItems = useMemo(() => {
     return filteredItems.slice(0, page * pageSize);

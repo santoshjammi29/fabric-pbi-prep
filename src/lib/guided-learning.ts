@@ -40,14 +40,13 @@ export function getTopicItems(topicKey: string): LearningItem[] {
         keyPoints: concept.keyPoints,
         category: concept.category,
         sourceLabel: 'Key Concepts',
-        sourceHref: `/concepts?tab=concepts&category=${encodeURIComponent(concept.category)}`,
+        sourceHref: `/concepts?tab=concepts&category=${encodeURIComponent(concept.category)}&term=${encodeURIComponent(concept.term)}`,
       });
     }
   });
 
-  // 3. Filter questionsDb + questionsDeDb
-  const allQs = [...questionsDb, ...questionsDeDb];
-  allQs.forEach((q) => {
+  // 3. Filter questionsDb
+  questionsDb.forEach((q) => {
     const cat = (q.category || '').toUpperCase();
     if (topic.questionCategories.some((tc) => cat === tc || cat.includes(tc))) {
       items.push({
@@ -59,7 +58,25 @@ export function getTopicItems(topicKey: string): LearningItem[] {
         category: q.category,
         niche: q.niche,
         sourceLabel: 'Q&A Prep',
-        sourceHref: `/qa-prep?category=${encodeURIComponent(q.category)}`,
+        sourceHref: `/qa-prep?category=${encodeURIComponent(q.category)}&card=${q.id}`,
+      });
+    }
+  });
+
+  // Filter questionsDeDb using deKeywords
+  questionsDeDb.forEach((q) => {
+    const cat = (q.category || '').toUpperCase();
+    if (topic.deKeywords.some((dk) => cat.includes(dk))) {
+      items.push({
+        id: q.id,
+        type: 'qa',
+        difficulty: normalizeDifficulty(q.difficulty),
+        title: q.question,
+        body: q.answer,
+        category: q.category,
+        niche: q.niche,
+        sourceLabel: 'Q&A Prep',
+        sourceHref: `/qa-prep?category=${encodeURIComponent(q.category)}&card=${q.id}`,
       });
     }
   });
@@ -77,7 +94,7 @@ export function getTopicItems(topicKey: string): LearningItem[] {
         category: arch.category,
         niche: arch.niche,
         sourceLabel: 'Architecture Hub',
-        sourceHref: `/architecture?category=${encodeURIComponent(arch.category)}`,
+        sourceHref: `/architecture?category=${encodeURIComponent(arch.category)}&card=${arch.id}`,
       });
     }
   });

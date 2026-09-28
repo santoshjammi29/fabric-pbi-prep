@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Radio,
   Database,
@@ -654,7 +654,7 @@ export function InteractiveMindmap() {
                 className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
                 style={{ left: `${subPos.x}px`, top: `${subPos.y}px` }}
               >
-                <motion.div
+                <m.div
                   whileHover={{ scale: 1.02 }}
                   onClick={() => {
                     setSelectedDomain(domain);
@@ -704,7 +704,7 @@ export function InteractiveMindmap() {
                       </span>
                     )}
                   </div>
-                </motion.div>
+                </m.div>
               </div>
             );
           });
@@ -734,7 +734,7 @@ export function InteractiveMindmap() {
       {/* ─── RIGHT SLIDE-OUT INSPECTOR DRAWER ────────────────────────── */}
       <AnimatePresence>
         {selectedSubtopic && selectedDomain && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 380 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 380 }}
@@ -836,7 +836,7 @@ export function InteractiveMindmap() {
                 Directly opens verified question banks &amp; scenario simulations
               </p>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

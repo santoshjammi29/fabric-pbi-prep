@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { FileCode2, Copy, Check, Bookmark, BookmarkCheck, ChevronDown, Search } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";

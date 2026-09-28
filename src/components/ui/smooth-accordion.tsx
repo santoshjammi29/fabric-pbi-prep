@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface SmoothAccordionProps {
@@ -20,7 +20,7 @@ export function SmoothAccordion({
   return (
     <AnimatePresence initial={false}>
       {isOpen && (
-        <motion.div
+        <m.div
           key="smooth-accordion-content"
           initial={{ height: 0, opacity: 0 }}
           animate={{
@@ -57,7 +57,7 @@ export function SmoothAccordion({
           )}
         >
           <div className={innerClassName}>{children}</div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

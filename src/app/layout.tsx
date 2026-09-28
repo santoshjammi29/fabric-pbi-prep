@@ -10,18 +10,23 @@ import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
 import { CommandPalette } from "@/components/command-palette";
 import { Toaster } from "sonner";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { LazyMotion, domAnimation } from "framer-motion";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'sans-serif'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -77,6 +82,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-[#0A0A0B] text-[#f0f0f5]">
 
         <ThemeProvider>
+          <LazyMotion features={domAnimation}>
           {/* Top scroll progress indicator across all interfaces */}
           <ScrollProgressBar />
 
@@ -140,6 +146,17 @@ export default function RootLayout({
               },
             }}
           />
+          </LazyMotion>
+          <Script id="speculation-rules" type="speculationrules" strategy="afterInteractive">
+{`{
+  "prefetch": [
+    {"where": {"href_matches": "/*"}, "eagerness": "moderate"}
+  ],
+  "prerender": [
+    {"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}
+  ]
+}`}
+          </Script>
         </ThemeProvider>
       </body>
     </html>

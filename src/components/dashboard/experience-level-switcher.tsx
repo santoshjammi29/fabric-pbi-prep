@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
   ArrowRight,
@@ -130,7 +130,7 @@ export function ExperienceLevelSwitcher() {
                   )}
                 >
                   {isSelected && (
-                    <motion.div
+                    <m.div
                       layoutId="activeTierPill"
                       className="absolute inset-0 bg-[var(--surface-3)] rounded-xl shadow-md border border-[var(--border-hover)] -z-10"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -152,7 +152,7 @@ export function ExperienceLevelSwitcher() {
         </div>
 
         {/* Selected Tier Feature Card with Framer Motion layout morph */}
-        <motion.div
+        <m.div
           key={activeTier}
           layout
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -252,7 +252,7 @@ export function ExperienceLevelSwitcher() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
       </div>
 
       {/* 10-Question Diagnostic Assessment Modal */}
