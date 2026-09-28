@@ -22,7 +22,14 @@ const difficultyOrder = {
   'ARCHITECT': 4
 };
 
+const itemsCache = new Map<string, LearningItem[]>();
+const countsCache = new Map<string, { concepts: number; qa: number; arch: number; total: number }>();
+
 export function getTopicItems(topicKey: string): LearningItem[] {
+  if (itemsCache.has(topicKey)) {
+    return itemsCache.get(topicKey)!;
+  }
+
   const topic = GUIDED_TOPICS.find((t) => t.key === topicKey);
   if (!topic) return [];
 
@@ -100,21 +107,31 @@ export function getTopicItems(topicKey: string): LearningItem[] {
   });
 
   // 6. Sort: concepts first, then qa, then arch. Within each, EASY→ARCHITECT.
-  return items.sort((a, b) => {
+  const sorted = items.sort((a, b) => {
     const typeOrder = { 'concept': 1, 'qa': 2, 'architecture': 3 };
     if (typeOrder[a.type] !== typeOrder[b.type]) {
       return typeOrder[a.type] - typeOrder[b.type];
     }
     return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
   });
+
+  itemsCache.set(topicKey, sorted);
+  return sorted;
 }
 
 export function getTopicCounts(topicKey: string): { concepts: number; qa: number; arch: number; total: number } {
+  if (countsCache.has(topicKey)) {
+    return countsCache.get(topicKey)!;
+  }
+
   const items = getTopicItems(topicKey);
-  return {
+  const result = {
     concepts: items.filter(i => i.type === 'concept').length,
     qa: items.filter(i => i.type === 'qa').length,
     arch: items.filter(i => i.type === 'architecture').length,
     total: items.length,
   };
+
+  countsCache.set(topicKey, result);
+  return result;
 }
