@@ -21598,5 +21598,1085 @@
     "difficulty": "HARD",
     "question": "Detail the production-grade architecture design for Granular schema access grant policies within governing multi-tenant SaaS schema access that satisfies preventing client-side extraction leaks SLA constraints. What are the key failure remediation gotchas?",
     "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nDeploying **Granular schema access grant policies Advanced Architecture** within an enterprise environment running **enterprise data pipelines** requires addressing the critical challenges related to **maximize throughput and reliability**. At a high level, **Granular schema access grant policies Advanced Architecture** optimizes underlying compute topology, memory buffers, and distributed data structures to isolate workloads and prevent performance degradation. In the context of enterprise data pipelines, this architectural setup isolates failure domains, prevents resource contention, and guarantees predictable execution latencies.\n\n### Phase 2: Low-Level Mechanics & Implementation\nImplementing this pattern requires the following setup steps and configuration files:\n\n1. **Architecture Setup**: Establish session context and validate configuration arguments for enterprise data pipelines.\n2. **Implementation Snippet**:\n```python\n# Core execution engine configuration for: Granular schema access grant policies Advanced Architecture\n# Optimized for enterprise data pipelines\nfrom dataclasses import dataclass\nfrom typing import Dict, Any\n\n@dataclass\nclass ConfiguredArchitecture:\n    topic_name: str = 'Granular schema access grant policies Advanced Architecture'\n    target_scenario: str = 'enterprise data pipelines'\n    timeout_sec: int = 300\n    retry_limit: int = 3\n\n    def apply_settings(self, engine_context: Any) -> bool:\n        # Enforce configuration parameters to achieve maximize throughput and reliability\n        print(f'Applying settings for {self.topic_name}')\n        return True\n```\n3. **Parameter Tuning**: Tune operational parameters and buffer memory quotas to satisfy: maximize throughput and reliability.\n\n### Phase 3: Production Hardening & Gotchas\nIn a production environment, several failure states can cause this design to degrade:\n\n- **Resource Saturation during Peak Load**: Operating under high concurrent spikes without backpressure throttles memory limits. *Remediation*: Implement dynamic rate limiters and pre-allocated buffer queues to stabilize throughput.\n- **Silent Failure on Edge Exception**: Unhandled boundary errors cause processing pipelines to hang without emitting telemetry. *Remediation*: Wrap critical execution paths in structured try-except blocks and export metrics to Prometheus/Datadog.\n- **State Desynchronization across Replicas**: Network partitions cause state inconsistencies between distributed processing nodes. *Remediation*: Enforce distributed locking and idempotent state checkpointing."
+  },
+  {
+    "id": "arch-airflow-001",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Basic DAG design for ETL",
+    "difficulty": "EASY",
+    "question": "Explain Basic DAG design for ETL in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Basic DAG design for ETL in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Basic DAG design for ETL\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-002",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "SimpleHttpOperator usage",
+    "difficulty": "EASY",
+    "question": "Explain SimpleHttpOperator usage in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain SimpleHttpOperator usage in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for SimpleHttpOperator usage\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-003",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "BashOperator for shell scripts",
+    "difficulty": "EASY",
+    "question": "Explain BashOperator for shell scripts in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain BashOperator for shell scripts in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for BashOperator for shell scripts\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-004",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "PythonOperator for transformations",
+    "difficulty": "EASY",
+    "question": "Explain PythonOperator for transformations in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain PythonOperator for transformations in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for PythonOperator for transformations\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-005",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "FileSensor for landing zone",
+    "difficulty": "EASY",
+    "question": "Explain FileSensor for landing zone in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain FileSensor for landing zone in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for FileSensor for landing zone\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-006",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "EmailOperator for alerts",
+    "difficulty": "EASY",
+    "question": "Explain EmailOperator for alerts in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain EmailOperator for alerts in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for EmailOperator for alerts\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-007",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "BranchPythonOperator for conditional flows",
+    "difficulty": "EASY",
+    "question": "Explain BranchPythonOperator for conditional flows in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain BranchPythonOperator for conditional flows in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for BranchPythonOperator for conditional flows\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-008",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "ShortCircuitOperator",
+    "difficulty": "EASY",
+    "question": "Explain ShortCircuitOperator in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain ShortCircuitOperator in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for ShortCircuitOperator\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-009",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "TaskFlow API basics",
+    "difficulty": "EASY",
+    "question": "Explain TaskFlow API basics in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain TaskFlow API basics in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for TaskFlow API basics\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-010",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "XCom for passing small datasets",
+    "difficulty": "EASY",
+    "question": "Explain XCom for passing small datasets in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain XCom for passing small datasets in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for XCom for passing small datasets\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-011",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Celery executor with Redis broker setup",
+    "difficulty": "MEDIUM",
+    "question": "Explain Celery executor with Redis broker setup in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Celery executor with Redis broker setup in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Celery executor with Redis broker setup\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-012",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "KubernetesExecutor pod template design",
+    "difficulty": "MEDIUM",
+    "question": "Explain KubernetesExecutor pod template design in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain KubernetesExecutor pod template design in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for KubernetesExecutor pod template design\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-013",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "TaskGroup for complex pipelines",
+    "difficulty": "MEDIUM",
+    "question": "Explain TaskGroup for complex pipelines in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain TaskGroup for complex pipelines in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for TaskGroup for complex pipelines\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-014",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Dynamic Task Mapping for parallel processing",
+    "difficulty": "MEDIUM",
+    "question": "Explain Dynamic Task Mapping for parallel processing in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Dynamic Task Mapping for parallel processing in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Dynamic Task Mapping for parallel processing\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-015",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Dataset-driven scheduling between DAGs",
+    "difficulty": "MEDIUM",
+    "question": "Explain Dataset-driven scheduling between DAGs in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Dataset-driven scheduling between DAGs in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Dataset-driven scheduling between DAGs\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-016",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Custom sensor with reschedule mode",
+    "difficulty": "MEDIUM",
+    "question": "Explain Custom sensor with reschedule mode in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Custom sensor with reschedule mode in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Custom sensor with reschedule mode\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-017",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Pool management for DB connections",
+    "difficulty": "MEDIUM",
+    "question": "Explain Pool management for DB connections in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Pool management for DB connections in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Pool management for DB connections\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-018",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Retry with exponential backoff",
+    "difficulty": "MEDIUM",
+    "question": "Explain Retry with exponential backoff in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Retry with exponential backoff in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Retry with exponential backoff\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-019",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Airflow + S3 pipeline pattern",
+    "difficulty": "MEDIUM",
+    "question": "Explain Airflow + S3 pipeline pattern in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Airflow + S3 pipeline pattern in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Airflow + S3 pipeline pattern\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-020",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "ExternalTaskSensor for cross-DAG dependencies",
+    "difficulty": "MEDIUM",
+    "question": "Explain ExternalTaskSensor for cross-DAG dependencies in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain ExternalTaskSensor for cross-DAG dependencies in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for ExternalTaskSensor for cross-DAG dependencies\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-021",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "HA Scheduler failover architecture",
+    "difficulty": "HARD",
+    "question": "Explain HA Scheduler failover architecture in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain HA Scheduler failover architecture in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for HA Scheduler failover architecture\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-022",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Celery worker autoscaling with KEDA on K8s",
+    "difficulty": "HARD",
+    "question": "Explain Celery worker autoscaling with KEDA on K8s in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Celery worker autoscaling with KEDA on K8s in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Celery worker autoscaling with KEDA on K8s\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-023",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "DAG serialization to DB for performance",
+    "difficulty": "HARD",
+    "question": "Explain DAG serialization to DB for performance in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain DAG serialization to DB for performance in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for DAG serialization to DB for performance\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-024",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Multi-region Airflow active-passive setup",
+    "difficulty": "HARD",
+    "question": "Explain Multi-region Airflow active-passive setup in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Multi-region Airflow active-passive setup in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Multi-region Airflow active-passive setup\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-025",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "CI/CD DAG deployment via Git-sync",
+    "difficulty": "HARD",
+    "question": "Explain CI/CD DAG deployment via Git-sync in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain CI/CD DAG deployment via Git-sync in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for CI/CD DAG deployment via Git-sync\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-026",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Custom XCom backend using S3",
+    "difficulty": "HARD",
+    "question": "Explain Custom XCom backend using S3 in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Custom XCom backend using S3 in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Custom XCom backend using S3\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-027",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "HashiCorp Vault secret backend integration",
+    "difficulty": "HARD",
+    "question": "Explain HashiCorp Vault secret backend integration in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain HashiCorp Vault secret backend integration in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for HashiCorp Vault secret backend integration\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-028",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Metadata DB optimization for high task volume",
+    "difficulty": "HARD",
+    "question": "Explain Metadata DB optimization for high task volume in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Metadata DB optimization for high task volume in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Metadata DB optimization for high task volume\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-029",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Airflow RBAC with LDAP/SAML",
+    "difficulty": "HARD",
+    "question": "Explain Airflow RBAC with LDAP/SAML in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Airflow RBAC with LDAP/SAML in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Airflow RBAC with LDAP/SAML\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-030",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "KPO with ephemeral storage and network policies",
+    "difficulty": "HARD",
+    "question": "Explain KPO with ephemeral storage and network policies in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain KPO with ephemeral storage and network policies in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for KPO with ephemeral storage and network policies\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-031",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Multi-tenant Airflow platform design",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Multi-tenant Airflow platform design in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Multi-tenant Airflow platform design in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Multi-tenant Airflow platform design\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-032",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Astronomer vs MWAA vs Cloud Composer TCO analysis",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Astronomer vs MWAA vs Cloud Composer TCO analysis in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Astronomer vs MWAA vs Cloud Composer TCO analysis in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Astronomer vs MWAA vs Cloud Composer TCO analysis\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-033",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Event-driven orchestration with Kafka + Airflow",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Event-driven orchestration with Kafka + Airflow in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Event-driven orchestration with Kafka + Airflow in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Event-driven orchestration with Kafka + Airflow\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-034",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Airflow + dbt + Spark end-to-end ML pipeline",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Airflow + dbt + Spark end-to-end ML pipeline in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Airflow + dbt + Spark end-to-end ML pipeline in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Airflow + dbt + Spark end-to-end ML pipeline\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-035",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Global-scale Airflow deployment with cross-region DAG sync",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Global-scale Airflow deployment with cross-region DAG sync in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Global-scale Airflow deployment with cross-region DAG sync in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Global-scale Airflow deployment with cross-region DAG sync\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-036",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Observability platform (Prometheus + Grafana + OpenTelemetry)",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Observability platform (Prometheus + Grafana + OpenTelemetry) in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Observability platform (Prometheus + Grafana + OpenTelemetry) in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Observability platform (Prometheus + Grafana + OpenTelemetry)\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-037",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Airflow data mesh orchestration",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Airflow data mesh orchestration in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Airflow data mesh orchestration in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Airflow data mesh orchestration\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-038",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Cost optimization for MWAA at scale",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Cost optimization for MWAA at scale in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Cost optimization for MWAA at scale in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Cost optimization for MWAA at scale\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-039",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Airflow 3.0 migration strategy",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Airflow 3.0 migration strategy in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Airflow 3.0 migration strategy in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Airflow 3.0 migration strategy\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-airflow-040",
+    "source": "Architecture Hub",
+    "category": "Apache Airflow Architecture",
+    "niche": "Building self-healing pipelines with Airflow",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Building self-healing pipelines with Airflow in Apache Airflow.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Building self-healing pipelines with Airflow in Apache Airflow. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Building self-healing pipelines with Airflow\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-001",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Basic dbt project structure for a star schema",
+    "difficulty": "EASY",
+    "question": "Explain Basic dbt project structure for a star schema in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Basic dbt project structure for a star schema in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Basic dbt project structure for a star schema\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-002",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "staging model design",
+    "difficulty": "EASY",
+    "question": "Explain staging model design in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain staging model design in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for staging model design\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-003",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "mart model design",
+    "difficulty": "EASY",
+    "question": "Explain mart model design in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain mart model design in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for mart model design\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-004",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "source freshness check setup",
+    "difficulty": "EASY",
+    "question": "Explain source freshness check setup in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain source freshness check setup in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for source freshness check setup\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-005",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "generic tests on dimension tables",
+    "difficulty": "EASY",
+    "question": "Explain generic tests on dimension tables in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain generic tests on dimension tables in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for generic tests on dimension tables\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-006",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "seed loading for lookup tables",
+    "difficulty": "EASY",
+    "question": "Explain seed loading for lookup tables in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain seed loading for lookup tables in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for seed loading for lookup tables\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-007",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "documentation with schema.yml",
+    "difficulty": "EASY",
+    "question": "Explain documentation with schema.yml in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain documentation with schema.yml in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for documentation with schema.yml\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-008",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "running dbt in CI with GitHub Actions",
+    "difficulty": "EASY",
+    "question": "Explain running dbt in CI with GitHub Actions in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain running dbt in CI with GitHub Actions in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for running dbt in CI with GitHub Actions\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-009",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "profiles.yml multi-environment setup",
+    "difficulty": "EASY",
+    "question": "Explain profiles.yml multi-environment setup in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain profiles.yml multi-environment setup in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for profiles.yml multi-environment setup\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-010",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt Cloud job scheduling basics",
+    "difficulty": "EASY",
+    "question": "Explain dbt Cloud job scheduling basics in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt Cloud job scheduling basics in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt Cloud job scheduling basics\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-011",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Incremental model design for fact tables",
+    "difficulty": "MEDIUM",
+    "question": "Explain Incremental model design for fact tables in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Incremental model design for fact tables in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Incremental model design for fact tables\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-012",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "SCD Type 2 with dbt snapshots",
+    "difficulty": "MEDIUM",
+    "question": "Explain SCD Type 2 with dbt snapshots in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain SCD Type 2 with dbt snapshots in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for SCD Type 2 with dbt snapshots\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-013",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Custom schema override for environment-based deployment",
+    "difficulty": "MEDIUM",
+    "question": "Explain Custom schema override for environment-based deployment in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Custom schema override for environment-based deployment in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Custom schema override for environment-based deployment\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-014",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Macro for dynamic date filtering",
+    "difficulty": "MEDIUM",
+    "question": "Explain Macro for dynamic date filtering in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Macro for dynamic date filtering in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Macro for dynamic date filtering\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-015",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt-utils cross-db compatibility macros",
+    "difficulty": "MEDIUM",
+    "question": "Explain dbt-utils cross-db compatibility macros in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt-utils cross-db compatibility macros in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt-utils cross-db compatibility macros\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-016",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Slim CI with state:modified",
+    "difficulty": "MEDIUM",
+    "question": "Explain Slim CI with state:modified in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Slim CI with state:modified in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Slim CI with state:modified\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-017",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Pre/post hooks for table grants",
+    "difficulty": "MEDIUM",
+    "question": "Explain Pre/post hooks for table grants in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Pre/post hooks for table grants in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Pre/post hooks for table grants\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-018",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Source-to-target mapping with dbt Exposures",
+    "difficulty": "MEDIUM",
+    "question": "Explain Source-to-target mapping with dbt Exposures in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Source-to-target mapping with dbt Exposures in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Source-to-target mapping with dbt Exposures\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-019",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt Semantic Layer for BI tools",
+    "difficulty": "MEDIUM",
+    "question": "Explain dbt Semantic Layer for BI tools in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt Semantic Layer for BI tools in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt Semantic Layer for BI tools\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-020",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Advanced singular tests for business rules",
+    "difficulty": "MEDIUM",
+    "question": "Explain Advanced singular tests for business rules in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Advanced singular tests for business rules in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Advanced singular tests for business rules\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-021",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt Mesh cross-project dependencies",
+    "difficulty": "HARD",
+    "question": "Explain dbt Mesh cross-project dependencies in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt Mesh cross-project dependencies in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt Mesh cross-project dependencies\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-022",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Custom materialization for merge-only pattern",
+    "difficulty": "HARD",
+    "question": "Explain Custom materialization for merge-only pattern in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Custom materialization for merge-only pattern in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Custom materialization for merge-only pattern\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-023",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt + Databricks optimizations (OPTIMIZE post-hook)",
+    "difficulty": "HARD",
+    "question": "Explain dbt + Databricks optimizations (OPTIMIZE post-hook) in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt + Databricks optimizations (OPTIMIZE post-hook) in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt + Databricks optimizations (OPTIMIZE post-hook)\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-024",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Large project performance (partial parsing, parallelism)",
+    "difficulty": "HARD",
+    "question": "Explain Large project performance (partial parsing, parallelism) in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Large project performance (partial parsing, parallelism) in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Large project performance (partial parsing, parallelism)\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-025",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "State-based CI/CD pipeline with GitHub Actions",
+    "difficulty": "HARD",
+    "question": "Explain State-based CI/CD pipeline with GitHub Actions in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain State-based CI/CD pipeline with GitHub Actions in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for State-based CI/CD pipeline with GitHub Actions\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-026",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Unit testing dbt models with mock data",
+    "difficulty": "HARD",
+    "question": "Explain Unit testing dbt models with mock data in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Unit testing dbt models with mock data in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Unit testing dbt models with mock data\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-027",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt + Great Expectations integration",
+    "difficulty": "HARD",
+    "question": "Explain dbt + Great Expectations integration in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt + Great Expectations integration in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt + Great Expectations integration\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-028",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Advanced Jinja for adapter-specific SQL",
+    "difficulty": "HARD",
+    "question": "Explain Advanced Jinja for adapter-specific SQL in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Advanced Jinja for adapter-specific SQL in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Advanced Jinja for adapter-specific SQL\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-029",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt for data vault modeling",
+    "difficulty": "HARD",
+    "question": "Explain dbt for data vault modeling in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt for data vault modeling in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt for data vault modeling\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-030",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Custom generic test with error messages",
+    "difficulty": "HARD",
+    "question": "Explain Custom generic test with error messages in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Custom generic test with error messages in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Custom generic test with error messages\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-031",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt enterprise architecture (monorepo vs federated)",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt enterprise architecture (monorepo vs federated) in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt enterprise architecture (monorepo vs federated) in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt enterprise architecture (monorepo vs federated)\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-032",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt Center of Excellence governance model",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt Center of Excellence governance model in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt Center of Excellence governance model in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt Center of Excellence governance model\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-033",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt + Airflow production orchestration at scale",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt + Airflow production orchestration at scale in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt + Airflow production orchestration at scale in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt + Airflow production orchestration at scale\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-034",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt data product design with contracts",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt data product design with contracts in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt data product design with contracts in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt data product design with contracts\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-035",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Cost governance via model materializations",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Cost governance via model materializations in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Cost governance via model materializations in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Cost governance via model materializations\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-036",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt lineage for enterprise data catalog",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt lineage for enterprise data catalog in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt lineage for enterprise data catalog in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt lineage for enterprise data catalog\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-037",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Multi-cloud dbt deployment strategy",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Multi-cloud dbt deployment strategy in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Multi-cloud dbt deployment strategy in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Multi-cloud dbt deployment strategy\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-038",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt testing pyramid for data quality",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt testing pyramid for data quality in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt testing pyramid for data quality in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt testing pyramid for data quality\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-039",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "dbt Fusion engine migration strategy",
+    "difficulty": "ARCHITECT",
+    "question": "Explain dbt Fusion engine migration strategy in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain dbt Fusion engine migration strategy in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for dbt Fusion engine migration strategy\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-dbt-040",
+    "source": "Architecture Hub",
+    "category": "dbt Architecture & Transformation",
+    "niche": "Building observable dbt pipelines (Elementary)",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Building observable dbt pipelines (Elementary) in dbt.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Building observable dbt pipelines (Elementary) in dbt. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Building observable dbt pipelines (Elementary)\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-001",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Cluster configuration for interactive vs job workloads",
+    "difficulty": "EASY",
+    "question": "Explain Cluster configuration for interactive vs job workloads in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Cluster configuration for interactive vs job workloads in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Cluster configuration for interactive vs job workloads\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-002",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Auto-termination policy",
+    "difficulty": "EASY",
+    "question": "Explain Auto-termination policy in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Auto-termination policy in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Auto-termination policy\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-003",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Notebook-based EDA",
+    "difficulty": "EASY",
+    "question": "Explain Notebook-based EDA in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Notebook-based EDA in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Notebook-based EDA\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-004",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Delta Lake CRUD operations",
+    "difficulty": "EASY",
+    "question": "Explain Delta Lake CRUD operations in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Delta Lake CRUD operations in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Delta Lake CRUD operations\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-005",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Unity Catalog table creation",
+    "difficulty": "EASY",
+    "question": "Explain Unity Catalog table creation in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Unity Catalog table creation in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Unity Catalog table creation\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-006",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Auto Loader for incremental file ingestion",
+    "difficulty": "EASY",
+    "question": "Explain Auto Loader for incremental file ingestion in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Auto Loader for incremental file ingestion in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Auto Loader for incremental file ingestion\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-007",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Basic DLT pipeline",
+    "difficulty": "EASY",
+    "question": "Explain Basic DLT pipeline in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Basic DLT pipeline in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Basic DLT pipeline\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-008",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Medallion Architecture setup (Bronze/Silver/Gold)",
+    "difficulty": "EASY",
+    "question": "Explain Medallion Architecture setup (Bronze/Silver/Gold) in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Medallion Architecture setup (Bronze/Silver/Gold) in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Medallion Architecture setup (Bronze/Silver/Gold)\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-009",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "MLflow experiment tracking",
+    "difficulty": "EASY",
+    "question": "Explain MLflow experiment tracking in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain MLflow experiment tracking in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for MLflow experiment tracking\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-010",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Delta table time travel queries",
+    "difficulty": "EASY",
+    "question": "Explain Delta table time travel queries in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Delta table time travel queries in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Delta table time travel queries\ndef run_easy_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-011",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Structured Streaming with Delta Lake",
+    "difficulty": "MEDIUM",
+    "question": "Explain Structured Streaming with Delta Lake in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Structured Streaming with Delta Lake in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Structured Streaming with Delta Lake\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-012",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "OPTIMIZE and Z-Order for performance",
+    "difficulty": "MEDIUM",
+    "question": "Explain OPTIMIZE and Z-Order for performance in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain OPTIMIZE and Z-Order for performance in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for OPTIMIZE and Z-Order for performance\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-013",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Change Data Feed for downstream processing",
+    "difficulty": "MEDIUM",
+    "question": "Explain Change Data Feed for downstream processing in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Change Data Feed for downstream processing in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Change Data Feed for downstream processing\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-014",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Shallow/deep clone for dev environments",
+    "difficulty": "MEDIUM",
+    "question": "Explain Shallow/deep clone for dev environments in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Shallow/deep clone for dev environments in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Shallow/deep clone for dev environments\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-015",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Unity Catalog fine-grained access control",
+    "difficulty": "MEDIUM",
+    "question": "Explain Unity Catalog fine-grained access control in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Unity Catalog fine-grained access control in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Unity Catalog fine-grained access control\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-016",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Feature Store for ML training",
+    "difficulty": "MEDIUM",
+    "question": "Explain Feature Store for ML training in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Feature Store for ML training in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Feature Store for ML training\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-017",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Databricks SQL Warehouse optimization",
+    "difficulty": "MEDIUM",
+    "question": "Explain Databricks SQL Warehouse optimization in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Databricks SQL Warehouse optimization in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Databricks SQL Warehouse optimization\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-018",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "DLT expectations for data quality",
+    "difficulty": "MEDIUM",
+    "question": "Explain DLT expectations for data quality in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain DLT expectations for data quality in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for DLT expectations for data quality\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-019",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Photon engine workload optimization",
+    "difficulty": "MEDIUM",
+    "question": "Explain Photon engine workload optimization in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Photon engine workload optimization in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Photon engine workload optimization\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-020",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Databricks Repos for Git integration",
+    "difficulty": "MEDIUM",
+    "question": "Explain Databricks Repos for Git integration in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Databricks Repos for Git integration in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Databricks Repos for Git integration\ndef run_medium_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-021",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Unity Catalog multi-workspace federation",
+    "difficulty": "HARD",
+    "question": "Explain Unity Catalog multi-workspace federation in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Unity Catalog multi-workspace federation in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Unity Catalog multi-workspace federation\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-022",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Delta Sharing for external data access",
+    "difficulty": "HARD",
+    "question": "Explain Delta Sharing for external data access in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Delta Sharing for external data access in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Delta Sharing for external data access\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-023",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Liquid Clustering vs Z-Ordering comparison",
+    "difficulty": "HARD",
+    "question": "Explain Liquid Clustering vs Z-Ordering comparison in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Liquid Clustering vs Z-Ordering comparison in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Liquid Clustering vs Z-Ordering comparison\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-024",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Serverless compute for DLT",
+    "difficulty": "HARD",
+    "question": "Explain Serverless compute for DLT in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Serverless compute for DLT in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Serverless compute for DLT\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-025",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Databricks Asset Bundles CI/CD",
+    "difficulty": "HARD",
+    "question": "Explain Databricks Asset Bundles CI/CD in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Databricks Asset Bundles CI/CD in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Databricks Asset Bundles CI/CD\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-026",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "SCIM provisioning for enterprise IAM",
+    "difficulty": "HARD",
+    "question": "Explain SCIM provisioning for enterprise IAM in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain SCIM provisioning for enterprise IAM in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for SCIM provisioning for enterprise IAM\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-027",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Predictive optimization enabling",
+    "difficulty": "HARD",
+    "question": "Explain Predictive optimization enabling in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Predictive optimization enabling in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Predictive optimization enabling\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-028",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Structured Streaming stateful processing",
+    "difficulty": "HARD",
+    "question": "Explain Structured Streaming stateful processing in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Structured Streaming stateful processing in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Structured Streaming stateful processing\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-029",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Spark Connect for remote execution",
+    "difficulty": "HARD",
+    "question": "Explain Spark Connect for remote execution in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Spark Connect for remote execution in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Spark Connect for remote execution\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-030",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Databricks Connect v2 local dev workflow",
+    "difficulty": "HARD",
+    "question": "Explain Databricks Connect v2 local dev workflow in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Databricks Connect v2 local dev workflow in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Databricks Connect v2 local dev workflow\ndef run_hard_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-031",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Databricks Lakehouse vs Snowflake at petabyte scale",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Databricks Lakehouse vs Snowflake at petabyte scale in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Databricks Lakehouse vs Snowflake at petabyte scale in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Databricks Lakehouse vs Snowflake at petabyte scale\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-032",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Multi-cloud Databricks deployment (Azure + AWS)",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Multi-cloud Databricks deployment (Azure + AWS) in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Multi-cloud Databricks deployment (Azure + AWS) in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Multi-cloud Databricks deployment (Azure + AWS)\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-033",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Unity Catalog enterprise governance topology",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Unity Catalog enterprise governance topology in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Unity Catalog enterprise governance topology in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Unity Catalog enterprise governance topology\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-034",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Cost optimization (DBU management, spot instances, serverless)",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Cost optimization (DBU management, spot instances, serverless) in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Cost optimization (DBU management, spot instances, serverless) in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Cost optimization (DBU management, spot instances, serverless)\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-035",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Data mesh on Databricks with Unity Catalog",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Data mesh on Databricks with Unity Catalog in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Data mesh on Databricks with Unity Catalog in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Data mesh on Databricks with Unity Catalog\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-036",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Databricks + dbt production integration",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Databricks + dbt production integration in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Databricks + dbt production integration in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Databricks + dbt production integration\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-037",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Real-time lakehouse architecture (Kafka + Structured Streaming + Delta)",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Real-time lakehouse architecture (Kafka + Structured Streaming + Delta) in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Real-time lakehouse architecture (Kafka + Structured Streaming + Delta) in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Real-time lakehouse architecture (Kafka + Structured Streaming + Delta)\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-038",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "MLOps platform on Databricks end-to-end",
+    "difficulty": "ARCHITECT",
+    "question": "Explain MLOps platform on Databricks end-to-end in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain MLOps platform on Databricks end-to-end in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for MLOps platform on Databricks end-to-end\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-039",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Disaster recovery for Unity Catalog and workspaces",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Disaster recovery for Unity Catalog and workspaces in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Disaster recovery for Unity Catalog and workspaces in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Disaster recovery for Unity Catalog and workspaces\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
+  },
+  {
+    "id": "arch-databricks-040",
+    "source": "Architecture Hub",
+    "category": "Databricks Lakehouse Architecture",
+    "niche": "Building a self-service analytics platform on Databricks",
+    "difficulty": "ARCHITECT",
+    "question": "Explain Building a self-service analytics platform on Databricks in Databricks.",
+    "answer": "### Phase 1: Conceptual Foundation & Core Architecture\nThe Explain Building a self-service analytics platform on Databricks in Databricks. scenario involves designing a robust solution. We begin by defining the core components and integration points. This ensures a scalable and maintainable foundation.\n\n### Phase 2: Low-Level Mechanics & Implementation\n1. **Architecture Setup**: Ensure all prerequisites are met.\n2. **Implementation Snippet**:\n```python\n# Implementation for Building a self-service analytics platform on Databricks\ndef run_architect_task():\n    pass\n```\n3. **Parameter Tuning**: Adjust parameters based on volume.\n\n### Phase 3: Production Hardening & Gotchas\n- **Resource Exhaustion**: Monitor memory and CPU. *Remediation*: Implement proper scaling limits.\n- **Network Latency**: High latency during data transfer. *Remediation*: Use VPC endpoints.\n- **Authentication Failures**: Token expiration. *Remediation*: Implement auto-renewal."
   }
 ]
