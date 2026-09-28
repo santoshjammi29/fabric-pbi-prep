@@ -78,6 +78,11 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}}catch(e){}})();`,
           }}
         />
+        <style dangerouslySetInnerHTML={{ __html: `
+          body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
+          html, body { scrollbar-gutter: stable; overscroll-behavior-y: none; }
+          #main-content { overscroll-behavior: contain; }
+        `}} />
       </head>
       <body className="min-h-dvh bg-[#0A0A0B] text-[#f0f0f5]">
 
@@ -114,7 +119,7 @@ export default function RootLayout({
               {/* Page content */}
               <main
                 id="main-content"
-                className="flex-1 overflow-y-auto px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10"
+                className="flex-1 overflow-y-auto px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10 overscroll-contain"
                 tabIndex={-1}
               >
                 <div className="mx-auto max-w-7xl">
@@ -147,16 +152,14 @@ export default function RootLayout({
             }}
           />
           </LazyMotion>
-          <Script id="speculation-rules" type="speculationrules" strategy="afterInteractive">
-{`{
-  "prefetch": [
-    {"where": {"href_matches": "/*"}, "eagerness": "moderate"}
-  ],
-  "prerender": [
-    {"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}
-  ]
-}`}
-          </Script>
+          <Script 
+            id="speculation-rules" 
+            type="speculationrules" 
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prerender": [{"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}]}`
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

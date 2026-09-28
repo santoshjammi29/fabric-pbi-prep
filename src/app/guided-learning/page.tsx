@@ -7,8 +7,10 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getTopicItems, getTopicCounts, LearningItem } from "@/lib/guided-learning";
 import { GUIDED_TOPICS, GuidedTopic } from "@/data/guided-learning-topics";
-import { AnswerRenderer } from "@/components/ui/answer-renderer";
-import { SmoothAccordion } from "@/components/ui/smooth-accordion";
+import dynamic from "next/dynamic";
+
+const AnswerRenderer = dynamic(() => import("@/components/ui/answer-renderer").then(mod => mod.AnswerRenderer), { ssr: false });
+const SmoothAccordion = dynamic(() => import("@/components/ui/smooth-accordion").then(mod => mod.SmoothAccordion), { ssr: false });
 import { Difficulty } from "@/types/data";
 
 const difficultyColors: Record<string, { bg: string; text: string; border: string }> = {

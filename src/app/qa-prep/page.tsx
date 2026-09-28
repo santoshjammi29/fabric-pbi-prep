@@ -23,8 +23,10 @@ import { cn } from "@/lib/utils";
 import { questionsDb, questionsDeDb, getStandardizedDomain } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
-import { AnswerRenderer } from "@/components/ui/answer-renderer";
-import { SmoothAccordion } from "@/components/ui/smooth-accordion";
+import dynamic from "next/dynamic";
+
+const AnswerRenderer = dynamic(() => import("@/components/ui/answer-renderer").then(mod => mod.AnswerRenderer), { ssr: false });
+const SmoothAccordion = dynamic(() => import("@/components/ui/smooth-accordion").then(mod => mod.SmoothAccordion), { ssr: false });
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },

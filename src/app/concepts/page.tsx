@@ -24,8 +24,10 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { conceptsDb, pythonData } from "@/data";
 import { Concept, Difficulty, CodeLevel } from "@/types/data";
-import { CodeBlock } from "@/components/ui/code-block";
-import { SmoothAccordion } from "@/components/ui/smooth-accordion";
+import dynamic from "next/dynamic";
+
+const CodeBlock = dynamic(() => import("@/components/ui/code-block").then(mod => mod.CodeBlock), { ssr: false });
+const SmoothAccordion = dynamic(() => import("@/components/ui/smooth-accordion").then(mod => mod.SmoothAccordion), { ssr: false });
 import { recordLastTopic } from "@/lib/user-progress";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
