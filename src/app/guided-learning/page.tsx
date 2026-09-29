@@ -137,7 +137,7 @@ export default function GuidedLearningPage() {
   const estTimeMins = totalItemsCount * 2;
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 max-w-5xl 2xl:max-w-7xl mx-auto">
       {/* Topic Selector Grid */}
       <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-4 sm:p-6 isolate">
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

@@ -330,13 +330,13 @@ export function InteractiveMindmap() {
       ref={containerRef}
       className={cn(
         "relative w-full overflow-hidden select-none border border-[var(--border)] bg-[#070709] rounded-3xl shadow-2xl transition-all duration-300 hidden lg:block",
-        isFullscreen ? "fixed inset-0 z-50 rounded-none h-dvh w-screen" : "h-[calc(100vh-140px)] min-h-[760px]"
+        isFullscreen ? "fixed inset-0 z-50 rounded-none h-dvh w-screen" : "min-h-[600px]"
       )}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onWheel={handleWheel}
-      style={{ cursor: isDragging ? "grabbing" : "grab" }}
+      style={{ cursor: isDragging ? "grabbing" : "grab", touchAction: "none", height: isFullscreen ? undefined : "clamp(600px, calc(100svh - 160px), 1100px)" }}
     >
       {/* ─── DOT GRID BACKGROUND ──────────────── */}
       <div

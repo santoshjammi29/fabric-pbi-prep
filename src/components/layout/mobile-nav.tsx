@@ -66,6 +66,7 @@ export function MobileNav() {
         "safe-area-pb"
       )}
       aria-label="Mobile Navigation"
+      style={{ touchAction: "pan-x" }}
     >
       {/* ── Compact Mobile Layout (< 640px): 5 Perfect Equal Columns, Zero Clipping ── */}
       <div className="flex sm:hidden items-center justify-around px-1 py-1">
