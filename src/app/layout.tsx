@@ -70,7 +70,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       style={{ colorScheme: "dark", backgroundColor: "#0A0A0B" }}
-      className={`${inter.variable} ${jetbrainsMono.variable} dark h-full antialiased bg-[#0A0A0B] text-[#f0f0f5]`}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark antialiased bg-[#0A0A0B] text-[#f0f0f5]`}
     >
       <head>
         <script

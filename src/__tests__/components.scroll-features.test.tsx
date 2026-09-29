@@ -22,27 +22,21 @@ describe('ScrollProgressBar Component', () => {
     expect(bar.getAttribute('aria-valuenow')).toBe('0')
   })
 
-  it('reacts to main-content scroll events and updates progress', async () => {
-    // Create a mock #main-content element
-    const container = document.createElement('div')
-    container.id = 'main-content'
-    Object.defineProperty(container, 'scrollHeight', { value: 1000, configurable: true })
-    Object.defineProperty(container, 'clientHeight', { value: 500, configurable: true })
-    Object.defineProperty(container, 'scrollTop', { value: 250, writable: true, configurable: true })
-    document.body.appendChild(container)
+  it('reacts to window scroll events and updates progress', async () => {
+    Object.defineProperty(document.documentElement, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(window, 'innerHeight', { value: 500, configurable: true })
+    Object.defineProperty(window, 'scrollY', { value: 250, writable: true, configurable: true })
 
     render(<ScrollProgressBar />)
 
     // Trigger scroll event
     await act(async () => {
-      container.dispatchEvent(new Event('scroll'))
+      window.dispatchEvent(new Event('scroll'))
     })
 
     const bar = screen.getByRole('progressbar', { name: /Page reading progress/i })
-    // At scrollTop = 250 with total = 500 (1000 - 500), progress is 50%
+    // At scrollY = 250 with total = 500 (1000 - 500), progress is 50%
     expect(bar.getAttribute('aria-valuenow')).toBe('50')
-
-    document.body.removeChild(container)
   })
 
   it('handles window scroll fallback if main-content has no scroll overflow', async () => {
@@ -79,31 +73,23 @@ describe('ScrollBackToTop Component', () => {
     expect(btn.className).toContain('pointer-events-none')
   })
 
-  it('becomes visible when main-content scrolls past threshold', async () => {
-    const container = document.createElement('div')
-    container.id = 'main-content'
-    Object.defineProperty(container, 'scrollTop', { value: 350, writable: true, configurable: true })
-    document.body.appendChild(container)
+  it('becomes visible when window scrolls past threshold', async () => {
+    Object.defineProperty(window, 'scrollY', { value: 350, writable: true, configurable: true })
 
     render(<ScrollBackToTop />)
 
     await act(async () => {
-      container.dispatchEvent(new Event('scroll'))
+      window.dispatchEvent(new Event('scroll'))
     })
 
     const btn = screen.getByRole('button', { name: /Scroll back to top/i })
     expect(btn.className).toContain('opacity-100')
     expect(btn.className).toContain('pointer-events-auto')
-
-    document.body.removeChild(container)
   })
 
   it('triggers smooth scroll to top when clicked', async () => {
-    const container = document.createElement('div')
-    container.id = 'main-content'
     const scrollToMock = vi.fn()
-    container.scrollTo = scrollToMock
-    document.body.appendChild(container)
+    window.scrollTo = scrollToMock
 
     render(<ScrollBackToTop />)
     const btn = screen.getByRole('button', { name: /Scroll back to top/i })
@@ -113,7 +99,6 @@ describe('ScrollBackToTop Component', () => {
     })
 
     expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
-    document.body.removeChild(container)
   })
 })
 

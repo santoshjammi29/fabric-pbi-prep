@@ -11,8 +11,7 @@ export function ScrollBackToTop() {
     let ticking = false;
 
     const checkScroll = () => {
-      const container = document.getElementById("main-content");
-      const currentScroll = container ? container.scrollTop : (window.scrollY || document.documentElement.scrollTop || 0);
+      const currentScroll = window.scrollY || document.documentElement.scrollTop || 0;
 
       setIsVisible(currentScroll > 260);
       ticking = false;
@@ -28,25 +27,14 @@ export function ScrollBackToTop() {
     // Initial check
     checkScroll();
 
-    const container = document.getElementById("main-content");
-    if (container) {
-      container.addEventListener("scroll", onScroll, { passive: true });
-    }
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      if (container) {
-        container.removeEventListener("scroll", onScroll);
-      }
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
   const scrollToTop = () => {
-    const container = document.getElementById("main-content");
-    if (container) {
-      container.scrollTo({ top: 0, behavior: "smooth" });
-    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

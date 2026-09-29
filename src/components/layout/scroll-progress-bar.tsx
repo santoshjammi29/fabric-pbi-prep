@@ -11,18 +11,9 @@ export function ScrollProgressBar() {
     let ticking = false;
 
     const computeProgress = () => {
-      const container = document.getElementById("main-content");
-      let current = 0;
-      let total = 0;
-
-      if (container && container.scrollHeight > container.clientHeight) {
-        current = container.scrollTop;
-        total = container.scrollHeight - container.clientHeight;
-      } else {
-        const docEl = document.documentElement;
-        current = window.scrollY || docEl.scrollTop || 0;
-        total = docEl.scrollHeight - window.innerHeight;
-      }
+      const docEl = document.documentElement;
+      const current = window.scrollY || docEl.scrollTop || 0;
+      const total = docEl.scrollHeight - window.innerHeight;
 
       if (total > 0) {
         const pct = Math.min(100, Math.max(0, (current / total) * 100));
@@ -43,17 +34,10 @@ export function ScrollProgressBar() {
     // Calculate immediately on mount/navigation
     computeProgress();
 
-    const container = document.getElementById("main-content");
-    if (container) {
-      container.addEventListener("scroll", onScroll, { passive: true });
-    }
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
 
     return () => {
-      if (container) {
-        container.removeEventListener("scroll", onScroll);
-      }
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
