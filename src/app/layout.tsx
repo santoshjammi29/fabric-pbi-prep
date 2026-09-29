@@ -80,8 +80,7 @@ export default function RootLayout({
         />
         <style dangerouslySetInnerHTML={{ __html: `
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
-          html, body { scrollbar-gutter: stable; overscroll-behavior-y: none; }
-          #main-content { overscroll-behavior: contain; }
+          html, body { scrollbar-gutter: stable; }
         `}} />
       </head>
       <body className="min-h-dvh bg-[#0A0A0B] text-[#f0f0f5]">
@@ -104,12 +103,12 @@ export default function RootLayout({
           </div>
 
           {/* App shell */}
-          <div className="relative z-10 flex h-dvh overflow-hidden">
+          <div className="relative z-10 flex min-h-dvh">
             {/* Desktop sidebar */}
             <Sidebar />
 
             {/* Main content area */}
-            <div className="flex flex-1 flex-col min-w-0 h-full overflow-hidden">
+            <div className="flex flex-1 flex-col min-w-0">
               {/* Mobile header */}
               <MobileHeader />
 
@@ -119,10 +118,10 @@ export default function RootLayout({
               {/* Page content */}
               <main
                 id="main-content"
-                className="flex-1 overflow-y-auto px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10 overscroll-contain"
+                className="flex-1 px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10"
                 tabIndex={-1}
               >
-                <div className="mx-auto max-w-[1600px]">
+                <div className="mx-auto w-full max-w-7xl 2xl:max-w-[1600px]">
                   <Breadcrumbs />
                   {children}
                 </div>

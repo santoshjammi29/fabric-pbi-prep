@@ -284,7 +284,7 @@ export default function QaPrepPage() {
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
+          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-xs font-semibold text-orange-400">
               <MessageSquare size={14} />
               <span>Step 5 · Interview Mastery</span>
@@ -324,7 +324,7 @@ export default function QaPrepPage() {
 
       {/* FLASHCARD STUDY MODE */}
       {isStudyMode && currentStudyCard && (
-        <div className="space-y-4 max-w-3xl mx-auto animate-in fade-in zoom-in-95 duration-300">
+        <div className="space-y-4 max-w-5xl 2xl:max-w-7xl mx-auto animate-in fade-in zoom-in-95 duration-300">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-2">
             <span>
               Card <strong>{studyIndex + 1}</strong> of <strong>{filteredQuestions.length}</strong>

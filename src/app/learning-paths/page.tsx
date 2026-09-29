@@ -51,7 +51,7 @@ function LearningPathsContent() {
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
+          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
               <Compass size={14} />
               <span>Structured Career Curricula</span>
@@ -134,7 +134,7 @@ function LearningPathsContent() {
         <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-8 animate-in fade-in duration-300">
           {/* Path Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-[var(--border)]">
-            <div className="space-y-3 max-w-3xl">
+            <div className="space-y-3 max-w-5xl 2xl:max-w-7xl">
               <div className="flex items-start sm:items-center gap-3">
                 <span className="text-3xl shrink-0 p-2 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">{selectedPath.icon}</span>
                 <div className="space-y-1">
