@@ -104,12 +104,12 @@ export default function RootLayout({
           </div>
 
           {/* App shell */}
-          <div className="relative z-10 flex min-h-dvh">
+          <div className="relative z-10 flex h-dvh overflow-hidden">
             {/* Desktop sidebar */}
             <Sidebar />
 
             {/* Main content area */}
-            <div className="flex flex-1 flex-col min-w-0">
+            <div className="flex flex-1 flex-col min-w-0 h-full overflow-hidden">
               {/* Mobile header */}
               <MobileHeader />
 
@@ -122,7 +122,7 @@ export default function RootLayout({
                 className="flex-1 overflow-y-auto px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10 overscroll-contain"
                 tabIndex={-1}
               >
-                <div className="mx-auto max-w-7xl">
+                <div className="mx-auto max-w-[1600px]">
                   <Breadcrumbs />
                   {children}
                 </div>

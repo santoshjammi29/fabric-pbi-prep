@@ -73,6 +73,9 @@ const RIGHT_SUBTOPIC_X = 2220;
 export function InteractiveMindmap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Dynamic canvas dimensions
+  const [canvasDim, setCanvasDim] = useState({ width: 2600, height: 1600 });
+
   // Transform state: pan & zoom
   const [zoom, setZoom] = useState(0.85);
   const [pan, setPan] = useState({ x: -450, y: -250 });
@@ -88,18 +91,41 @@ export function InteractiveMindmap() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
 
-  // Auto-center canvas on initial mount
+  // ResizeObserver for dynamic scaling on big monitors
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setCanvasDim({
+          width: Math.max(2600, width * 1.5),
+          height: Math.max(1600, height * 1.5),
+        });
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const ROOT_X = canvasDim.width / 2;
+  const ROOT_Y = canvasDim.height / 2;
+  const LEFT_BRANCH_X = ROOT_X - 450;
+  const RIGHT_BRANCH_X = ROOT_X + 450;
+  const LEFT_SUBTOPIC_X = ROOT_X - 920;
+  const RIGHT_SUBTOPIC_X = ROOT_X + 920;
+
+  // Auto-center canvas on initial mount or dimension change
   useEffect(() => {
     if (containerRef.current) {
       const { clientWidth, clientHeight } = containerRef.current;
       const initialZoom = clientWidth < 768 ? 0.45 : clientWidth < 1280 ? 0.65 : 0.82;
       setZoom(initialZoom);
       setPan({
-        x: (clientWidth - CANVAS_WIDTH * initialZoom) / 2,
-        y: (clientHeight - CANVAS_HEIGHT * initialZoom) / 2,
+        x: (clientWidth - canvasDim.width * initialZoom) / 2,
+        y: (clientHeight - canvasDim.height * initialZoom) / 2,
       });
     }
-  }, []);
+  }, [canvasDim.width, canvasDim.height]);
 
   // Handle Fullscreen toggle
   const toggleFullscreen = () => {
@@ -136,12 +162,12 @@ export function InteractiveMindmap() {
       const targetZoom = clientWidth < 768 ? 0.45 : 0.82;
       setZoom(targetZoom);
       setPan({
-        x: (clientWidth - CANVAS_WIDTH * targetZoom) / 2,
-        y: (clientHeight - CANVAS_HEIGHT * targetZoom) / 2,
+        x: (clientWidth - canvasDim.width * targetZoom) / 2,
+        y: (clientHeight - canvasDim.height * targetZoom) / 2,
       });
       setSelectedSubtopic(null);
     }
-  }, []);
+  }, [canvasDim.width, canvasDim.height]);
 
   // Pan interaction handlers (mouse drag)
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -244,8 +270,8 @@ export function InteractiveMindmap() {
     const leftDomains = MINDMAP_DOMAINS.filter((d) => d.side === "left");
     const rightDomains = MINDMAP_DOMAINS.filter((d) => d.side === "right");
 
-    const leftSpacing = CANVAS_HEIGHT / (leftDomains.length + 1);
-    const rightSpacing = CANVAS_HEIGHT / (rightDomains.length + 1);
+    const leftSpacing = canvasDim.height / (leftDomains.length + 1);
+    const rightSpacing = canvasDim.height / (rightDomains.length + 1);
 
     const positions: Record<
       string,
@@ -287,7 +313,7 @@ export function InteractiveMindmap() {
     });
 
     return positions;
-  }, []);
+  }, [canvasDim.height, LEFT_BRANCH_X, RIGHT_BRANCH_X, LEFT_SUBTOPIC_X, RIGHT_SUBTOPIC_X]);
 
   // Copy code helper
   const copySnippet = (code: string) => {
@@ -298,10 +324,12 @@ export function InteractiveMindmap() {
   };
 
   return (
+    <>
+    {/* Desktop Interactive Canvas View */}
     <div
       ref={containerRef}
       className={cn(
-        "relative w-full overflow-hidden select-none border border-[var(--border)] bg-[#070709] rounded-3xl shadow-2xl transition-all duration-300",
+        "relative w-full overflow-hidden select-none border border-[var(--border)] bg-[#070709] rounded-3xl shadow-2xl transition-all duration-300 hidden lg:block",
         isFullscreen ? "fixed inset-0 z-50 rounded-none h-dvh w-screen" : "h-[calc(100vh-140px)] min-h-[760px]"
       )}
       onMouseDown={handleMouseDown}
@@ -428,8 +456,8 @@ export function InteractiveMindmap() {
       <div
         className="absolute origin-top-left transition-transform duration-75 ease-out"
         style={{
-          width: `${CANVAS_WIDTH}px`,
-          height: `${CANVAS_HEIGHT}px`,
+          width: `${canvasDim.width}px`,
+          height: `${canvasDim.height}px`,
           transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
         }}
       >
@@ -840,5 +868,67 @@ export function InteractiveMindmap() {
         )}
       </AnimatePresence>
     </div>
+
+    {/* Mobile/Tablet Fallback List View */}
+    <div className="block lg:hidden space-y-6">
+      <div className="flex items-center gap-2 p-4 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-sm">
+        <Compass className="text-purple-400" size={24} />
+        <div>
+          <h2 className="text-sm font-bold text-[var(--foreground)]">Enterprise Data Stack 2026</h2>
+          <p className="text-xs text-[var(--muted-foreground)]">7 Core Domains</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {MINDMAP_DOMAINS.map((domain) => (
+          <div key={domain.id} className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] shadow-md overflow-hidden">
+            <div className={cn("p-4 border-b border-[var(--border)] flex items-center gap-3", domain.color.bg)}>
+              <div className={cn("p-2 rounded-xl border bg-[var(--surface-0)]", domain.color.text, domain.color.border)}>
+                {getDomainIcon(domain.icon, 20)}
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--foreground)]">{domain.title}</h3>
+                <p className="text-xs text-[var(--muted-foreground)]">{domain.subtopics.length} subtopics</p>
+              </div>
+            </div>
+            
+            <div className="divide-y divide-[var(--border)]">
+              {domain.subtopics.map((sub) => (
+                <div key={sub.id} className="p-4 space-y-3 hover:bg-[var(--surface-2)] transition-colors">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-[var(--foreground)] mb-1">{sub.name}</h4>
+                      <p className="text-xs text-[var(--muted-foreground)] line-clamp-2">{sub.desc}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {sub.protocols.slice(0, 4).map((p) => (
+                      <span key={p} className="text-[10px] px-2 py-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]">
+                        {p}
+                      </span>
+                    ))}
+                    {sub.protocols.length > 4 && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-lg text-[var(--muted-foreground)]">
+                        +{sub.protocols.length - 4}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <Link 
+                    href={sub.practiceLink}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-400 hover:text-purple-300 mt-2"
+                  >
+                    <span>Practice Questions</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    </>
   );
 }

@@ -17,10 +17,10 @@ describe('InteractiveMindmap Component', () => {
   it('renders subtopics for visible branches', () => {
     render(<InteractiveMindmap />);
     // Check known subtopics from different domains
-    expect(screen.getByText('Log-Based CDC & Event Sourcing')).toBeDefined();
-    expect(screen.getByText('ACID Open Table Formats')).toBeDefined();
-    expect(screen.getByText('Apache Spark 4.0 Internals')).toBeDefined();
-    expect(screen.getByText('Fabric Direct Lake & Memory Caching')).toBeDefined();
+    expect(screen.getAllByText('Log-Based CDC & Event Sourcing')[0]).toBeDefined();
+    expect(screen.getAllByText('ACID Open Table Formats')[0]).toBeDefined();
+    expect(screen.getAllByText('Apache Spark 4.0 Internals')[0]).toBeDefined();
+    expect(screen.getAllByText('Fabric Direct Lake & Memory Caching')[0]).toBeDefined();
   });
 
   it('filters nodes when searching', () => {
@@ -34,7 +34,7 @@ describe('InteractiveMindmap Component', () => {
 
   it('opens detail inspector drawer when subtopic is clicked', () => {
     render(<InteractiveMindmap />);
-    const subtopicNode = screen.getByText('Log-Based CDC & Event Sourcing');
+    const subtopicNode = screen.getAllByText('Log-Based CDC & Event Sourcing')[0];
     fireEvent.click(subtopicNode);
 
     // Inspector drawer should display trade-offs and practice button
