@@ -75,6 +75,7 @@ export interface Question {
   answer: string;
   domain?: string;
   subdomain?: string;
+  mergedFrom?: string[];
 }
 
 // ==========================================
@@ -282,6 +283,7 @@ export interface UnifiedQuestion {
   notes?: string[];
   use_case?: string;
   level?: CodeLevel | number;
+  mergedFrom?: string[];
 }
 
 // ==========================================
