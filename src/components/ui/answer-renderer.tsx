@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Layers,
   Code2,
@@ -26,6 +27,33 @@ interface ParsedPhase {
 
 // Markdown component renderers for AST-based parsing
 const markdownComponents = {
+  h3({ children }: { children?: React.ReactNode }) {
+    return <h3 className="text-sm sm:text-base font-bold text-purple-300 mt-4 mb-2 flex items-center gap-1.5">{children}</h3>;
+  },
+  table({ children }: { children?: React.ReactNode }) {
+    return (
+      <div className="overflow-x-auto my-3 rounded-xl border border-[var(--border)] bg-[#121214]">
+        <table className="w-full text-left border-collapse text-xs sm:text-sm">
+          {children}
+        </table>
+      </div>
+    );
+  },
+  thead({ children }: { children?: React.ReactNode }) {
+    return <thead className="bg-[var(--surface-2)] text-purple-300 font-semibold border-b border-[var(--border)]">{children}</thead>;
+  },
+  tbody({ children }: { children?: React.ReactNode }) {
+    return <tbody className="divide-y divide-[var(--border)] text-slate-200">{children}</tbody>;
+  },
+  tr({ children }: { children?: React.ReactNode }) {
+    return <tr className="hover:bg-white/[0.02] transition-colors">{children}</tr>;
+  },
+  th({ children }: { children?: React.ReactNode }) {
+    return <th className="px-3.5 py-2.5 font-semibold text-purple-300 text-xs tracking-wider border-b border-[var(--border)]">{children}</th>;
+  },
+  td({ children }: { children?: React.ReactNode }) {
+    return <td className="px-3.5 py-2.5 text-xs sm:text-sm leading-relaxed text-slate-200 border-t border-[var(--border)]/30">{children}</td>;
+  },
   pre({ children }: { children?: React.ReactNode }) {
     return <>{children}</>;
   },
@@ -118,7 +146,7 @@ export function AnswerRenderer({ text, className, compact = false }: AnswerRende
   if (phases.length === 0) {
     return (
       <div className={cn("space-y-3 text-xs sm:text-sm leading-relaxed", className)}>
-        <ReactMarkdown components={markdownComponents}>{cleanText}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{cleanText}</ReactMarkdown>
       </div>
     );
   }
@@ -191,7 +219,7 @@ function PhaseCard({ phase, compact }: { phase: ParsedPhase; compact?: boolean }
         {phaseNum === 3 ? (
           <Phase3HardeningBody content={rawContent} />
         ) : (
-          <ReactMarkdown components={markdownComponents}>{rawContent}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{rawContent}</ReactMarkdown>
         )}
       </div>
     </div>
@@ -203,7 +231,7 @@ function Phase3HardeningBody({ content }: { content: string }) {
   const bulletItems = lines.filter((l) => l.startsWith("-") || l.startsWith("*"));
 
   if (bulletItems.length === 0) {
-    return <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>;
+    return <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{content}</ReactMarkdown>;
   }
 
   return (
@@ -212,7 +240,7 @@ function Phase3HardeningBody({ content }: { content: string }) {
         if (!line.startsWith("-") && !line.startsWith("*")) {
           return (
             <div key={idx} className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-              <ReactMarkdown components={markdownComponents}>{line}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{line}</ReactMarkdown>
             </div>
           );
         }
@@ -230,7 +258,7 @@ function Phase3HardeningBody({ content }: { content: string }) {
             <div className="flex items-start gap-2">
               <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
               <div className="text-xs sm:text-sm text-slate-200 leading-relaxed flex-1">
-                <ReactMarkdown components={markdownComponents}>{mainPart.trim()}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{mainPart.trim()}</ReactMarkdown>
               </div>
             </div>
 
@@ -241,7 +269,7 @@ function Phase3HardeningBody({ content }: { content: string }) {
                   <span className="font-semibold text-emerald-400 uppercase tracking-wider text-[10px] mr-1">
                     Mitigation:
                   </span>
-                  <ReactMarkdown components={markdownComponents}>{remediationPart.trim()}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{remediationPart.trim()}</ReactMarkdown>
                 </div>
               </div>
             )}

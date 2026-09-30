@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from "react";
+import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -17,10 +18,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { questionsDb, questionsDeDb, getStandardizedDomain } from "@/data";
+import { questionsDb, questionsDeDb, conceptsDb, getStandardizedDomain } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
 import dynamic from "next/dynamic";
@@ -57,6 +59,13 @@ export default function QaPrepPage() {
   // Combine datasets
   const allQuestions: Question[] = useMemo(() => {
     return [...questionsDb, ...questionsDeDb];
+  }, []);
+
+  // Concept lookup map for Master Concept Map navigation
+  const conceptMap = useMemo(() => {
+    const map = new Map<string, { id: string; term: string }>();
+    conceptsDb.forEach((c) => map.set(c.id, { id: c.id, term: c.term }));
+    return map;
   }, []);
 
   // Sync URL parameters on initial load & popstate
@@ -338,10 +347,23 @@ export default function QaPrepPage() {
             className="min-h-[360px] p-8 rounded-3xl bg-[var(--surface-1)] border border-purple-500/40 shadow-2xl cursor-pointer select-none transition-all flex flex-col justify-between hover:border-purple-400 group"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">
-                  {currentStudyCard.category} · {currentStudyCard.niche}
-                </span>
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">
+                    {currentStudyCard.category} {currentStudyCard.niche ? `· ${currentStudyCard.niche}` : ""}
+                  </span>
+                  {currentStudyCard.linked_concept_id && conceptMap.get(currentStudyCard.linked_concept_id) && (
+                    <Link
+                      href={`/concepts?term=${encodeURIComponent(conceptMap.get(currentStudyCard.linked_concept_id)!.term)}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 hover:bg-cyan-500/20 hover:text-cyan-200 transition-colors"
+                      title={`Core Concept: ${conceptMap.get(currentStudyCard.linked_concept_id)!.term}`}
+                    >
+                      <BookOpen size={10} />
+                      <span>{conceptMap.get(currentStudyCard.linked_concept_id)!.term}</span>
+                    </Link>
+                  )}
+                </div>
                 <span
                   className={cn(
                     "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
@@ -610,6 +632,17 @@ export default function QaPrepPage() {
                             >
                               {q.difficulty}
                             </span>
+                            {q.linked_concept_id && conceptMap.get(q.linked_concept_id) && (
+                              <Link
+                                href={`/concepts?term=${encodeURIComponent(conceptMap.get(q.linked_concept_id)!.term)}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 hover:bg-cyan-500/20 hover:text-cyan-200 transition-colors"
+                                title={`Core Concept: ${conceptMap.get(q.linked_concept_id)!.term}`}
+                              >
+                                <BookOpen size={10} />
+                                <span>{conceptMap.get(q.linked_concept_id)!.term}</span>
+                              </Link>
+                            )}
                           </div>
                           <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight leading-snug">
                             {q.question}
