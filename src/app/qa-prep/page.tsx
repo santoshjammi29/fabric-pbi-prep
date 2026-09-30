@@ -19,6 +19,8 @@ import {
   ChevronRight,
   Filter,
   BookOpen,
+  Compass,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -42,6 +44,7 @@ export default function QaPrepPage() {
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [selectedDomain, setSelectedDomain] = useState<string>("ALL");
+  const [selectedConceptId, setSelectedConceptId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
   const pageSize = 25;
@@ -78,6 +81,15 @@ export default function QaPrepPage() {
       const domainParam = params.get("domain") || params.get("category");
       const diffParam = params.get("difficulty");
       const studyParam = params.get("study");
+      const conceptParam = params.get("conceptId") || params.get("concept");
+
+      if (conceptParam) {
+        setSelectedConceptId(conceptParam);
+        const termParam = params.get("term");
+        if (termParam && !qParam) {
+          setSearchQuery(termParam);
+        }
+      }
 
       if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
         setSelectedDifficulty(diffParam.toUpperCase());
@@ -178,6 +190,9 @@ export default function QaPrepPage() {
   // Filtered dataset
   const filteredQuestions = useMemo(() => {
     return allQuestions.filter((q) => {
+      if (selectedConceptId && q.linked_concept_id !== selectedConceptId) {
+        return false;
+      }
       if (selectedDifficulty !== "ALL" && q.difficulty !== selectedDifficulty) {
         return false;
       }
@@ -551,6 +566,33 @@ export default function QaPrepPage() {
             </div>
           </div>
 
+          {/* Active Concept Filter Banner (Modal Interconnectivity) */}
+          {selectedConceptId && (
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-xs">
+              <div className="flex items-center gap-2">
+                <BookOpen size={14} className="text-cyan-400 shrink-0" />
+                <span className="text-[var(--foreground)]">
+                  Filtered by Concept: <strong className="text-cyan-300">{conceptMap.get(selectedConceptId)?.term || selectedConceptId}</strong> ({filteredQuestions.length} questions)
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedConceptId(null);
+                  if (typeof window !== "undefined") {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete("conceptId");
+                    url.searchParams.delete("concept");
+                    window.history.replaceState(null, "", url.toString());
+                  }
+                }}
+                className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 hover:text-cyan-300 text-[11px] font-semibold flex items-center gap-1 transition-colors shrink-0"
+              >
+                <X size={12} />
+                <span>Clear Concept Filter</span>
+              </button>
+            </div>
+          )}
+
           {/* Results Action Bar */}
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
             <span>
@@ -706,6 +748,20 @@ export default function QaPrepPage() {
                       </div>
                       <div className="pt-2">
                         <AnswerRenderer text={q.answer} />
+                      </div>
+
+                      {/* Modal Interconnectivity: Q&A -> Mindmap & Concept links */}
+                      <div className="pt-3 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="text-[var(--muted-foreground)]">
+                          System Architecture Topography:
+                        </span>
+                        <Link
+                          href={`/mindmap?node=${q.linked_concept_id || q.category}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 font-semibold transition-colors shadow-sm"
+                        >
+                          <Compass size={13} />
+                          <span>Visualize in Mindmap</span>
+                        </Link>
                       </div>
                     </SmoothAccordion>
                   </div>

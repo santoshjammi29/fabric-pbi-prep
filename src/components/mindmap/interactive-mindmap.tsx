@@ -25,9 +25,12 @@ import {
   Copy,
   Check,
   Compass,
+  BookOpen,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { conceptsDb } from "@/data";
 import {
   MINDMAP_DOMAINS,
   MindmapDomain,
@@ -90,6 +93,37 @@ export function InteractiveMindmap() {
   const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<"rubric" | "concept">("rubric");
+  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+
+  // Sync URL search parameters (?node=... or ?conceptId=...) to automatically center & highlight nodes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const target = params.get("node") || params.get("conceptId") || params.get("highlight");
+      if (target) {
+        for (const domain of MINDMAP_DOMAINS) {
+          const match = domain.subtopics.find(
+            (s) =>
+              s.id.toLowerCase() === target.toLowerCase() ||
+              (s.conceptId && s.conceptId.toLowerCase() === target.toLowerCase()) ||
+              s.name.toLowerCase().includes(target.toLowerCase())
+          );
+          if (match) {
+            setSelectedDomain(domain);
+            setSelectedSubtopic(match);
+            setHighlightedNodeId(match.id);
+            setDrawerTab("concept");
+            break;
+          }
+        }
+      }
+    };
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, []);
 
   // ResizeObserver for dynamic scaling on big monitors
   useEffect(() => {
@@ -692,6 +726,8 @@ export function InteractiveMindmap() {
                     "w-72 p-3.5 rounded-2xl border transition-all duration-200 shadow-md cursor-pointer space-y-2 backdrop-blur-md",
                     isSelected
                       ? `bg-[var(--surface-1)] ${domain.color.border} ring-2 ring-purple-500 shadow-xl scale-105`
+                      : highlightedNodeId === sub.id
+                      ? "bg-[var(--surface-1)] border-cyan-400 ring-4 ring-cyan-400/80 shadow-2xl animate-pulse scale-105"
                       : isMatched
                       ? "bg-[var(--surface-1)] border-cyan-400 ring-2 ring-cyan-400/50"
                       : "bg-[var(--surface-1)]/90 border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -769,101 +805,208 @@ export function InteractiveMindmap() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="absolute top-0 right-0 bottom-0 z-40 w-full sm:w-[440px] bg-[var(--surface-1)] border-l border-[var(--border)] shadow-2xl p-6 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
           >
-            <div className="space-y-6">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border",
-                      selectedDomain.color.badge
-                    )}
-                  >
-                    {selectedDomain.shortTitle}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setSelectedSubtopic(null)}
-                  className="p-1.5 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors"
-                  aria-label="Close details"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+            {(() => {
+              const linkedConcept = selectedSubtopic.conceptId
+                ? conceptsDb.find((c) => c.id === selectedSubtopic.conceptId)
+                : null;
 
-              {/* Title & Description */}
-              <div className="space-y-2">
-                <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
-                  {selectedSubtopic.name}
-                </h3>
-                <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-                  {selectedSubtopic.desc}
-                </p>
-              </div>
-
-              {/* Architectural Trade-offs Callout */}
-              <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-amber-500/30 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
-                  <Sparkles size={14} />
-                  <span>Architectural Trade-Off &amp; Production Rubric</span>
-                </div>
-                <p className="text-xs text-[var(--foreground)] opacity-90 leading-relaxed">
-                  {selectedSubtopic.tradeOffs}
-                </p>
-              </div>
-
-              {/* Ecosystem & Protocols Badges */}
-              <div className="space-y-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                  Ecosystem Protocols &amp; Standard Tooling
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedSubtopic.protocols.map((protocol) => (
-                    <span
-                      key={protocol}
-                      className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
-                    >
-                      {protocol}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Code Snippet */}
-              {selectedSubtopic.codeSnippet && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      Production Blueprint Snippet
-                    </span>
+              return (
+                <div className="space-y-6">
+                  {/* Drawer Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border",
+                          selectedDomain.color.badge
+                        )}
+                      >
+                        {selectedDomain.shortTitle}
+                      </span>
+                    </div>
                     <button
-                      onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
-                      className="inline-flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300"
+                      onClick={() => setSelectedSubtopic(null)}
+                      className="p-1.5 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors"
+                      aria-label="Close details"
                     >
-                      {hasCopied ? <Check size={12} /> : <Copy size={12} />}
-                      <span>{hasCopied ? "Copied" : "Copy"}</span>
+                      <X size={18} />
                     </button>
                   </div>
-                  <pre className="p-3.5 rounded-xl bg-black/70 border border-[var(--border)] text-[11px] font-mono text-cyan-300 overflow-x-auto leading-relaxed">
-                    <code>{selectedSubtopic.codeSnippet}</code>
-                  </pre>
-                </div>
-              )}
-            </div>
 
-            {/* Drawer Footer */}
-            <div className="pt-6 mt-6 border-t border-[var(--border)] space-y-2">
-              <Link
-                href={selectedSubtopic.practiceLink}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-98 text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-600/30 transition-all"
-              >
-                <span>Practice Interview Q&amp;As for this Topic</span>
-                <ArrowRight size={15} />
-              </Link>
-              <p className="text-[11px] text-center text-[var(--muted-foreground)]">
-                Directly opens verified question banks &amp; scenario simulations
-              </p>
-            </div>
+                  {/* Mode Tab Switcher: Concept Card vs Architect Rubric */}
+                  <div className="flex items-center p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold">
+                    <button
+                      onClick={() => setDrawerTab("concept")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg transition-all",
+                        drawerTab === "concept"
+                          ? "bg-purple-600 text-white shadow-sm"
+                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                      )}
+                    >
+                      <BookOpen size={13} />
+                      <span>Concept Card</span>
+                    </button>
+                    <button
+                      onClick={() => setDrawerTab("rubric")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg transition-all",
+                        drawerTab === "rubric"
+                          ? "bg-purple-600 text-white shadow-sm"
+                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                      )}
+                    >
+                      <Sparkles size={13} />
+                      <span>Architect Rubric</span>
+                    </button>
+                  </div>
+
+                  {/* VIEW 1: CONCEPT CARD OVERLAY */}
+                  {drawerTab === "concept" && (
+                    <div className="space-y-5 animate-in fade-in duration-200">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                          {linkedConcept?.category || selectedDomain.shortTitle} · Core Concept
+                        </span>
+                        <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
+                          {linkedConcept?.term || selectedSubtopic.name}
+                        </h3>
+                      </div>
+
+                      {/* Plain-English Definition */}
+                      <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-cyan-500/30 space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                          Plain-English Definition
+                        </span>
+                        <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                          {linkedConcept?.definition || selectedSubtopic.desc}
+                        </p>
+                      </div>
+
+                      {/* Architectural Deep-Dive */}
+                      <div className="space-y-1.5">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
+                          <Sparkles size={13} className="text-purple-400" />
+                          Architectural Deep-Dive
+                        </h4>
+                        <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                          {linkedConcept?.explanation || selectedSubtopic.tradeOffs}
+                        </p>
+                      </div>
+
+                      {/* Key Architectural Takeaways */}
+                      {linkedConcept?.keyPoints && linkedConcept.keyPoints.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                            Core Takeaways:
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {linkedConcept.keyPoints.map((point, ki) => (
+                              <li key={ki} className="flex items-start gap-2 text-xs text-[var(--muted-foreground)]">
+                                <CheckCircle2 size={13} className="text-green-400 mt-0.5 shrink-0" />
+                                <span className="leading-snug">{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* VIEW 2: ARCHITECT RUBRIC (ORIGINAL VIEW) */}
+                  {drawerTab === "rubric" && (
+                    <div className="space-y-5 animate-in fade-in duration-200">
+                      {/* Title & Description */}
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
+                          {selectedSubtopic.name}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+                          {selectedSubtopic.desc}
+                        </p>
+                      </div>
+
+                      {/* Architectural Trade-offs Callout */}
+                      <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-amber-500/30 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                          <Sparkles size={14} />
+                          <span>Architectural Trade-Off &amp; Production Rubric</span>
+                        </div>
+                        <p className="text-xs text-[var(--foreground)] opacity-90 leading-relaxed">
+                          {selectedSubtopic.tradeOffs}
+                        </p>
+                      </div>
+
+                      {/* Ecosystem & Protocols Badges */}
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                          Ecosystem Protocols &amp; Standard Tooling
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedSubtopic.protocols.map((protocol) => (
+                            <span
+                              key={protocol}
+                              className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
+                            >
+                              {protocol}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Code Snippet */}
+                      {selectedSubtopic.codeSnippet && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                              Production Blueprint Snippet
+                            </span>
+                            <button
+                              onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
+                              className="inline-flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300"
+                            >
+                              {hasCopied ? <Check size={12} /> : <Copy size={12} />}
+                              <span>{hasCopied ? "Copied" : "Copy"}</span>
+                            </button>
+                          </div>
+                          <pre className="p-3.5 rounded-xl bg-black/70 border border-[var(--border)] text-[11px] font-mono text-cyan-300 overflow-x-auto leading-relaxed">
+                            <code>{selectedSubtopic.codeSnippet}</code>
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Drawer Footer Actions */}
+                  <div className="pt-6 mt-6 border-t border-[var(--border)] space-y-2">
+                    <Link
+                      href={
+                        selectedSubtopic.conceptId
+                          ? `/qa-prep?conceptId=${selectedSubtopic.conceptId}&term=${encodeURIComponent(selectedSubtopic.name)}`
+                          : selectedSubtopic.practiceLink
+                      }
+                      className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-98 text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-600/30 transition-all"
+                    >
+                      <Zap size={15} />
+                      <span>Practice Interview Q&amp;As for this Topic</span>
+                      <ArrowRight size={15} />
+                    </Link>
+                    {linkedConcept && (
+                      <Link
+                        href={`/concepts?card=${linkedConcept.id}`}
+                        className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 text-xs font-semibold transition-colors border border-[var(--border)]"
+                      >
+                        <BookOpen size={13} />
+                        <span>Open in Concepts Library</span>
+                      </Link>
+                    )}
+                    <p className="text-[11px] text-center text-[var(--muted-foreground)]">
+                      Filters verified interview questions for this specific architecture node
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
           </m.div>
         )}
       </AnimatePresence>

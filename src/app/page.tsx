@@ -1,3 +1,6 @@
+"use client";
+
+import { useUserStore } from "@/store/useUserStore";
 import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { EditorialHero } from "@/components/dashboard/editorial-hero";
 import { HeroQuickStart } from "@/components/dashboard/hero-quick-start";
@@ -19,6 +22,9 @@ function SectionDivider({ text }: { text: string }) {
 }
 
 export default function DashboardPage() {
+  const activeTier = useUserStore((s) => s.experienceTier);
+  const isBeginnerRail = activeTier === "beginner";
+
   return (
     <div className="space-y-8 pb-24 lg:pb-12">
       {/* 1. Horizontal Scrolling Bar at the very top of the home page */}
@@ -32,6 +38,14 @@ export default function DashboardPage() {
 
       {/* 4. 4-Tier Interactive Experience Level Switcher */}
       <ExperienceLevelSwitcher />
+
+      {/* For Beginners: Hoist the Visual Progression Roadmap to the TOP */}
+      {isBeginnerRail && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          <SectionDivider text="The Beginner's Rail: 6-Step Progression Curriculum" />
+          <RoadmapGrid />
+        </div>
+      )}
 
       {/* 5. Category Capsule Navigation (Architecture Focus) */}
       <TopicCapsules />
@@ -53,9 +67,13 @@ export default function DashboardPage() {
       <SectionDivider text="Portal Analytics & Live Question Banks" />
       <StatCards />
 
-      {/* 9. Guided Curriculum Roadmap */}
-      <SectionDivider text="Your Guided Curriculum Roadmap" />
-      <RoadmapGrid />
+      {/* For Advanced Tiers: Curriculum Roadmap in standard architectural position */}
+      {!isBeginnerRail && (
+        <>
+          <SectionDivider text="Your Guided Curriculum Roadmap" />
+          <RoadmapGrid />
+        </>
+      )}
 
       {/* 10. Architect Digest Subscription (SitePoint & Noupe callout box) */}
       <ArchitectDigest />

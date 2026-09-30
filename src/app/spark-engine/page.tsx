@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { pysparkData } from "@/data";
 import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
+import { PrerequisiteBanner } from "@/components/ui/prerequisite-banner";
 import { recordLastTopic } from "@/lib/user-progress";
 
 type SparkSubtab = "architecture" | "simulator" | "memory" | "curriculum" | "lexicon";
@@ -295,6 +296,28 @@ export default function SparkEnginePage() {
           </div>
         </div>
       </div>
+
+      {/* Prerequisite Cognitive Scaffolding Banner */}
+      <PrerequisiteBanner
+        moduleTitle="Apache Spark 4.0 Engine Internals"
+        prerequisites={[
+          {
+            term: "Lakehouse vs Data Warehouse",
+            conceptId: "fabric-lakehouse",
+            whyNeeded: "Understand why Spark executes transformations against open object storage formats rather than relational database engines.",
+          },
+          {
+            term: "Medallion Architecture",
+            conceptId: "fabric-medallion",
+            whyNeeded: "Provides the structured data pipeline boundaries (Bronze raw, Silver validated, Gold business) where Spark tasks execute.",
+          },
+          {
+            term: "Delta Lake & ACID",
+            conceptId: "dl-delta-lake",
+            whyNeeded: "Learn how Spark safely writes transactional Parquet logs without concurrent write collisions or partial write corruption.",
+          },
+        ]}
+      />
 
       {/* 4-Layer Integrated Domain Taxonomy */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

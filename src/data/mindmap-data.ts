@@ -10,6 +10,7 @@ export interface MindmapSubtopic {
   tradeOffs: string;
   protocols: string[];
   practiceLink: string;
+  conceptId?: string;
   codeSnippet?: string;
 }
 
@@ -51,6 +52,7 @@ export const MINDMAP_DOMAINS: MindmapDomain[] = [
     subtopics: [
       {
         id: "ingestion-cdc",
+        conceptId: "de-cdc",
         name: "Log-Based CDC & Event Sourcing",
         desc: "Zero-overhead transaction log mining (WAL/Binlog) extracting row-level inserts, updates, and deletes with ACID consistency.",
         tradeOffs: "Near real-time latency (<1s) vs initial snapshot resource spikes and schema drift handling.",
@@ -67,6 +69,7 @@ export const MINDMAP_DOMAINS: MindmapDomain[] = [
       },
       {
         id: "ingestion-brokers",
+        conceptId: "de-outbox-pattern",
         name: "Distributed Event Brokers",
         desc: "Horizontally partitioned append-only commit logs providing consumer group load-balancing and durable replay.",
         tradeOffs: "Extreme write throughput (GB/s) vs partition rebalancing latency and consumer lag monitoring.",
@@ -79,6 +82,7 @@ kafka-consumer-groups.sh --bootstrap-server kafka:9092 \\
       },
       {
         id: "ingestion-processing",
+        conceptId: "spark-streaming-checkpointing",
         name: "Stream Processing Engines",
         desc: "Stateful streaming transformations with event-time watermarking, sessionization, and exactly-once checkpointing.",
         tradeOffs: "Sub-second analytical aggregates vs RocksDB state store memory pressure and checkpoint storage I/O.",
@@ -94,6 +98,7 @@ val streamDf = spark.readStream
       },
       {
         id: "ingestion-batch",
+        conceptId: "fabric-dataflows-gen2",
         name: "Edge & Polyglot Batch Connectors",
         desc: "Managed orchestrator endpoints, REST API webhooks, SFTP file listeners, and high-concurrency staging pools.",
         tradeOffs: "Simple implementation and schema validation vs poll latency and duplicate record deduplication overhead.",
@@ -120,6 +125,7 @@ val streamDf = spark.readStream
     subtopics: [
       {
         id: "storage-formats",
+        conceptId: "dl-delta-lake",
         name: "ACID Open Table Formats",
         desc: "Atomic commit logs, snapshot isolation, time travel, and unified streaming + batch writes directly on object storage.",
         tradeOffs: "Eliminates warehouse vendor lock-in vs metadata management and periodic commit log compaction.",
@@ -135,6 +141,7 @@ ALTER TABLE gold_sales SET TBLPROPERTIES (
       },
       {
         id: "storage-clustering",
+        conceptId: "delta-liquid-clustering",
         name: "Liquid Clustering & Z-Ordering",
         desc: "Multi-dimensional file indexing grouping co-queried data into identical Parquet files to eliminate file scan I/O.",
         tradeOffs: "Dramatic query speedups (10x-50x) vs write-time shuffle overhead and periodic OPTIMIZE execution.",
@@ -148,6 +155,7 @@ OPTIMIZE silver_telemetry;`,
       },
       {
         id: "storage-uniform",
+        conceptId: "dl-uniform",
         name: "UniForm & Universal Catalogs",
         desc: "Write Delta Parquet files once while automatically generating Apache Iceberg and Hudi metadata for multi-engine access.",
         tradeOffs: "Zero storage duplication across Snowflake, Databricks, and Fabric vs slight catalog sync latency.",
@@ -156,6 +164,7 @@ OPTIMIZE silver_telemetry;`,
       },
       {
         id: "storage-substrate",
+        conceptId: "fabric-onelake",
         name: "Cloud Object Storage Substrate",
         desc: "Hyperscale distributed blob storage providing 99.999999999% durability, hierarchical namespaces, and private endpoint isolation.",
         tradeOffs: "Low cost ($0.02/GB) vs eventual metadata listing bottlenecks on flat namespaces.",
@@ -182,6 +191,7 @@ OPTIMIZE silver_telemetry;`,
     subtopics: [
       {
         id: "compute-spark",
+        conceptId: "spark-memory-management",
         name: "Apache Spark 4.0 Internals",
         desc: "Catalyst rule-based query planner, Project Tungsten off-heap memory, Adaptive Query Execution (AQE), and Dynamic Partition Pruning.",
         tradeOffs: "Handles petabyte scale with fault tolerance vs JVM GC pauses, executor OOM risks, and cluster startup delay.",
@@ -194,6 +204,7 @@ spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")`,
       },
       {
         id: "compute-vectorized",
+        conceptId: "fabric-v-order",
         name: "Native C++ Vectorized Kernels",
         desc: "SIMD instruction-level parallelism, columnar cache-aware processing, and direct CPU memory execution bypassing the JVM.",
         tradeOffs: "3x-5x faster raw compute and lower cloud spend vs proprietary runtime availability.",
@@ -202,6 +213,7 @@ spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")`,
       },
       {
         id: "compute-embedded",
+        conceptId: "fabric-kql-database",
         name: "Embedded Columnar Engines",
         desc: "In-process analytical SQL engines designed for instant startup, zero network egress, and blazingly fast Parquet operations.",
         tradeOffs: "Microsecond query response and zero infrastructure management vs single-node RAM boundaries.",
@@ -220,6 +232,7 @@ df = q.collect()`,
       },
       {
         id: "compute-dbt",
+        conceptId: "de-dbt",
         name: "Declarative Transformations (dbt/SQLMesh)",
         desc: "Transformations defined as declarative SQL SELECT models with automated DAG dependency compilation, unit tests, and lineage.",
         tradeOffs: "Version control, dry testing, and self-documenting models vs warehouse compute consumption for materializations.",
@@ -248,6 +261,7 @@ df = q.collect()`,
     subtopics: [
       {
         id: "serving-directlake",
+        conceptId: "fabric-direct-lake",
         name: "Fabric Direct Lake & Memory Caching",
         desc: "Power BI VertiPaq engine directly loads OneLake Delta Parquet columns into RAM on-demand, eliminating scheduled import refreshes.",
         tradeOffs: "Sub-second dashboards on billions of rows without data copying vs DirectQuery fallback if memory limits are exceeded.",
@@ -264,6 +278,7 @@ DEFINE
       },
       {
         id: "serving-warehouses",
+        conceptId: "fabric-lakehouse",
         name: "Serverless Analytical Warehouses",
         desc: "Separation of compute and storage with auto-suspend, multi-cluster concurrency scaling, and cached result reuse.",
         tradeOffs: "Instant scaling for thousands of analysts vs per-second compute billing if queries are unoptimized.",
@@ -272,6 +287,7 @@ DEFINE
       },
       {
         id: "serving-semantic",
+        conceptId: "pbi-star-schema",
         name: "Universal Semantic & Metrics Layer",
         desc: "Centralized metric definitions (e.g. ARR, Churn, Active Users) governed in code and queryable by any BI tool or LLM.",
         tradeOffs: "Single source of truth across Power BI, Tableau, and agents vs upfront semantic modeling governance overhead.",
@@ -280,6 +296,7 @@ DEFINE
       },
       {
         id: "serving-composite",
+        conceptId: "pbi-import-mode",
         name: "Composite Models & Hybrid Partitions",
         desc: "Combine blazing-fast in-memory cached historical data with real-time DirectQuery partitions for current-day telemetry.",
         tradeOffs: "Combines petabyte scale with real-time freshness vs complex relationship modeling and query plan debugging.",
@@ -306,6 +323,7 @@ DEFINE
     subtopics: [
       {
         id: "orchestration-pipelines",
+        conceptId: "fabric-shortcuts",
         name: "Metadata-Driven Pipeline Orchestration",
         desc: "Parameterized pipelines executing dynamic parallel loops from database control tables with failure circuit breakers.",
         tradeOffs: "Eliminates hardcoded pipelines across thousands of tables vs initial control framework engineering effort.",
@@ -326,6 +344,7 @@ DEFINE
       },
       {
         id: "orchestration-airflow",
+        conceptId: "airflow-airflow---spark-integration",
         name: "Code-First DAG Orchestrators",
         desc: "Pipelines defined strictly as Python code allowing unit testing, dynamic task generation, and SLA alerting.",
         tradeOffs: "Maximum flexibility and rich ecosystem integrations vs infrastructure hosting and Celery/Kubernetes executor tuning.",
@@ -334,6 +353,7 @@ DEFINE
       },
       {
         id: "orchestration-cicd",
+        conceptId: "fabric-capacities",
         name: "Data CI/CD & Deployment Pipelines",
         desc: "Automated PR testing with ephemeral staging schemas, PBIP git synchronization, and Azure DevOps / GitHub Actions.",
         tradeOffs: "Zero production regressions and automated rollbacks vs pipeline build time and dev sandbox costs.",
@@ -342,6 +362,7 @@ DEFINE
       },
       {
         id: "orchestration-bluegreen",
+        conceptId: "delta-occ-conflicts",
         name: "Zero-Downtime Blue-Green Cutover",
         desc: "Materialize new lakehouse table versions in a shadow schema, run data quality gates, and atomically swap table pointers.",
         tradeOffs: "Zero downstream downtime during breaking schema migrations vs 2x storage consumption during active cutover.",
@@ -368,6 +389,7 @@ DEFINE
     subtopics: [
       {
         id: "governance-catalog",
+        conceptId: "databricks-governance-with-unity-catalog---purview",
         name: "Unified Access Control & Catalogs",
         desc: "Centralized 3-level namespace (catalog.schema.table) enforcing row-level security, column masking, and tag-based policies.",
         tradeOffs: "Consistent enterprise security across multiple engines vs cross-account credential federation complexity.",
@@ -382,6 +404,7 @@ ALTER TABLE gold_employees ALTER COLUMN ssn SET MASK pii_mask;`,
       },
       {
         id: "governance-contracts",
+        conceptId: "de-data-contracts",
         name: "Data Contracts & Quality Assertion",
         desc: "Enforceable schema and SLA contracts published by upstream domain producers with automated circuit-breaking quarantine.",
         tradeOffs: "Stops breaking schema changes before reaching analytical consumers vs friction during rapid source iteration.",
@@ -390,6 +413,7 @@ ALTER TABLE gold_employees ALTER COLUMN ssn SET MASK pii_mask;`,
       },
       {
         id: "governance-finops",
+        conceptId: "de-finops-unit-economics",
         name: "Cloud FinOps & Capacity Optimization",
         desc: "Capacity Unit (CU) smoothing, burst throttling, auto-termination of idle clusters, and automated orphan file VACUUMing.",
         tradeOffs: "Reduces cloud data bills by 30%-60% vs potential queue delays during peak concurrent workloads.",
@@ -398,6 +422,7 @@ ALTER TABLE gold_employees ALTER COLUMN ssn SET MASK pii_mask;`,
       },
       {
         id: "governance-mesh",
+        conceptId: "fabric-onelake-mesh",
         name: "Data Mesh Federated Ownership",
         desc: "Domain-oriented decentralized data ownership treating data as a product with federated computational governance.",
         tradeOffs: "High developer autonomy and rapid scaling across business units vs central governance alignment overhead.",
@@ -424,6 +449,7 @@ ALTER TABLE gold_employees ALTER COLUMN ssn SET MASK pii_mask;`,
     subtopics: [
       {
         id: "ai-vector",
+        conceptId: "databricks-vector-search",
         name: "Vector Search & Hybrid Retrieval",
         desc: "High-dimensional vector indexing (HNSW, IVF) integrated directly into the Lakehouse alongside structured metadata filters.",
         tradeOffs: "Enables semantic semantic search and RAG over enterprise data vs vector embedding generation and index refresh cost.",
@@ -436,6 +462,7 @@ WITH (m = 16, ef_construction = 64);`,
       },
       {
         id: "ai-mcp",
+        conceptId: "spark-connect",
         name: "Model Context Protocol (MCP) Endpoints",
         desc: "Exposing governed warehouse schemas, semantic models, and pipeline triggers to AI agents via standardized JSON-RPC protocols.",
         tradeOffs: "Autonomous AI agent tool calls with audited permissions vs strict prompt injection and query cost guardrails.",
@@ -444,6 +471,7 @@ WITH (m = 16, ef_construction = 64);`,
       },
       {
         id: "ai-text2sql",
+        conceptId: "fabric-semantic-link",
         name: "Deterministic Text-to-SQL Systems",
         desc: "Combining LLMs with semantic metadata schemas, golden query few-shot examples, and automated SQL AST validation.",
         tradeOffs: "Enables natural language business analytics vs hallucinations on complex joins requiring guardrail verification.",

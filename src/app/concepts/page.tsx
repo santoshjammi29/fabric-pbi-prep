@@ -19,6 +19,8 @@ import {
   FileCode2,
   Terminal,
   MessageSquare,
+  Compass,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -677,6 +679,24 @@ function ConceptsContent() {
                           </ul>
                         </div>
                       )}
+
+                      {/* Modal Interconnectivity: The Knowledge Loop */}
+                      <div className="pt-3 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-2">
+                        <Link
+                          href={`/qa-prep?conceptId=${concept.id}&term=${encodeURIComponent(concept.term)}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-colors shadow-sm"
+                        >
+                          <Zap size={13} />
+                          <span>Test Your Knowledge (Q&amp;A)</span>
+                        </Link>
+                        <Link
+                          href={`/mindmap?node=${concept.id}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 font-semibold text-xs transition-colors border border-[var(--border)]"
+                        >
+                          <Compass size={13} />
+                          <span>Visualize in Mindmap</span>
+                        </Link>
+                      </div>
                     </SmoothAccordion>
                   </div>
                 );
