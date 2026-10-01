@@ -15,6 +15,7 @@ import {
   User,
   LayoutGrid,
   BookMarked,
+  Terminal,
 } from "lucide-react";
 
 // 4 Core tabs on small mobile screens (< 640px)
@@ -31,6 +32,7 @@ const tabletTabs = [
   { label: "Concepts", href: "/concepts", icon: BookOpen },
   { label: "Python", href: "/python", icon: Code2, isNew: true },
   { label: "Code", href: "/code-practice", icon: FileCode2 },
+  { label: "Cheat", href: "/cheat-sheet", icon: Terminal, isNew: true },
   { label: "Spark", href: "/spark-engine", icon: Zap },
   { label: "Modern", href: "/modern-stack", icon: Layers },
   { label: "Q&A", href: "/qa-prep", icon: MessageSquare },

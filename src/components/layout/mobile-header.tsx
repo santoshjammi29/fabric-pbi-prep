@@ -22,6 +22,7 @@ import {
   Building2,
   Compass,
   User,
+  Terminal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +48,7 @@ const navGroups: NavGroup[] = [
       { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "112 Terms", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
       { label: "Python Hub", href: "/python", icon: Code2, badge: "NEW", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
       { label: "Code Practice", href: "/code-practice", icon: FileCode2, badge: "Medium", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
       { label: "Spark Engine", href: "/spark-engine", icon: Zap, badge: "Medium", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
       { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Hard", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
       { label: "DE Mindmap", href: "/mindmap", icon: Globe, badge: "NEW", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },

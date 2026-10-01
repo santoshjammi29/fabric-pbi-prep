@@ -22,6 +22,7 @@ import {
   Moon,
   ChevronLeft,
   BookMarked,
+  Terminal,
 } from "lucide-react";
 
 interface NavItem {
@@ -61,6 +62,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Architecture Hub", href: "/architecture", icon: Layers, pill: { text: "Principal", variant: "architect" } },
       { label: "Code Practice", href: "/code-practice", icon: FileCode2, pill: { text: "Advanced", variant: "medium" } },
+      { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, pill: { text: "Prod Ready", variant: "new" } },
     ],
   },
   {

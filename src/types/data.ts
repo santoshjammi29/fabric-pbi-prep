@@ -308,3 +308,36 @@ export interface DatasetCounts {
   learningPathsDb: number;
   totalQuestions: number;
 }
+
+// ==========================================
+// 12. Production Cheat Sheet
+// ==========================================
+
+export type CheatCodeCategory =
+  | 'Spark Core'
+  | 'Spark Optimization'
+  | 'Orchestration'
+  | 'Debugging & Observability'
+  | 'SQL & Storage'
+  | 'Production Best Practices';
+
+export type CheatCodeImpact = 'High Impact' | 'Quick Win' | 'Architect Level' | 'Critical';
+export type CheatCodeEffort = 'Low Effort' | 'Medium Effort' | 'High Effort';
+
+export interface CheatCode {
+  id: string;
+  title: string;
+  category: CheatCodeCategory;
+  categorySlug: string;
+  impact: CheatCodeImpact;
+  effort: CheatCodeEffort;
+  problem: string;
+  solution: string;
+  codeSnippet: string;
+  language: 'python' | 'sql' | 'bash' | 'json';
+  whyItMatters: string;
+  metrics: string;
+  antiPattern: string;
+  tags: string[];
+  docLinks?: { label: string; url?: string }[];
+}

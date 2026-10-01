@@ -20,9 +20,10 @@ import {
   Calculator,
   Flame,
   Globe,
+  Terminal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { conceptsDb, learningPathsDb, modernBlueprintsDb } from "@/data";
+import { conceptsDb, learningPathsDb, modernBlueprintsDb, cheatsheetData } from "@/data";
 
 interface CommandItem {
   id: string;
@@ -52,6 +53,7 @@ export function CommandPalette() {
       { id: "nav-mindmap", title: "DE Mindmap (Visual Architecture Topography)", category: "Navigation", icon: Globe, href: "/mindmap", badge: "NEW" },
       { id: "nav-qa", title: "Q&A Prep Hub (6,100+ Questions)", category: "Navigation", icon: MessageSquare, href: "/qa-prep", badge: "SM-2" },
       { id: "nav-arch", title: "Architecture Hub (2,400+ Scenarios)", category: "Navigation", icon: Cpu, href: "/architecture", badge: "Architect" },
+      { id: "nav-cheatsheet", title: "Production Cheat Sheet (Spark, dbt, Airflow, SQL)", category: "Navigation", icon: Terminal, href: "/cheat-sheet", badge: "PROD" },
       { id: "nav-gcc", title: "Company Research (GCC Profiles)", category: "Navigation", icon: Building2, href: "/company-research", badge: "Enterprise" },
       { id: "nav-paths", title: "Learning Paths (12 Structured Tracks)", category: "Navigation", icon: Compass, href: "/learning-paths", badge: "Curriculum" },
       { id: "nav-diagnostic", title: "Diagnostic Assessment (10-Q Architecture Evaluation)", category: "Navigation", icon: GraduationCap, href: "/diagnostic", badge: "10-Q" },
@@ -97,7 +99,17 @@ export function CommandPalette() {
       keywords: b.tags,
     }));
 
-    return [...staticRoutes, ...conceptItems, ...pathItems, ...blueprintItems];
+    const cheatItems: CommandItem[] = cheatsheetData.map((c) => ({
+      id: `cheat-${c.id}`,
+      title: `${c.title} — ${c.category}`,
+      category: "Concepts",
+      icon: Terminal,
+      href: `/cheat-sheet?id=${c.id}`,
+      badge: c.impact,
+      keywords: [c.problem, c.solution, c.whyItMatters, ...c.tags],
+    }));
+
+    return [...staticRoutes, ...conceptItems, ...pathItems, ...blueprintItems, ...cheatItems];
   }, [staticRoutes]);
 
   // Filter items based on query
