@@ -45,7 +45,7 @@ export function ScrollBackToTop() {
       aria-label="Scroll back to top"
       title="Scroll back to top"
       className={cn(
-        "fixed z-40 bottom-20 right-4 md:bottom-20 md:right-6 lg:bottom-[88px] lg:right-8 flex items-center justify-center w-11 h-11 rounded-full",
+        "fixed z-40 bottom-20 right-4 md:bottom-24 md:right-6 lg:bottom-[96px] lg:right-8 flex items-center justify-center w-11 h-11 rounded-full",
         "backdrop-blur-xl shadow-lg transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
         "bg-white/90 text-purple-700 border border-purple-200 hover:bg-purple-50 shadow-purple-900/10",
         "dark:bg-slate-900/85 dark:text-purple-300 dark:border-purple-500/30 dark:hover:bg-purple-900/30 dark:hover:text-purple-100 dark:shadow-purple-950/40",
