@@ -41,4 +41,43 @@ describe('InteractiveMindmap Component', () => {
     expect(screen.getByText(/Architectural Trade-Off & Production Rubric/i)).toBeDefined();
     expect(screen.getByText(/Practice Interview Q&As for this Topic/i)).toBeDefined();
   });
+
+  it('toggles architectural data flow stream mode', () => {
+    render(<InteractiveMindmap />);
+    // FLOW #01 is active by default in flow mode
+    expect(screen.getAllByText(/FLOW #01/i).length).toBeGreaterThan(0);
+
+    const flowBtn = screen.getByTitle(/toggle animated architectural data flow/i);
+    // Toggle flow mode off
+    fireEvent.click(flowBtn);
+    expect(screen.queryByText(/FLOW #01/i)).toBeNull();
+
+    // Toggle flow mode back on
+    fireEvent.click(flowBtn);
+    expect(screen.getAllByText(/FLOW #01/i).length).toBeGreaterThan(0);
+  });
+
+  it('provides a Tidy Up button to reset dragged nodes', () => {
+    render(<InteractiveMindmap />);
+    const tidyBtn = screen.getByTitle(/auto-organize movable nodes/i);
+    expect(tidyBtn).toBeDefined();
+    fireEvent.click(tidyBtn);
+  });
+
+  it('prevents default window scroll when wheel event occurs on canvas', () => {
+    const { container } = render(<InteractiveMindmap />);
+    const canvasContainer = container.querySelector('.select-none.border');
+    expect(canvasContainer).toBeDefined();
+
+    if (canvasContainer) {
+      const wheelEvent = new WheelEvent('wheel', {
+        deltaY: 50,
+        bubbles: true,
+        cancelable: true,
+      });
+      canvasContainer.dispatchEvent(wheelEvent);
+      expect(wheelEvent.defaultPrevented).toBe(true);
+    }
+  });
 });
+
