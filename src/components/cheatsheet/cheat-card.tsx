@@ -192,7 +192,7 @@ export function CheatCard({
           <div className="space-y-3 pt-2 text-xs">
             {/* The Why */}
             <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/15">
-              <span className="font-bold text-blue-400 block mb-1">The "Why" (Production ROI):</span>
+              <span className="font-bold text-blue-400 block mb-1">The &quot;Why&quot; (Production ROI):</span>
               <p className="text-[var(--foreground)] leading-relaxed">{cheat.whyItMatters}</p>
             </div>
 

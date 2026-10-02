@@ -239,7 +239,7 @@ function CheatSheetContent() {
                   No Cheat Codes Found
                 </h3>
                 <p className="mt-1 text-xs text-[var(--muted-foreground)] max-w-sm">
-                  We couldn't find any cheat codes matching "{searchQuery}". Try searching for terms like "Kryo", "AQE", "BHJ", "Spill", or "dbt".
+                  We couldn&apos;t find any cheat codes matching &quot;{searchQuery}&quot;. Try searching for terms like &quot;Kryo&quot;, &quot;AQE&quot;, &quot;BHJ&quot;, &quot;Spill&quot;, or &quot;dbt&quot;.
                 </p>
                 <button
                   type="button"
