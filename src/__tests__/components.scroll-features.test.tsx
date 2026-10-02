@@ -100,5 +100,14 @@ describe('ScrollBackToTop Component', () => {
 
     expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
   })
+
+  it('uses elevated positioning classes to prevent overlapping the quick search command palette trigger', () => {
+    render(<ScrollBackToTop />)
+    const btn = screen.getByRole('button', { name: /Scroll back to top/i })
+    expect(btn.className).toContain('lg:bottom-[88px]')
+    expect(btn.className).toContain('lg:right-8')
+    expect(btn.className).toContain('md:bottom-20')
+    expect(btn.className).toContain('md:right-6')
+  })
 })
 
