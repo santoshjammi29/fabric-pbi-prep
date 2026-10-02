@@ -75,16 +75,16 @@ const FLOW_SEQUENCE = [
 
 /* ─── Canvas Geometry Base Dimensions ────────────────────────────────── */
 const CANVAS_WIDTH = 3400;
-const CANVAS_HEIGHT = 2500;
+const CANVAS_HEIGHT = 4400;
 const ROOT_X = 1700;
-const ROOT_Y = 1250;
+const ROOT_Y = 2200;
 
 export function InteractiveMindmap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Transform state: pan & zoom
-  const [zoom, setZoom] = useState(0.75);
-  const [pan, setPan] = useState({ x: -450, y: -250 });
+  const [zoom, setZoom] = useState(0.55);
+  const [pan, setPan] = useState({ x: -450, y: -900 });
   const [isPanning, setIsPanning] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
@@ -275,7 +275,7 @@ export function InteractiveMindmap() {
   useEffect(() => {
     if (containerRef.current) {
       const { clientWidth, clientHeight } = containerRef.current;
-      const initialZoom = clientWidth < 768 ? 0.42 : clientWidth < 1280 ? 0.62 : 0.76;
+      const initialZoom = clientWidth < 768 ? 0.35 : clientWidth < 1280 ? 0.45 : 0.55;
       setZoom(initialZoom);
       setPan({
         x: (clientWidth - CANVAS_WIDTH * initialZoom) / 2,
@@ -288,7 +288,7 @@ export function InteractiveMindmap() {
   const resetView = useCallback(() => {
     if (containerRef.current) {
       const { clientWidth, clientHeight } = containerRef.current;
-      const targetZoom = clientWidth < 768 ? 0.42 : 0.76;
+      const targetZoom = clientWidth < 768 ? 0.35 : 0.55;
       setZoom(targetZoom);
       setPan({
         x: (clientWidth - CANVAS_WIDTH * targetZoom) / 2,
@@ -400,16 +400,16 @@ export function InteractiveMindmap() {
     const leftBranchX = 1100;
     const leftSubtopicX = 520;
     const leftDomainYConfigs = [
-      { id: "ingestion", centerY: 420 },
-      { id: "storage", centerY: 1250 },
-      { id: "compute", centerY: 2080 },
+      { id: "ingestion", centerY: 750 },
+      { id: "storage", centerY: 2200 },
+      { id: "compute", centerY: 3650 },
     ];
 
     leftDomainYConfigs.forEach((cfg) => {
       const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
       if (!domain) return;
       const count = domain.subtopics.length;
-      const pitch = 125;
+      const pitch = 230;
       const startY = cfg.centerY - ((count - 1) * pitch) / 2;
 
       positions[domain.id] = {
@@ -427,17 +427,17 @@ export function InteractiveMindmap() {
     const rightBranchX = 2300;
     const rightSubtopicX = 2880;
     const rightDomainYConfigs = [
-      { id: "orchestration", centerY: 360 },
-      { id: "serving", centerY: 950 },
-      { id: "governance", centerY: 1540 },
-      { id: "ai", centerY: 2130 },
+      { id: "orchestration", centerY: 580 },
+      { id: "serving", centerY: 1660 },
+      { id: "governance", centerY: 2740 },
+      { id: "ai", centerY: 3820 },
     ];
 
     rightDomainYConfigs.forEach((cfg) => {
       const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
       if (!domain) return;
       const count = domain.subtopics.length;
-      const pitch = 115;
+      const pitch = 230;
       const startY = cfg.centerY - ((count - 1) * pitch) / 2;
 
       positions[domain.id] = {
@@ -526,7 +526,7 @@ export function InteractiveMindmap() {
       <div
         ref={containerRef}
         className={cn(
-          "relative w-full overflow-hidden select-none border border-[var(--border)] bg-[#070709] rounded-3xl shadow-2xl transition-all duration-300 hidden lg:block",
+          "relative w-full overflow-hidden select-none border border-[var(--border)] bg-[var(--surface-0)] rounded-3xl shadow-2xl transition-all duration-300 hidden lg:block",
           isFullscreen ? "fixed inset-0 z-50 rounded-none h-dvh w-screen" : "min-h-[640px]"
         )}
         onMouseDown={handleCanvasMouseDown}
@@ -538,19 +538,19 @@ export function InteractiveMindmap() {
           height: isFullscreen ? undefined : "clamp(640px, calc(100svh - 150px), 1100px)",
         }}
       >
-        {/* Dot Grid Background */}
+        {/* Dot Grid Background (Theme-Adaptive) */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-20"
+          className="absolute inset-0 pointer-events-none opacity-30 dark:opacity-20"
           style={{
             backgroundImage:
-              "radial-gradient(circle, rgba(255, 255, 255, 0.35) 1px, transparent 1px)",
+              "radial-gradient(circle, var(--muted-foreground) 1.2px, transparent 1.2px)",
             backgroundSize: "32px 32px",
           }}
         />
 
         {/* Ambient Glow Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 dark:bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* ─── TOP CONTROL TOOLBAR ─────────────────────────────────────── */}
         <div className="absolute top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
@@ -854,7 +854,7 @@ export function InteractiveMindmap() {
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 opacity-40 blur-xl group-hover:opacity-60 transition-opacity" />
               <div className="relative w-84 p-6 rounded-3xl bg-[var(--surface-0)] border border-[var(--border)] flex flex-col items-center text-center space-y-3">
                 {/* Drag handle pill */}
-                <div className="flex items-center gap-1 text-[10px] text-[var(--muted-foreground)] opacity-60 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 text-[10px] text-[var(--muted-foreground)] opacity-70 group-hover:opacity-100 transition-opacity">
                   <Move size={11} />
                   <span>Movable Central Hub</span>
                 </div>
@@ -863,7 +863,7 @@ export function InteractiveMindmap() {
                   <Sparkles size={24} />
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
                     Enterprise Data Stack 2026
                   </span>
                   <h2 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
@@ -873,7 +873,7 @@ export function InteractiveMindmap() {
                     7 Core Domains · Open Lakehouse · Vector Engines · Zero-Copy Serving
                   </p>
                 </div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[11px] font-semibold text-purple-300">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/25 text-[11px] font-semibold text-purple-700 dark:text-purple-300">
                   <span>Click any node to inspect · Drag to arrange</span>
                 </div>
               </div>
@@ -923,11 +923,11 @@ export function InteractiveMindmap() {
                   {/* Top Flow Step Indicator */}
                   {isFlowMode && flowInfo && (
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--border)]/60 text-[10px] font-mono">
-                      <span className="font-bold text-cyan-400 flex items-center gap-1">
+                      <span className="font-bold text-cyan-700 dark:text-cyan-400 flex items-center gap-1">
                         <Activity size={10} className="animate-pulse" />
                         FLOW #{flowInfo.step}
                       </span>
-                      <span className="text-[var(--muted-foreground)] truncate max-w-[170px]">
+                      <span className="text-[var(--muted-foreground)] font-medium truncate max-w-[170px]">
                         {flowInfo.flowRole}
                       </span>
                     </div>
@@ -955,7 +955,7 @@ export function InteractiveMindmap() {
                         <h3 className="text-sm font-bold text-[var(--foreground)] truncate leading-tight">
                           {domain.title}
                         </h3>
-                        <span className="text-[10px] text-[var(--muted-foreground)]">
+                        <span className="text-[10px] text-[var(--muted-foreground)] font-medium">
                           {domain.subtopics.length} Architectural Subtopics
                         </span>
                       </div>
@@ -971,7 +971,7 @@ export function InteractiveMindmap() {
                       {isCollapsed ? (
                         domain.side === "left" ? <ChevronLeft size={15} /> : <ChevronRight size={15} />
                       ) : (
-                        <span className="text-[10px] font-mono font-bold px-1 text-purple-400">
+                        <span className="text-[10px] font-mono font-bold px-1 text-purple-700 dark:text-purple-400">
                           {domain.subtopics.length}
                         </span>
                       )}
@@ -1042,12 +1042,12 @@ export function InteractiveMindmap() {
                         size={13}
                         className={cn(
                           "shrink-0 transition-transform",
-                          isSelected ? "text-purple-400 translate-x-0.5" : "text-[var(--muted-foreground)]"
+                          isSelected ? "text-purple-600 dark:text-purple-400 translate-x-0.5" : "text-[var(--muted-foreground)]"
                         )}
                       />
                     </div>
 
-                    <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                    <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed font-normal">
                       {sub.desc}
                     </p>
 
@@ -1055,13 +1055,13 @@ export function InteractiveMindmap() {
                       {sub.protocols.slice(0, 3).map((protocol) => (
                         <span
                           key={protocol}
-                          className="text-[9px] font-mono px-1.5 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] opacity-85"
+                          className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
                         >
                           {protocol}
                         </span>
                       ))}
                       {sub.protocols.length > 3 && (
-                        <span className="text-[9px] font-mono px-1 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted-foreground)]">
+                        <span className="text-[9px] font-mono font-medium px-1 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted-foreground)] border border-[var(--border)]">
                           +{sub.protocols.length - 3}
                         </span>
                       )}
@@ -1237,7 +1237,7 @@ export function InteractiveMindmap() {
                     {drawerTab === "concept" && (
                       <div className="space-y-5 animate-in fade-in duration-200">
                         <div className="space-y-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">
                             {linkedConcept?.category || selectedDomain.shortTitle} · Core Concept
                           </span>
                           <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
@@ -1247,7 +1247,7 @@ export function InteractiveMindmap() {
 
                         {/* Plain-English Definition */}
                         <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-cyan-500/30 space-y-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">
                             Plain-English Definition
                           </span>
                           <p className="text-xs text-[var(--foreground)] leading-relaxed">
@@ -1258,7 +1258,7 @@ export function InteractiveMindmap() {
                         {/* Architectural Deep-Dive */}
                         <div className="space-y-1.5">
                           <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
-                            <Sparkles size={13} className="text-purple-400" />
+                            <Sparkles size={13} className="text-purple-700 dark:text-purple-400" />
                             Architectural Deep-Dive
                           </h4>
                           <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
@@ -1275,7 +1275,7 @@ export function InteractiveMindmap() {
                             <ul className="space-y-1.5">
                               {linkedConcept.keyPoints.map((point, ki) => (
                                 <li key={ki} className="flex items-start gap-2 text-xs text-[var(--muted-foreground)]">
-                                  <CheckCircle2 size={13} className="text-green-400 mt-0.5 shrink-0" />
+                                  <CheckCircle2 size={13} className="text-emerald-700 dark:text-green-400 mt-0.5 shrink-0" />
                                   <span className="leading-snug">{point}</span>
                                 </li>
                               ))}
@@ -1300,11 +1300,11 @@ export function InteractiveMindmap() {
 
                         {/* Architectural Trade-offs Callout */}
                         <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-amber-500/30 space-y-1.5">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
                             <Sparkles size={14} />
                             <span>Architectural Trade-Off &amp; Production Rubric</span>
                           </div>
-                          <p className="text-xs text-[var(--foreground)] opacity-90 leading-relaxed">
+                          <p className="text-xs text-[var(--foreground)] leading-relaxed">
                             {selectedSubtopic.tradeOffs}
                           </p>
                         </div>

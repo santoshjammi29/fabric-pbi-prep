@@ -23,6 +23,8 @@ import {
   Compass,
   User,
   Terminal,
+  BookMarked,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,40 +41,43 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    title: "Overview",
-    items: [{ label: "Home Dashboard", href: "/", icon: Home }],
-  },
-  {
-    title: "Learn & Code",
+    title: "Portal",
     items: [
-      { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "112 Terms", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
-      { label: "Python Hub", href: "/python", icon: Code2, badge: "NEW", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
-      { label: "Code Practice", href: "/code-practice", icon: FileCode2, badge: "Medium", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-      { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-      { label: "Spark Engine", href: "/spark-engine", icon: Zap, badge: "Medium", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-      { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Hard", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-      { label: "DE Mindmap", href: "/mindmap", icon: Globe, badge: "NEW", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+      { label: "Home Dashboard", href: "/", icon: Home },
+      { label: "Learning Paths", href: "/learning-paths", icon: Compass, badge: "The Map", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      { label: "Diagnostic Exam", href: "/diagnostic", icon: GraduationCap, badge: "10-Q", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
     ],
   },
   {
-    title: "Interactive Tools & Simulators",
+    title: "Knowledge Base",
     items: [
-      { label: "6 Live Simulators", href: "/modern-stack#simulators", icon: Layers, badge: "Live Tool", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
-      { label: "Spark Physical Simulator", href: "/spark-engine#simulator", icon: Zap, badge: "Physical", badgeColor: "bg-red-500/10 text-red-400 border-red-500/20" },
+      { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "Foundations", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
+      { label: "Python Hub", href: "/python", icon: Code2, badge: "Core", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+      { label: "Spark Engine", href: "/spark-engine", icon: Zap, badge: "Internal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+      { label: "DE Mindmap", href: "/mindmap", icon: Globe, badge: "Visual Hub", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+      { label: "Guided Learning", href: "/guided-learning", icon: BookMarked, badge: "Journey", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
     ],
   },
   {
-    title: "Practice & Scenarios",
+    title: "Architectural Mastery",
     items: [
-      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, badge: "6.1k Qs", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-      { label: "Architecture Hub", href: "/architecture", icon: Layers, badge: "Architect", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-      { label: "Company Research", href: "/company-research", icon: Building2, badge: "GCC", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      { label: "Architecture Hub", href: "/architecture", icon: Layers, badge: "Principal", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+      { label: "Code Practice", href: "/code-practice", icon: FileCode2, badge: "Advanced", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+      { label: "Live Simulators", href: "/modern-stack#simulators", icon: Layers, badge: "Live Tool", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
     ],
   },
   {
-    title: "Account & Paths",
+    title: "Interview & Prep",
     items: [
-      { label: "Learning Paths", href: "/learning-paths", icon: Compass, badge: "12 Paths", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, badge: "6.4k+ Qs", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+      { label: "Company Research", href: "/company-research", icon: Building2, badge: "Strategic", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+    ],
+  },
+  {
+    title: "Studio",
+    items: [
       { label: "My Studio", href: "/studio", icon: User },
     ],
   },
@@ -203,7 +208,7 @@ export function MobileHeader() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-[var(--foreground)]">Navigation Menu</div>
-                  <div className="text-[10px] text-[var(--muted-foreground)]">Explore all 11+ modules</div>
+                  <div className="text-[10px] text-[var(--muted-foreground)]">Explore all 16 modules</div>
                 </div>
               </div>
               <button
