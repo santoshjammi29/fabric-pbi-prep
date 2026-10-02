@@ -81,7 +81,6 @@ export default function RootLayout({
         />
         <style dangerouslySetInnerHTML={{ __html: `
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
-          html, body { scrollbar-gutter: stable; }
         `}} />
       </head>
       <body className="min-h-dvh bg-[#0A0A0B] text-[#f0f0f5]">
