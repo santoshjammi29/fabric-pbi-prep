@@ -94,9 +94,9 @@ export function PrerequisiteBanner({
                 <div>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--foreground)] group-hover:text-cyan-300">
                     <BookOpen size={13} className="text-cyan-400 shrink-0" />
-                    <span className="truncate">{item.term}</span>
+                    <span>{item.term}</span>
                   </div>
-                  <p className="text-[11px] text-[var(--muted-foreground)] mt-1 line-clamp-2 leading-snug">
+                  <p className="text-[11px] text-[var(--muted-foreground)] mt-1 leading-snug">
                     {item.whyNeeded}
                   </p>
                 </div>

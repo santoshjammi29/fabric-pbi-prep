@@ -146,7 +146,7 @@ export function EditorialHero() {
               <Link href={featured.href}>{featured.title}</Link>
             </h2>
 
-            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed line-clamp-3">
+            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
               {featured.description}
             </p>
           </div>
@@ -212,7 +212,7 @@ export function EditorialHero() {
                   <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors leading-snug">
                     {card.title}
                   </h3>
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-1">
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                     {card.description}
                   </p>
                 </div>

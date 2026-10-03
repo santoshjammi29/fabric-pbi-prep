@@ -956,7 +956,7 @@ export default function ModernStackPage() {
                             </span>
                           </div>
                           <h4 className="text-sm font-bold text-[var(--foreground)]">{item.title}</h4>
-                          <p className="text-xs text-[var(--muted-foreground)] line-clamp-2">{item.description}</p>
+                          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{item.description}</p>
                         </div>
                         <div className="border-t border-[var(--border)] p-4 bg-[var(--surface-2)]">
                           <CodeBlock

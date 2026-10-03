@@ -107,7 +107,7 @@ function LearningPathsContent() {
                 </div>
                 <h3
                   className={cn(
-                    "text-xs sm:text-sm font-bold line-clamp-2",
+                    "text-xs sm:text-sm font-bold",
                     isSelected ? "text-purple-300" : "text-[var(--foreground)]"
                   )}
                 >

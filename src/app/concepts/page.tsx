@@ -645,7 +645,7 @@ function ConceptsContent() {
                       </div>
 
                       {/* Summary Definition */}
-                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
                         {concept.definition}
                       </p>
                     </div>
@@ -902,7 +902,7 @@ function ConceptsContent() {
                         </div>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
                         {item.description}
                       </p>
                     </div>

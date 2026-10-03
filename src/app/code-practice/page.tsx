@@ -525,7 +525,7 @@ export default function CodePracticePage() {
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[var(--muted-foreground)] line-clamp-1">
+                  <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
                     {item.description}
                   </p>
                 </div>

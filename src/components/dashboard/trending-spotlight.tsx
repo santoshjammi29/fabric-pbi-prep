@@ -103,7 +103,7 @@ export function TrendingSpotlight() {
             </h4>
 
             {!isAnswerRevealed ? (
-              <p className="text-xs text-[var(--muted-foreground)] line-clamp-3 leading-relaxed">
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 {scenario.teaser}
               </p>
             ) : (

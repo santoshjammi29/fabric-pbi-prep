@@ -47,8 +47,8 @@ const ItemCard = React.memo(function ItemCard({
     >
       <div className="p-4 flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-[var(--foreground)] truncate sm:whitespace-normal">{item.title}</h3>
-          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] truncate">{item.category}</p>
+          <h3 className="font-medium text-[var(--foreground)] break-words">{item.title}</h3>
+          <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">{item.category}</p>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <span

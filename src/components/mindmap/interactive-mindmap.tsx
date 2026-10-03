@@ -1047,7 +1047,7 @@ export function InteractiveMindmap() {
                       />
                     </div>
 
-                    <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed font-normal">
+                    <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed font-normal">
                       {sub.desc}
                     </p>
 
@@ -1417,7 +1417,7 @@ export function InteractiveMindmap() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h4 className="text-sm font-bold text-[var(--foreground)] mb-1">{sub.name}</h4>
-                        <p className="text-xs text-[var(--muted-foreground)] line-clamp-2">{sub.desc}</p>
+                        <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{sub.desc}</p>
                       </div>
                     </div>
 

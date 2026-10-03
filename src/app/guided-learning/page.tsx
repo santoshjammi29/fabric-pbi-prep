@@ -340,7 +340,7 @@ export default function GuidedLearningPage() {
                               </div>
                                 
                               <h4 className={cn(
-                                "text-xs font-semibold text-[var(--foreground)] truncate flex-1",
+                                "text-xs font-semibold text-[var(--foreground)] flex-1",
                                 isCompleted && !isExpanded && "line-through text-[var(--muted-foreground)]"
                               )}>
                                 {item.title}

@@ -894,7 +894,7 @@ export default function SparkEnginePage() {
                       </div>
                       <div className="min-w-0">
                         <div className="text-[11px] text-purple-400 font-semibold uppercase">{item.category}</div>
-                        <h4 className="text-sm sm:text-base font-bold text-[var(--foreground)] truncate">
+                        <h4 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
                           {item.title}
                         </h4>
                       </div>

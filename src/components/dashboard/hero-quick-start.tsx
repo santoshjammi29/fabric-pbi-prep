@@ -58,8 +58,8 @@ export function HeroQuickStart() {
                 <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Step 1 · 112 Topics</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-green-400 transition-colors">→</span>
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">Core Concepts Hub</h3>
-              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Core Concepts Hub</h3>
+              <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
                 Foundational architectures, Fabric Direct Lake, and Delta protocols.
               </p>
             </div>
@@ -78,8 +78,8 @@ export function HeroQuickStart() {
                 <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Code-First · NEW</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-cyan-400 transition-colors">→</span>
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">Python DE Hub</h3>
-              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Python DE Hub</h3>
+              <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
                 Foundations to Principal Architect patterns with copyable code snippets.
               </p>
             </div>
@@ -98,8 +98,8 @@ export function HeroQuickStart() {
                 <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Interactive</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-purple-400 transition-colors">→</span>
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">6 Live Simulators</h3>
-              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">6 Live Simulators</h3>
+              <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
                 Model Spark shuffles, query costs, cluster resources, and RAG chunks.
               </p>
             </div>
@@ -118,8 +118,8 @@ export function HeroQuickStart() {
                 <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Step 5 · 6,100+ Q&amp;As</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-orange-400 transition-colors">→</span>
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">Interview Prep Hub</h3>
-              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Interview Prep Hub</h3>
+              <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
                 Practice interview questions with SM-2 spaced repetition flashcards.
               </p>
             </div>
