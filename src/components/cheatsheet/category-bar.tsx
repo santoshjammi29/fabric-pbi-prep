@@ -1,9 +1,27 @@
 "use client";
 
 import React from "react";
-import { Search, X, Sparkles, Filter, Check } from "lucide-react";
+import { Search, X, Sparkles, Filter, Check, Flame, ShieldAlert, Cpu, Database, RefreshCw, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CheatCodeCategory, CheatCodeImpact } from "@/types/data";
+
+export interface EmergencyScenario {
+  id: string;
+  label: string;
+  icon: string;
+  badge: string;
+}
+
+export const EMERGENCY_SCENARIOS: EmergencyScenario[] = [
+  { id: "ALL", label: "All Codes", icon: "⚡", badge: "53 Items" },
+  { id: "p0_outages", label: "P0 Sev-1 Outages", icon: "🚨", badge: "Incident Triage" },
+  { id: "oom_memory", label: "OOM & Memory Crashes", icon: "💥", badge: "Heap & Exit 137" },
+  { id: "skew_stragglers", label: "Skew & Stragglers", icon: "🐢", badge: "Salting & BNLJ" },
+  { id: "shuffle_spill", label: "Shuffles & Disk Spills", icon: "🌊", badge: "I/O & Retries" },
+  { id: "lakehouse_storage", label: "Lakehouse & Storage", icon: "🗄️", badge: "Delta & Iceberg" },
+  { id: "concurrency_locks", label: "Locks & Concurrency", icon: "🔄", badge: "Deadlocks & OCC" },
+  { id: "finops_scaling", label: "FinOps & Cloud Scaling", icon: "💰", badge: "Spot & Policies" },
+];
 
 interface CategoryBarProps {
   categories: CheatCodeCategory[];
@@ -12,6 +30,8 @@ interface CategoryBarProps {
   onSelectCategory: (cat: string) => void;
   selectedImpact: string;
   onSelectImpact: (impact: string) => void;
+  selectedScenario: string;
+  onSelectScenario: (scenario: string) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   totalFiltered: number;
@@ -33,6 +53,8 @@ export function CategoryBar({
   onSelectCategory,
   selectedImpact,
   onSelectImpact,
+  selectedScenario,
+  onSelectScenario,
   searchQuery,
   onSearchChange,
   totalFiltered,
@@ -40,9 +62,64 @@ export function CategoryBar({
 }: CategoryBarProps) {
   return (
     <div className="space-y-4">
-      {/* Search Bar + Impact Filter Row */}
+      {/* 1. Emergency Prod Triage Scenarios Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs px-1">
+          <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-[var(--foreground)]">
+            <ShieldAlert size={14} className="text-amber-400" />
+            <span>Emergency Incident Triage &amp; Performance Runbooks</span>
+          </div>
+          {selectedScenario !== "ALL" && (
+            <button
+              type="button"
+              onClick={() => onSelectScenario("ALL")}
+              className="text-blue-400 hover:underline text-[11px] font-medium"
+            >
+              Reset Scenarios &times;
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-slate-700">
+          {EMERGENCY_SCENARIOS.map((scen) => {
+            const isActive = selectedScenario === scen.id;
+            return (
+              <button
+                key={scen.id}
+                type="button"
+                onClick={() => {
+                  onSelectScenario(scen.id);
+                  if (scen.id !== "ALL") {
+                    onSelectCategory("ALL");
+                  }
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0 touch-manipulation",
+                  isActive
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md shadow-amber-500/10 ring-1 ring-amber-500/30"
+                    : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                )}
+              >
+                <span>{scen.icon}</span>
+                <span>{scen.label}</span>
+                <span
+                  className={cn(
+                    "px-1.5 py-0.5 rounded text-[10px] font-mono",
+                    isActive
+                      ? "bg-amber-500/30 text-amber-200"
+                      : "bg-[var(--surface-2)] text-[var(--muted-foreground)]"
+                  )}
+                >
+                  {scen.badge}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Global Search Input + Impact Filter */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        {/* Global Search Input */}
         <div className="relative flex-1">
           <Search
             size={16}
@@ -52,7 +129,7 @@ export function CategoryBar({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search cheat codes by problem, API, knob, or tag (e.g. Kryo, AQE, BHJ, dbt)..."
+            placeholder="Search 53+ cheat codes (e.g. OOM, Kryo, Salting, Exit 137, Vacuum, RocksDB, dbt)..."
             aria-label="Search cheat codes"
             className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 shadow-sm transition-all"
           />
@@ -97,23 +174,28 @@ export function CategoryBar({
         </div>
       </div>
 
-      {/* Category Pills (Horizontal Scroll) */}
+      {/* 3. Category Pills (Horizontal Scroll) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700">
         <button
           type="button"
-          onClick={() => onSelectCategory("ALL")}
+          onClick={() => {
+            onSelectCategory("ALL");
+            onSelectScenario("ALL");
+          }}
           className={cn(
             "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0",
-            selectedCategory === "ALL"
+            selectedCategory === "ALL" && selectedScenario === "ALL"
               ? "bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/20"
               : "bg-[var(--card)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--border-hover)]"
           )}
         >
-          <span>All Categories</span>
+          <span>All Domains</span>
           <span
             className={cn(
               "px-1.5 py-0.2 rounded-full text-[10px] font-mono",
-              selectedCategory === "ALL" ? "bg-white/20 text-white" : "bg-[var(--surface-2)] text-[var(--muted-foreground)]"
+              selectedCategory === "ALL" && selectedScenario === "ALL"
+                ? "bg-white/20 text-white"
+                : "bg-[var(--surface-2)] text-[var(--muted-foreground)]"
             )}
           >
             {totalCount}
@@ -121,16 +203,19 @@ export function CategoryBar({
         </button>
 
         {categories.map((cat) => {
-          const isSelected = selectedCategory === cat;
+          const isSelected = selectedCategory === cat && selectedScenario === "ALL";
           const count = categoryCounts[cat] || 0;
 
           return (
             <button
               key={cat}
               type="button"
-              onClick={() => onSelectCategory(cat)}
+              onClick={() => {
+                onSelectCategory(cat);
+                onSelectScenario("ALL");
+              }}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0",
+                "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0",
                 isSelected
                   ? "bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/20"
                   : "bg-[var(--card)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--border-hover)]"
