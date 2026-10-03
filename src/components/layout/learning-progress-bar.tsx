@@ -102,7 +102,7 @@ export function LearningProgressBar() {
   const activeStepConfig = CURRICULUM_STEPS[activeStep - 1] || CURRICULUM_STEPS[0];
 
   return (
-    <div className="w-full bg-[var(--surface-0)] border-b border-[var(--border)] py-2 px-4 sm:px-6 lg:px-8 text-xs backdrop-blur-md sticky top-0 z-30 shadow-sm">
+    <div className="w-full bg-[var(--surface-0)] border-b border-[var(--border)] py-2 px-4 sm:px-6 lg:px-8 text-xs sticky top-0 z-30 shadow-sm">
       <div className="mx-auto w-full max-w-7xl 2xl:max-w-[1600px] flex items-center justify-between gap-4">
         {/* Left: Active Location & Track Indicator */}
         <div className="flex items-center gap-2.5 shrink-0">

@@ -28,9 +28,9 @@ export function ArchitectDigest() {
 
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950/70 via-[#111126] to-blue-950/70 border border-purple-500/30 [.light_&]:from-purple-50 [.light_&]:via-white [.light_&]:to-blue-50 [.light_&]:border-purple-200 p-8 sm:p-10 isolate shadow-sm dark:shadow-none">
-      {/* Ambient background glow */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/20 [.light_&]:bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/20 [.light_&]:bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Ambient background glow — GPU-composited radial gradients */}
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-[radial-gradient(circle,rgba(147,51,234,0.18)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[radial-gradient(circle,rgba(37,99,235,0.18)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-8">
         <div className="space-y-3 max-w-xl">
@@ -56,7 +56,7 @@ export function ArchitectDigest() {
               <ShieldCheck size={14} className="text-purple-400 [.light_&]:text-purple-600" /> No Spam Guarantee
             </span>
             <span className="flex items-center gap-1.5">
-              <BookOpen size={14} className="text-blue-400 [.light_&]:text-blue-600" /> 6,100+ Q&amp;A Archive
+              <BookOpen size={14} className="text-blue-400 [.light_&]:text-blue-600" /> 6,500+ Q&amp;A Archive
             </span>
           </div>
         </div>

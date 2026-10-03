@@ -317,7 +317,7 @@ export default function QaPrepPage() {
               Architect Q&amp;A Prep Hub
             </h1>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Study 6,100+ vetted technical interview questions across Fabric, Azure DP-203, Databricks Spark,
+              Study 6,500+ vetted technical interview questions across Fabric, Azure DP-203, Databricks Spark,
               and Distributed System Architecture with interactive SM-2 spaced repetition flashcards.
             </p>
           </div>
@@ -492,7 +492,7 @@ export default function QaPrepPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  placeholder="Search 6,100+ questions (e.g., Delta log, CDC, Shuffling, Direct Lake, RLS)..."
+                  placeholder="Search 6,500+ questions (e.g., Delta log, CDC, Shuffling, Direct Lake, RLS)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (

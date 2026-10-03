@@ -53,8 +53,14 @@ export function ScrollProgressBar() {
       className="fixed top-0 inset-x-0 z-[60] h-[3px] pointer-events-none bg-transparent"
     >
       <div
-        className="h-full bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 shadow-[0_0_10px_rgba(139,92,246,0.6)] transition-[width] duration-150 ease-out"
-        style={{ width: `${progress}%`, opacity: progress > 0.5 ? 1 : 0 }}
+        className="h-full bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 shadow-[0_0_10px_rgba(139,92,246,0.6)]"
+        style={{
+          width: "100%",
+          transform: `scaleX(${progress / 100})`,
+          transformOrigin: "left center",
+          willChange: "transform",
+          opacity: progress > 0.5 ? 1 : 0,
+        }}
       />
     </div>
   );

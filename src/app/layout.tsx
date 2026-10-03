@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Microsoft Data Platform Architect Prep",
     description:
-      "2,600+ architect-level Q&As across Fabric, Power BI, ADF, SQL Server, Data Lake and Spark. Master the concepts that matter.",
+      "6,500+ architect-level Q&As across Fabric, Power BI, Databricks, Delta Lake, PySpark and System Design. Master the concepts that matter.",
     type: "website",
   },
   twitter: {

@@ -429,7 +429,7 @@ function ConceptsContent() {
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
-              6,100+ Interview Questions
+              6,500+ Interview Questions
             </div>
           </div>
         </Link>
@@ -444,7 +444,7 @@ function ConceptsContent() {
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">
-              2,400+ Scenarios
+              3,000+ Scenarios
             </div>
           </div>
         </Link>

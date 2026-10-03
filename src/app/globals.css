@@ -140,13 +140,6 @@ html {
   scrollbar-width: thin;
   scrollbar-color: rgba(168, 85, 247, 0.4) rgba(255, 255, 255, 0.02);
   scrollbar-gutter: stable;
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto !important;
-  }
 }
 
 body {
@@ -386,8 +379,7 @@ body {
 .aurora-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(55px);
-  opacity: 0.10;
+  opacity: 0.12;
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -395,14 +387,13 @@ body {
 }
 
 .light .aurora-orb {
-  opacity: 0.05;
-  filter: blur(45px);
+  opacity: 0.06;
 }
 
 .aurora-orb-1 {
   width: 550px;
   height: 550px;
-  background: radial-gradient(circle, #8b5cf6, transparent 65%);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.45) 0%, rgba(139, 92, 246, 0.15) 35%, transparent 70%);
   top: -150px;
   left: -80px;
 }
@@ -410,7 +401,7 @@ body {
 .aurora-orb-2 {
   width: 450px;
   height: 450px;
-  background: radial-gradient(circle, #3b82f6, transparent 65%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.12) 35%, transparent 70%);
   bottom: -150px;
   right: -80px;
   animation-delay: -14s;
@@ -419,11 +410,17 @@ body {
 .aurora-orb-3 {
   width: 380px;
   height: 380px;
-  background: radial-gradient(circle, #06b6d4, transparent 65%);
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0.1) 35%, transparent 70%);
   top: 45%;
   left: 50%;
   transform: translate3d(-50%, -50%, 0);
   animation-delay: -28s;
+}
+
+/* ═══ MODERN CONTENT DEFERRAL FOR LIQUID SCROLLING ═══ */
+.section-deferred {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 400px;
 }
 
 @keyframes aurora-float {

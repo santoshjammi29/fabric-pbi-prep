@@ -1,22 +1,44 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Compass, Sparkles, MessageSquare, Cpu, Code2 } from "lucide-react";
+import { ArrowRight, Compass, Sparkles, MessageSquare, Cpu, Code2, X } from "lucide-react";
 
 export function HeroQuickStart() {
-  return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950/40 via-[var(--surface-1)] to-blue-950/30 border border-purple-500/30 p-6 sm:p-8 shadow-xl">
-      {/* Decorative ambient glow */}
-      <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute -left-20 -bottom-20 w-72 h-72 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+  const [isDismissed, setIsDismissed] = useState(false);
 
-      <div className="relative space-y-6">
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("dataprep_dismiss_quickstart") === "true") {
+        setIsDismissed(true);
+      }
+    } catch {}
+  }, []);
+
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    try {
+      localStorage.setItem("dataprep_dismiss_quickstart", "true");
+    } catch {}
+  };
+
+  if (isDismissed) return null;
+
+  return (
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950/40 via-[var(--surface-1)] to-blue-950/30 border border-purple-500/30 p-5 sm:p-7 shadow-lg transition-all animate-in fade-in duration-300">
+      {/* Decorative ambient glow */}
+      <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.15)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute -left-20 -bottom-20 w-72 h-72 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.15)_0%,transparent_70%)] pointer-events-none" />
+
+      <div className="relative space-y-5">
         {/* Header with clear focus */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-xs font-bold text-purple-300">
-              <Compass size={13} className="text-purple-400" />
-              <span>Recommended Starting Path</span>
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-xs font-bold text-purple-300">
+                <Compass size={13} className="text-purple-400" />
+                <span>Recommended Starting Path</span>
+              </div>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--foreground)] tracking-tight">
               New to the Platform? Start Here
@@ -26,20 +48,23 @@ export function HeroQuickStart() {
             </p>
           </div>
 
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             <Link
               href="/concepts"
-              className="min-h-[44px] px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-600/25 inline-flex items-center gap-2 transition-all touch-manipulation cursor-pointer"
+              className="min-h-[40px] px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-purple-600/25 inline-flex items-center gap-2 transition-all touch-manipulation cursor-pointer"
             >
               <span>Begin Step 1: Key Concepts</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={14} />
             </Link>
-            <Link
-              href="/learning-paths"
-              className="min-h-[44px] px-4 py-2.5 rounded-2xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] active:scale-95 text-[var(--foreground)] text-xs sm:text-sm font-semibold border border-[var(--border)] inline-flex items-center gap-1.5 transition-all touch-manipulation cursor-pointer"
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors"
+              title="Dismiss quick-start guide"
+              aria-label="Dismiss quick-start banner"
             >
-              <span>View All 12 Paths</span>
-            </Link>
+              <X size={16} />
+            </button>
           </div>
         </div>
 
@@ -55,7 +80,7 @@ export function HeroQuickStart() {
             </div>
             <div className="space-y-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Step 1 · 112 Topics</span>
+                <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Step 1 · 290 Topics</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-green-400 transition-colors">→</span>
               </div>
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Core Concepts Hub</h3>
@@ -115,7 +140,7 @@ export function HeroQuickStart() {
             </div>
             <div className="space-y-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Step 5 · 6,100+ Q&amp;As</span>
+                <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Step 5 · 6,500+ Q&amp;As</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-orange-400 transition-colors">→</span>
               </div>
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Interview Prep Hub</h3>

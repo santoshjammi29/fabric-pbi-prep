@@ -63,12 +63,12 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 
 export function StatCards() {
   const stats: StatCardProps[] = [
-    { title: "Core Concepts", value: 112, suffix: "+", icon: BookOpen, href: "/concepts", accent: "green" },
-    { title: "Interview Q&As", value: 6100, suffix: "+", icon: MessageSquare, href: "/qa-prep", accent: "orange" },
-    { title: "Coding Sheets", value: 120, suffix: "+", icon: FileCode2, href: "/code-practice", accent: "amber" },
+    { title: "Core Concepts", value: 290, suffix: "+", icon: BookOpen, href: "/concepts", accent: "green" },
+    { title: "Interview Q&As", value: 6500, suffix: "+", icon: MessageSquare, href: "/qa-prep", accent: "orange" },
+    { title: "Coding Sheets", value: 128, suffix: "+", icon: FileCode2, href: "/code-practice", accent: "amber" },
     { title: "Spark Engine", value: 85, suffix: "+", icon: Zap, href: "/spark-engine", accent: "red" },
-    { title: "Arch Scenarios", value: 2400, suffix: "+", icon: Layers, href: "/architecture", accent: "purple" },
-    { title: "GCC Firms", value: 40, suffix: "+", icon: Building2, href: "/company-research", accent: "sky" },
+    { title: "Arch Scenarios", value: 3000, suffix: "+", icon: Layers, href: "/architecture", accent: "purple" },
+    { title: "GCC Firms", value: 6, suffix: "+", icon: Building2, href: "/company-research", accent: "sky" },
   ];
 
   return (

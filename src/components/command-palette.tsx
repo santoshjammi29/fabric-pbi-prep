@@ -45,14 +45,14 @@ export function CommandPalette() {
   const staticRoutes: CommandItem[] = useMemo(
     () => [
       { id: "nav-home", title: "Home Dashboard", category: "Navigation", icon: Sparkles, href: "/", badge: "Main" },
-      { id: "nav-concepts", title: "Key Concepts (112+ Terms)", category: "Navigation", icon: BookOpen, href: "/concepts", badge: "Easy" },
+      { id: "nav-concepts", title: "Key Concepts (290+ Terms)", category: "Navigation", icon: BookOpen, href: "/concepts", badge: "Easy" },
       { id: "nav-python", title: "Python Hub (Data Engineering & Architect)", category: "Navigation", icon: FileCode2, href: "/python", badge: "NEW" },
       { id: "nav-code", title: "Code Practice (PySpark, SQL, Python)", category: "Navigation", icon: FileCode2, href: "/code-practice", badge: "Polyglot" },
       { id: "nav-spark", title: "Spark Engine & Simulator", category: "Navigation", icon: Zap, href: "/spark-engine", badge: "Internals" },
       { id: "nav-modern", title: "Modern Data Stack & AI Architecture", category: "Navigation", icon: Layers, href: "/modern-stack", badge: "Hard" },
       { id: "nav-mindmap", title: "DE Mindmap (Visual Architecture Topography)", category: "Navigation", icon: Globe, href: "/mindmap", badge: "NEW" },
-      { id: "nav-qa", title: "Q&A Prep Hub (6,100+ Questions)", category: "Navigation", icon: MessageSquare, href: "/qa-prep", badge: "SM-2" },
-      { id: "nav-arch", title: "Architecture Hub (2,400+ Scenarios)", category: "Navigation", icon: Cpu, href: "/architecture", badge: "Architect" },
+      { id: "nav-qa", title: "Q&A Prep Hub (6,500+ Questions)", category: "Navigation", icon: MessageSquare, href: "/qa-prep", badge: "SM-2" },
+      { id: "nav-arch", title: "Architecture Hub (3,000+ Scenarios)", category: "Navigation", icon: Cpu, href: "/architecture", badge: "Architect" },
       { id: "nav-cheatsheet", title: "Production Cheat Sheet (Spark, dbt, Airflow, SQL)", category: "Navigation", icon: Terminal, href: "/cheat-sheet", badge: "PROD" },
       { id: "nav-gcc", title: "Company Research (GCC Profiles)", category: "Navigation", icon: Building2, href: "/company-research", badge: "Enterprise" },
       { id: "nav-paths", title: "Learning Paths (12 Structured Tracks)", category: "Navigation", icon: Compass, href: "/learning-paths", badge: "Curriculum" },

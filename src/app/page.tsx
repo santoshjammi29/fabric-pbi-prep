@@ -1,6 +1,5 @@
 "use client";
 
-import { useUserStore } from "@/store/useUserStore";
 import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { EditorialHero } from "@/components/dashboard/editorial-hero";
 import { HeroQuickStart } from "@/components/dashboard/hero-quick-start";
@@ -13,70 +12,59 @@ import { StatCards } from "@/components/dashboard/stat-cards";
 import { RoadmapGrid } from "@/components/dashboard/roadmap-grid";
 import { ArchitectDigest } from "@/components/dashboard/architect-digest";
 
-function SectionDivider({ text }: { text: string }) {
-  return (
-    <div className="section-divider">
-      <span>{text}</span>
-    </div>
-  );
-}
-
 export default function DashboardPage() {
-  const activeTier = useUserStore((s) => s.experienceTier);
-  const isBeginnerRail = activeTier === "beginner";
-
   return (
     <div className="space-y-8 pb-24 lg:pb-12">
-      {/* 1. Horizontal Scrolling Bar at the very top of the home page */}
+      {/* 1. Horizontal Live Ticker */}
       <RollingTicker />
 
       {/* 2. Editorial Magazine Hero Split */}
       <EditorialHero />
 
-      {/* 3. Clear Guided Onboarding Bar: 'New to the Platform? Start Here' */}
-      <HeroQuickStart />
-
-      {/* 4. 4-Tier Interactive Experience Level Switcher */}
-      <ExperienceLevelSwitcher />
-
-      {/* For Beginners: Hoist the Visual Progression Roadmap to the TOP */}
-      {isBeginnerRail && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-          <SectionDivider text="The Beginner's Rail: 6-Step Progression Curriculum" />
-          <RoadmapGrid />
-        </div>
-      )}
-
-      {/* 5. Category Capsule Navigation (Architecture Focus) */}
+      {/* 3. Architecture Topic Capsule Navigation */}
       <TopicCapsules />
 
-      {/* 6. Daily Curated Spotlight (Scenario, Code, Simulator) */}
-      <TrendingSpotlight />
+      {/* 4. Guided Quick-Start Bar (Dismissible with LocalStorage persistence) */}
+      <HeroQuickStart />
+
+      {/* 5. Unified Progressive Learning Journey & Curriculum Roadmap */}
+      <section className="space-y-4">
+        <ExperienceLevelSwitcher />
+        <RoadmapGrid />
+      </section>
+
+      {/* 6. Daily Curated Spotlight (Scenario, Code Snippet, Simulator) */}
+      <section className="section-deferred">
+        <TrendingSpotlight />
+      </section>
 
       {/* 7. Continue Learning & Tip of Day */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section className="section-deferred grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ContinueLearning />
         </div>
         <div className="lg:col-span-1">
           <TipOfDay />
         </div>
-      </div>
+      </section>
 
-      {/* 8. Portal Analytics */}
-      <SectionDivider text="Portal Analytics & Live Question Banks" />
-      <StatCards />
+      {/* 8. Verified Platform Analytics & Live Archives */}
+      <section className="section-deferred space-y-3">
+        <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
+          <span className="font-bold uppercase tracking-wider text-[11px] text-[var(--foreground)]">
+            Platform Metrics &amp; Question Archives
+          </span>
+          <span className="text-[11px] text-[var(--muted-foreground)] hidden sm:inline">
+            6,500+ Verified Scenarios &amp; Live Guides
+          </span>
+        </div>
+        <StatCards />
+      </section>
 
-      {/* For Advanced Tiers: Curriculum Roadmap in standard architectural position */}
-      {!isBeginnerRail && (
-        <>
-          <SectionDivider text="Your Guided Curriculum Roadmap" />
-          <RoadmapGrid />
-        </>
-      )}
-
-      {/* 10. Architect Digest Subscription (SitePoint & Noupe callout box) */}
-      <ArchitectDigest />
+      {/* 9. Architect Digest Subscription */}
+      <section className="section-deferred">
+        <ArchitectDigest />
+      </section>
     </div>
   );
 }

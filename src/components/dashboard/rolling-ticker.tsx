@@ -324,8 +324,6 @@ export function RollingTicker() {
                     fontWeight: 500,
                     letterSpacing: "0.012em",
                     lineHeight: "1.4",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
                     whiteSpace: "nowrap",
                     cursor: "pointer",
                   }}

@@ -249,7 +249,7 @@ export default function ArchitectureHubPage() {
               Data Platform Architecture Hub
             </h1>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              2,400+ advanced design scenarios covering Lakehouse, real-time streaming, LLM/RAG,
+              3,000+ advanced design scenarios covering Lakehouse, real-time streaming, LLM/RAG,
               IaC, disaster recovery, data mesh, and MPP distributed engine patterns.
             </p>
           </div>
@@ -309,7 +309,7 @@ export default function ArchitectureHubPage() {
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
-              6,100+ Interview Questions
+              6,500+ Interview Questions
             </div>
           </div>
         </Link>
@@ -342,7 +342,7 @@ export default function ArchitectureHubPage() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search 2,400+ architecture scenarios (e.g. Disaster recovery, CDC, Direct Lake, Mesh)..."
+              placeholder="Search 3,000+ architecture scenarios (e.g. Disaster recovery, CDC, Direct Lake, Mesh)..."
               className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
             />
             {searchQuery && (
