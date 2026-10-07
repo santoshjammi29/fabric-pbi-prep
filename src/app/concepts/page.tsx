@@ -21,14 +21,14 @@ import {
   MessageSquare,
   Compass,
   Zap,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { conceptsDb, pythonData } from "@/data";
-import { Concept, Difficulty, CodeLevel } from "@/types/data";
+import { Concept, Difficulty } from "@/types/data";
 import dynamic from "next/dynamic";
 
-const CodeBlock = dynamic(() => import("@/components/ui/code-block").then(mod => mod.CodeBlock), { ssr: false });
 const SmoothAccordion = dynamic(() => import("@/components/ui/smooth-accordion").then(mod => mod.SmoothAccordion), { ssr: false });
 import { recordLastTopic } from "@/lib/user-progress";
 
@@ -39,20 +39,10 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
   ARCHITECT: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
 };
 
-const levelBadges: Record<CodeLevel, { bg: string; text: string; border: string }> = {
-  beginner: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
-  intermediate: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" },
-  advanced: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/20" },
-  architect: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
-};
-
-type ViewMode = "concepts" | "python";
-
 function ConceptsContent() {
   const searchParams = useSearchParams();
   const initialTerm = searchParams.get("term") || "";
 
-  const [viewMode, setViewMode] = useState<ViewMode>("concepts");
   const [searchQuery, setSearchQuery] = useState(initialTerm);
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -63,22 +53,6 @@ function ConceptsContent() {
 
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
-
-  // Python tab state
-  const [pyLevel, setPyLevel] = useState<string>("ALL");
-  const [pyCategory, setPyCategory] = useState<string>("ALL");
-  const [pyExpandedIds, setPyExpandedIds] = useState<Set<string>>(new Set());
-  const [pyPage, setPyPage] = useState(1);
-  const pyPageSize = 10;
-
-  const handleViewModeChange = useCallback((mode: ViewMode) => {
-    setViewMode(mode);
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("tab", mode);
-      window.history.replaceState(null, "", url.toString());
-    }
-  }, []);
 
   const handleCategoryChange = useCallback((cat: string) => {
     setSelectedCategory(cat);
@@ -125,15 +99,6 @@ function ConceptsContent() {
     });
   }, []);
 
-  const togglePyExpand = useCallback((id: string) => {
-    setPyExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
   // Sync URL parameters on initial load & popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -146,9 +111,10 @@ function ConceptsContent() {
       const catParam = params.get("category");
 
       if (tabParam === "python") {
-        setViewMode("python");
-      } else if (tabParam === "concepts") {
-        setViewMode("concepts");
+        if (typeof window !== "undefined") {
+          window.location.replace("/python");
+          return;
+        }
       }
 
       if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {
@@ -272,60 +238,6 @@ function ConceptsContent() {
     });
   }, [deferredSearch, selectedCategory, selectedDifficulty]);
 
-  // Python tab – distinct categories
-  const pyCategories = useMemo(() => {
-    const cats = new Set<string>();
-    pythonData.forEach((c) => {
-      if (c.category) cats.add(c.category);
-    });
-    return ["ALL", ...Array.from(cats).sort()];
-  }, []);
-
-  // Python tab – filtered items
-  const filteredPython = useMemo(() => {
-    return pythonData.filter((item) => {
-      if (pyLevel !== "ALL" && item.level !== pyLevel) return false;
-      if (pyCategory !== "ALL" && item.category !== pyCategory) return false;
-      if (deferredSearch.trim()) {
-        const q = deferredSearch.toLowerCase();
-        return (
-          item.title.toLowerCase().includes(q) ||
-          (item.description?.toLowerCase().includes(q) ?? false) ||
-          (item.code?.toLowerCase().includes(q) ?? false) ||
-          (item.category?.toLowerCase().includes(q) ?? false)
-        );
-      }
-      return true;
-    });
-  }, [deferredSearch, pyLevel, pyCategory]);
-
-  const pyPaginated = useMemo(() => {
-    const start = (pyPage - 1) * pyPageSize;
-    return filteredPython.slice(start, start + pyPageSize);
-  }, [filteredPython, pyPage]);
-
-  const pyTotalPages = Math.max(1, Math.ceil(filteredPython.length / pyPageSize));
-
-  const copyCode = useCallback((code: string, id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(code);
-    setCopiedId(id);
-    toast.success("Code copied to clipboard!");
-    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
-  }, []);
-
-  const togglePyBookmark = useCallback((id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setBookmarks(prev => {
-      const safePrev = Array.isArray(prev) ? prev : [];
-      const updated = safePrev.includes(id) ? safePrev.filter(b => b !== id) : [...safePrev, id];
-      try { localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated)); } catch {}
-      if (safePrev.includes(id)) toast.info("Bookmark removed"); else toast.success("Saved to bookmarks");
-      return updated;
-    });
-  }, []);
-
   return (
     <div className="space-y-8 pb-20">
       {/* Page Header */}
@@ -351,43 +263,41 @@ function ConceptsContent() {
               <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Terms</div>
             </div>
             <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl sm:text-2xl font-bold text-blue-400">{pythonData.length}</div>
-              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Python</div>
+              <div className="text-xl sm:text-2xl font-bold text-blue-400">{categories.length - 1}</div>
+              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Categories</div>
             </div>
             <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl sm:text-2xl font-bold text-purple-400">{categories.length - 1}</div>
-              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Categories</div>
+              <div className="text-xl sm:text-2xl font-bold text-purple-400">4</div>
+              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Tiers</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* View Mode Toggle */}
+      {/* Navigation Quick Switch */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-        <button
-          onClick={() => handleViewModeChange("concepts")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
-            viewMode === "concepts"
-              ? "bg-green-600 text-white shadow-lg shadow-green-500/20"
-              : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
-          )}
+        <div
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-green-600 text-white shadow-lg shadow-green-500/20 whitespace-nowrap shrink-0"
         >
           <BookOpen size={16} />
           <span>📚 Key Concepts ({conceptsDb.length})</span>
-        </button>
-        <button
-          onClick={() => handleViewModeChange("python")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
-            viewMode === "python"
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-              : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
-          )}
+        </div>
+        <Link
+          href="/python"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-emerald-400 hover:bg-[var(--surface-2)] border border-[var(--border)] transition-all whitespace-nowrap shrink-0 group"
         >
-          <FileCode2 size={16} />
-          <span>🐍 Python Coding ({pythonData.length})</span>
-        </button>
+          <FileCode2 size={16} className="text-emerald-400" />
+          <span>🐍 Unified Python Hub ({pythonData.length})</span>
+          <ArrowRight size={14} className="opacity-60 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link
+          href="/code-practice"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-blue-400 hover:bg-[var(--surface-2)] border border-[var(--border)] transition-all whitespace-nowrap shrink-0 group"
+        >
+          <Terminal size={16} className="text-blue-400" />
+          <span>⚡ Polyglot Code Practice</span>
+          <ArrowRight size={14} className="opacity-60 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
 
       {/* 4-Layer Integrated Domain Navigation */}
@@ -405,16 +315,16 @@ function ConceptsContent() {
         </div>
 
         <Link
-          href="/code-practice"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
+          href="/python"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-emerald-500/40 transition-all flex items-center gap-3 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
             <FileCode2 size={16} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Practice</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-300">
-              120+ Coding Sheets
+            <div className="text-[10px] uppercase font-bold text-emerald-400">Layer 2 · Python Hub</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-emerald-300">
+              32+ DE Runbooks &amp; Slicers
             </div>
           </div>
         </Link>
@@ -451,10 +361,8 @@ function ConceptsContent() {
       </div>
 
       {/* ============== CONCEPTS VIEW ============== */}
-      {viewMode === "concepts" && (
-        <>
-          {/* Filter & Search Bar */}
-          <div className="space-y-4">
+      {/* Filter & Search Bar */}
+      <div className="space-y-4">
             {/* Search row */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
@@ -703,272 +611,6 @@ function ConceptsContent() {
               })}
             </div>
           )}
-        </>
-      )}
-
-      {/* ============== PYTHON CODING VIEW ============== */}
-      {viewMode === "python" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Python Filters */}
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search
-                  size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-                />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); setPyPage(1); }}
-                  placeholder="Search Python topics (e.g., decorators, generators, pandas, delta lake)..."
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => { setSearchQuery(""); setPyPage(1); }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Level filter */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
-                {["ALL", "beginner", "intermediate", "advanced", "architect"].map((lvl) => (
-                  <button
-                    key={lvl}
-                    onClick={() => { setPyLevel(lvl); setPyPage(1); }}
-                    className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
-                      pyLevel === lvl
-                        ? "bg-blue-600 text-white shadow-md font-semibold"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                    )}
-                  >
-                    {lvl === "ALL" ? "All Levels" : lvl.charAt(0).toUpperCase() + lvl.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Category chips */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-                <Filter size={12} /> Domain:
-              </span>
-              {pyCategories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => { setPyCategory(cat); setPyPage(1); }}
-                  className={cn(
-                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
-                    pyCategory === cat
-                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-sm font-semibold"
-                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                  )}
-                >
-                  {cat === "ALL" ? "🐍 All Categories" : cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Results Count */}
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-            <span>
-              Showing <strong className="text-[var(--foreground)]">{filteredPython.length}</strong> Python topics
-              {filteredPython.length > pyPageSize && (
-                <span className="ml-1">(Page {pyPage} of {pyTotalPages})</span>
-              )}
-            </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setPyExpandedIds(new Set(pyPaginated.map((i) => i.id)))}
-                className="hover:text-[var(--foreground)] font-medium transition-colors"
-              >
-                Expand All
-              </button>
-              <span>•</span>
-              <button
-                onClick={() => setPyExpandedIds(new Set())}
-                className="hover:text-[var(--foreground)] font-medium transition-colors"
-              >
-                Collapse All
-              </button>
-            </div>
-          </div>
-
-          {/* Python Cards */}
-          {filteredPython.length === 0 ? (
-            <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
-              <Terminal size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
-              <h3 className="text-base font-semibold text-[var(--foreground)]">No matching Python topics found</h3>
-              <p className="text-xs text-[var(--muted-foreground)] mt-1 max-w-sm mx-auto">
-                Try adjusting your search or level/category filters.
-              </p>
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setPyLevel("ALL");
-                  setPyCategory("ALL");
-                  setPyPage(1);
-                }}
-                className="mt-4 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors"
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pyPaginated.map((item, index) => {
-                const isExpanded = pyExpandedIds.has(item.id);
-                const isBookmarked = bookmarks.includes(item.id);
-                const lvlStyle = levelBadges[item.level] || levelBadges.intermediate;
-
-                return (
-                  <div
-                    key={item.id}
-                    className={cn(
-                      "rounded-2xl border transition-all duration-200 overflow-hidden",
-                      isExpanded
-                        ? "bg-[var(--surface-1)] border-blue-500/40 shadow-sm"
-                        : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
-                    )}
-                  >
-                    {/* Card Header */}
-                    <div
-                      onClick={() => togglePyExpand(item.id)}
-                      className="p-5 cursor-pointer select-none space-y-3"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-semibold text-blue-400 tracking-wide uppercase">
-                              {item.category}
-                            </span>
-                            <span
-                              className={cn(
-                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
-                                lvlStyle.bg,
-                                lvlStyle.text,
-                                lvlStyle.border
-                              )}
-                            >
-                              {item.level}
-                            </span>
-                          </div>
-                          <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight">
-                            {item.title}
-                          </h3>
-                        </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={(e) => togglePyBookmark(item.id, e)}
-                            className={cn(
-                              "p-2 rounded-xl transition-colors",
-                              isBookmarked
-                                ? "text-amber-400 bg-amber-400/10"
-                                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                            )}
-                            title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
-                          >
-                            {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-                          </button>
-
-                          <button
-                            onClick={(e) => copyCode(item.code, item.id, e)}
-                            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
-                            title="Copy Code"
-                          >
-                            {copiedId === item.id ? (
-                              <Check size={16} className="text-green-400" />
-                            ) : (
-                              <Copy size={16} />
-                            )}
-                          </button>
-
-                          <div className="p-2 text-[var(--muted-foreground)]">
-                            <ChevronDown
-                              size={16}
-                              className={cn(
-                                "transition-transform duration-300",
-                                isExpanded && "rotate-180 text-blue-400"
-                              )}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-
-                    {/* Expanded Code & Details */}
-                    <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
-                      <CodeBlock
-                        code={item.code}
-                        language="python"
-                        filename={`${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40)}.py`}
-                        showLineNumbers
-                      />
-
-                      {item.notes && item.notes.length > 0 && (
-                        <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                            📝 Notes:
-                          </h4>
-                          <ul className="space-y-1.5">
-                            {item.notes.map((note, ni) => (
-                              <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
-                                <CheckCircle2 size={14} className="text-blue-400 mt-0.5 shrink-0" />
-                                <span className="leading-snug">{note}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {item.use_case && (
-                        <div className="pt-2 border-t border-[var(--border)]">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] mb-1">
-                            🎯 Use Case:
-                          </h4>
-                          <p className="text-[var(--foreground)] opacity-90 leading-relaxed">{item.use_case}</p>
-                        </div>
-                      )}
-                    </SmoothAccordion>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Python Pagination */}
-          {filteredPython.length > pyPageSize && (
-            <div className="flex justify-center items-center gap-4 mt-4">
-              <button
-                onClick={() => setPyPage(p => Math.max(p - 1, 1))}
-                disabled={pyPage === 1}
-                className={cn("px-3 py-1.5 rounded-xl border text-sm", pyPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-[var(--surface-2)]")}
-              >
-                Previous
-              </button>
-              <span className="text-sm">Page {pyPage} of {pyTotalPages}</span>
-              <button
-                onClick={() => setPyPage(p => Math.min(p + 1, pyTotalPages))}
-                disabled={pyPage === pyTotalPages}
-                className={cn("px-3 py-1.5 rounded-xl border text-sm", pyPage === pyTotalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-[var(--surface-2)]")}
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

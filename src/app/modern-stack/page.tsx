@@ -11,7 +11,9 @@ import {
   Terminal,
   Bot,
   FileCode2,
+  ArrowRight,
 } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
   modernCodeMatrix,
@@ -824,6 +826,25 @@ export default function ModernStackPage() {
                 <div className="text-lg font-bold text-purple-400">{pythonData.filter(p => ['Delta Lake', 'Distributed Computing', 'Streaming', 'Architecture', 'Data Patterns', 'Performance'].includes(p.category)).length}</div>
                 <div className="text-[10px] text-[var(--muted-foreground)]">DE Python Patterns</div>
               </div>
+            </div>
+
+            {/* Link to Unified Python Hub */}
+            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
+              <div className="space-y-0.5">
+                <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <Sparkles size={14} /> Unified Python Hub
+                </div>
+                <div className="text-xs text-[var(--muted-foreground)]">
+                  Explore all 32+ full-code data engineering runbooks with instant Experience Level, Domain, and Framework slicers.
+                </div>
+              </div>
+              <Link
+                href="/python"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs whitespace-nowrap transition-colors shrink-0 shadow-sm"
+              >
+                <span>Open Python Hub</span>
+                <ArrowRight size={13} />
+              </Link>
             </div>
           </div>
 
