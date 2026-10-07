@@ -448,8 +448,8 @@ function ArchitectureHubContent() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const pageSize = 25;
+  const initialBatch = 25;
+  const [visibleCount, setVisibleCount] = useState(initialBatch);
 
   // Python Runbook filter states
   const [pySearch, setPySearch] = useState("");
@@ -596,8 +596,8 @@ function ArchitectureHubContent() {
   }, [deferredSearch, selectedDifficulty, selectedCategory]);
 
   const paginatedItems = useMemo(() => {
-    return filteredItems.slice(0, page * pageSize);
-  }, [filteredItems, page]);
+    return filteredItems.slice(0, visibleCount);
+  }, [filteredItems, visibleCount]);
 
   // Filtered Python Runbooks
   const filteredRunbooks = useMemo(() => {
@@ -877,7 +877,7 @@ function ArchitectureHubContent() {
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setPage(1);
+                    setVisibleCount(initialBatch);
                   }}
                   placeholder="Search 3,080+ architecture blueprints (e.g., Vitess sharding, Spanner TrueTime, gh-ost, CoW branching, Little's Law)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
@@ -886,7 +886,7 @@ function ArchitectureHubContent() {
                   <button
                     onClick={() => {
                       setSearchQuery("");
-                      setPage(1);
+                      setVisibleCount(initialBatch);
                     }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
                   >
@@ -902,7 +902,7 @@ function ArchitectureHubContent() {
                     key={diff}
                     onClick={() => {
                       setSelectedDifficulty(diff);
-                      setPage(1);
+                      setVisibleCount(initialBatch);
                       updateUrlParam("difficulty", diff);
                     }}
                     className={cn(
@@ -928,7 +928,7 @@ function ArchitectureHubContent() {
                   key={cat}
                   onClick={() => {
                     setSelectedCategory(cat);
-                    setPage(1);
+                    setVisibleCount(initialBatch);
                     updateUrlParam("category", cat);
                   }}
                   className={cn(
@@ -1083,12 +1083,19 @@ function ArchitectureHubContent() {
               })}
 
               {paginatedItems.length < filteredItems.length && (
-                <div className="pt-6 text-center">
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
-                    onClick={() => setPage((prev) => prev + 1)}
-                    className="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg hover:shadow-purple-500/25"
+                    onClick={() => setVisibleCount((prev) => prev * 2)}
+                    className="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg hover:shadow-purple-500/25 flex items-center gap-2"
                   >
-                    Load More Scenarios ({filteredItems.length - paginatedItems.length} remaining)
+                    <span>⚡ Load More (+{Math.min(paginatedItems.length, filteredItems.length - paginatedItems.length).toLocaleString()})</span>
+                    <span className="opacity-75 font-normal">· {(filteredItems.length - paginatedItems.length).toLocaleString()} remaining</span>
+                  </button>
+                  <button
+                    onClick={() => setVisibleCount(filteredItems.length)}
+                    className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[var(--foreground)] text-xs sm:text-sm font-semibold transition-all"
+                  >
+                    Load All ({filteredItems.length.toLocaleString()})
                   </button>
                 </div>
               )}

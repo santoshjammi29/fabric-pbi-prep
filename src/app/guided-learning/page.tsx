@@ -394,12 +394,19 @@ export default function GuidedLearningPage() {
                     </div>
                     
                     {visibleItems.length < items.length && (
-                      <div className="text-center pt-1">
+                      <div className="flex items-center justify-center gap-2 pt-1">
                         <button
-                          onClick={() => setPages(p => ({ ...p, [stage.id]: pageNum + 1 }))}
-                          className="px-3 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[10px] font-semibold text-[var(--foreground)] transition-colors"
+                          onClick={() => setPages((p) => ({ ...p, [stage.id]: (p[stage.id] || 1) * 2 }))}
+                          className="px-3 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[10px] font-semibold text-[var(--foreground)] transition-colors flex items-center gap-1.5"
                         >
-                          Load More ({items.length - visibleItems.length} left)
+                          <span>⚡ Load More (+{Math.min(visibleItems.length, items.length - visibleItems.length)})</span>
+                          <span className="opacity-70">· {items.length - visibleItems.length} left</span>
+                        </button>
+                        <button
+                          onClick={() => setPages((p) => ({ ...p, [stage.id]: Math.ceil(items.length / pageSize) }))}
+                          className="px-2 py-1 rounded-lg bg-[var(--surface-1)] hover:bg-[var(--surface-2)] text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                        >
+                          All ({items.length})
                         </button>
                       </div>
                     )}

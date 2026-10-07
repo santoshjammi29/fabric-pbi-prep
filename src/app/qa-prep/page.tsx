@@ -46,8 +46,8 @@ export default function QaPrepPage() {
   const [selectedDomain, setSelectedDomain] = useState<string>("ALL");
   const [selectedConceptId, setSelectedConceptId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [page, setPage] = useState(1);
-  const pageSize = 25;
+  const initialBatch = 25;
+  const [visibleCount, setVisibleCount] = useState(initialBatch);
 
   // Study Mode State
   const [isStudyMode, setIsStudyMode] = useState(false);
@@ -112,7 +112,7 @@ export default function QaPrepPage() {
         if (matched) {
           if (!diffParam) setSelectedDifficulty("ALL");
           if (!domainParam) setSelectedDomain("ALL");
-          setPage(1);
+          setVisibleCount(initialBatch);
           setExpandedIds(new Set([matched.id]));
           if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
           scrollTimerRef.current = setTimeout(() => {
@@ -216,8 +216,8 @@ export default function QaPrepPage() {
 
   // Paginated slice
   const paginatedQuestions = useMemo(() => {
-    return filteredQuestions.slice(0, page * pageSize);
-  }, [filteredQuestions, page]);
+    return filteredQuestions.slice(0, visibleCount);
+  }, [filteredQuestions, visibleCount]);
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
@@ -490,14 +490,17 @@ export default function QaPrepPage() {
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setPage(1);
+                    setVisibleCount(initialBatch);
                   }}
                   placeholder="Search 6,500+ questions (e.g., Delta log, CDC, Shuffling, Direct Lake, RLS)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (
                   <button
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => {
+                      setSearchQuery("");
+                      setVisibleCount(initialBatch);
+                    }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
                   >
                     Clear
@@ -512,7 +515,7 @@ export default function QaPrepPage() {
                     key={diff}
                     onClick={() => {
                       setSelectedDifficulty(diff);
-                      setPage(1);
+                      setVisibleCount(initialBatch);
                     }}
                     className={cn(
                       "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
@@ -535,7 +538,7 @@ export default function QaPrepPage() {
               <button
                 onClick={() => {
                   setSelectedDomain("ALL");
-                  setPage(1);
+                  setVisibleCount(initialBatch);
                 }}
                 className={cn(
                   "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
@@ -551,7 +554,7 @@ export default function QaPrepPage() {
                   key={dom}
                   onClick={() => {
                     setSelectedDomain(dom);
-                    setPage(1);
+                    setVisibleCount(initialBatch);
                   }}
                   className={cn(
                     "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
@@ -770,12 +773,19 @@ export default function QaPrepPage() {
 
               {/* Load More Pagination */}
               {paginatedQuestions.length < filteredQuestions.length && (
-                <div className="pt-6 text-center">
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
-                    onClick={() => setPage((prev) => prev + 1)}
-                    className="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg hover:shadow-purple-500/25"
+                    onClick={() => setVisibleCount((prev) => prev * 2)}
+                    className="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg hover:shadow-purple-500/25 flex items-center gap-2"
                   >
-                    Load More Questions ({filteredQuestions.length - paginatedQuestions.length} remaining)
+                    <span>⚡ Load More (+{Math.min(paginatedQuestions.length, filteredQuestions.length - paginatedQuestions.length).toLocaleString()})</span>
+                    <span className="opacity-75 font-normal">· {(filteredQuestions.length - paginatedQuestions.length).toLocaleString()} remaining</span>
+                  </button>
+                  <button
+                    onClick={() => setVisibleCount(filteredQuestions.length)}
+                    className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[var(--foreground)] text-xs sm:text-sm font-semibold transition-all"
+                  >
+                    Load All ({filteredQuestions.length.toLocaleString()})
                   </button>
                 </div>
               )}
