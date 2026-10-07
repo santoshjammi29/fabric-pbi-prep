@@ -4198,5 +4198,159 @@
       "Supports high-performance batch operations via session.execute(insert(Model), list_of_dicts) translating to multi-row INSERTs.",
       "Strict 2.0-style execution syntax enforces explicit transaction boundaries, eliminating accidental auto-commit anti-patterns."
     ]
+  },
+  {
+    "id": "db-concept-vitess-vschema",
+    "term": "Vitess Architecture & VSchema Declarative Sharding",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "A cloud-native horizontal database scaling engine for MySQL that abstracts sharded storage behind stateless query proxies (VTGate) governed by declarative JSON schemas (VSchema).",
+    "explanation": "Vitess was developed at YouTube to scale MySQL horizontally to thousands of nodes and billions of queries without changing application SQL syntax. Its architecture decouples routing from execution: client applications connect to stateless VTGate proxies via standard MySQL protocol. VTGate consults the VSchema (Vitess Schema) to inspect primary and secondary vindexes, determining whether a query targets a single shard or requires a distributed scatter-gather plan. Each underlying MySQL instance is guarded by a VTTablet agent that enforces connection pooling, memory limits, dead-end query cancellation, and semi-synchronous replication failovers. VSchema defines primary functional vindexes (e.g. hash of user_id) for physical shard placement and lookup vindexes (e.g. lookup tables for email_id) to route non-sharded lookups without broadcasting to all shards.",
+    "keyPoints": [
+      "VTGate acts as a stateless distributed SQL query planner and connection multiplexer, eliminating connection pool starvation.",
+      "VTTablet guards MySQL instances with query memory limits, row limits, and connection shielding against thundering herds.",
+      "VSchema maps tables to keyspaces and defines Primary Vindexes (hash-based shard keys) and Lookup Vindexes (secondary key routing).",
+      "Scatter-gather queries spanning multiple shards are executed in parallel by VTGate with automated sort, limit, and aggregation merging."
+    ]
+  },
+  {
+    "id": "db-concept-sharding-resharding",
+    "term": "Database Sharding Topologies & Live Dynamic Re-sharding",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "EASY",
+    "definition": "Techniques for horizontally partitioning database tables across independent physical nodes and dynamically splitting shards in production with zero application downtime.",
+    "explanation": "As data volumes breach single-node storage limits (tens of terabytes), sharding partitions tables horizontally. Hash Sharding applies a cryptographic hash (Murmur3/MD5) to the shard key, distributing rows uniformly across shard keyspace ranges (e.g., -80 to 80- in hex), eliminating write hotspots at the expense of distributed range scans. Range Sharding partitions by ordered keys (e.g., timestamps or alphabetical ranges), optimizing localized range queries but creating write hotspots on the leading edge. Entity-Group Sharding co-locates child tables (orders, line items) with root entities (tenant_id) on the same shard to preserve local ACID transactions. Dynamic Re-sharding splits an overloaded shard (e.g., -80 into -40 and 40-80) by initializing follower replicas, streaming binlog CDC changes, verifying row checksums continuously, and executing an atomic sub-5ms router cutover.",
+    "keyPoints": [
+      "Hash Sharding prevents hot shards by distributing uniform entropy across keyspace ranges.",
+      "Range Sharding preserves contiguous range queries but suffers from leading-edge write hotspots.",
+      "Entity-Group Sharding co-locates relational child rows on the same physical shard to avoid expensive cross-shard distributed 2PC.",
+      "Live re-sharding leverages continuous binlog replication and atomic metadata cutover to split shards without maintenance windows."
+    ]
+  },
+  {
+    "id": "db-concept-backpressure-admission",
+    "term": "Database Backpressure & Concurrency Admission Control",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "Flow-control and overload-shedding mechanisms that regulate query ingress, enforcing Little's Law to prevent database CPU thrashing, memory exhaustion, and cascading collapse.",
+    "explanation": "When database systems experience sudden query spikes, unbounded queueing creates catastrophic latency degradation. According to Little's Law (L = λW), as arrival rate λ spikes beyond processing capacity, queue wait times W grow non-linearly, causing client timeouts while the database burns CPU cycles executing stale, already-abandoned queries. Database admission control layers implement backpressure via TCP socket window saturation, token-bucket rate limiting, and adaptive concurrency limits (e.g. CoDel algorithm). When queue depth or P99 response time breaches SLA thresholds, the proxy immediately sheds load by rejecting non-critical or read-only queries with SQL Error 1205 / HTTP 429, reserving scarce database CPU cores and buffer pools for in-flight transactional commits.",
+    "keyPoints": [
+      "Unbounded query queueing triggers non-linear latency spikes and thread context-switching overhead.",
+      "TCP backpressure freezes kernel socket buffers when database worker pools become saturated.",
+      "Adaptive concurrency limiters dynamically calibrate max active transactions based on measured P99 round-trip latency.",
+      "Load shedding proactively rejects excess requests before CPU thrashing can trigger cluster-wide cascading failure."
+    ]
+  },
+  {
+    "id": "db-concept-traffic-control-gtid",
+    "term": "Database Traffic Control: Read-After-Write Consistency & GTID Pinning",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "Routing architectures that decouple reads and writes across replicas while tracking Global Transaction Identifiers (GTIDs) to eliminate replication lag anomalies.",
+    "explanation": "In high-throughput relational architectures, writes are routed to a primary database while reads are distributed across semi-synchronous or asynchronous read replicas. However, replication lag (typically 5ms to 500ms) causes the notorious 'read-your-own-writes' inconsistency, where a user updates their profile, reloads the page, and sees stale data. Modern traffic control gateways (e.g., VTGate, ProxySQL, RDS Proxy) solve this using GTID tracking. Upon completing a mutation on the primary, the client session receives the commit GTID. Subsequent read queries from that session inspect replica GTID positions; if the replica has not caught up to the session's GTID, the query is temporarily pinned to the primary or routed to a fully synchronized replica.",
+    "keyPoints": [
+      "Decouples write workloads from read replicas while maintaining perceptual consistency for interactive users.",
+      "GTID (Global Transaction Identifier) uniquely tags each commit across primary and follower nodes.",
+      "Session pinning ensures users always observe their own recent mutations even when read replicas experience replication lag.",
+      "Adaptive throttling automatically halts background analytics or ETL jobs if replica lag exceeds configured thresholds."
+    ]
+  },
+  {
+    "id": "db-concept-isolation-linearlizability",
+    "term": "Transaction Isolation Levels: Snapshot Isolation, SSI & Linearizability",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "The spectrum of transactional safety guarantees in distributed databases, spanning Read Committed, Snapshot Isolation, Serializable SSI, and External Consistency (Linearizability).",
+    "explanation": "Isolation levels balance database concurrency against transactional anomaly prevention. In Read Committed, transactions only read committed data but suffer from non-repeatable reads. In Snapshot Isolation (SI), readers view an immutable snapshot of data taken at transaction start, preventing non-repeatable reads and phantom reads without acquiring read locks; however, SI is vulnerable to Write Skew (where concurrent transactions read overlapping data and make conflicting updates). Serializable Snapshot Isolation (SSI) tracks read-write conflict graphs in memory, aborting only transactions that form cyclic serialization dependencies without blocking reads. External Consistency / Linearizability (achieved in Google Spanner via TrueTime atomic clocks and CockroachDB via Hybrid Logical Clocks) guarantees real-time causal ordering: if transaction T2 begins after T1 commits anywhere on Earth, T2 is mathematically guaranteed to observe T1's commit timestamp.",
+    "keyPoints": [
+      "Snapshot Isolation (SI) eliminates read-write lock contention using Multi-Version Concurrency Control (MVCC) but permits Write Skew.",
+      "Serializable Snapshot Isolation (SSI) provides mathematical serializability without pessimistic page-level read locks.",
+      "Linearizability (External Consistency) enforces real-world wall-clock causal ordering across globally distributed nodes.",
+      "Hardware-assisted time synchronization (GPS receivers + Rubidium atomic clocks in TrueTime) enables Spanner to achieve linearizable transactions with bounded uncertainty (ε ≈ 1-7ms)."
+    ]
+  },
+  {
+    "id": "db-concept-raft-paxos-quorums",
+    "term": "Quorum Consensus & Redundancy: Multi-Raft, Paxos & Witness Nodes",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "Distributed consensus algorithms that guarantee fault-tolerant state machine replication across independent nodes through majority voting quorums.",
+    "explanation": "Modern NewSQL databases (CockroachDB, Spanner, TiDB) reject single-primary replication topologies in favor of distributed consensus algorithms like Raft and Multi-Paxos. Tables are partitioned into ranges (typically 64MB-512MB), with each range managed by an independent Raft consensus group (Multi-Raft). A write operation is committed as soon as a majority quorum of replicas acknowledge the Raft log entry (e.g. 2 out of 3, or 3 out of 5 nodes). Range Leases elect a single node as the leaseholder to serve linearizable reads locally without quorum roundtrips. In multi-region deployments, Witness / Arbiter nodes serve as lightweight consensus voters that participate in quorum ballots without storing underlying table data, preventing split-brain scenarios across regions without doubling storage hardware costs.",
+    "keyPoints": [
+      "Multi-Raft enables independent consensus groups across millions of horizontal ranges, localizing failovers.",
+      "Write quorum requires floor(N/2) + 1 acknowledgments, ensuring data durability across node crashes.",
+      "Range Leases grant single-node read authority, eliminating distributed consensus latency on read operations.",
+      "Witness / Arbiter nodes provide tie-breaking quorum votes across availability zones without duplicating raw dataset storage."
+    ]
+  },
+  {
+    "id": "db-concept-compute-storage-decoupling",
+    "term": "Compute & Storage Decoupling: Log-is-the-Database Paradigm",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "A cloud-native database architecture where stateless SQL execution engines are separated from a distributed, purpose-built write-ahead log (WAL) storage tier.",
+    "explanation": "Traditional databases bundle query execution, buffer pool caching, and physical disk storage on the same virtual machine. Decoupled architectures (AWS Aurora, Neon, Google AlloyDB) treat 'the log as the database'. The compute instance executes SQL, parses plans, and sends only dirty Write-Ahead Log (WAL) records over the network to a distributed storage fleet. The storage tier ingests the WAL, writes it to NVMe disks, replicates across availability zones via Paxos quorum, and reconstructs data pages asynchronously out-of-band. Because compute nodes hold no persistent state, read replicas scale up in seconds without copying terabytes of data, and database crashes recover instantaneously because redo log replay occurs continuously in the distributed storage fleet.",
+    "keyPoints": [
+      "Eliminates network transmission of dirty data pages; only lightweight WAL streams cross the network fabric.",
+      "Enables near-zero crash recovery times by offloading page materialization to background storage nodes.",
+      "Stateless compute replicas can be spawned, resized, or terminated in seconds without data replication delays.",
+      "Shared-storage architecture allows thousands of isolated compute tenants to query the same underlying storage volume."
+    ]
+  },
+  {
+    "id": "db-concept-database-branching",
+    "term": "Database Branching & Copy-on-Write CoW Virtual Forks",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "A Git-like database lifecycle capability that instantly provisions isolated, fully functional database clones in seconds using Copy-on-Write pointer manipulation without duplicating physical data.",
+    "explanation": "Pioneered by platforms like Neon and PlanetScale, Database Branching applies version control paradigms to relational databases. Rather than spending hours restoring multi-terabyte backups to create staging environments, branching snapshots the database at a specific Log Sequence Number (LSN). The branch compute node mounts the parent's base storage pages as read-only. Any subsequent writes, schema modifications, or test mutations made within the branch are written to dedicated branch delta-pages via Copy-on-Write (CoW). This enables developers to create instant, isolated 50TB database clones for every GitHub pull request, validate complex schema migrations against production-volume data, and discard the branch upon merge with zero storage footprint overhead.",
+    "keyPoints": [
+      "Provisions production-volume database clones in <3 seconds using metadata pointer forks.",
+      "Copy-on-Write (CoW) ensures child branches consume storage only for newly modified and inserted delta pages.",
+      "Integrates with CI/CD pipelines to run integration tests and automated migrations against ephemeral preview environments.",
+      "Guarantees 100% isolation; destructive operations (DROP TABLE) inside a branch never impact the production parent."
+    ]
+  },
+  {
+    "id": "db-concept-deploy-requests-ghost",
+    "term": "Deploy Requests & Zero-Downtime Online Schema Migrations with gh-ost",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "An asynchronous schema migration methodology that modifies large tables without locking DDL, using shadow tables, continuous CDC binlog stream catchup, and atomic cutovers.",
+    "explanation": "Running native DDL (ALTER TABLE) on hundreds of gigabytes in production causes exclusive metadata locks (MDL), table locking, replication lag storms, and service outages. The Deploy Request pattern (popularized by PlanetScale and GitHub's gh-ost) eliminates downtime through asynchronous shadow table migration: 1) A ghost table (_gho_table) is created with the modified schema; 2) Historical rows are copied in micro-chunks throttled by database CPU and replica lag; 3) Concurrent live writes to the primary table are captured from the binlog stream and applied asynchronously to the ghost table; 4) Once delta lag converges to zero, an atomic double-rename query swaps the ghost table into place in <10 milliseconds.",
+    "keyPoints": [
+      "Prevents exclusive metadata locks (MDL) from blocking production transactions on large tables.",
+      "Throttles migration copy speed dynamically based on database CPU utilization, memory pressure, and replica lag.",
+      "Captures concurrent mutations via binary log (CDC) replay rather than expensive and lock-prone database triggers.",
+      "Executes an atomic RENAME TABLE cutover in <10ms with instantaneous rollback capability if anomalies occur."
+    ]
+  },
+  {
+    "id": "db-concept-lsm-vs-btree",
+    "term": "Storage Engine Trade-offs: LSM-Trees vs B+Trees & Compaction Dynamics",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "The foundational architectural trade-offs between write-optimized Log-Structured Merge Trees (LSM) and read-optimized B+Tree storage engines in modern database design.",
+    "explanation": "B+Trees (InnoDB, Postgres heap) organize data into balanced tree pages on disk, optimized for fast random reads (O(log N)) and localized range scans. However, random writes cause in-place page updates, leading to random I/O and high write amplification. Log-Structured Merge Trees (LSM) (RocksDB, CockroachDB Pebble, ScyllaDB, Cassandra) optimize for massive write throughput by appending mutations sequentially to an in-memory MemTable and Write-Ahead Log. When full, MemTables flush as immutable SSTables to disk across hierarchical levels (Level 0 to Level N). Background compaction threads merge and sort SSTables to purge deleted tombstones and deduplicate keys. If write volume exceeds compaction capacity, databases experience Compaction Storms and Write Stalls, severely degrading read latencies.",
+    "keyPoints": [
+      "B+Trees offer optimal single-point read latencies and predictable range scans at the expense of random write I/O.",
+      "LSM-Trees convert random writes into fast sequential disk I/O, achieving 10x higher write throughput.",
+      "Compaction processes (Size-Tiered vs Leveled Compaction) consume disk I/O to deduplicate keys and reclaim tombstone space.",
+      "Compaction debt occurs when disk bandwidth is saturated, triggering write stalls to protect storage integrity."
+    ]
+  },
+  {
+    "id": "db-concept-distributed-2pc-deadlocks",
+    "term": "Distributed Two-Phase Commit & Cross-Shard Transaction Latency",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "The distributed consensus protocol used to guarantee atomic transactions across multiple database shards, and the inherent latency and locking bottlenecks it introduces.",
+    "explanation": "When an ACID transaction mutates records residing on multiple physical shards, a distributed coordinator must execute Two-Phase Commit (2PC): Phase 1 (Prepare): The coordinator asks all participant shards to acquire local locks and write mutations to their WAL; each participant votes 'Prepared' or 'Abort'. Phase 2 (Commit): If all vote Prepared, the coordinator writes a global Commit record to its log and commands all participants to commit. 2PC introduces severe latency bottlenecks: transaction duration is bounded by the slowest participant node and multiple network roundtrips. Furthermore, because participant shards hold exclusive row locks throughout both phases, distributed 2PC dramatically increases the probability of distributed deadlocks, requiring global deadlock detection or wait-die lock timeout algorithms.",
+    "keyPoints": [
+      "Guarantees all-or-nothing atomicity across multiple sharded nodes at the cost of multiple network roundtrips.",
+      "Participants hold row locks throughout both Prepare and Commit phases, reducing overall system concurrency.",
+      "Vulnerable to coordinator failure: if the coordinator crashes during Phase 2, participants remain blocked in limbo.",
+      "Principal design rule: Minimize cross-shard transactions through entity-group co-location and asynchronous Saga patterns."
+    ]
   }
 ]

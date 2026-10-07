@@ -1206,5 +1206,137 @@
       "Governance",
       "Cloud"
     ]
+  },
+  {
+    "id": "cs-db-ghost-ddl",
+    "title": "Zero-Downtime Schema Migration with gh-ost",
+    "category": "SQL & Storage",
+    "categorySlug": "sql-storage",
+    "impact": "CRITICAL",
+    "effort": "MEDIUM",
+    "problem": "Running native ALTER TABLE on 500GB+ tables in production acquires exclusive Metadata Locks (MDL), blocking client queries, exhausting connection pools, and causing site-wide outages.",
+    "solution": "Execute non-blocking online schema change using gh-ost with dynamic throttling, replica lag monitoring, triggerless binlog streaming, and an atomic cutover.",
+    "codeSnippet": "# Run non-blocking schema migration with gh-ost\ngh-ost \\\n  --host=\"prod-mysql-primary.internal\" \\\n  --user=\"migration_user\" \\\n  --password=\"${DB_PASSWORD}\" \\\n  --database=\"finance\" \\\n  --table=\"transactions\" \\\n  --alter=\"ADD COLUMN status_v2 VARCHAR(32) DEFAULT 'PENDING' NOT NULL, ADD INDEX idx_status_created (status_v2, created_at)\" \\\n  --chunk-size=1000 \\\n  --max-lag-millis=1500 \\\n  --max-load=\"Threads_running=50,Threads_connected=1000\" \\\n  --critical-load=\"Threads_running=80\" \\\n  --throttle-control-replicas=\"prod-mysql-replica-1.internal:3306\" \\\n  --switchover=\"atomic\" \\\n  --cut-over-lock-timeout-seconds=3 \\\n  --serve-socket-file=\"/tmp/gh-ost.transactions.sock\" \\\n  --verbose \\\n  --execute",
+    "language": "bash",
+    "whyItMatters": "Eliminates locking downtime and trigger overhead completely. Copies rows in adaptive chunks while continuously replaying live binlog stream events, swapping tables in <10ms.",
+    "metrics": "Zero query stalls; replica lag strictly bounded under 1.5s; 100% rollback safety using preserved _old table.",
+    "antiPattern": "Running ALTER TABLE directly in production or using trigger-based tools that double write I/O and lock contention.",
+    "tags": [
+      "gh-ost",
+      "Schema Migration",
+      "Zero-Downtime",
+      "MySQL",
+      "DDL"
+    ]
+  },
+  {
+    "id": "cs-db-vitess-vschema-debug",
+    "title": "Vitess VSchema Routing & Scatter-Gather Triage",
+    "category": "Debugging & Observability",
+    "categorySlug": "debugging-observability",
+    "impact": "HIGH",
+    "effort": "LOW",
+    "problem": "Queries without explicit sharding keys or unmapped secondary columns broadcast scatter-gather queries across all 64 shards, saturating network bandwidth and CPU.",
+    "solution": "Inspect VTGate query execution plans using EXPLAIN FORMAT=VITESS and verify VSchema primary and lookup vindex bindings.",
+    "codeSnippet": "-- 1. Explain Vitess query plan to detect Scatter-Gather vs Single-Shard Route\nEXPLAIN FORMAT=VITESS \nSELECT * FROM orders \nWHERE user_id = 'usr_991204' AND order_status = 'SHIPPED';\n\n-- 2. Expected output for optimal point routing:\n-- +--------------------------------------------------------------------+\n-- | Operator: Route                                                    |\n-- | RouteType: EqualUnique (Target: user_ledger_ks, Shard: 40-80)      |\n-- | Vindex: user_id_hash_vdx                                           |\n-- +--------------------------------------------------------------------+\n\n-- 3. If RouteType shows 'Scatter', check VSchema lookup vindex:\nvtctlclient GetVSchema user_ledger_ks\n\n-- 4. Apply non-blocking lookup vindex creation if missing:\nvtctlclient ApplyVSchema -vschema='{\n  \"tables\": {\n    \"orders\": {\n      \"column_vindexes\": [\n        {\"column\": \"user_id\", \"name\": \"hash\"},\n        {\"column\": \"order_guid\", \"name\": \"order_guid_lookup_vdx\"}\n      ]\n    }\n  }\n}' user_ledger_ks",
+    "language": "sql",
+    "whyItMatters": "Prevents accidental full-keyspace scatter-gather queries from reducing cluster throughput by 95% on high-QPS endpoints.",
+    "metrics": "Replaces 64-shard scatter-gather with single-shard point routing, cutting P99 latency from 140ms to 2.4ms.",
+    "antiPattern": "Querying sharded tables on non-indexed secondary columns without a lookup vindex or routing hint.",
+    "tags": [
+      "Vitess",
+      "VSchema",
+      "Scatter-Gather",
+      "Query Planning",
+      "Sharding"
+    ]
+  },
+  {
+    "id": "cs-db-gtid-read-your-writes",
+    "title": "Read-After-Write Consistency with GTID Tracking",
+    "category": "Production Best Practices",
+    "categorySlug": "production-best-practices",
+    "impact": "HIGH",
+    "effort": "MEDIUM",
+    "problem": "Users update profiles or submit orders, but immediate page reloads route to lagging read replicas, displaying stale data or 404s.",
+    "solution": "Capture the transaction GTID upon write commit and route subsequent user reads to replicas that have caught up, or pin temporarily to Primary.",
+    "codeSnippet": "# Python/FastAPI GTID-aware read router\nimport time\nfrom sqlalchemy import text\nfrom my_db import get_primary_session, get_replica_pool\n\nasync def execute_mutation(query: str, params: dict, response) -> dict:\n    async with get_primary_session() as session:\n        result = await session.execute(text(query), params)\n        # Capture commit GTID on Primary\n        gtid_res = await session.execute(text(\"SELECT @@GLOBAL.gtid_executed AS gtid;\"))\n        commit_gtid = gtid_res.scalar()\n        # Set session cookie for subsequent client reads\n        response.set_cookie(key=\"last_commit_gtid\", value=commit_gtid, max_age=5)\n        return {\"status\": \"ok\"}\n\nasync def execute_consistent_read(query: str, params: dict, request):\n    target_gtid = request.cookies.get(\"last_commit_gtid\")\n    if not target_gtid:\n        # Route to any available read replica\n        return await read_from_replica(query, params)\n\n    # Check replica synchronization status\n    replica = await get_replica_pool().find_replica_with_gtid(target_gtid, timeout_ms=50)\n    if replica:\n        return await replica.execute(query, params)\n    else:\n        # Fallback to Primary if replicas are lagging behind user's mutation\n        async with get_primary_session() as session:\n            return await session.execute(text(query), params)",
+    "language": "python",
+    "whyItMatters": "Eliminates user-facing replication lag glitches while preserving 90%+ read offload capacity to replica fleets.",
+    "metrics": "Zero user reports of stale data post-mutation; primary database CPU remains protected under 35%.",
+    "antiPattern": "Forcing all user traffic to the Primary database for several minutes after any write.",
+    "tags": [
+      "GTID",
+      "Read-After-Write",
+      "Replication Lag",
+      "Traffic Control",
+      "Proxy"
+    ]
+  },
+  {
+    "id": "cs-db-connection-pool-thrashing",
+    "title": "Database Connection Pool Thrashing & Storm Triage",
+    "category": "Debugging & Observability",
+    "categorySlug": "debugging-observability",
+    "impact": "CRITICAL",
+    "effort": "LOW",
+    "problem": "1,000+ serverless Lambda or Kubernetes microservice containers open direct database connections, exhausting OS file descriptors and driving PostgreSQL/MySQL CPU to 100% on context switching.",
+    "solution": "Deploy transaction-level connection pooling via PgBouncer or AWS RDS Proxy and tune max_connections and pool size formulas.",
+    "codeSnippet": "# /etc/pgbouncer/pgbouncer.ini - High-Performance Transaction Pooling\n[databases]\nanalytics_db = host=postgres-primary.internal port=5432 dbname=analytics_db\n\n[pgbouncer]\nlisten_addr = 0.0.0.0\nlisten_port = 6432\nauth_type = scram-sha-256\nauth_file = /etc/pgbouncer/userlist.txt\n\n# Transaction pooling mode: connection returned to pool immediately upon COMMIT\npool_mode = transaction\n\n# Mathematical Sizing Rule: pool_size <= (CPU_Cores * 2) + Disk_Count\ndefault_pool_size = 40\nmin_pool_size = 10\nreserve_pool_size = 5\nmax_client_conn = 10000\n\n# Client timeouts to prevent zombie connection holding\nserver_idle_timeout = 600\nclient_idle_timeout = 120\nquery_timeout = 30\nmax_user_connections = 10000",
+    "language": "ini",
+    "whyItMatters": "Allows 10,000 application microservices to multiplex over 40 physical database backend connections, eliminating CPU thrashing and RAM exhaustion.",
+    "metrics": "Drops database memory usage by 80%; eliminates connection handshake latency (<1ms pool checkout vs 45ms TCP/SSL handshake).",
+    "antiPattern": "Configuring application microservices with min_pool=20 across 500 pods (attempting 10,000 direct connections to PostgreSQL).",
+    "tags": [
+      "PgBouncer",
+      "Connection Pooling",
+      "RDS Proxy",
+      "PostgreSQL",
+      "Scalability"
+    ]
+  },
+  {
+    "id": "cs-db-dynamodb-salted-keys",
+    "title": "Eliminate DynamoDB Hot Partitions via Key Salting",
+    "category": "Production Best Practices",
+    "categorySlug": "production-best-practices",
+    "impact": "HIGH",
+    "effort": "LOW",
+    "problem": "A viral event or celebrity account sends 15,000 writes/sec to a single DynamoDB partition key, breaching the hard 1,000 WCU partition limit and throwing ProvisionedThroughputExceededException.",
+    "solution": "Distribute write traffic uniformly across multiple physical partitions using deterministic partition key salting.",
+    "codeSnippet": "import boto3\nimport random\nfrom typing import List, Dict, Any\n\ndynamodb = boto3.resource('dynamodb')\ntable = dynamodb.Table('LiveEventTelemetry')\n\nNUM_PARTITION_SLICES = 16  # Distribute across 16 physical partitions (16,000 WCU capacity)\n\ndef write_event(event_id: str, timestamp: int, payload: dict):\n    # Salt the partition key with random uniform slice\n    salt = random.randint(0, NUM_PARTITION_SLICES - 1)\n    salted_pk = f\"{event_id}#{salt}\"\n    \n    table.put_item(\n        Item={\n            'PK': salted_pk,\n            'SK': timestamp,\n            'data': payload\n        }\n    )\n\ndef read_event_history(event_id: str, start_ts: int, end_ts: int) -> List[Dict[str, Any]]:\n    # Scatter-gather read across all slices concurrently\n    all_events = []\n    for s in range(NUM_PARTITION_SLICES):\n        pk = f\"{event_id}#{s}\"\n        resp = table.query(\n            KeyConditionExpression=\"PK = :pk AND SK BETWEEN :start AND :end\",\n            ExpressionAttributeValues={':pk': pk, ':start': start_ts, ':end': end_ts}\n        )\n        all_events.extend(resp.get('Items', []))\n        \n    # Sort unified results by timestamp\n    all_events.sort(key=lambda x: x['SK'])\n    return all_events",
+    "language": "python",
+    "whyItMatters": "Expands individual entity throughput capacity linearly from 1,000 WCU to 16,000+ WCU without triggering throttling.",
+    "metrics": "Zero ProvisionedThroughputExceededException errors; uniform distribution across DynamoDB storage partitions.",
+    "antiPattern": "Using monotonically increasing dates or unsalted popular entity IDs as primary partition keys.",
+    "tags": [
+      "DynamoDB",
+      "Hot Partitions",
+      "Salting",
+      "Key-Value",
+      "NoSQL"
+    ]
+  },
+  {
+    "id": "cs-db-lsm-compaction-triage",
+    "title": "LSM Compaction Backlog & Write-Stall Recovery",
+    "category": "Debugging & Observability",
+    "categorySlug": "debugging-observability",
+    "impact": "CRITICAL",
+    "effort": "MEDIUM",
+    "problem": "Bursty write workloads in RocksDB, CockroachDB, or Cassandra cause Level 0 SSTables to accumulate (>25 files), triggering write stalls and read latency degradation.",
+    "solution": "Scale background compaction thread allocations, configure rate-limited disk bandwidth, and tune write buffer thresholds.",
+    "codeSnippet": "# RocksDB / CockroachDB Storage Engine Tuning for Heavy Write Throughput\n[rocksdb]\n# 1. Increase Level 0 write-stall threshold to tolerate bursts\nlevel0_file_num_compaction_trigger = 8\nlevel0_slowdown_writes_trigger = 24\nlevel0_stop_writes_trigger = 36\n\n# 2. Allocate dedicated background compaction threads\nmax_background_jobs = 12\nmax_background_compactions = 8\nmax_background_flushes = 4\n\n# 3. Increase MemTable sizing to produce larger, fewer SSTables\nwrite_buffer_size = 134217728        # 128 MB MemTable\nmax_write_buffer_number = 6          # Up to 6 in-memory MemTables before stall\nmin_write_buffer_number_to_merge = 2\n\n# 4. Target SSTable file sizes at base level\ntarget_file_size_base = 67108864     # 64 MB SSTables\nmax_bytes_for_level_base = 536870912 # 512 MB for Level 1\n\n# 5. Rate limit background compaction to avoid starving client I/O\nrate_limiter_bytes_per_sec = 419430400 # 400 MB/s max background disk write",
+    "language": "ini",
+    "whyItMatters": "Prevents catastrophic write stalls where database freezes client queries to catch up on disk merges, while bounding NVMe I/O starvation.",
+    "metrics": "Eliminates write stall pauses; reduces P99 point-lookup read latency by 85% by keeping Level 0 file count under 8.",
+    "antiPattern": "Leaving default compaction settings on write-heavy clusters or running unlimited compaction threads that exhaust NVMe IOPS.",
+    "tags": [
+      "RocksDB",
+      "LSM-Tree",
+      "Compaction",
+      "Write Stalls",
+      "CockroachDB"
+    ]
   }
 ]

@@ -348,7 +348,7 @@ function ConceptsContent() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search 310+ concepts (e.g., Lakehouse, ACID, Direct Lake, GIL, Polars, Arrow)..."
+                  placeholder="Search 320+ concepts (e.g., Vitess, VSchema, Sharding, Spanner, CoW Branching, Lakehouse, ACID)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (

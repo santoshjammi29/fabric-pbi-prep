@@ -879,7 +879,7 @@ function ArchitectureHubContent() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  placeholder="Search 3,000+ architecture blueprints (e.g., Lakehouse, Kappa, CDC, Python cgroups, zero-copy)..."
+                  placeholder="Search 3,080+ architecture blueprints (e.g., Vitess sharding, Spanner TrueTime, gh-ost, CoW branching, Little's Law)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (
