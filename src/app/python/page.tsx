@@ -218,13 +218,13 @@ const RunbookCard = React.memo(function RunbookCard({
         </div>
 
         {/* Tuning notes / Production gotchas */}
-        {item.notes && item.notes.length > 0 && (
+        {item.notes && (Array.isArray(item.notes) ? item.notes.length > 0 : Boolean(item.notes)) && (
           <div className="space-y-2 pt-3 border-t border-[var(--border)]">
             <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <Sparkles size={14} /> Production Tuning &amp; Gotchas
             </h4>
             <ul className="space-y-2">
-              {item.notes.map((note, idx) => (
+              {(Array.isArray(item.notes) ? item.notes : [item.notes]).map((note, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-[var(--muted-foreground)]">
                   <CheckCircle2 size={15} className="text-emerald-400 mt-0.5 shrink-0" />
                   <span className="leading-snug text-slate-300">{note}</span>
@@ -748,7 +748,8 @@ function PythonHubContent() {
         const inCode = item.code?.toLowerCase().includes(q) ?? false;
         const inCat = item.category?.toLowerCase().includes(q) ?? false;
         const inUseCase = item.use_case?.toLowerCase().includes(q) ?? false;
-        const inNotes = item.notes?.some((n) => n.toLowerCase().includes(q)) ?? false;
+        const notesArr = Array.isArray(item.notes) ? item.notes : typeof item.notes === "string" ? [item.notes] : [];
+        const inNotes = notesArr.some((n) => n.toLowerCase().includes(q));
         return inTitle || inDesc || inCode || inCat || inUseCase || inNotes;
       }
       return true;
@@ -773,6 +774,28 @@ function PythonHubContent() {
 
   return (
     <div className="space-y-8 pb-24">
+      {/* ARCHITECTURE HUB CONSOLIDATION BANNER */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-between gap-4 flex-wrap shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl sm:text-3xl">🏛️</span>
+          <div>
+            <div className="text-sm sm:text-base font-bold text-purple-300">
+              Consolidated with Enterprise Architecture Hub
+            </div>
+            <div className="text-xs text-[var(--muted-foreground)]">
+              Python Platform Engineering and System Blueprints are now unified in one master architecture workspace.
+            </div>
+          </div>
+        </div>
+        <Link
+          href="/architecture?tab=python"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-md hover:shadow-purple-500/25"
+        >
+          <span>Open Unified Architecture Hub</span>
+          <ArrowRight size={14} />
+        </Link>
+      </div>
+
       {/* 1. HERO SECTION */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">

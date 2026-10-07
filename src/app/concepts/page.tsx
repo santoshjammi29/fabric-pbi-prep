@@ -274,32 +274,6 @@ function ConceptsContent() {
         </div>
       </div>
 
-      {/* Navigation Quick Switch */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-        <div
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-green-600 text-white shadow-lg shadow-green-500/20 whitespace-nowrap shrink-0"
-        >
-          <BookOpen size={16} />
-          <span>📚 Key Concepts ({conceptsDb.length})</span>
-        </div>
-        <Link
-          href="/python"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-emerald-400 hover:bg-[var(--surface-2)] border border-[var(--border)] transition-all whitespace-nowrap shrink-0 group"
-        >
-          <FileCode2 size={16} className="text-emerald-400" />
-          <span>🐍 Unified Python Hub ({pythonData.length})</span>
-          <ArrowRight size={14} className="opacity-60 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-        <Link
-          href="/code-practice"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-blue-400 hover:bg-[var(--surface-2)] border border-[var(--border)] transition-all whitespace-nowrap shrink-0 group"
-        >
-          <Terminal size={16} className="text-blue-400" />
-          <span>⚡ Polyglot Code Practice</span>
-          <ArrowRight size={14} className="opacity-60 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-      </div>
-
       {/* 4-Layer Integrated Domain Navigation */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="p-3.5 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center gap-3">
@@ -308,23 +282,23 @@ function ConceptsContent() {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-green-400">Layer 1 · Concepts Active</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate">
+            <div className="text-xs font-bold text-[var(--foreground)] break-words">
               {conceptsDb.length} Core Topics
             </div>
           </div>
         </div>
 
         <Link
-          href="/python"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-emerald-500/40 transition-all flex items-center gap-3 group"
+          href="/code-practice"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
             <FileCode2 size={16} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-emerald-400">Layer 2 · Python Hub</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-emerald-300">
-              32+ DE Runbooks &amp; Slicers
+            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Practice</div>
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-300">
+              120+ Coding Sheets
             </div>
           </div>
         </Link>
@@ -338,7 +312,7 @@ function ConceptsContent() {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-orange-300">
               6,500+ Interview Questions
             </div>
           </div>
@@ -346,15 +320,15 @@ function ConceptsContent() {
 
         <Link
           href="/architecture"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-3 group"
+          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
             <Layers size={16} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">
-              3,000+ Scenarios
+            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 4 · Architecture Hub</div>
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-purple-300">
+              Architecture &amp; Python Hub
             </div>
           </div>
         </Link>
@@ -374,7 +348,7 @@ function ConceptsContent() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search 140+ concepts (e.g., Lakehouse, ACID, Direct Lake, Tungsten, Lineage)..."
+                  placeholder="Search 310+ concepts (e.g., Lakehouse, ACID, Direct Lake, GIL, Polars, Arrow)..."
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
                 />
                 {searchQuery && (

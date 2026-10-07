@@ -90,9 +90,9 @@ export function HeroQuickStart() {
             </div>
           </Link>
 
-          {/* Card 2: Python DE Hub (NEW) */}
+          {/* Card 2: Architecture & Python Hub (Consolidated) */}
           <Link
-            href="/python"
+            href="/architecture?tab=python"
             className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-cyan-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
           >
             <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0 font-bold">
@@ -100,12 +100,12 @@ export function HeroQuickStart() {
             </div>
             <div className="space-y-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Code-First · NEW</span>
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Unified · NEW</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-cyan-400 transition-colors">→</span>
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Python DE Hub</h3>
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Architecture &amp; Python Hub</h3>
               <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
-                Foundations to Principal Architect patterns with copyable code snippets.
+                Foundations to Principal Architect patterns with system blueprints &amp; copyable runbooks.
               </p>
             </div>
           </Link>
