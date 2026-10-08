@@ -455,6 +455,19 @@ function ArchitectureHubContent() {
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
+  // Python Runbook filter states
+  const [pySearch, setPySearch] = useState("");
+  const deferredPySearch = useDeferredValue(pySearch);
+  const [selectedPyLevel, setSelectedPyLevel] = useState<CodeLevel | "all">("all");
+  const [selectedPyDomain, setSelectedPyDomain] = useState<string>("all");
+  const [selectedPyFramework, setSelectedPyFramework] = useState<FrameworkKey>("all");
+  const [showPyBookmarksOnly, setShowPyBookmarksOnly] = useState(false);
+  const [pyBookmarks, setPyBookmarks] = useState<string[]>([]);
+  const [pyExpandedIds, setPyExpandedIds] = useState<Set<string>>(new Set());
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [pyPage, setPyPage] = useState(1);
+  const pyPageSize = 15;
+
   const handleShuffle = useCallback(() => {
     setIsShuffled(true);
     setShuffleSeed((s) => s + 1);
@@ -469,19 +482,6 @@ function ArchitectureHubContent() {
     setPyPage(1);
     toast.info("Reset to default order");
   }, [initialBatch]);
-
-  // Python Runbook filter states
-  const [pySearch, setPySearch] = useState("");
-  const deferredPySearch = useDeferredValue(pySearch);
-  const [selectedPyLevel, setSelectedPyLevel] = useState<CodeLevel | "all">("all");
-  const [selectedPyDomain, setSelectedPyDomain] = useState<string>("all");
-  const [selectedPyFramework, setSelectedPyFramework] = useState<FrameworkKey>("all");
-  const [showPyBookmarksOnly, setShowPyBookmarksOnly] = useState(false);
-  const [pyBookmarks, setPyBookmarks] = useState<string[]>([]);
-  const [pyExpandedIds, setPyExpandedIds] = useState<Set<string>>(new Set());
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [pyPage, setPyPage] = useState(1);
-  const pyPageSize = 15;
 
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);

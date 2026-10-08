@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Search,
   Maximize2,
@@ -8,11 +8,8 @@ import {
   Share2,
   Download,
   Check,
-  Layers,
   Sparkles,
-  ExternalLink,
   ChevronRight,
-  Info,
   ZoomIn,
   ZoomOut,
   RotateCcw

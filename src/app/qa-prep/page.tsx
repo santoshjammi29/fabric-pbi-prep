@@ -52,6 +52,13 @@ export default function QaPrepPage() {
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
+  // Study Mode State
+  const [isStudyMode, setIsStudyMode] = useState(false);
+  const [studyIndex, setStudyIndex] = useState(0);
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   const handleShuffle = useCallback(() => {
     setIsShuffled(true);
     setShuffleSeed((s) => s + 1);
@@ -66,13 +73,6 @@ export default function QaPrepPage() {
     setStudyIndex(0);
     toast.info("Reset to default order");
   }, [initialBatch]);
-
-  // Study Mode State
-  const [isStudyMode, setIsStudyMode] = useState(false);
-  const [studyIndex, setStudyIndex] = useState(0);
-  const [isCardFlipped, setIsCardFlipped] = useState(false);
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
