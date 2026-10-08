@@ -4,7 +4,6 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { LearningProgressBar } from "@/components/layout/learning-progress-bar";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
 import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
@@ -114,9 +113,6 @@ export default function RootLayout({
 
               {/* Top Announcement Bar (SitePoint/Noupe style) */}
               <AnnouncementBar />
-
-              {/* Global Persistent Learning Progress Bar (Beginner's Rail) */}
-              <LearningProgressBar />
 
               {/* Page content */}
               <main

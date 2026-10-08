@@ -22,6 +22,7 @@ import {
   Compass,
   Zap,
   ArrowRight,
+  Shuffle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,19 @@ function ConceptsContent() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+
+  const handleShuffle = useCallback(() => {
+    setIsShuffled(true);
+    setShuffleSeed((s) => s + 1);
+    toast.success("Shuffled concepts order");
+  }, []);
+
+  const handleResetOrder = useCallback(() => {
+    setIsShuffled(false);
+    toast.info("Reset to default order");
+  }, []);
 
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -238,6 +252,20 @@ function ConceptsContent() {
     });
   }, [deferredSearch, selectedCategory, selectedDifficulty]);
 
+  // Shuffled or standard order
+  const displayedConcepts = useMemo(() => {
+    if (!isShuffled) return filteredConcepts;
+    const arr = [...filteredConcepts];
+    let m = arr.length, t, i;
+    let seed = shuffleSeed * 9301 + 49297;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    while (m) {
+      i = Math.floor(rnd() * m--);
+      t = arr[m]; arr[m] = arr[i]; arr[i] = t;
+    }
+    return arr;
+  }, [filteredConcepts, isShuffled, shuffleSeed]);
+
   return (
     <div className="space-y-8 pb-20">
       {/* Page Header */}
@@ -403,13 +431,36 @@ function ConceptsContent() {
           </div>
 
           {/* Results Header Count */}
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-            <span>
-              Showing <strong className="text-[var(--foreground)]">{filteredConcepts.length}</strong> concepts
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
+            <div className="flex items-center gap-3">
+              <span>
+                Showing <strong className="text-[var(--foreground)]">{displayedConcepts.length}</strong> concepts
+              </span>
+              <button
+                onClick={handleShuffle}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
+                  isShuffled
+                    ? "bg-purple-600 text-white border-purple-500 shadow-sm"
+                    : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+                )}
+                title="Shuffle or randomize concept cards"
+              >
+                <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
+                <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+              </button>
+              {isShuffled && (
+                <button
+                  onClick={handleResetOrder}
+                  className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-1 underline underline-offset-2"
+                >
+                  Reset Order
+                </button>
+              )}
+            </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setExpandedIds(new Set(filteredConcepts.map((c) => c.id)))}
+                onClick={() => setExpandedIds(new Set(displayedConcepts.map((c) => c.id)))}
                 className="hover:text-[var(--foreground)] font-medium transition-colors"
               >
                 Expand All
@@ -425,7 +476,7 @@ function ConceptsContent() {
           </div>
 
           {/* Concepts Grid / List */}
-          {filteredConcepts.length === 0 ? (
+          {displayedConcepts.length === 0 ? (
             <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
               <Layers size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
               <h3 className="text-base font-semibold text-[var(--foreground)]">No matching concepts found</h3>
@@ -437,6 +488,7 @@ function ConceptsContent() {
                   setSearchQuery("");
                   setSelectedCategory("ALL");
                   setSelectedDifficulty("ALL");
+                  setIsShuffled(false);
                 }}
                 className="mt-4 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
               >
@@ -445,7 +497,7 @@ function ConceptsContent() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredConcepts.map((concept, index) => {
+              {displayedConcepts.map((concept, index) => {
                 const isExpanded = expandedIds.has(concept.id);
                 const isBookmarked = bookmarks.includes(concept.id);
                 const diffStyle = difficultyColors[concept.difficulty] || difficultyColors.MEDIUM;

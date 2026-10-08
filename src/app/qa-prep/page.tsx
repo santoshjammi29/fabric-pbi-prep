@@ -21,6 +21,7 @@ import {
   BookOpen,
   Compass,
   X,
+  Shuffle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,23 @@ export default function QaPrepPage() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const initialBatch = 25;
   const [visibleCount, setVisibleCount] = useState(initialBatch);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+
+  const handleShuffle = useCallback(() => {
+    setIsShuffled(true);
+    setShuffleSeed((s) => s + 1);
+    setVisibleCount(initialBatch);
+    setStudyIndex(0);
+    toast.success("Shuffled questions order");
+  }, [initialBatch]);
+
+  const handleResetOrder = useCallback(() => {
+    setIsShuffled(false);
+    setVisibleCount(initialBatch);
+    setStudyIndex(0);
+    toast.info("Reset to default order");
+  }, [initialBatch]);
 
   // Study Mode State
   const [isStudyMode, setIsStudyMode] = useState(false);
@@ -214,10 +232,24 @@ export default function QaPrepPage() {
     });
   }, [allQuestions, selectedDifficulty, selectedDomain, deferredSearch]);
 
+  // Shuffled or natural order
+  const displayedFilteredQuestions = useMemo(() => {
+    if (!isShuffled) return filteredQuestions;
+    const arr = [...filteredQuestions];
+    let m = arr.length, t, i;
+    let seed = shuffleSeed * 9301 + 49297;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    while (m) {
+      i = Math.floor(rnd() * m--);
+      t = arr[m]; arr[m] = arr[i]; arr[i] = t;
+    }
+    return arr;
+  }, [filteredQuestions, isShuffled, shuffleSeed]);
+
   // Paginated slice
   const paginatedQuestions = useMemo(() => {
-    return filteredQuestions.slice(0, visibleCount);
-  }, [filteredQuestions, visibleCount]);
+    return displayedFilteredQuestions.slice(0, visibleCount);
+  }, [displayedFilteredQuestions, visibleCount]);
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
@@ -263,7 +295,7 @@ export default function QaPrepPage() {
       };
       localStorage.setItem("dataprep_userdata", JSON.stringify(nextData));
 
-      const card = filteredQuestions[studyIndex];
+      const card = displayedFilteredQuestions[studyIndex];
       if (card) {
         recordLastTopic({
           title: card.question.length > 55 ? card.question.slice(0, 55) + "..." : card.question,
@@ -273,8 +305,8 @@ export default function QaPrepPage() {
       }
     } catch {}
 
-    setStudyIndex((prev) => (prev + 1) % (filteredQuestions.length || 1));
-  }, [filteredQuestions, studyIndex]);
+    setStudyIndex((prev) => (prev + 1) % (displayedFilteredQuestions.length || 1));
+  }, [displayedFilteredQuestions, studyIndex]);
 
   // Keyboard navigation for study mode
   useEffect(() => {
@@ -287,21 +319,21 @@ export default function QaPrepPage() {
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
         setIsCardFlipped(false);
-        setStudyIndex((prev) => (prev + 1) % (filteredQuestions.length || 1));
+        setStudyIndex((prev) => (prev + 1) % (displayedFilteredQuestions.length || 1));
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         setIsCardFlipped(false);
         setStudyIndex((prev) =>
-          prev === 0 ? Math.max(0, filteredQuestions.length - 1) : prev - 1
+          prev === 0 ? Math.max(0, displayedFilteredQuestions.length - 1) : prev - 1
         );
       }
     };
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [isStudyMode, filteredQuestions.length]);
+  }, [isStudyMode, displayedFilteredQuestions.length]);
 
-  const currentStudyCard = filteredQuestions[studyIndex] || filteredQuestions[0];
+  const currentStudyCard = displayedFilteredQuestions[studyIndex] || displayedFilteredQuestions[0];
 
   return (
     <div className="space-y-8 pb-20">
@@ -349,10 +381,33 @@ export default function QaPrepPage() {
       {/* FLASHCARD STUDY MODE */}
       {isStudyMode && currentStudyCard && (
         <div className="space-y-4 max-w-5xl 2xl:max-w-7xl mx-auto animate-in fade-in zoom-in-95 duration-300">
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-2">
-            <span>
-              Card <strong>{studyIndex + 1}</strong> of <strong>{filteredQuestions.length}</strong>
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--muted-foreground)] px-2">
+            <div className="flex items-center gap-3">
+              <span>
+                Card <strong>{studyIndex + 1}</strong> of <strong>{displayedFilteredQuestions.length}</strong>
+              </span>
+              <button
+                onClick={handleShuffle}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
+                  isShuffled
+                    ? "bg-purple-600 text-white border-purple-500 shadow-sm"
+                    : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+                )}
+                title="Shuffle or randomize flashcards"
+              >
+                <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
+                <span>{isShuffled ? "Reshuffle" : "Shuffle Cards"}</span>
+              </button>
+              {isShuffled && (
+                <button
+                  onClick={handleResetOrder}
+                  className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1 underline underline-offset-2"
+                >
+                  Reset Order
+                </button>
+              )}
+            </div>
             <span>Press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] font-mono">Space</kbd> to flip</span>
           </div>
 
@@ -597,11 +652,34 @@ export default function QaPrepPage() {
           )}
 
           {/* Results Action Bar */}
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-            <span>
-              Showing <strong className="text-[var(--foreground)]">{paginatedQuestions.length}</strong> of{" "}
-              <strong className="text-[var(--foreground)]">{filteredQuestions.length}</strong> matching questions
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
+            <div className="flex items-center gap-3">
+              <span>
+                Showing <strong className="text-[var(--foreground)]">{paginatedQuestions.length}</strong> of{" "}
+                <strong className="text-[var(--foreground)]">{displayedFilteredQuestions.length}</strong> matching questions
+              </span>
+              <button
+                onClick={handleShuffle}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
+                  isShuffled
+                    ? "bg-purple-600 text-white border-purple-500 shadow-sm"
+                    : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+                )}
+                title="Shuffle or randomize questions"
+              >
+                <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
+                <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+              </button>
+              {isShuffled && (
+                <button
+                  onClick={handleResetOrder}
+                  className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-1 underline underline-offset-2"
+                >
+                  Reset Order
+                </button>
+              )}
+            </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={expandAll}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
 import { m, AnimatePresence } from "framer-motion";
-import { Search, ExternalLink, CheckCircle2, Circle, GraduationCap, LayoutList, Layers, ChevronDown } from "lucide-react";
+import { Search, ExternalLink, CheckCircle2, Circle, GraduationCap, LayoutList, Layers, ChevronDown, Shuffle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getTopicItems, getTopicCounts, LearningItem } from "@/lib/guided-learning";
@@ -42,6 +42,8 @@ export default function GuidedLearningPage() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [pages, setPages] = useState<Record<string, number>>({});
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
   
   const pageSize = 15;
 
@@ -73,6 +75,7 @@ export default function GuidedLearningPage() {
       setSelectedType("ALL");
       setSelectedDifficulty("ALL");
       setExpandedIds(new Set());
+      setIsShuffled(false);
     } else {
       window.history.replaceState(null, '', window.location.pathname);
     }
@@ -128,8 +131,21 @@ export default function GuidedLearningPage() {
         grouped[item.difficulty].push(item);
       }
     });
+    if (isShuffled) {
+      Object.keys(grouped).forEach((stage) => {
+        const arr = [...grouped[stage]];
+        let m = arr.length, t, i;
+        let seed = (shuffleSeed + stage.charCodeAt(0)) * 9301 + 49297;
+        const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        while (m) {
+          i = Math.floor(rnd() * m--);
+          t = arr[m]; arr[m] = arr[i]; arr[i] = t;
+        }
+        grouped[stage] = arr;
+      });
+    }
     return grouped;
-  }, [filteredItems]);
+  }, [filteredItems, isShuffled, shuffleSeed]);
 
   const totalItemsCount = rawItems.length;
   const completedCount = completedIds.size;
@@ -275,6 +291,41 @@ export default function GuidedLearningPage() {
                     {diff === "ALL" ? "All Levels" : diff}
                   </button>
                 ))}
+              </div>
+
+              <div className="w-px h-3 bg-[var(--border)] mx-1 shrink-0" />
+
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => {
+                    setIsShuffled(true);
+                    setShuffleSeed((s) => s + 1);
+                    setPages({});
+                    toast.success("Shuffled journey items");
+                  }}
+                  className={cn(
+                    "flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium transition-all duration-150 shrink-0",
+                    isShuffled
+                      ? "bg-purple-600 text-white shadow-sm font-semibold"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                  )}
+                  title="Shuffle or randomize journey items"
+                >
+                  <Shuffle size={11} className={cn(isShuffled && "rotate-180 transition-transform")} />
+                  <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+                </button>
+                {isShuffled && (
+                  <button
+                    onClick={() => {
+                      setIsShuffled(false);
+                      setPages({});
+                      toast.info("Reset to default order");
+                    }}
+                    className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1 underline"
+                  >
+                    Reset
+                  </button>
+                )}
               </div>
             </div>
 

@@ -16,6 +16,7 @@ import {
   Layers,
   BookOpen,
   MessageSquare,
+  Shuffle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -71,6 +72,19 @@ export default function CodePracticePage() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+
+  const handleShuffle = () => {
+    setIsShuffled(true);
+    setShuffleSeed((s) => s + 1);
+    toast.success(`Shuffled ${languageConfigs[activeLang].name} templates`);
+  };
+
+  const handleResetOrder = () => {
+    setIsShuffled(false);
+    toast.info("Reset to default order");
+  };
 
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -136,6 +150,7 @@ export default function CodePracticePage() {
   const handleLangChange = (lang: LanguageKey) => {
     setActiveLang(lang);
     setExpandedIds(new Set());
+    setIsShuffled(false);
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `?db=${lang}`);
     }
@@ -230,6 +245,19 @@ export default function CodePracticePage() {
       return true;
     });
   }, [currentDataset, selectedLevel, searchQuery]);
+
+  const displayedItems = useMemo(() => {
+    if (!isShuffled) return filteredItems;
+    const arr = [...filteredItems];
+    let m = arr.length, t, i;
+    let seed = shuffleSeed * 9301 + 49297;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    while (m) {
+      i = Math.floor(rnd() * m--);
+      t = arr[m]; arr[m] = arr[i]; arr[i] = t;
+    }
+    return arr;
+  }, [filteredItems, isShuffled, shuffleSeed]);
 
   return (
     <div className="space-y-8 pb-20">
@@ -401,15 +429,37 @@ export default function CodePracticePage() {
         </div>
       </div>
 
-      {/* Count summary */}
       {/* Count summary & Actions */}
-      <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-        <span>
-          Showing <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> coding templates
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
+        <div className="flex items-center gap-3">
+          <span>
+            Showing <strong className="text-[var(--foreground)]">{displayedItems.length}</strong> coding templates
+          </span>
+          <button
+            onClick={handleShuffle}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
+              isShuffled
+                ? "bg-purple-600 text-white border-purple-500 shadow-sm"
+                : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+            )}
+            title="Shuffle or randomize coding templates"
+          >
+            <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
+            <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+          </button>
+          {isShuffled && (
+            <button
+              onClick={handleResetOrder}
+              className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-1 underline underline-offset-2"
+            >
+              Reset Order
+            </button>
+          )}
+        </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setExpandedIds(new Set(filteredItems.map((i) => i.id)))}
+            onClick={() => setExpandedIds(new Set(displayedItems.map((i) => i.id)))}
             className="hover:text-[var(--foreground)] font-medium transition-colors"
           >
             Expand All
@@ -425,7 +475,7 @@ export default function CodePracticePage() {
       </div>
 
       {/* Code Templates Stream */}
-      {filteredItems.length === 0 ? (
+      {displayedItems.length === 0 ? (
         <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
           <Layers size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
           <h3 className="text-base font-semibold text-[var(--foreground)]">No matching templates found</h3>
@@ -436,6 +486,7 @@ export default function CodePracticePage() {
             onClick={() => {
               setSearchQuery("");
               setSelectedLevel("ALL");
+              setIsShuffled(false);
             }}
             className="mt-4 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
           >
@@ -444,7 +495,7 @@ export default function CodePracticePage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredItems.map((item, index) => {
+          {displayedItems.map((item, index) => {
             const isExpanded = expandedIds.has(item.id);
             const isBookmarked = bookmarks.includes(item.id);
             const levelStyle = levelBadges[item.level] || levelBadges.intermediate;
