@@ -43,7 +43,7 @@
   },
   {
     "id": "bp-04",
-    "title": "4. CDC Pipeline: Debezium → Kafka → Delta Lake → Vector Index",
+    "title": "4. CDC Pipeline: Debezium \u2192 Kafka \u2192 Delta Lake \u2192 Vector Index",
     "category": "CDC & Streaming",
     "costEstimate": "$1,500 - $4,200 / month",
     "tags": [
@@ -57,7 +57,7 @@
   },
   {
     "id": "bp-05",
-    "title": "5. AI Governance Stack — Unity Catalog + Databricks AI Gateway + Llama Guard",
+    "title": "5. AI Governance Stack \u2014 Unity Catalog + Databricks AI Gateway + Llama Guard",
     "category": "AI Security & Governance",
     "costEstimate": "$1,000 - $3,000 / month",
     "tags": [
@@ -70,7 +70,7 @@
   },
   {
     "id": "bp-06",
-    "title": "6. Databricks Serverless Mesh — Photon + DABs + Lakeflow Workflows",
+    "title": "6. Databricks Serverless Mesh \u2014 Photon + DABs + Lakeflow Workflows",
     "category": "Serverless DataOps",
     "costEstimate": "$2,000 - $6,000 / month",
     "tags": [
@@ -140,7 +140,7 @@
   },
   {
     "id": "bp-11",
-    "title": "11. MCP Server Catalog — Model Context Protocol Backed by Lakehouse",
+    "title": "11. MCP Server Catalog \u2014 Model Context Protocol Backed by Lakehouse",
     "category": "AI Orchestration",
     "costEstimate": "$500 - $1,800 / month",
     "tags": [
@@ -165,5 +165,95 @@
     ],
     "mermaid": "graph TD\n    subgraph EU Sovereign Vault\n        A1[(ADLS EU German Region)] --> B1[EU Isolated Databricks]\n    end\n    subgraph Global Analytics\n        A2[(US S3 Anonymized)] --> B2[Global Warehouse]\n    end\n    B1 --> C[Databricks Clean Rooms & Pseudonymizer]\n    C --> B2",
     "ascii": "[EU Sovereign Region] --> [Clean Rooms & Anonymizer] --> [Global Analytics Warehouse]"
+  },
+  {
+    "id": "bp-13",
+    "title": "13. 50TB/Day Real-Time E-Commerce Clickstream & Inventory Orchestration",
+    "category": "Real-Time Streaming",
+    "costEstimate": "$2,200 - $4,800 / month",
+    "tags": [
+      "Event Hubs",
+      "Flink",
+      "Cosmos DB",
+      "Direct Lake",
+      "OneLake"
+    ],
+    "mermaid": "graph LR\n    A[Event Hubs 64 Partitions] --> B[Apache Flink Stateful Engine]\n    B --> C[(Cosmos DB Point Lookups)]\n    B --> D[Redis Flash Inventory]\n    B --> E[(Fabric OneLake Delta)]\n    E --> F[Power BI Direct Lake]",
+    "ascii": "[Event Hubs] --> [Apache Flink] --> [(Cosmos DB & Redis)] + [(OneLake Delta)] --> [Power BI Direct Lake]"
+  },
+  {
+    "id": "bp-14",
+    "title": "14. Zero-Downtime Synapse Dedicated Pool (DW3000c) to Microsoft Fabric OneLake Migration",
+    "category": "Data Platform Migration",
+    "costEstimate": "$3,500 - $6,500 / month (F64)",
+    "tags": [
+      "Synapse",
+      "Fabric",
+      "Migration",
+      "Direct Lake",
+      "FinOps"
+    ],
+    "mermaid": "graph LR\n    A[Synapse Dedicated DW3000c] --> B[OneLake Shortcuts Coexistence]\n    B --> C[DACPAC Schema Refactoring]\n    C --> D[Dual-Run Reconciliation]\n    D --> E[Direct Lake Cutover & Decommission]",
+    "ascii": "[Synapse DW3000c] --> [OneLake Shortcuts] --> [DACPAC Refactor] --> [Reconciliation] --> [Direct Lake Cutover]"
+  },
+  {
+    "id": "bp-15",
+    "title": "15. Azure Cosmos DB Request Unit (RU/s) & HTAP FinOps Remediation",
+    "category": "NoSQL & HTAP Architecture",
+    "costEstimate": "$1,200 - $3,000 / month",
+    "tags": [
+      "Cosmos DB",
+      "Synapse Link",
+      "RU/s",
+      "HTAP",
+      "Autoscale"
+    ],
+    "mermaid": "graph LR\n    A[App Point Writes] --> B[(Cosmos DB Transactional Store)]\n    B -->|Zero-RU Internal Sync| C[(Cosmos Analytical Store)]\n    C --> D[Synapse Serverless / Fabric Mirroring]\n    D --> E[Power BI Real-Time Dashboard]",
+    "ascii": "[Writes] --> [(Cosmos OLTP)] -->|Zero-RU Sync| [(Cosmos Analytical Store)] --> [Serverless SQL / Fabric]"
+  },
+  {
+    "id": "bp-16",
+    "title": "16. In-Process Analytics Pipeline: DuckDB + Polars on Spot VMs vs Distributed Spark",
+    "category": "In-Process Analytics",
+    "costEstimate": "$40 - $180 / month",
+    "tags": [
+      "DuckDB",
+      "Polars",
+      "Apache Arrow",
+      "Spot VMs",
+      "FinOps"
+    ],
+    "mermaid": "graph LR\n    A[ADLS Gen2 Parquet] --> B[Polars Rust Multi-Core Engine]\n    B -->|Zero-Copy Arrow C Data| C[DuckDB SQL Aggregator]\n    C --> D[(Curated Gold Delta Tables)]",
+    "ascii": "[ADLS Parquet] --> [Polars Rust Engine] -->|Arrow Zero-Copy| [DuckDB Out-of-Core] --> [(Gold Delta Tables)]"
+  },
+  {
+    "id": "bp-17",
+    "title": "17. Enterprise Multi-Tenant Legal GenAI / RAG Platform with Qdrant Vector HNSW",
+    "category": "AI & RAG Architecture",
+    "costEstimate": "$1,400 - $3,800 / month",
+    "tags": [
+      "Qdrant",
+      "HNSW",
+      "Azure OpenAI",
+      "Hybrid Search",
+      "Multi-Tenant"
+    ],
+    "mermaid": "graph LR\n    A[Legal Contracts & Schemas] --> B[Azure Document Intelligence]\n    B --> C[Semantic Chunker + text-embedding-3]\n    C --> D[(Qdrant HNSW Vector DB)]\n    E[User Query] --> F[Hybrid Dense+BM25 Search]\n    F --> D\n    D --> G[Cohere Reranker]\n    G --> H[GPT-4o Grounded Citations]",
+    "ascii": "[Legal Docs] --> [Document Intelligence] --> [(Qdrant HNSW)] <--> [Hybrid Search + Reranker] --> [GPT-4o]"
+  },
+  {
+    "id": "bp-18",
+    "title": "18. Ultra-Cost-Effective 10TB/Day Modern Data Platform for Under $3,000/Month",
+    "category": "FinOps & Modern ELT",
+    "costEstimate": "$2,200 - $2,800 / month",
+    "tags": [
+      "Debezium",
+      "ZSTD",
+      "DuckDB",
+      "Synapse Serverless",
+      "Dagster"
+    ],
+    "mermaid": "graph LR\n    A[PostgreSQL / MySQL] --> B[Debezium CDC on Spot Kubernetes]\n    B --> C[(ADLS Gen2 ZSTD Compressed)]\n    C --> D[DuckDB / Polars Spot Workers]\n    D --> E[Synapse Serverless $5/TB Partition Pruned]\n    E --> F[Executive Power BI]",
+    "ascii": "[RDBMS] --> [Debezium CDC] --> [(ADLS ZSTD)] --> [DuckDB Spot Engine] --> [Synapse Serverless] --> [Power BI]"
   }
 ]

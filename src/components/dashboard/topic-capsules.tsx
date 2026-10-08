@@ -28,6 +28,7 @@ const topics: Topic[] = [
   { id: "python", label: "🐍 Python DE Hub", icon: Code2, href: "/python" },
   { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator, href: "/modern-stack#simulators" },
   { id: "fabric", label: "Fabric & OneLake", icon: Database, href: "/concepts?term=Fabric" },
+  { id: "synapse-fabric", label: "🏛️ Synapse & Fabric Masterclass", icon: Database, href: "/modern-stack#blueprints" },
   { id: "spark", label: "Spark 4.0 Internals", icon: Flame, href: "/spark-engine" },
   { id: "mindmap", label: "🗺️ DE Mindmap", icon: Globe, href: "/mindmap" },
   { id: "lakehouse", label: "Delta & Iceberg", icon: Layers, href: "/modern-stack" },

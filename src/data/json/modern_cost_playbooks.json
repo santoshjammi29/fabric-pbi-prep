@@ -10,5 +10,41 @@
     "savings": "60% I/O and Write Reduction",
     "summary": "Enable Deletion Vectors on high-churn Delta tables to avoid rewriting 500MB Parquet files on single-row updates.",
     "code": "ALTER TABLE silver.orders SET TBLPROPERTIES ('delta.enableDeletionVectors' = 'true');"
+  },
+  {
+    "title": "Fabric Capacity (F-SKU) Auto-Pause via Azure Logic Apps",
+    "savings": "70% Non-Production Compute Reduction ($3,500+/mo)",
+    "summary": "Pause non-production Fabric capacities outside business hours (7 PM to 7 AM and weekends) using Azure Logic Apps or CLI, reducing monthly runtime from 730 hours to 220 hours.",
+    "code": "az fabric capacity suspend --resource-group rg-fabric-dev --capacity-name capfabricdev01"
+  },
+  {
+    "title": "Synapse Serverless filepath() & filename() Partition Pruning",
+    "savings": "90% Scan Cost Reduction ($5/TB Scanned)",
+    "summary": "Filter directly on directory structure metadata via filepath(1) and filepath(2) to prevent Serverless SQL from scanning unwanted historical year/month Parquet partitions.",
+    "code": "SELECT r.filepath(1) AS [Year], SUM(r.Total) FROM OPENROWSET(BULK 'sales/year=*/month=*/*.parquet', FORMAT='PARQUET') AS r WHERE r.filepath(1) = '2024' GROUP BY r.filepath(1);"
+  },
+  {
+    "title": "Automated Storage Lifecycle Tiering: Hot to Cool to Cold to Archive",
+    "savings": "88% Long-Term Storage Cost Reduction",
+    "summary": "Configure Azure Storage lifecycle rules to transition Bronze raw landing data from Hot ($0.018/GB) to Cool ($0.010/GB) at 30 days, Cold ($0.0036/GB) at 90 days, and Archive ($0.00099/GB) at 365 days.",
+    "code": "az storage account management-policy create --account-name mylakehouse --policy @lifecycle_policy.json"
+  },
+  {
+    "title": "Parquet Zstandard (ZSTD Level 7) Recompression in Lakehouse",
+    "savings": "38% Storage & Read I/O Reduction over Snappy",
+    "summary": "Re-encode cold and curated Silver/Gold Parquet partitions using ZSTD level 7 compression, cutting disk footprint by 38% with zero perceptible query decompression latency penalty.",
+    "code": "spark.conf.set('spark.sql.parquet.compression.codec', 'zstd')\ndf.write.option('compression', 'zstd').mode('overwrite').parquet('/mnt/gold/curated_orders')"
+  },
+  {
+    "title": "Cosmos DB Synthetic Partitioning & Targeted Path Indexing",
+    "savings": "65% RU/s Reduction & Eliminates Hot Partitions",
+    "summary": "Exclude high-cardinality nested JSON attributes from automatic indexing and append synthetic hash suffixes to partition keys to avoid 10,000 RU/s physical partition throttling.",
+    "code": "az cosmosdb sql container update --account-name mycosmos --indexing-policy '{\"indexingMode\":\"consistent\",\"includedPaths\":[{\"path\":\"/tenantId/?\"}],\"excludedPaths\":[{\"path\":\"/*\"}]}'"
+  },
+  {
+    "title": "Delta Lake & Iceberg VACUUM Snapshot Compaction",
+    "savings": "50% Orphan File Storage Reduction",
+    "summary": "Run regular OPTIMIZE to compact small delta files into 128MB-512MB columnar files and VACUUM to purge historical snapshots older than 7 days, stopping dead storage accumulation.",
+    "code": "OPTIMIZE gold.fact_transactions ZORDER BY (customer_id, transaction_date);\nVACUUM gold.fact_transactions RETAIN 168 HOURS;"
   }
 ]

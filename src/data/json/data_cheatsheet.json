@@ -1338,5 +1338,97 @@
       "Write Stalls",
       "CockroachDB"
     ]
+  },
+  {
+    "id": "cs-synapse-skew-wlm",
+    "title": "Synapse Data Skew Diagnosis & Distribution Rebuild",
+    "category": "Debugging & Observability",
+    "categorySlug": "debugging-observability",
+    "impact": "Critical",
+    "effort": "Low Effort",
+    "problem": "Synapse Dedicated query hangs at 98% execution or runs 10x slower than normal due to data skew across 60 distributions.",
+    "solution": "Run DBCC PDW_SHOWSPACEUSED to identify skewed distributions where one distribution holds >20% of total rows. Create a high-cardinality synthetic hash key and rebuild the table with CTAS.",
+    "codeSnippet": "-- 1. Check row distribution across all 60 distributions\nDBCC PDW_SHOWSPACEUSED('dbo.FactSales');\n\n-- 2. Identify skewed column and rehash table on synthetic composite key\nCREATE TABLE dbo.FactSales_Rehashed\nWITH (\n    DISTRIBUTION = HASH(CompositeKey),\n    CLUSTERED COLUMNSTORE INDEX\n)\nAS SELECT *, CONCAT(CustomerId, '_', OrderId) AS CompositeKey\nFROM dbo.FactSales;\n\n-- 3. Swap tables via atomic metadata rename\nRENAME OBJECT dbo.FactSales TO FactSales_Old;\nRENAME OBJECT dbo.FactSales_Rehashed TO FactSales;",
+    "language": "sql",
+    "whyItMatters": "Because MPP execution speed is strictly bounded by the slowest distribution, a single skewed node degrades performance for the entire cluster regardless of DWU scale.",
+    "metrics": "Eliminates straggler tasks, 8x-15x query acceleration",
+    "antiPattern": "Hashing on low-cardinality columns (e.g. CountryCode where 90% is 'US') or hashing on nullable columns.",
+    "tags": [
+      "Synapse",
+      "MPP",
+      "Data Skew",
+      "Columnstore",
+      "DBCC",
+      "Performance"
+    ]
+  },
+  {
+    "id": "cs-fabric-directlake-tshoot",
+    "title": "Fabric Direct Lake Mode Fallback Troubleshooting",
+    "category": "Production Best Practices",
+    "categorySlug": "production-best-practices",
+    "impact": "High Impact",
+    "effort": "Low Effort",
+    "problem": "Power BI dashboard suddenly drops from sub-second latency to 15-second timeouts due to silent fallback from Direct Lake to DirectQuery.",
+    "solution": "Inspect DAX Studio server timings for DirectQuery fallback events. Pre-compute DAX calculated columns upstream in Spark/dbt, strip high-cardinality decimal strings, and enforce RLS in the Semantic Model rather than Lakehouse SQL endpoint.",
+    "codeSnippet": "-- 1. In DAX Studio, verify Direct Lake query events\n-- Query: Check if event 'Direct Lake' or 'DirectQuery' is triggered\n\n-- 2. Upstream Spark optimization: Pre-calculate all DAX calculated columns\ndf_silver = spark.read.table('silver_orders')\ndf_gold = df_silver.withColumn(\n    'gross_margin',\n    (F.col('revenue') - F.col('cost')) / F.col('revenue')\n)\ndf_gold.write.format('delta').mode('overwrite').saveAsTable('gold_orders')\n\n-- 3. Set V-Order on Delta table to optimize VertiPaq in-memory paging\n-- spark.conf.set('spark.sql.parquet.vorder.enabled', 'true')",
+    "language": "python",
+    "whyItMatters": "DirectQuery mode forces runtime translation to SQL queries against the SQL endpoint, causing CPU saturation on Fabric capacities and dashboard timeouts.",
+    "metrics": "Restores sub-second VertiPaq memory paging",
+    "antiPattern": "Creating complex DAX calculated columns in Direct Lake semantic models or applying unsupported RLS on Lakehouse tables.",
+    "tags": [
+      "Fabric",
+      "Power BI",
+      "Direct Lake",
+      "VertiPaq",
+      "DirectQuery",
+      "V-Order"
+    ]
+  },
+  {
+    "id": "cs-cosmos-ru-tuning",
+    "title": "Cosmos DB HTTP 429 Surge & Synthetic Key Runbook",
+    "category": "Debugging & Observability",
+    "categorySlug": "debugging-observability",
+    "impact": "Critical",
+    "effort": "Medium Effort",
+    "problem": "Cosmos DB client throws HTTP 429 (RequestRateTooLarge) errors despite provisioned RU/s appearing sufficient in Azure Monitor.",
+    "solution": "Locate the hot partition causing 10,000 RU/s saturation. Re-partition the container using a synthetic key appending a randomized or modulus hash suffix, and exclude high-cardinality audit fields from automatic indexing.",
+    "codeSnippet": "// 1. Generate Synthetic Partition Key on document write\nfunction buildSyntheticPartitionKey(tenantId, userId) {\n  const shardSuffix = Math.abs(hashCode(userId)) % 10;\n  return `${tenantId}_${shardSuffix}`; // Disperses writes across 10 physical partitions\n}\n\n// 2. Azure Cosmos DB Client Bulk Executor with Exponential Backoff\nconst client = new CosmosClient({\n  endpoint: process.env.COSMOS_ENDPOINT,\n  key: process.env.COSMOS_KEY,\n  connectionPolicy: {\n    retryOptions: {\n      maxRetryAttemptCount: 9,\n      fixedRetryIntervalInMilliseconds: 1000,\n      maxWaitTimeInSeconds: 30\n    }\n  }\n});",
+    "language": "javascript",
+    "whyItMatters": "Cosmos DB enforces a hard ceiling of 10,000 RU/s and 50GB per physical partition. If traffic is skewed to a single partition key, that partition throttles while the rest of the capacity sits idle.",
+    "metrics": "Eliminates HTTP 429 throttling, cuts RU waste by 60%",
+    "antiPattern": "Partitioning by static category fields with uneven cardinality, or issuing cross-partition fan-out queries without partition key filter.",
+    "tags": [
+      "Cosmos DB",
+      "NoSQL",
+      "RU/s",
+      "HTTP 429",
+      "Synthetic Key",
+      "Performance"
+    ]
+  },
+  {
+    "id": "cs-deltalake-vacuum-opt",
+    "title": "Delta Lake & Iceberg VACUUM Compaction Runbook",
+    "category": "SQL & Storage",
+    "categorySlug": "sql-storage",
+    "impact": "High Impact",
+    "effort": "Low Effort",
+    "problem": "Lakehouse storage bills grow uncontrollably and query scan times increase due to millions of dead Parquet file snapshots and small micro-files.",
+    "solution": "Execute OPTIMIZE with Liquid Clustering / Z-Ordering on primary join keys, followed by VACUUM to purge historical commit snapshots older than retention threshold.",
+    "codeSnippet": "-- 1. Compact small files into optimal 128MB-512MB chunks & cluster by join keys\nOPTIMIZE gold.fact_orders\nZORDER BY (customer_id, order_date);\n\n-- 2. Verify retention threshold before purging\n-- Note: Default safety threshold is 168 hours (7 days)\nVACUUM gold.fact_orders RETAIN 168 HOURS;\n\n-- 3. Dry run check: count files eligible for deletion without deleting\nVACUUM gold.fact_orders RETAIN 168 HOURS DRY RUN;",
+    "language": "sql",
+    "whyItMatters": "Every lakehouse ACID mutation creates new immutable Parquet files. Without periodic VACUUM, old file versions remain in object storage indefinitely, causing massive storage inflation.",
+    "metrics": "30%-50% storage cost reduction, 4x faster file pruning",
+    "antiPattern": "Running VACUUM RETAIN 0 HOURS in production, which corrupts concurrent active read queries with FileNotFoundException.",
+    "tags": [
+      "Delta Lake",
+      "Iceberg",
+      "VACUUM",
+      "OPTIMIZE",
+      "Z-Order",
+      "FinOps"
+    ]
   }
 ]

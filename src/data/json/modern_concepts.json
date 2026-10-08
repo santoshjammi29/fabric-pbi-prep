@@ -29,7 +29,7 @@
     "subdomain": "compute-engines",
     "difficulty": "HARD",
     "summary": "Runtime query plan adjustments based on actual shuffle statistics collected during stage execution.",
-    "details": "Adaptive Query Execution (AQE) dynamically merges small post-shuffle partitions into optimal 64MB–128MB tasks, converts sort-merge joins to broadcast hash joins when build-side stats drop below threshold, and splits skewed partitions into sub-partitions to prevent single-straggler tasks."
+    "details": "Adaptive Query Execution (AQE) dynamically merges small post-shuffle partitions into optimal 64MB\u2013128MB tasks, converts sort-merge joins to broadcast hash joins when build-side stats drop below threshold, and splits skewed partitions into sub-partitions to prevent single-straggler tasks."
   },
   {
     "id": "mc-05",
@@ -110,5 +110,53 @@
     "difficulty": "MEDIUM",
     "summary": "Automated extraction of end-to-end data lineage coupled with Spark History task distribution analysis.",
     "details": "OpenLineage emits real-time execution events (input datasets, output schemas, job durations) to platforms like Marquez or Atlan. Spark UI task metrics identify data skew when 99th percentile task duration severely exceeds median duration."
+  },
+  {
+    "id": "mc-15",
+    "title": "Power BI Direct Lake Mode: In-Memory VertiPaq Paging",
+    "subdomain": "lakehouse-formats",
+    "difficulty": "ARCHITECT",
+    "summary": "Semantic model connectivity where VertiPaq directly reads Delta Parquet columnar files from OneLake into RAM on demand with zero refresh lag.",
+    "details": "Direct Lake solves the classic trade-off between Import mode (fast, but 24hr stale cache lag and memory ceilings) and DirectQuery mode (real-time, but slow SQL query translation). Direct Lake delivers in-memory query performance on multi-billion row tables while reflecting data modifications instantly when upstream Spark or Warehouse jobs commit."
+  },
+  {
+    "id": "mc-16",
+    "title": "Fabric Capacity Smoothing & Bursting 24-Hour Windows",
+    "subdomain": "serverless-arch",
+    "difficulty": "ARCHITECT",
+    "summary": "Capacity allocation algorithm averaging background compute consumption over a 24-hour moving window to prevent job throttling during heavy batch spikes.",
+    "details": "Fabric smooths heavy batch tasks (Spark notebooks, Data Factory pipelines) across 24 hours, so a 15-minute high-CPU pipeline does not exhaust capacity or cause interactive Power BI dashboards to freeze. Capacity bursting allows jobs to temporarily draw additional Capacity Units (CUs) if the overall tenant is under-utilized."
+  },
+  {
+    "id": "mc-17",
+    "title": "Cosmos DB Request Units (RU/s) & Analytical Store (HTAP)",
+    "subdomain": "dist-sys",
+    "difficulty": "ARCHITECT",
+    "summary": "Compute currency of Cosmos DB and its zero-RU analytical store enabling real-time analytics without impacting transactional throughput.",
+    "details": "In Cosmos DB, 1 point read costs 1 RU, while writes cost 5-10 RUs due to 4-replica quorum consensus and automatic index inversion. Enabling Cosmos DB Analytical Store performs lock-free background sync to a columnar Parquet format in <2 minutes, allowing Synapse Serverless or Fabric to query operational data with zero transactional RU impact."
+  },
+  {
+    "id": "mc-18",
+    "title": "ScyllaDB C++ Seastar Asynchronous Engine vs JVM Cassandra",
+    "subdomain": "compute-engines",
+    "difficulty": "ARCHITECT",
+    "summary": "Why C++ thread-per-core architecture eliminates JVM Garbage Collection pauses, delivering sub-millisecond p99 latencies at 100K+ writes/sec.",
+    "details": "Apache Cassandra written in Java suffers from JVM stop-the-world GC pauses under heavy write loads. ScyllaDB rewrote the Cassandra engine in C++ using the Seastar asynchronous framework, utilizing a shared-nothing thread-per-core design that bypasses OS context switches and locks, maintaining consistent sub-millisecond tail latencies."
+  },
+  {
+    "id": "mc-19",
+    "title": "Vector Indexing Architecture: HNSW vs IVF in Enterprise RAG",
+    "subdomain": "ai-llm-native",
+    "difficulty": "ARCHITECT",
+    "summary": "The algorithmic trade-off between search recall accuracy, query latency, and RAM memory consumption for GenAI RAG applications.",
+    "details": "HNSW (Hierarchical Navigable Small World) constructs a multi-layered geometric graph, enabling sub-5ms search latencies and 98%+ recall by navigating skip-list style connections; however, the graph must reside entirely in RAM. IVF (Inverted File Index) partitions vector space into Voronoi cells via k-means clustering, requiring significantly less memory but suffering lower recall."
+  },
+  {
+    "id": "mc-20",
+    "title": "In-Process Analytics Revolution: DuckDB + Polars via Apache Arrow Zero-Copy",
+    "subdomain": "compute-engines",
+    "difficulty": "ARCHITECT",
+    "summary": "Replacing distributed Spark clusters with single-node vectorized engines for sub-500GB datasets, exchanging memory via Apache Arrow zero-copy.",
+    "details": "For workloads under 500GB, distributed clusters spend more time on network serialization, task scheduling, and node coordination than actual data processing. Polars uses multi-threaded Rust execution to saturate all machine cores, while DuckDB provides an embedded SQL OLAP engine. Interoperability via the Apache Arrow C Data Interface allows zero-copy DataFrame sharing, cutting costs by 90%."
   }
 ]

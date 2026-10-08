@@ -162,14 +162,14 @@ export default function ModernStackPage() {
               Modern Data Engineering &amp; AI Architecture ⚡🌐
             </h1>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Serverless-first, polyglot, AI-native — 6 live simulators, 12 production architecture blueprints,
+              Serverless-first, polyglot, AI-native — 6 live simulators, {modernBlueprintsDb.length} production architecture blueprints,
               polyglot engine comparison matrix, and serverless FinOps playbooks.
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
             <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-cyan-400">12</div>
+              <div className="text-2xl font-bold text-cyan-400">{modernBlueprintsDb.length}</div>
               <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Blueprints</div>
             </div>
             <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
@@ -185,7 +185,7 @@ export default function ModernStackPage() {
         {[
           { id: "overview", label: "⚡ Hub Overview", icon: Sparkles },
           { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator },
-          { id: "blueprints", label: "🗺️ 12 Blueprints Gallery", icon: Cpu },
+          { id: "blueprints", label: `🗺️ ${modernBlueprintsDb.length} Blueprints Gallery`, icon: Cpu },
           { id: "matrix", label: "💻 Polyglot Engine Matrix", icon: FileCode2 },
           { id: "ai", label: "🤖 AI & RAG Stack", icon: Bot },
           { id: "cost", label: "💰 Cost Optimization Playbook", icon: Flame },
@@ -289,7 +289,7 @@ export default function ModernStackPage() {
               <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg">
                 🗺️
               </div>
-              <h4 className="text-base font-bold text-[var(--foreground)]">12 Production Blueprints</h4>
+              <h4 className="text-base font-bold text-[var(--foreground)]">{modernBlueprintsDb.length} Production Blueprints</h4>
               <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 End-to-end Mermaid and ASCII reference architectures with cost bands and failover playbooks.
               </p>
