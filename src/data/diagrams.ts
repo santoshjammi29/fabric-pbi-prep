@@ -1,5 +1,5 @@
 /**
- * Databricks & Modern Lakehouse Architecture Whiteboard Diagrams
+ * Modern Data Platform & Lakehouse Architecture Whiteboard Diagrams
  * High-resolution visual diagrams with technical specifications and key mechanisms.
  */
 
@@ -7,7 +7,13 @@ export interface ArchitectureDiagramItem {
   id: string;
   title: string;
   subtitle: string;
-  category: "Platform Landscape" | "Data Pipelines & Ingestion" | "Governance & Security" | "Storage Engine" | "Compute & Optimization";
+  category:
+    | "Platform Landscape"
+    | "Fabric & Power BI"
+    | "Data Pipelines & Ingestion"
+    | "Governance & Security"
+    | "Storage Engine"
+    | "Compute & Optimization";
   image: string;
   tags: string[];
   description: string;
@@ -16,6 +22,66 @@ export interface ArchitectureDiagramItem {
 }
 
 export const architectureDiagrams: ArchitectureDiagramItem[] = [
+  {
+    id: "fabric-onelake-architecture",
+    title: "Microsoft Fabric Unified Architecture & OneLake",
+    subtitle: "Single SaaS Lakehouse with Zero Data Duplication, Multi-Engine Compute, and Cross-Cloud Shortcuts",
+    category: "Fabric & Power BI",
+    image: "/diagrams/fabric_onelake_architecture.jpg",
+    tags: ["Microsoft Fabric", "OneLake", "Delta Lake", "Direct Lake", "Shortcuts", "Synapse Data Warehouse", "Fabric Spark", "Purview"],
+    description: "End-to-end Microsoft Fabric architecture showing the single SaaS data lake (OneLake), universal Delta Parquet storage format with V-Order optimization, zero-copy shortcuts linking AWS S3 and GCP, and multi-engine compute integration (Spark, Synapse DW, Power BI Direct Lake, KQL, and Data Factory).",
+    keyPoints: [
+      "OneLake acts as the 'OneDrive for Data' providing a single logical data lake across the entire organization without fragmented silos.",
+      "OneLake Shortcuts allow instant virtualization of external data in Amazon S3, Google Cloud Storage, and ADLS Gen2 with zero data copying or egress fees.",
+      "Multi-Engine Compute: Fabric Spark, Synapse Data Warehouse (T-SQL), and Real-Time Intelligence all read and write to the same open Delta Parquet files.",
+      "Unified governance via Microsoft Purview provides centralized access control, workspace domains, automated sensitivity labels, and full data lineage."
+    ]
+  },
+  {
+    id: "powerbi-direct-lake-vertipaq",
+    title: "Power BI Direct Lake Mode & VertiPaq Semantic Engine",
+    subtitle: "Memory-Mapped Delta Parquet vs Legacy Import and DirectQuery Modes",
+    category: "Fabric & Power BI",
+    image: "/diagrams/powerbi_direct_lake_vertipaq.jpg",
+    tags: ["Power BI", "Direct Lake", "VertiPaq", "DAX", "Fabric Semantic Model", "Delta Parquet", "Import vs DirectQuery"],
+    description: "Architectural comparison of Power BI Direct Lake mode against legacy Import and DirectQuery. Illustrates how the VertiPaq in-memory analytics engine directly memory-maps Delta Parquet column chunks from OneLake storage into RAM on-demand, achieving sub-second DAX query response times with real-time data freshness and zero data duplication.",
+    keyPoints: [
+      "Bypasses scheduled data refresh entirely by loading Delta Parquet column chunks straight into VertiPaq memory on demand.",
+      "Eliminates data duplication and 1GB/10GB model size limits inherent to traditional Power BI Import mode.",
+      "Provides sub-second DAX analytical query speeds without generating high query loads or concurrency bottlenecks on underlying relational databases.",
+      "Automatic Fallback mechanism gracefully falls back to DirectQuery if semantic model features or security constraints exceed Direct Lake thresholds."
+    ]
+  },
+  {
+    id: "apache-airflow-distributed-architecture",
+    title: "Apache Airflow Distributed Production Architecture",
+    subtitle: "Multi-Threaded Scheduler, Metadata DB, Kubernetes/Celery Executors, and Triggerer",
+    category: "Data Pipelines & Ingestion",
+    image: "/diagrams/apache_airflow_architecture.jpg",
+    tags: ["Apache Airflow", "Orchestration", "DAG", "CeleryExecutor", "KubernetesExecutor", "Triggerer", "PostgreSQL", "Operators"],
+    description: "Production distributed architecture of Apache Airflow showing the multi-process scheduler parsing DAG directories, PostgreSQL metadata database managing task states, Celery/Redis queue or Kubernetes API dispatcher, asynchronous Triggerer event loop for deferrable operators, and auto-scaling worker pods orchestrating Spark, Databricks, and dbt jobs.",
+    keyPoints: [
+      "Multi-threaded Airflow Scheduler continuously loops through the DAG directory, evaluates task upstream dependencies, and enqueues executable tasks.",
+      "PostgreSQL Metadata DB serves as the single source of truth storing DAG run history, task instances, connection pools, and XCom variables.",
+      "KubernetesExecutor and CeleryExecutor dynamically provision isolated worker pods on demand to execute compute-heavy pipelines.",
+      "Airflow Triggerer runs an async Python asyncio event loop, allowing deferrable operators and external sensors to release worker resources while waiting."
+    ]
+  },
+  {
+    id: "dbt-analytics-engineering-dag",
+    title: "dbt (Data Build Tool) Modern Analytics Engineering DAG",
+    subtitle: "From Raw Sources to Production Data Marts with Incremental Models, Tests & Semantic Layer",
+    category: "Data Pipelines & Ingestion",
+    image: "/diagrams/dbt_analytics_engineering_dag.jpg",
+    tags: ["dbt", "Analytics Engineering", "DAG", "Incremental Models", "Snapshots", "SCD Type 2", "Semantic Layer", "Data Testing"],
+    description: "Complete dbt transformation DAG pipeline illustrating the progression from Raw Landing Sources through Staging views (stg_), Intermediate business logic (int_), to production Star Schema Marts (fct_ and dim_). Highlights dbt incremental strategies (is_incremental()), SCD Type 2 history snapshots, automated schema tests, and the dbt Semantic Layer.",
+    keyPoints: [
+      "Structured multi-layer modeling pattern: Staging (1:1 schema normalization) -> Intermediate (business logic & deduplication) -> Marts (Star Schema).",
+      "dbt Incremental Strategy: Uses is_incremental() and unique_key to transform and merge only new or modified rows, saving compute and runtime.",
+      "dbt Snapshots provide automated SCD Type 2 historical dimension tracking using either timestamp or check strategies without complex procedural code.",
+      "Built-in testing assertions (unique, not_null, accepted_values, relationships) validate data quality before publishing to downstream BI tools."
+    ]
+  },
   {
     id: "databricks-platform-master",
     title: "Databricks Unified Data Intelligence Platform",

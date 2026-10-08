@@ -20,6 +20,7 @@ import { architectureDiagrams, ArchitectureDiagramItem } from "@/data";
 
 const CATEGORIES = [
   "All",
+  "Fabric & Power BI",
   "Platform Landscape",
   "Data Pipelines & Ingestion",
   "Governance & Security",
