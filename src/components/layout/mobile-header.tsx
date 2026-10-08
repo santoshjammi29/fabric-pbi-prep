@@ -63,6 +63,7 @@ const navGroups: NavGroup[] = [
     title: "Architectural Mastery",
     items: [
       { label: "Architecture Hub", href: "/architecture", icon: Layers, badge: "Principal", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+      { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Layers, badge: "Visual Hub", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
       { label: "Code Practice", href: "/code-practice", icon: FileCode2, badge: "Advanced", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
       { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
       { label: "Live Simulators", href: "/modern-stack#simulators", icon: Layers, badge: "Live Tool", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },

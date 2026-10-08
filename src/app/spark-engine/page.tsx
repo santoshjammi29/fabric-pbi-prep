@@ -465,7 +465,7 @@ export default function SparkEnginePage() {
 
               <Link
                 href="/architecture?tab=diagrams"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shrink-0"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shrink-0"
               >
                 <span>View Full Diagrams Hub</span>
                 <ChevronDown size={14} className="-rotate-90" />

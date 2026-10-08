@@ -874,7 +874,7 @@ function ArchitectureHubContent() {
             <button
               onClick={() => handleTabChange("distributed")}
               className={cn(
-                "p-3 rounded-2xl border text-left transition-all",
+                "p-3 rounded-2xl border text-left transition-all col-span-2 sm:col-span-1",
                 activeTab === "distributed"
                   ? "bg-blue-500/15 border-blue-500/40 shadow-sm"
                   : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-blue-500/30"
