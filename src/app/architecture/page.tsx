@@ -28,7 +28,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { architectureData, pythonData, modernCodeMatrix, modernStackDb } from "@/data";
+import { architectureData, pythonData, modernCodeMatrix, modernStackDb, architectureDiagrams } from "@/data";
+import { ArchitectureDiagramsGallery } from "@/components/architecture/diagrams-gallery";
 import {
   ArchitectureQuestion,
   Difficulty,
@@ -94,7 +95,7 @@ const PYTHON_LEVELS: { id: CodeLevel | "all"; label: string; desc: string }[] = 
   { id: "beginner", label: "Beginner", desc: "Foundations & essential data structures" },
 ];
 
-type ArchHubTab = "scenarios" | "python" | "polyglot" | "distributed";
+type ArchHubTab = "scenarios" | "diagrams" | "python" | "polyglot" | "distributed";
 
 // Sub-component: Runbook Card for Python Runbooks
 const RunbookCard = React.memo(function RunbookCard({
@@ -501,7 +502,7 @@ function ArchitectureHubContent() {
     const syncFromUrl = () => {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab") as ArchHubTab | null;
-      if (tabParam && ["scenarios", "python", "polyglot", "distributed"].includes(tabParam)) {
+      if (tabParam && ["scenarios", "diagrams", "python", "polyglot", "distributed"].includes(tabParam)) {
         setActiveTab(tabParam);
       }
 
@@ -801,7 +802,7 @@ function ArchitectureHubContent() {
           </p>
 
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
             <button
               onClick={() => handleTabChange("scenarios")}
               className={cn(
@@ -816,6 +817,23 @@ function ArchitectureHubContent() {
               </div>
               <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
                 <span>🏛️</span> System Blueprints
+              </div>
+            </button>
+
+            <button
+              onClick={() => handleTabChange("diagrams")}
+              className={cn(
+                "p-3 rounded-2xl border text-left transition-all",
+                activeTab === "diagrams"
+                  ? "bg-purple-500/15 border-purple-500/40 shadow-sm"
+                  : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-purple-500/30"
+              )}
+            >
+              <div className="text-lg sm:text-xl font-extrabold text-purple-400">
+                {architectureDiagrams.length}
+              </div>
+              <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
+                <span>📐</span> Whiteboard Diagrams
               </div>
             </button>
 
@@ -877,6 +895,7 @@ function ArchitectureHubContent() {
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-none p-1.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
         {[
           { id: "scenarios", label: "System Blueprints", count: architectureData.length, icon: "🏛️" },
+          { id: "diagrams", label: "Whiteboard Diagrams", count: architectureDiagrams.length, icon: "📐" },
           { id: "python", label: "Python Architecture & Runbooks", count: pythonData.length, icon: "🐍" },
           { id: "polyglot", label: "Cross-Engine Polyglot Matrix", count: modernCodeMatrix.length, icon: "🔀" },
           { id: "distributed", label: "Distributed Python Solutions", count: modernStackWithPy.length, icon: "💡" },
@@ -1168,6 +1187,13 @@ function ArchitectureHubContent() {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* 3.5. WHITEBOARD ARCHITECTURE DIAGRAMS VIEW */}
+      {activeTab === "diagrams" && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <ArchitectureDiagramsGallery />
         </div>
       )}
 

@@ -375,3 +375,4 @@ export function getDatasetCounts(): DatasetCounts {
 }
 
 export * from './home-dynamic-topics';
+export * from './diagrams';

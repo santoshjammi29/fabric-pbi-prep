@@ -448,6 +448,83 @@ export default function SparkEnginePage() {
             </div>
           </div>
 
+          {/* Whiteboard Architecture Blueprints Showcase */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                  <Layers size={14} /> Visual System Blueprints
+                </span>
+                <h3 className="text-xl font-bold text-[var(--foreground)] mt-1">
+                  Databricks &amp; Spark Engine Architecture Blueprints
+                </h3>
+                <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-0.5">
+                  High-resolution digital whiteboard sketch diagrams explaining query optimization, medallion pipelines, and vectorized compute.
+                </p>
+              </div>
+
+              <Link
+                href="/architecture?tab=diagrams"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shrink-0"
+              >
+                <span>View Full Diagrams Hub</span>
+                <ChevronDown size={14} className="-rotate-90" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link
+                href="/architecture?tab=diagrams"
+                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+              >
+                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                  <img
+                    src="/diagrams/catalyst_photon_engine.jpg"
+                    alt="Catalyst and Photon Engine"
+                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                    Compute &amp; Optimization
+                  </div>
+                </div>
+                <div className="px-1">
+                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Catalyst Optimizer, AQE &amp; Photon Engine
+                  </h4>
+                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                    4-phase Catalyst query compilation pipeline, runtime Adaptive Query Execution re-planning, and vectorized C++ execution.
+                  </p>
+                </div>
+              </Link>
+
+              <Link
+                href="/architecture?tab=diagrams"
+                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+              >
+                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                  <img
+                    src="/diagrams/databricks_ecosystem_landscape.jpg"
+                    alt="Databricks Unified Platform"
+                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                    Master Platform Landscape
+                  </div>
+                </div>
+                <div className="px-1">
+                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Databricks Unified Data Intelligence Platform
+                  </h4>
+                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                    Complete multi-tier architectural map spanning Auto Loader, Delta Lake, Unity Catalog, Photon, DLT, BI, and Mosaic AI.
+                  </p>
+                </div>
+              </Link>
+            </div>
+          </div>
+
           {/* 6 Production Rules */}
           <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6">
             <div>
