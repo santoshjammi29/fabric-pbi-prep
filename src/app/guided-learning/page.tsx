@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useDeferredValue, useCallback } from "react";
+import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -594,6 +595,30 @@ export default function GuidedLearningPage() {
                 </div>
 
                 <div
+                  onClick={() => setSelectedTopic("adf")}
+                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
+                >
+                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    ADF Hybrid Ingestion
+                  </div>
+                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
+                    Self-Hosted IR gateways, private endpoints, tumbling window CDC, and multi-cloud.
+                  </p>
+                </div>
+
+                <div
+                  onClick={() => setSelectedTopic("streaming")}
+                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
+                >
+                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Kafka & Streaming Engine
+                  </div>
+                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
+                    Partition brokers, schema registry, stateful watermarking, and exactly-once sinks.
+                  </p>
+                </div>
+
+                <div
                   onClick={() => setSelectedTopic("dbt")}
                   className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
                 >
@@ -616,6 +641,38 @@ export default function GuidedLearningPage() {
                     Logical plan optimization, AQE runtime re-planning, and vectorized C++ engine.
                   </p>
                 </div>
+
+                <div
+                  onClick={() => setSelectedTopic("modeling")}
+                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
+                >
+                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Kimball Star Schema
+                  </div>
+                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
+                    Atomic grain facts, conformed dimensions, SCD Type 1 & 2, and Bus Matrix.
+                  </p>
+                </div>
+
+                <div
+                  onClick={() => setSelectedTopic("governance")}
+                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
+                >
+                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Purview Enterprise Catalog
+                  </div>
+                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
+                    Automated data map, PII scanning, end-to-end lineage graph, and ABAC policies.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-2 flex justify-end">
+                <Link
+                  href="/architecture?tab=diagrams"
+                  className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors"
+                >
+                  <span>Explore all 21 High-Resolution Whiteboard Blueprints &rarr;</span>
+                </Link>
               </div>
             </div>
           </m.div>
@@ -778,6 +835,52 @@ export default function GuidedLearningPage() {
                       <ExternalLink size={12} />
                     </a>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Related Whiteboard Architecture Blueprints (if track has multiple) */}
+            {topicSummary?.relatedDiagrams && topicSummary.relatedDiagrams.length > 0 && (
+              <div className="p-3.5 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] space-y-2.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-[var(--foreground)] flex items-center gap-1.5 text-purple-400">
+                    <Sparkles size={13} />
+                    <span>Related System Architecture Blueprints</span>
+                  </span>
+                  <a
+                    href="/architecture?tab=diagrams"
+                    className="text-[11px] text-[var(--muted-foreground)] hover:text-purple-400 transition-colors"
+                  >
+                    View All {overviewStats.totalWhiteboards} Blueprints &rarr;
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {topicSummary.relatedDiagrams.map((rd) => (
+                    <button
+                      key={rd.id}
+                      onClick={() => {
+                        setActiveDiagramModal(rd);
+                        setDiagramZoom(1);
+                      }}
+                      className="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 text-left transition-all flex items-center gap-3 group"
+                    >
+                      <div className="w-14 h-9 rounded-lg bg-black shrink-0 overflow-hidden relative border border-[var(--border)] shadow-xs">
+                        <img
+                          src={rd.image}
+                          alt={rd.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h5 className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors truncate">
+                          {rd.title}
+                        </h5>
+                        <p className="text-[10px] text-[var(--muted-foreground)] truncate">{rd.category}</p>
+                      </div>
+                      <Maximize2 size={13} className="text-[var(--muted-foreground)] group-hover:text-purple-400 shrink-0" />
+                    </button>
+                  ))}
                 </div>
               </div>
             )}

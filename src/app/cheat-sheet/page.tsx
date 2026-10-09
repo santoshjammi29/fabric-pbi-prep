@@ -304,6 +304,23 @@ function CheatSheetContent() {
           <OptimizationFlow onSelectCheatCode={handleJumpToCode} />
         </section>
 
+        {/* Whiteboard Blueprints Reference Banner */}
+        <div className="p-4 rounded-2xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📐</span>
+            <div>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">Looking for visual system design blueprints?</h4>
+              <p className="text-xs text-[var(--muted-foreground)]">Pair your code optimization with 21 high-resolution whiteboard architecture diagrams detailing Spark memory shuffles, Catalyst query plans, Delta Lake ACID commits, and Airflow distributed workers.</p>
+            </div>
+          </div>
+          <Link
+            href="/architecture?tab=diagrams"
+            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
+          >
+            Explore 21 Blueprints &rarr;
+          </Link>
+        </div>
+
         {/* Search, Filter Pills & Impact Select */}
         <section aria-labelledby="filters-heading" className="pt-2">
           <CategoryBar

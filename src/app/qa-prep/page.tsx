@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { questionsDb, questionsDeDb, conceptsDb, getStandardizedDomain } from "@/data";
+import { questionsDb, questionsDeDb, conceptsDb, getStandardizedDomain, architectureDiagrams, ArchitectureDiagramItem } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
 import dynamic from "next/dynamic";
@@ -39,6 +39,21 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
   HARD: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/20" },
   ARCHITECT: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
 };
+
+function getQuestionMatchingDiagram(q: Question): ArchitectureDiagramItem | undefined {
+  const cat = (q.category || "").toLowerCase();
+  const niche = (q.niche || "").toLowerCase();
+  return architectureDiagrams.find((d) => {
+    return d.tags.some((t) => {
+      const tLower = t.toLowerCase();
+      return (
+        cat === tLower ||
+        cat.includes(tLower) ||
+        niche.includes(tLower)
+      );
+    });
+  });
+}
 
 export default function QaPrepPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -722,6 +737,7 @@ export default function QaPrepPage() {
                 const isExpanded = expandedIds.has(q.id);
                 const isBookmarked = bookmarks.includes(q.id);
                 const diffStyle = difficultyColors[q.difficulty] || difficultyColors.MEDIUM;
+                const matchingDiagram = getQuestionMatchingDiagram(q);
 
                 return (
                   <div
@@ -833,9 +849,20 @@ export default function QaPrepPage() {
 
                       {/* Modal Interconnectivity: Q&A -> Mindmap & Concept links */}
                       <div className="pt-3 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <span className="text-[var(--muted-foreground)]">
-                          System Architecture Topography:
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[var(--muted-foreground)]">
+                            System Architecture:
+                          </span>
+                          {matchingDiagram && (
+                            <Link
+                              href={`/architecture?tab=diagrams&diagram=${matchingDiagram.id}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-purple-200 border border-purple-500/30 font-semibold transition-colors shadow-sm"
+                              title={`View ${matchingDiagram.title} architecture blueprint`}
+                            >
+                              <span>📐 Architecture Blueprint</span>
+                            </Link>
+                          )}
+                        </div>
                         <Link
                           href={`/mindmap?node=${q.linked_concept_id || q.category}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 font-semibold transition-colors shadow-sm"

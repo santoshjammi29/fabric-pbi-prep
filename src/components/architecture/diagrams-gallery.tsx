@@ -26,6 +26,7 @@ const CATEGORIES = [
   "Governance & Security",
   "Storage Engine",
   "Compute & Optimization",
+  "Data Modeling & Architecture",
 ] as const;
 
 export function ArchitectureDiagramsGallery() {

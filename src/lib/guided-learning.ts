@@ -34,6 +34,7 @@ export interface TopicSummaryStats {
   architect: number;
   estMinutes: number;
   diagram?: ArchitectureDiagramItem;
+  relatedDiagrams?: ArchitectureDiagramItem[];
 }
 
 const difficultyOrder: Record<'EASY' | 'MEDIUM' | 'HARD' | 'ARCHITECT', number> = {
@@ -189,6 +190,15 @@ export function getTopicDiagram(topicKey: string): ArchitectureDiagramItem | und
   );
 }
 
+export function getTopicRelatedDiagrams(topicKey: string): ArchitectureDiagramItem[] {
+  const topic = GUIDED_TOPICS.find((t) => t.key === topicKey);
+  if (!topic || !topic.relatedDiagramIds) return [];
+
+  return topic.relatedDiagramIds
+    .map((id) => architectureDiagrams.find((d) => d.id === id))
+    .filter((d): d is ArchitectureDiagramItem => Boolean(d));
+}
+
 export function getTopicSummaryStats(topicKey: string): TopicSummaryStats {
   if (summaryCache.has(topicKey)) {
     return summaryCache.get(topicKey)!;
@@ -196,6 +206,7 @@ export function getTopicSummaryStats(topicKey: string): TopicSummaryStats {
 
   const items = getTopicItems(topicKey);
   const diagram = getTopicDiagram(topicKey);
+  const relatedDiagrams = getTopicRelatedDiagrams(topicKey);
 
   const stats: TopicSummaryStats = {
     concepts: 0,
@@ -208,6 +219,7 @@ export function getTopicSummaryStats(topicKey: string): TopicSummaryStats {
     architect: 0,
     estMinutes: items.length * 2, // ~2 mins average per item
     diagram,
+    relatedDiagrams,
   };
 
   items.forEach((item) => {

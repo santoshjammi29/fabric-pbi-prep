@@ -474,7 +474,7 @@ export default function SparkEnginePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link
-                href="/architecture?tab=diagrams"
+                href="/architecture?tab=diagrams&diagram=spark-catalyst-photon-engine"
                 className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
               >
                 <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
@@ -499,7 +499,57 @@ export default function SparkEnginePage() {
               </Link>
 
               <Link
-                href="/architecture?tab=diagrams"
+                href="/architecture?tab=diagrams&diagram=spark-shuffle-memory-execution"
+                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+              >
+                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                  <img
+                    src="/diagrams/spark_shuffle_memory_execution.jpg"
+                    alt="Spark Memory Architecture and Shuffle Mechanics"
+                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                    Memory &amp; Shuffle
+                  </div>
+                </div>
+                <div className="px-1">
+                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Spark Executor Memory &amp; Shuffle Mechanics
+                  </h4>
+                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                    Unified Memory Manager dynamic borrowing, Tungsten off-heap memory, and sort-based shuffle spilling to disk.
+                  </p>
+                </div>
+              </Link>
+
+              <Link
+                href="/architecture?tab=diagrams&diagram=delta-lake-under-the-hood"
+                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+              >
+                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                  <img
+                    src="/diagrams/delta_lake_mechanism.jpg"
+                    alt="Delta Lake Storage Engine"
+                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                    Storage Engine
+                  </div>
+                </div>
+                <div className="px-1">
+                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                    Delta Lake ACID &amp; Transaction Log Mechanics
+                  </h4>
+                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                    3-panel mechanism contrasting raw Parquet limitations with _delta_log JSON commits, OCC, and Liquid Clustering.
+                  </p>
+                </div>
+              </Link>
+
+              <Link
+                href="/architecture?tab=diagrams&diagram=databricks-platform-master"
                 className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
               >
                 <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">

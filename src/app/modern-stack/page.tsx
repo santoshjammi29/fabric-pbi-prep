@@ -628,7 +628,23 @@ export default function ModernStackPage() {
 
       {/* 3. 12 BLUEPRINTS GALLERY */}
       {activeTab === "blueprints" && (
-        <div id="blueprints" className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+        <div id="blueprints" className="space-y-6 animate-in fade-in duration-300">
+          <div className="p-5 rounded-3xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                <Sparkles size={14} /> Full Visual System Blueprints
+              </span>
+              <h3 className="text-base font-bold text-[var(--foreground)]">Explore 21 High-Resolution Whiteboard Diagrams</h3>
+              <p className="text-xs text-[var(--muted-foreground)]">Looking for hand-drawn whiteboard architecture diagrams? View our complete library of 21 interactive blueprints covering Apache Iceberg, RAG Vector Search, Kafka, Airflow, and Medallion Lakehouses.</p>
+            </div>
+            <Link
+              href="/architecture?tab=diagrams"
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
+            >
+              Open Whiteboard Hub &rarr;
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {modernBlueprintsDb.map((bp) => (
             <div key={bp.id} id={`bp-${bp.id}`} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
@@ -658,6 +674,7 @@ export default function ModernStackPage() {
               </div>
             </div>
           ))}
+          </div>
         </div>
       )}
 

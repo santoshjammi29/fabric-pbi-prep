@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { conceptsDb, pythonData } from "@/data";
+import { conceptsDb, pythonData, architectureDiagrams, ArchitectureDiagramItem } from "@/data";
 import { Concept, Difficulty } from "@/types/data";
 import dynamic from "next/dynamic";
 
@@ -39,6 +39,19 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
   HARD: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/20" },
   ARCHITECT: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
 };
+
+function getConceptMatchingDiagram(concept: Concept): ArchitectureDiagramItem | undefined {
+  const termLower = concept.term.toLowerCase();
+  return architectureDiagrams.find((d) => {
+    return (
+      d.tags.some((t) => {
+        const tLower = t.toLowerCase();
+        return termLower === tLower || termLower.includes(tLower) || tLower.includes(termLower);
+      }) ||
+      d.title.toLowerCase().includes(termLower)
+    );
+  });
+}
 
 function ConceptsContent() {
   const searchParams = useSearchParams();
@@ -501,6 +514,7 @@ function ConceptsContent() {
                 const isExpanded = expandedIds.has(concept.id);
                 const isBookmarked = bookmarks.includes(concept.id);
                 const diffStyle = difficultyColors[concept.difficulty] || difficultyColors.MEDIUM;
+                const matchingDiagram = getConceptMatchingDiagram(concept);
 
                 return (
                   <div
@@ -616,13 +630,24 @@ function ConceptsContent() {
 
                       {/* Modal Interconnectivity: The Knowledge Loop */}
                       <div className="pt-3 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-2">
-                        <Link
-                          href={`/qa-prep?conceptId=${concept.id}&term=${encodeURIComponent(concept.term)}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-colors shadow-sm"
-                        >
-                          <Zap size={13} />
-                          <span>Test Your Knowledge (Q&amp;A)</span>
-                        </Link>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Link
+                            href={`/qa-prep?conceptId=${concept.id}&term=${encodeURIComponent(concept.term)}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-colors shadow-sm"
+                          >
+                            <Zap size={13} />
+                            <span>Test Your Knowledge (Q&amp;A)</span>
+                          </Link>
+                          {matchingDiagram && (
+                            <Link
+                              href={`/architecture?tab=diagrams&diagram=${matchingDiagram.id}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 font-semibold text-xs transition-colors border border-purple-500/30 shadow-sm"
+                              title={`View ${matchingDiagram.title} architecture blueprint`}
+                            >
+                              <span>📐 Architecture Blueprint</span>
+                            </Link>
+                          )}
+                        </div>
                         <Link
                           href={`/mindmap?node=${concept.id}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 font-semibold text-xs transition-colors border border-[var(--border)]"
