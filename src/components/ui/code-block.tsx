@@ -180,12 +180,12 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-md my-4 font-mono transition-all",
+        "rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-sm my-4 font-mono transition-all",
         className
       )}
     >
       {/* Code Header Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161618] border-b border-slate-800 text-xs select-none">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
         {/* Left: Window Controls + Filename */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
@@ -195,8 +195,8 @@ export function CodeBlock({
           </div>
 
           <div className="flex items-center gap-2 truncate">
-            <Terminal size={13} className="text-slate-400 shrink-0" />
-            <span className="text-slate-300 font-mono text-[11px] truncate">{displayFilename}</span>
+            <Terminal size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
+            <span className="text-slate-700 dark:text-slate-300 font-mono text-[11px] font-semibold truncate">{displayFilename}</span>
             <span
               className={cn(
                 "hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0",
@@ -224,8 +224,8 @@ export function CodeBlock({
             className={cn(
               "min-h-[30px] px-2 py-1 rounded-lg transition-all text-xs font-mono flex items-center gap-1 touch-manipulation cursor-pointer",
               lineNumbersEnabled
-                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
             )}
           >
             <AlignLeft size={13} />
@@ -241,8 +241,8 @@ export function CodeBlock({
             className={cn(
               "min-h-[30px] px-2.5 py-1 rounded-lg transition-all text-xs flex items-center gap-1.5 touch-manipulation cursor-pointer",
               isWrap
-                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
             )}
           >
             <WrapText size={13} />
@@ -254,16 +254,16 @@ export function CodeBlock({
             type="button"
             onClick={handleCopy}
             aria-label="Copy code to clipboard"
-            className="min-h-[32px] flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 active:scale-95 text-blue-300 text-xs font-semibold border border-blue-500/30 shadow-sm transition-all touch-manipulation cursor-pointer"
+            className="min-h-[32px] flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 active:scale-95 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-500/30 shadow-xs transition-all touch-manipulation cursor-pointer"
           >
             {copied ? (
               <>
-                <Check size={13} className="text-emerald-400" />
-                <span className="text-emerald-300 font-semibold">Copied</span>
+                <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-700 dark:text-emerald-300 font-semibold">Copied</span>
               </>
             ) : (
               <>
-                <Copy size={13} className="text-blue-300" />
+                <Copy size={13} className="text-blue-700 dark:text-blue-300" />
                 <span>Copy</span>
               </>
             )}

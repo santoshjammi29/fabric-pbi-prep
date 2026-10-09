@@ -2,9 +2,11 @@
 
 import { RollingTicker } from "@/components/dashboard/rolling-ticker";
 import { EditorialHero } from "@/components/dashboard/editorial-hero";
+import { HomeWhiteboardsShowcase } from "@/components/dashboard/home-whiteboards-showcase";
+import { HomeGuidedLearningHub } from "@/components/dashboard/home-guided-learning-hub";
+import { TopicCapsules } from "@/components/dashboard/topic-capsules";
 import { HeroQuickStart } from "@/components/dashboard/hero-quick-start";
 import { ExperienceLevelSwitcher } from "@/components/dashboard/experience-level-switcher";
-import { TopicCapsules } from "@/components/dashboard/topic-capsules";
 import { TrendingSpotlight } from "@/components/dashboard/trending-spotlight";
 import { ContinueLearning } from "@/components/dashboard/continue-learning";
 import { TipOfDay } from "@/components/dashboard/tip-of-day";
@@ -14,7 +16,7 @@ import { ArchitectDigest } from "@/components/dashboard/architect-digest";
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8 pb-24 lg:pb-12">
+    <div className="space-y-10 pb-24 lg:pb-12">
       {/* 1. Horizontal Live Ticker */}
       <RollingTicker />
 
@@ -24,21 +26,27 @@ export default function DashboardPage() {
       {/* 3. Architecture Topic Capsule Navigation */}
       <TopicCapsules />
 
-      {/* 4. Guided Quick-Start Bar (Dismissible with LocalStorage persistence) */}
+      {/* 4. Executive Whiteboard Architecture Blueprints (21 Hand-Drawn Schematics) */}
+      <HomeWhiteboardsShowcase />
+
+      {/* 5. Guided Learning Journeys Hub (13 Senior Tracks & 4-Stage Milestones) */}
+      <HomeGuidedLearningHub />
+
+      {/* 6. Guided Quick-Start Bar (Dismissible with LocalStorage persistence) */}
       <HeroQuickStart />
 
-      {/* 5. Unified Progressive Learning Journey & Curriculum Roadmap */}
+      {/* 7. Daily Curated Spotlight (Scenario, Code Snippet, Simulator) */}
+      <section className="section-deferred">
+        <TrendingSpotlight />
+      </section>
+
+      {/* 8. Unified Progressive Learning Journey & Curriculum Roadmap */}
       <section className="space-y-4">
         <ExperienceLevelSwitcher />
         <RoadmapGrid />
       </section>
 
-      {/* 6. Daily Curated Spotlight (Scenario, Code Snippet, Simulator) */}
-      <section className="section-deferred">
-        <TrendingSpotlight />
-      </section>
-
-      {/* 7. Continue Learning & Tip of Day */}
+      {/* 9. Continue Learning & Tip of Day */}
       <section className="section-deferred grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ContinueLearning />
@@ -48,7 +56,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* 8. Verified Platform Analytics & Live Archives */}
+      {/* 10. Verified Platform Analytics & Live Archives */}
       <section className="section-deferred space-y-3">
         <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
           <span className="font-bold uppercase tracking-wider text-[11px] text-[var(--foreground)]">
@@ -61,7 +69,7 @@ export default function DashboardPage() {
         <StatCards />
       </section>
 
-      {/* 9. Architect Digest Subscription */}
+      {/* 11. Architect Digest Subscription */}
       <section className="section-deferred">
         <ArchitectDigest />
       </section>

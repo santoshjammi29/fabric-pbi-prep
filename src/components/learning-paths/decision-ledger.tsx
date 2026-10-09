@@ -199,24 +199,24 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
   };
 
   return (
-    <div className="rounded-3xl border border-slate-800 bg-[#161618] p-6 sm:p-8 space-y-6 shadow-xl">
+    <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface-1)] p-6 sm:p-8 space-y-6 shadow-xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[var(--border)]">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-400">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-600 dark:text-blue-400">
             <GitCommit size={14} />
             <span>Interactive Architecture Decision Ledger (ADR)</span>
           </div>
-          <h3 className="text-xl font-bold text-white tracking-tight">
+          <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">
             System Design Decision Points
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] max-w-2xl">
             Evaluate real-world trade-offs, record architectural choices, and generate portfolio-ready Technical Justification briefs.
           </p>
         </div>
 
         {/* Decision Point Tabs */}
-        <div className="flex items-center gap-2 bg-[#0A0A0B] p-1.5 rounded-2xl border border-slate-800 self-start sm:self-auto">
+        <div className="flex items-center gap-2 bg-[var(--surface-2)] p-1.5 rounded-2xl border border-[var(--border)] self-start sm:self-auto">
           {DECISION_POINTS.map((dp, idx) => (
             <button
               key={dp.id}
@@ -225,7 +225,7 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
                 "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer",
                 activePointIndex === idx
                   ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               Scenario {idx + 1}
@@ -235,17 +235,17 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
       </div>
 
       {/* Decision Point Context */}
-      <div className="p-4 rounded-2xl bg-[#1C1C20] border border-slate-800 space-y-1.5">
-        <div className="text-xs font-mono text-blue-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+      <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5">
+        <div className="text-xs font-mono text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
           <Layers size={13} /> Engineering Scenario:
         </div>
-        <h4 className="text-sm sm:text-base font-bold text-white">{currentPoint.title}</h4>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{currentPoint.context}</p>
+        <h4 className="text-sm sm:text-base font-bold text-[var(--foreground)]">{currentPoint.title}</h4>
+        <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">{currentPoint.context}</p>
       </div>
 
       {/* Options Cards */}
       <div className="space-y-3">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
           Select Candidate Architecture:
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -260,29 +260,29 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
                   "p-5 rounded-2xl border text-left transition-all space-y-3 flex flex-col justify-between cursor-pointer",
                   isSelected
                     ? "border-blue-500 bg-blue-500/[0.08] shadow-lg shadow-blue-500/10"
-                    : "border-slate-800 bg-[#1C1C20] hover:border-slate-700 hover:bg-[#222228]"
+                    : "border-[var(--border)] bg-[var(--surface-2)] hover:border-blue-500/40 hover:bg-[var(--surface-3)]"
                 )}
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-blue-400 uppercase">
+                    <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 uppercase">
                       Option
                     </span>
                     {isSelected && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded-full border border-blue-500/30">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded-full border border-blue-500/30">
                         <CheckCircle2 size={11} /> Selected
                       </span>
                     )}
                   </div>
-                  <h5 className="text-sm font-bold text-white leading-snug">{opt.name}</h5>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{opt.tagline}</p>
+                  <h5 className="text-sm font-bold text-[var(--foreground)] leading-snug">{opt.name}</h5>
+                  <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">{opt.tagline}</p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800 space-y-1.5 text-xs">
-                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                <div className="pt-3 border-t border-[var(--border)] space-y-1.5 text-xs">
+                  <div className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">
                     Best Fit:
                   </div>
-                  <div className="text-slate-300 text-[11px] leading-relaxed">{opt.bestFor}</div>
+                  <div className="text-[var(--foreground)] text-[11px] leading-relaxed">{opt.bestFor}</div>
                 </div>
               </button>
             );
@@ -291,9 +291,9 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
       </div>
 
       {/* Generated ADR Brief */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-[#0A0A0B] border border-slate-800 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider">
+      <div className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border)]">
+          <div className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
             <FileText size={15} />
             <span>Generated Architecture Decision Record (ADR)</span>
           </div>
@@ -301,12 +301,12 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
           <button
             type="button"
             onClick={handleCopyAdr}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 active:scale-95 text-blue-300 text-xs font-semibold border border-blue-500/30 transition-all cursor-pointer self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 active:scale-95 text-blue-600 dark:text-blue-300 text-xs font-semibold border border-blue-500/30 transition-all cursor-pointer self-start sm:self-auto"
           >
             {copied ? (
               <>
-                <Check size={13} className="text-emerald-400" />
-                <span className="text-emerald-300">Copied ADR</span>
+                <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-700 dark:text-emerald-300">Copied ADR</span>
               </>
             ) : (
               <>
@@ -318,22 +318,22 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
         </div>
 
         {/* Content Breakdown */}
-        <div className="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+        <div className="space-y-3 text-xs sm:text-sm text-[var(--foreground)] leading-relaxed font-sans">
           <div>
-            <span className="font-semibold text-white mr-1.5">Decision:</span>
+            <span className="font-semibold text-[var(--foreground)] mr-1.5">Decision:</span>
             <span>Adopt {selectedOption.name} as primary tier standard.</span>
           </div>
           <div>
-            <span className="font-semibold text-white mr-1.5">Technical Rationale:</span>
-            <span>{selectedOption.adrSummary}</span>
+            <span className="font-semibold text-[var(--foreground)] mr-1.5">Technical Rationale:</span>
+            <span className="text-[var(--muted-foreground)]">{selectedOption.adrSummary}</span>
           </div>
 
           <div className="pt-2 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-emerald-500/[0.05] border border-emerald-500/20 space-y-1.5">
-              <div className="font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <div className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                 <CheckCircle2 size={13} /> Architectural Benefits
               </div>
-              <ul className="space-y-1 text-slate-300">
+              <ul className="space-y-1 text-[var(--muted-foreground)]">
                 {selectedOption.pros.map((p, i) => (
                   <li key={i}>• {p}</li>
                 ))}
@@ -341,10 +341,10 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
             </div>
 
             <div className="p-3.5 rounded-xl bg-amber-500/[0.05] border border-amber-500/20 space-y-1.5">
-              <div className="font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <div className="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                 <ShieldAlert size={13} /> Trade-offs & Mitigations
               </div>
-              <ul className="space-y-1 text-slate-300">
+              <ul className="space-y-1 text-[var(--muted-foreground)]">
                 {selectedOption.cons.map((c, i) => (
                   <li key={i}>• {c}</li>
                 ))}

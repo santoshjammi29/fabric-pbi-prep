@@ -252,19 +252,19 @@ export function DiagnosticModal({
     >
       <div
         ref={modalRef}
-        className="w-full max-w-2xl bg-[#161618] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-2xl bg-[var(--surface-1)] border border-[var(--border)] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#161618]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--surface-1)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 flex items-center justify-center">
               <GraduationCap size={16} />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white leading-tight">
+              <h2 className="text-sm font-bold text-[var(--foreground)] leading-tight">
                 Architect Diagnostic Assessment
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-[var(--muted-foreground)]">
                 10 Scenarios · Auto-placement into optimal career tier
               </p>
             </div>
@@ -273,7 +273,7 @@ export function DiagnosticModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors"
             aria-label="Close assessment"
           >
             <X size={18} />
@@ -286,13 +286,13 @@ export function DiagnosticModal({
             <div className="space-y-6">
               {/* Progress Tracker */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
+                <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] font-mono">
                   <span>
                     Question {currentIndex + 1} of {DIAGNOSTIC_QUESTIONS.length}
                   </span>
-                  <span className="text-blue-400 font-semibold">{currentQ.topic}</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">{currentQ.topic}</span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-[var(--surface-3)] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-blue-500 transition-all duration-300 rounded-full"
                     style={{
@@ -304,7 +304,7 @@ export function DiagnosticModal({
 
               {/* Question Text */}
               <div className="space-y-2">
-                <h3 className="text-base sm:text-lg font-bold text-white leading-relaxed">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] leading-relaxed">
                   {currentQ.question}
                 </h3>
               </div>
@@ -317,14 +317,14 @@ export function DiagnosticModal({
                   const isCorrect = optIdx === currentQ.correctIndex;
 
                   let optionStyle =
-                    "border-slate-800 bg-[#1C1C20] text-slate-200 hover:border-slate-700 hover:bg-[#222228]";
+                    "border-[var(--border)] bg-[var(--surface-2)] text-[var(--foreground)] hover:border-blue-500/40 hover:bg-[var(--surface-3)]";
                   if (isAnswered) {
                     if (isCorrect) {
-                      optionStyle = "border-emerald-500/50 bg-emerald-500/10 text-emerald-200";
+                      optionStyle = "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200";
                     } else if (isSelected) {
-                      optionStyle = "border-red-500/50 bg-red-500/10 text-red-200";
+                      optionStyle = "border-red-500/50 bg-red-500/10 text-red-700 dark:text-red-200";
                     } else {
-                      optionStyle = "border-slate-800/40 bg-[#1C1C20]/40 text-slate-500";
+                      optionStyle = "border-[var(--border)]/40 bg-[var(--surface-2)]/40 text-[var(--muted-foreground)]";
                     }
                   }
 
@@ -353,36 +353,36 @@ export function DiagnosticModal({
                 <m.div
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.05] space-y-1.5 text-xs sm:text-sm text-slate-300"
+                  className="p-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.05] space-y-1.5 text-xs sm:text-sm text-[var(--foreground)]"
                 >
-                  <div className="font-bold text-blue-400 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+                  <div className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 text-xs uppercase tracking-wider">
                     <Sparkles size={13} /> Engineering Insight:
                   </div>
-                  <p className="leading-relaxed">{currentQ.explanation}</p>
+                  <p className="leading-relaxed text-[var(--muted-foreground)]">{currentQ.explanation}</p>
                 </m.div>
               )}
             </div>
           ) : (
             /* Results Screen */
             <div className="text-center space-y-6 py-4">
-              <div className="w-16 h-16 rounded-3xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/10">
+              <div className="w-16 h-16 rounded-3xl bg-blue-500/10 border border-blue-500/20 text-blue-500 dark:text-blue-400 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/10">
                 <Award size={32} />
               </div>
 
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-400">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-600 dark:text-blue-400">
                   <CheckCircle2 size={13} /> Assessment Completed
                 </div>
-                <h3 className="text-2xl font-bold text-white tracking-tight">
+                <h3 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
                   Diagnostic Score: {finalScore} / {DIAGNOSTIC_QUESTIONS.length}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+                <p className="text-xs sm:text-sm text-[var(--muted-foreground)] max-w-md mx-auto">
                   Based on your responses across distributed compute, storage concurrency, and FinOps, we have placed you in:
                 </p>
               </div>
 
               {/* Assigned Tier Card */}
-              <div className="p-5 rounded-2xl border border-slate-800 bg-[#1C1C20] text-left space-y-3">
+              <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] text-left space-y-3">
                 <div className="flex items-center justify-between">
                   <span
                     className={cn(
@@ -392,14 +392,14 @@ export function DiagnosticModal({
                   >
                     {tierConfig.badge}
                   </span>
-                  <span className="text-xs font-mono text-slate-400">{tierConfig.role}</span>
+                  <span className="text-xs font-mono text-[var(--muted-foreground)]">{tierConfig.role}</span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-[var(--foreground)] leading-relaxed">
                   {tierConfig.description}
                 </p>
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--muted-foreground)]">
                   <span>Recommended Starting Module:</span>
-                  <span className="font-semibold text-blue-400">{tierConfig.startingPath.title}</span>
+                  <span className="font-semibold text-blue-600 dark:text-blue-400">{tierConfig.startingPath.title}</span>
                 </div>
               </div>
             </div>
@@ -407,10 +407,10 @@ export function DiagnosticModal({
         </div>
 
         {/* Footer Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-[#161618]">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border)] bg-[var(--surface-1)]">
           {!isCompleted ? (
             <>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-[var(--muted-foreground)] font-mono">
                 {hasSelected ? "Click Continue to advance" : "Select an answer to reveal explanation"}
               </span>
               <button
@@ -421,7 +421,7 @@ export function DiagnosticModal({
                   "inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all",
                   hasSelected
                     ? "bg-blue-600 hover:bg-blue-500 active:scale-95 text-white shadow-md shadow-blue-600/25 cursor-pointer"
-                    : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    : "bg-[var(--surface-3)] text-[var(--muted-foreground)] cursor-not-allowed"
                 )}
               >
                 <span>{currentIndex === DIAGNOSTIC_QUESTIONS.length - 1 ? "Finish Assessment" : "Continue"}</span>
@@ -433,7 +433,7 @@ export function DiagnosticModal({
               <button
                 type="button"
                 onClick={handleRestart}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-semibold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] text-xs font-semibold transition-colors cursor-pointer"
               >
                 <RotateCcw size={13} />
                 <span>Retake</span>
