@@ -1147,12 +1147,18 @@ export default function GuidedLearningPage() {
                               {/* Compact Reference Row (nextjs-compact-ui pattern) */}
                               <div
                                 onClick={() => toggleExpand(item.id)}
-                                className="py-1.5 px-3 flex items-center gap-2.5 cursor-pointer select-none group"
+                                className={cn(
+                                  "px-3 flex gap-2.5 cursor-pointer select-none group transition-colors",
+                                  isExpanded
+                                    ? "py-3 items-start bg-[var(--surface-2)]/60"
+                                    : "py-2 items-start sm:items-center hover:bg-[var(--surface-2)]/40"
+                                )}
                               >
                                 <button
                                   onClick={(e) => toggleComplete(item.id, e)}
                                   className={cn(
                                     "shrink-0 transition-colors p-0.5 rounded",
+                                    isExpanded && "mt-0.5",
                                     isCompleted
                                       ? "text-purple-400 hover:text-purple-300"
                                       : "text-[var(--muted-foreground)] hover:text-purple-400"
@@ -1167,7 +1173,7 @@ export default function GuidedLearningPage() {
                                 </button>
 
                                 {/* Badges */}
-                                <div className="flex items-center gap-1 shrink-0">
+                                <div className={cn("flex items-center gap-1 shrink-0", isExpanded && "mt-0.5")}>
                                   <span
                                     className={cn(
                                       "text-[9px] font-semibold px-1.5 py-0.5 rounded border uppercase flex items-center gap-1",
@@ -1191,24 +1197,39 @@ export default function GuidedLearningPage() {
                                   </span>
                                 </div>
 
-                                {/* Title */}
-                                <h4
-                                  className={cn(
-                                    "text-xs font-semibold text-[var(--foreground)] flex-1 truncate transition-colors",
-                                    isCompleted && !isExpanded && "line-through text-[var(--muted-foreground)]"
-                                  )}
-                                >
-                                  {item.title}
-                                </h4>
+                                {/* Title & Niche Container */}
+                                <div className="flex-1 min-w-0 space-y-1">
+                                  <h4
+                                    title={item.title}
+                                    className={cn(
+                                      "font-semibold text-[var(--foreground)] transition-colors",
+                                      isExpanded
+                                        ? "text-xs sm:text-sm leading-relaxed whitespace-normal break-words font-bold"
+                                        : "text-xs leading-snug line-clamp-2",
+                                      isCompleted && !isExpanded && "line-through text-[var(--muted-foreground)]"
+                                    )}
+                                  >
+                                    {item.title}
+                                  </h4>
 
-                                {item.niche && (
-                                  <span className="text-[10px] text-[var(--muted-foreground)] shrink-0 hidden md:inline max-w-[160px] truncate">
+                                  {/* When expanded, show niche clearly underneath title */}
+                                  {item.niche && isExpanded && (
+                                    <div className="text-[11px] text-[var(--muted-foreground)] font-mono flex items-center gap-1.5 pt-0.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500/60 inline-block" />
+                                      <span>Domain Focus: {item.niche}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* When collapsed, show niche inline if space permits */}
+                                {item.niche && !isExpanded && (
+                                  <span className="text-[10px] text-[var(--muted-foreground)] shrink-0 hidden lg:inline max-w-[160px] truncate">
                                     • {item.niche}
                                   </span>
                                 )}
 
                                 {/* Action Buttons */}
-                                <div className="flex items-center gap-1 shrink-0">
+                                <div className={cn("flex items-center gap-1 shrink-0", isExpanded && "mt-0.5")}>
                                   <a
                                     href={item.sourceHref}
                                     target="_blank"
@@ -1232,7 +1253,7 @@ export default function GuidedLearningPage() {
                               </div>
 
                               {/* Expanded Content Accordion */}
-                              <SmoothAccordion isOpen={isExpanded} innerClassName="px-8 pb-3.5 pt-1 space-y-3">
+                              <SmoothAccordion isOpen={isExpanded} innerClassName="px-4 sm:px-8 pb-3.5 pt-1 space-y-3">
                                 {item.type === "concept" ? (
                                   <div className="space-y-2.5">
                                     <div className="text-xs text-[var(--foreground)] leading-relaxed whitespace-pre-line">
