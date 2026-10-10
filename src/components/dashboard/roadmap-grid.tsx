@@ -34,7 +34,7 @@ export const STEPS_CONFIG = [
     title: "Key Concepts",
     shortTitle: "Concepts",
     description: "Foundational definitions, lakehouse architectures, and core data engineering principles.",
-    meta: "290+ concepts",
+    meta: "415+ concepts",
     icon: BookOpen,
     href: "/concepts",
     unlockQas: 0,

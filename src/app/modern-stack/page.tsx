@@ -845,7 +845,7 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            {/* Link to Unified Python Hub */}
+            {/* Link to Python Guided Learning */}
             <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
               <div className="space-y-0.5">
                 <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">

@@ -63,7 +63,7 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 
 export function StatCards() {
   const stats: StatCardProps[] = [
-    { title: "Core Concepts", value: 290, suffix: "+", icon: BookOpen, href: "/concepts", accent: "green" },
+    { title: "Core Concepts", value: 415, suffix: "+", icon: BookOpen, href: "/concepts", accent: "green" },
     { title: "Interview Q&As", value: 6500, suffix: "+", icon: MessageSquare, href: "/qa-prep", accent: "orange" },
     { title: "Coding Sheets", value: 128, suffix: "+", icon: FileCode2, href: "/code-practice", accent: "amber" },
     { title: "Spark Engine", value: 85, suffix: "+", icon: Zap, href: "/spark-engine", accent: "red" },

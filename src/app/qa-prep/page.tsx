@@ -364,8 +364,8 @@ export default function QaPrepPage() {
               Architect Q&amp;A Prep Hub
             </h1>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Study 6,500+ vetted technical interview questions across Fabric, Azure DP-203, Databricks Spark,
-              and Distributed System Architecture with interactive SM-2 spaced repetition flashcards.
+              Study 6,570+ vetted technical interview questions across Fabric, Azure DP-203, Databricks Spark,
+              Python Data Engineering, and Distributed System Architecture with interactive SM-2 spaced repetition flashcards.
             </p>
           </div>
 

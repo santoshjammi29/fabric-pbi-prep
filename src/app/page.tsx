@@ -63,7 +63,7 @@ export default function DashboardPage() {
             Platform Metrics &amp; Question Archives
           </span>
           <span className="text-[11px] text-[var(--muted-foreground)] hidden sm:inline">
-            6,500+ Verified Scenarios &amp; Live Guides
+            6,570+ Verified Scenarios &amp; Live Guides
           </span>
         </div>
         <StatCards />

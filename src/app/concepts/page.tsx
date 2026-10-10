@@ -334,7 +334,7 @@ function ConceptsContent() {
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Practice</div>
             <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-300">
-              120+ Coding Sheets
+              128+ Coding Sheets
             </div>
           </div>
         </Link>
@@ -349,7 +349,7 @@ function ConceptsContent() {
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
             <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-orange-300">
-              6,500+ Interview Questions
+              6,570+ Interview Questions
             </div>
           </div>
         </Link>
@@ -364,7 +364,7 @@ function ConceptsContent() {
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-purple-400">Layer 4 · Architecture Hub</div>
             <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-purple-300">
-              Architecture &amp; Python Hub
+              3,000+ Enterprise Scenarios
             </div>
           </div>
         </Link>

@@ -22,7 +22,7 @@ const mobileCoreTabs = [
   { label: "Home", href: "/", icon: Home },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
   { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
-  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.1k" },
+  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.5k" },
 ];
 
 // Extended tabs on tablet screens (640px - 1023px)

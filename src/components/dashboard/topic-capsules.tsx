@@ -24,7 +24,7 @@ interface Topic {
 }
 
 const topics: Topic[] = [
-  { id: "all", label: "⚡ All 11 Modules", icon: Sparkles, href: "/qa-prep" },
+  { id: "all", label: "⚡ All 13 Tracks", icon: Sparkles, href: "/guided-learning" },
   { id: "python", label: "🐍 Python for DE", icon: Code2, href: "/guided-learning?topic=python" },
   { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator, href: "/modern-stack#simulators" },
   { id: "fabric", label: "Fabric & OneLake", icon: Database, href: "/concepts?term=Fabric" },
@@ -48,7 +48,7 @@ export function TopicCapsules() {
           Explore by Architecture Focus
         </span>
         <Link href="/qa-prep" className="text-purple-400 hover:underline font-medium">
-          View all 6,500+ Questions &rarr;
+          View all 6,570+ Questions &rarr;
         </Link>
       </div>
 

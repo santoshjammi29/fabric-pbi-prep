@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Compass, Sparkles, MessageSquare, Cpu, Code2, X } from "lucide-react";
+import { ArrowRight, Compass, Sparkles, MessageSquare, Cpu, Layers, X } from "lucide-react";
 
 export function HeroQuickStart() {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -80,7 +80,7 @@ export function HeroQuickStart() {
             </div>
             <div className="space-y-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Step 1 · 290 Topics</span>
+                <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Step 1 · 415 Concepts</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-green-400 transition-colors">→</span>
               </div>
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Core Concepts Hub</h3>
@@ -90,20 +90,20 @@ export function HeroQuickStart() {
             </div>
           </Link>
 
-          {/* Card 2: Architecture & Python Hub (Consolidated) */}
+          {/* Card 2: Enterprise Architecture Hub */}
           <Link
-            href="/architecture?tab=python"
+            href="/architecture"
             className="group p-4 rounded-2xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-cyan-500/40 transition-all flex items-start gap-3.5 touch-manipulation"
           >
             <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0 font-bold">
-              <Code2 size={18} />
+              <Layers size={18} />
             </div>
             <div className="space-y-1 min-w-0">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Unified · NEW</span>
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">3,000+ Scenarios</span>
                 <span className="text-xs text-[var(--muted-foreground)] group-hover:text-cyan-400 transition-colors">→</span>
               </div>
-              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Architecture &amp; Python Hub</h3>
+              <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Enterprise Architecture Hub</h3>
               <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
                 Foundations to Principal Architect patterns with system blueprints &amp; copyable runbooks.
               </p>

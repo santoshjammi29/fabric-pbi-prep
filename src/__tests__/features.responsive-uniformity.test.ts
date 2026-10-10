@@ -39,7 +39,7 @@ describe('Studio Bookmark Resolution Across All Datasets', () => {
     expect(arch.question).toBeTruthy()
   })
 
-  it('resolves bookmarks from pythonData (Python Hub)', () => {
+  it('resolves bookmarks from pythonData (Python Data Engineering)', () => {
     const py = pythonData[0]
     expect(py).toBeDefined()
     expect(py.id).toBeTruthy()
