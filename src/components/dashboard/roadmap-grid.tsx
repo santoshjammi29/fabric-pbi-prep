@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
-  Code2,
   Zap,
   MessageSquare,
   Layers,
@@ -15,6 +14,7 @@ import {
   CheckCircle2,
   LayoutGrid,
   Route,
+  BookMarked,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EXPERIENCE_TIERS } from "@/lib/user-progress";
@@ -42,12 +42,12 @@ export const STEPS_CONFIG = [
   {
     step: 2,
     difficulty: "Medium",
-    title: "Python Hub",
-    shortTitle: "Python",
-    description: "Foundational to Principal Architect Python, Pandas, Polars, and optimization patterns.",
-    meta: "75+ patterns",
-    icon: Code2,
-    href: "/python",
+    title: "Guided Learning",
+    shortTitle: "Journey",
+    description: "Structured multi-stage tracks: Python DE, Spark, Databricks, Fabric, and more.",
+    meta: "13 tracks",
+    icon: BookMarked,
+    href: "/guided-learning",
     unlockQas: 5,
   },
   {

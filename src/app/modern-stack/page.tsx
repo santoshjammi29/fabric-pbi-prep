@@ -849,17 +849,17 @@ export default function ModernStackPage() {
             <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
               <div className="space-y-0.5">
                 <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                  <Sparkles size={14} /> Unified Python Hub
+                  <Sparkles size={14} /> Python Guided Learning & Practice
                 </div>
                 <div className="text-xs text-[var(--muted-foreground)]">
-                  Explore all 32+ full-code data engineering runbooks with instant Experience Level, Domain, and Framework slicers.
+                  Explore full-code data engineering runbooks and structured stage-by-stage Python learning.
                 </div>
               </div>
               <Link
-                href="/python"
+                href="/guided-learning?topic=python"
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs whitespace-nowrap transition-colors shrink-0 shadow-sm"
               >
-                <span>Open Python Hub</span>
+                <span>Open Python Track</span>
                 <ArrowRight size={13} />
               </Link>
             </div>

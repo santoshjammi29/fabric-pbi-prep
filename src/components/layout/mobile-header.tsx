@@ -13,7 +13,6 @@ import {
   X,
   Home,
   BookOpen,
-  Code2,
   FileCode2,
   Zap,
   Layers,
@@ -52,11 +51,10 @@ const navGroups: NavGroup[] = [
     title: "Knowledge Base",
     items: [
       { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "Foundations", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
-      { label: "Python Hub", href: "/python", icon: Code2, badge: "Core", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+      { label: "Guided Learning", href: "/guided-learning", icon: BookMarked, badge: "Core", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
       { label: "Spark Engine", href: "/spark-engine", icon: Zap, badge: "Internal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
       { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
       { label: "DE Mindmap", href: "/mindmap", icon: Globe, badge: "Visual Hub", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-      { label: "Guided Learning", href: "/guided-learning", icon: BookMarked, badge: "Journey", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
     ],
   },
   {

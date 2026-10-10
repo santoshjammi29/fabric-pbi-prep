@@ -144,7 +144,7 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     raw.push({ label: `T-SQL · ${m.title}`, href: `/code-practice?db=mssql&id=${m.id}&q=${encodeURIComponent(m.title)}` })
   );
   sampleItems(pythonData.filter((p) => p.title), 2, rng).forEach((p) =>
-    raw.push({ label: `Python · ${p.title}`, href: `/python?id=${p.id}&q=${encodeURIComponent(p.title)}` })
+    raw.push({ label: `Python · ${p.title}`, href: `/code-practice?db=python&id=${p.id}&q=${encodeURIComponent(p.title)}` })
   );
 
   // 7. Architectural Blueprints & Modern Concepts
@@ -196,7 +196,7 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     if (item.href.startsWith("/learning-paths")) return 80;
     if (item.href.startsWith("/spark-engine")) return 75;
     if (item.href.startsWith("/modern-stack")) return 70;
-    if (item.href.startsWith("/code-practice") || item.href.startsWith("/python")) return 60;
+    if (item.href.startsWith("/code-practice")) return 60;
     return 50;
   };
 

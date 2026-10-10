@@ -143,10 +143,10 @@ function BreadcrumbsInner() {
       } else if (card) {
         list.push({ label: `Scenario #${card}` });
       }
-    } else if (pathname === "/python") {
-      const level = searchParams.get("level");
-      if (level && level !== "ALL") {
-        list.push({ label: `${level.toUpperCase()} Level` });
+    } else if (pathname === "/guided-learning") {
+      const topic = searchParams.get("topic");
+      if (topic) {
+        list.push({ label: `${topic.toUpperCase()} Track` });
       }
     } else if (pathname === "/code-practice") {
       const cat = searchParams.get("category");

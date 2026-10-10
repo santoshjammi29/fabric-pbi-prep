@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Check, Lock, ChevronRight, BookOpen, Code2, Zap, Layers, MessageSquare, Compass } from "lucide-react";
+import { Check, Lock, ChevronRight, BookOpen, Zap, Layers, MessageSquare, Compass, BookMarked } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserStore } from "@/store/useUserStore";
 import { EXPERIENCE_TIERS } from "@/lib/user-progress";
@@ -30,11 +30,11 @@ export const CURRICULUM_STEPS: CurriculumStep[] = [
   },
   {
     step: 2,
-    id: "python",
-    title: "Python Hub",
-    shortTitle: "Python",
-    href: "/python",
-    icon: Code2,
+    id: "guided-learning",
+    title: "Guided Learning",
+    shortTitle: "Journey",
+    href: "/guided-learning",
+    icon: BookMarked,
     minQas: 5,
   },
   {

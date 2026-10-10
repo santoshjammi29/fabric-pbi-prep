@@ -23,6 +23,7 @@ const VALID_ROUTES = new Set([
   '/modern-stack',
   '/company-research',
   '/python',
+  '/guided-learning',
   '/mindmap',
   '/studio',
   '/cheat-sheet',

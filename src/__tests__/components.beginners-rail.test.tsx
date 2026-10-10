@@ -36,12 +36,12 @@ describe("Beginner's Rail Components", () => {
       expect(screen.getByText("Key Concepts")).toBeDefined();
     });
 
-    it("updates location when on Step 2 (Python Hub)", () => {
-      mockPathname = "/python";
+    it("updates location when on Step 2 (Guided Learning)", () => {
+      mockPathname = "/guided-learning";
       render(<LearningProgressBar />);
 
       expect(screen.getByText(/Step 2 of 6/i)).toBeDefined();
-      expect(screen.getByText("Python Hub")).toBeDefined();
+      expect(screen.getByText("Guided Learning")).toBeDefined();
     });
 
     it("renders all 6 curriculum steps", () => {

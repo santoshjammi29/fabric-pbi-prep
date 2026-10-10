@@ -5368,5 +5368,213 @@
       "Proves that relational calculus operations can be modeled uniformly within a single join graph algebra.",
       "Highlights why join ordering, cardinality estimation, and join execution dominate query engine design."
     ]
+  },
+  {
+    "id": "py-concept-generators",
+    "term": "Python Generators & Memory Efficiency",
+    "category": "PYTHON",
+    "difficulty": "EASY",
+    "definition": "Generators are iterator functions written with the yield statement that produce a sequence of values lazily on-demand rather than allocating the entire collection in RAM.",
+    "explanation": "In data engineering, streaming large files (CSV, JSON lines, Parquet batches) line-by-line using generators avoids catastrophic Out-Of-Memory (OOM) errors. Instead of loading a 10 GB file into memory with readlines(), a generator yields one record per iteration with O(1) memory overhead.",
+    "keyPoints": [
+      "Lazily evaluates expressions using yield",
+      "Consumes O(1) memory footprint regardless of file size",
+      "Integrates natively with itertools and pipeline chaining"
+    ]
+  },
+  {
+    "id": "py-concept-type-hints",
+    "term": "Python Type Hints & Static Typing",
+    "category": "PYTHON",
+    "difficulty": "EASY",
+    "definition": "Type hints (PEP 484) provide annotations on function signatures and variables, enabling static analysis tools like mypy and IDE autocompletion without impacting runtime performance.",
+    "explanation": "Type annotations specify expected parameter and return types (e.g., Union, Optional, List, Dict). In large data pipelines, static typing catches null reference bugs, unexpected float conversions, and schema mismatches during CI/CD before pipelines execute against production data.",
+    "keyPoints": [
+      "Introduced in PEP 484 with zero runtime performance penalty",
+      "Enables static verification with mypy and Pyright",
+      "Greatly reduces interface bugs across team-maintained ETL modules"
+    ]
+  },
+  {
+    "id": "py-concept-context-managers",
+    "term": "Python Context Managers & with Statement",
+    "category": "PYTHON",
+    "difficulty": "EASY",
+    "definition": "Context managers encapsulate setup and teardown logic around a code block using the __enter__ and __exit__ dunder methods invoked via the with statement.",
+    "explanation": "In data systems, context managers guarantee deterministic cleanup of external resources—such as closing database connection pools, releasing file descriptors, committing/rolling back transactions, and releasing distributed locks—even when unhandled exceptions occur inside the block.",
+    "keyPoints": [
+      "Guarantees deterministic resource teardown even upon exceptions",
+      "Implemented via __enter__/__exit__ or contextlib.contextmanager",
+      "Essential for DB connections, cloud storage sessions, and file locks"
+    ]
+  },
+  {
+    "id": "py-concept-comprehensions",
+    "term": "Python List & Dictionary Comprehensions",
+    "category": "PYTHON",
+    "difficulty": "EASY",
+    "definition": "Comprehensions provide a concise syntactic construct to generate lists, sets, or dictionaries by transforming and filtering iterables in optimized C-level bytecode.",
+    "explanation": "Comprehensions execute significantly faster than traditional for-loops with .append() because Python optimizes loop execution and memory pre-allocation in the CPython C runtime. They are widely used for cleaning dictionary payloads, normalizing column headers, and mapping record schemas.",
+    "keyPoints": [
+      "Syntactically concise and readable data transformation",
+      "Executes faster than manual loop appends due to CPython bytecode optimization",
+      "Supports conditional filtering with inline if clauses"
+    ]
+  },
+  {
+    "id": "py-concept-pydantic",
+    "term": "Pydantic Data Contracts & Validation",
+    "category": "PYTHON",
+    "difficulty": "MEDIUM",
+    "definition": "Pydantic is a data validation and parsing library that enforces type hints at runtime, parsing raw dictionaries or JSON payloads into validated, immutable domain models.",
+    "explanation": "In modern data architectures, Pydantic acts as the contract enforcement layer at the edge of ingestion pipelines. It validates incoming payloads against strict schemas, coerces compatible types, rejects malformed payloads into dead-letter queues, and serializes clean JSON schemas for API consumers.",
+    "keyPoints": [
+      "Enforces runtime schema contracts using Python type annotations",
+      "Core foundation for FastAPI, data contract enforcement, and config management",
+      "Leverages pydantic-core written in Rust for high-throughput validation"
+    ]
+  },
+  {
+    "id": "py-concept-pandas-vectorization",
+    "term": "Pandas Vectorization vs Itertuples",
+    "category": "PYTHON",
+    "difficulty": "MEDIUM",
+    "definition": "Vectorization delegates operations to pre-compiled C/Fortran SIMD loops across contiguous memory buffers, avoiding the massive Python interpreter overhead of row-by-row iteration.",
+    "explanation": "Iterating over a DataFrame using iterrows() or for-loops incurs Python boxing/unboxing overhead on every single cell, running 100x to 1000x slower. Vectorized NumPy expressions execute batch math in contiguous C arrays. When row-wise logic cannot be vectorized, itertuples() provides a lightweight namedtuple alternative that is 10x faster than iterrows().",
+    "keyPoints": [
+      "Vectorized operations leverage SIMD parallelism in underlying C arrays",
+      "iterrows() creates a new Series per row, causing severe memory overhead",
+      "itertuples() yields lightweight named tuples for non-vectorizable loops"
+    ]
+  },
+  {
+    "id": "py-concept-concurrency-models",
+    "term": "Python Multiprocessing vs Multithreading",
+    "category": "PYTHON",
+    "difficulty": "MEDIUM",
+    "definition": "Multithreading runs multiple threads within a single process sharing memory under the GIL, while multiprocessing spawns distinct OS processes with independent GILs and memory spaces.",
+    "explanation": "Because the CPython Global Interpreter Lock (GIL) permits only one thread to execute Python bytecode at a time, multithreading is only beneficial for I/O-bound tasks (network requests, DB queries). CPU-bound data transformations (JSON parsing, regex, compression) require multiprocessing or ProcessPoolExecutor to utilize all available CPU cores.",
+    "keyPoints": [
+      "Threading shares address space; ideal for I/O concurrency",
+      "Multiprocessing bypasses GIL by spawning separate OS processes",
+      "Inter-process communication requires pickle serialization or shared memory"
+    ]
+  },
+  {
+    "id": "py-concept-decorators",
+    "term": "Python Decorators & Pipeline Interceptors",
+    "category": "PYTHON",
+    "difficulty": "MEDIUM",
+    "definition": "Decorators are higher-order functions that dynamically wrap and extend the behavior of another function or method without altering its source code.",
+    "explanation": "In enterprise data engineering, decorators are the standard mechanism for cross-cutting concerns: automated exponential backoff retries on network failures, distributed tracing (OpenTelemetry), execution timing/metrics, caching (@functools.lru_cache), and role-based authentication.",
+    "keyPoints": [
+      "Higher-order function wrapping another callable using @syntax",
+      "Standard for retries, telemetry logging, performance timing, and caching",
+      "Preserves function metadata using functools.wraps"
+    ]
+  },
+  {
+    "id": "py-concept-gil-internals",
+    "term": "CPython GIL (Global Interpreter Lock)",
+    "category": "PYTHON",
+    "difficulty": "HARD",
+    "definition": "The Global Interpreter Lock is a mutual exclusion lock used by CPython to prevent multiple native OS threads from executing Python bytecode simultaneously, protecting internal memory reference counts.",
+    "explanation": "CPython's memory manager relies on reference counting, which is not thread-safe without atomic locks on every reference change. The GIL solves this with a single global lock. In data systems, native C/Rust extensions (NumPy, Polars, PyArrow, DuckDB) explicitly release the GIL (Py_BEGIN_ALLOW_THREADS) before executing heavy compute, enabling true multi-core parallel execution.",
+    "keyPoints": [
+      "Serializes bytecode execution to protect CPython reference counting",
+      "Prevents multi-threaded CPU scaling in pure Python code",
+      "Third-party C/Rust extensions release the GIL for full multi-core performance"
+    ]
+  },
+  {
+    "id": "py-concept-polars-lazyframe",
+    "term": "Polars LazyFrame & Query Optimization",
+    "category": "PYTHON",
+    "difficulty": "HARD",
+    "definition": "Polars LazyFrame defers DataFrame computations into an Abstract Syntax Tree (AST) that undergoes logical optimization (predicate and projection pushdown) prior to vectorized execution.",
+    "explanation": "Unlike Pandas which executes eagerly and materializes intermediate DataFrames into RAM, Polars LazyFrame builds an execution plan. The Polars optimizer pushes filters down directly to the Parquet scanner (predicate pushdown), discards unused columns (projection pushdown), and processes data in streaming chunks, enabling datasets larger than RAM to be processed seamlessly.",
+    "keyPoints": [
+      "Builds optimized logical execution graph before touching storage",
+      "Predicate & projection pushdown minimizes disk I/O and RAM allocation",
+      "Written in Rust with multi-threaded parallel SIMD execution"
+    ]
+  },
+  {
+    "id": "py-concept-apache-arrow",
+    "term": "Apache Arrow & Zero-Copy Memory Model",
+    "category": "PYTHON",
+    "difficulty": "HARD",
+    "definition": "Apache Arrow is a standardized columnar in-memory format that enables zero-copy sharing of data arrays between different execution engines without serialization overhead.",
+    "explanation": "Traditional data interchange between Python, Spark, and DuckDB requires costly serialization to CSV or JSON and deserialization back into memory. Arrow defines an immutable, SIMD-aligned columnar layout in shared memory. Systems like PySpark (via PyArrow) transfer DataFrames to Python workers with zero copying or IPC serialization penalty.",
+    "keyPoints": [
+      "Language-independent columnar in-memory format specification",
+      "Zero-copy shared memory IPC between Python, C++, Rust, and Spark",
+      "Native support for chunked arrays, dictionaries, and nested data structures"
+    ]
+  },
+  {
+    "id": "py-concept-asyncio",
+    "term": "Python AsyncIO Event Loop & Non-Blocking I/O",
+    "category": "PYTHON",
+    "difficulty": "HARD",
+    "definition": "AsyncIO provides single-threaded concurrent execution using cooperative multitasking managed by an event loop, scheduling coroutines using async and await keywords.",
+    "explanation": "When ingesting data from thousands of REST API endpoints, WebSockets, or cloud blob storage, synchronous requests block worker threads. AsyncIO leverages OS primitives (epoll/kqueue) to handle tens of thousands of concurrent network connections on a single CPU core without thread context-switching overhead.",
+    "keyPoints": [
+      "Single-threaded cooperative concurrency driven by an OS event loop",
+      "Eliminates thread context-switching overhead for massive network concurrency",
+      "Requires non-blocking async libraries (aiohttp, httpx, asyncpg)"
+    ]
+  },
+  {
+    "id": "py-concept-memory-internals",
+    "term": "CPython Memory Internals & GC Tracemalloc",
+    "category": "PYTHON",
+    "difficulty": "ARCHITECT",
+    "definition": "CPython manages memory through reference counting supplemented by a cyclic generational garbage collector (Generations 0, 1, and 2) and the PyMalloc sub-allocator for small objects.",
+    "explanation": "In Petabyte-scale Python worker microservices, cyclic references prevent memory reclamation by reference counts alone, causing generational GC pauses. Architects use tracemalloc and objgraph to profile heap allocations, invoke gc.freeze() in pre-forked worker pools (e.g. Celery/Gunicorn) to leverage Linux Copy-On-Write (COW), and bypass the allocator using memoryview and ctypes for raw buffers.",
+    "keyPoints": [
+      "Dual memory model: reference counting + 3-generation cyclic GC",
+      "gc.freeze() preserves Copy-On-Write memory across forked worker pools",
+      "tracemalloc captures source-level heap allocations and memory leaks"
+    ]
+  },
+  {
+    "id": "py-concept-arrow-flight",
+    "term": "High-Throughput Polyglot Arrow IPC & Flight Architecture",
+    "category": "PYTHON",
+    "difficulty": "ARCHITECT",
+    "definition": "Arrow Flight is a high-performance RPC framework built on gRPC and Arrow columnar data, designed specifically for parallel stream transfer of large tabular datasets across distributed cluster nodes.",
+    "explanation": "Architecting microservices that transfer multi-gigabyte DataFrames over standard REST/JSON creates 90%+ CPU waste in serialization. Arrow Flight transfers memory-mapped Arrow record batches directly over TCP without translation, supporting distributed parallel streams where clients read multiple stream partitions simultaneously from different cluster nodes.",
+    "keyPoints": [
+      "Zero-serialization RPC framework optimized for big data transport",
+      "Outperforms REST/ODBC/JDBC by 10x-100x for large record batch transfers",
+      "Enables federated query engines to exchange partitions in parallel"
+    ]
+  },
+  {
+    "id": "py-concept-rust-pyo3",
+    "term": "Rust PyO3 Extension Architecture for Data Pipelines",
+    "category": "PYTHON",
+    "difficulty": "ARCHITECT",
+    "definition": "PyO3 provides Rust bindings for Python, allowing developers to write native Rust extension modules that compile into shared libraries (.so / .pyd) callable directly from Python code.",
+    "explanation": "When core pipeline bottlenecks (e.g., custom binary parsing, financial trade simulations, geo-spatial hashing) saturate Python CPU cores, architects write high-performance native extensions in Rust with PyO3 and Maturin. Rust guarantees memory safety without garbage collection, enables fearless Rayon thread parallelism with GIL release, and exposes clean Python APIs.",
+    "keyPoints": [
+      "Compiles memory-safe native Rust code into native Python extension modules",
+      "Releases the GIL to leverage Rayon multi-threaded parallelism across all CPU cores",
+      "Powers modern data tools including Polars, Ruff, and Pydantic-Core"
+    ]
+  },
+  {
+    "id": "py-concept-ray-vs-pyspark",
+    "term": "Distributed Python Runtimes: Ray vs PySpark Architecture",
+    "category": "PYTHON",
+    "difficulty": "ARCHITECT",
+    "definition": "Ray is an asynchronous distributed actor and task execution framework designed for Python-native distributed computing, contrasting with PySpark's JVM-centric BSP (Bulk Synchronous Parallel) execution model.",
+    "explanation": "While PySpark excels at SQL, tabular lakehouse transforms, and massive batch shuffles, its JVM-Python inter-process communication overhead and rigid DAG barrier synchronization create friction for dynamic ML training, reinforcement learning, and fine-grained agent loops. Ray provides native shared-memory object storage (Plasma), sub-millisecond task scheduling, and stateful actor clusters.",
+    "keyPoints": [
+      "Ray features distributed actors, tasks, and Plasma shared memory",
+      "PySpark uses JVM workers and Bulk Synchronous Parallel execution plans",
+      "Architectural choice: Spark for data lakehouse ETL; Ray for ML/AI workloads"
+    ]
   }
 ]

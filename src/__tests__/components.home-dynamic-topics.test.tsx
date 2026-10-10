@@ -18,7 +18,7 @@ describe('Home Page Dynamic Topics Data & Selection Engine', () => {
     expect(FEATURED_HERO_GUIDES.length).toBeGreaterThanOrEqual(10);
     FEATURED_HERO_GUIDES.forEach((guide) => {
       expect(guide.title).toBeTruthy();
-      expect(guide.href).toMatch(/^\/(concepts|spark-engine|architecture|modern-stack|python|code-practice)/);
+      expect(guide.href).toMatch(/^\/(concepts|spark-engine|architecture|modern-stack|guided-learning|python|code-practice)/);
       expect(guide.description.length).toBeGreaterThan(20);
       expect(guide.author.name).toBe('Santosh Jammi');
     });
@@ -28,7 +28,7 @@ describe('Home Page Dynamic Topics Data & Selection Engine', () => {
     expect(SECONDARY_HERO_CARDS.length).toBeGreaterThanOrEqual(15);
     SECONDARY_HERO_CARDS.forEach((card) => {
       expect(card.title).toBeTruthy();
-      expect(card.href).toMatch(/^\/(concepts|spark-engine|architecture|modern-stack|python|code-practice)/);
+      expect(card.href).toMatch(/^\/(concepts|spark-engine|architecture|modern-stack|guided-learning|python|code-practice)/);
       expect(card.trackLabel).toBeTruthy();
     });
   });

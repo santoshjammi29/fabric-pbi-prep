@@ -21,6 +21,7 @@ import {
   Flame,
   Globe,
   Terminal,
+  BookMarked,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { conceptsDb, learningPathsDb, modernBlueprintsDb, cheatsheetData } from "@/data";
@@ -45,8 +46,9 @@ export function CommandPalette() {
   const staticRoutes: CommandItem[] = useMemo(
     () => [
       { id: "nav-home", title: "Home Dashboard", category: "Navigation", icon: Sparkles, href: "/", badge: "Main" },
-      { id: "nav-concepts", title: "Key Concepts (290+ Terms)", category: "Navigation", icon: BookOpen, href: "/concepts", badge: "Easy" },
-      { id: "nav-python", title: "Python Hub (Data Engineering & Architect)", category: "Navigation", icon: FileCode2, href: "/python", badge: "NEW" },
+      { id: "nav-concepts", title: "Key Concepts (415+ Terms)", category: "Navigation", icon: BookOpen, href: "/concepts", badge: "Easy" },
+      { id: "nav-guided", title: "Guided Learning (13 Structured Tracks)", category: "Navigation", icon: BookMarked, href: "/guided-learning", badge: "Core" },
+      { id: "nav-python", title: "Python for Data Engineering (Guided Track)", category: "Navigation", icon: FileCode2, href: "/guided-learning?topic=python", badge: "Track" },
       { id: "nav-code", title: "Code Practice (PySpark, SQL, Python)", category: "Navigation", icon: FileCode2, href: "/code-practice", badge: "Polyglot" },
       { id: "nav-spark", title: "Spark Engine & Simulator", category: "Navigation", icon: Zap, href: "/spark-engine", badge: "Internals" },
       { id: "nav-modern", title: "Modern Data Stack & AI Architecture", category: "Navigation", icon: Layers, href: "/modern-stack", badge: "Hard" },

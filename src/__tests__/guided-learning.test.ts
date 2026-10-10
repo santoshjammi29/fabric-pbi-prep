@@ -23,6 +23,7 @@ describe('guided-learning data', () => {
     expect(keys).toContain('streaming');
     expect(keys).toContain('modeling');
     expect(keys).toContain('governance');
+    expect(keys).toContain('python');
   });
 
   it('GUIDED_DOMAINS contains standard architectural domains', () => {
@@ -103,9 +104,17 @@ describe('guided-learning data', () => {
     expect(stats.estMinutes).toBeGreaterThan(0);
   });
 
+  it('getTopicItems returns items for python track', () => {
+    const pythonItems = getTopicItems('python');
+    expect(pythonItems.length).toBeGreaterThan(30);
+    expect(pythonItems.some((i) => i.type === 'concept')).toBe(true);
+    expect(pythonItems.some((i) => i.type === 'qa')).toBe(true);
+    expect(pythonItems.some((i) => i.type === 'architecture')).toBe(true);
+  });
+
   it('getPlatformOverviewStats returns comprehensive platform totals', () => {
     const overview = getPlatformOverviewStats();
-    expect(overview.totalTopics).toBe(12);
+    expect(overview.totalTopics).toBe(13);
     expect(overview.totalUniqueItems).toBeGreaterThan(500);
     expect(overview.totalWhiteboards).toBe(21);
     expect(overview.domainsCount).toBeGreaterThanOrEqual(4);

@@ -218,7 +218,7 @@ spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")`,
         desc: "In-process analytical SQL engines designed for instant startup, zero network egress, and blazingly fast Parquet operations.",
         tradeOffs: "Microsecond query response and zero infrastructure management vs single-node RAM boundaries.",
         protocols: ["DuckDB", "Polars", "PyArrow", "DuckDB Wasm"],
-        practiceLink: "/python?q=Polars",
+        practiceLink: "/code-practice?db=python&q=Polars",
         codeSnippet: `import polars as pl
 
 # Zero-copy parallel scan over multi-part Parquet

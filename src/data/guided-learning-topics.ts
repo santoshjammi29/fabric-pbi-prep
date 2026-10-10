@@ -282,4 +282,25 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
       architect: 'Direct Lake mode deployment over OneLake, ALM Toolkit CI/CD deployment pipelines, Incremental Refresh, and multi-tenant row security.'
     }
   },
+  {
+    key: 'python',
+    label: 'Python for Data Engineering',
+    icon: '🐍',
+    domain: 'Distributed Compute',
+    gradient: 'from-emerald-500 to-teal-600',
+    description: 'Polars vs Pandas, Arrow memory model, GIL, async pipelines, PySpark internals & Pydantic',
+    executiveSummary: 'Master high-performance Python data engineering: Apache Arrow in-memory zero-copy IPC, lazy vectorized execution in Polars, CPython GIL internals, multiprocessing/asyncio for IO concurrency, and robust data contracts with Pydantic.',
+    diagramId: 'spark-catalyst-photon-engine',
+    relatedDiagramIds: ['rag-vector-search-data-pipeline', 'spark-shuffle-memory-execution'],
+    conceptCategories: ['PYTHON'],
+    questionCategories: ['PYTHON', 'PYTHON DATA ENGINEERING'],
+    archKeywords: ['PYTHON', 'POLARS', 'PYSPARK'],
+    deKeywords: ['PYTHON', 'BIG DATA'],
+    stages: {
+      foundations: 'Memory management, mutable vs immutable primitives, list/dict comprehensions, generators, and virtual environments.',
+      core: 'Pandas vs Polars DataFrame APIs, vectorized execution, schema enforcement with Pydantic, and unit testing with pytest.',
+      advanced: 'CPython GIL, multiprocessing vs threading vs asyncio, Cython/Rust extensions, memory profiling with memory_profiler/tracemalloc, and PyArrow zero-copy interchange.',
+      architect: 'Distributed Python runtime topologies, high-throughput streaming consumers, polyglot Arrow IPC pipelines, and Petabyte-scale Python microservice architecture.'
+    }
+  },
 ];

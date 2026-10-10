@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   BookOpen,
-  Code2,
   FileCode2,
   Zap,
   Layers,
@@ -22,7 +21,7 @@ import {
 const mobileCoreTabs = [
   { label: "Home", href: "/", icon: Home },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
-  { label: "Python", href: "/python", icon: Code2, isNew: true },
+  { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
   { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.1k" },
 ];
 
@@ -30,7 +29,7 @@ const mobileCoreTabs = [
 const tabletTabs = [
   { label: "Home", href: "/", icon: Home },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
-  { label: "Python", href: "/python", icon: Code2, isNew: true },
+  { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
   { label: "Code", href: "/code-practice", icon: FileCode2 },
   { label: "Cheat", href: "/cheat-sheet", icon: Terminal, isNew: true },
   { label: "Spark", href: "/spark-engine", icon: Zap },
@@ -38,7 +37,6 @@ const tabletTabs = [
   { label: "Q&A", href: "/qa-prep", icon: MessageSquare },
   { label: "Arch", href: "/architecture", icon: Layers },
   { label: "Mindmap", href: "/mindmap", icon: Globe, isNew: true },
-  { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
   { label: "Studio", href: "/studio", icon: User },
 ];
 
@@ -53,7 +51,7 @@ export function MobileNav() {
   const isOtherActive =
     !isActive("/") &&
     !isActive("/concepts") &&
-    !isActive("/python") &&
+    !isActive("/guided-learning") &&
     !isActive("/qa-prep");
 
   const openDrawer = () => {

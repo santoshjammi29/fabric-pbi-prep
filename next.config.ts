@@ -20,6 +20,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/python',
+        destination: '/guided-learning?topic=python',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

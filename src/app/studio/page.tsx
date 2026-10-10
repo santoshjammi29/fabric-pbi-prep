@@ -101,7 +101,7 @@ export default function StudioPage() {
         }
         const py = pythonData.find((item) => item.id === id);
         if (py) {
-          resolved.push({ id: py.id, title: py.title, type: "python", href: "/python" });
+          resolved.push({ id: py.id, title: py.title, type: "python", href: "/code-practice?db=python" });
           return;
         }
         const psp = pysparkData.find((item) => item.id === id);

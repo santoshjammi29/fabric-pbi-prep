@@ -82,7 +82,7 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
     expect(robotsContent).toContain('Sitemap: https://fabric-pbi-prep.vercel.app/sitemap.xml');
 
     const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
-    expect(sitemapContent).toContain('<loc>https://fabric-pbi-prep.vercel.app/python</loc>');
+    expect(sitemapContent).toContain('<loc>https://fabric-pbi-prep.vercel.app/guided-learning</loc>');
     expect(sitemapContent).toContain('<loc>https://fabric-pbi-prep.vercel.app/architecture</loc>');
     expect(sitemapContent).toContain('<lastmod>2026-09-11</lastmod>');
   });

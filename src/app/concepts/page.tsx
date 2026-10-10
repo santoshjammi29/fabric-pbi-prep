@@ -17,16 +17,14 @@ import {
   Filter,
   Layers,
   FileCode2,
-  Terminal,
   MessageSquare,
   Compass,
   Zap,
-  ArrowRight,
   Shuffle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { conceptsDb, pythonData, architectureDiagrams, ArchitectureDiagramItem } from "@/data";
+import { conceptsDb, architectureDiagrams, ArchitectureDiagramItem } from "@/data";
 import { Concept, Difficulty } from "@/types/data";
 import dynamic from "next/dynamic";
 
@@ -138,10 +136,7 @@ function ConceptsContent() {
       const catParam = params.get("category");
 
       if (tabParam === "python") {
-        if (typeof window !== "undefined") {
-          window.location.replace("/python");
-          return;
-        }
+        setSelectedCategory("PYTHON");
       }
 
       if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT"].includes(diffParam.toUpperCase())) {

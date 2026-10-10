@@ -25,7 +25,7 @@ interface Topic {
 
 const topics: Topic[] = [
   { id: "all", label: "⚡ All 11 Modules", icon: Sparkles, href: "/qa-prep" },
-  { id: "python", label: "🐍 Python DE Hub", icon: Code2, href: "/python" },
+  { id: "python", label: "🐍 Python for DE", icon: Code2, href: "/guided-learning?topic=python" },
   { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator, href: "/modern-stack#simulators" },
   { id: "fabric", label: "Fabric & OneLake", icon: Database, href: "/concepts?term=Fabric" },
   { id: "synapse-fabric", label: "🏛️ Synapse & Fabric Masterclass", icon: Database, href: "/modern-stack#blueprints" },

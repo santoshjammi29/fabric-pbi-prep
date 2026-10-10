@@ -117,7 +117,9 @@ export function getStandardizedDomain(item: {
     cat.includes('BIG DATA') ||
     cat.includes('DISTRIBUTED') ||
     cat.includes('RESOURCE') ||
-    sourceDb === 'pyspark'
+    cat.includes('PYTHON') ||
+    sourceDb === 'pyspark' ||
+    sourceDb === 'python'
   ) {
     return 'Compute & Orchestration';
   }
