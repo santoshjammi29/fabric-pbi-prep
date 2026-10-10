@@ -30,6 +30,7 @@ import dynamic from "next/dynamic";
 
 const SmoothAccordion = dynamic(() => import("@/components/ui/smooth-accordion").then(mod => mod.SmoothAccordion), { ssr: false });
 import { recordLastTopic } from "@/lib/user-progress";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -275,7 +276,16 @@ function ConceptsContent() {
   }, [filteredConcepts, isShuffled, shuffleSeed]);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Knowledge Base"
+        items={[
+          { label: "Key Concepts (Glossary)", href: "/concepts", icon: BookOpen, badge: "290 Concepts" },
+          { label: "Spark Engine Internals", href: "/spark-engine", icon: Zap, badge: "Deep Dive" },
+          { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud" },
+        ]}
+      />
+
       {/* Page Header */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

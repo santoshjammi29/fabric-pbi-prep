@@ -9,26 +9,27 @@ import {
   Home,
   BookOpen,
   FileCode2,
-  Zap,
   Layers,
-  Globe,
   MessageSquare,
-  Building2,
   Compass,
-  GraduationCap,
   User,
   Sun,
   Moon,
   ChevronLeft,
-  BookMarked,
-  Terminal,
 } from "lucide-react";
+
+interface SubNavItem {
+  label: string;
+  href: string;
+}
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
   pill?: { text: string; variant: "easy" | "medium" | "hard" | "architect" | "new" | "info" };
+  matches?: string[];
+  subItems?: SubNavItem[];
 }
 
 interface NavGroup {
@@ -41,33 +42,79 @@ const navGroups: NavGroup[] = [
     title: "Portal",
     items: [
       { label: "Home", href: "/", icon: Home },
-      { label: "Learning Paths", href: "/learning-paths", icon: Compass, pill: { text: "The Map", variant: "info" } },
-      { label: "Diagnostic Exam", href: "/diagnostic", icon: GraduationCap, pill: { text: "10-Q", variant: "new" } },
+      {
+        label: "Learning Journey",
+        href: "/learning-paths",
+        icon: Compass,
+        pill: { text: "The Map", variant: "info" },
+        matches: ["/learning-paths", "/guided-learning", "/diagnostic"],
+        subItems: [
+          { label: "Career Curricula", href: "/learning-paths" },
+          { label: "Guided Topics", href: "/guided-learning" },
+          { label: "Diagnostic Exam", href: "/diagnostic" },
+        ],
+      },
     ],
   },
   {
     title: "Knowledge Base",
     items: [
-      { label: "Key Concepts", href: "/concepts", icon: BookOpen, pill: { text: "Foundations", variant: "easy" } },
-      { label: "Guided Learning", href: "/guided-learning", icon: BookMarked, pill: { text: "Core", variant: "new" } },
-      { label: "Spark Engine", href: "/spark-engine", icon: Zap, pill: { text: "Internal", variant: "medium" } },
-      { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, pill: { text: "Multi-Cloud", variant: "hard" } },
-      { label: "DE Mindmap", href: "/mindmap", icon: Globe, pill: { text: "Visual", variant: "new" } },
+      {
+        label: "Key Concepts & Engines",
+        href: "/concepts",
+        icon: BookOpen,
+        pill: { text: "Foundations", variant: "easy" },
+        matches: ["/concepts", "/spark-engine", "/modern-stack"],
+        subItems: [
+          { label: "Glossary Concepts", href: "/concepts" },
+          { label: "Spark Engine", href: "/spark-engine" },
+          { label: "Modern Data Stack", href: "/modern-stack" },
+        ],
+      },
     ],
   },
   {
     title: "Architectural Mastery",
     items: [
-      { label: "Architecture Hub", href: "/architecture", icon: Layers, pill: { text: "Principal", variant: "architect" } },
-      { label: "Code Practice", href: "/code-practice", icon: FileCode2, pill: { text: "Advanced", variant: "medium" } },
-      { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, pill: { text: "Prod Ready", variant: "new" } },
+      {
+        label: "Architecture Hub",
+        href: "/architecture",
+        icon: Layers,
+        pill: { text: "Principal", variant: "architect" },
+        matches: ["/architecture", "/mindmap"],
+        subItems: [
+          { label: "System Scenarios", href: "/architecture" },
+          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams" },
+          { label: "DE Mindmap", href: "/mindmap" },
+        ],
+      },
+      {
+        label: "Code & Cheat Sheet",
+        href: "/code-practice",
+        icon: FileCode2,
+        pill: { text: "Prod Ready", variant: "medium" },
+        matches: ["/code-practice", "/cheat-sheet"],
+        subItems: [
+          { label: "Practice Snippets", href: "/code-practice" },
+          { label: "Cheat Sheet", href: "/cheat-sheet" },
+        ],
+      },
     ],
   },
   {
     title: "Interview & Prep",
     items: [
-      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, pill: { text: "High Stakes", variant: "hard" } },
-      { label: "Company Research", href: "/company-research", icon: Building2, pill: { text: "Strategic", variant: "easy" } },
+      {
+        label: "Q&A Prep Hub",
+        href: "/qa-prep",
+        icon: MessageSquare,
+        pill: { text: "6.4k+ Qs", variant: "hard" },
+        matches: ["/qa-prep", "/company-research"],
+        subItems: [
+          { label: "Question Drill", href: "/qa-prep" },
+          { label: "Company Intel", href: "/company-research" },
+        ],
+      },
     ],
   },
   {
@@ -105,10 +152,18 @@ export function Sidebar() {
     localStorage.setItem("sidebar-collapsed", String(next));
   };
 
-  const isActive = (href: string) => {
+  const isItemActive = (item: NavItem) => {
     if (!pathname) return false;
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
+    if (item.href === "/") return pathname === "/";
+    if (pathname.startsWith(item.href)) return true;
+    if (item.matches && item.matches.some((m) => pathname.startsWith(m))) return true;
+    return false;
+  };
+
+  const isSubActive = (subHref: string) => {
+    if (!pathname) return false;
+    const [subPath] = subHref.split("?");
+    return pathname === subPath;
   };
 
   return (
@@ -120,10 +175,12 @@ export function Sidebar() {
       )}
     >
       {/* Brand */}
-      <div className={cn(
-        "flex items-center h-16 px-4 border-b border-[var(--border)] shrink-0",
-        collapsed ? "justify-center" : "justify-between"
-      )}>
+      <div
+        className={cn(
+          "flex items-center h-16 px-4 border-b border-[var(--border)] shrink-0",
+          collapsed ? "justify-center" : "justify-between"
+        )}
+      >
         {!collapsed && (
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -161,9 +218,9 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 scrollbar-none">
         {navGroups.map((group, gi) => (
-          <div key={gi} className={cn(gi > 0 && "mt-4")}>
+          <div key={gi} className={cn(gi > 0 && "mt-3.5")}>
             {group.title && !collapsed && (
-              <div className="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted-foreground)]">
+              <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted-foreground)]">
                 {group.title}
               </div>
             )}
@@ -172,17 +229,17 @@ export function Sidebar() {
             )}
             <ul className="space-y-0.5">
               {group.items.map((item) => {
-                const active = isActive(item.href);
+                const active = isItemActive(item);
                 const Icon = item.icon;
                 return (
                   <li key={item.href}>
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                        "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150",
                         "hover:bg-[var(--surface-3)]",
                         active
-                          ? "bg-purple-500/10 text-purple-400 shadow-[inset_2px_0_0_rgb(139,92,246)]"
+                          ? "bg-purple-500/10 text-purple-400 font-semibold shadow-[inset_2px_0_0_rgb(139,92,246)]"
                           : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
                         collapsed && "justify-center px-0"
                       )}
@@ -195,7 +252,7 @@ export function Sidebar() {
                           {item.pill && (
                             <span
                               className={cn(
-                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0",
+                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 leading-tight",
                                 pillVariants[item.pill.variant]
                               )}
                             >
@@ -205,6 +262,30 @@ export function Sidebar() {
                         </>
                       )}
                     </Link>
+
+                    {/* Clean sub-navigation reveals when item is active in expanded mode */}
+                    {active && !collapsed && item.subItems && (
+                      <ul className="ml-7 my-1 space-y-0.5 border-l border-[var(--border)] pl-2.5 animate-in fade-in duration-150">
+                        {item.subItems.map((sub) => {
+                          const subActive = isSubActive(sub.href);
+                          return (
+                            <li key={sub.href}>
+                              <Link
+                                href={sub.href}
+                                className={cn(
+                                  "block px-2 py-1 text-xs rounded-lg transition-colors truncate",
+                                  subActive
+                                    ? "text-purple-400 bg-purple-500/10 font-semibold"
+                                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                                )}
+                              >
+                                {sub.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}

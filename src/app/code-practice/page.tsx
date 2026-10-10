@@ -17,9 +17,11 @@ import {
   BookOpen,
   MessageSquare,
   Shuffle,
+  Terminal,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 import { pysparkData, sparksqlData, mssqlData, pythonData } from "@/data";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
@@ -260,7 +262,15 @@ export default function CodePracticePage() {
   }, [filteredItems, isShuffled, shuffleSeed]);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Code & Reference"
+        items={[
+          { label: "Code Practice Drills", href: "/code-practice", icon: FileCode2, badge: "PySpark & SQL" },
+          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready" },
+        ]}
+      />
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

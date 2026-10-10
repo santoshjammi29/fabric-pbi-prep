@@ -17,26 +17,24 @@ import {
   Terminal,
 } from "lucide-react";
 
+import { Compass } from "lucide-react";
+
 // 4 Core tabs on small mobile screens (< 640px)
 const mobileCoreTabs = [
   { label: "Home", href: "/", icon: Home },
+  { label: "Journey", href: "/learning-paths", icon: Compass, isNew: true },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
-  { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
-  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.5k" },
+  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.4k" },
 ];
 
-// Extended tabs on tablet screens (640px - 1023px)
+// Extended tabs on tablet screens (640px - 1023px) — 7 Primary Hubs
 const tabletTabs = [
   { label: "Home", href: "/", icon: Home },
+  { label: "Journey", href: "/learning-paths", icon: Compass, isNew: true },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
-  { label: "Journey", href: "/guided-learning", icon: BookMarked, isNew: true },
-  { label: "Code", href: "/code-practice", icon: FileCode2 },
-  { label: "Cheat", href: "/cheat-sheet", icon: Terminal, isNew: true },
-  { label: "Spark", href: "/spark-engine", icon: Zap },
-  { label: "Modern", href: "/modern-stack", icon: Layers },
-  { label: "Q&A", href: "/qa-prep", icon: MessageSquare },
   { label: "Arch", href: "/architecture", icon: Layers },
-  { label: "Mindmap", href: "/mindmap", icon: Globe, isNew: true },
+  { label: "Code", href: "/code-practice", icon: FileCode2 },
+  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.4k" },
   { label: "Studio", href: "/studio", icon: User },
 ];
 
@@ -50,8 +48,8 @@ export function MobileNav() {
 
   const isOtherActive =
     !isActive("/") &&
+    !isActive("/learning-paths") &&
     !isActive("/concepts") &&
-    !isActive("/guided-learning") &&
     !isActive("/qa-prep");
 
   const openDrawer = () => {
@@ -177,7 +175,7 @@ export function MobileNav() {
         >
           <LayoutGrid size={19} strokeWidth={1.8} />
           <span className="text-[10px] font-medium leading-none mt-1 whitespace-nowrap">
-            All (11+)
+            More
           </span>
         </button>
       </div>

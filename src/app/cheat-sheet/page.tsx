@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   RefreshCw,
   ShieldAlert,
+  FileCode2,
 } from "lucide-react";
 import { cheatsheetData } from "@/data";
 import type { CheatCodeCategory } from "@/types/data";
@@ -24,6 +25,7 @@ import { OptimizationFlow } from "@/components/cheatsheet/optimization-flow";
 import { CategoryBar } from "@/components/cheatsheet/category-bar";
 import { QuickJumpTOC } from "@/components/cheatsheet/quick-jump-toc";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 const ALL_CATEGORIES: CheatCodeCategory[] = [
   "Spark Core",
@@ -239,6 +241,14 @@ function CheatSheetContent() {
       {/* Hero / Header Section */}
       <section className="relative overflow-hidden border-b border-[var(--border)] bg-[var(--surface-0)] py-10 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
+          <HubSubnav
+            hubTitle="Code & Reference"
+            items={[
+              { label: "Code Practice Drills", href: "/code-practice", icon: FileCode2, badge: "PySpark & SQL" },
+              { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready" },
+            ]}
+          />
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">
             <Terminal size={14} />

@@ -4,10 +4,20 @@ import React from "react";
 import { InteractiveMindmap } from "@/components/mindmap/interactive-mindmap";
 import { Globe, Sparkles, Layers, Cpu, Database, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 export default function MindmapPage() {
   return (
     <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Architectural Mastery"
+        items={[
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "2,520 Scenarios" },
+          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "Visual Hub" },
+          { label: "DE Mindmap Topography", href: "/mindmap", icon: Globe, badge: "Interactive" },
+        ]}
+      />
+
       {/* Mindmap Canvas Container */}
       <InteractiveMindmap />
 

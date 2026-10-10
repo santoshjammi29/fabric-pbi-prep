@@ -25,9 +25,11 @@ import {
   ArrowRight,
   ExternalLink,
   Shuffle,
+  Globe,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 import { architectureData, pythonData, modernCodeMatrix, modernStackDb, architectureDiagrams } from "@/data";
 import { ArchitectureDiagramsGallery } from "@/components/architecture/diagrams-gallery";
 import {
@@ -781,7 +783,16 @@ function ArchitectureHubContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-in fade-in duration-300">
+      <HubSubnav
+        hubTitle="Architectural Mastery"
+        items={[
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "2,520 Scenarios" },
+          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "Visual Hub" },
+          { label: "DE Mindmap Topography", href: "/mindmap", icon: Globe, badge: "Interactive" },
+        ]}
+      />
+
       {/* 1. HERO BANNER */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />

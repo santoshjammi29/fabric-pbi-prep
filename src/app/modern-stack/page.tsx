@@ -12,9 +12,12 @@ import {
   Bot,
   FileCode2,
   ArrowRight,
+  BookOpen,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 import {
   modernCodeMatrix,
   modernBlueprintsDb,
@@ -149,7 +152,16 @@ export default function ModernStackPage() {
   ];
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Knowledge Base"
+        items={[
+          { label: "Key Concepts (Glossary)", href: "/concepts", icon: BookOpen, badge: "290 Concepts" },
+          { label: "Spark Engine Internals", href: "/spark-engine", icon: Zap, badge: "Deep Dive" },
+          { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud" },
+        ]}
+      />
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

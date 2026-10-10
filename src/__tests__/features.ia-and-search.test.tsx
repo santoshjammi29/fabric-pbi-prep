@@ -24,17 +24,12 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
     expect(screen.getByText('Interview & Prep')).toBeDefined();
     expect(screen.getByText('Studio')).toBeDefined();
 
-    // Check specific pill tags
+    // Check specific pill tags for streamlined primary hubs
     expect(screen.getByText('The Map')).toBeDefined();
     expect(screen.getByText('Foundations')).toBeDefined();
-    expect(screen.getByText('Core')).toBeDefined();
-    expect(screen.getByText('Internal')).toBeDefined();
-    expect(screen.getByText('Multi-Cloud')).toBeDefined();
-    expect(screen.getByText('Visual')).toBeDefined();
     expect(screen.getByText('Principal')).toBeDefined();
-    expect(screen.getByText('Advanced')).toBeDefined();
-    expect(screen.getByText('High Stakes')).toBeDefined();
-    expect(screen.getByText('Strategic')).toBeDefined();
+    expect(screen.getByText('Prod Ready')).toBeDefined();
+    expect(screen.getByText('6.4k+ Qs')).toBeDefined();
   });
 
   it('supports toggling collapsed and expanded states smoothly', () => {

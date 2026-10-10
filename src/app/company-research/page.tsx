@@ -6,8 +6,10 @@ import {
   Search,
   Sparkles,
   Globe,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 interface CompanyProfile {
   id: string;
@@ -147,7 +149,15 @@ export default function CompanyResearchPage() {
   }, [selectedTier, searchQuery]);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Interview & Career"
+        items={[
+          { label: "Interview Q&A Drill (6.4k+)", href: "/qa-prep", icon: MessageSquare, badge: "6,570+ Qs" },
+          { label: "Target Company Intel", href: "/company-research", icon: Building2, badge: "FAANG & GCC" },
+        ]}
+      />
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

@@ -2,16 +2,20 @@
 
 import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   Compass,
   Calendar,
   CheckCircle2,
   GitBranch,
+  BookMarked,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { learningPathsDb } from "@/data";
 import { LearningPath, Difficulty } from "@/types/data";
 import { DecisionLedger } from "@/components/learning-paths/decision-ledger";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -47,7 +51,16 @@ function LearningPathsContent() {
   }, [selectedPathId]);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Learning Journey"
+        items={[
+          { label: "Career Curricula Tracks", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
+          { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "9 Topics" },
+          { label: "10-Q Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q" },
+        ]}
+      />
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -66,6 +79,13 @@ function LearningPathsContent() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0 text-center">
+            <Link
+              href="/diagnostic"
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-colors shadow-sm shadow-purple-500/20"
+            >
+              <GraduationCap size={15} />
+              <span>10-Q Diagnostic</span>
+            </Link>
             <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
               <div className="text-2xl font-bold text-blue-400">12</div>
               <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Curricula Tracks</div>

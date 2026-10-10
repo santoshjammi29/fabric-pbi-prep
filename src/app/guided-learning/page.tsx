@@ -26,9 +26,11 @@ import {
   Check,
   Share2,
   CheckCheck,
+  BookMarked,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 import {
   getTopicItems,
   getTopicCounts,
@@ -358,6 +360,15 @@ export default function GuidedLearningPage() {
 
   return (
     <div className="space-y-6 pb-24 max-w-6xl 2xl:max-w-7xl mx-auto px-2 sm:px-4">
+      <HubSubnav
+        hubTitle="Learning Journey"
+        items={[
+          { label: "Career Curricula Tracks", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
+          { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "9 Topics" },
+          { label: "10-Q Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q" },
+        ]}
+      />
+
       {/* ── TOP BANNER & TRACK MATRIX ─────────────────────────────────── */}
       <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-4 sm:p-6 shadow-sm isolate">
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />

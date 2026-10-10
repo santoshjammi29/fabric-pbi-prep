@@ -27,15 +27,19 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: string;
+  badgeColor?: string;
+  matches?: string[];
+  subItems?: { label: string; href: string }[];
+}
+
 interface NavGroup {
   title: string;
-  items: {
-    label: string;
-    href: string;
-    icon: React.ElementType;
-    badge?: string;
-    badgeColor?: string;
-  }[];
+  items: NavItem[];
 }
 
 const navGroups: NavGroup[] = [
@@ -43,35 +47,84 @@ const navGroups: NavGroup[] = [
     title: "Portal",
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
-      { label: "Learning Paths", href: "/learning-paths", icon: Compass, badge: "The Map", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-      { label: "Diagnostic Exam", href: "/diagnostic", icon: GraduationCap, badge: "10-Q", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+      {
+        label: "Learning Journey",
+        href: "/learning-paths",
+        icon: Compass,
+        badge: "The Map",
+        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+        matches: ["/learning-paths", "/guided-learning", "/diagnostic"],
+        subItems: [
+          { label: "Career Curricula", href: "/learning-paths" },
+          { label: "Guided Topics", href: "/guided-learning" },
+          { label: "Diagnostic Exam", href: "/diagnostic" },
+        ],
+      },
     ],
   },
   {
     title: "Knowledge Base",
     items: [
-      { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "Foundations", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
-      { label: "Guided Learning", href: "/guided-learning", icon: BookMarked, badge: "Core", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
-      { label: "Spark Engine", href: "/spark-engine", icon: Zap, badge: "Internal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-      { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-      { label: "DE Mindmap", href: "/mindmap", icon: Globe, badge: "Visual Hub", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+      {
+        label: "Key Concepts & Engines",
+        href: "/concepts",
+        icon: BookOpen,
+        badge: "Foundations",
+        badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
+        matches: ["/concepts", "/spark-engine", "/modern-stack"],
+        subItems: [
+          { label: "Glossary Concepts", href: "/concepts" },
+          { label: "Spark Engine", href: "/spark-engine" },
+          { label: "Modern Data Stack", href: "/modern-stack" },
+        ],
+      },
     ],
   },
   {
     title: "Architectural Mastery",
     items: [
-      { label: "Architecture Hub", href: "/architecture", icon: Layers, badge: "Principal", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-      { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Layers, badge: "Visual Hub", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-      { label: "Code Practice", href: "/code-practice", icon: FileCode2, badge: "Advanced", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-      { label: "Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
-      { label: "Live Simulators", href: "/modern-stack#simulators", icon: Layers, badge: "Live Tool", badgeColor: "bg-green-500/10 text-green-400 border-green-500/20" },
+      {
+        label: "Architecture Hub",
+        href: "/architecture",
+        icon: Layers,
+        badge: "Principal",
+        badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+        matches: ["/architecture", "/mindmap"],
+        subItems: [
+          { label: "System Scenarios", href: "/architecture" },
+          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams" },
+          { label: "DE Mindmap", href: "/mindmap" },
+        ],
+      },
+      {
+        label: "Code & Cheat Sheet",
+        href: "/code-practice",
+        icon: FileCode2,
+        badge: "Prod Ready",
+        badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+        matches: ["/code-practice", "/cheat-sheet"],
+        subItems: [
+          { label: "Practice Snippets", href: "/code-practice" },
+          { label: "Cheat Sheet", href: "/cheat-sheet" },
+        ],
+      },
     ],
   },
   {
     title: "Interview & Prep",
     items: [
-      { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, badge: "6.4k+ Qs", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-      { label: "Company Research", href: "/company-research", icon: Building2, badge: "Strategic", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+      {
+        label: "Q&A Prep Hub",
+        href: "/qa-prep",
+        icon: MessageSquare,
+        badge: "6.4k+ Qs",
+        badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+        matches: ["/qa-prep", "/company-research"],
+        subItems: [
+          { label: "Question Drill", href: "/qa-prep" },
+          { label: "Company Intel", href: "/company-research" },
+        ],
+      },
     ],
   },
   {
@@ -207,7 +260,7 @@ export function MobileHeader() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-[var(--foreground)]">Navigation Menu</div>
-                  <div className="text-[10px] text-[var(--muted-foreground)]">Explore all 16 modules</div>
+                  <div className="text-[10px] text-[var(--muted-foreground)]">Explore learning hubs</div>
                 </div>
               </div>
               <button
@@ -245,34 +298,60 @@ export function MobileHeader() {
                   </div>
                   <div className="space-y-0.5">
                     {group.items.map((item) => {
-                      const active = isActive(item.href);
+                      const active =
+                        (item.href === "/" && pathname === "/") ||
+                        (item.href !== "/" && pathname?.startsWith(item.href)) ||
+                        Boolean(item.matches?.some((m) => pathname?.startsWith(m)));
                       const Icon = item.icon;
                       return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={cn(
-                            "flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all",
-                            active
-                              ? "bg-purple-600 text-white font-semibold shadow-md shadow-purple-500/20"
-                              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                        <div key={item.href}>
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              "flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all",
+                              active
+                                ? "bg-purple-600 text-white font-semibold shadow-md shadow-purple-500/20"
+                                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                            )}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Icon size={16} className={cn(active ? "text-white" : "text-purple-400")} />
+                              <span>{item.label}</span>
+                            </div>
+                            {item.badge && (
+                              <span
+                                className={cn(
+                                  "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                                  active ? "bg-white/20 text-white border-white/30" : item.badgeColor
+                                )}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                          </Link>
+
+                          {active && item.subItems && (
+                            <div className="ml-6 my-1 space-y-0.5 border-l border-[var(--border)] pl-2.5">
+                              {item.subItems.map((sub) => {
+                                const isSubActive = pathname === sub.href.split("?")[0];
+                                return (
+                                  <Link
+                                    key={sub.href}
+                                    href={sub.href}
+                                    className={cn(
+                                      "block px-2 py-1 text-xs rounded-lg transition-colors truncate",
+                                      isSubActive
+                                        ? "text-purple-400 font-semibold bg-purple-500/10"
+                                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                                    )}
+                                  >
+                                    {sub.label}
+                                  </Link>
+                                );
+                              })}
+                            </div>
                           )}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Icon size={16} className={cn(active ? "text-white" : "text-purple-400")} />
-                            <span>{item.label}</span>
-                          </div>
-                          {item.badge && (
-                            <span
-                              className={cn(
-                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
-                                active ? "bg-white/20 text-white border-white/30" : item.badgeColor
-                              )}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </Link>
+                        </div>
                       );
                     })}
                   </div>

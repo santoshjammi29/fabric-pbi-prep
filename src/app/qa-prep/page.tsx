@@ -22,9 +22,11 @@ import {
   Compass,
   X,
   Shuffle,
+  Building2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 import { questionsDb, questionsDeDb, conceptsDb, getStandardizedDomain, architectureDiagrams, ArchitectureDiagramItem } from "@/data";
 import { Question, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { recordLastTopic } from "@/lib/user-progress";
@@ -351,7 +353,15 @@ export default function QaPrepPage() {
   const currentStudyCard = displayedFilteredQuestions[studyIndex] || displayedFilteredQuestions[0];
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Interview & Career"
+        items={[
+          { label: "Interview Q&A Drill (6.4k+)", href: "/qa-prep", icon: MessageSquare, badge: "6,570+ Qs" },
+          { label: "Target Company Intel", href: "/company-research", icon: Building2, badge: "FAANG & GCC" },
+        ]}
+      />
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

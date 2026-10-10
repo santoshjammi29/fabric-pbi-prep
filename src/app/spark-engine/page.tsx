@@ -21,6 +21,7 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { PrerequisiteBanner } from "@/components/ui/prerequisite-banner";
 import { recordLastTopic } from "@/lib/user-progress";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 type SparkSubtab = "architecture" | "simulator" | "memory" | "curriculum" | "lexicon";
 
@@ -266,7 +267,16 @@ export default function SparkEnginePage() {
   }, [selectedLexiconCat, lexiconQuery]);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
+      <HubSubnav
+        hubTitle="Knowledge Base"
+        items={[
+          { label: "Key Concepts (Glossary)", href: "/concepts", icon: BookOpen, badge: "290 Concepts" },
+          { label: "Spark Engine Internals", href: "/spark-engine", icon: Zap, badge: "Deep Dive" },
+          { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud" },
+        ]}
+      />
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
