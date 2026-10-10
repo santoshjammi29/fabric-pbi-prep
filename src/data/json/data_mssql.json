@@ -474,5 +474,50 @@
       "GROUPING_ID() emits an integer bitmask identifying the exact dimensional grouping level"
     ],
     "use_case": "Executive financial reporting, matrix balance sheets, and fast pre-aggregation for OLAP cubes."
+  },
+  {
+    "id": "sql-adv-copyinto-parquet",
+    "title": "Synapse Dedicated SQL Pool COPY INTO with Parquet & Error Logging",
+    "level": "advanced",
+    "category": "Bulk Ingestion",
+    "description": "Production-grade T-SQL pattern for high-throughput parallel bulk loading from ADLS Gen2 Parquet files into an MPP Clustered Columnstore table, featuring Managed Identity, column ordinal mapping, and quarantine error logging.",
+    "code": "-- =====================================================================\n-- Production COPY INTO Pipeline: ADLS Gen2 Parquet to Synapse Dedicated\n-- Scenario: EU BFSI Daily Transaction Settlement Ingestion (50M rows)\n-- =====================================================================\n\n-- 1. Ensure target table is optimized with Hash Distribution and Columnstore\nCREATE TABLE dbo.FactTransactions_Staging (\n    transaction_id      VARCHAR(64)     NOT NULL,\n    account_id          BIGINT          NOT NULL,\n    customer_id         BIGINT          NOT NULL,\n    transaction_amount  DECIMAL(18, 2)  NOT NULL,\n    currency_code       CHAR(3)         NOT NULL,\n    transaction_ts      DATETIME2(3)    NOT NULL,\n    ingest_batch_id     INT             DEFAULT 20240315\n)\nWITH (\n    DISTRIBUTION = HASH(account_id),\n    CLUSTERED COLUMNSTORE INDEX\n);\n\n-- 2. Execute parallel high-throughput COPY INTO\n-- Uses Azure Managed Identity (zero secrets embedded in code)\nCOPY INTO dbo.FactTransactions_Staging (\n    transaction_id      1,\n    account_id          2,\n    customer_id         3,\n    transaction_amount  4,\n    currency_code       5,\n    transaction_ts      6\n)\nFROM 'https://eubfsidatalakeprod.dfs.core.windows.net/curated/transactions/year=2024/month=03/*.parquet'\nWITH (\n    FILE_TYPE       = 'PARQUET',\n    CREDENTIAL      = (IDENTITY = 'Managed Identity'),\n    COMPRESSION     = 'snappy',\n    MAXERRORS       = 100,               -- Allow up to 100 corrupted records before rollback\n    ERRORFILE       = '/quarantine/errors_fact_txns_20240315/', -- Output directory in ADLS\n    AUTO_CREATE_TABLE = 'OFF'\n);\n\n-- 3. Validate row counts and verify zero memory spill across distributions\nSELECT \n    COUNT(*) AS total_loaded_rows,\n    MIN(transaction_ts) AS earliest_txn,\n    MAX(transaction_ts) AS latest_txn\nFROM dbo.FactTransactions_Staging;\n\n-- Check Columnstore row group health (aiming for ~1M rows per active rowgroup)\nSELECT \n    state_desc, \n    COUNT(*) AS row_group_count,\n    SUM(total_rows) AS total_rows,\n    SUM(size_in_bytes) / 1024 / 1024 AS total_size_mb\nFROM sys.pdw_nodes_column_store_row_groups\nWHERE object_id = OBJECT_ID('dbo.FactTransactions_Staging')\nGROUP BY state_desc;",
+    "notes": [
+      "Always map column ordinals explicitly (col 1, col 2) when source Parquet schema order might drift",
+      "Managed Identity eliminates Key Vault credential rotation overhead and secures network communication",
+      "MAXERRORS quarantines malformed records in the ERRORFILE storage path for automated DLQ inspection",
+      "Target table should be pre-created with HASH distribution to prevent expensive shuffle data movement post-load"
+    ],
+    "use_case": "Daily high-throughput bulk ingestion of 50M settled financial transactions from curated ADLS Gen2 Parquet files into Azure Synapse Dedicated SQL Pools for EU banking regulatory reporting."
+  },
+  {
+    "id": "sql-adv-openrowset-serverless",
+    "title": "Synapse Serverless T-SQL OPENROWSET with Parquet Pushdown",
+    "level": "advanced",
+    "category": "Data Lake Virtualization",
+    "description": "Querying raw and curated Parquet files directly in ADLS Gen2 using Synapse Serverless SQL OPENROWSET. Demonstrates column projection pushdown, filepath() partition pruning, and CETAS materialization.",
+    "code": "-- =====================================================================\n-- Synapse Serverless SQL: Querying Parquet Directly with Zero Infrastructure\n-- Scenario: Fraud Detection Analytics across multi-terabyte ADLS Lake\n-- =====================================================================\n\n-- 1. Direct query with column projection and partition pruning via filepath()\nSELECT\n    r.filepath(1) AS txn_year,\n    r.filepath(2) AS txn_month,\n    r.account_id,\n    COUNT(*) AS high_risk_count,\n    SUM(r.transaction_amount) AS total_flagged_eur\nFROM OPENROWSET(\n    BULK 'https://eubfsidatalakeprod.dfs.core.windows.net/curated/transactions/year=*/month=*/*.parquet',\n    FORMAT = 'PARQUET'\n) WITH (\n    account_id          BIGINT,\n    transaction_amount  DECIMAL(18, 2),\n    risk_score          TINYINT,\n    is_flagged          BIT\n) AS [r]\nWHERE\n    r.filepath(1) = '2024'               -- Partition pruning: only scans 2024 directories\n    AND r.filepath(2) IN ('01', '02', '03') -- Pruning Q1 months\n    AND r.is_flagged = 1\n    AND r.risk_score >= 8\nGROUP BY\n    r.filepath(1),\n    r.filepath(2),\n    r.account_id\nHAVING\n    SUM(r.transaction_amount) > 50000\nORDER BY\n    total_flagged_eur DESC;\n\n-- 2. CETAS: Materialize aggregated results directly back into curated Parquet\nCREATE EXTERNAL TABLE gold.Q1HighRiskSummary\nWITH (\n    LOCATION = 'gold/fraud_summaries/q1_2024/',\n    DATA_SOURCE = ADLSGen2_Curated_Source,\n    FILE_FORMAT = ParquetFormatSnappy\n)\nAS\nSELECT\n    account_id,\n    COUNT(*) AS total_txns,\n    SUM(transaction_amount) AS total_volume_eur\nFROM OPENROWSET(\n    BULK 'curated/transactions/year=2024/month=03/*.parquet',\n    DATA_SOURCE = 'ADLSGen2_Curated_Source',\n    FORMAT = 'PARQUET'\n) WITH (\n    account_id BIGINT,\n    transaction_amount DECIMAL(18,2)\n) AS [txns]\nGROUP BY account_id;",
+    "notes": [
+      "filepath(1), filepath(2) dynamically extract directory partition values without reading file contents",
+      "WITH clause enforces strict schema casting and tells serverless engine which exact column chunks to fetch",
+      "Serverless billing ($5/TB) is directly reduced by Parquet column projection and partition pruning",
+      "CETAS writes results in parallel as clean Snappy-compressed Parquet files ready for Power BI or downstream tools"
+    ],
+    "use_case": "Ad-hoc compliance investigation on 100TB of historical banking records in ADLS Gen2, achieving sub-10 second query execution without provisioning dedicated warehouse compute."
+  },
+  {
+    "id": "sql-adv-polybase-parquet",
+    "title": "PolyBase External Data Source, File Format & External Table Setup",
+    "level": "advanced",
+    "category": "Data Lake Virtualization",
+    "description": "Complete end-to-end DDL blueprint for configuring PolyBase to query and ingest Parquet files in Azure Synapse or SQL Server 2022, including master key, scoped credential, and CTAS ingestion.",
+    "code": "-- =====================================================================\n-- PolyBase Configuration Blueprint for Enterprise Parquet Ingestion\n-- =====================================================================\n\n-- 1. Create Database Master Key if not already present\nIF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE name LIKE '%DatabaseMasterKey%')\n    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'SecureComplexMasterKey#2024!';\n\n-- 2. Create Database Scoped Credential using Managed Identity\nCREATE DATABASE SCOPED CREDENTIAL PolyBase_MSI_Cred\nWITH IDENTITY = 'Managed Identity';\n\n-- 3. Define External Data Source pointing to ADLS Gen2 container\nCREATE EXTERNAL DATA SOURCE ADLS_Curated_Lake\nWITH (\n    TYPE = HADOOP,\n    LOCATION = 'abfss://curated@eubfsidatalakeprod.dfs.core.windows.net',\n    CREDENTIAL = PolyBase_MSI_Cred\n);\n\n-- 4. Define External File Format for Snappy-compressed Parquet\nCREATE EXTERNAL FILE FORMAT Parquet_Snappy_Format\nWITH (\n    FORMAT_TYPE = PARQUET,\n    DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec'\n);\n\n-- 5. Create External Table over ADLS Gen2 Parquet dataset\nCREATE EXTERNAL TABLE ext.FactTransactions (\n    transaction_id      VARCHAR(64)     NOT NULL,\n    account_id          BIGINT          NOT NULL,\n    transaction_amount  DECIMAL(18, 2)  NOT NULL,\n    currency_code       CHAR(3)         NOT NULL,\n    transaction_date    DATE            NOT NULL\n)\nWITH (\n    LOCATION = '/transactions/active/',\n    DATA_SOURCE = ADLS_Curated_Lake,\n    FILE_FORMAT = Parquet_Snappy_Format\n);\n\n-- 6. Ingest into internal Clustered Columnstore fact table via CTAS\nCREATE TABLE dbo.FactTransactions_Internal\nWITH (\n    DISTRIBUTION = HASH(account_id),\n    CLUSTERED COLUMNSTORE INDEX\n)\nAS\nSELECT * FROM ext.FactTransactions;",
+    "notes": [
+      "PolyBase requires all 3 foundation objects: Credential, Data Source, and File Format",
+      "FORMAT_TYPE = PARQUET automatically utilizes Snappy decompression natively",
+      "CTAS distributes the read across all 60 MPP compute nodes, transforming external files into native columnstore",
+      "For SQL Server 2022 on-premises, PolyBase connects to S3-compatible storage using S3 credentials"
+    ],
+    "use_case": "Enterprise hybrid data lake virtualization architecture allowing on-premises SQL Server 2022 and Synapse Dedicated Pools to ingest Azure Data Lake Parquet files directly via T-SQL."
   }
 ]

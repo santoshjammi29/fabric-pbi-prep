@@ -5576,5 +5576,278 @@
       "PySpark uses JVM workers and Bulk Synchronous Parallel execution plans",
       "Architectural choice: Spark for data lakehouse ETL; Ray for ML/AI workloads"
     ]
+  },
+  {
+    "id": "open-format-parquet-anatomy",
+    "term": "Apache Parquet Hybrid Columnar Anatomy",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "EASY",
+    "definition": "A self-describing, hybrid columnar storage format organized into Row Groups, Column Chunks, and Pages with a Thrift metadata footer.",
+    "explanation": "Parquet partitions data horizontally into Row Groups (typically 128MB to 512MB in size), and within each row group, data is sliced vertically into Column Chunks. Each column chunk consists of Data Pages and optional Dictionary Pages. A 4-byte magic number 'PAR1' borders the file header and footer. Crucially, the FileMetaData resides in the footer, containing exact byte offsets, schema definitions, and column statistics (min/max values, null counts). This architecture enables SQL engines to read only the requested columns (projection pushdown) and skip unneeded row groups entirely (predicate pushdown) by scanning the footer before reading any payload bytes.",
+    "keyPoints": [
+      "Hybrid layout: Horizontal Row Groups containing vertical Column Chunks and compressed Data Pages.",
+      "Thrift metadata footer contains file-level, row-group-level, and column-level statistics (min, max, null count).",
+      "Enables projection pushdown (reading only required columns) and predicate pushdown (skipping irrelevant row groups without decompression)."
+    ]
+  },
+  {
+    "id": "open-format-orc-stripes",
+    "term": "Apache ORC Stripe Architecture & Built-in Indexes",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "EASY",
+    "definition": "An optimized columnar format dividing data into self-contained Stripes (typically 64MB-256MB) with built-in index streams and bloom filters.",
+    "explanation": "Optimized Row Columnar (ORC) files are composed of Stripes, a File Footer, and a tiny Postscript at the very end. Within each stripe, data is segregated into Index Data, Row Data, and a Stripe Footer. The index data contains lightweight column statistics (min/max, sum, hasNull) recorded for every block of 10,000 rows (row index stride), alongside optional Bloom filters for high-cardinality equality lookups. The postscript contains file compression parameters and footer byte lengths. Because the stripe footer is read before data streams, query engines like Hive, Trino, and Synapse can skip entire stripes or 10,000-row chunks with zero disk I/O.",
+    "keyPoints": [
+      "Organized into large Stripes (64MB-256MB) terminating in a Postscript and File Footer.",
+      "Built-in row index strides track min/max statistics every 10,000 rows for granular intra-stripe row skipping.",
+      "Native Bloom filter indexes accelerate high-cardinality point queries (e.g. UUID, customer_id lookups)."
+    ]
+  },
+  {
+    "id": "open-format-avro-row-binary",
+    "term": "Apache Avro Binary Row Format & Schema Evolution",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "EASY",
+    "definition": "A compact, row-based binary serialization format with a JSON-encoded schema stored in the file header, designed for streaming and RPC.",
+    "explanation": "Unlike Parquet or ORC, Apache Avro serializes data row-by-row into contiguous binary blocks separated by 16-byte cryptographic sync markers. Avro files are self-describing because the exact JSON schema is embedded in the file metadata header. Avro excels at high-throughput write serialization in streaming ingestion platforms (Kafka, Event Hubs) because appending a row requires zero column splitting or memory buffering. It provides industry-standard schema evolution rules (backward, forward, full compatibility) via schema resolution: when reading an Avro file, the reader schema is compared against the writer schema, inserting default values for missing attributes without corrupting data.",
+    "keyPoints": [
+      "Row-oriented binary storage:Contiguous records grouped into blocks punctuated by 16-byte sync markers.",
+      "Full JSON schema embedded in file header ensures self-describing portability across disparate systems.",
+      "Gold standard for streaming message brokers (Kafka/Event Hubs) due to ultra-fast row-level serialization and robust schema evolution."
+    ]
+  },
+  {
+    "id": "sql-ingest-copy-into-mpp",
+    "term": "High-Throughput SQL Ingestion via COPY INTO",
+    "category": "SQL SERVER",
+    "difficulty": "EASY",
+    "definition": "The standard high-performance T-SQL declarative command for parallel, distributed bulk ingestion from cloud storage into relational SQL tables.",
+    "explanation": "The COPY INTO statement is the modern, flexible successor to PolyBase for MPP architectures like Azure Synapse Dedicated SQL Pools, Snowflake, and Fabric Warehouses. In Synapse MPP, COPY INTO bypasses external data source and format object creation, allowing data engineers to load Parquet, ORC, or CSV files from ADLS Gen2 with a single T-SQL command using Managed Identity (MSI), SAS keys, or Service Principals. In distributed architectures, the Control node assigns storage file splits across all 60 compute distributions, streaming data directly into target staging heaps or Clustered Columnstore tables in parallel.",
+    "keyPoints": [
+      "Single-statement declarative bulk ingestion from cloud object storage (ADLS Gen2, AWS S3) into relational tables.",
+      "Distributed parallel execution across compute nodes/distributions without requiring external table DDL.",
+      "Built-in support for Managed Identity, custom column mappings, reject limits (MAXERRORS), and auto-detection."
+    ]
+  },
+  {
+    "id": "sql-ingest-polybase-architecture",
+    "term": "PolyBase Distributed Query & External Tables",
+    "category": "SQL SERVER",
+    "difficulty": "EASY",
+    "definition": "A database virtualization and scale-out ingestion technology that maps non-relational storage files into SQL relational external tables.",
+    "explanation": "PolyBase integrates SQL Server and Synapse Dedicated SQL Pools with external data stored in Azure Data Lake, Blob Storage, or Hadoop HDFS. It relies on three database objects: MASTER KEY / DATABASE SCOPED CREDENTIAL (security), EXTERNAL DATA SOURCE (storage location), and EXTERNAL FILE FORMAT (Parquet, ORC, DelimitedText). When querying an external table, PolyBase's Data Movement Service (DMS) scales out across compute nodes to read, parse, and distribute external files. Ingestion is accomplished using CREATE TABLE AS SELECT (CTAS) or INSERT INTO ... SELECT, transferring data from external tables into internal columnstore tables.",
+    "keyPoints": [
+      "Decouples storage from compute: Virtualizes external Parquet/CSV files as queryable relational tables.",
+      "Requires 3 foundational objects: Scoped Credential, External Data Source, and External File Format.",
+      "Utilizes Data Movement Service (DMS) to distribute external storage chunk reads across compute nodes."
+    ]
+  },
+  {
+    "id": "sql-ingest-openrowset-serverless",
+    "term": "T-SQL OPENROWSET Serverless Data Lake Querying",
+    "category": "SQL SERVER",
+    "difficulty": "EASY",
+    "definition": "A built-in T-SQL table-valued function that enables instant, serverless querying of data lake files without provisioning managed tables.",
+    "explanation": "In Azure Synapse Serverless SQL Pools and Fabric SQL Endpoints, OPENROWSET acts as a bridge between T-SQL and raw cloud object storage. By specifying the file URL and FORMAT = 'PARQUET' (or 'DELTA' / 'CSV'), users can immediately filter, join, and aggregate files stored in ADLS Gen2. When querying Parquet or Delta, OPENROWSET automatically leverages column projection and min/max statistics pushdown. Furthermore, it supports the CREATE EXTERNAL TABLE AS SELECT (CETAS) command to transform and materialize raw formats into curated Parquet datasets, or feed downstream relational ingestion pipelines.",
+    "keyPoints": [
+      "Instant ad-hoc querying of Parquet, Delta, and CSV files in ADLS Gen2 without upfront table provisioning.",
+      "Serverless cost model: Pay strictly for the volume of data scanned (benefiting directly from Parquet columnar projection).",
+      "Pairs with CETAS to transform and materialize query results back into optimized columnar lake storage."
+    ]
+  },
+  {
+    "id": "open-format-compression-codecs",
+    "term": "Columnar Compression Codecs: Snappy vs ZSTD vs GZIP",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "Algorithm trade-offs between compression ratio, CPU encode/decode throughput, and splittability for lakehouse columnar files.",
+    "explanation": "In columnar storage, compression is applied at the individual Page or Stripe level after lightweight encoding (dictionary, RLE, bit-packing). Snappy delivers high decompress/compress throughput (250-500 MB/s per core) with moderate compression ratios (~3x), making it the historical default for analytical SQL engines where query latency trumps storage cost. Zstandard (ZSTD) offers configurable compression levels (1-22), achieving 30-50% higher compression density than Snappy while matching or exceeding its decompression speed at level 1-3. GZIP yields high compression ratios but imposes heavy CPU decompression penalties (50-100 MB/s per core) and is non-splittable when used on standalone text files.",
+    "keyPoints": [
+      "Snappy: Blazing-fast decompression with moderate compression; optimized for CPU-bounded low-latency SQL scans.",
+      "Zstandard (ZSTD): Modern lakehouse standard delivering superior compression ratios with near-Snappy read speeds.",
+      "GZIP: High compression ratio but CPU-intensive; non-splittable on raw text files, causing single-thread MPP bottlenecks."
+    ]
+  },
+  {
+    "id": "open-format-dictionary-encoding",
+    "term": "Dictionary Encoding & Run-Length Encoding (RLE)",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "Lightweight compression techniques that replace repeated string values with compact bit-packed integer keys prior to page compression.",
+    "explanation": "Columnar formats achieve their high storage efficiency by grouping values of the same type together, enabling domain-specific encodings before applying general-purpose compressors (Snappy/ZSTD). In Dictionary Encoding, a Dictionary Page builds an array of unique values (e.g. State names: 'CA', 'NY', 'TX'). Subsequent Data Pages store only the compact integer index of each value, bit-packed into 2 to 4 bits per row. If duplicate values appear contiguously (e.g., sorted columns), Run-Length Encoding (RLE) compresses repetitions into (count, value) pairs. During SQL query execution, engines can evaluate WHERE filters directly against the dictionary keys without decoding strings, achieving orders-of-magnitude faster filtering.",
+    "keyPoints": [
+      "Replaces repetitive data values with small integer keys in a dedicated Dictionary Page.",
+      "Bit-packing ensures integers consume only the minimum required bits (e.g., 3 bits for 8 distinct values).",
+      "Enables vectorized SQL engines to execute equality predicates directly against integer dictionary indexes."
+    ]
+  },
+  {
+    "id": "sql-ingest-schema-drift",
+    "term": "Schema Drift & Type Coercion during SQL Loading",
+    "category": "SQL SERVER",
+    "difficulty": "MEDIUM",
+    "definition": "Structural and type discrepancies between source file formats and relational SQL target tables that cause ingest failures or data corruption.",
+    "explanation": "Schema drift occurs when upstream application pipelines introduce new columns, rename fields, or widen data types. In open file formats like Parquet, types are strictly typed (e.g. INT64, Utf8, Timestamp[us]). When loading into SQL tables with fixed DDL (e.g., Synapse or Snowflake), discrepancies trigger catastrophic batch failures. Common type coercion pitfalls include: (1) Parquet INT64 loaded into SQL INT (overflow error), (2) Parquet UTC timestamps without timezone loaded into SQL DATETIME2, causing silent 5-hour timezone shifts, and (3) Positional vs. Name-based column binding, where reordered columns in CSV/Parquet populate wrong SQL table fields.",
+    "keyPoints": [
+      "Mismatched data types (e.g. INT64 vs SQL INT) trigger runtime numeric overflow or abort the entire COPY batch.",
+      "Timestamp precision differences (nanoseconds in Parquet vs 100ns in SQL DATETIME2) can cause precision loss or parse errors.",
+      "Modern engines use MATCH_BY_COLUMN_NAME or Auto Loader schema rescue columns to isolate drifting attributes safely."
+    ]
+  },
+  {
+    "id": "sql-ingest-decimal-mismatch",
+    "term": "Decimal Precision & Scale Mismatch Pitfalls",
+    "category": "SQL SERVER",
+    "difficulty": "MEDIUM",
+    "definition": "Incompatibilities between Spark/Parquet 128-bit decimal implementations and SQL relational decimal scale constraints.",
+    "explanation": "Parquet encodes decimal numbers using fixed-length byte arrays (4, 8, or 16 bytes depending on precision). PySpark frequently defaults to DECIMAL(38, 18) for arithmetic calculations. When a high-throughput SQL loading command (`COPY INTO` or PolyBase) attempts to insert this data into a SQL table column defined as DECIMAL(18, 2), relational engines encounter scale/precision overflow. In SQL Server/Synapse, if the integer component of the incoming number exceeds (TargetPrecision - TargetScale), the engine throws an unrecoverable arithmetic overflow error. Production pipelines must enforce explicit CAST transformations in upstream Silver layers prior to staging.",
+    "keyPoints": [
+      "Spark frequently defaults unconfigured floating-point calculations to DECIMAL(38, 18).",
+      "SQL target tables with tighter precision (e.g. DECIMAL(18, 2)) reject records where integer digits exceed (p - s).",
+      "Requires automated schema validation gates or explicit staging views with ROUND() and CAST() safeguards."
+    ]
+  },
+  {
+    "id": "sql-ingest-reject-limits",
+    "term": "Ingestion Rejection Limits & Error File Quarantining",
+    "category": "SQL SERVER",
+    "difficulty": "MEDIUM",
+    "definition": "Error tolerance thresholds and automated bad-record logging mechanisms in SQL bulk loading commands.",
+    "explanation": "When loading millions of records from open file formats into SQL tables, malformed records (unparseable dates, string overflow, corrupted delimiters) can abort multi-hour bulk loads. Commands like Synapse `COPY INTO` provide `MAXERRORS = <n>` and `ERRORFILE = '<path>'`. If `MAXERRORS` is set to 100, the loader tolerates up to 100 rejected rows, writing the offending rows and specific error reason codes into an external error directory in ADLS Gen2. If the threshold is exceeded, the entire transaction rolls back. Production best practices mandate setting MAXERRORS = 0 for financial ledgers, and MAXERRORS > 0 with downstream DLQ reconciliation for clickstream ingest.",
+    "keyPoints": [
+      "MAXERRORS specifies the maximum number of malformed rows allowed before the transaction aborts and rolls back.",
+      "ERRORFILE directs the SQL engine to write rejected rows and error diagnostic text files directly into cloud storage.",
+      "Provides an automated Dead Letter Queue (DLQ) pattern directly inside the database ingestion layer."
+    ]
+  },
+  {
+    "id": "lakehouse-delta-transaction-log",
+    "term": "Delta Lake ACID Transaction Log & Checkpointing",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "An ordered, append-only JSON log (_delta_log/) coupled with Parquet checkpoints that guarantees ACID isolation over raw cloud storage.",
+    "explanation": "Delta Lake transforms raw Parquet files into resilient relational tables by tracking all file modifications in a `_delta_log/` directory. Each atomic transaction writes a JSON commit file (e.g. `000000.json`, `000001.json`) detailing added files, removed files, schema updates, and commit metadata. Every 10 commits, Delta writes a Parquet checkpoint file that consolidates all prior transactions, preventing the query engine from having to replay thousands of JSON files. When a SQL engine queries a Delta table, it reconciles the transaction log to identify the exact active file set for snapshot isolation, preventing dirty reads of concurrent writes or deleted records.",
+    "keyPoints": [
+      "Append-only JSON commit files in _delta_log/ record exact file additions, removals, and schema changes atomically.",
+      "Every 10 commits, a multi-part Parquet checkpoint consolidates state for instant snapshot reconstruction.",
+      "Provides Serializable / WriteSerializable isolation on top of eventually consistent cloud object storage."
+    ]
+  },
+  {
+    "id": "lakehouse-iceberg-metadata-tree",
+    "term": "Apache Iceberg Hierarchical Metadata Tree",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "A 4-tier metadata hierarchy (Catalog -> Metadata JSON -> Manifest List -> Manifest Files) enabling partition evolution and snapshot isolation.",
+    "explanation": "Apache Iceberg manages open lakehouse tables through a decoupled metadata tree. At the root, the Iceberg Catalog stores the pointer to the current `metadata.json`. The `metadata.json` tracks table schemas, partition specs, and snapshots. Each snapshot points to a Manifest List (an Avro file) containing an array of Manifest Files. Each Manifest File tracks individual Parquet/ORC data files along with partition field values, row counts, and column-level upper/lower bounds. Because file statistics reside in the manifest layer, SQL engines can prune unneeded data files before reading storage, enabling hidden partitioning, partition spec evolution without rewriting data, and field-ID schema evolution.",
+    "keyPoints": [
+      "4-tier hierarchy: Catalog -> Metadata JSON -> Snapshot Manifest List (Avro) -> Manifest Files -> Data Files (Parquet).",
+      "Hidden partitioning: Users query by standard timestamp columns while Iceberg automatically prunes days/months under the hood.",
+      "Field ID mapping: Schema columns are tracked by unique numeric IDs, allowing seamless renames and reordering."
+    ]
+  },
+  {
+    "id": "open-format-small-file-syndrome",
+    "term": "Small File Syndrome in Data Lake Ingestion",
+    "category": "GENERAL DE",
+    "difficulty": "HARD",
+    "definition": "Performance degradation and storage throttling caused by millions of micro-batch files (under 10MB) flooding lakehouse directories.",
+    "explanation": "When streaming pipelines (Spark Structured Streaming, Kafka Connect, Flink) write records every few seconds to cloud storage, they generate millions of sub-megabyte Parquet or JSON files. This triggers severe architectural bottlenecks: (1) Object storage API limits: Each file requires an HTTPS GET request, TLS handshake, and metadata lookup, rapidly triggering AWS S3 / ADLS Gen2 503 SlowDown egress throttling. (2) Metadata explosion: SQL engines spend 90% of query execution time deserializing Parquet footers across 500,000 files rather than reading data. (3) Ingestion stalls: MPP loaders running COPY INTO crawl to single-digit MB/s throughput. Remediation requires automated bin-packing compaction (Delta OPTIMIZE, Iceberg rewrite_data_files) targeting 128MB-512MB file sizes.",
+    "keyPoints": [
+      "Caused by high-frequency streaming writes producing millions of sub-10MB files in lake storage.",
+      "Saturates cloud storage IOPS/TPS limits, inducing HTTP 503 SlowDown errors and network connection stalls.",
+      "Remediated via bin-packing compaction (target 128MB-512MB file size) using Delta OPTIMIZE or Iceberg compaction."
+    ]
+  },
+  {
+    "id": "sql-ingest-mpp-resource-classes",
+    "term": "Synapse MPP Resource Classes & Columnstore Compression RAM",
+    "category": "SQL SERVER",
+    "difficulty": "HARD",
+    "definition": "Workload management memory allocations required to prevent Clustered Columnstore row group spilling to TempDB during bulk loads.",
+    "explanation": "In Azure Synapse Dedicated SQL Pools, loading millions of rows into a Clustered Columnstore Index (CCI) requires substantial RAM on each distribution to dictionary-encode, sort, and compress 1,048,576 rows per rowgroup. By default, users belong to the `smallrc` resource class, which allocates only ~100MB of RAM per query on DWU1000c. When loading large Parquet files under `smallrc`, the engine runs out of memory, trims rowgroups prematurely to <100,000 rows, or spills dictionaries to TempDB, degrading load speed by 15x-20x. Assigning the loading user to `largerc`, `xlargerc`, or a dynamic Workload Management Group with 20%+ memory grant ensures optimal full 1M rowgroups without disk spilling.",
+    "keyPoints": [
+      "Default smallrc (~100MB RAM) starves columnstore encoders during large Parquet bulk ingestion.",
+      "Insufficient memory forces premature row group trimming (<100K rows) and massive TempDB spill latencies.",
+      "Production loaders must use largerc / xlargerc or staticrc60 to guarantee 1,048,576-row compressed rowgroups."
+    ]
+  },
+  {
+    "id": "sql-ingest-multiline-gzip-stall",
+    "term": "Non-Splittable Compression & Multiline Record Bottlenecks",
+    "category": "SQL SERVER",
+    "difficulty": "HARD",
+    "definition": "The serialization choke point where compressed text files cannot be split, forcing a distributed cluster down to a single core.",
+    "explanation": "In distributed SQL systems (Synapse, Spark, Snowflake), files are split across cores and distributions for parallel processing. GZIP, standard ZLIB, and multiline CSV files with embedded newlines enclosed in quotes are fundamentally non-splittable: a reader cannot seek to an arbitrary byte offset because it cannot determine whether a byte sequence represents a row delimiter or compressed payload. When a 20GB `.csv.gz` file is loaded via COPY INTO, only one single compute distribution can decompress and read the file from start to finish, leaving the other 59 distributions idle. Best practices mandate converting raw text to splittable Parquet/BZIP2 or generating multiple uncompressed chunked files upstream.",
+    "keyPoints": [
+      "GZIP and multiline quoted CSV files cannot be split at arbitrary byte boundaries across cluster nodes.",
+      "Forces MPP engines (Synapse 60 distributions) to serialize ingestion through a single worker core.",
+      "Upstream pipelines must produce native splittable formats (Parquet, ORC) or partitioned 100MB uncompressed files."
+    ]
+  },
+  {
+    "id": "sql-ingest-bom-header-corruption",
+    "term": "UTF-8 Byte Order Mark (BOM) & Header Alignment Corruption",
+    "category": "SQL SERVER",
+    "difficulty": "HARD",
+    "definition": "Hidden 3-byte prefixes (0xEF, 0xBB, 0xBF) in Windows-generated text files that break column 1 mapping in relational bulk loaders.",
+    "explanation": "When text files (CSV, TSV) are exported from Windows tools or legacy databases, they often prepend a 3-byte UTF-8 Byte Order Mark (BOM: `0xEF, 0xBB, 0xBF`) to the beginning of the stream. In strict distributed loaders (PolyBase, Synapse COPY INTO), the engine does not discard the BOM by default. Instead, it prepends the BOM bytes to the first column name in the header or the first field value of row 1. As a result, column mapping fails with 'Column [Field1] not found' (it sees `ï»¿Field1`), or row 1 fails type conversion to INT/DATE. Automated ingestion pipelines must include a pre-flight BOM detection and stripping step (via Python or ADF) before triggering SQL bulk copy.",
+    "keyPoints": [
+      "Hidden 3-byte prefix (0xEF, 0xBB, 0xBF) corrupts the first column identifier or first row data field.",
+      "Causes mysterious 'Column not found' errors in COPY INTO when resolving schema headers by name.",
+      "Requires automated pre-ingestion BOM stripping or configuring encoding explicitly (e.g. UTF-8 without BOM)."
+    ]
+  },
+  {
+    "id": "lakehouse-deletion-vectors-internals",
+    "term": "Delta Lake Deletion Vectors (Roaring Bitmaps)",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "A soft-delete storage optimization that tracks deleted rows via Roaring Bitmap files, avoiding full Parquet file rewrites.",
+    "explanation": "In traditional Copy-on-Write (COW) lakehouse tables, updating or deleting a single row in a 500MB Parquet file requires the engine to read the entire file, filter out the record, and write a brand new 500MB Parquet file (1000x write amplification). Delta Lake Deletion Vectors (DV) eliminate this write penalty. When a DELETE or MERGE operation executes, Delta writes a tiny auxiliary Deletion Vector file (using compact Roaring Bitmaps) recording the 0-indexed row positions that were modified. When SQL engines query the table, they read the original Parquet file and skip rows marked in the deletion vector in memory. Full file rewrites are deferred to scheduled background compaction jobs (`OPTIMIZE`).",
+    "keyPoints": [
+      "Soft-delete mechanism: Writes tiny Roaring Bitmap index files rather than rewriting entire 500MB Parquet files.",
+      "Reduces write amplification during SQL MERGE and DELETE operations by up to 99%.",
+      "Read-side penalty is minimal (sub-millisecond bitmap lookup in RAM); compacted during scheduled maintenance."
+    ]
+  },
+  {
+    "id": "sql-ingest-direct-lake-vertipaq",
+    "term": "Fabric Direct Lake Mode: Zero-ETL VertiPaq Paging",
+    "category": "SQL SERVER",
+    "difficulty": "ARCHITECT",
+    "definition": "A semantic layer breakthrough where Power BI's in-memory VertiPaq engine directly memory-maps Delta Parquet columns from OneLake.",
+    "explanation": "Direct Lake mode eliminates traditional ETL/ELT pipelines between the data lake and the relational data warehouse. In classic architectures, data is copied from raw lake storage, transformed, loaded into a relational SQL database, and then imported into an in-memory semantic model (Import Mode). In Fabric Direct Lake, the VertiPaq analytical engine bypasses the SQL relational layer entirely: it reads the columnar Delta Parquet files directly from OneLake storage, loading only the requested column chunks into RAM on demand. Delta Parquet files optimized with V-Order align perfectly with VertiPaq's internal memory structures, delivering the sub-second query performance of Import Mode with the instant data freshness of DirectQuery.",
+    "keyPoints": [
+      "Bypasses SQL relational staging entirely: VertiPaq memory-maps Delta Parquet files directly from OneLake.",
+      "Eliminates latency between data landing and reporting: Power BI reports reflect Spark/DLT commits immediately.",
+      "V-Order sorting applied at write time enables zero-recompression column paging straight into server RAM."
+    ]
+  },
+  {
+    "id": "sql-ingest-petabyte-staged-pipeline",
+    "term": "Petabyte-Scale Staged Ingestion & Partition Switching",
+    "category": "SQL SERVER",
+    "difficulty": "ARCHITECT",
+    "definition": "An enterprise MPP ingestion architecture utilizing unindexed round-robin heap staging, CTAS, and atomic partition metadata swaps.",
+    "explanation": "Loading tens of terabytes of Parquet data directly into a production Clustered Columnstore table creates severe table lock contention, index fragmentation, and high transaction log overhead. The enterprise architectural blueprint uses a 3-stage pipeline: (1) Parallel Ingest: `COPY INTO` streams raw Parquet files into a temporary Round-Robin HEAP staging table with zero indexes, maximizing raw I/O throughput. (2) Transformation & Compression: A `CREATE TABLE AS SELECT` (CTAS) builds an isolated interim Clustered Columnstore table partitioned identically to the target production table, utilizing large resource classes for maximum compression. (3) Metadata Switch: An `ALTER TABLE ... SWITCH PARTITION` command atomically swaps the interim partition into the production fact table in <100 milliseconds with zero user downtime.",
+    "keyPoints": [
+      "Stage 1: Load into unindexed Round-Robin Heap staging table via COPY INTO for maximum network throughput.",
+      "Stage 2: Materialize and compress into interim Clustered Columnstore table via CTAS with high memory grants.",
+      "Stage 3: Atomically switch partitions into production fact table (sub-100ms metadata pointer swap, zero locking)."
+    ]
+  },
+  {
+    "id": "open-format-catalog-federation",
+    "term": "Unified Lakehouse Catalog Federation & REST APIs",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "Decoupled catalog architecture enabling disparate query engines (Spark, Trino, Snowflake, Synapse) to share Iceberg/Delta tables via REST.",
+    "explanation": "In modern multi-cloud architectures, organizations avoid vendor lock-in by decoupling data storage from engine catalogs. The Apache Iceberg REST Catalog specification defines an open HTTP protocol for catalog operations (get-table, commit-transaction, rename-table). Engines like Snowflake, Databricks, AWS Athena, and Trino query and mutate the exact same underlying Parquet/Iceberg tables in ADLS Gen2 or S3 simultaneously. Conflict resolution is handled via optimistic concurrency control (OCC) at the catalog commit endpoint. This eliminates cross-platform data copying and ETL replication while enabling uniform Unity Catalog or Polaris governance across enterprise ecosystems.",
+    "keyPoints": [
+      "Standardized HTTP OpenAPI specification decoupling engine execution from metadata catalog storage.",
+      "Enables Snowflake, Databricks, Trino, and Fabric to read and write the exact same underlying Parquet files.",
+      "Optimistic Concurrency Control (OCC) at the catalog endpoint ensures atomic commits and snapshot integrity."
+    ]
   }
 ]

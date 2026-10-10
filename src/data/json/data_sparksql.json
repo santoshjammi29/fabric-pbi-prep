@@ -574,5 +574,50 @@
       "APPLY CHANGES INTO requires the target table to be a LIVE table (DLT-managed) — it cannot be used with regular Delta tables outside DLT"
     ],
     "use_case": "Real-time Core Banking CDC pipeline at a European challenger bank — Debezium captures every account attribute change from PostgreSQL Core Banking, APPLY CHANGES INTO processes 500K daily CDC events into SCD2, enabling the risk team to query a customer's exact risk classification at any point in time for MiFID II suitability back-testing."
+  },
+  {
+    "id": "sparksql-openformat-delta-copyinto",
+    "title": "Databricks SQL COPY INTO for Incremental File Ingestion",
+    "level": "intermediate",
+    "category": "Lakehouse Ingestion",
+    "description": "Production Databricks SQL COPY INTO pattern for idempotent, incremental file loading from cloud storage into Delta tables, featuring schema merging, validation, and file tracking.",
+    "code": "-- =====================================================================\n-- Databricks SQL: Idempotent Incremental Ingestion via COPY INTO\n-- Scenario: Incremental hourly ingestion of banking payment files\n-- =====================================================================\n\n-- 1. Create target Delta table with schema and table constraints\nCREATE TABLE IF NOT EXISTS eu_bfsi_prod.silver.payment_events (\n    payment_id          STRING          NOT NULL,\n    account_id          BIGINT          NOT NULL,\n    amount_eur          DECIMAL(18, 2)  NOT NULL,\n    counterparty_iban   STRING,\n    payment_timestamp   TIMESTAMP       NOT NULL,\n    payment_status      STRING          NOT NULL,\n    ingest_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP()\n)\nUSING DELTA\nTBLPROPERTIES (\n    'delta.autoOptimize.optimizeWrite' = 'true',\n    'delta.autoOptimize.autoCompact'   = 'true'\n);\n\n-- 2. Execute idempotent COPY INTO from ADLS Gen2 landing zone\n-- Automatically skips files previously loaded into this Delta table\nCOPY INTO eu_bfsi_prod.silver.payment_events\nFROM 'abfss://landing@eubfsidatalakeprod.dfs.core.windows.net/payments/incoming/'\nFILEFORMAT = PARQUET\nFORMAT_OPTIONS (\n    'mergeSchema' = 'false',              -- Prevent unexpected column expansion\n    'ignoreCorruptFiles' = 'false'        -- Abort immediately if corrupt file detected\n)\nCOPY_OPTIONS (\n    'force' = 'false'                     -- false = Idempotent (skip already-processed files)\n);\n\n-- 3. Check commit history and verified loaded files\nDESCRIBE HISTORY eu_bfsi_prod.silver.payment_events LIMIT 5;\n\n-- View number of added files and rows in latest commit\nSELECT \n    version,\n    timestamp,\n    operation,\n    operationMetrics.numTargetRowsInserted AS rows_inserted,\n    operationMetrics.numFilesAdded AS files_added\nFROM (DESCRIBE HISTORY eu_bfsi_prod.silver.payment_events)\nWHERE operation = 'COPY INTO'\nORDER BY version DESC\nLIMIT 1;",
+    "notes": [
+      "COPY INTO is completely idempotent when force = 'false' — safe to re-run on pipeline retries",
+      "Delta tracks loaded file paths and timestamps in _delta_log; no external checkpoint table needed",
+      "mergeSchema = 'false' enforces strict schema validation, rejecting unauthorized upstream schema changes",
+      "Ideal for low-complexity scheduled batch file ingestion (every 15-60 minutes)"
+    ],
+    "use_case": "Automated hourly financial payment file ingestion into an Azure Databricks Delta Lake Silver table, ensuring zero duplicate records even if upstream orchestrators retry failed runs."
+  },
+  {
+    "id": "sparksql-openformat-binpack-optimize",
+    "title": "Delta Lake File Compaction, Z-Order & Liquid Clustering",
+    "level": "advanced",
+    "category": "Performance Tuning",
+    "description": "Production optimization recipes for resolving Small File Syndrome in Delta Lake tables using OPTIMIZE bin-packing, multi-column Z-Ordering, and Liquid Clustering.",
+    "code": "-- =====================================================================\n-- Delta Lake Compaction & Clustering Engineering Blueprint\n-- =====================================================================\n\n-- 1. Inspect file distribution and detect Small File Syndrome\nDESCRIBE DETAIL eu_bfsi_prod.silver.payment_events;\n-- Check avg file size: (sizeInBytes / numFiles) < 67108864 (64MB) indicates compaction needed\n\n-- 2. Execute Bin-Packing OPTIMIZE on recent active partitions\n-- Consolidates thousands of 1MB-5MB files into uniform 256MB-512MB Parquet files\nOPTIMIZE eu_bfsi_prod.silver.payment_events\nWHERE payment_timestamp >= CURRENT_DATE() - INTERVAL 14 DAYS\nZORDER BY (account_id, payment_status);\n\n-- 3. Modern Alternative: Liquid Clustering (Databricks Runtime 13.3+)\n-- Eliminates rigid partition columns; clusters dynamically without data rewriting\n-- CREATE TABLE eu_bfsi_prod.gold.fact_transactions (\n--     transaction_id STRING,\n--     account_id BIGINT,\n--     txn_date DATE,\n--     amount DECIMAL(18,2)\n-- )\n-- USING DELTA\n-- CLUSTER BY (txn_date, account_id);\n\n-- Trigger incremental re-clustering on Liquid Clustered table\n-- OPTIMIZE eu_bfsi_prod.gold.fact_transactions;\n\n-- 4. Safely VACUUM expired historical files to reclaim object storage costs\n-- Default safety threshold is 7 days (168 hours)\nVACUUM eu_bfsi_prod.silver.payment_events RETAIN 168 HOURS;",
+    "notes": [
+      "OPTIMIZE bin-packs files to target size (default 1GB, or configured spark.databricks.delta.optimize.maxFileSize)",
+      "Z-Order colocates multidimensional data points, maximizing column min/max statistics skipping",
+      "Liquid Clustering replaces static partitioning and Z-Order, allowing clustering keys to be changed on-the-fly",
+      "VACUUM deletes physically tombstoned files from ADLS Gen2, freeing up cloud storage expenses"
+    ],
+    "use_case": "Weekly maintenance runbook for a Tier-1 retail banking lakehouse, reducing query scan time by 80% and saving $4,000/month in cloud object storage overhead."
+  },
+  {
+    "id": "sparksql-openformat-jdbc-synapse-bulk",
+    "title": "PySpark High-Throughput Bulk Write to Synapse SQL Pool",
+    "level": "advanced",
+    "category": "Engine Interoperability",
+    "description": "High-speed parallel bulk export from PySpark DataFrames directly into Azure Synapse Dedicated SQL Pools using the Synapse Spark-to-SQL connector and ADLS Gen2 staging.",
+    "code": "# =====================================================================\n# PySpark: High-Throughput Bulk Copy to Synapse Dedicated SQL Pool\n# Scenario: Exporting 20M curated risk scoring records to Synapse\n# =====================================================================\n\nfrom pyspark.sql import functions as F\n\n# 1. Prepare curated DataFrame with strict SQL data types\ndf_curated = spark.table('eu_bfsi_prod.gold.daily_credit_risk_scores') \\\n    .select(\n        F.col('assessment_id').cast('string'),\n        F.col('account_id').cast('bigint'),\n        F.col('risk_score').cast('decimal(5,2)'),\n        F.col('regulatory_tier').cast('string'),\n        F.col('calculated_date').cast('date')\n    )\n\n# 2. Configure Synapse Dedicated SQL Pool connection parameters\nsynapse_server   = 'eubfsisynapseprod.sql.azuresynapse.net'\nsynapse_database = 'DedicatedPool01'\nsynapse_table    = 'dbo.FactCreditRiskScores'\n\n# Staging storage account in ADLS Gen2 for intermediate PolyBase / COPY INTO transfer\ntemp_storage_dir = 'abfss://synapsestaging@eubfsidatalakeprod.dfs.core.windows.net/staging_txns'\n\n# 3. Write DataFrame to Synapse using Azure Synapse Apache Spark to Synapse SQL connector\n# In Databricks or Synapse Spark, this utilizes high-speed distributed COPY INTO under the hood\ndf_curated.write \\\n    .format('com.microsoft.sqlserver.jdbc.spark') \\\n    .mode('append') \\\n    .option('url', f'jdbc:sqlserver://{synapse_server}:1433;database={synapse_database}') \\\n    .option('dbtable', synapse_table) \\\n    .option('user', 'IngestServicePrincipal') \\\n    .option('password', dbutils.secrets.get(scope='azure-key-vault', key='synapse-sql-pwd')) \\\n    .option('tempDir', temp_storage_dir) \\\n    .option('forwardSparkAzureStorageCredentials', 'true') \\\n    .option('bulkCopyTableLock', 'true') \\\n    .option('bulkCopyBatchSize', '100000') \\\n    .save()\n\nprint('Successfully staged and loaded curated DataFrame into Synapse Dedicated Pool.')",
+    "notes": [
+      "Connector writes PySpark partitions to ADLS Gen2 tempDir, then dispatches COPY INTO to Synapse in parallel",
+      "bulkCopyTableLock = true significantly accelerates throughput by minimizing SQL transaction lock escalation",
+      "bulkCopyBatchSize = 100000 balances executor memory buffers with network packet transmission",
+      "Avoids single-threaded JDBC driver bottlenecks by executing distributed parallel loading across MPP nodes"
+    ],
+    "use_case": "End-of-day risk reporting pipeline in Azure Databricks exporting multi-gigabyte risk scoring aggregates into Azure Synapse Dedicated SQL Pools for executive Power BI dashboards."
   }
 ]

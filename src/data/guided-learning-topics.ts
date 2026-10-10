@@ -171,10 +171,10 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     archKeywords: ['LAKEHOUSE', 'DATA MESH', 'MODELING', 'ARCHITECTURE', 'DATA VAULT'],
     deKeywords: ['DATA ENGINEERING', 'GOVERNANCE'],
     stages: {
-      foundations: 'Object storage fundamentals (ADLS/S3), Parquet columnar layout, and raw zone landing patterns.',
-      core: 'Medallion progression: Bronze schema validation, Silver deduplication/enrichment, Gold aggregation.',
-      advanced: 'Open table format comparison (Delta Lake vs Apache Iceberg vs Apache Hudi), ACID isolation levels, and vacuum/compaction.',
-      architect: 'Decentralized Data Mesh domain boundaries, data product contracts, cross-cloud lakehouse federation, and Disaster Recovery.'
+      foundations: 'Object storage fundamentals (ADLS/S3), Parquet & ORC columnar anatomy, Avro binary serialization, and raw landing patterns.',
+      core: 'Medallion progression, schema evolution, small-file compaction, Delta transaction logs, and Iceberg metadata trees.',
+      advanced: 'Open table format comparison (Delta Lake vs Apache Iceberg vs Apache Hudi), Deletion Vectors (Roaring Bitmaps), ACID isolation, and Z-Order.',
+      architect: 'Decentralized Data Mesh, cross-cloud lakehouse federation (Iceberg REST catalog), petabyte bin-packing, and Disaster Recovery.'
     }
   },
   {
@@ -213,10 +213,10 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     archKeywords: ['SQL', 'MPP', 'MASSIVE PARALLEL PROCESSING', 'DATABASE ARCHITECTURE', 'MODERN DATABASE ARCHITECTURE'],
     deKeywords: ['DATABASES & SQL'],
     stages: {
-      foundations: 'Relational algebra, SELECT processing phases, 3VL truth tables, JOIN varieties (Nested Loops, Hash, Merge), and B-Tree index seeks.',
-      core: 'Execution plan analysis, index seek vs scan, parameter sniffing, transactions (ACID), lock escalation, keyset pagination, and window frames (ROWS vs RANGE).',
-      advanced: 'MVCC garbage collection, write skew in Snapshot Isolation, SSI retry loops, partial indexes, and sargability query rewrites.',
-      architect: 'Volcano vs Vectorized SIMD, Worst-Case Optimal Joins (WCOJ), XTID wraparound emergency, database cracking, and kernel writeback durability.'
+      foundations: 'Relational algebra, SELECT processing phases, 3VL truth tables, JOIN varieties, and bulk data loading primitives (COPY INTO, PolyBase, OPENROWSET).',
+      core: 'Execution plan analysis, index seek vs scan, parameter sniffing, columnstore compression, and Parquet/ORC schema mapping.',
+      advanced: 'MVCC garbage collection, MPP resource classes (smallrc vs xlargerc), decimal precision alignment, and TempDB spill mitigation.',
+      architect: 'Volcano vs Vectorized SIMD, 100TB staged ingestion with atomic partition switching, Direct Lake zero-ETL memory paging, and storage IOPS governors.'
     }
   },
   {
