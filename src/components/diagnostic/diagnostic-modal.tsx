@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { m, AnimatePresence } from "framer-motion";
+import { m } from "framer-motion";
 import {
   Sparkles,
   CheckCircle2,
@@ -11,7 +11,6 @@ import {
   ChevronRight,
   GraduationCap,
   Award,
-  Zap,
   RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";

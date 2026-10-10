@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ListTree, Zap, Sliders, Clock, Bug, Database, ShieldCheck, ChevronRight, AlertOctagon, Flame, ShieldAlert } from "lucide-react";
+import { ListTree, Zap, Sliders, Clock, Bug, Database, ShieldCheck, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CheatCodeCategory } from "@/types/data";
 

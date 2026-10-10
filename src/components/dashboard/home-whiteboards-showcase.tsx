@@ -14,7 +14,6 @@ import {
   Sparkles,
   ArrowRight,
   ExternalLink,
-  Layers,
   Shuffle,
   Compass,
   CheckCircle2,
@@ -22,7 +21,6 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { architectureDiagrams, ArchitectureDiagramItem } from "@/data/diagrams";
-import { GUIDED_TOPICS } from "@/data/guided-learning-topics";
 
 // Map diagrams to guided learning topics for deep-linking
 const DIAGRAM_TO_TOPIC: Record<string, { topicKey: string; topicName: string }> = {

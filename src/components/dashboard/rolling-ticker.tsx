@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Shuffle } from "lucide-react";
 import { toast } from "sonner";
@@ -90,7 +90,7 @@ function sampleItems<T>(arr: T[], count: number, rng?: () => number): T[] {
 }
 
 /* ─── Shuffle array with optional RNG ───────────────────────────────── */
-function shuffleArray<T>(arr: T[], rng?: () => number): T[] {
+function _shuffleArray<T>(arr: T[], rng?: () => number): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const r = rng ? rng() : Math.random();

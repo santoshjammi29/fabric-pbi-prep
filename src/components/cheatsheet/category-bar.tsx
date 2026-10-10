@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Search, X, Sparkles, Filter, Check, Flame, ShieldAlert, Cpu, Database, RefreshCw, Zap } from "lucide-react";
+import { Search, X, Filter, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { CheatCodeCategory, CheatCodeImpact } from "@/types/data";
+import type { CheatCodeCategory } from "@/types/data";
 
 export interface EmergencyScenario {
   id: string;

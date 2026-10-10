@@ -2,14 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { m, AnimatePresence } from "framer-motion";
+import { m } from "framer-motion";
 import {
   Sparkles,
   ArrowRight,
   GraduationCap,
   Award,
-  Layers,
-  CheckCircle2,
   Compass,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,11 +23,9 @@ export function ExperienceLevelSwitcher() {
   const activeTier = useUserStore((s) => s.experienceTier);
   const setExperienceTier = useUserStore((s) => s.setExperienceTier);
   const diagnosticScore = useUserStore((s) => s.diagnosticScore);
-  const [mounted, setMounted] = useState(false);
   const [showDiagnostic, setShowDiagnostic] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tierParam = params.get("tier");
@@ -55,7 +51,7 @@ export function ExperienceLevelSwitcher() {
     if (stored && stored !== activeTier) {
       setExperienceTier(stored);
     }
-  }, []);
+  }, [activeTier, setExperienceTier]);
 
   const handleSelectTier = (tierKey: ExperienceTier) => {
     setExperienceTier(tierKey);

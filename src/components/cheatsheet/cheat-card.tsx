@@ -11,13 +11,11 @@ import {
   AlertTriangle,
   Flame,
   Check,
-  Copy,
   Sparkles,
   ChevronDown,
   ChevronUp,
   Tag,
   Share2,
-  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";

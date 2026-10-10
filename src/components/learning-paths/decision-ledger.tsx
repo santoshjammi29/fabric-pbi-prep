@@ -1,20 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { m, AnimatePresence } from "framer-motion";
 import {
   GitCommit,
   CheckCircle2,
   FileText,
   Copy,
   Check,
-  Sparkles,
   Layers,
-  ArrowRight,
   ShieldAlert,
-  Server,
-  Database,
-  Cpu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";

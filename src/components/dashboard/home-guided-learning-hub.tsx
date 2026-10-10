@@ -3,18 +3,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Compass,
   ArrowRight,
-  BookOpen,
   Workflow,
-  Sparkles,
   Shuffle,
-  CheckCircle2,
-  Clock,
-  Layers,
-  ChevronRight,
-  Award,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -60,13 +54,15 @@ export function HomeGuidedLearningHub() {
     return GUIDED_TOPICS.filter((t) => t.domain === selectedDomain);
   }, [selectedDomain]);
 
-  // Daily trending track of the day
-  const trendingTrack = useMemo(() => {
-    // Deterministic daily track
+  const router = useRouter();
+  const [trendingTrack, setTrendingTrack] = useState<GuidedTopic>(GUIDED_TOPICS[0]);
+
+  // Deterministic daily track calculated after mount to avoid render impurity
+  useEffect(() => {
     const dayOfYear = Math.floor(
       (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
     );
-    return GUIDED_TOPICS[dayOfYear % GUIDED_TOPICS.length];
+    setTrendingTrack(GUIDED_TOPICS[dayOfYear % GUIDED_TOPICS.length]);
   }, []);
 
   const handleRandomTrack = useCallback(() => {
@@ -75,9 +71,9 @@ export function HomeGuidedLearningHub() {
     toast.info(`Random Track Pick: ${rand.label}!`);
     setTimeout(() => {
       setIsShuffling(false);
-      window.location.href = `/guided-learning?topic=${rand.key}`;
+      router.push(`/guided-learning?topic=${rand.key}`);
     }, 400);
-  }, []);
+  }, [router]);
 
   return (
     <section className="space-y-5">

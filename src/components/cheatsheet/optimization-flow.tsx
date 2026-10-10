@@ -9,10 +9,8 @@ import {
   Zap,
   Flame,
   ChevronRight,
-  Info,
   CheckCircle2,
   Sparkles,
-  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
