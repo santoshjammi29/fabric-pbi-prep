@@ -204,19 +204,19 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     icon: '🗄️',
     domain: 'Data Modeling & SQL',
     gradient: 'from-emerald-500 to-teal-600',
-    description: 'T-SQL internals, query execution plans, columnstore indexing & MPP',
-    executiveSummary: 'Deep-dive into SQL query optimization: reading execution plans, B-Tree vs Clustered Columnstore indexes, tempdb spill mitigation, window functions, and distributed MPP hash/round-robin distributions.',
+    description: 'T-SQL internals, query execution plans, MVCC, storage engines & relational theory',
+    executiveSummary: 'Deep-dive into SQL & database systems: B-Tree leaf traversal, Volcano vs Vectorized SIMD execution, SSI isolation & Write Skew, MVCC autovacuum freeze & XTID wraparound, WCOJ graph joins, and deep relational algebra.',
     diagramId: 'sql-server-query-engine-optimization',
     relatedDiagramIds: ['kimball-dimensional-star-schema'],
-    conceptCategories: ['SQL SERVER'],
-    questionCategories: ['SQL SERVER'],
-    archKeywords: ['SQL', 'MPP', 'MASSIVE PARALLEL PROCESSING'],
+    conceptCategories: ['SQL SERVER', 'DATABASE ARCHITECTURE'],
+    questionCategories: ['SQL SERVER', 'MODERN DATABASE ARCHITECTURE', 'DATABASE ARCHITECTURE'],
+    archKeywords: ['SQL', 'MPP', 'MASSIVE PARALLEL PROCESSING', 'DATABASE ARCHITECTURE', 'MODERN DATABASE ARCHITECTURE'],
     deKeywords: ['DATABASES & SQL'],
     stages: {
-      foundations: 'Relational algebra, SELECT processing phases, JOIN varieties (Nested Loops, Hash Match, Merge Join), and basic DDL/DML.',
-      core: 'Execution plan analysis, index seek vs scan, parameter sniffing, transactions (ACID), and lock escalation.',
-      advanced: 'Non-clustered Columnstore indexes, memory grant exhaustion, tempdb contention, and advanced analytical window framing.',
-      architect: 'Distributed MPP table distribution (Hash vs Round-Robin vs Replicated), partition elimination, and distributed deadlock resolution.'
+      foundations: 'Relational algebra, SELECT processing phases, 3VL truth tables, JOIN varieties (Nested Loops, Hash, Merge), and B-Tree index seeks.',
+      core: 'Execution plan analysis, index seek vs scan, parameter sniffing, transactions (ACID), lock escalation, keyset pagination, and window frames (ROWS vs RANGE).',
+      advanced: 'MVCC garbage collection, write skew in Snapshot Isolation, SSI retry loops, partial indexes, and sargability query rewrites.',
+      architect: 'Volcano vs Vectorized SIMD, Worst-Case Optimal Joins (WCOJ), XTID wraparound emergency, database cracking, and kernel writeback durability.'
     }
   },
   {

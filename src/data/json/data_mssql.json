@@ -418,5 +418,61 @@
       "Schema version table (DbUp/Flyway pattern) tracks migrations — integrate with ADF CI/CD YAML pipeline"
     ],
     "use_case": "Adding risk_score column to the 100M-row fact_transactions table on Azure SQL at TCS EU BFSI with zero downtime — maintaining 99.9% SLA while migrating the schema across 5 concurrent engineering squads."
+  },
+  {
+    "id": "sql-iceberg-cs-01",
+    "title": "Keyset Pagination (Seek Method) over Massive Datasets",
+    "level": "expert",
+    "category": "Advanced T-SQL",
+    "description": "High-performance keyset pagination pattern replacing OFFSET-FETCH with B-Tree composite index seeks, delivering O(log N) latency regardless of page depth.",
+    "code": "-- Keyset Pagination (Seek Method)\n-- Eliminates linear O(N) OFFSET scanning penalties\n-- Supporting Index: CREATE INDEX idx_orders_seek ON dbo.orders (order_date DESC, order_id DESC) INCLUDE (total_amount, customer_id);\n\nDECLARE @last_seen_date DATETIME2 = '2026-10-10 08:30:00';\nDECLARE @last_seen_id BIGINT = 9845210;\nDECLARE @page_size INT = 25;\n\n-- Direct B-Tree Seek Query\nSELECT TOP (@page_size)\n    o.order_id,\n    o.customer_id,\n    o.order_date,\n    o.total_amount\nFROM dbo.orders o\nWHERE \n    (o.order_date < @last_seen_date)\n    OR (o.order_date = @last_seen_date AND o.order_id < @last_seen_id)\nORDER BY \n    o.order_date DESC, \n    o.order_id DESC;\n\n-- Note: Bypasses scanning preceding 500,000 rows, executing in <2ms!",
+    "notes": [
+      "Replaces OFFSET N with index seeks based on the previous page's tie-breaker key",
+      "Maintains constant O(log N + K) latency regardless of whether querying page 1 or page 50,000",
+      "Completely immune to page drift caused by concurrent insertions"
+    ],
+    "use_case": "Deep API pagination, infinite scrolling feeds, and high-throughput real-time mobile order history retrieval."
+  },
+  {
+    "id": "sql-iceberg-cs-02",
+    "title": "Top-N Per Group via CROSS APPLY / LATERAL Iterator",
+    "level": "advanced",
+    "category": "Analytical Functions",
+    "description": "Correlated inline iterator pattern utilizing CROSS APPLY to fetch the Top-N records per category with targeted index seeks instead of full-table window scans.",
+    "code": "-- Top-3 Recent Transactions per Customer\n-- Supporting Index: CREATE INDEX idx_cust_txn ON dbo.transactions (customer_id, transaction_date DESC) INCLUDE (amount, status);\n\nSELECT \n    c.customer_id,\n    c.customer_name,\n    t.transaction_id,\n    t.transaction_date,\n    t.amount,\n    t.status\nFROM dbo.dim_customers c\nCROSS APPLY (\n    -- Evaluated iteratively per customer using targeted B-Tree seeks\n    SELECT TOP 3\n        tx.transaction_id,\n        tx.transaction_date,\n        tx.amount,\n        tx.status\n    FROM dbo.transactions tx\n    WHERE tx.customer_id = c.customer_id\n    ORDER BY tx.transaction_date DESC\n) t;\n\n-- Use OUTER APPLY to preserve customers who have 0 transactions!",
+    "notes": [
+      "Reads exactly 3 leaf rows per customer instead of scanning millions of rows",
+      "Bypasses full-table Sort/Segment operators required by ROW_NUMBER() window functions",
+      "OUTER APPLY functions identically to LEFT JOIN LATERAL in PostgreSQL"
+    ],
+    "use_case": "Customer 360 profiling, recent order previews in e-commerce portals, and top fraud alerts per merchant."
+  },
+  {
+    "id": "sql-iceberg-cs-03",
+    "title": "High-Throughput Queue Processing via READPAST & UPDLOCK",
+    "level": "expert",
+    "category": "Advanced T-SQL",
+    "description": "Lock-free concurrent worker queue polling in T-SQL using UPDLOCK and READPAST (the SQL Server equivalent of SELECT FOR UPDATE SKIP LOCKED).",
+    "code": "-- High-Throughput Concurrent Queue Consumer (50+ Workers)\n-- Supporting Index: CREATE INDEX idx_jobs_pending ON dbo.task_queue (priority DESC, job_id ASC) WHERE status = 'PENDING';\n\nBEGIN TRANSACTION;\n\nWITH NextJob AS (\n    SELECT TOP (1)\n        job_id,\n        payload,\n        status\n    FROM dbo.task_queue WITH (UPDLOCK, READPAST) -- Equivalent to SKIP LOCKED!\n    WHERE status = 'PENDING'\n    ORDER BY priority DESC, job_id ASC\n)\nUPDATE NextJob\nSET \n    status = 'PROCESSING',\n    locked_by = HOST_NAME(),\n    locked_at = SYSUTCDATETIME()\nOUTPUT \n    inserted.job_id,\n    inserted.payload;\n\nCOMMIT TRANSACTION;",
+    "notes": [
+      "UPDLOCK acquires update locks during the read phase to prevent race conditions",
+      "READPAST instructs the engine to silently skip rows locked by other concurrent sessions",
+      "Enables horizontal scaling across hundreds of worker nodes without lock contention or deadlocks"
+    ],
+    "use_case": "Transactional background task processing, event dispatchers, and reliable message queuing inside SQL Server."
+  },
+  {
+    "id": "sql-iceberg-cs-04",
+    "title": "Multidimensional Aggregation with GROUPING SETS & ROLLUP",
+    "level": "advanced",
+    "category": "Aggregation",
+    "description": "Computing multi-level hierarchical sub-totals and cross-tabulations in a single physical data scan using GROUPING SETS and ROLLUP.",
+    "code": "-- Single-Pass Financial Revenue Rollup\n-- Hierarchy: Year -> Quarter -> Region -> Channel -> Total\n\nSELECT\n    CASE \n        WHEN GROUPING(r.region_name) = 1 THEN 'All Regions' \n        ELSE r.region_name \n    END AS region,\n    CASE \n        WHEN GROUPING(d.fiscal_year) = 1 THEN 'All Years' \n        ELSE CAST(d.fiscal_year AS VARCHAR(10)) \n    END AS fiscal_year,\n    CASE \n        WHEN GROUPING(c.channel_name) = 1 THEN 'All Channels' \n        ELSE c.channel_name \n    END AS sales_channel,\n    SUM(f.gross_revenue) AS total_gross_revenue,\n    SUM(f.net_revenue) AS total_net_revenue,\n    GROUPING_ID(r.region_name, d.fiscal_year, c.channel_name) AS aggregation_level_bitmap\nFROM dbo.fact_sales f\nINNER JOIN dbo.dim_date d ON f.date_key = d.date_key\nINNER JOIN dbo.dim_regions r ON f.region_key = r.region_key\nINNER JOIN dbo.dim_channels c ON f.channel_key = c.channel_key\nGROUP BY ROLLUP (\n    r.region_name,\n    d.fiscal_year,\n    c.channel_name\n)\nORDER BY \n    r.region_name, \n    d.fiscal_year, \n    c.channel_name;",
+    "notes": [
+      "ROLLUP generates hierarchical sub-totals in a single physical pass over source fact tables",
+      "GROUPING() detects whether a column is collapsed into a sub-total or represents a detail row",
+      "GROUPING_ID() emits an integer bitmask identifying the exact dimensional grouping level"
+    ],
+    "use_case": "Executive financial reporting, matrix balance sheets, and fast pre-aggregation for OLAP cubes."
   }
 ]
