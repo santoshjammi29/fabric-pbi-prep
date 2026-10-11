@@ -111,6 +111,25 @@ describe("HubSubnav & E-Ink Accessibility Suite", () => {
       const pre = container.querySelector("pre.code-block");
       expect(pre).toBeTruthy();
     });
+
+    it("wraps code lines by default across all pages", () => {
+      const { container } = render(
+        <CodeBlock
+          code="df.with_columns(pl.col('sales').sum().over('region')).filter(pl.col('amount') > 1000)"
+          language="python"
+        />
+      );
+
+      const pre = container.querySelector("pre.code-block");
+      expect(pre).toBeTruthy();
+      expect(pre?.className).toContain("whitespace-pre-wrap");
+      expect(pre?.className).toContain("break-words");
+
+      const lineSpan = container.querySelector(".group\\/line span.flex-1");
+      expect(lineSpan).toBeTruthy();
+      expect(lineSpan?.className).toContain("whitespace-pre-wrap");
+      expect(lineSpan?.className).toContain("min-w-0");
+    });
   });
 
   describe("E-Ink CSS High Contrast Verification", () => {

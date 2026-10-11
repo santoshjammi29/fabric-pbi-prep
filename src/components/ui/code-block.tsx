@@ -29,6 +29,7 @@ export interface CodeBlockProps {
   className?: string;
   badge?: string;
   allowEdit?: boolean;
+  defaultWrap?: boolean;
 }
 
 interface LineToken {
@@ -191,12 +192,13 @@ export function CodeBlock({
   className,
   badge,
   allowEdit = true,
+  defaultWrap = true,
 }: CodeBlockProps) {
   const initialCode = useMemo(() => (code || "").trim(), [code]);
   const [activeCode, setActiveCode] = useState<string>(initialCode);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
-  const [isWrap, setIsWrap] = useState(false);
+  const [isWrap, setIsWrap] = useState(defaultWrap);
   const [lineNumbersEnabled, setLineNumbersEnabled] = useState(showLineNumbers);
   const [fontSize, setFontSize] = useState<FontSize>("normal");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -461,9 +463,9 @@ export function CodeBlock({
         ) : (
           <pre
             className={cn(
-              "code-block m-0 p-2.5 sm:p-3 font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
+              "code-block m-0 p-2.5 sm:p-3 font-mono tracking-normal text-slate-200 bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
               fontSizeClasses,
-              isWrap && "whitespace-pre-wrap break-words"
+              isWrap ? "whitespace-pre-wrap break-words overflow-x-hidden" : "whitespace-pre overflow-x-auto"
             )}
             style={{
               fontFamily:
@@ -485,7 +487,7 @@ export function CodeBlock({
                       {idx + 1}
                     </span>
                   )}
-                  <span className="flex-1">
+                  <span className={cn("flex-1 min-w-0", isWrap && "break-words whitespace-pre-wrap")}>
                     {tokens.map((t, ti) => {
                       const tokenClass = tokenClasses[t.type] || tokenClasses.text;
                       return (

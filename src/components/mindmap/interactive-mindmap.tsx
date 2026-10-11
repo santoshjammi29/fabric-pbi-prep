@@ -1384,7 +1384,7 @@ export function InteractiveMindmap() {
                                 <span>{hasCopied ? "Copied" : "Copy"}</span>
                               </button>
                             </div>
-                            <pre className="p-3.5 rounded-xl bg-black/70 border border-[var(--border)] text-[11px] font-mono text-cyan-300 overflow-x-auto leading-relaxed">
+                            <pre className="p-3.5 rounded-xl bg-black/70 border border-[var(--border)] text-[11px] font-mono text-cyan-300 whitespace-pre-wrap break-words leading-relaxed">
                               <code>{selectedSubtopic.codeSnippet}</code>
                             </pre>
                           </div>
