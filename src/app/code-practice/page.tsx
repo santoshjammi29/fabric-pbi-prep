@@ -28,34 +28,35 @@ import { CodeSheetItem, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { recordLastTopic } from "@/lib/user-progress";
+import { TopicIcon } from "@/components/ui/topic-icon";
 
 type LanguageKey = "pyspark" | "sparksql" | "mssql" | "python";
 
 const languageConfigs: Record<
   LanguageKey,
-  { name: string; icon: string; data: CodeSheetItem[]; badgeColor: string }
+  { name: string; topicKey: string; data: CodeSheetItem[]; badgeColor: string }
 > = {
   pyspark: {
     name: "PySpark 3.4+ / 4.0",
-    icon: "🐍",
+    topicKey: "spark",
     data: pysparkData,
     badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   },
   sparksql: {
     name: "Spark SQL & Unity",
-    icon: "⚡",
+    topicKey: "sql",
     data: sparksqlData,
     badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   },
   mssql: {
     name: "MS SQL / T-SQL",
-    icon: "🗄️",
+    topicKey: "mssql",
     data: mssqlData,
     badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
   },
   python: {
     name: "Python (Pandas & Polars)",
-    icon: "🐼",
+    topicKey: "python",
     data: pythonData,
     badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
   },
@@ -263,7 +264,7 @@ export default function CodePracticePage() {
   }, [filteredItems, isShuffled, shuffleSeed]);
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
         hubTitle="Code & Runbooks"
         items={[
@@ -276,37 +277,37 @@ export default function CodePracticePage() {
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
-              <FileCode2 size={14} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
+              <FileCode2 size={13} />
               <span>Step 2 · Polyglot Engineering</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
               Hands-On Code Practice &amp; Syntaxes
             </h1>
-            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
               Production-grade code patterns across 4 core languages. Optimized for window functions,
               incremental merges, vector operations, and low-latency analytics.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 shrink-0 text-center">
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-2xl font-bold text-blue-400">128+</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Templates</div>
+          <div className="grid grid-cols-2 gap-2 shrink-0 text-center">
+            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-xl font-bold text-blue-400">128+</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">Templates</div>
             </div>
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-2xl font-bold text-purple-400">4</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Languages</div>
+            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-xl font-bold text-purple-400">4</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">Languages</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Language Selector Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         {(Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
           const cfg = languageConfigs[key];
           const isSelected = activeLang === key;
@@ -315,13 +316,13 @@ export default function CodePracticePage() {
               key={key}
               onClick={() => handleLangChange(key)}
               className={cn(
-                "flex items-center gap-3 p-3.5 rounded-2xl border transition-all text-left group",
+                "flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border transition-all text-left group",
                 isSelected
-                  ? "bg-purple-600/15 border-purple-500/50 shadow-lg"
+                  ? "bg-purple-600/15 border-purple-500/50 shadow-sm"
                   : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)]"
               )}
             >
-              <span className="text-2xl group-hover:scale-110 transition-transform">{cfg.icon}</span>
+              <TopicIcon topic={cfg.topicKey} size={22} className="group-hover:scale-110 transition-transform shrink-0" />
               <div className="min-w-0 flex-1">
                 <div
                   className={cn(
@@ -341,13 +342,13 @@ export default function CodePracticePage() {
       </div>
 
       {/* 4-Layer Integrated Domain Navigation */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
         <Link
           href={`/concepts?term=${activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark"}`}
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-            <BookOpen size={16} />
+          <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <BookOpen size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
@@ -357,9 +358,9 @@ export default function CodePracticePage() {
           </div>
         </Link>
 
-        <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 font-bold">
-            <FileCode2 size={16} />
+        <div className="p-2.5 sm:p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 font-bold">
+            <FileCode2 size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Active</div>
@@ -371,10 +372,10 @@ export default function CodePracticePage() {
 
         <Link
           href={`/qa-prep?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark")}`}
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
-            <MessageSquare size={16} />
+          <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
@@ -386,10 +387,10 @@ export default function CodePracticePage() {
 
         <Link
           href={`/architecture?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : "Spark")}`}
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-3 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-            <Layers size={16} />
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
@@ -401,23 +402,23 @@ export default function CodePracticePage() {
       </div>
 
       {/* Search & Level Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <div className="relative flex-1">
           <Search
-            size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
           />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
-            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)]"
             >
               Clear
             </button>
@@ -425,15 +426,15 @@ export default function CodePracticePage() {
         </div>
 
         {/* Level Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
           {["ALL", "beginner", "intermediate", "advanced", "architect"].map((lvl) => (
             <button
               key={lvl}
               onClick={() => setSelectedLevel(lvl)}
               className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 capitalize",
+                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize",
                 selectedLevel === lvl
-                  ? "bg-purple-600 text-white shadow-md font-semibold"
+                  ? "bg-purple-600 text-white shadow-sm font-semibold"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
               )}
             >
@@ -519,7 +520,7 @@ export default function CodePracticePage() {
                 key={item.id}
                 id={`code-${item.id}`}
                 className={cn(
-                  "rounded-2xl border transition-all duration-200 overflow-hidden",
+                  "rounded-xl border transition-all duration-200 overflow-hidden",
                   isExpanded
                     ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -528,7 +529,7 @@ export default function CodePracticePage() {
                 {/* Header */}
                 <div
                   onClick={() => toggleExpand(item.id)}
-                  className="p-5 cursor-pointer select-none space-y-2"
+                  className="p-3.5 sm:p-4 cursor-pointer select-none space-y-1.5"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1 min-w-0">
@@ -547,7 +548,7 @@ export default function CodePracticePage() {
                           {item.level}
                         </span>
                       </div>
-                      <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight">
+                      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight">
                         {item.title}
                       </h3>
                     </div>
@@ -556,31 +557,31 @@ export default function CodePracticePage() {
                       <button
                         onClick={(e) => toggleBookmark(item.id, e)}
                         className={cn(
-                          "p-2 rounded-xl transition-colors",
+                          "p-1.5 rounded-lg transition-colors",
                           isBookmarked
                             ? "text-amber-400 bg-amber-400/10"
                             : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                         )}
                         title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                       >
-                        {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                        {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
                       </button>
 
                       <button
                         onClick={(e) => copyCode(item.code, item.id, e)}
-                        className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
                         title="Copy Code"
                       >
                         {copiedId === item.id ? (
-                          <Check size={16} className="text-green-400" />
+                          <Check size={15} className="text-green-400" />
                         ) : (
-                          <Copy size={16} />
+                          <Copy size={15} />
                         )}
                       </button>
 
-                      <div className="p-2 text-[var(--muted-foreground)]">
+                      <div className="p-1.5 text-[var(--muted-foreground)]">
                         <ChevronDown
-                          size={16}
+                          size={15}
                           className={cn(
                             "transition-transform duration-300",
                             isExpanded && "rotate-180 text-purple-400"
@@ -590,13 +591,13 @@ export default function CodePracticePage() {
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
                 {/* Expanded Code & Notes Body */}
-                <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                <SmoothAccordion isOpen={isExpanded} innerClassName="p-3.5 sm:p-4 pt-0 space-y-3 text-xs sm:text-sm">
                   {/* Use Case Scenario */}
                   {item.use_case && (
                     <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2.5">

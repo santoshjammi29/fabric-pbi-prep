@@ -1,7 +1,20 @@
 "use client";
 
 import React from "react";
-import { ListTree, Zap, Sliders, Clock, Bug, Database, ShieldCheck, ShieldAlert } from "lucide-react";
+import {
+  ListTree,
+  Zap,
+  Sliders,
+  Clock,
+  Bug,
+  Database,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  Flame,
+  Activity,
+  ArrowLeftRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CheatCodeCategory } from "@/types/data";
 
@@ -124,7 +137,7 @@ export function QuickJumpTOC({
             )}
           >
             <span className="flex items-center gap-1.5 truncate">
-              <span>🚨</span>
+              <AlertTriangle size={13} className="text-red-400 shrink-0" />
               <span className="truncate">P0 Sev-1 Outages</span>
             </span>
             <span className="text-[10px] font-mono opacity-70">&rarr;</span>
@@ -144,7 +157,7 @@ export function QuickJumpTOC({
             )}
           >
             <span className="flex items-center gap-1.5 truncate">
-              <span>💥</span>
+              <Flame size={13} className="text-amber-400 shrink-0" />
               <span className="truncate">OOM &amp; Exit 137</span>
             </span>
             <span className="text-[10px] font-mono opacity-70">&rarr;</span>
@@ -164,7 +177,7 @@ export function QuickJumpTOC({
             )}
           >
             <span className="flex items-center gap-1.5 truncate">
-              <span>🐢</span>
+              <Activity size={13} className="text-orange-400 shrink-0" />
               <span className="truncate">Skew &amp; Stragglers</span>
             </span>
             <span className="text-[10px] font-mono opacity-70">&rarr;</span>
@@ -184,7 +197,7 @@ export function QuickJumpTOC({
             )}
           >
             <span className="flex items-center gap-1.5 truncate">
-              <span>🌊</span>
+              <ArrowLeftRight size={13} className="text-cyan-400 shrink-0" />
               <span className="truncate">Shuffles &amp; Spills</span>
             </span>
             <span className="text-[10px] font-mono opacity-70">&rarr;</span>

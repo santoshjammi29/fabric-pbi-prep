@@ -16,7 +16,7 @@ export default function DiagnosticPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20 max-w-5xl mx-auto px-4 py-6">
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
         hubTitle="Learning Journey"
         items={[

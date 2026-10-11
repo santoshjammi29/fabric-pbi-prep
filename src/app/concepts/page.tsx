@@ -31,6 +31,22 @@ import dynamic from "next/dynamic";
 const SmoothAccordion = dynamic(() => import("@/components/ui/smooth-accordion").then(mod => mod.SmoothAccordion), { ssr: false });
 import { recordLastTopic } from "@/lib/user-progress";
 import { HubSubnav } from "@/components/layout/hub-subnav";
+import { TopicIcon } from "@/components/ui/topic-icon";
+
+function getCategoryTopicKey(cat: string): string {
+  const c = cat.toLowerCase();
+  if (c.includes("spark")) return "spark";
+  if (c.includes("databricks")) return "databricks";
+  if (c.includes("fabric")) return "fabric";
+  if (c.includes("airflow")) return "airflow";
+  if (c.includes("dbt")) return "dbt";
+  if (c.includes("adf") || c.includes("data factory")) return "adf";
+  if (c.includes("lake") || c.includes("delta")) return "datalake";
+  if (c.includes("sql")) return "sql";
+  if (c.includes("power bi") || c.includes("powerbi")) return "powerbi";
+  if (c.includes("python")) return "python";
+  return "architecture";
+}
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
   EASY: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
@@ -276,7 +292,7 @@ function ConceptsContent() {
   }, [filteredConcepts, isShuffled, shuffleSeed]);
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
         hubTitle="Concepts & Engines"
         items={[
@@ -287,48 +303,48 @@ function ConceptsContent() {
       />
 
       {/* Page Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-xs font-semibold text-green-400">
-              <BookOpen size={14} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 shadow-xs isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-500/10 border border-green-500/20 text-[10px] font-semibold text-green-400">
+              <BookOpen size={12} />
               <span>Step 1 · Core Foundations</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
               Architect&rsquo;s Key Concepts &amp; Glossary
             </h1>
-            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-snug">
               Master foundational definitions, architectural trade-offs, and critical buzzwords across
               Fabric, Databricks, Delta Lake, Synapse, and Modern Lakehouse architectures.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 sm:flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl sm:text-2xl font-bold text-green-400">{conceptsDb.length}</div>
-              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Terms</div>
+          <div className="grid grid-cols-3 sm:flex items-center gap-2 shrink-0">
+            <div className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-base font-bold text-green-400">{conceptsDb.length}</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium leading-none">Terms</div>
             </div>
-            <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl sm:text-2xl font-bold text-blue-400">{categories.length - 1}</div>
-              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Categories</div>
+            <div className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-base font-bold text-blue-400">{categories.length - 1}</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium leading-none">Categories</div>
             </div>
-            <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl sm:text-2xl font-bold text-purple-400">4</div>
-              <div className="text-[10px] sm:text-[11px] text-[var(--muted-foreground)] font-medium">Tiers</div>
+            <div className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-base font-bold text-purple-400">4</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium leading-none">Tiers</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* 4-Layer Integrated Domain Navigation */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-green-500/20 text-green-300 flex items-center justify-center shrink-0 font-bold">
-            <BookOpen size={16} />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="p-2.5 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-green-500/20 text-green-300 flex items-center justify-center shrink-0 font-bold">
+            <BookOpen size={15} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-green-400">Layer 1 · Concepts Active</div>
-            <div className="text-xs font-bold text-[var(--foreground)] break-words">
+            <div className="text-[9px] uppercase font-bold text-green-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate">
               {conceptsDb.length} Core Topics
             </div>
           </div>
@@ -336,14 +352,14 @@ function ConceptsContent() {
 
         <Link
           href="/code-practice"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
+          className="p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-            <FileCode2 size={16} />
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+            <FileCode2 size={15} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Practice</div>
-            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-300">
+            <div className="text-[9px] uppercase font-bold text-blue-400">Layer 2 · Code</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-300">
               128+ Coding Sheets
             </div>
           </div>
@@ -351,30 +367,30 @@ function ConceptsContent() {
 
         <Link
           href="/qa-prep"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+          className="p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
-            <MessageSquare size={16} />
+          <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={15} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
-            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-orange-300">
-              6,570+ Interview Questions
+            <div className="text-[9px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
+              6,570+ Questions
             </div>
           </div>
         </Link>
 
         <Link
           href="/architecture"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
+          className="p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-            <Layers size={16} />
+          <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <Layers size={15} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 4 · Architecture Hub</div>
-            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-purple-300">
-              3,000+ Enterprise Scenarios
+            <div className="text-[9px] uppercase font-bold text-purple-400">Layer 4 · Architecture</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">
+              3,000+ Scenarios
             </div>
           </div>
         </Link>
@@ -382,71 +398,81 @@ function ConceptsContent() {
 
       {/* ============== CONCEPTS VIEW ============== */}
       {/* Filter & Search Bar */}
-      <div className="space-y-4">
-            {/* Search row */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search
-                  size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-                />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search 320+ concepts (e.g., Vitess, VSchema, Sharding, Spanner, CoW Branching, Lakehouse, ACID)..."
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Difficulty filter chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
-                {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
-                  <button
-                    key={diff}
-                    onClick={() => handleDifficultyChange(diff)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
-                      selectedDifficulty === diff
-                        ? "bg-purple-600 text-white shadow-md font-semibold"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                    )}
-                  >
-                    {diff === "ALL" ? "All Levels" : diff}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Category chips scroll */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-                <Filter size={12} /> Domain:
-              </span>
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
-                    selectedCategory === cat
-                      ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm font-semibold"
-                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                  )}
-                >
-                  {cat === "ALL" ? "⚡ All Domains" : cat}
-                </button>
-              ))}
-            </div>
+      <div className="space-y-2.5">
+        {/* Search row */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search
+              size={15}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search 436+ concepts (e.g., Sharding, Spanner, CoW Branching, Lakehouse, ACID)..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-0.5 rounded bg-[var(--surface-2)]"
+              >
+                Clear
+              </button>
+            )}
           </div>
+
+          {/* Difficulty filter chips */}
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+            {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
+              <button
+                key={diff}
+                onClick={() => handleDifficultyChange(diff)}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0",
+                  selectedDifficulty === diff
+                    ? "bg-purple-600 text-white shadow-xs font-semibold"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                )}
+              >
+                {diff === "ALL" ? "All Levels" : diff}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Category chips scroll with authentic TopicIcons */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+            <Filter size={11} /> Domain:
+          </span>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => handleCategoryChange(cat)}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5",
+                selectedCategory === cat
+                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-xs font-semibold"
+                  : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
+              )}
+            >
+              {cat === "ALL" ? (
+                <>
+                  <Sparkles size={11} className="text-purple-400" />
+                  <span>All Domains</span>
+                </>
+              ) : (
+                <>
+                  <TopicIcon topicKey={getCategoryTopicKey(cat)} size={13} />
+                  <span>{cat}</span>
+                </>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
 
           {/* Results Header Count */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
@@ -649,7 +675,8 @@ function ConceptsContent() {
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 font-semibold text-xs transition-colors border border-purple-500/30 shadow-sm"
                               title={`View ${matchingDiagram.title} architecture blueprint`}
                             >
-                              <span>📐 Architecture Blueprint</span>
+                              <Layers size={13} />
+                              <span>Architecture Blueprint</span>
                             </Link>
                           )}
                         </div>

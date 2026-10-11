@@ -14,10 +14,14 @@ import {
   ArrowRight,
   BookOpen,
   Zap,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
+import { TopicIcon } from "@/components/ui/topic-icon";
 import {
   modernCodeMatrix,
   modernBlueprintsDb,
@@ -116,35 +120,35 @@ export default function ModernStackPage() {
   const canvasStages = [
     {
       step: "1. Ingest",
-      icon: "📡",
+      topicKey: "kafka",
       tech: "Kafka · Debezium · DMS",
       title: "Stage 1: Real-time & Batch Ingestion",
       desc: "Log-based Change Data Capture (CDC) via Debezium feeding Kafka event streams with Avro schema registry validation and zero data loss guarantees.",
     },
     {
       step: "2. Store",
-      icon: "🪶",
+      topicKey: "datalake",
       tech: "Delta · Iceberg · S3",
       title: "Stage 2: Open Lakehouse Storage",
       desc: "Open table formats (Delta Lake UniForm / Apache Iceberg) on cloud object storage (ADLS Gen2 / AWS S3) with ACID guarantees, time-travel, and compaction.",
     },
     {
       step: "3. Transform",
-      icon: "🚀",
+      topicKey: "spark",
       tech: "Spark 4 · Photon · dbt",
       title: "Stage 3: Vectorized Compute Engine",
       desc: "High-throughput transformations running on Apache Spark with Photon C++ native execution and dbt-core for declarative SQL lineage and data tests.",
     },
     {
       step: "4. Serve",
-      icon: "❄️",
+      topicKey: "snowflake",
       tech: "Snowflake · DBSQL · DuckDB",
       title: "Stage 4: Low-Latency Semantic Serving",
       desc: "Serverless SQL Warehouses and embedded DuckDB instances serving sub-second BI dashboards and Fabric Direct Lake semantic models.",
     },
     {
       step: "5. AI / RAG",
-      icon: "🤖",
+      topicKey: "ai",
       tech: "Vector Search · MCP · LLM",
       title: "Stage 5: AI & Agentic Pipelines",
       desc: "Automated chunking and embedding pipelines feeding Delta Vector Search and Model Context Protocol (MCP) server tools for LLM agent workflows.",
@@ -152,7 +156,7 @@ export default function ModernStackPage() {
   ];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 pb-16">
       <HubSubnav
         hubTitle="Concepts & Engines"
         items={[
@@ -163,30 +167,30 @@ export default function ModernStackPage() {
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-              <Layers size={14} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
+              <Layers size={13} />
               <span>Step 4 · Modern Data &amp; AI Stack</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--foreground)]">
-              Modern Data Engineering &amp; AI Architecture ⚡🌐
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+              Modern Data Engineering &amp; AI Architecture
             </h1>
-            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
               Serverless-first, polyglot, AI-native — 6 live simulators, {modernBlueprintsDb.length} production architecture blueprints,
               polyglot engine comparison matrix, and serverless FinOps playbooks.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-cyan-400">{modernBlueprintsDb.length}</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Blueprints</div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl font-bold text-cyan-400 leading-none">{modernBlueprintsDb.length}</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Blueprints</div>
             </div>
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-green-400">6</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Live Simulators</div>
+            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl font-bold text-green-400 leading-none">6</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Live Simulators</div>
             </div>
           </div>
         </div>
@@ -195,14 +199,14 @@ export default function ModernStackPage() {
       {/* Subtab Navigation Chips */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: "overview", label: "⚡ Hub Overview", icon: Sparkles },
-          { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator },
-          { id: "blueprints", label: `🗺️ ${modernBlueprintsDb.length} Blueprints Gallery`, icon: Cpu },
-          { id: "matrix", label: "💻 Polyglot Engine Matrix", icon: FileCode2 },
-          { id: "ai", label: "🤖 AI & RAG Stack", icon: Bot },
-          { id: "cost", label: "💰 Cost Optimization Playbook", icon: Flame },
-          { id: "compatibility", label: "🌐 Cloud × Table Matrix", icon: Table },
-          { id: "python", label: "🐍 Python for Modern Stack", icon: FileCode2 },
+          { id: "overview", label: "Hub Overview", icon: Sparkles },
+          { id: "simulators", label: "6 Live Simulators", icon: Calculator },
+          { id: "blueprints", label: `${modernBlueprintsDb.length} Blueprints Gallery`, icon: Cpu },
+          { id: "matrix", label: "Polyglot Engine Matrix", icon: FileCode2 },
+          { id: "ai", label: "AI & RAG Stack", icon: Bot },
+          { id: "cost", label: "Cost Optimization Playbook", icon: Flame },
+          { id: "compatibility", label: "Cloud × Table Matrix", icon: Table },
+          { id: "python", label: "Python for Modern Stack", icon: FileCode2 },
         ].map((tab) => {
           const Icon = tab.icon;
           const isSelected = activeTab === tab.id;
@@ -211,13 +215,13 @@ export default function ModernStackPage() {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as ModernSubtab)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0",
                 isSelected
-                  ? "bg-purple-600 text-white shadow-lg shadow-purple-500/20"
+                  ? "bg-purple-600 text-white shadow-sm shadow-purple-500/20"
                   : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
               )}
             >
-              <Icon size={16} />
+              <Icon size={14} />
               <span>{tab.label}</span>
             </button>
           );
@@ -226,22 +230,22 @@ export default function ModernStackPage() {
 
       {/* 1. OVERVIEW & CANVAS */}
       {activeTab === "overview" && (
-        <div id="overview" className="space-y-6 animate-in fade-in duration-300">
+        <div id="overview" className="space-y-4 animate-in fade-in duration-300">
           {/* Interactive Stack Flow Canvas */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-[var(--foreground)]">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)]">
                   Your AI-Era Data Stack Flow Canvas
                 </h3>
-                <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+                <p className="text-xs text-[var(--muted-foreground)]">
                   Click any stage node to inspect architectural best practices and production tech choices.
                 </p>
               </div>
             </div>
 
             {/* Nodes Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               {canvasStages.map((stage, idx) => {
                 const isSelected = selectedCanvasStage === idx;
                 return (
@@ -249,17 +253,17 @@ export default function ModernStackPage() {
                     key={stage.step}
                     onClick={() => setSelectedCanvasStage(idx)}
                     className={cn(
-                      "p-4 rounded-2xl border text-left transition-all relative group",
+                      "p-3 rounded-xl border text-left transition-all relative group",
                       isSelected
-                        ? "bg-purple-600/15 border-purple-500 shadow-lg shadow-purple-500/10"
+                        ? "bg-purple-600/15 border-purple-500 shadow-sm shadow-purple-500/10"
                         : "bg-[var(--surface-2)] border-[var(--border)] hover:border-purple-500/40"
                     )}
                   >
-                    <span className="text-2xl">{stage.icon}</span>
-                    <div className="font-bold text-xs sm:text-sm text-[var(--foreground)] mt-2">
+                    <TopicIcon topic={stage.topicKey} size={22} />
+                    <div className="font-bold text-xs text-[var(--foreground)] mt-2">
                       {stage.step}
                     </div>
-                    <div className="text-[11px] text-[var(--muted-foreground)] mt-0.5 truncate">
+                    <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5 truncate">
                       {stage.tech}
                     </div>
                   </button>
@@ -268,27 +272,27 @@ export default function ModernStackPage() {
             </div>
 
             {/* Stage Detail Card */}
-            <div className="p-5 rounded-2xl bg-[var(--surface-2)] border border-purple-500/30 space-y-2">
-              <h4 className="text-sm font-bold text-purple-300 flex items-center gap-2">
-                <Sparkles size={16} className="text-purple-400" />
+            <div className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 space-y-1.5">
+              <h4 className="text-xs sm:text-sm font-bold text-purple-300 flex items-center gap-1.5">
+                <Sparkles size={14} className="text-purple-400" />
                 {canvasStages[selectedCanvasStage].title}
               </h4>
-              <p className="text-xs sm:text-sm text-[var(--foreground)] opacity-90 leading-relaxed">
+              <p className="text-xs text-[var(--foreground)] opacity-90 leading-relaxed">
                 {canvasStages[selectedCanvasStage].desc}
               </p>
             </div>
           </div>
 
           {/* Quick Launch Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div
               onClick={() => handleTabChange("simulators")}
-              className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-3"
+              className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2"
             >
-              <div className="w-10 h-10 rounded-2xl bg-green-500/10 text-green-400 flex items-center justify-center font-bold text-lg">
-                ⚙️
+              <div className="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center font-bold">
+                <Calculator size={16} />
               </div>
-              <h4 className="text-base font-bold text-[var(--foreground)]">6 Live Simulators</h4>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">6 Live Simulators</h4>
               <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 Tune shuffles, compare Delta vs Iceberg catalogs, calculate serverless costs, and size RAG tokens.
               </p>
@@ -296,12 +300,12 @@ export default function ModernStackPage() {
 
             <div
               onClick={() => handleTabChange("blueprints")}
-              className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-3"
+              className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2"
             >
-              <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg">
-                🗺️
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+                <Cpu size={16} />
               </div>
-              <h4 className="text-base font-bold text-[var(--foreground)]">{modernBlueprintsDb.length} Production Blueprints</h4>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">{modernBlueprintsDb.length} Production Blueprints</h4>
               <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 End-to-end Mermaid and ASCII reference architectures with cost bands and failover playbooks.
               </p>
@@ -309,12 +313,12 @@ export default function ModernStackPage() {
 
             <div
               onClick={() => handleTabChange("matrix")}
-              className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-3"
+              className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2"
             >
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg">
-                💻
+              <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
+                <FileCode2 size={16} />
               </div>
-              <h4 className="text-base font-bold text-[var(--foreground)]">Polyglot Engine Matrix</h4>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">Polyglot Engine Matrix</h4>
               <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 Compare side-by-side implementations across Polars, PySpark, DuckDB, Snowflake, and BigQuery.
               </p>
@@ -325,12 +329,12 @@ export default function ModernStackPage() {
 
       {/* 2. 6 LIVE SIMULATORS */}
       {activeTab === "simulators" && (
-        <div id="simulators" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+        <div id="simulators" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 animate-in fade-in duration-300">
           {/* Simulator 1: Shuffle Estimator */}
-          <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
                   1. Shuffle Estimator
                 </span>
                 <button
@@ -338,14 +342,14 @@ export default function ModernStackPage() {
                     setShuffleRows(50);
                     setShuffleSkew(1.5);
                   }}
-                  className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                 >
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-3">
-                <div className="space-y-1">
+              <div className="space-y-2">
+                <div className="space-y-0.5">
                   <label htmlFor="sim-shuffle-rows" className="flex justify-between text-xs font-medium cursor-pointer">
                     <span>Input Rows (Millions):</span>
                     <span className="font-bold text-purple-400">{shuffleRows}M</span>
@@ -367,7 +371,7 @@ export default function ModernStackPage() {
                   />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <label htmlFor="sim-shuffle-skew" className="flex justify-between text-xs font-medium cursor-pointer">
                     <span>Data Skew Factor:</span>
                     <span className="font-bold text-orange-400">{shuffleSkew}x</span>
@@ -392,32 +396,32 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-purple-500/20 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-purple-500/20 text-xs space-y-0.5">
               <div className="text-purple-300 font-bold">Predicted Output:</div>
               <div className="text-[var(--foreground)] font-mono">
                 Shuffle Size: ~{((shuffleRows * 0.25 * shuffleSkew)).toFixed(1)} GB
               </div>
-              <div className="text-[var(--muted-foreground)]">
+              <div className="text-[var(--muted-foreground)] text-[11px]">
                 Recommended Partitions: {Math.max(10, Math.round(shuffleRows * 2 * shuffleSkew))}
               </div>
             </div>
           </div>
 
           {/* Simulator 2: Iceberg vs Delta Selector */}
-          <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
                   2. Table Format Selector
                 </span>
-                <button onClick={() => setTreeCatalog("uc")} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                <button onClick={() => setTreeCatalog("uc")} className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <label className="text-xs font-medium block">Select Target Enterprise Catalog:</label>
-                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
                   {[
                     { id: "uc", label: "Unity Catalog" },
                     { id: "polaris", label: "Polaris" },
@@ -427,9 +431,9 @@ export default function ModernStackPage() {
                       key={c.id}
                       onClick={() => setTreeCatalog(c.id)}
                       className={cn(
-                        "py-1.5 text-[11px] font-semibold rounded-lg transition-all",
+                        "py-1 text-[10px] font-semibold rounded-md transition-all",
                         treeCatalog === c.id
-                          ? "bg-purple-600 text-white shadow-sm"
+                          ? "bg-purple-600 text-white shadow-xs"
                           : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                       )}
                     >
@@ -440,9 +444,9 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-cyan-500/20 text-xs space-y-1.5">
+            <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-cyan-500/20 text-xs space-y-1">
               <div className="text-cyan-300 font-bold">Architect Recommendation:</div>
-              <div className="text-[var(--foreground)]">
+              <div className="text-[var(--foreground)] text-[11px] leading-relaxed">
                 {treeCatalog === "uc" && "Format: Delta Lake with UniForm enabled. Automatic iceberg metadata allows cross-querying from Snowflake & Fabric Direct Lake."}
                 {treeCatalog === "polaris" && "Format: Apache Iceberg v2. Native REST catalog integration across Snowflake, Trino, and Databricks external locations."}
                 {treeCatalog === "glue" && "Format: Apache Iceberg or Delta Lake. Ensure Glue Data Catalog crawler sync or Athena engine v3 is provisioned."}
@@ -451,18 +455,18 @@ export default function ModernStackPage() {
           </div>
 
           {/* Simulator 3: Serverless Storage vs Scan Cost */}
-          <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-green-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">
                   3. Query Scan Cost Estimator
                 </span>
-                <button onClick={() => setCostTb(10)} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                <button onClick={() => setCostTb(10)} className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label htmlFor="sim-cost-tb" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Monthly TB Scanned:</span>
                   <span className="font-bold text-green-400">{costTb} TB</span>
@@ -485,30 +489,30 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-green-500/20 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-green-500/20 text-xs space-y-0.5">
               <div className="text-green-300 font-bold">Estimated Cost Comparison:</div>
-              <div className="text-[var(--foreground)] font-mono">
+              <div className="text-[var(--foreground)] font-mono text-[11px]">
                 BigQuery On-Demand: ${(costTb * 5.0).toFixed(2)}/mo
               </div>
-              <div className="text-[var(--muted-foreground)] font-mono">
+              <div className="text-[var(--muted-foreground)] font-mono text-[11px]">
                 DBSQL Serverless: ~${(costTb * 12.0).toFixed(2)}/mo
               </div>
             </div>
           </div>
 
           {/* Simulator 4: Spark Cluster Sizing */}
-          <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
                   4. Spark Cluster Sizer
                 </span>
-                <button onClick={() => setSparkWorkers(8)} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                <button onClick={() => setSparkWorkers(8)} className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label htmlFor="sim-spark-workers" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Worker Nodes (4 cores/node):</span>
                   <span className="font-bold text-amber-400">{sparkWorkers} Nodes</span>
@@ -532,30 +536,30 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-amber-500/20 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-amber-500/20 text-xs space-y-0.5">
               <div className="text-amber-300 font-bold">Cluster Compute Capacity:</div>
-              <div className="text-[var(--foreground)] font-mono">
+              <div className="text-[var(--foreground)] font-mono text-[11px]">
                 Total Cores: {sparkWorkers * 4} · RAM: {sparkWorkers * 16} GB
               </div>
-              <div className="text-[var(--muted-foreground)]">
+              <div className="text-[var(--muted-foreground)] text-[11px]">
                 Max Read Bandwidth: ~{(sparkWorkers * 0.3).toFixed(1)} GB/s
               </div>
             </div>
           </div>
 
           {/* Simulator 5: RAG Chunk & Token Config */}
-          <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-pink-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-pink-400 uppercase tracking-wider">
                   5. RAG Token Sizer
                 </span>
-                <button onClick={() => setRagChunk(512)} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                <button onClick={() => setRagChunk(512)} className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label htmlFor="sim-rag-chunk" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Chunk Size (Tokens):</span>
                   <span className="font-bold text-pink-400">{ragChunk} tokens</span>
@@ -579,30 +583,30 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-pink-500/20 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-pink-500/20 text-xs space-y-0.5">
               <div className="text-pink-300 font-bold">Embedding Strategy:</div>
-              <div className="text-[var(--foreground)] font-mono">
+              <div className="text-[var(--foreground)] font-mono text-[11px]">
                 Overlap: {Math.round(ragChunk * 0.15)} tokens (15%)
               </div>
-              <div className="text-[var(--muted-foreground)]">
+              <div className="text-[var(--muted-foreground)] text-[11px]">
                 {ragChunk <= 512 ? "High precision, best for factual search." : "Broad context, best for document summaries."}
               </div>
             </div>
           </div>
 
           {/* Simulator 6: Streaming Watermark */}
-          <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-red-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
                   6. Streaming Watermark
                 </span>
-                <button onClick={() => setWatermarkMins(10)} className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                <button onClick={() => setWatermarkMins(10)} className="text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                   ↺ Reset
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label htmlFor="sim-watermark" className="flex justify-between text-xs font-medium cursor-pointer">
                   <span>Allowed Lateness (Minutes):</span>
                   <span className="font-bold text-red-400">{watermarkMins} Mins</span>
@@ -625,12 +629,12 @@ export default function ModernStackPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-red-500/20 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-red-500/20 text-xs space-y-0.5">
               <div className="text-red-300 font-bold">State Policy:</div>
-              <div className="text-[var(--foreground)] font-mono">
+              <div className="text-[var(--foreground)] font-mono text-[11px]">
                 Events lagging &gt; {watermarkMins}m dropped silently
               </div>
-              <div className="text-[var(--muted-foreground)]">
+              <div className="text-[var(--muted-foreground)] text-[11px]">
                 RocksDB Estimated State: ~{(watermarkMins * 0.12).toFixed(2)} GB
               </div>
             </div>
@@ -640,28 +644,28 @@ export default function ModernStackPage() {
 
       {/* 3. 12 BLUEPRINTS GALLERY */}
       {activeTab === "blueprints" && (
-        <div id="blueprints" className="space-y-6 animate-in fade-in duration-300">
-          <div className="p-5 rounded-3xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                <Sparkles size={14} /> Full Visual System Blueprints
+        <div id="blueprints" className="space-y-4 animate-in fade-in duration-300">
+          <div className="p-3.5 sm:p-4 rounded-xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                <Sparkles size={13} /> Full Visual System Blueprints
               </span>
-              <h3 className="text-base font-bold text-[var(--foreground)]">Explore 21 High-Resolution Whiteboard Diagrams</h3>
+              <h3 className="text-sm font-bold text-[var(--foreground)]">Explore 21 High-Resolution Whiteboard Diagrams</h3>
               <p className="text-xs text-[var(--muted-foreground)]">Looking for hand-drawn whiteboard architecture diagrams? View our complete library of 21 interactive blueprints covering Apache Iceberg, RAG Vector Search, Kafka, Airflow, and Medallion Lakehouses.</p>
             </div>
             <Link
               href="/architecture?tab=diagrams"
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
+              className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-xs whitespace-nowrap"
             >
               Open Whiteboard Hub &rarr;
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {modernBlueprintsDb.map((bp) => (
-            <div key={bp.id} id={`bp-${bp.id}`} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
+            <div key={bp.id} id={`bp-${bp.id}`} className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
                     {bp.category}
                   </span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
@@ -669,11 +673,11 @@ export default function ModernStackPage() {
                   </span>
                 </div>
 
-                <h3 className="text-base font-bold text-[var(--foreground)]">{bp.title}</h3>
+                <h3 className="text-sm font-bold text-[var(--foreground)]">{bp.title}</h3>
 
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1">
                   {bp.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted-foreground)]">
+                    <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted-foreground)]">
                       {tag}
                     </span>
                   ))}
@@ -681,7 +685,7 @@ export default function ModernStackPage() {
               </div>
 
               {/* ASCII Diagram representation */}
-              <div className="p-4 rounded-2xl bg-[#090d13] border border-white/10 text-[11px] font-mono text-purple-300 overflow-x-auto whitespace-pre">
+              <div className="p-3 rounded-lg bg-[#090d13] border border-white/10 text-[10px] font-mono text-purple-300 overflow-x-auto whitespace-pre">
                 {bp.ascii}
               </div>
             </div>
@@ -692,15 +696,15 @@ export default function ModernStackPage() {
 
       {/* 4. POLYGLOT MATRIX */}
       {activeTab === "matrix" && (
-        <div id="matrix" className="space-y-6 animate-in fade-in duration-300">
+        <div id="matrix" className="space-y-3 animate-in fade-in duration-300">
           {modernCodeMatrix.map((item, idx) => (
-            <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
-              <h4 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2">
-                <Sparkles size={16} className="text-purple-400" />
+            <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] flex items-center gap-1.5">
+                <Sparkles size={14} className="text-purple-400" />
                 {item.topic}
               </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 <CodeBlock code={item.python} language="python" filename="Python (Polars)" badge="Polars" showLineNumbers={false} />
                 <CodeBlock code={item.pyspark} language="python" filename="PySpark DataFrame" badge="PySpark" showLineNumbers={false} />
                 <CodeBlock code={item.duckdb} language="sql" filename="DuckDB SQL" badge="DuckDB" showLineNumbers={false} />
@@ -712,7 +716,7 @@ export default function ModernStackPage() {
 
       {/* 5. AI & RAG STACK */}
       {activeTab === "ai" && (
-        <div id="ai" className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+        <div id="ai" className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-in fade-in duration-300">
           {[
             {
               title: "Delta Vector Search & Embedding Sync",
@@ -735,12 +739,12 @@ export default function ModernStackPage() {
               desc: "Chunk SQL, Python, and Markdown documents along syntax boundaries rather than arbitrary token boundaries to maintain semantic integrity.",
             },
           ].map((item, idx) => (
-            <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+            <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20">
                 {item.badge}
               </span>
-              <h4 className="text-base font-bold text-[var(--foreground)]">{item.title}</h4>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">{item.desc}</p>
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">{item.title}</h4>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -748,16 +752,16 @@ export default function ModernStackPage() {
 
       {/* 6. COST PLAYBOOKS */}
       {activeTab === "cost" && (
-        <div id="cost" className="space-y-4 animate-in fade-in duration-300">
+        <div id="cost" className="space-y-3 animate-in fade-in duration-300">
           {modernCostPlaybooks.map((item, idx) => (
-            <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+            <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2.5">
               <div className="flex items-center justify-between">
-                <h4 className="text-base font-bold text-[var(--foreground)]">{item.title}</h4>
-                <span className="text-xs font-bold text-green-400 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">{item.title}</h4>
+                <span className="text-[10px] font-bold text-green-400 px-2.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
                   {item.savings}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">{item.summary}</p>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{item.summary}</p>
               <CodeBlock
                 code={item.code}
                 language="sql"
@@ -771,55 +775,60 @@ export default function ModernStackPage() {
 
       {/* 7. CLOUD TABLE COMPATIBILITY */}
       {activeTab === "compatibility" && (
-        <div id="compatibility" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 overflow-x-auto animate-in fade-in duration-300">
-          <h3 className="text-lg font-bold text-[var(--foreground)]">
-            Cloud Engine × Table Format Compatibility Matrix
-          </h3>
+        <div id="compatibility" className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 overflow-x-auto animate-in fade-in duration-300">
+          <div>
+            <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)]">
+              Cloud Engine × Table Format Compatibility Matrix
+            </h3>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Current native, metadata-bridged, and read/write compatibility across modern data platforms.
+            </p>
+          </div>
           <table className="w-full text-xs text-left border-collapse min-w-[640px]">
             <thead>
               <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
-                <th className="py-3 px-4 font-semibold">Engine / Service</th>
-                <th className="py-3 px-4 font-semibold">Delta Lake</th>
-                <th className="py-3 px-4 font-semibold">Apache Iceberg</th>
-                <th className="py-3 px-4 font-semibold">Apache Hudi</th>
-                <th className="py-3 px-4 font-semibold">Native Metastore</th>
+                <th className="py-2.5 px-3 font-semibold">Engine / Service</th>
+                <th className="py-2.5 px-3 font-semibold">Delta Lake</th>
+                <th className="py-2.5 px-3 font-semibold">Apache Iceberg</th>
+                <th className="py-2.5 px-3 font-semibold">Apache Hudi</th>
+                <th className="py-2.5 px-3 font-semibold">Native Metastore</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
               <tr>
-                <td className="py-3 px-4 font-bold">Databricks</td>
-                <td className="py-3 px-4 text-green-400">✅ Native (_delta_log)</td>
-                <td className="py-3 px-4 text-green-400">✅ UniForm / Read</td>
-                <td className="py-3 px-4 text-yellow-400">⚠️ Read Support</td>
-                <td className="py-3 px-4">Unity Catalog</td>
+                <td className="py-2.5 px-3 font-bold">Databricks</td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> Native (_delta_log)</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> UniForm / Read</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-yellow-400 font-medium"><AlertTriangle size={13} /> Read Support</span></td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">Unity Catalog</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-bold">Snowflake</td>
-                <td className="py-3 px-4 text-yellow-400">⚠️ External Stage</td>
-                <td className="py-3 px-4 text-green-400">✅ Native Iceberg Table</td>
-                <td className="py-3 px-4 text-slate-500">❌ None</td>
-                <td className="py-3 px-4">Polaris / S3</td>
+                <td className="py-2.5 px-3 font-bold">Snowflake</td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-yellow-400 font-medium"><AlertTriangle size={13} /> External Stage</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> Native Iceberg Table</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-slate-500 font-medium"><XCircle size={13} /> None</span></td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">Polaris / S3</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-bold">Google BigQuery</td>
-                <td className="py-3 px-4 text-green-400">✅ BigLake Delta</td>
-                <td className="py-3 px-4 text-green-400">✅ BigLake Iceberg</td>
-                <td className="py-3 px-4 text-yellow-400">⚠️ Manifest</td>
-                <td className="py-3 px-4">BigLake Metastore</td>
+                <td className="py-2.5 px-3 font-bold">Google BigQuery</td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> BigLake Delta</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> BigLake Iceberg</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-yellow-400 font-medium"><AlertTriangle size={13} /> Manifest</span></td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">BigLake Metastore</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-bold">Microsoft Fabric</td>
-                <td className="py-3 px-4 text-green-400">✅ OneLake Native</td>
-                <td className="py-3 px-4 text-green-400">✅ Iceberg Shortcut</td>
-                <td className="py-3 px-4 text-yellow-400">⚠️ Parquet Shortcut</td>
-                <td className="py-3 px-4">OneLake Metastore</td>
+                <td className="py-2.5 px-3 font-bold">Microsoft Fabric</td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> OneLake Native</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> Iceberg Shortcut</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-yellow-400 font-medium"><AlertTriangle size={13} /> Parquet Shortcut</span></td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">OneLake Metastore</td>
               </tr>
               <tr>
-                <td className="py-3 px-4 font-bold">DuckDB</td>
-                <td className="py-3 px-4 text-green-400">✅ delta extension</td>
-                <td className="py-3 px-4 text-green-400">✅ iceberg extension</td>
-                <td className="py-3 px-4 text-yellow-400">⚠️ Direct Parquet</td>
-                <td className="py-3 px-4">MotherDuck / In-Memory</td>
+                <td className="py-2.5 px-3 font-bold">DuckDB</td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> delta extension</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-green-400 font-medium"><CheckCircle2 size={13} /> iceberg extension</span></td>
+                <td className="py-2.5 px-3"><span className="inline-flex items-center gap-1 text-yellow-400 font-medium"><AlertTriangle size={13} /> Direct Parquet</span></td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">MotherDuck / In-Memory</td>
               </tr>
             </tbody>
           </table>
@@ -828,40 +837,40 @@ export default function ModernStackPage() {
 
       {/* 8. PYTHON FOR MODERN STACK */}
       {activeTab === "python" && (
-        <div id="python" className="space-y-8 animate-in fade-in duration-300">
+        <div id="python" className="space-y-4 animate-in fade-in duration-300">
           {/* Section Intro */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+          <div className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-lg">
-                🐍
+              <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+                <TopicIcon topic="python" size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[var(--foreground)]">Python for Modern Data Stacks</h3>
-                <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)]">Python for Modern Data Stacks</h3>
+                <p className="text-xs text-[var(--muted-foreground)]">
                   Python implementations across lakehouse, distributed computing, and AI-native pipelines.
                 </p>
               </div>
             </div>
-            <div className="flex gap-3 text-center">
-              <div className="px-4 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div className="text-lg font-bold text-blue-400">{modernStackDb.filter(q => q.py_code?.trim()).length}</div>
-                <div className="text-[10px] text-[var(--muted-foreground)]">Modern Stack Q&A with Python</div>
+            <div className="flex flex-wrap gap-2 text-center">
+              <div className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="text-base font-bold text-blue-400 leading-none">{modernStackDb.filter(q => q.py_code?.trim()).length}</div>
+                <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5">Modern Stack Q&A with Python</div>
               </div>
-              <div className="px-4 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div className="text-lg font-bold text-green-400">{modernCodeMatrix.length}</div>
-                <div className="text-[10px] text-[var(--muted-foreground)]">Polyglot Matrix Entries</div>
+              <div className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="text-base font-bold text-green-400 leading-none">{modernCodeMatrix.length}</div>
+                <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5">Polyglot Matrix Entries</div>
               </div>
-              <div className="px-4 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div className="text-lg font-bold text-purple-400">{pythonData.filter(p => ['Delta Lake', 'Distributed Computing', 'Streaming', 'Architecture', 'Data Patterns', 'Performance'].includes(p.category)).length}</div>
-                <div className="text-[10px] text-[var(--muted-foreground)]">DE Python Patterns</div>
+              <div className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+                <div className="text-base font-bold text-purple-400 leading-none">{pythonData.filter(p => ['Delta Lake', 'Distributed Computing', 'Streaming', 'Architecture', 'Data Patterns', 'Performance'].includes(p.category)).length}</div>
+                <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5">DE Python Patterns</div>
               </div>
             </div>
 
             {/* Link to Python Guided Learning */}
-            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mt-2">
               <div className="space-y-0.5">
                 <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                  <Sparkles size={14} /> Python Guided Learning & Practice
+                  <Sparkles size={13} /> Python Guided Learning &amp; Practice
                 </div>
                 <div className="text-xs text-[var(--muted-foreground)]">
                   Explore full-code data engineering runbooks and structured stage-by-stage Python learning.
@@ -869,7 +878,7 @@ export default function ModernStackPage() {
               </div>
               <Link
                 href="/guided-learning?topic=python"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs whitespace-nowrap transition-colors shrink-0 shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs whitespace-nowrap transition-colors shrink-0 shadow-xs"
               >
                 <span>Open Python Track</span>
                 <ArrowRight size={13} />
@@ -878,16 +887,16 @@ export default function ModernStackPage() {
           </div>
 
           {/* Modern Stack Q&A with Python Code */}
-          <div className="space-y-4">
-            <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
-              <Terminal size={18} className="text-blue-400" />
-              Modern Stack Interview Q&A · Python Solutions
+          <div className="space-y-3">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-0.5">
+              <Terminal size={16} className="text-blue-400" />
+              Modern Stack Interview Q&amp;A · Python Solutions
             </h3>
             {modernStackDb.filter(q => q.py_code?.trim()).map((q) => (
-              <div key={q.id} className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden">
-                <div className="p-5 space-y-3">
+              <div key={q.id} className="rounded-xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden">
+                <div className="p-3.5 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                    <span className="text-[10px] font-semibold text-purple-400 tracking-wide uppercase">
                       {q.category}
                     </span>
                     <span className={cn(
@@ -899,12 +908,12 @@ export default function ModernStackPage() {
                       {q.difficulty}
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-[var(--foreground)]">{q.question}</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">{q.question}</h4>
                   <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{q.answer.slice(0, 300)}{q.answer.length > 300 ? "..." : ""}</p>
                 </div>
 
-                <div className="border-t border-[var(--border)] p-4 bg-[var(--surface-2)] space-y-3">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="border-t border-[var(--border)] p-3 bg-[var(--surface-2)] space-y-2.5">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
                     {q.py_code?.trim() && (
                       <CodeBlock
                         code={q.py_code}
@@ -939,18 +948,18 @@ export default function ModernStackPage() {
           </div>
 
           {/* Polyglot Matrix – Python Focus */}
-          <div className="space-y-4">
-            <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
-              <FileCode2 size={18} className="text-green-400" />
+          <div className="space-y-3">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-0.5">
+              <FileCode2 size={16} className="text-green-400" />
               Polyglot Engine Matrix · Python vs Others
             </h3>
             {modernCodeMatrix.map((item, idx) => (
-              <div key={idx} className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
-                <h4 className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+              <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2.5">
+                <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] flex items-center gap-1.5">
                   <Sparkles size={14} className="text-purple-400" />
                   {item.topic}
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
                   <CodeBlock
                     code={item.python}
                     language="python"
@@ -983,32 +992,32 @@ export default function ModernStackPage() {
             const deItems = pythonData.filter(p => deCategories.includes(p.category));
             if (deItems.length === 0) return null;
             return (
-              <div className="space-y-4">
-                <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
-                  <Layers size={18} className="text-cyan-400" />
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2 px-0.5">
+                  <Layers size={16} className="text-cyan-400" />
                   Python Data Engineering Patterns ({deItems.length})
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {deItems.map((item) => {
                     const lvlColor = item.level === 'architect' ? 'text-purple-400 bg-purple-500/10 border-purple-500/20'
                       : item.level === 'advanced' ? 'text-orange-400 bg-orange-500/10 border-orange-500/20'
                       : item.level === 'intermediate' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
                       : 'text-green-400 bg-green-500/10 border-green-500/20';
                     return (
-                      <div key={item.id} className="rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden">
-                        <div className="p-5 space-y-2">
+                      <div key={item.id} className="rounded-xl bg-[var(--surface-1)] border border-[var(--border)] overflow-hidden">
+                        <div className="p-3.5 space-y-1.5">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-semibold text-cyan-400 tracking-wide uppercase">
+                            <span className="text-[10px] font-semibold text-cyan-400 tracking-wide uppercase">
                               {item.category}
                             </span>
                             <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", lvlColor)}>
                               {item.level}
                             </span>
                           </div>
-                          <h4 className="text-sm font-bold text-[var(--foreground)]">{item.title}</h4>
+                          <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">{item.title}</h4>
                           <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{item.description}</p>
                         </div>
-                        <div className="border-t border-[var(--border)] p-4 bg-[var(--surface-2)]">
+                        <div className="border-t border-[var(--border)] p-3 bg-[var(--surface-2)]">
                           <CodeBlock
                             code={item.code}
                             language="python"
@@ -1016,8 +1025,8 @@ export default function ModernStackPage() {
                             showLineNumbers
                           />
                           {item.use_case && (
-                            <p className="mt-3 text-xs text-[var(--muted-foreground)] flex items-start gap-1.5">
-                              <span className="shrink-0">🎯</span>
+                            <p className="mt-2 text-xs text-[var(--muted-foreground)] flex items-start gap-1.5">
+                              <CheckCircle2 size={13} className="text-purple-400 shrink-0 mt-0.5" />
                               <span>{item.use_case}</span>
                             </p>
                           )}

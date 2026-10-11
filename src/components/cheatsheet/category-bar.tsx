@@ -1,26 +1,39 @@
 "use client";
 
 import React from "react";
-import { Search, X, Filter, ShieldAlert } from "lucide-react";
+import {
+  Search,
+  X,
+  Filter,
+  ShieldAlert,
+  Zap,
+  AlertTriangle,
+  Flame,
+  Activity,
+  ArrowLeftRight,
+  Database,
+  RefreshCw,
+  DollarSign,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CheatCodeCategory } from "@/types/data";
 
 export interface EmergencyScenario {
   id: string;
   label: string;
-  icon: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   badge: string;
 }
 
 export const EMERGENCY_SCENARIOS: EmergencyScenario[] = [
-  { id: "ALL", label: "All Codes", icon: "⚡", badge: "53 Items" },
-  { id: "p0_outages", label: "P0 Sev-1 Outages", icon: "🚨", badge: "Incident Triage" },
-  { id: "oom_memory", label: "OOM & Memory Crashes", icon: "💥", badge: "Heap & Exit 137" },
-  { id: "skew_stragglers", label: "Skew & Stragglers", icon: "🐢", badge: "Salting & BNLJ" },
-  { id: "shuffle_spill", label: "Shuffles & Disk Spills", icon: "🌊", badge: "I/O & Retries" },
-  { id: "lakehouse_storage", label: "Lakehouse & Storage", icon: "🗄️", badge: "Delta & Iceberg" },
-  { id: "concurrency_locks", label: "Locks & Concurrency", icon: "🔄", badge: "Deadlocks & OCC" },
-  { id: "finops_scaling", label: "FinOps & Cloud Scaling", icon: "💰", badge: "Spot & Policies" },
+  { id: "ALL", label: "All Codes", icon: Zap, badge: "53 Items" },
+  { id: "p0_outages", label: "P0 Sev-1 Outages", icon: AlertTriangle, badge: "Incident Triage" },
+  { id: "oom_memory", label: "OOM & Memory Crashes", icon: Flame, badge: "Heap & Exit 137" },
+  { id: "skew_stragglers", label: "Skew & Stragglers", icon: Activity, badge: "Salting & BNLJ" },
+  { id: "shuffle_spill", label: "Shuffles & Disk Spills", icon: ArrowLeftRight, badge: "I/O & Retries" },
+  { id: "lakehouse_storage", label: "Lakehouse & Storage", icon: Database, badge: "Delta & Iceberg" },
+  { id: "concurrency_locks", label: "Locks & Concurrency", icon: RefreshCw, badge: "Deadlocks & OCC" },
+  { id: "finops_scaling", label: "FinOps & Cloud Scaling", icon: DollarSign, badge: "Spot & Policies" },
 ];
 
 interface CategoryBarProps {
@@ -61,9 +74,9 @@ export function CategoryBar({
   totalCount,
 }: CategoryBarProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* 1. Emergency Prod Triage Scenarios Bar */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs px-1">
           <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-[var(--foreground)]">
             <ShieldAlert size={14} className="text-amber-400" />
@@ -80,9 +93,10 @@ export function CategoryBar({
           )}
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-slate-700">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700">
           {EMERGENCY_SCENARIOS.map((scen) => {
             const isActive = selectedScenario === scen.id;
+            const Icon = scen.icon;
             return (
               <button
                 key={scen.id}
@@ -94,17 +108,17 @@ export function CategoryBar({
                   }
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0 touch-manipulation",
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0 touch-manipulation",
                   isActive
-                    ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md shadow-amber-500/10 ring-1 ring-amber-500/30"
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm ring-1 ring-amber-500/30"
                     : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                 )}
               >
-                <span>{scen.icon}</span>
+                <Icon size={13} className="shrink-0" />
                 <span>{scen.label}</span>
                 <span
                   className={cn(
-                    "px-1.5 py-0.5 rounded text-[10px] font-mono",
+                    "px-1 py-0.2 rounded text-[10px] font-mono",
                     isActive
                       ? "bg-amber-500/30 text-amber-200"
                       : "bg-[var(--surface-2)] text-[var(--muted-foreground)]"

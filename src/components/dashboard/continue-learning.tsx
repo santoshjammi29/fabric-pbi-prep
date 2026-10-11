@@ -32,7 +32,7 @@ export function ContinueLearning() {
   const displayProgress = isClient ? Math.max(topic.progress, stats.masteryPercentage) : 15;
 
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 shadow-sm transition-all hover:shadow-md">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-5 shadow-sm transition-all hover:shadow-md">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div className="flex-1 space-y-3 w-full">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400">

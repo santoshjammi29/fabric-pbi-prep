@@ -200,30 +200,30 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-              <User size={14} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
+              <User size={13} />
               <span>Personal Learning Studio</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
               My Progress &amp; Architect Studio
             </h1>
-            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
               Track your daily review streak, active SM-2 retention levels, saved code templates, and
               manage offline JSON data backups.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={exportBackupJSON}
-              className="px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-purple-500/20"
+              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
             >
-              <Download size={15} />
+              <Download size={14} />
               <span>Export JSON</span>
             </button>
           </div>
@@ -231,72 +231,72 @@ export default function StudioPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-5 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span>Daily Streak</span>
-            <Flame size={18} className="text-orange-400" />
+            <span className="text-[11px] font-medium">Daily Streak</span>
+            <Flame size={16} className="text-orange-400" />
           </div>
-          <div className="text-2xl font-bold text-[var(--foreground)]">{userData.streak} Days 🔥</div>
-          <div className="text-[11px] text-green-400 font-medium">Keep it going!</div>
+          <div className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{userData.streak} Days</div>
+          <div className="text-[10px] text-green-400 font-medium">Active streak</div>
         </div>
 
-        <div className="p-5 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span>Weekly XP</span>
-            <Zap size={18} className="text-purple-400" />
+            <span className="text-[11px] font-medium">Weekly XP</span>
+            <Zap size={16} className="text-purple-400" />
           </div>
-          <div className="text-2xl font-bold text-[var(--foreground)]">{userData.xp} XP ⚡</div>
-          <div className="text-[11px] text-purple-400 font-medium">Top 5% Learner</div>
+          <div className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{userData.xp} XP</div>
+          <div className="text-[10px] text-purple-400 font-medium">Top 5% Learner</div>
         </div>
 
-        <div className="p-5 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span>Saved Bookmarks</span>
-            <Bookmark size={18} className="text-amber-400" />
+            <span className="text-[11px] font-medium">Saved Bookmarks</span>
+            <Bookmark size={16} className="text-amber-400" />
           </div>
-          <div className="text-2xl font-bold text-[var(--foreground)]">{bookmarkedItems.length} Saved</div>
-          <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Concepts &amp; Q&As</div>
+          <div className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{bookmarkedItems.length} Saved</div>
+          <div className="text-[10px] text-[var(--muted-foreground)] font-medium">Concepts &amp; Q&As</div>
         </div>
 
-        <div className="p-5 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span>Mastery Rank</span>
-            <Award size={18} className="text-blue-400" />
+            <span className="text-[11px] font-medium">Mastery Rank</span>
+            <Award size={16} className="text-blue-400" />
           </div>
-          <div className="text-2xl font-bold text-blue-400">Principal</div>
-          <div className="text-[11px] text-blue-300 font-medium">Level 4 Architect</div>
+          <div className="text-xl sm:text-2xl font-bold text-blue-400">Principal</div>
+          <div className="text-[10px] text-blue-300 font-medium">Level 4 Architect</div>
         </div>
       </div>
 
       {/* Bookmarks & Storage Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 sm:gap-4">
         {/* Bookmarks List */}
-        <div className="lg:col-span-2 p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
+        <div className="lg:col-span-2 p-3.5 sm:p-5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2">
-              <Bookmark size={18} className="text-amber-400" />
+            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2">
+              <Bookmark size={16} className="text-amber-400" />
               Saved Bookmarks ({bookmarkedItems.length})
             </h3>
           </div>
 
           {bookmarkedItems.length === 0 ? (
-            <div className="py-12 text-center text-xs text-[var(--muted-foreground)] space-y-2">
+            <div className="py-8 text-center text-xs text-[var(--muted-foreground)] space-y-1.5">
               <p>No bookmarks saved yet.</p>
               <p>Click the bookmark ribbon on any Concept or Q&A card to save it here for quick access.</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+            <div className="space-y-1.5 max-h-[400px] overflow-y-auto pr-1">
               {bookmarkedItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 text-xs sm:text-sm transition-all group"
+                  className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 text-xs transition-all group"
                 >
                   <Link
                     href={item.href}
-                    className="flex items-center gap-2.5 min-w-0 pr-2 flex-1 hover:text-purple-300 transition-colors"
+                    className="flex items-center gap-2 min-w-0 pr-2 flex-1 hover:text-purple-300 transition-colors"
                   >
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 uppercase shrink-0">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 uppercase shrink-0">
                       {item.type}
                     </span>
                     <span className="font-semibold text-[var(--foreground)] group-hover:text-purple-300 transition-colors truncate">
@@ -305,10 +305,10 @@ export default function StudioPage() {
                   </Link>
                   <button
                     onClick={() => removeBookmark(item.id)}
-                    className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+                    className="p-1 rounded-md text-[var(--muted-foreground)] hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0 cursor-pointer"
                     title="Remove Bookmark"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                   </button>
                 </div>
               ))}
@@ -317,36 +317,36 @@ export default function StudioPage() {
         </div>
 
         {/* Local Storage & Backup Tools */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 flex flex-col justify-between">
-          <div className="space-y-4">
-            <h3 className="text-base font-bold text-[var(--foreground)]">
+        <div className="p-3.5 sm:p-5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
+          <div className="space-y-3">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
               Data &amp; Local Persistence
             </h3>
             <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
               All your study progress, SM-2 ratings, and bookmarks are securely stored in your browser&rsquo;s local storage.
             </p>
 
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2 pt-1">
               <label className="block w-full">
                 <input type="file" accept=".json" onChange={importBackupJSON} className="hidden" />
-                <div className="w-full py-2.5 px-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer flex items-center justify-center gap-2 transition-colors">
-                  <Upload size={14} />
+                <div className="w-full py-2 px-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer flex items-center justify-center gap-2 transition-colors">
+                  <Upload size={13} />
                   <span>Import JSON Backup</span>
                 </div>
               </label>
 
               <button
                 onClick={resetAllProgress}
-                className="w-full py-2.5 px-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2 px-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <RotateCcw size={14} />
+                <RotateCcw size={13} />
                 <span>Reset All Data</span>
               </button>
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[var(--surface-2)] text-[11px] text-[var(--muted-foreground)] flex items-center gap-2">
-            <CheckCircle2 size={14} className="text-green-400 shrink-0" />
+          <div className="p-2.5 rounded-xl bg-[var(--surface-2)] text-[10px] text-[var(--muted-foreground)] flex items-center gap-2">
+            <CheckCircle2 size={13} className="text-green-400 shrink-0" />
             <span>Zero cloud tracking. 100% private offline-first app.</span>
           </div>
         </div>

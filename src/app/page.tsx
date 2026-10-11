@@ -10,23 +10,23 @@ import { ArchitectDigest } from "@/components/dashboard/architect-digest";
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-12 pb-24 lg:pb-12 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* 1. Motivational Hero & 4 Core Pillars of Mastery */}
       <HeroCommandCenter />
 
       {/* 2. Personal Study Cockpit & Streak */}
-      <section className="space-y-4">
+      <section className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <div>
             <div className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">
               Study Command Center
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[var(--foreground)] tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--foreground)] tracking-tight">
               Resume Your Learning Momentum
             </h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 sm:gap-4">
           <div className="lg:col-span-2">
             <ContinueLearning />
           </div>

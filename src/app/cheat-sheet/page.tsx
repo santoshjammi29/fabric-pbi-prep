@@ -237,105 +237,107 @@ function CheatSheetContent() {
   }, [categoryCounts]);
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-24">
-      {/* Hero / Header Section */}
-      <section className="relative overflow-hidden border-b border-[var(--border)] bg-[var(--surface-0)] py-10 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <HubSubnav
-            hubTitle="Code & Runbooks"
-            items={[
-              { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
-              { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
-              { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
-              { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
-              { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
-            ]}
-          />
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
+      <HubSubnav
+        hubTitle="Code & Runbooks"
+        items={[
+          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
+          { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
+          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
+          { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
+          { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
+        ]}
+      />
 
+      {/* Hero / Header Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
+        <div className="space-y-2">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">
-            <Terminal size={14} />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <Terminal size={13} />
             <span>Architectural Production Reference &amp; Incident Runbooks</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[var(--foreground)]">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
             Data Engineering{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
               Production Cheat Sheet
             </span>
           </h1>
 
-          <p className="mt-3.5 max-w-3xl text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
-            Essential battle-tested cheat codes, emergency incident runbooks, and performance knobs for Apache Spark, dbt, Airflow, and Lakehouse platforms. Structured as Problem Scenario &rarr; Root Cause Triage &rarr; Hardened Solution with measurable production ROI.
+          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed max-w-3xl">
+            Battle-tested cheat codes, emergency incident runbooks, and performance knobs for Apache Spark, dbt, Airflow, and Lakehouse platforms. Structured as Problem Scenario &rarr; Root Cause Triage &rarr; Hardened Solution with measurable production ROI.
           </p>
 
           {/* Quick Metrics Bar */}
-          <div className="mt-7 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl">
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 sm:p-4 shadow-sm">
-              <span className="text-xs text-[var(--muted-foreground)] font-medium">Production Codes</span>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-[var(--foreground)]">
+          <div className="pt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 max-w-3xl">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+              <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Production Codes</span>
+              <div className="mt-0.5 flex items-baseline gap-1.5">
+                <span className="text-lg sm:text-xl font-bold font-mono text-[var(--foreground)]">
                   {cheatsheetData.length}
                 </span>
-                <span className="text-xs text-blue-400 font-medium">Battle-Tested</span>
+                <span className="text-[10px] text-blue-400 font-medium">Battle-Tested</span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 sm:p-4 shadow-sm">
-              <span className="text-xs text-[var(--muted-foreground)] font-medium">Emergency Triage</span>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-400">10+ Sev-1</span>
-                <span className="text-xs text-[var(--muted-foreground)]">Runbooks</span>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+              <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Emergency Triage</span>
+              <div className="mt-0.5 flex items-baseline gap-1.5">
+                <span className="text-lg sm:text-xl font-bold font-mono text-emerald-400">10+ Sev-1</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">Runbooks</span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 sm:p-4 shadow-sm">
-              <span className="text-xs text-[var(--muted-foreground)] font-medium">Shuffle Reduction</span>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-purple-400">80% - 100%</span>
-                <span className="text-xs text-[var(--muted-foreground)]">BHJ / Bucketing</span>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+              <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Shuffle Reduction</span>
+              <div className="mt-0.5 flex items-baseline gap-1.5">
+                <span className="text-lg sm:text-xl font-bold font-mono text-purple-400">80%-100%</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">BHJ</span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 sm:p-4 shadow-sm">
-              <span className="text-xs text-[var(--muted-foreground)] font-medium">Core Domains</span>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-cyan-400">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+              <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Core Domains</span>
+              <div className="mt-0.5 flex items-baseline gap-1.5">
+                <span className="text-lg sm:text-xl font-bold font-mono text-cyan-400">
                   {ALL_CATEGORIES.length}
                 </span>
-                <span className="text-xs text-[var(--muted-foreground)]">End-to-End</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">End-to-End</span>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Main Content Area */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8" id="main-content">
+      <div className="space-y-4" id="main-content">
         {/* Interactive Optimization Flow Diagram */}
         <section aria-labelledby="optimization-flow-heading">
           <OptimizationFlow onSelectCheatCode={handleJumpToCode} />
         </section>
 
         {/* Whiteboard Blueprints Reference Banner */}
-        <div className="p-4 rounded-2xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">📐</span>
-            <div>
-              <h4 className="text-sm font-bold text-[var(--foreground)]">Looking for visual system design blueprints?</h4>
-              <p className="text-xs text-[var(--muted-foreground)]">Pair your code optimization with 21 high-resolution whiteboard architecture diagrams detailing Spark memory shuffles, Catalyst query plans, Delta Lake ACID commits, and Airflow distributed workers.</p>
+        <div className="p-3 sm:p-3.5 rounded-xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
+              <Layers size={16} />
+            </div>
+            <div className="min-w-0">
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Looking for visual system design blueprints?</h4>
+              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-1">Pair your code optimization with 21 high-resolution whiteboard architecture diagrams detailing Spark memory shuffles, Catalyst query plans, Delta Lake ACID commits, and Airflow distributed workers.</p>
             </div>
           </div>
           <Link
             href="/architecture?tab=diagrams"
-            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
+            className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
           >
             Explore 21 Blueprints &rarr;
           </Link>
         </div>
 
         {/* Search, Filter Pills & Impact Select */}
-        <section aria-labelledby="filters-heading" className="pt-2">
+        <section aria-labelledby="filters-heading">
           <CategoryBar
             categories={ALL_CATEGORIES}
             categoryCounts={categoryCounts}
@@ -353,11 +355,11 @@ function CheatSheetContent() {
         </section>
 
         {/* Grid Layout + Sticky TOC Sidebar */}
-        <div className="flex items-start gap-8">
+        <div className="flex items-start gap-4 sm:gap-6">
           {/* Main Grid of Cards */}
           <div className="flex-1 min-w-0">
             {filteredCodes.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-3.5 sm:gap-4">
                 {filteredCodes.map((cheat) => (
                   <CheatCard
                     key={cheat.id}
@@ -408,7 +410,7 @@ function CheatSheetContent() {
             onSelectScenario={setSelectedScenario}
           />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

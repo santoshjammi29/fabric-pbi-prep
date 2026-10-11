@@ -14,6 +14,7 @@ import {
   Search,
   MessageSquare,
   FileCode2,
+  GitMerge,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pysparkData } from "@/data";
@@ -267,7 +268,7 @@ export default function SparkEnginePage() {
   }, [selectedLexiconCat, lexiconQuery]);
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 pb-16">
       <HubSubnav
         hubTitle="Concepts & Engines"
         items={[
@@ -278,30 +279,30 @@ export default function SparkEnginePage() {
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400">
-              <Zap size={14} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400">
+              <Zap size={13} />
               <span>Step 3 · Distributed Engine Internals</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
               Apache Spark &amp; Tungsten Engine Hub
             </h1>
-            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
               Deep-dive into Spark physical execution plans, memory management, Catalyst optimizers,
               live partition flow simulators, and the 32-level PySpark curriculum.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-red-400">Spark 4.0</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Ready Engine</div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl font-bold text-red-400 leading-none">Spark 4.0</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Ready Engine</div>
             </div>
-            <div className="px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-2xl font-bold text-amber-400">32</div>
-              <div className="text-[11px] text-[var(--muted-foreground)] font-medium">Curriculum Levels</div>
+            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-xl font-bold text-amber-400 leading-none">32</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Curriculum Levels</div>
             </div>
           </div>
         </div>
@@ -330,13 +331,13 @@ export default function SparkEnginePage() {
       />
 
       {/* 4-Layer Integrated Domain Taxonomy */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
         <Link
           href="/concepts?term=Spark"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-3 group"
+          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-            <BookOpen size={16} />
+          <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <BookOpen size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
@@ -346,10 +347,10 @@ export default function SparkEnginePage() {
 
         <Link
           href="/code-practice?db=pyspark"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-3 group"
+          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-            <FileCode2 size={16} />
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+            <FileCode2 size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code</div>
@@ -359,10 +360,10 @@ export default function SparkEnginePage() {
 
         <Link
           href="/qa-prep?q=Spark"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-3 group"
+          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
-            <MessageSquare size={16} />
+          <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
@@ -372,10 +373,10 @@ export default function SparkEnginePage() {
 
         <Link
           href="/architecture?q=Spark"
-          className="p-3.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-3 group"
+          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-            <Layers size={16} />
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={15} />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
@@ -387,11 +388,11 @@ export default function SparkEnginePage() {
       {/* Subtab Navigation Chips */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: "architecture", label: "⚡ Engine Architecture", icon: Cpu },
-          { id: "simulator", label: "▶ Live Physical Simulator", icon: Activity },
-          { id: "memory", label: "🧮 Tungsten Memory Mapper", icon: Calculator },
-          { id: "curriculum", label: "🎓 32-Level PySpark Curriculum", icon: BookOpen },
-          { id: "lexicon", label: "📖 Architect's Lexicon", icon: Layers },
+          { id: "architecture", label: "Engine Architecture", icon: Cpu },
+          { id: "simulator", label: "Live Physical Simulator", icon: Activity },
+          { id: "memory", label: "Tungsten Memory Mapper", icon: Calculator },
+          { id: "curriculum", label: "32-Level PySpark Curriculum", icon: BookOpen },
+          { id: "lexicon", label: "Architect's Lexicon", icon: Layers },
         ].map((tab) => {
           const Icon = tab.icon;
           const isSelected = activeTab === tab.id;
@@ -400,13 +401,13 @@ export default function SparkEnginePage() {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as SparkSubtab)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0",
                 isSelected
-                  ? "bg-purple-600 text-white shadow-lg shadow-purple-500/20"
+                  ? "bg-purple-600 text-white shadow-sm shadow-purple-500/20"
                   : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
               )}
             >
-              <Icon size={16} />
+              <Icon size={14} />
               <span>{tab.label}</span>
             </button>
           );
@@ -415,94 +416,94 @@ export default function SparkEnginePage() {
 
       {/* 1. ENGINE ARCHITECTURE VIEW */}
       {activeTab === "architecture" && (
-        <div id="architecture" className="space-y-6 animate-in fade-in duration-300">
+        <div id="architecture" className="space-y-4 animate-in fade-in duration-300">
           {/* 3 Milestones */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-lg">
-                🔗
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold">
+                <GitMerge size={16} />
               </div>
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
                 Unification Breakthrough
               </div>
-              <h3 className="text-base font-bold text-[var(--foreground)]">Unified Data Plane</h3>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              <h3 className="text-sm font-bold text-[var(--foreground)]">Unified Data Plane</h3>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 By integrating streaming, interactive SQL, graph structures, and iterative machine learning directly into a single engine, Spark eliminates expensive system-to-system serialization.
               </p>
             </div>
 
-            <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg">
-                🧬
+            <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
+                <Cpu size={16} />
               </div>
-              <div className="text-xs font-bold text-purple-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
                 Memory Paradigm Shift
               </div>
-              <h3 className="text-base font-bold text-[var(--foreground)]">Lineage vs Replication</h3>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              <h3 className="text-sm font-bold text-[var(--foreground)]">Lineage vs Replication</h3>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 Rather than writing intermediate states to physical disk (like MapReduce), RDDs store deterministic lineage graphs. If a partition fails, it is recomputed on-the-fly.
               </p>
             </div>
 
-            <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-lg">
-                🧠
+            <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                <Zap size={16} />
               </div>
-              <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
                 Optimized Compilation
               </div>
-              <h3 className="text-base font-bold text-[var(--foreground)]">Declarative Optimization</h3>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              <h3 className="text-sm font-bold text-[var(--foreground)]">Declarative Optimization</h3>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                 High-level DataFrame queries allow the Catalyst Optimizer and Tungsten Engine to dynamically rewrite query DAGs and compile custom JVM bytecode at runtime.
               </p>
             </div>
           </div>
 
           {/* Whiteboard Architecture Blueprints Showcase */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                  <Layers size={14} /> Visual System Blueprints
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                  <Layers size={13} /> Visual System Blueprints
                 </span>
-                <h3 className="text-xl font-bold text-[var(--foreground)] mt-1">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
                   Databricks &amp; Spark Engine Architecture Blueprints
                 </h3>
-                <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-0.5">
+                <p className="text-xs text-[var(--muted-foreground)]">
                   High-resolution digital whiteboard sketch diagrams explaining query optimization, medallion pipelines, and vectorized compute.
                 </p>
               </div>
 
               <Link
                 href="/architecture?tab=diagrams"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shrink-0"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-sm shrink-0"
               >
                 <span>View Full Diagrams Hub</span>
-                <ChevronDown size={14} className="-rotate-90" />
+                <ChevronDown size={13} className="-rotate-90" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Link
                 href="/architecture?tab=diagrams&diagram=spark-catalyst-photon-engine"
-                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
               >
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
                   <img
                     src="/diagrams/catalyst_photon_engine.jpg"
                     alt="Catalyst and Photon Engine"
                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
                     Compute &amp; Optimization
                   </div>
                 </div>
-                <div className="px-1">
-                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                <div className="px-0.5">
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
                     Catalyst Optimizer, AQE &amp; Photon Engine
                   </h4>
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
                     4-phase Catalyst query compilation pipeline, runtime Adaptive Query Execution re-planning, and vectorized C++ execution.
                   </p>
                 </div>
@@ -510,24 +511,24 @@ export default function SparkEnginePage() {
 
               <Link
                 href="/architecture?tab=diagrams&diagram=spark-shuffle-memory-execution"
-                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
               >
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
                   <img
                     src="/diagrams/spark_shuffle_memory_execution.jpg"
                     alt="Spark Memory Architecture and Shuffle Mechanics"
                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
                     Memory &amp; Shuffle
                   </div>
                 </div>
-                <div className="px-1">
-                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                <div className="px-0.5">
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
                     Spark Executor Memory &amp; Shuffle Mechanics
                   </h4>
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
                     Unified Memory Manager dynamic borrowing, Tungsten off-heap memory, and sort-based shuffle spilling to disk.
                   </p>
                 </div>
@@ -535,24 +536,24 @@ export default function SparkEnginePage() {
 
               <Link
                 href="/architecture?tab=diagrams&diagram=delta-lake-under-the-hood"
-                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
               >
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
                   <img
                     src="/diagrams/delta_lake_mechanism.jpg"
                     alt="Delta Lake Storage Engine"
                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
                     Storage Engine
                   </div>
                 </div>
-                <div className="px-1">
-                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                <div className="px-0.5">
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
                     Delta Lake ACID &amp; Transaction Log Mechanics
                   </h4>
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
                     3-panel mechanism contrasting raw Parquet limitations with _delta_log JSON commits, OCC, and Liquid Clustering.
                   </p>
                 </div>
@@ -560,24 +561,24 @@ export default function SparkEnginePage() {
 
               <Link
                 href="/architecture?tab=diagrams&diagram=databricks-platform-master"
-                className="group rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-3 overflow-hidden transition-all flex flex-col space-y-3"
+                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
               >
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
                   <img
                     src="/diagrams/databricks_ecosystem_landscape.jpg"
                     alt="Databricks Unified Platform"
                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold text-white uppercase">
+                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
                     Master Platform Landscape
                   </div>
                 </div>
-                <div className="px-1">
-                  <h4 className="text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
+                <div className="px-0.5">
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
                     Databricks Unified Data Intelligence Platform
                   </h4>
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
+                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
                     Complete multi-tier architectural map spanning Auto Loader, Delta Lake, Unity Catalog, Photon, DLT, BI, and Mosaic AI.
                   </p>
                 </div>
@@ -586,34 +587,39 @@ export default function SparkEnginePage() {
           </div>
 
           {/* 6 Production Rules */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-green-400 flex items-center gap-1.5">
-                <ShieldCheck size={14} /> Production Engineering Standard
+              <span className="text-[10px] font-bold uppercase tracking-wider text-green-400 flex items-center gap-1.5">
+                <ShieldCheck size={13} /> Production Engineering Standard
               </span>
-              <h3 className="text-xl font-bold text-[var(--foreground)] mt-1">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
                 6 Rules for High-Throughput Spark Architectures
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
-                { num: "01", icon: "🌊", title: "Eliminate Shuffle Spills", desc: "Spills occur when execution memory cannot fit in-flight shuffle structures. Size partitions properly (100–200 MB) and balance spark.memory.fraction = 0.6." },
-                { num: "02", icon: "📡", title: "Broadcast Small-File Joins", desc: "Avoid sort-merge joins when joining large datasets with small lookups (<10MB). Explicitly broadcast the smaller table to bypass full stage exchanges." },
-                { num: "03", icon: "🚫", title: "Avoid Row-by-Row UDFs", desc: "Python/Scala UDFs bypass Catalyst optimization and force row-by-row object instantiation. Use native Spark SQL expressions or vectorized Pandas-UDFs." },
-                { num: "04", icon: "⏱️", title: "Enforce Dynamic Watermarking", desc: "Stateful Structured Streaming applications must enforce retention limits with watermarks. Uncapped state expansion triggers OutOfMemory errors." },
-                { num: "05", icon: "🔗", title: "Truncate Long Lineage DAGs", desc: "Long lineage graphs overwhelm the Driver JVM call stack. Break long DAGs in iterative algorithms by periodically calling .checkpoint() to disk." },
-                { num: "06", icon: "🧹", title: "Explicit Storage Unpersist", desc: "DataFrames persisted via .cache() or .persist() remain in memory indefinitely. Always call .unpersist() as soon as downstream stages complete." },
-              ].map((rule) => (
-                <div key={rule.num} className="p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl">{rule.icon}</span>
-                    <span className="text-xs font-mono font-bold text-[var(--muted-foreground)]">{rule.num}</span>
+                { num: "01", iconComponent: Layers, iconColor: "text-blue-400", title: "Eliminate Shuffle Spills", desc: "Spills occur when execution memory cannot fit in-flight shuffle structures. Size partitions properly (100–200 MB) and balance spark.memory.fraction = 0.6." },
+                { num: "02", iconComponent: Cpu, iconColor: "text-purple-400", title: "Broadcast Small-File Joins", desc: "Avoid sort-merge joins when joining large datasets with small lookups (<10MB). Explicitly broadcast the smaller table to bypass full stage exchanges." },
+                { num: "03", iconComponent: ShieldCheck, iconColor: "text-amber-400", title: "Avoid Row-by-Row UDFs", desc: "Python/Scala UDFs bypass Catalyst optimization and force row-by-row object instantiation. Use native Spark SQL expressions or vectorized Pandas-UDFs." },
+                { num: "04", iconComponent: Activity, iconColor: "text-emerald-400", title: "Enforce Dynamic Watermarking", desc: "Stateful Structured Streaming applications must enforce retention limits with watermarks. Uncapped state expansion triggers OutOfMemory errors." },
+                { num: "05", iconComponent: GitMerge, iconColor: "text-cyan-400", title: "Truncate Long Lineage DAGs", desc: "Long lineage graphs overwhelm the Driver JVM call stack. Break long DAGs in iterative algorithms by periodically calling .checkpoint() to disk." },
+                { num: "06", iconComponent: Zap, iconColor: "text-red-400", title: "Explicit Storage Unpersist", desc: "DataFrames persisted via .cache() or .persist() remain in memory indefinitely. Always call .unpersist() as soon as downstream stages complete." },
+              ].map((rule) => {
+                const RuleIcon = rule.iconComponent;
+                return (
+                  <div key={rule.num} className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="w-6 h-6 rounded-md bg-[var(--surface-1)] border border-[var(--border)] flex items-center justify-center">
+                        <RuleIcon size={13} className={rule.iconColor} />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-[var(--muted-foreground)]">{rule.num}</span>
+                    </div>
+                    <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">{rule.title}</h4>
+                    <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">{rule.desc}</p>
                   </div>
-                  <h4 className="text-sm font-bold text-[var(--foreground)]">{rule.title}</h4>
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{rule.desc}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -621,25 +627,25 @@ export default function SparkEnginePage() {
 
       {/* 2. PHYSICAL SIMULATOR VIEW */}
       {activeTab === "simulator" && (
-        <div id="simulator" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div id="simulator" className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-300">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
-                ▶ Physical Execution Engine
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
+                Physical Execution Engine
               </span>
-              <h3 className="text-xl font-bold text-[var(--foreground)] mt-0.5">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
                 Interactive Execution Simulator
               </h3>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+              <p className="text-xs text-[var(--muted-foreground)]">
                 Simulate task scheduling, partition flows, and stage boundaries across executor cores in real time.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <select
                 value={flowType}
                 onChange={(e) => handleFlowTypeChange(e.target.value as any)}
-                className="px-4 py-2.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm font-semibold text-[var(--foreground)] outline-none"
+                className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] outline-none"
               >
                 <option value="narrow">Narrow Dependency (Map/Filter)</option>
                 <option value="wide">Wide Dependency (Sort-Merge Shuffle)</option>
@@ -650,66 +656,66 @@ export default function SparkEnginePage() {
               <button
                 onClick={runSimulation}
                 disabled={isSimRunning}
-                className="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-sm hover:shadow-purple-500/25 disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                <Activity size={16} className={cn(isSimRunning && "animate-pulse")} />
-                <span>{isSimRunning ? "Running..." : "▶ Run Plan"}</span>
+                <Activity size={14} className={cn(isSimRunning && "animate-pulse")} />
+                <span>{isSimRunning ? "Running..." : "Run Plan"}</span>
               </button>
             </div>
           </div>
 
           {/* Simulator Canvas */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             {/* Terminal Visualizer */}
-            <div className="lg:col-span-2 rounded-2xl bg-[#090d13] border border-white/10 p-5 space-y-4 font-mono text-xs text-slate-300">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <span className="w-3 h-3 rounded-full bg-green-500/80" />
-                  <span className="text-[11px] text-slate-400 ml-2">spark-physical-plan.scala</span>
+            <div className="lg:col-span-2 rounded-xl bg-[#090d13] border border-white/10 p-4 space-y-3 font-mono text-xs text-slate-300">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                  <span className="text-[10px] text-slate-400 ml-1.5">spark-physical-plan.scala</span>
                 </div>
-                <span className="text-[10px] text-purple-400 font-bold px-2 py-0.5 rounded bg-purple-950/80 border border-purple-800">
+                <span className="text-[9px] text-purple-400 font-bold px-1.5 py-0.5 rounded bg-purple-950/80 border border-purple-800">
                   LIVE CLUSTER
                 </span>
               </div>
 
               {/* Node Visualizer */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-center">
                 {/* Column 1: Input Partitions */}
-                <div className="space-y-2">
-                  <div className="text-[11px] font-bold text-slate-400 uppercase">Input Slices (S3/ADLS)</div>
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Input Slices (S3/ADLS)</div>
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
                       className={cn(
-                        "p-2.5 rounded-xl border transition-all text-xs",
+                        "p-2 rounded-lg border transition-all text-xs",
                         simStep >= 1
                           ? "bg-blue-950/60 border-blue-500/50 text-blue-300 shadow-[0_0_10px_rgba(59,130,246,0.2)]"
                           : "bg-slate-900/60 border-white/5 text-slate-400"
                       )}
                     >
                       Partition A{i}
-                      <div className="text-[10px] opacity-60">Block 128MB</div>
+                      <div className="text-[9px] opacity-60">Block 128MB</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Column 2: Executor Cores */}
-                <div className="space-y-2">
-                  <div className="text-[11px] font-bold text-slate-400 uppercase">Executor Cores</div>
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Executor Cores</div>
                   {[1, 2].map((i) => (
                     <div
                       key={i}
                       className={cn(
-                        "p-4 rounded-xl border transition-all text-xs flex flex-col items-center justify-center",
+                        "p-3 rounded-lg border transition-all text-xs flex flex-col items-center justify-center",
                         simStep === 2
                           ? "bg-purple-950/80 border-purple-500 text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)] animate-pulse"
                           : "bg-slate-900/60 border-white/5 text-slate-400"
                       )}
                     >
-                      <span>⚡ Core #{i}</span>
-                      <span className="text-[10px] opacity-70 mt-1">
+                      <span className="flex items-center gap-1"><Cpu size={12} className="text-purple-400" /> Core #{i}</span>
+                      <span className="text-[9px] opacity-70 mt-0.5">
                         {simStep === 2 ? "Compiling Bytecode..." : simStep === 3 ? "Idle" : "Ready"}
                       </span>
                     </div>
@@ -717,20 +723,20 @@ export default function SparkEnginePage() {
                 </div>
 
                 {/* Column 3: Tungsten Targets */}
-                <div className="space-y-2">
-                  <div className="text-[11px] font-bold text-slate-400 uppercase">Tungsten Memory</div>
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase">Tungsten Memory</div>
                   {[0, 1].map((i) => (
                     <div
                       key={i}
                       className={cn(
-                        "p-3 rounded-xl border transition-all text-xs",
+                        "p-2 rounded-lg border transition-all text-xs",
                         simStep === 3
                           ? "bg-green-950/60 border-green-500/60 text-green-300 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
                           : "bg-slate-900/60 border-white/5 text-slate-400"
                       )}
                     >
                       Out Partition #{i}
-                      <div className="text-[10px] opacity-60">
+                      <div className="text-[9px] opacity-60">
                         {simStep === 3 ? "✓ Materialized" : "Pending"}
                       </div>
                     </div>
@@ -740,12 +746,12 @@ export default function SparkEnginePage() {
             </div>
 
             {/* Metrics & Logs Panel */}
-            <div className="p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-4 text-xs sm:text-sm">
+            <div className="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-3 text-xs sm:text-sm">
               <div>
-                <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
                   Physical Execution Breakdown
                 </span>
-                <h4 className="text-base font-bold text-[var(--foreground)] mt-0.5">
+                <h4 className="text-sm font-bold text-[var(--foreground)] mt-0.5">
                   {simFlowDetails[flowType].title}
                 </h4>
               </div>
@@ -754,12 +760,12 @@ export default function SparkEnginePage() {
                 {simFlowDetails[flowType].mechanics}
               </p>
 
-              <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs">
+              <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs">
                 <strong>Architect Benefit:</strong> {simFlowDetails[flowType].benefit}
               </div>
 
               {/* Stats */}
-              <div className="pt-2 border-t border-[var(--border)] space-y-2 text-xs">
+              <div className="pt-2 border-t border-[var(--border)] space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[var(--muted-foreground)]">Network Shuffled Bytes:</span>
                   <span className="font-mono font-bold text-orange-400">{simFlowDetails[flowType].shuffled}</span>
@@ -780,25 +786,25 @@ export default function SparkEnginePage() {
 
       {/* 3. TUNGSTEN MEMORY MAPPER VIEW */}
       {activeTab === "memory" && (
-        <div id="memory" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
+        <div id="memory" className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-300">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-              <Calculator size={14} /> Tungsten &amp; Unified Memory
+            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+              <Calculator size={13} /> Tungsten &amp; Unified Memory
             </span>
-            <h3 className="text-xl font-bold text-[var(--foreground)] mt-1">
+            <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
               Live JVM Executor Memory Allocator
             </h3>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+            <p className="text-xs text-[var(--muted-foreground)]">
               Spark dynamically shares JVM heap between Execution (shuffles/joins) and Storage (caching). Adjust the parameters below to compute pool splits.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Sliders */}
-            <div className="space-y-5 p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
+            <div className="space-y-4 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
               {/* Heap Size */}
-              <div className="space-y-2">
-                <label htmlFor="spark-heap-size" className="flex items-center justify-between text-xs sm:text-sm font-semibold cursor-pointer">
+              <div className="space-y-1.5">
+                <label htmlFor="spark-heap-size" className="flex items-center justify-between text-xs font-semibold cursor-pointer">
                   <span className="text-[var(--foreground)]">Executor Heap Memory (--executor-memory)</span>
                   <span className="font-mono text-purple-400 font-bold">{heapSize} GB</span>
                 </label>
@@ -818,14 +824,14 @@ export default function SparkEnginePage() {
                   aria-valuenow={heapSize}
                   aria-valuetext={`${heapSize} gigabytes heap memory`}
                 />
-                <div className="text-[11px] text-[var(--muted-foreground)]">
+                <div className="text-[10px] text-[var(--muted-foreground)]">
                   Total JVM memory allocated per container.
                 </div>
               </div>
 
               {/* Memory Fraction */}
-              <div className="space-y-2">
-                <label htmlFor="spark-mem-fraction" className="flex items-center justify-between text-xs sm:text-sm font-semibold cursor-pointer">
+              <div className="space-y-1.5">
+                <label htmlFor="spark-mem-fraction" className="flex items-center justify-between text-xs font-semibold cursor-pointer">
                   <span className="text-[var(--foreground)]">spark.memory.fraction</span>
                   <span className="font-mono text-blue-400 font-bold">{memFraction}</span>
                 </label>
@@ -845,14 +851,14 @@ export default function SparkEnginePage() {
                   aria-valuenow={memFraction}
                   aria-valuetext={`Memory fraction ${memFraction}`}
                 />
-                <div className="text-[11px] text-[var(--muted-foreground)]">
+                <div className="text-[10px] text-[var(--muted-foreground)]">
                   Fraction of usable heap dedicated to Spark internal execution &amp; caching.
                 </div>
               </div>
 
               {/* Storage Fraction */}
-              <div className="space-y-2">
-                <label htmlFor="spark-storage-fraction" className="flex items-center justify-between text-xs sm:text-sm font-semibold cursor-pointer">
+              <div className="space-y-1.5">
+                <label htmlFor="spark-storage-fraction" className="flex items-center justify-between text-xs font-semibold cursor-pointer">
                   <span className="text-[var(--foreground)]">spark.memory.storageFraction</span>
                   <span className="font-mono text-green-400 font-bold">{storageFraction}</span>
                 </label>
@@ -872,20 +878,20 @@ export default function SparkEnginePage() {
                   aria-valuenow={storageFraction}
                   aria-valuetext={`Storage fraction ${storageFraction}`}
                 />
-                <div className="text-[11px] text-[var(--muted-foreground)]">
+                <div className="text-[10px] text-[var(--muted-foreground)]">
                   Immune storage margin protected from eviction by active execution shuffles.
                 </div>
               </div>
             </div>
 
             {/* Visual Allocation Breakdown */}
-            <div className="space-y-4 p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+            <div className="space-y-3 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--foreground)]">
                 JVM Executor Heap Allocation Breakdown:
               </h4>
 
               {/* Multi-segment progress bar */}
-              <div className="h-8 rounded-xl overflow-hidden flex border border-[var(--border)] shadow-inner">
+              <div className="h-7 rounded-lg overflow-hidden flex border border-[var(--border)] shadow-inner">
                 <div
                   style={{ width: `${(executionPoolMB / totalHeapMB) * 100}%` }}
                   className="bg-purple-600 flex items-center justify-center text-[10px] font-bold text-white transition-all truncate px-1"
@@ -917,34 +923,34 @@ export default function SparkEnginePage() {
               </div>
 
               {/* Legend with calculated MBs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2">
-                <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                  <div className="text-purple-400 font-bold">⚡ Execution Pool</div>
-                  <div className="text-base font-bold text-[var(--foreground)] mt-0.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <div className="text-purple-400 font-bold flex items-center gap-1.5"><Cpu size={13} /> Execution Pool</div>
+                  <div className="text-sm font-bold text-[var(--foreground)] mt-0.5">
                     {(executionPoolMB / 1024).toFixed(2)} GB
                   </div>
                   <div className="text-[10px] text-[var(--muted-foreground)]">Joins, Shuffles, Aggregations</div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                  <div className="text-blue-400 font-bold">📦 Storage Pool</div>
-                  <div className="text-base font-bold text-[var(--foreground)] mt-0.5">
+                <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <div className="text-blue-400 font-bold flex items-center gap-1.5"><Layers size={13} /> Storage Pool</div>
+                  <div className="text-sm font-bold text-[var(--foreground)] mt-0.5">
                     {(storagePoolMB / 1024).toFixed(2)} GB
                   </div>
                   <div className="text-[10px] text-[var(--muted-foreground)]">.cache() &amp; .persist() tables</div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                  <div className="text-amber-400 font-bold">👤 User Memory</div>
-                  <div className="text-base font-bold text-[var(--foreground)] mt-0.5">
+                <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <div className="text-amber-400 font-bold flex items-center gap-1.5"><Zap size={13} /> User Memory</div>
+                  <div className="text-sm font-bold text-[var(--foreground)] mt-0.5">
                     {(userMemoryMB / 1024).toFixed(2)} GB
                   </div>
                   <div className="text-[10px] text-[var(--muted-foreground)]">Custom structures &amp; UDFs</div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-500/10 border border-slate-500/20">
-                  <div className="text-slate-400 font-bold">🔒 Reserved Memory</div>
-                  <div className="text-base font-bold text-[var(--foreground)] mt-0.5">300 MB</div>
+                <div className="p-2.5 rounded-lg bg-slate-500/10 border border-slate-500/20">
+                  <div className="text-slate-400 font-bold flex items-center gap-1.5"><ShieldCheck size={13} /> Reserved Memory</div>
+                  <div className="text-sm font-bold text-[var(--foreground)] mt-0.5">300 MB</div>
                   <div className="text-[10px] text-[var(--muted-foreground)]">Spark hardcoded safety buffer</div>
                 </div>
               </div>
@@ -955,27 +961,27 @@ export default function SparkEnginePage() {
 
       {/* 4. PYSPARK CURRICULUM VIEW */}
       {activeTab === "curriculum" && (
-        <div id="curriculum" className="space-y-6 animate-in fade-in duration-300">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div id="curriculum" className="space-y-3.5 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h3 className="text-xl font-bold text-[var(--foreground)]">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)]">
                 Senior PySpark Master Curriculum (32 Levels)
               </h3>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+              <p className="text-xs text-[var(--muted-foreground)]">
                 From Spark Connect architecture to K8s dynamic allocations and PyDeequ testing.
               </p>
             </div>
 
             {/* Phase Filters */}
-            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+            <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
               {["all", 1, 2, 3, 4].map((phase) => (
                 <button
                   key={phase}
                   onClick={() => setSelectedPhase(phase as any)}
                   className={cn(
-                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 capitalize",
+                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize",
                     selectedPhase === phase
-                      ? "bg-purple-600 text-white shadow-md font-semibold"
+                      ? "bg-purple-600 text-white shadow-sm font-semibold"
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >
@@ -986,11 +992,11 @@ export default function SparkEnginePage() {
           </div>
 
           {/* Curriculum Meta Action Bar */}
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
+          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-0.5">
             <span>
               Showing <strong className="text-[var(--foreground)]">{pysparkData.length}</strong> curriculum modules
             </span>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setExpandedLevels(new Set(pysparkData.map((i) => i.id)))}
                 className="hover:text-[var(--foreground)] font-medium transition-colors"
@@ -1008,43 +1014,43 @@ export default function SparkEnginePage() {
           </div>
 
           {/* Curriculum items */}
-          <div className="space-y-4">
+          <div className="space-y-2.5">
             {pysparkData.map((item, index) => {
               const isExpanded = expandedLevels.has(item.id);
               return (
                 <div
                   key={item.id}
                   className={cn(
-                    "rounded-2xl border transition-all duration-200 overflow-hidden",
+                    "rounded-xl border transition-all duration-150 overflow-hidden",
                     isExpanded
-                      ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
+                      ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xs"
                       : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)]"
                   )}
                 >
                   <div
                     onClick={() => toggleLevelExpand(item.id)}
-                    className="p-5 cursor-pointer flex items-center justify-between gap-3 select-none"
+                    className="p-3 sm:p-3.5 cursor-pointer flex items-center justify-between gap-3 select-none"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0 border border-purple-500/20">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0 border border-purple-500/20">
                         L{index + 1}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-[11px] text-purple-400 font-semibold uppercase">{item.category}</div>
-                        <h4 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
+                        <div className="text-[10px] text-purple-400 font-semibold uppercase">{item.category}</div>
+                        <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">
                           {item.title}
                         </h4>
                       </div>
                     </div>
                     <ChevronDown
-                      size={16}
-                      className={cn("text-[var(--muted-foreground)] transition-transform duration-200 shrink-0", isExpanded && "rotate-180 text-purple-400")}
+                      size={15}
+                      className={cn("text-[var(--muted-foreground)] transition-transform duration-150 shrink-0", isExpanded && "rotate-180 text-purple-400")}
                     />
                   </div>
 
-                  <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                  <SmoothAccordion isOpen={isExpanded} innerClassName="p-3.5 space-y-3 text-xs sm:text-sm border-t border-[var(--border)] bg-[var(--surface-2)]">
                     {item.use_case && (
-                      <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200">
+                      <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs">
                         <strong>Enterprise Scenario:</strong> {item.use_case}
                       </div>
                     )}
@@ -1056,8 +1062,8 @@ export default function SparkEnginePage() {
                     />
                     {item.notes && item.notes.length > 0 && (
                       <div className="space-y-1">
-                        <span className="font-bold text-[var(--foreground)]">Execution Mechanics:</span>
-                        <ul className="list-disc pl-5 space-y-1 text-[var(--muted-foreground)]">
+                        <span className="font-bold text-[var(--foreground)] text-xs">Execution Mechanics:</span>
+                        <ul className="list-disc pl-5 space-y-0.5 text-xs text-[var(--muted-foreground)]">
                           {item.notes.map((n, i) => (
                             <li key={i}>{n}</li>
                           ))}
@@ -1074,26 +1080,26 @@ export default function SparkEnginePage() {
 
       {/* 5. ARCHITECT'S LEXICON VIEW */}
       {activeTab === "lexicon" && (
-        <div id="lexicon" className="p-6 sm:p-8 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-6 animate-in fade-in duration-300">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div id="lexicon" className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
                 Core Terminology Encyclopedia
               </span>
-              <h3 className="text-xl font-bold text-[var(--foreground)] mt-0.5">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
                 The Architect&rsquo;s Spark Lexicon
               </h3>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2.5">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
                   type="text"
                   value={lexiconQuery}
                   onChange={(e) => setLexiconQuery(e.target.value)}
                   placeholder="Search terms (e.g. AQE, Tungsten)..."
-                  className="pl-9 pr-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--foreground)] outline-none"
+                  className="pl-8 pr-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--foreground)] outline-none"
                 />
               </div>
 
@@ -1103,7 +1109,7 @@ export default function SparkEnginePage() {
                     key={cat}
                     onClick={() => setSelectedLexiconCat(cat)}
                     className={cn(
-                      "px-2.5 py-1 rounded-lg text-xs font-medium capitalize",
+                      "px-2 py-0.5 rounded-lg text-xs font-medium capitalize",
                       selectedLexiconCat === cat
                         ? "bg-purple-600 text-white font-semibold"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
@@ -1117,18 +1123,18 @@ export default function SparkEnginePage() {
           </div>
 
           {/* Lexicon Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filteredLexicon.map((term) => (
-              <div key={term.term} className="p-5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+              <div key={term.term} className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wide">
+                  <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wide">
                     {term.category}
                   </span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
                     {term.badge}
                   </span>
                 </div>
-                <h4 className="text-base font-bold text-[var(--foreground)]">{term.term}</h4>
+                <h4 className="text-sm font-bold text-[var(--foreground)]">{term.term}</h4>
                 <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{term.def}</p>
               </div>
             ))}

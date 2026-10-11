@@ -163,7 +163,7 @@ export function HomeWhiteboardsShowcase() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left: Featured Large Interactive Blueprint Card */}
         {featuredDiagram && (
-          <div className="lg:col-span-8 rounded-3xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 space-y-4 shadow-sm relative overflow-hidden group">
+          <div className="lg:col-span-8 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-3.5 sm:p-5 space-y-3.5 shadow-sm relative overflow-hidden group">
             {/* Top row: Badge + Categories */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export function HomeWhiteboardsShowcase() {
                     setActiveModalDiagram(d);
                     setZoomLevel(1);
                   }}
-                  className="p-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] transition-all cursor-pointer group flex items-start gap-3 shadow-xs hover:border-purple-500/40"
+                  className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] transition-all cursor-pointer group flex items-start gap-3 shadow-xs hover:border-purple-500/40"
                 >
                   {/* Thumbnail */}
                   <div className="relative w-24 h-18 sm:w-28 sm:h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white shrink-0 shadow-inner">

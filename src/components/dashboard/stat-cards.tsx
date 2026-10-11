@@ -72,7 +72,7 @@ export function StatCards() {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 sm:gap-3.5">
       {stats.map((stat, i) => {
         const Icon = stat.icon;
         return (
@@ -82,16 +82,16 @@ export function StatCards() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.3 }}
-              className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)] p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)] p-3 sm:p-3.5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
             >
-              <div className={cn("mb-4 inline-flex rounded-xl p-2.5 border", colorMap[stat.accent])}>
-                <Icon className="h-5 w-5" />
+              <div className={cn("mb-2.5 inline-flex rounded-lg p-2 border", colorMap[stat.accent])}>
+                <Icon className="h-4 w-4" />
               </div>
-              <div className="space-y-1">
-                <div className="text-2xl font-bold text-[var(--foreground)]">
+              <div className="space-y-0.5">
+                <div className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="text-sm font-medium text-[var(--muted-foreground)]">
+                <div className="text-xs font-medium text-[var(--muted-foreground)]">
                   {stat.title}
                 </div>
               </div>

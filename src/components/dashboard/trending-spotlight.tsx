@@ -87,7 +87,7 @@ export function TrendingSpotlight() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card 1: Question / Scenario of the Day */}
-        <div className="magazine-card p-6 flex flex-col justify-between space-y-4 transition-all">
+        <div className="magazine-card p-4 sm:p-5 rounded-xl flex flex-col justify-between space-y-3.5 transition-all">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -131,7 +131,7 @@ export function TrendingSpotlight() {
         </div>
 
         {/* Card 2: Code Snippet of the Day */}
-        <div className="magazine-card p-6 flex flex-col justify-between space-y-4 transition-all">
+        <div className="magazine-card p-4 sm:p-5 rounded-xl flex flex-col justify-between space-y-3.5 transition-all">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -167,7 +167,7 @@ export function TrendingSpotlight() {
         </div>
 
         {/* Card 3: Interactive Simulator Launcher */}
-        <div className="magazine-card p-6 flex flex-col justify-between space-y-4 transition-all">
+        <div className="magazine-card p-4 sm:p-5 rounded-xl flex flex-col justify-between space-y-3.5 transition-all">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-green-400 uppercase tracking-wider flex items-center gap-1.5">

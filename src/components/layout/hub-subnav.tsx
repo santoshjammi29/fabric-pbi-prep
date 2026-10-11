@@ -52,7 +52,7 @@ function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--surface-2)]/80 border border-[var(--border)] overflow-x-auto scrollbar-none mb-6",
+        "flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)]/80 border border-[var(--border)] overflow-x-auto scrollbar-none mb-3 sm:mb-4",
         className
       )}
       role="navigation"

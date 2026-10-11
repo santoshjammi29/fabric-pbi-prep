@@ -2,16 +2,17 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 interface TopicIconProps {
-  topicKey: string;
+  topicKey?: string;
+  topic?: string;
   size?: number;
   className?: string;
 }
 
-export function TopicIcon({ topicKey, size = 18, className }: TopicIconProps) {
-  const normKey = (topicKey || "").toLowerCase().trim();
+export function TopicIcon({ topicKey, topic, size = 18, className }: TopicIconProps) {
+  const normKey = (topicKey || topic || "").toLowerCase().trim();
 
   // 1. Apache Spark: Signature red-orange flame burst
-  if (normKey === "spark") {
+  if (normKey === "spark" || normKey === "pyspark") {
     return (
       <svg
         width={size}
@@ -306,7 +307,7 @@ export function TopicIcon({ topicKey, size = 18, className }: TopicIconProps) {
   }
 
   // 9. SQL Server & Distributed SQL: Database stack + query lightning
-  if (normKey === "sql") {
+  if (normKey === "sql" || normKey === "mssql" || normKey === "tsql") {
     return (
       <svg
         width={size}
@@ -498,6 +499,153 @@ export function TopicIcon({ topicKey, size = 18, className }: TopicIconProps) {
           fill="url(#pyYellow)"
         />
         <circle cx="14" cy="20" r="0.9" fill="#0F172A" />
+      </svg>
+    );
+  }
+
+  // 14. Snowflake: Official crystal blue snowflake
+  if (normKey === "snowflake" || normKey.includes("snowpro")) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Snowflake">
+        <path d="M12 2V22M2 12H22M4.93 4.93L19.07 19.07M4.93 19.07L19.07 4.93" stroke="#29B5E8" strokeWidth="2" strokeLinecap="round" />
+        <path d="M12 6L10 8M12 6L14 8M12 18L10 16M12 18L14 16M6 12L8 10M6 12L8 14M18 12L16 10M18 12L16 14" stroke="#29B5E8" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="12" cy="12" r="2.5" fill="#29B5E8" />
+      </svg>
+    );
+  }
+
+  // 15. DuckDB: Fast analytics duck logo
+  if (normKey === "duckdb") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="DuckDB">
+        <circle cx="12" cy="12" r="9" fill="#FFF000" stroke="#000000" strokeWidth="1.5" />
+        <ellipse cx="14" cy="11" rx="4" ry="3.5" fill="#FFF000" />
+        <circle cx="15.5" cy="9.5" r="1.2" fill="#000000" />
+        <path d="M17.5 11.5L21.5 12.5L17.5 13.5Z" fill="#FF8000" />
+        <path d="M7 14C8 17 12 18 15 16" stroke="#000000" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  // 16. Polars: High performance rust dataframe engine
+  if (normKey === "polars") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Polars">
+        <rect x="3" y="4" width="7" height="7" rx="1.5" fill="#00D4FF" />
+        <rect x="14" y="4" width="7" height="7" rx="1.5" fill="#2055A5" />
+        <rect x="3" y="13" width="7" height="7" rx="1.5" fill="#2055A5" />
+        <rect x="14" y="13" width="7" height="7" rx="1.5" fill="#CD79FF" />
+        <path d="M6.5 7.5H17.5M10.5 4V16.5" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" opacity="0.9" />
+      </svg>
+    );
+  }
+
+  // 17. Pandas: Data analysis library
+  if (normKey === "pandas") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Pandas">
+        <rect x="4" y="4" width="4" height="16" rx="1" fill="#150458" />
+        <rect x="10" y="8" width="4" height="12" rx="1" fill="#E70488" />
+        <rect x="16" y="4" width="4" height="16" rx="1" fill="#00B0FF" />
+      </svg>
+    );
+  }
+
+  // 18. FinOps & Cloud Cost Optimization
+  if (normKey === "finops" || normKey === "cost" || normKey.includes("finops")) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="FinOps">
+        <circle cx="12" cy="12" r="9" stroke="#10B981" strokeWidth="1.8" />
+        <path d="M12 6V18M15 9.5C15 8 13.5 7.5 12 7.5C10 7.5 9 8.5 9 10C9 12 15 11.5 15 14C15 15.5 14 16.5 12 16.5C10 16.5 9 15.5 9 14.5" stroke="#10B981" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M7 12H9M15 12H17" stroke="#10B981" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  // 19. Architecture & System Scenarios
+  if (normKey === "architecture" || normKey === "scenarios" || normKey.includes("architecture")) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Architecture">
+        <path d="M12 2.5L3 7.5L12 12.5L21 7.5L12 2.5Z" fill="#A855F7" />
+        <path d="M3 12L12 17L21 12" stroke="#A855F7" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M3 16.5L12 21.5L21 16.5" stroke="#9333EA" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  // 20. AI, LLM & RAG Vector Pipelines
+  if (normKey === "ai" || normKey === "rag" || normKey.includes("llm")) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="AI & RAG">
+        <circle cx="12" cy="12" r="3" fill="#8B5CF6" />
+        <circle cx="5" cy="8" r="2" fill="#EC4899" />
+        <circle cx="19" cy="8" r="2" fill="#3B82F6" />
+        <circle cx="7" cy="18" r="2" fill="#10B981" />
+        <circle cx="17" cy="18" r="2" fill="#F59E0B" />
+        <line x1="12" y1="12" x2="5" y2="8" stroke="#8B5CF6" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+        <line x1="12" y1="12" x2="19" y2="8" stroke="#8B5CF6" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+        <line x1="12" y1="12" x2="7" y2="18" stroke="#8B5CF6" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+        <line x1="12" y1="12" x2="17" y2="18" stroke="#8B5CF6" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+      </svg>
+    );
+  }
+
+  // 21. Microsoft Corporate
+  if (normKey === "microsoft") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Microsoft">
+        <rect x="3" y="3" width="8.5" height="8.5" fill="#F25022" />
+        <rect x="12.5" y="3" width="8.5" height="8.5" fill="#7FBA00" />
+        <rect x="3" y="12.5" width="8.5" height="8.5" fill="#00A4EF" />
+        <rect x="12.5" y="12.5" width="8.5" height="8.5" fill="#FFB900" />
+      </svg>
+    );
+  }
+
+  // 22. Amazon / AWS
+  if (normKey === "aws" || normKey === "amazon") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="AWS">
+        <path d="M12 4C7.5 4 4 7 4 10.5C4 12.5 5.5 14.5 7.5 15.5V18.5L10.5 17C11 17 11.5 17 12 17C16.5 17 20 14 20 10.5C20 7 16.5 4 12 4Z" fill="#232F3E" />
+        <path d="M6 18C10 20.5 14 20.5 18 18" stroke="#FF9900" strokeWidth="2" strokeLinecap="round" />
+        <path d="M17 16.5L19 18L16.5 19.5" fill="#FF9900" />
+      </svg>
+    );
+  }
+
+  // 23. Google Cloud / BigQuery
+  if (normKey === "gcp" || normKey === "bigquery" || normKey === "google") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Google Cloud">
+        <path d="M12 4C8.7 4 6 6.7 6 10C6 10.4 6.05 10.8 6.13 11.2C4.33 11.9 3 13.7 3 15.8C3 18.7 5.3 21 8.2 21H18C20.2 21 22 19.2 22 17C22 15 20.5 13.4 18.6 13.1C18.2 8 13.8 4 12 4Z" fill="#4285F4" />
+        <circle cx="12" cy="13" r="3" fill="#34A853" />
+        <circle cx="10" cy="11" r="1.5" fill="#EA4335" />
+        <circle cx="14" cy="14" r="1.5" fill="#FBBC05" />
+      </svg>
+    );
+  }
+
+  // 24. JPMorgan / Banking Finance
+  if (normKey === "jpmorgan" || normKey === "finance" || normKey === "bank") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Enterprise Finance">
+        <path d="M3 9L12 4L21 9V11H3V9Z" fill="#005A9C" />
+        <rect x="5" y="11" width="2.5" height="7" fill="#64748B" />
+        <rect x="9.75" y="11" width="2.5" height="7" fill="#64748B" />
+        <rect x="14.5" y="11" width="2.5" height="7" fill="#64748B" />
+        <rect x="19" y="11" width="2.5" height="7" fill="#64748B" />
+        <rect x="3" y="18" width="18" height="2.5" rx="0.5" fill="#005A9C" />
+      </svg>
+    );
+  }
+
+  // 25. Target / Retail E-Commerce
+  if (normKey === "target" || normKey === "retail") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn("shrink-0", className)} aria-label="Target">
+        <circle cx="12" cy="12" r="9" fill="#CC0000" />
+        <circle cx="12" cy="12" r="6" fill="#FFFFFF" />
+        <circle cx="12" cy="12" r="3" fill="#CC0000" />
       </svg>
     );
   }

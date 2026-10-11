@@ -26,10 +26,13 @@ import {
   ExternalLink,
   Shuffle,
   Globe,
+  Target,
+  Database,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
+import { TopicIcon } from "@/components/ui/topic-icon";
 import { architectureData, pythonData, modernCodeMatrix, modernStackDb, architectureDiagrams } from "@/data";
 import { ArchitectureDiagramsGallery } from "@/components/architecture/diagrams-gallery";
 import {
@@ -80,13 +83,13 @@ function detectFramework(item: CodeSheetItem): "pandas" | "polars" | "pyspark" |
   return "pure_python";
 }
 
-const FRAMEWORKS: { id: FrameworkKey; label: string; icon: string; badgeColor: string }[] = [
-  { id: "all", label: "All Stacks", icon: "⚡", badgeColor: "bg-slate-500/10 text-slate-300 border-slate-500/20" },
-  { id: "polars", label: "Polars (Rust Engine)", icon: "🐻‍❄️", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
-  { id: "pyspark", label: "PySpark & Connect", icon: "💥", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
-  { id: "delta", label: "Delta-RS / Lakehouse", icon: "📐", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-  { id: "pandas", label: "Pandas 2.0 / Arrow", icon: "🐼", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-  { id: "pure_python", label: "Pure Python / AsyncIO", icon: "🐍", badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+const FRAMEWORKS: { id: FrameworkKey; label: string; topicKey?: string; badgeColor: string }[] = [
+  { id: "all", label: "All Stacks", badgeColor: "bg-slate-500/10 text-slate-300 border-slate-500/20" },
+  { id: "polars", label: "Polars (Rust Engine)", topicKey: "polars", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+  { id: "pyspark", label: "PySpark & Connect", topicKey: "spark", badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+  { id: "delta", label: "Delta-RS / Lakehouse", topicKey: "datalake", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+  { id: "pandas", label: "Pandas 2.0 / Arrow", topicKey: "pandas", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+  { id: "pure_python", label: "Pure Python / AsyncIO", topicKey: "python", badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
 ];
 
 const PYTHON_LEVELS: { id: CodeLevel | "all"; label: string; desc: string }[] = [
@@ -162,11 +165,11 @@ const RunbookCard = React.memo(function RunbookCard({
               </span>
               <span
                 className={cn(
-                  "text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1",
+                  "text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1.5",
                   fwMeta.badgeColor
                 )}
               >
-                <span>{fwMeta.icon}</span>
+                {fwMeta.topicKey ? <TopicIcon topic={fwMeta.topicKey} size={12} /> : <Sparkles size={11} />}
                 <span>{fwMeta.label}</span>
               </span>
             </div>
@@ -268,11 +271,12 @@ const RunbookCard = React.memo(function RunbookCard({
 
         {item.use_case && (
           <div className="pt-3 border-t border-[var(--border)]">
-            <div className="p-3.5 sm:p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs sm:text-sm space-y-1">
+            <div className="p-3 sm:p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs sm:text-sm space-y-1">
               <div className="font-bold text-purple-300 flex items-center gap-1.5">
-                <span>🎯</span> Enterprise Scenario:
+                <Target size={14} className="text-purple-400 shrink-0" />
+                <span>Enterprise Scenario:</span>
               </div>
-              <p className="text-purple-200/90 leading-relaxed">{item.use_case}</p>
+              <p className="text-purple-200/90 leading-relaxed text-xs sm:text-sm">{item.use_case}</p>
             </div>
           </div>
         )}
@@ -294,14 +298,14 @@ function PolyglotCard({
   const [activeEngine, setActiveEngine] = useState<"side_by_side" | "python" | "pyspark" | "duckdb" | "sparksql" | "snowflake">("side_by_side");
 
   return (
-    <div className="rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-5 sm:p-7 space-y-5 shadow-sm">
+    <div className="rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4 space-y-3.5 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border)]">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-400 mb-1.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-400 mb-1">
             <Sparkles size={12} />
             <span>Cross-Engine Translation</span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)]">{item.topic}</h3>
+          <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">{item.topic}</h3>
         </div>
 
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] self-start sm:self-auto">
@@ -330,11 +334,12 @@ function PolyglotCard({
       </div>
 
       {activeEngine === "side_by_side" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                🐍 Python (Polars/Pandas)
+              <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <TopicIcon topic="python" size={13} />
+                <span>Python (Polars/Pandas)</span>
               </span>
               <button
                 onClick={() => onCopySnippet(item.python, `${item.topic}-python`)}
@@ -349,8 +354,9 @@ function PolyglotCard({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-bold text-orange-400 flex items-center gap-1">
-                💥 PySpark
+              <span className="text-xs font-bold text-orange-400 flex items-center gap-1.5">
+                <TopicIcon topic="spark" size={13} />
+                <span>PySpark</span>
               </span>
               <button
                 onClick={() => onCopySnippet(item.pyspark, `${item.topic}-pyspark`)}
@@ -365,8 +371,9 @@ function PolyglotCard({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
-                🦆 DuckDB
+              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <Database size={13} className="text-amber-400" />
+                <span>DuckDB</span>
               </span>
               <button
                 onClick={() => onCopySnippet(item.duckdb, `${item.topic}-duckdb`)}
@@ -381,8 +388,9 @@ function PolyglotCard({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-bold text-blue-400 flex items-center gap-1">
-                ⚡ Spark SQL
+              <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+                <TopicIcon topic="spark" size={13} />
+                <span>Spark SQL</span>
               </span>
               <button
                 onClick={() => onCopySnippet(item.sparksql, `${item.topic}-sparksql`)}
@@ -397,8 +405,9 @@ function PolyglotCard({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-bold text-cyan-400 flex items-center gap-1">
-                ❄️ Snowflake SQL
+              <span className="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                <TopicIcon topic="snowflake" size={13} />
+                <span>Snowflake SQL</span>
               </span>
               <button
                 onClick={() => onCopySnippet(item.snowflake, `${item.topic}-snowflake`)}
@@ -783,7 +792,7 @@ function ArchitectureHubContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-4 pb-16 animate-in fade-in duration-300">
       <HubSubnav
         hubTitle="Architecture Hub"
         items={[
@@ -794,108 +803,108 @@ function ArchitectureHubContent() {
       />
 
       {/* 1. HERO BANNER */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 isolate">
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
         <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 -mb-12 w-64 h-64 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-4 max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-            <Sparkles size={14} />
+        <div className="relative z-10 space-y-2 max-w-4xl">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
+            <Sparkles size={13} />
             <span>Unified Architecture &amp; Python Systems Hub</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-[var(--foreground)] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Enterprise Architecture &amp; Python Platform Hub
           </h1>
 
-          <p className="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
             End-to-end distributed system blueprints, Lakehouse medallion topologies, high-performance Python runbooks, and cross-engine polyglot translation matrices engineered for high-concurrency production platforms.
           </p>
 
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1">
             <button
               onClick={() => handleTabChange("scenarios")}
               className={cn(
-                "p-3 rounded-2xl border text-left transition-all",
+                "p-2.5 rounded-xl border text-left transition-all",
                 activeTab === "scenarios"
-                  ? "bg-purple-500/15 border-purple-500/40 shadow-sm"
+                  ? "bg-purple-500/15 border-purple-500/40 shadow-xs"
                   : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-purple-500/30"
               )}
             >
-              <div className="text-lg sm:text-xl font-extrabold text-purple-400">
+              <div className="text-base sm:text-lg font-bold text-purple-400 leading-none">
                 {architectureData.length}
               </div>
-              <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
-                <span>🏛️</span> System Blueprints
+              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
+                <Layers size={12} className="text-purple-400" /> System Blueprints
               </div>
             </button>
 
             <button
               onClick={() => handleTabChange("diagrams")}
               className={cn(
-                "p-3 rounded-2xl border text-left transition-all",
+                "p-2.5 rounded-xl border text-left transition-all",
                 activeTab === "diagrams"
-                  ? "bg-purple-500/15 border-purple-500/40 shadow-sm"
+                  ? "bg-purple-500/15 border-purple-500/40 shadow-xs"
                   : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-purple-500/30"
               )}
             >
-              <div className="text-lg sm:text-xl font-extrabold text-purple-400">
+              <div className="text-base sm:text-lg font-bold text-purple-400 leading-none">
                 {architectureDiagrams.length}
               </div>
-              <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
-                <span>📐</span> Whiteboard Diagrams
+              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
+                <Sparkles size={12} className="text-purple-400" /> Whiteboard Diagrams
               </div>
             </button>
 
             <button
               onClick={() => handleTabChange("python")}
               className={cn(
-                "p-3 rounded-2xl border text-left transition-all",
+                "p-2.5 rounded-xl border text-left transition-all",
                 activeTab === "python"
-                  ? "bg-emerald-500/15 border-emerald-500/40 shadow-sm"
+                  ? "bg-emerald-500/15 border-emerald-500/40 shadow-xs"
                   : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-emerald-500/30"
               )}
             >
-              <div className="text-lg sm:text-xl font-extrabold text-emerald-400">
+              <div className="text-base sm:text-lg font-bold text-emerald-400 leading-none">
                 {pythonData.length}
               </div>
-              <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
-                <span>🐍</span> Python Runbooks
+              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
+                <TopicIcon topic="python" size={12} /> Python Runbooks
               </div>
             </button>
 
             <button
               onClick={() => handleTabChange("polyglot")}
               className={cn(
-                "p-3 rounded-2xl border text-left transition-all",
+                "p-2.5 rounded-xl border text-left transition-all",
                 activeTab === "polyglot"
-                  ? "bg-amber-500/15 border-amber-500/40 shadow-sm"
+                  ? "bg-amber-500/15 border-amber-500/40 shadow-xs"
                   : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-amber-500/30"
               )}
             >
-              <div className="text-lg sm:text-xl font-extrabold text-amber-400">
+              <div className="text-base sm:text-lg font-bold text-amber-400 leading-none">
                 {modernCodeMatrix.length} Engines
               </div>
-              <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
-                <span>🔀</span> Polyglot Matrix
+              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
+                <Code2 size={12} className="text-amber-400" /> Polyglot Matrix
               </div>
             </button>
 
             <button
               onClick={() => handleTabChange("distributed")}
               className={cn(
-                "p-3 rounded-2xl border text-left transition-all col-span-2 sm:col-span-1",
+                "p-2.5 rounded-xl border text-left transition-all col-span-2 sm:col-span-1",
                 activeTab === "distributed"
-                  ? "bg-blue-500/15 border-blue-500/40 shadow-sm"
+                  ? "bg-blue-500/15 border-blue-500/40 shadow-xs"
                   : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-blue-500/30"
               )}
             >
-              <div className="text-lg sm:text-xl font-extrabold text-blue-400">
+              <div className="text-base sm:text-lg font-bold text-blue-400 leading-none">
                 {modernStackWithPy.length}
               </div>
-              <div className="text-[11px] font-medium text-[var(--muted-foreground)] flex items-center gap-1">
-                <span>💡</span> Distributed Scenarios
+              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
+                <Terminal size={12} className="text-blue-400" /> Distributed Scenarios
               </div>
             </button>
           </div>
@@ -903,36 +912,43 @@ function ArchitectureHubContent() {
       </div>
 
       {/* 2. UNIFIED HUB VIEW TABS */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none p-1.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
         {[
-          { id: "scenarios", label: "System Blueprints", count: architectureData.length, icon: "🏛️" },
-          { id: "diagrams", label: "Whiteboard Diagrams", count: architectureDiagrams.length, icon: "📐" },
-          { id: "python", label: "Python Architecture & Runbooks", count: pythonData.length, icon: "🐍" },
-          { id: "polyglot", label: "Cross-Engine Polyglot Matrix", count: modernCodeMatrix.length, icon: "🔀" },
-          { id: "distributed", label: "Distributed Python Solutions", count: modernStackWithPy.length, icon: "💡" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => handleTabChange(tab.id as ArchHubTab)}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2",
-              activeTab === tab.id
-                ? "bg-purple-600 text-white shadow-md"
-                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
-            <span
+          { id: "scenarios", label: "System Blueprints", count: architectureData.length, iconComponent: Layers, iconColor: "text-purple-400" },
+          { id: "diagrams", label: "Whiteboard Diagrams", count: architectureDiagrams.length, iconComponent: Sparkles, iconColor: "text-purple-400" },
+          { id: "python", label: "Python Architecture & Runbooks", count: pythonData.length, topicKey: "python" },
+          { id: "polyglot", label: "Cross-Engine Polyglot Matrix", count: modernCodeMatrix.length, iconComponent: Code2, iconColor: "text-amber-400" },
+          { id: "distributed", label: "Distributed Python Solutions", count: modernStackWithPy.length, iconComponent: Terminal, iconColor: "text-blue-400" },
+        ].map((tab) => {
+          const TabIcon = tab.iconComponent;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id as ArchHubTab)}
               className={cn(
-                "text-[10px] px-2 py-0.5 rounded-full font-bold",
-                activeTab === tab.id ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+                "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0",
+                activeTab === tab.id
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
               )}
             >
-              {tab.count}
-            </span>
-          </button>
-        ))}
+              {tab.topicKey ? (
+                <TopicIcon topic={tab.topicKey} size={13} />
+              ) : TabIcon ? (
+                <TabIcon size={13} className={activeTab === tab.id ? "text-white" : tab.iconColor} />
+              ) : null}
+              <span>{tab.label}</span>
+              <span
+                className={cn(
+                  "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
+                  activeTab === tab.id ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+                )}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* 3. SYSTEM SCENARIOS VIEW */}
@@ -1309,7 +1325,11 @@ function ArchitectureHubContent() {
                         : "bg-[var(--surface-2)]/60 text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
                     )}
                   >
-                    <span>{fw.icon}</span>
+                    {fw.topicKey ? (
+                      <TopicIcon topic={fw.topicKey} size={13} />
+                    ) : (
+                      <Sparkles size={12} className="text-purple-400" />
+                    )}
                     <span>{fw.label}</span>
                   </button>
                 ))}

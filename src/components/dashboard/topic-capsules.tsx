@@ -2,40 +2,31 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import {
-  Sparkles,
-  Zap,
-  Layers,
-  Database,
-  Flame,
-  Bot,
-  ShieldCheck,
-  Code2,
-  Globe,
-  Calculator,
-} from "lucide-react";
+import { Sparkles, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TopicIcon } from "@/components/ui/topic-icon";
 
 interface Topic {
   id: string;
   label: string;
-  icon: React.ElementType;
+  topicKey?: string;
+  icon?: React.ElementType;
   href: string;
 }
 
 const topics: Topic[] = [
-  { id: "all", label: "⚡ All 13 Tracks", icon: Sparkles, href: "/guided-learning" },
-  { id: "python", label: "🐍 Python for DE", icon: Code2, href: "/guided-learning?topic=python" },
-  { id: "simulators", label: "⚙️ 6 Live Simulators", icon: Calculator, href: "/modern-stack#simulators" },
-  { id: "fabric", label: "Fabric & OneLake", icon: Database, href: "/concepts?term=Fabric" },
-  { id: "synapse-fabric", label: "🏛️ Synapse & Fabric Masterclass", icon: Database, href: "/modern-stack#blueprints" },
-  { id: "spark", label: "Spark 4.0 Internals", icon: Flame, href: "/spark-engine" },
-  { id: "mindmap", label: "🗺️ DE Mindmap", icon: Globe, href: "/mindmap" },
-  { id: "lakehouse", label: "Delta & Iceberg", icon: Layers, href: "/modern-stack" },
-  { id: "code", label: "Polyglot Practice", icon: Code2, href: "/code-practice" },
-  { id: "ai", label: "AI & Vector RAG", icon: Bot, href: "/modern-stack#ai" },
-  { id: "finops", label: "FinOps & Tuning", icon: Zap, href: "/modern-stack#cost" },
-  { id: "governance", label: "Mesh & Contracts", icon: ShieldCheck, href: "/architecture" },
+  { id: "all", label: "All 13 Tracks", icon: Sparkles, href: "/guided-learning" },
+  { id: "python", label: "Python for DE", topicKey: "python", href: "/guided-learning?topic=python" },
+  { id: "simulators", label: "6 Live Simulators", topicKey: "spark", href: "/modern-stack#simulators" },
+  { id: "fabric", label: "Fabric & OneLake", topicKey: "fabric", href: "/concepts?term=Fabric" },
+  { id: "synapse-fabric", label: "Synapse & Fabric Masterclass", topicKey: "azure", href: "/modern-stack#blueprints" },
+  { id: "spark", label: "Spark 4.0 Internals", topicKey: "spark", href: "/spark-engine" },
+  { id: "mindmap", label: "DE Mindmap", icon: Globe, href: "/mindmap" },
+  { id: "lakehouse", label: "Delta & Iceberg", topicKey: "datalake", href: "/modern-stack" },
+  { id: "code", label: "Polyglot Practice", topicKey: "sql", href: "/code-practice" },
+  { id: "ai", label: "AI & Vector RAG", topicKey: "ai", href: "/modern-stack#ai" },
+  { id: "finops", label: "FinOps & Tuning", topicKey: "finops", href: "/modern-stack#cost" },
+  { id: "governance", label: "Mesh & Contracts", topicKey: "unitycatalog", href: "/architecture" },
 ];
 
 export function TopicCapsules() {
@@ -52,7 +43,7 @@ export function TopicCapsules() {
         </Link>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none">
         {topics.map((t) => {
           const Icon = t.icon;
           const isActive = activeId === t.id;
@@ -66,7 +57,11 @@ export function TopicCapsules() {
                 isActive ? "category-capsule-active" : "category-capsule-idle"
               )}
             >
-              <Icon size={14} className={isActive ? "text-purple-400" : "opacity-70"} />
+              {t.topicKey ? (
+                <TopicIcon topic={t.topicKey} size={14} className="shrink-0" />
+              ) : Icon ? (
+                <Icon size={14} className={isActive ? "text-purple-400 shrink-0" : "opacity-70 shrink-0"} />
+              ) : null}
               <span>{t.label}</span>
             </Link>
           );

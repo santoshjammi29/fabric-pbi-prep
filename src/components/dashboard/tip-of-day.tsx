@@ -27,7 +27,7 @@ export function TipOfDay() {
   return (
     <div
       onClick={nextTip}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-amber-500/20 bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-amber-500/30 p-6 transition-all hover:shadow-md h-full flex flex-col justify-center"
+      className="group relative cursor-pointer overflow-hidden rounded-xl border border-amber-500/20 bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-amber-500/30 p-4 sm:p-5 transition-all hover:shadow-md h-full flex flex-col justify-center"
     >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3 text-amber-400 transition-transform group-hover:scale-110 group-hover:rotate-12">
