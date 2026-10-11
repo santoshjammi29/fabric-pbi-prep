@@ -41,6 +41,7 @@ import {
 } from "@/lib/guided-learning";
 import { GUIDED_TOPICS, GUIDED_DOMAINS } from "@/data/guided-learning-topics";
 import { ArchitectureDiagramItem } from "@/data";
+import { TopicIcon } from "@/components/ui/topic-icon";
 import dynamic from "next/dynamic";
 
 const AnswerRenderer = dynamic(
@@ -359,53 +360,64 @@ export default function GuidedLearningPage() {
   const estHours = Math.round((totalItemsCount * 2) / 60);
 
   return (
-    <div className="space-y-6 pb-24 max-w-6xl 2xl:max-w-7xl mx-auto px-2 sm:px-4">
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
         hubTitle="Learning Journey"
         items={[
-          { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "9 Topics" },
+          { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "13 Tracks" },
           { label: "Career Curricula", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
           { label: "Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q Test" },
         ]}
       />
 
       {/* ── TOP BANNER & TRACK MATRIX ─────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-4 sm:p-6 shadow-sm isolate">
-        <div className="absolute -top-24 -right-24 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 shadow-xs isolate">
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[11px] font-semibold text-purple-400">
-              <GraduationCap size={13} className="text-purple-400" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-[10px] font-semibold text-purple-400">
+              <GraduationCap size={12} className="text-purple-400" />
               <span className="uppercase tracking-wider font-mono">Senior DE Learning Tracks</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)] flex items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)] flex items-center gap-2">
               Guided Learning Journeys
-              <span className="text-xs font-normal text-[var(--muted-foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--border)] hidden sm:inline">
+              <span className="text-[11px] font-normal text-[var(--muted-foreground)] px-2 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] hidden sm:inline">
                 {overviewStats.totalTopics} Tracks · {overviewStats.totalUniqueItems}+ Problems
               </span>
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-2xl">
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
               End-to-end engineered career tracks across distributed engines, lakehouses, orchestration, and enterprise modeling. Built for senior and staff data platform interviews.
             </p>
           </div>
 
-          {selectedTopic && (
-            <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            {selectedTopic ? (
               <button
                 onClick={() => setSelectedTopic(null)}
-                className="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors flex items-center gap-1.5 shadow-xs"
               >
                 <Compass size={13} />
-                <span>Browse All Tracks</span>
+                <span>Browse All 13 Tracks</span>
               </button>
-            </div>
-          )}
+            ) : (
+              <div className="hidden lg:flex items-center gap-2">
+                <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-right">
+                  <div className="text-xs font-bold text-purple-400">13 Tracks</div>
+                  <div className="text-[10px] text-[var(--muted-foreground)] font-mono leading-none">4 Stages Each</div>
+                </div>
+                <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-right">
+                  <div className="text-xs font-bold text-blue-400">25+ Blueprints</div>
+                  <div className="text-[10px] text-[var(--muted-foreground)] font-mono leading-none">Whiteboard HD</div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Domain Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none mb-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none mb-2.5">
           {GUIDED_DOMAINS.map((dom) => (
             <button
               key={dom}
@@ -413,7 +425,7 @@ export default function GuidedLearningPage() {
               className={cn(
                 "px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
                 selectedDomain === dom
-                  ? "bg-purple-600 text-white font-semibold shadow-sm"
+                  ? "bg-purple-600 text-white font-semibold shadow-xs"
                   : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]"
               )}
             >
@@ -422,8 +434,8 @@ export default function GuidedLearningPage() {
           ))}
         </div>
 
-        {/* Tracks Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+        {/* Tracks Grid: Clean, compact 5-column grid with authentic tech vector icons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
           {visibleTopics.map((topic) => {
             const isActive = selectedTopic === topic.key;
             const counts = getTopicCounts(topic.key);
@@ -443,42 +455,32 @@ export default function GuidedLearningPage() {
                 key={topic.key}
                 onClick={() => setSelectedTopic(topic.key)}
                 className={cn(
-                  "p-2.5 rounded-xl border text-left transition-all duration-150 relative group flex flex-col justify-between gap-2 overflow-hidden",
+                  "p-2 rounded-xl border text-left transition-all duration-150 relative group flex items-center gap-2.5 overflow-hidden",
                   isActive
-                    ? "bg-[var(--surface-2)] border-purple-500 ring-1 ring-purple-500/40 shadow-md shadow-purple-500/5"
-                    : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                    ? "bg-[var(--surface-2)] border-purple-500 ring-1 ring-purple-500/40 shadow-xs"
+                    : "bg-[var(--surface-1)] border-[var(--border)] hover:border-purple-500/30 hover:bg-[var(--surface-2)]/80"
                 )}
               >
-                <div className="flex items-center gap-2">
-                  <div
-                    className={cn(
-                      "w-7 h-7 rounded-lg flex items-center justify-center text-xs shrink-0 bg-gradient-to-br shadow-sm",
-                      topic.gradient
-                    )}
-                  >
-                    {topic.icon}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors truncate">
-                      {topic.label}
-                    </h3>
-                    <p className="text-[10px] text-[var(--muted-foreground)] truncate">{counts.total} items</p>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--surface-2)] border border-[var(--border)] group-hover:border-purple-500/30 group-hover:bg-purple-500/5 transition-all shadow-xs">
+                  <TopicIcon topicKey={topic.key} size={18} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors leading-tight truncate">
+                    {topic.label}
+                  </h3>
+                  <div className="flex items-center gap-1.5 text-[10px] text-[var(--muted-foreground)] font-mono leading-none pt-0.5">
+                    <span>{counts.total} items</span>
+                    <span>•</span>
+                    <span className="truncate max-w-[105px]">{topic.domain}</span>
                   </div>
                 </div>
-
-                {/* Progress bar inside chip */}
-                <div className="w-full space-y-1">
-                  <div className="flex items-center justify-between text-[9px] text-[var(--muted-foreground)]">
-                    <span className="truncate">{topic.domain}</span>
-                    {trackPct > 0 && <span className="text-purple-400 font-mono font-semibold">{trackPct}%</span>}
-                  </div>
-                  <div className="h-1 w-full bg-[var(--surface-3)] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-purple-500 to-cyan-400 transition-all duration-200"
-                      style={{ width: `${trackPct}%` }}
-                    />
-                  </div>
-                </div>
+                {trackPct > 0 ? (
+                  <span className="text-[10px] font-mono font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded-md shrink-0 ml-auto">
+                    {trackPct}%
+                  </span>
+                ) : isActive ? (
+                  <div className="w-2 h-2 rounded-full bg-purple-500 shrink-0 ml-auto animate-pulse" />
+                ) : null}
               </button>
             );
           })}
@@ -495,195 +497,140 @@ export default function GuidedLearningPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="space-y-6"
+            className="space-y-3.5"
           >
             {/* Featured Journey Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:border-purple-500/40 transition-all flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase tracking-wide">
-                    Compute & Engine Deep Dive
-                  </span>
-                  <h3 className="text-base font-bold text-[var(--foreground)]">Apache Spark & Databricks Track</h3>
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+              <div className="p-3.5 sm:p-4 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] hover:border-orange-500/40 transition-all flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase tracking-wide">
+                      Compute & Engine Deep Dive
+                    </span>
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">1,039 items</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                      <TopicIcon topicKey="spark" size={16} />
+                    </div>
+                    <h3 className="text-sm font-bold text-[var(--foreground)]">Apache Spark & Databricks Track</h3>
+                  </div>
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed line-clamp-2">
                     Master Tungsten off-heap memory, Catalyst physical query plans, Adaptive Query Execution (AQE), Liquid Clustering, and Photon vectorization.
                   </p>
                 </div>
                 <button
                   onClick={() => setSelectedTopic("spark")}
-                  className="w-full py-2 px-3 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 text-xs font-semibold flex items-center justify-between border border-orange-500/30 transition-colors"
+                  className="w-full py-1.5 px-3 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 text-xs font-semibold flex items-center justify-between border border-orange-500/30 transition-colors"
                 >
-                  <span>Start Spark Track</span>
-                  <ArrowRight size={14} />
+                  <span>Launch Spark Track</span>
+                  <ArrowRight size={13} />
                 </button>
               </div>
 
-              <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:border-purple-500/40 transition-all flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 uppercase tracking-wide">
-                    Orchestration & Transformation
-                  </span>
-                  <h3 className="text-base font-bold text-[var(--foreground)]">Airflow & dbt Engineering Track</h3>
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <div className="p-3.5 sm:p-4 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] hover:border-sky-500/40 transition-all flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 uppercase tracking-wide">
+                      Orchestration & Transformation
+                    </span>
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">852 items</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                      <TopicIcon topicKey="airflow" size={16} />
+                    </div>
+                    <h3 className="text-sm font-bold text-[var(--foreground)]">Airflow & dbt Engineering Track</h3>
+                  </div>
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed line-clamp-2">
                     Construct production DAGs with TaskFlow, Celery/K8s executors, async Triggerers, incremental merge models, and dbt Mesh governance.
                   </p>
                 </div>
                 <button
                   onClick={() => setSelectedTopic("airflow")}
-                  className="w-full py-2 px-3 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-semibold flex items-center justify-between border border-sky-500/30 transition-colors"
+                  className="w-full py-1.5 px-3 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-semibold flex items-center justify-between border border-sky-500/30 transition-colors"
                 >
-                  <span>Start Airflow Track</span>
-                  <ArrowRight size={14} />
+                  <span>Launch Airflow Track</span>
+                  <ArrowRight size={13} />
                 </button>
               </div>
 
-              <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:border-purple-500/40 transition-all flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase tracking-wide">
-                    Enterprise SaaS Lakehouse
-                  </span>
-                  <h3 className="text-base font-bold text-[var(--foreground)]">Microsoft Fabric & OneLake Track</h3>
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <div className="p-3.5 sm:p-4 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] hover:border-purple-500/40 transition-all flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase tracking-wide">
+                      Enterprise SaaS Lakehouse
+                    </span>
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">436 items</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                      <TopicIcon topicKey="fabric" size={16} />
+                    </div>
+                    <h3 className="text-sm font-bold text-[var(--foreground)]">Microsoft Fabric & OneLake Track</h3>
+                  </div>
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed line-clamp-2">
                     Explore OneLake zero-copy shortcuts, universal Delta Parquet storage, Direct Lake VertiPaq memory mapping, and cross-workspace governance.
                   </p>
                 </div>
                 <button
                   onClick={() => setSelectedTopic("fabric")}
-                  className="w-full py-2 px-3 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-semibold flex items-center justify-between border border-purple-500/30 transition-colors"
+                  className="w-full py-1.5 px-3 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-semibold flex items-center justify-between border border-purple-500/30 transition-colors"
                 >
-                  <span>Start Fabric Track</span>
-                  <ArrowRight size={14} />
+                  <span>Launch Fabric Track</span>
+                  <ArrowRight size={13} />
                 </button>
               </div>
             </div>
 
             {/* Platform Whiteboard Showcase Banner */}
-            <div className="p-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-purple-400">
-                    <Sparkles size={13} />
-                    <span>INTEGRATED SYSTEM DESIGN BLUEPRINTS</span>
+            <div className="p-3.5 sm:p-4 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] space-y-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
+                <div className="space-y-0.5">
+                  <div className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-purple-400 uppercase tracking-wider">
+                    <Sparkles size={12} />
+                    <span>Integrated System Design Blueprints</span>
                   </div>
-                  <h2 className="text-lg font-bold text-[var(--foreground)]">
+                  <h2 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
                     Whiteboard System Architecture Blueprints
                   </h2>
-                  <p className="text-xs text-[var(--muted-foreground)]">
-                    Every Guided Learning track is paired with high-resolution hand-drawn whiteboard architecture diagrams detailing distributed execution mechanisms and storage internals.
-                  </p>
                 </div>
-                <button
-                  onClick={() => setSelectedTopic("databricks")}
-                  className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
-                >
-                  Explore Blueprint Track
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div
-                  onClick={() => setSelectedTopic("airflow")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Airflow Distributed Engine
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Multi-threaded scheduler, metadata DB, triggerers, and worker execution pools.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("fabric")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Fabric OneLake Architecture
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Universal Delta Parquet storage, cross-cloud shortcuts, and multi-engine compute.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("adf")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    ADF Hybrid Ingestion
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Self-Hosted IR gateways, private endpoints, tumbling window CDC, and multi-cloud.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("streaming")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Kafka & Streaming Engine
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Partition brokers, schema registry, stateful watermarking, and exactly-once sinks.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("dbt")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    dbt Analytics Engineering
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Incremental models, SCD2 snapshots, automated testing, and Semantic Layer.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("spark")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Catalyst & Photon Execution
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Logical plan optimization, AQE runtime re-planning, and vectorized C++ engine.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("modeling")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Kimball Star Schema
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Atomic grain facts, conformed dimensions, SCD Type 1 & 2, and Bus Matrix.
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTopic("governance")}
-                  className="cursor-pointer p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 transition-all space-y-1.5 group"
-                >
-                  <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Purview Enterprise Catalog
-                  </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2">
-                    Automated data map, PII scanning, end-to-end lineage graph, and ABAC policies.
-                  </p>
-                </div>
-              </div>
-              <div className="pt-2 flex justify-end">
                 <Link
                   href="/architecture?tab=diagrams"
-                  className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors"
+                  className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors self-start sm:self-auto"
                 >
-                  <span>Explore all 21 High-Resolution Whiteboard Blueprints &rarr;</span>
+                  <span>Explore all 25+ Blueprints</span>
+                  <ArrowRight size={12} />
                 </Link>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { key: "airflow", title: "Airflow Distributed Engine", desc: "Multi-threaded scheduler, metadata DB, triggerers, and workers." },
+                  { key: "fabric", title: "Fabric OneLake Architecture", desc: "Universal Delta Parquet, shortcuts, and multi-engine compute." },
+                  { key: "adf", title: "ADF Hybrid Ingestion", desc: "Self-Hosted IR gateways, private endpoints, and CDC." },
+                  { key: "streaming", title: "Kafka & Streaming Engine", desc: "Partition brokers, schema registry, and watermarking." },
+                  { key: "dbt", title: "dbt Analytics Engineering", desc: "Incremental models, SCD2 snapshots, and Semantic Layer." },
+                  { key: "spark", title: "Catalyst & Photon Execution", desc: "Logical plan optimization, AQE, and C++ vectorization." },
+                  { key: "modeling", title: "Kimball Star Schema", desc: "Atomic grain facts, conformed dims, SCD1 & 2." },
+                  { key: "governance", title: "Purview Enterprise Catalog", desc: "Automated data map, lineage graph, and ABAC policies." },
+                ].map((bp) => (
+                  <div
+                    key={bp.key}
+                    onClick={() => setSelectedTopic(bp.key)}
+                    className="cursor-pointer p-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 hover:bg-[var(--surface-3)] transition-all space-y-1 group"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <TopicIcon topicKey={bp.key} size={14} />
+                      <div className="text-xs font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors truncate">
+                        {bp.title}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-[var(--muted-foreground)] line-clamp-2 leading-tight">
+                      {bp.desc}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </m.div>
@@ -695,21 +642,16 @@ export default function GuidedLearningPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="space-y-4"
+            className="space-y-3"
           >
             {/* Topic Executive Header Banner */}
-            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 shadow-sm overflow-hidden">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div className="space-y-2 max-w-3xl">
+            <div className="relative rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-3.5 sm:p-4 shadow-xs overflow-hidden">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="space-y-1.5 max-w-3xl">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={cn(
-                        "w-7 h-7 rounded-lg flex items-center justify-center text-xs shrink-0 bg-gradient-to-br shadow-sm",
-                        activeTopicObj?.gradient
-                      )}
-                    >
-                      {activeTopicObj?.icon}
-                    </span>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[var(--surface-2)] border border-[var(--border)] shadow-xs">
+                      <TopicIcon topicKey={activeTopicObj?.key || ""} size={18} />
+                    </div>
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted-foreground)] border border-[var(--border)]">
                       {activeTopicObj?.domain}
                     </span>
@@ -718,39 +660,39 @@ export default function GuidedLearningPage() {
                     </span>
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">
+                  <h2 className="text-lg sm:text-xl font-bold text-[var(--foreground)]">
                     {activeTopicObj?.label}
                   </h2>
 
-                  <p className="text-xs text-[var(--foreground)] leading-relaxed italic border-l-2 border-purple-500 pl-3 py-0.5 bg-purple-500/5 rounded-r-md">
+                  <p className="text-xs text-[var(--foreground)] leading-relaxed italic border-l-2 border-purple-500 pl-2.5 py-0.5 bg-purple-500/5 rounded-r">
                     &ldquo;{activeTopicObj?.executiveSummary}&rdquo;
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--muted-foreground)] pt-1">
+                  <div className="flex flex-wrap items-center gap-2.5 text-xs text-[var(--muted-foreground)] pt-0.5">
                     <span className="flex items-center gap-1">
-                      <BookOpen size={13} className="text-emerald-400" />
+                      <BookOpen size={12} className="text-emerald-400" />
                       <strong>{topicSummary?.concepts}</strong> Concepts
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
-                      <HelpCircle size={13} className="text-blue-400" />
+                      <HelpCircle size={12} className="text-blue-400" />
                       <strong>{topicSummary?.qa}</strong> Q&As
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
-                      <Workflow size={13} className="text-purple-400" />
+                      <Workflow size={12} className="text-purple-400" />
                       <strong>{topicSummary?.arch}</strong> Architecture
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
-                      <Clock size={13} />
+                      <Clock size={12} />
                       ~{estHours}h Study Time
                     </span>
                   </div>
                 </div>
 
                 {/* Progress & Quick Actions */}
-                <div className="flex flex-col items-start lg:items-end justify-between gap-3 shrink-0 p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] min-w-[240px]">
+                <div className="flex flex-col items-start lg:items-end justify-between gap-2.5 shrink-0 p-2.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] min-w-[210px]">
                   <div className="w-full flex items-center justify-between text-xs">
                     <span className="font-semibold text-[var(--foreground)]">Mastery Progress</span>
                     <span className="font-mono font-bold text-purple-400">
@@ -758,7 +700,7 @@ export default function GuidedLearningPage() {
                     </span>
                   </div>
 
-                  <div className="h-2 w-full bg-[var(--surface-3)] rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-[var(--surface-3)] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 transition-all duration-300"
                       style={{ width: `${pctComplete}%` }}
@@ -791,59 +733,59 @@ export default function GuidedLearningPage() {
 
             {/* Featured Whiteboard Architecture Blueprint Banner (if available) */}
             {featuredDiagram && (
-              <div className="p-4 sm:p-5 rounded-2xl border border-purple-500/30 bg-purple-500/5 flex flex-col md:flex-row items-center gap-4 transition-all">
+              <div className="p-3 rounded-xl border border-purple-500/30 bg-purple-500/5 flex flex-col md:flex-row items-center gap-3 transition-all">
                 <div
                   onClick={() => {
                     setActiveDiagramModal(featuredDiagram);
                     setDiagramZoom(1);
                   }}
-                  className="relative group cursor-pointer w-full md:w-56 h-32 rounded-xl overflow-hidden border border-[var(--border)] bg-black shrink-0 shadow-md"
+                  className="relative group cursor-pointer w-full md:w-44 h-24 rounded-lg overflow-hidden border border-[var(--border)] bg-black shrink-0 shadow-xs"
                 >
                   <img
                     src={featuredDiagram.image}
                     alt={featuredDiagram.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90 group-hover:opacity-100"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 opacity-90 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                    <div className="p-1.5 rounded-full bg-black/60 text-white backdrop-blur-sm group-hover:scale-110 transition-transform">
-                      <Maximize2 size={16} />
+                    <div className="p-1 rounded-full bg-black/60 text-white backdrop-blur-sm group-hover:scale-110 transition-transform">
+                      <Maximize2 size={14} />
                     </div>
                   </div>
-                  <span className="absolute bottom-1.5 left-1.5 text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/75 text-purple-300 border border-purple-500/30">
+                  <span className="absolute bottom-1 left-1 text-[8px] font-mono px-1 py-0.2 rounded bg-black/80 text-purple-300 border border-purple-500/30">
                     Whiteboard HD
                   </span>
                 </div>
 
-                <div className="space-y-1.5 flex-1 min-w-0">
-                  <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-purple-400 uppercase tracking-wider">
-                    <Sparkles size={12} />
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="inline-flex items-center gap-1.5 text-[9px] font-bold text-purple-400 uppercase tracking-wider">
+                    <Sparkles size={11} />
                     <span>Featured Whiteboard Architecture Blueprint</span>
                   </div>
-                  <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] truncate">
+                  <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">
                     {featuredDiagram.title}
                   </h3>
-                  <p className="text-xs text-[var(--muted-foreground)] line-clamp-2">
+                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-1">
                     {featuredDiagram.subtitle}
                   </p>
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <div className="flex flex-wrap items-center gap-2 pt-0.5">
                     <button
                       onClick={() => {
                         setActiveDiagramModal(featuredDiagram);
                         setDiagramZoom(1);
                       }}
-                      className="px-2.5 py-1 rounded-md bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                      className="px-2.5 py-1 rounded-md bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-semibold flex items-center gap-1 transition-colors"
                     >
-                      <Maximize2 size={12} />
+                      <Maximize2 size={11} />
                       <span>Inspect Blueprint (HD Lightbox)</span>
                     </button>
                     <a
                       href={`/architecture?category=${encodeURIComponent(featuredDiagram.category)}&card=${featuredDiagram.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2.5 py-1 rounded-md bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--foreground)] text-[11px] font-semibold flex items-center gap-1 border border-[var(--border)] transition-colors"
+                      className="px-2.5 py-1 rounded-md bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--foreground)] text-[10px] font-semibold flex items-center gap-1 border border-[var(--border)] transition-colors"
                     >
                       <span>Open in Architecture Hub</span>
-                      <ExternalLink size={12} />
+                      <ExternalLink size={11} />
                     </a>
                   </div>
                 </div>
@@ -852,21 +794,21 @@ export default function GuidedLearningPage() {
 
             {/* Related Whiteboard Architecture Blueprints (if track has multiple) */}
             {topicSummary?.relatedDiagrams && topicSummary.relatedDiagrams.length > 0 && (
-              <div className="p-3.5 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] space-y-2.5">
+              <div className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-[var(--foreground)] flex items-center gap-1.5 text-purple-400">
-                    <Sparkles size={13} />
+                    <Sparkles size={12} />
                     <span>Related System Architecture Blueprints</span>
                   </span>
                   <a
                     href="/architecture?tab=diagrams"
-                    className="text-[11px] text-[var(--muted-foreground)] hover:text-purple-400 transition-colors"
+                    className="text-[10px] text-[var(--muted-foreground)] hover:text-purple-400 transition-colors"
                   >
                     View All {overviewStats.totalWhiteboards} Blueprints &rarr;
                   </a>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {topicSummary.relatedDiagrams.map((rd) => (
                     <button
                       key={rd.id}
@@ -874,9 +816,9 @@ export default function GuidedLearningPage() {
                         setActiveDiagramModal(rd);
                         setDiagramZoom(1);
                       }}
-                      className="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 text-left transition-all flex items-center gap-3 group"
+                      className="p-2 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 text-left transition-all flex items-center gap-2.5 group"
                     >
-                      <div className="w-14 h-9 rounded-lg bg-black shrink-0 overflow-hidden relative border border-[var(--border)] shadow-xs">
+                      <div className="w-12 h-8 rounded bg-black shrink-0 overflow-hidden relative border border-[var(--border)] shadow-xs">
                         <img
                           src={rd.image}
                           alt={rd.title}
@@ -889,7 +831,7 @@ export default function GuidedLearningPage() {
                         </h5>
                         <p className="text-[10px] text-[var(--muted-foreground)] truncate">{rd.category}</p>
                       </div>
-                      <Maximize2 size={13} className="text-[var(--muted-foreground)] group-hover:text-purple-400 shrink-0" />
+                      <Maximize2 size={12} className="text-[var(--muted-foreground)] group-hover:text-purple-400 shrink-0" />
                     </button>
                   ))}
                 </div>

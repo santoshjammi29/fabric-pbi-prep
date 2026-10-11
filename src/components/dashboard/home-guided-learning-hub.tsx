@@ -22,6 +22,7 @@ import {
   getTopicDiagram,
   getPlatformOverviewStats,
 } from "@/lib/guided-learning";
+import { TopicIcon } from "@/components/ui/topic-icon";
 
 export function HomeGuidedLearningHub() {
   const [selectedDomain, setSelectedDomain] = useState<string>("All Tracks");
@@ -234,10 +235,10 @@ export function HomeGuidedLearningHub() {
               {/* Card Header */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl sm:text-2xl" role="img" aria-label={topic.label}>
-                      {topic.icon}
-                    </span>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:border-emerald-500/40 transition-colors shadow-xs">
+                      <TopicIcon topicKey={topic.key} size={20} />
+                    </div>
                     <div>
                       <div className="flex items-center gap-1.5">
                         <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
