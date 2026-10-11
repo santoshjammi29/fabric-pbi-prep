@@ -341,3 +341,29 @@ export interface CheatCode {
   tags: string[];
   docLinks?: { label: string; url?: string }[];
 }
+
+// ==========================================
+// 13. Company Intelligence Profiles
+// ==========================================
+
+export type CompanyTier =
+  | 'Tier 1 FAANG / BigTech'
+  | 'Tier 1 Global FinTech'
+  | 'Global Capability Center (GCC)';
+
+export interface CompanyProfile {
+  id: string;
+  name: string;
+  tier: CompanyTier;
+  location: string;
+  hiringGCCLocations?: string[];
+  topicKey: string;
+  seniorDeSalary: string;
+  architectSalary: string;
+  systemDesignArchetype?: string;
+  stack: string[];
+  interviewFocus: string[];
+  keyChallenges: string;
+  sampleQuestions?: string[];
+}
+

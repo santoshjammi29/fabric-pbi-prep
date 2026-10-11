@@ -23,6 +23,7 @@ import type {
   Difficulty,
   DatasetCounts,
   CheatCode,
+  CompanyProfile,
 } from '@/types/data';
 
 import questionsJson from './json/questions.json';
@@ -43,8 +44,10 @@ import modernStackJson from './json/modern_stack.json';
 import modernCostPlaybooksJson from './json/modern_cost_playbooks.json';
 import dataPathsJson from './json/data_paths.json';
 import dataCheatsheetJson from './json/data_cheatsheet.json';
+import companyProfilesJson from './json/company_profiles.json';
 
 // Cast datasets to typed arrays
+export const companyProfiles: CompanyProfile[] = companyProfilesJson as CompanyProfile[];
 export const cheatsheetData: CheatCode[] = dataCheatsheetJson as CheatCode[];
 export const questionsDb: Question[] = questionsJson as Question[];
 export const architectureData: ArchitectureQuestion[] = dataArchitectureJson as ArchitectureQuestion[];
