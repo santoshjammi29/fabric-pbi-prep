@@ -26,23 +26,23 @@ interface LineToken {
 }
 
 const tokenClasses: Record<string, string> = {
-  comment: "text-slate-500 italic selection:text-slate-400",
-  prolog: "text-slate-500 italic",
-  doctype: "text-slate-500 italic",
-  cdata: "text-slate-500 italic",
+  comment: "text-slate-400/90 italic selection:text-slate-300",
+  prolog: "text-slate-400 italic",
+  doctype: "text-slate-400 italic",
+  cdata: "text-slate-400 italic",
   string: "text-emerald-400 font-normal selection:text-emerald-200",
-  "triple-quoted-string": "text-emerald-400 font-normal selection:text-emerald-200",
+  "triple-quoted-string": "text-emerald-300/95 font-normal selection:text-emerald-100",
   char: "text-emerald-400",
-  keyword: "text-purple-400 font-semibold selection:text-purple-200",
-  boolean: "text-amber-400 font-medium selection:text-amber-200",
-  number: "text-orange-300 selection:text-orange-100",
+  keyword: "text-purple-400 font-medium selection:text-purple-200",
+  boolean: "text-amber-300 font-medium selection:text-amber-100",
+  number: "text-amber-300 selection:text-amber-100",
   builtin: "text-cyan-300 font-medium selection:text-cyan-100",
   "class-name": "text-cyan-300 font-medium",
-  function: "text-sky-300 font-normal selection:text-sky-100",
+  function: "text-sky-300 font-medium selection:text-sky-100",
   decorator: "text-amber-400 font-medium selection:text-amber-200",
   operator: "text-pink-400 selection:text-pink-200",
   punctuation: "text-slate-400 selection:text-slate-200",
-  variable: "text-blue-300 selection:text-blue-100",
+  variable: "text-slate-100 selection:text-white",
   property: "text-cyan-200",
   text: "text-slate-200 selection:text-white",
 };
@@ -275,9 +275,13 @@ export function CodeBlock({
       <div className="relative">
         <pre
           className={cn(
-            "m-0 p-3.5 sm:p-4 text-[12px] sm:text-[13px] leading-[1.7] font-mono tracking-tight text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
+            "m-0 p-3.5 sm:p-4 text-[13px] sm:text-[13.5px] leading-[1.75] font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
             isWrap && "whitespace-pre-wrap break-words"
           )}
+          style={{
+            fontFamily: "var(--font-mono), 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace",
+            fontFeatureSettings: '"calt" 1, "liga" 1',
+          }}
         >
           <code>
             {tokenizedLines.map((tokens, idx) => (
@@ -287,7 +291,7 @@ export function CodeBlock({
               >
                 {lineNumbersEnabled && (
                   <span
-                    className="select-none shrink-0 w-8 sm:w-9 pr-3 sm:pr-3.5 text-right text-[11px] text-slate-600 group-hover/line:text-slate-400 font-mono tracking-tighter"
+                    className="select-none shrink-0 w-8 sm:w-9 pr-3 sm:pr-3.5 text-right text-[11.5px] sm:text-[12px] text-slate-500 group-hover/line:text-slate-400 font-mono tracking-normal"
                     aria-hidden="true"
                   >
                     {idx + 1}

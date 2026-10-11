@@ -46,5 +46,29 @@
     "savings": "50% Orphan File Storage Reduction",
     "summary": "Run regular OPTIMIZE to compact small delta files into 128MB-512MB columnar files and VACUUM to purge historical snapshots older than 7 days, stopping dead storage accumulation.",
     "code": "OPTIMIZE gold.fact_transactions ZORDER BY (customer_id, transaction_date);\nVACUUM gold.fact_transactions RETAIN 168 HOURS;"
+  },
+  {
+    "title": "Snowflake Query Acceleration Service (QAS) vs Warehouse Upsizing",
+    "savings": "40% - 60% Compute Credit Reduction on Outlier Queries",
+    "summary": "Instead of permanently upsizing an entire Snowflake warehouse from Medium to 2X-Large to handle occasional outlier scans across billions of unclustered rows, enable Query Acceleration Service (QAS). QAS dynamically leases serverless compute slices exclusively for the scan portion of heavy queries, leaving standard queries running on low-cost small clusters.",
+    "code": "-- Enable QAS on analytical warehouse with max scale factor cap\nALTER WAREHOUSE analytics_wh SET \n  ENABLE_QUERY_ACCELERATION = TRUE \n  QUERY_ACCELERATION_MAX_SCALE_FACTOR = 8;\n\n-- Identify queries that benefited from QAS acceleration\nSELECT query_id, warehouse_name, query_acceleration_bytes_scanned, query_acceleration_partitions_scanned\nFROM snowflake.account_usage.query_acceleration_history\nWHERE start_time >= CURRENT_DATE() - 7;"
+  },
+  {
+    "title": "Databricks Serverless SQL Photon Scaling & 2-Minute Idle Shutdown",
+    "savings": "45% Reduction in Idle Cluster Billing vs Classic Clusters",
+    "summary": "Classic Databricks VM clusters take 3-5 minutes to start and require minimum 10-15 minute auto-termination to avoid start-up thrashing, wasting hundreds of idle compute hours every month. Serverless SQL warehouses boot in under 5 seconds with native C++ Photon execution and can safely auto-suspend after just 2 minutes of inactivity.",
+    "code": "-- Configure Databricks Serverless SQL auto-stop and auto-scaling\n-- Managed via Databricks REST API or Terraform:\nresource \"databricks_sql_endpoint\" \"serverless_bi\" {\n  name             = \"Serverless BI Warehouse\"\n  cluster_size     = \"Medium\"\n  auto_stop_mins   = 2\n  enable_serverless_compute = true\n  min_num_clusters = 1\n  max_num_clusters = 5\n}"
+  },
+  {
+    "title": "BigQuery Editions & Slot Reservations vs On-Demand ($6.25/TB)",
+    "savings": "30% - 55% Cost Savings at Scale (>1 PB/month scanned)",
+    "summary": "At enterprise scale, BigQuery's on-demand model ($6.25 per TB scanned) becomes unpredictable and cost-prohibitive. Switching to BigQuery Enterprise Edition with baseline slot reservations (e.g. 100 slots) plus dynamic auto-scaling caps ensures predictable monthly budgeting while preventing runaway queries from scanning 50TB in seconds.",
+    "code": "-- Enforce query byte scan safety caps in BigQuery\n-- Prevent accidental full-table scans (> 500GB)\n#standardSQL\nSET @@dataset_project_id = 'prod_analytics';\n-- Run query with maximum bytes billed protection\nSELECT customer_id, SUM(order_total)\nFROM `prod_analytics.sales.transactions`\nWHERE transaction_date >= '2026-01-01';\n-- Configure via CLI or JDBC: maximum_bytes_billed = 536870912000 (500GB)"
+  },
+  {
+    "title": "Fabric Capacity Smoothing & Background Job Throttling Guardrails",
+    "savings": "Prevents 100% Interactive Reporting Outages & SKU Burst Penalties",
+    "summary": "Microsoft Fabric capacities (F64, F128) use a 24-hour rolling smoothing algorithm for background jobs (Spark, Data Factory) and 5-minute smoothing for interactive visuals (Power BI Direct Lake). When heavy batch notebooks burst to 400% capacity, Fabric schedules CU debt that throttles interactive dashboards hours later. Scheduling Spark batch jobs during non-peak windows with dedicated capacity reservation isolates executive reporting from background ETL spikes.",
+    "code": "-- Fabric Capacity Metrics App Alerting Query\nSELECT TimeStamp, CapacityId, OperationName, ItemType,\n       TotalCU_s, InteractiveCU_s, BackgroundCU_s, ThrottlingStatus\nFROM fabric_monitoring.capacity_metrics\nWHERE ThrottlingStatus IN ('InteractiveDelay', 'InteractiveReject')\nORDER BY TimeStamp DESC;"
   }
 ]

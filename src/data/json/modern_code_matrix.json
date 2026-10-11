@@ -31,5 +31,71 @@
     "snowflake": "MERGE INTO customers t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET t.name = s.name\nWHEN NOT MATCHED THEN INSERT (id, name) VALUES (s.id, s.name);",
     "bigquery": "MERGE `project.dataset.customers` t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET t.updated_at = CURRENT_TIMESTAMP()\nWHEN NOT MATCHED THEN INSERT ROW;",
     "trino": "MERGE INTO iceberg.db.customers t USING updates s ON t.id = s.id\nWHEN MATCHED THEN UPDATE SET name = s.name\nWHEN NOT MATCHED THEN INSERT VALUES (s.id, s.name);"
+  },
+  {
+    "topic": "CDC Streaming Ingestion & Deduplication",
+    "python": "# Polars lazy stream dedup by event_time\nq = (\n    pl.scan_parquet('s3://lake/cdc/*.parquet')\n    .sort('event_time', descending=True)\n    .unique(subset=['order_id'], keep='first')\n)\ndf = q.collect(streaming=True)",
+    "pyspark": "# PySpark Structured Streaming with Watermark & DropDuplicates\nstream = (\n    spark.readStream.format('kafka')\n    .option('subscribe', 'cdc.orders')\n    .load()\n    .selectExpr('CAST(value AS STRING) as json_str')\n    .select(from_json(col('json_str'), schema).alias('data'))\n    .select('data.*')\n    .withWatermark('event_time', '10 minutes')\n    .dropDuplicates(['order_id', 'event_time'])\n    .writeStream.format('delta')\n    .option('checkpointLocation', 's3://chk/orders')\n    .table('silver.orders')\n)",
+    "sparksql": "-- Streaming Delta Deduplication with Windowing in DBSQL\nCREATE OR REPLACE TEMP VIEW deduplicated_orders AS\nSELECT * FROM (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY order_id ORDER BY event_time DESC\n  ) as rn\n  FROM silver_stream.raw_orders\n) WHERE rn = 1;",
+    "scala": "val stream = spark.readStream.table(\"bronze.orders\")\n  .withWatermark(\"event_time\", \"10 minutes\")\n  .dropDuplicates(Seq(\"order_id\", \"event_time\"))\n  .writeStream.table(\"silver.orders\")",
+    "duckdb": "-- DuckDB streaming scan with arg_max dedup\nSELECT order_id, arg_max(customer_id, event_time) as customer_id,\n       arg_max(amount, event_time) as amount,\n       max(event_time) as latest_event\nFROM read_parquet('s3://lake/cdc/*.parquet')\nGROUP BY order_id;",
+    "snowflake": "-- Snowflake Dynamic Table with automated lag dedup\nCREATE OR REPLACE DYNAMIC TABLE silver_orders\n  TARGET_LAG = '1 minute'\n  WAREHOUSE = transform_wh\nAS\nSELECT * EXCLUDE (rn) FROM (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY order_id ORDER BY event_time DESC\n  ) as rn\n  FROM bronze_orders_stream\n) WHERE rn = 1;",
+    "bigquery": "-- BigQuery Continuous Query deduplication\nSELECT * EXCEPT(rn) FROM (\n  SELECT *, ROW_NUMBER() OVER(\n    PARTITION BY order_id ORDER BY event_timestamp DESC\n  ) as rn\n  FROM \n) WHERE rn = 1;",
+    "trino": "SELECT order_id, max_by(amount, event_time) as amount\nFROM kafka.events.orders\nGROUP BY order_id;"
+  },
+  {
+    "topic": "Slowly Changing Dimension Type 2 (SCD2)",
+    "python": "# Polars SCD2 generation via window lag diff\nimport polars as pl\ndf = pl.read_parquet('customers_history.parquet')\nscd2 = df.sort(['customer_id', 'effective_date']).with_columns([\n    pl.col('effective_date').shift(-1).over('customer_id').alias('end_date'),\n    (pl.col('effective_date').shift(-1).over('customer_id').is_null()).alias('is_current')\n])",
+    "pyspark": "# PySpark Delta Table SCD2 MERGE pattern\nfrom delta.tables import DeltaTable\ntarget = DeltaTable.forName(spark, 'silver.dim_customer')\n# Split staging into inserts and historical closes\nstaged = staged_updates.selectExpr('NULL as merge_key', 'updates.*') \\n  .union(staged_updates.selectExpr('customer_id as merge_key', 'updates.*'))\ntarget.alias('t').merge(\n    staged.alias('s'),\n    't.customer_id = s.merge_key AND t.is_current = true'\n).whenMatchedUpdate(\n    condition='t.address <> s.address',\n    set={'is_current': 'false', 'end_date': 's.effective_date'}\n).whenNotMatchedInsert(\n    values={'customer_id': 's.customer_id', 'address': 's.address', 'is_current': 'true', 'effective_date': 's.effective_date', 'end_date': 'NULL'}\n).execute()",
+    "sparksql": "-- Databricks Delta SCD2 Merge with deletion vectors\nMERGE INTO silver.dim_customer t\nUSING updates_staged s\nON t.customer_id = s.customer_id AND t.is_current = TRUE\nWHEN MATCHED AND t.tier <> s.tier THEN\n  UPDATE SET t.is_current = FALSE, t.end_date = s.effective_date;\nINSERT INTO silver.dim_customer\nSELECT customer_id, tier, effective_date, NULL as end_date, TRUE as is_current\nFROM updates_staged;",
+    "scala": "// DeltaTable Scala API SCD2 implementation\nval target = DeltaTable.forName(\"silver.dim_customer\")\ntarget.as(\"t\").merge(updates.as(\"s\"), \"t.id = s.id AND t.is_current = true\")\n  .whenMatched(\"t.hash <> s.hash\").updateExpr(Map(\"is_current\" -> \"false\"))\n  .execute()",
+    "duckdb": "-- DuckDB SCD2 with window lead\nSELECT customer_id, address, effective_date,\n       LEAD(effective_date) OVER (PARTITION BY customer_id ORDER BY effective_date) as end_date,\n       CASE WHEN LEAD(effective_date) OVER (PARTITION BY customer_id ORDER BY effective_date) IS NULL THEN TRUE ELSE FALSE END as is_current\nFROM raw_customer_events;",
+    "snowflake": "-- Snowflake Streams & Tasks automated SCD2\nMERGE INTO dim_customer t\nUSING (SELECT * FROM customer_stream WHERE METADATA = 'INSERT') s\nON t.customer_id = s.customer_id AND t.is_current = TRUE\nWHEN MATCHED AND t.city <> s.city THEN\n  UPDATE SET is_current = FALSE, end_date = CURRENT_TIMESTAMP();",
+    "bigquery": "-- BigQuery Snapshot Table SCD2\nMERGE  t\nUSING staged_customers s\nON t.customer_id = s.customer_id AND t.is_current = TRUE\nWHEN MATCHED AND t.status <> s.status THEN\n  UPDATE SET is_current = FALSE, valid_to = s.change_date;",
+    "trino": "SELECT customer_id, status, start_date,\n       COALESCE(lead(start_date) OVER (PARTITION BY customer_id ORDER BY start_date), TIMESTAMP '9999-12-31') as end_date\nFROM customer_events;"
+  },
+  {
+    "topic": "Semi-Structured JSON Array Flattening",
+    "python": "# Polars struct & list explode\nimport polars as pl\ndf = pl.read_ndjson('events.json')\nflat_df = (\n    df.explode('line_items')\n    .unnest('line_items')\n    .select(['order_id', 'product_id', 'quantity', 'price'])\n)",
+    "pyspark": "# PySpark schema parsing & explode_outer\nfrom pyspark.sql.functions import from_json, explode_outer, col\nflat = (\n    df.withColumn('parsed', from_json(col('raw_json'), schema))\n    .select('order_id', explode_outer('parsed.items').alias('item'))\n    .select('order_id', 'item.sku', 'item.qty', 'item.price')\n)",
+    "sparksql": "SELECT order_id,\n       item.sku AS product_sku,\n       item.quantity AS quantity,\n       item.price AS unit_price\nFROM raw_orders\nLATERAL VIEW EXPLODE_OUTER(from_json(payload, 'ARRAY<STRUCT<sku:STRING, quantity:INT, price:DECIMAL(10,2)>>')) AS item;",
+    "scala": "val flat = df.select($\"order_id\", explode($\"payload.items\").as(\"item\"))\n  .select($\"order_id\", $\"item.sku\", $\"item.price\")",
+    "duckdb": "-- DuckDB UNNEST JSON array\nSELECT order_id,\n       item.sku::VARCHAR as sku,\n       item.qty::INT as quantity\nFROM read_json('s3://lake/orders/*.json'),\nUNNEST(items) as t(item);",
+    "snowflake": "-- Snowflake FLATTEN table function\nSELECT o.order_id,\n       f.value:sku::STRING as product_sku,\n       f.value:qty::INTEGER as quantity\nFROM raw_orders o,\nLATERAL FLATTEN(input => parse_json(o.raw_payload):items) f;",
+    "bigquery": "-- BigQuery UNNEST with JSON_EXTRACT_ARRAY\nSELECT order_id,\n       JSON_VALUE(item, '$.sku') as product_sku,\n       CAST(JSON_VALUE(item, '$.qty') AS INT64) as quantity\nFROM ,\nUNNEST(JSON_EXTRACT_ARRAY(raw_payload, '$.items')) as item;",
+    "trino": "SELECT order_id, item.sku, item.qty\nFROM raw_orders\nCROSS JOIN UNNEST(CAST(json_extract(payload, '$.items') AS ARRAY(ROW(sku VARCHAR, qty INT)))) as t(item);"
+  },
+  {
+    "topic": "As-Of Joins (Financial & Telemetry Event Alignment)",
+    "python": "# Polars native join_asof on timestamp\nimport polars as pl\ntrades = pl.read_parquet('trades.parquet').sort('trade_time')\nquotes = pl.read_parquet('quotes.parquet').sort('quote_time')\nmatched = trades.join_asof(\n    quotes,\n    left_on='trade_time',\n    right_on='quote_time',\n    by='ticker',\n    strategy='backward'\n)",
+    "pyspark": "# PySpark 3.5+ DataFrame join_asof\nfrom pyspark.sql.functions import col\n# Window range alternative or join_asof in Spark Connect\nmatched = trades.join_asof(\n    quotes,\n    on='timestamp',\n    by='ticker',\n    direction='backward',\n    tolerance=lit('5 seconds')\n)",
+    "sparksql": "-- Range join with broadcast quote lookup\nSELECT t.ticker, t.trade_time, t.trade_price, q.bid, q.ask\nFROM trades t\nLEFT JOIN quotes q ON t.ticker = q.ticker\n  AND q.quote_time = (\n    SELECT MAX(q2.quote_time) FROM quotes q2\n    WHERE q2.ticker = t.ticker AND q2.quote_time <= t.trade_time\n  );",
+    "scala": "val matched = trades.joinAsOf(quotes, \"timestamp\", Seq(\"ticker\"), \"backward\")",
+    "duckdb": "-- DuckDB native ASOF JOIN\nSELECT t.ticker, t.trade_time, t.price, q.bid, q.ask\nFROM trades t\nASOF JOIN quotes q\n  ON t.ticker = q.ticker\n AND t.trade_time >= q.quote_time;",
+    "snowflake": "-- Snowflake ASOF JOIN\nSELECT t.ticker, t.trade_time, t.price, q.bid, q.ask\nFROM trades t\nASOF JOIN quotes q\n  MATCH_CONDITION (t.trade_time >= q.quote_time)\n  ON t.ticker = q.ticker;",
+    "bigquery": "-- BigQuery Windowed Event Matching\nSELECT ticker, trade_time, price, last_bid, last_ask\nFROM (\n  SELECT *, LAST_VALUE(bid IGNORE NULLS) OVER (\n    PARTITION BY ticker ORDER BY ts ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  ) as last_bid\n  FROM combined_trades_quotes\n) WHERE is_trade = TRUE;",
+    "trino": "-- Trino correlated subquery / window lookup\nSELECT t.trade_id, q.bid_price\nFROM trades t\nCROSS JOIN LATERAL (\n  SELECT bid_price FROM quotes q\n  WHERE q.ticker = t.ticker AND q.ts <= t.ts\n  ORDER BY q.ts DESC LIMIT 1\n) q;"
+  },
+  {
+    "topic": "Vector Embeddings Batch Generation & Search",
+    "python": "# Polars + sentence_transformers batch embedding\nimport polars as pl\nfrom sentence_transformers import SentenceTransformer\nmodel = SentenceTransformer('BAAI/bge-small-en-v1.5')\ndf = pl.read_parquet('corpus.parquet')\ntexts = df['doc_text'].to_list()\nembeddings = model.encode(texts, batch_size=256, normalize_embeddings=True)\ndf = df.with_columns(pl.Series('embedding', embeddings))",
+    "pyspark": "# PySpark Arrow Vectorized UDF for Embeddings\nfrom pyspark.sql.functions import pandas_udf\nimport pandas as pd\n@pandas_udf('array<float>')\ndef generate_embeddings(texts: pd.Series) -> pd.Series:\n    from sentence_transformers import SentenceTransformer\n    model = SentenceTransformer('all-MiniLM-L6-v2')\n    vectors = model.encode(texts.tolist(), normalize_embeddings=True)\n    return pd.Series(list(vectors))\n\nembedded_df = df.withColumn('vector', generate_embeddings(col('doc_chunk')))",
+    "sparksql": "-- Databricks Vector Search SQL Query\nSELECT id, text_chunk, score\nFROM VECTOR_SEARCH(\n  index_name => 'gold_catalog.ai.knowledge_base_idx',\n  query_text => 'How does Delta UniForm synchronize Iceberg metadata?',\n  num_results => 5\n);",
+    "scala": "// Scala Spark with Databricks Foundation Model Serving\nval embedded = df.withColumn(\"vector\", expr(\"ai_embed('databricks-bge-large-en', doc_text)\"))",
+    "duckdb": "-- DuckDB with VSS extension vector similarity\nINSTALL vss; LOAD vss;\nSELECT id, doc_text, array_cosine_distance(embedding, [0.12, -0.45, 0.89]::FLOAT[3]) as distance\nFROM document_vectors\nORDER BY distance ASC LIMIT 5;",
+    "snowflake": "-- Snowflake Cortex AI Vector Search\nSELECT doc_id, text_chunk,\n       VECTOR_COSINE_SIMILARITY(embedding, SNOWFLAKE.CORTEX.EMBED_TEXT_768('e5-base-v2', 'query text')) as score\nFROM doc_vectors\nORDER BY score DESC LIMIT 5;",
+    "bigquery": "-- BigQuery VECTOR_SEARCH with ScaNN\nSELECT query.query_id, base.doc_id, distance\nFROM VECTOR_SEARCH(\n  TABLE , 'embedding',\n  TABLE , 'query_vector',\n  top_k => 5, distance_type => 'COSINE'\n);",
+    "trino": "SELECT id, doc_text FROM vector_store.ai.chunks WHERE cosine_similarity(vector, ARRAY[0.1, 0.2]) > 0.8;"
+  },
+  {
+    "topic": "Liquid Clustering & Storage Compaction (Optimize)",
+    "python": "# Delta-rs (Python native without JVM) Optimize & Vacuum\nfrom deltalake import DeltaTable\ndt = DeltaTable('s3://lake/gold/transactions')\n# Compact small files to 256MB\ndt.optimize.compact()\n# Vacuum historical snapshots older than 7 days\ndt.vacuum(retention_hours=168, enforce_retention_duration=False)",
+    "pyspark": "# PySpark Delta Liquid Clustering + Optimize\n# Create clustered table\nspark.sql('''\nCREATE TABLE gold.events (id BIGINT, user_id STRING, ts TIMESTAMP)\nUSING DELTA\nCLUSTER BY (user_id, ts)\n''')\n# Run incremental clustering\nspark.sql('OPTIMIZE gold.events')",
+    "sparksql": "-- Databricks Liquid Clustering incremental optimization\nALTER TABLE gold.fact_orders CLUSTER BY (customer_id, order_date);\nOPTIMIZE gold.fact_orders;\nVACUUM gold.fact_orders RETAIN 168 HOURS;",
+    "scala": "import io.delta.tables.DeltaTable\nval deltaTable = DeltaTable.forName(spark, \"gold.events\")\ndeltaTable.optimize().executeCompaction()\ndeltaTable.vacuum(168)",
+    "duckdb": "-- DuckDB compaction via sorted Parquet export\nCOPY (SELECT * FROM raw_events ORDER BY customer_id, event_date)\nTO 's3://lake/gold/events/'\n(FORMAT PARQUET, PARTITION_BY (event_year), COMPRESSION ZSTD, ROW_GROUP_SIZE 100000);",
+    "snowflake": "-- Snowflake automatic clustering key\nALTER TABLE fact_transactions CLUSTER BY (customer_id, DATE_TRUNC('month', transaction_date));\n-- Check clustering health\nSELECT SYSTEM('fact_transactions', '(customer_id)');",
+    "bigquery": "-- BigQuery table partitioning & clustering\nCREATE TABLE \nPARTITION BY DATE(order_timestamp)\nCLUSTER BY customer_id, store_id\nAS SELECT * FROM staged_orders;",
+    "trino": "-- Iceberg rewrite data files (bin-packing compaction)\nALTER TABLE iceberg.sales.orders EXECUTE optimize(file_size_threshold => '128MB');"
   }
 ]
