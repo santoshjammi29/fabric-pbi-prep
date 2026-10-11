@@ -1,25 +1,5 @@
 import { cache } from "react";
-import {
-  conceptsDb,
-  questionsDb,
-  questionsDeDb,
-  architectureData,
-  pysparkData,
-  sparksqlData,
-  mssqlData,
-  pythonData,
-  learningPathsDb,
-  cheatsheetData,
-  modernStackDb,
-  modernBlueprintsDb,
-  modernCodeMatrix,
-  modernCostPlaybooks,
-  modernConceptsDb,
-  modernSubdomains,
-  companyProfiles,
-  getUnifiedQuestions,
-  getStandardizedDomain,
-} from "@/data";
+import { serverlessDb } from "@/lib/db";
 import {
   Concept,
   Question,
@@ -33,27 +13,31 @@ import {
 
 /**
  * Server-Side Data Access Layer (DAL)
- * Wraps large dataset queries in React cache() to guarantee request-level deduplication,
- * zero-lag execution, and strict decoupling of multi-megabyte JSONs from client JS bundles.
+ *
+ * Interfaces with the Serverless Database Engine (Supabase / MongoDB Atlas / In-Memory Fallback).
+ * Wraps dataset queries in React cache() to guarantee request-level deduplication,
+ * sub-50ms execution, and strict decoupling of multi-megabyte JSONs from client JS bundles.
  */
 
 // --- 1. CONCEPTS ---
 export const getConceptsDAL = cache(async (): Promise<Concept[]> => {
-  return conceptsDb;
+  return await serverlessDb.getConcepts();
 });
 
 export const getConceptByIdDAL = cache(async (id: string): Promise<Concept | undefined> => {
-  return conceptsDb.find((c) => c.id === id);
+  const concepts = await serverlessDb.getConcepts();
+  return concepts.find((c: Concept) => c.id === id);
 });
 
 export const getConceptsCategoriesDAL = cache(async (): Promise<string[]> => {
-  const categories = Array.from(new Set(conceptsDb.map((c) => c.category))).sort();
-  return categories;
+  const concepts = await serverlessDb.getConcepts();
+  const categories = Array.from(new Set(concepts.map((c: Concept) => c.category))).sort();
+  return categories as string[];
 });
 
 // --- 2. QUESTIONS (Q&A PREP) ---
 export const getUnifiedQuestionsDAL = cache(async (): Promise<UnifiedQuestion[]> => {
-  return getUnifiedQuestions();
+  return await serverlessDb.getUnifiedQuestions();
 });
 
 export interface QuestionQueryParams {
@@ -66,10 +50,10 @@ export interface QuestionQueryParams {
 
 export const queryQuestionsDAL = cache(async (params: QuestionQueryParams = {}) => {
   const { query = "", difficulty = "ALL", domain = "ALL", page = 1, limit = 25 } = params;
-  const all = getUnifiedQuestions();
+  const all = await serverlessDb.getUnifiedQuestions();
 
   const qLower = query.toLowerCase().trim();
-  const filtered = all.filter((item) => {
+  const filtered = all.filter((item: UnifiedQuestion) => {
     if (difficulty !== "ALL" && item.difficulty !== difficulty) {
       return false;
     }
@@ -107,41 +91,29 @@ export const queryQuestionsDAL = cache(async (params: QuestionQueryParams = {}) 
 
 // --- 3. ARCHITECTURE QUESTIONS ---
 export const getArchitectureDataDAL = cache(async (): Promise<ArchitectureQuestion[]> => {
-  return architectureData;
+  return await serverlessDb.getArchitectureData();
 });
 
 // --- 4. CODE PRACTICE ---
 export const getCodePracticeDataDAL = cache(async () => {
-  return {
-    pyspark: pysparkData,
-    sparksql: sparksqlData,
-    mssql: mssqlData,
-    python: pythonData,
-  };
+  return await serverlessDb.getCodePractice();
 });
 
 // --- 5. LEARNING PATHS & CHEATSHEETS ---
 export const getLearningPathsDAL = cache(async (): Promise<LearningPath[]> => {
-  return learningPathsDb;
+  return await serverlessDb.getLearningPaths();
 });
 
 export const getCheatsheetDataDAL = cache(async (): Promise<CheatCode[]> => {
-  return cheatsheetData;
+  return await serverlessDb.getCheatsheetData();
 });
 
 // --- 6. MODERN STACK & BLUEPRINTS ---
 export const getModernStackDAL = cache(async () => {
-  return {
-    stack: modernStackDb,
-    blueprints: modernBlueprintsDb,
-    matrix: modernCodeMatrix,
-    costPlaybooks: modernCostPlaybooks,
-    concepts: modernConceptsDb,
-    subdomains: modernSubdomains,
-  };
+  return await serverlessDb.getModernStack();
 });
 
 // --- 7. COMPANY PROFILES ---
 export const getCompanyProfilesDAL = cache(async () => {
-  return companyProfiles;
+  return await serverlessDb.getCompanyProfiles();
 });

@@ -81,15 +81,32 @@ export function buildPageMetadata({
   };
 }
 
+export const generatePageMetadata = buildPageMetadata;
+
 /**
  * JSON-LD Course Schema Generator
  */
-export function generateCourseSchema(course: {
-  name: string;
-  description: string;
-  url: string;
-  skillLevel?: string;
-}) {
+export function generateCourseSchema(
+  courseOrName:
+    | {
+        name: string;
+        description: string;
+        url: string;
+        skillLevel?: string;
+      }
+    | string,
+  maybeDescription?: string,
+  maybeUrl: string = "/"
+) {
+  const course =
+    typeof courseOrName === "string"
+      ? {
+          name: courseOrName,
+          description: maybeDescription || courseOrName,
+          url: maybeUrl,
+        }
+      : courseOrName;
+
   return {
     "@context": "https://schema.org",
     "@type": "Course",
@@ -100,8 +117,8 @@ export function generateCourseSchema(course: {
       name: "Microsoft Data Platform Architect Academy",
       sameAs: SITE_URL,
     },
-    url: `${SITE_URL}${course.url}`,
-    educationalLevel: course.skillLevel || "Advanced / Staff / Principal Architect",
+    url: `${SITE_URL}${course.url.startsWith("/") ? course.url : `/${course.url}`}`,
+    educationalLevel: "Advanced / Staff / Principal Architect",
     inLanguage: "en-US",
   };
 }
@@ -127,17 +144,32 @@ export function generateFAQSchema(faqs: { question: string; answer: string }[]) 
 /**
  * JSON-LD HowTo Schema Generator
  */
-export function generateHowToSchema(howto: {
-  name: string;
-  description: string;
-  steps: { name: string; text: string }[];
-}) {
+export function generateHowToSchema(
+  howtoOrName:
+    | {
+        name: string;
+        description: string;
+        steps: { name: string; text: string }[];
+      }
+    | string,
+  maybeDescription?: string,
+  maybeSteps?: { name: string; text: string }[]
+) {
+  const howto =
+    typeof howtoOrName === "string"
+      ? {
+          name: howtoOrName,
+          description: maybeDescription || howtoOrName,
+          steps: maybeSteps || [],
+        }
+      : howtoOrName;
+
   return {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: howto.name,
     description: howto.description,
-    step: howto.steps.map((s, idx) => ({
+    step: (howto.steps || []).map((s, idx) => ({
       "@type": "HowToStep",
       position: idx + 1,
       name: s.name,
@@ -145,3 +177,4 @@ export function generateHowToSchema(howto: {
     })),
   };
 }
+

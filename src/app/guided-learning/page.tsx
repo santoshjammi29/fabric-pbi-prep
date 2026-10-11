@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useDeferredValue, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import {
@@ -741,9 +742,12 @@ export default function GuidedLearningPage() {
                   }}
                   className="relative group cursor-pointer w-full md:w-44 h-24 rounded-lg overflow-hidden border border-[var(--border)] bg-black shrink-0 shadow-xs"
                 >
-                  <img
+                  <Image
                     src={featuredDiagram.image}
                     alt={featuredDiagram.title}
+                    width={300}
+                    height={180}
+                    sizes="(max-width: 768px) 100vw, 200px"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 opacity-90 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors flex items-center justify-center">
@@ -819,9 +823,12 @@ export default function GuidedLearningPage() {
                       className="p-2 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-500/40 text-left transition-all flex items-center gap-2.5 group"
                     >
                       <div className="w-12 h-8 rounded bg-black shrink-0 overflow-hidden relative border border-[var(--border)] shadow-xs">
-                        <img
+                        <Image
                           src={rd.image}
                           alt={rd.title}
+                          width={80}
+                          height={50}
+                          sizes="80px"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
                       </div>
@@ -1326,11 +1333,15 @@ export default function GuidedLearningPage() {
 
               {/* Modal Body with Zoomable Image */}
               <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-black/60 min-h-[360px]">
-                <img
+                <Image
                   src={activeDiagramModal.image}
                   alt={activeDiagramModal.title}
+                  width={1400}
+                  height={900}
+                  sizes="(max-width: 768px) 100vw, 85vw"
+                  priority={true}
                   style={{ transform: `scale(${diagramZoom})`, transformOrigin: "center center" }}
-                  className="max-h-[58vh] max-w-full object-contain rounded-lg transition-transform duration-150"
+                  className="max-h-[58vh] max-w-full w-auto h-auto object-contain rounded-lg transition-transform duration-150"
                 />
               </div>
 

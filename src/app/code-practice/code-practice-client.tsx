@@ -1,0 +1,657 @@
+"use client";
+
+import React, { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
+import { m, AnimatePresence } from "framer-motion";
+import {
+  FileCode2,
+  Search,
+  Copy,
+  Check,
+  Bookmark,
+  BookmarkCheck,
+  ChevronDown,
+  Lightbulb,
+  Briefcase,
+  Layers,
+  BookOpen,
+  MessageSquare,
+  Shuffle,
+  Terminal,
+  Zap,
+} from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { HubSubnav } from "@/components/layout/hub-subnav";
+import { CodeSheetItem, CodeLevel } from "@/types/data";
+import { CodeBlock } from "@/components/ui/code-block";
+import { SmoothAccordion } from "@/components/ui/smooth-accordion";
+import { recordLastTopic } from "@/lib/user-progress";
+import { TopicIcon } from "@/components/ui/topic-icon";
+
+type LanguageKey = "pyspark" | "sparksql" | "mssql" | "python";
+
+const levelBadges: Record<CodeLevel, { bg: string; text: string; border: string }> = {
+  beginner: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/20" },
+  intermediate: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" },
+  advanced: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/20" },
+  architect: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
+};
+
+export interface CodePracticeClientProps {
+  initialData: {
+    pyspark: CodeSheetItem[];
+    sparksql: CodeSheetItem[];
+    mssql: CodeSheetItem[];
+    python: CodeSheetItem[];
+  };
+}
+
+export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
+  const languageConfigs: Record<
+    LanguageKey,
+    { name: string; topicKey: string; data: CodeSheetItem[]; badgeColor: string }
+  > = useMemo(
+    () => ({
+      pyspark: {
+        name: "PySpark 3.4+ / 4.0",
+        topicKey: "spark",
+        data: initialData.pyspark,
+        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+      },
+      sparksql: {
+        name: "Spark SQL & Unity",
+        topicKey: "sql",
+        data: initialData.sparksql,
+        badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      },
+      mssql: {
+        name: "MS SQL / T-SQL",
+        topicKey: "mssql",
+        data: initialData.mssql,
+        badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+      },
+      python: {
+        name: "Python (Pandas & Polars)",
+        topicKey: "python",
+        data: initialData.python,
+        badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
+      },
+    }),
+    [initialData]
+  );
+  const [activeLang, setActiveLang] = useState<LanguageKey>("pyspark");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState<string>("ALL");
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+
+  const handleShuffle = () => {
+    setIsShuffled(true);
+    setShuffleSeed((s) => s + 1);
+    toast.success(`Shuffled ${languageConfigs[activeLang].name} templates`);
+  };
+
+  const handleResetOrder = () => {
+    setIsShuffled(false);
+    toast.info("Reset to default order");
+  };
+
+  const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Synchronize language tab and item target from URL search parameter (?db=, ?id=, ?q=) or hash (#...)
+  useEffect(() => {
+    const syncTab = () => {
+      const params = new URLSearchParams(window.location.search);
+      const dbParam = params.get("db")?.toLowerCase();
+      const hashParam = window.location.hash.replace("#", "").toLowerCase();
+      const idParam = params.get("card") || params.get("id");
+      const qParam = params.get("q") || params.get("search");
+
+      let targetLang = (dbParam || hashParam) as LanguageKey;
+      const validLangs: LanguageKey[] = ["pyspark", "sparksql", "mssql", "python"];
+
+      // If id is provided, discover its language dataset
+      if (idParam) {
+        for (const l of validLangs) {
+          if (languageConfigs[l].data.some((item) => item.id === idParam)) {
+            targetLang = l;
+            break;
+          }
+        }
+      }
+
+      if (targetLang && validLangs.includes(targetLang)) {
+        setActiveLang(targetLang);
+      }
+
+      if (idParam || qParam) {
+        const targetData = targetLang && validLangs.includes(targetLang)
+          ? languageConfigs[targetLang].data
+          : initialData.pyspark;
+        const matched = targetData.find(
+          (item: CodeSheetItem) => (idParam && item.id === idParam) || (qParam && item.title.toLowerCase().includes(qParam.toLowerCase()))
+        );
+        if (matched) {
+          setSelectedLevel("ALL");
+          setSearchQuery(matched.title);
+          setExpandedIds(new Set([matched.id]));
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
+            const el = document.getElementById(`code-${matched.id}`);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        } else if (qParam) {
+          setSearchQuery(qParam);
+        }
+      }
+    };
+    syncTab();
+    window.addEventListener("hashchange", syncTab);
+    window.addEventListener("popstate", syncTab);
+    return () => {
+      window.removeEventListener("hashchange", syncTab);
+      window.removeEventListener("popstate", syncTab);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
+  const handleLangChange = (lang: LanguageKey) => {
+    setActiveLang(lang);
+    setExpandedIds(new Set());
+    setIsShuffled(false);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `?db=${lang}`);
+    }
+    recordLastTopic({
+      title: `${languageConfigs[lang].name} Syntax & Code Sheets`,
+      href: `/code-practice?db=${lang}`,
+      category: "Polyglot Code Hub",
+      progress: 45,
+    });
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Load bookmarks
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dataprep_bookmarks");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarks(parsed.filter((x): x is string => typeof x === "string"));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const toggleBookmark = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const safeBm = Array.isArray(bookmarks) ? bookmarks : [];
+    const isCurrentlyBookmarked = safeBm.includes(id);
+    const updated = isCurrentlyBookmarked
+      ? safeBm.filter((b) => b !== id)
+      : [...safeBm, id];
+    setBookmarks(updated);
+    try {
+      localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
+      const targetItem = languageConfigs[activeLang].data.find((item) => item.id === id);
+      if (targetItem) {
+        recordLastTopic({
+          title: targetItem.title,
+          href: `/code-practice?db=${activeLang}`,
+          category: `${languageConfigs[activeLang].name} Practice`,
+          progress: 60,
+        });
+      }
+      if (isCurrentlyBookmarked) {
+        toast.info("Bookmark removed");
+      } else {
+        toast.success("Saved code sheet to bookmarks in My Studio");
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const copyCode = (code: string, id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    toast.success("Code copied to clipboard!");
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const currentDataset = useMemo(() => {
+    return languageConfigs[activeLang].data;
+  }, [activeLang]);
+
+  const filteredItems = useMemo(() => {
+    return currentDataset.filter((item) => {
+      if (selectedLevel !== "ALL" && item.level !== selectedLevel) {
+        return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const titleMatch = item.title.toLowerCase().includes(q);
+        const descMatch = item.description?.toLowerCase().includes(q);
+        const codeMatch = item.code?.toLowerCase().includes(q);
+        const useCaseMatch = item.use_case?.toLowerCase().includes(q);
+        const catMatch = item.category?.toLowerCase().includes(q);
+        return titleMatch || descMatch || codeMatch || useCaseMatch || catMatch;
+      }
+      return true;
+    });
+  }, [currentDataset, selectedLevel, searchQuery]);
+
+  const displayedItems = useMemo(() => {
+    if (!isShuffled) return filteredItems;
+    const arr = [...filteredItems];
+    let m = arr.length, t, i;
+    let seed = shuffleSeed * 9301 + 49297;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    while (m) {
+      i = Math.floor(rnd() * m--);
+      t = arr[m]; arr[m] = arr[i]; arr[i] = t;
+    }
+    return arr;
+  }, [filteredItems, isShuffled, shuffleSeed]);
+
+  return (
+    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
+      <HubSubnav
+        hubTitle="Code & Runbooks"
+        items={[
+          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
+          { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
+          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
+          { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
+          { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
+        ]}
+      />
+
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
+              <FileCode2 size={13} />
+              <span>Step 2 · Polyglot Engineering</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+              Hands-On Code Practice &amp; Syntaxes
+            </h1>
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Production-grade code patterns across 4 core languages. Optimized for window functions,
+              incremental merges, vector operations, and low-latency analytics.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 shrink-0 text-center">
+            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-xl font-bold text-blue-400">128+</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">Templates</div>
+            </div>
+            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-xl font-bold text-purple-400">4</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">Languages</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Language Selector Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        {(Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
+          const cfg = languageConfigs[key];
+          const isSelected = activeLang === key;
+          return (
+            <button
+              key={key}
+              onClick={() => handleLangChange(key)}
+              className={cn(
+                "flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border transition-all text-left group",
+                isSelected
+                  ? "bg-purple-600/15 border-purple-500/50 shadow-sm"
+                  : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)]"
+              )}
+            >
+              <TopicIcon topic={cfg.topicKey} size={22} className="group-hover:scale-110 transition-transform shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div
+                  className={cn(
+                    "text-xs sm:text-sm font-bold truncate",
+                    isSelected ? "text-purple-300" : "text-[var(--foreground)]"
+                  )}
+                >
+                  {cfg.name}
+                </div>
+                <div className="text-[11px] text-[var(--muted-foreground)]">
+                  {cfg.data.length} Templates
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4-Layer Integrated Domain Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        <Link
+          href={`/concepts?term=${activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark"}`}
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-2.5 group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+            <BookOpen size={15} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">
+              {activeLang === "mssql" ? "T-SQL Definitions" : activeLang === "pyspark" ? "PySpark Core" : "Engine Concepts"}
+            </div>
+          </div>
+        </Link>
+
+        <div className="p-2.5 sm:p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 font-bold">
+            <FileCode2 size={15} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Active</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate">
+              {languageConfigs[activeLang].data.length} Templates Active
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href={`/qa-prep?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark")}`}
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2.5 group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={15} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
+              Related Interview Q&As
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href={`/architecture?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : "Spark")}`}
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-2.5 group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={15} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">
+              System Scenarios
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Search & Level Filters */}
+      <div className="flex flex-col sm:flex-row gap-2.5">
+        <div className="relative flex-1">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)]"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Level Filters */}
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+          {["ALL", "beginner", "intermediate", "advanced", "architect"].map((lvl) => (
+            <button
+              key={lvl}
+              onClick={() => setSelectedLevel(lvl)}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize",
+                selectedLevel === lvl
+                  ? "bg-purple-600 text-white shadow-sm font-semibold"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+              )}
+            >
+              {lvl === "ALL" ? "All Levels" : lvl}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Count summary & Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
+        <div className="flex items-center gap-3">
+          <span>
+            Showing <strong className="text-[var(--foreground)]">{displayedItems.length}</strong> coding templates
+          </span>
+          <button
+            onClick={handleShuffle}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
+              isShuffled
+                ? "bg-purple-600 text-white border-purple-500 shadow-sm"
+                : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+            )}
+            title="Shuffle or randomize coding templates"
+          >
+            <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
+            <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+          </button>
+          {isShuffled && (
+            <button
+              onClick={handleResetOrder}
+              className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-1 underline underline-offset-2"
+            >
+              Reset Order
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setExpandedIds(new Set(displayedItems.map((i) => i.id)))}
+            className="hover:text-[var(--foreground)] font-medium transition-colors"
+          >
+            Expand All
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setExpandedIds(new Set())}
+            className="hover:text-[var(--foreground)] font-medium transition-colors"
+          >
+            Collapse All
+          </button>
+        </div>
+      </div>
+
+      {/* Code Templates Stream */}
+      {displayedItems.length === 0 ? (
+        <div className="py-20 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
+          <Layers size={40} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
+          <h3 className="text-base font-semibold text-[var(--foreground)]">No matching templates found</h3>
+          <p className="text-xs text-[var(--muted-foreground)] mt-1 max-w-sm mx-auto">
+            Try adjusting your search query or selecting a different level.
+          </p>
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedLevel("ALL");
+              setIsShuffled(false);
+            }}
+            className="mt-4 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
+          >
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {displayedItems.map((item, index) => {
+            const isExpanded = expandedIds.has(item.id);
+            const isBookmarked = bookmarks.includes(item.id);
+            const levelStyle = levelBadges[item.level] || levelBadges.intermediate;
+
+            return (
+              <div
+                key={item.id}
+                id={`code-${item.id}`}
+                className={cn(
+                  "rounded-xl border transition-all duration-200 overflow-hidden",
+                  isExpanded
+                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
+                    : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                )}
+              >
+                {/* Header */}
+                <div
+                  onClick={() => toggleExpand(item.id)}
+                  className="p-3.5 sm:p-4 cursor-pointer select-none space-y-1.5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                          {item.category || languageConfigs[activeLang].name}
+                        </span>
+                        <span
+                          className={cn(
+                            "text-[10px] font-semibold px-2 py-0.5 rounded-full border capitalize",
+                            levelStyle.bg,
+                            levelStyle.text,
+                            levelStyle.border
+                          )}
+                        >
+                          {item.level}
+                        </span>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight">
+                        {item.title}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={(e) => toggleBookmark(item.id, e)}
+                        className={cn(
+                          "p-1.5 rounded-lg transition-colors",
+                          isBookmarked
+                            ? "text-amber-400 bg-amber-400/10"
+                            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                        )}
+                        title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
+                      >
+                        {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
+                      </button>
+
+                      <button
+                        onClick={(e) => copyCode(item.code, item.id, e)}
+                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                        title="Copy Code"
+                      >
+                        {copiedId === item.id ? (
+                          <Check size={15} className="text-green-400" />
+                        ) : (
+                          <Copy size={15} />
+                        )}
+                      </button>
+
+                      <div className="p-1.5 text-[var(--muted-foreground)]">
+                        <ChevronDown
+                          size={15}
+                          className={cn(
+                            "transition-transform duration-300",
+                            isExpanded && "rotate-180 text-purple-400"
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Expanded Code & Notes Body */}
+                <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 pb-3.5 pt-2 space-y-2.5 text-xs sm:text-sm bg-[var(--surface-2)]/30">
+                  {/* Use Case Scenario */}
+                  {item.use_case && (
+                    <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2">
+                      <Briefcase size={14} className="text-purple-400 mt-0.5 shrink-0" />
+                      <div className="space-y-0.5">
+                        <span className="font-bold text-[10px] uppercase tracking-wider text-purple-300">
+                          Enterprise Scenario:
+                        </span>
+                        <p className="text-xs text-purple-200/90 leading-relaxed">{item.use_case}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Modern Code Block */}
+                  <CodeBlock
+                    code={item.code}
+                    language={activeLang}
+                    filename={`${item.id}.${activeLang === "sparksql" || activeLang === "mssql" ? "sql" : "py"}`}
+                    badge={languageConfigs[activeLang].name}
+                  />
+
+                  {/* Performance / Best Practice Notes */}
+                  {item.notes && item.notes.length > 0 && (
+                    <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
+                        <Lightbulb size={14} className="text-amber-400" />
+                        Architectural Tuning Notes:
+                      </h4>
+                      <ul className="space-y-1.5">
+                        {item.notes.map((note, ni) => (
+                          <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
+                            <span className="text-amber-400 font-bold">•</span>
+                            <span className="leading-snug">{note}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </SmoothAccordion>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

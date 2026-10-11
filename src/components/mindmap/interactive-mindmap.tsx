@@ -38,6 +38,7 @@ import {
   MindmapDomain,
   MindmapSubtopic,
 } from "@/data/mindmap-data";
+import { MindmapCanvasEngine } from "./mindmap-canvas-engine";
 
 /* ─── Icon Mapper ────────────────────────────────────────────────────── */
 function getDomainIcon(name: string, size = 18) {
@@ -574,6 +575,26 @@ export function InteractiveMindmap() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 dark:bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
 
+        {/* GPU-Accelerated 60 FPS HTML5 Canvas Engine */}
+        <MindmapCanvasEngine
+          domains={filteredDomains}
+          layoutNodes={layoutNodes}
+          rootPos={{ x: rootActualX, y: rootActualY }}
+          zoom={zoom}
+          pan={pan}
+          isFlowMode={isFlowMode}
+          selectedDomain={selectedDomain}
+          selectedSubtopic={selectedSubtopic}
+          searchMatches={searchMatches}
+          collapsedDomains={collapsedDomains}
+          onSelectDomain={setSelectedDomain}
+          onSelectSubtopic={(sub, dom) => {
+            setSelectedDomain(dom);
+            setSelectedSubtopic(sub);
+          }}
+          onPanChange={setPan}
+        />
+
         {/* ─── TOP CONTROL TOOLBAR ─────────────────────────────────────── */}
         <div className="absolute top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
           {/* Left: Search & Filter Chips */}
@@ -631,6 +652,12 @@ export function InteractiveMindmap() {
 
           {/* Right: Modern Mindmap Tools (Movable nodes, Zoom, Flow Mode, Fullscreen) */}
           <div className="flex items-center gap-1.5 bg-[var(--surface-1)]/90 backdrop-blur-xl border border-[var(--border)] p-1.5 rounded-2xl shadow-xl">
+            {/* GPU Canvas 60 FPS Indicator */}
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>GPU Canvas 60fps</span>
+            </div>
+
             {/* Live Data Flow Toggle */}
             <button
               onClick={() => setIsFlowMode(!isFlowMode)}

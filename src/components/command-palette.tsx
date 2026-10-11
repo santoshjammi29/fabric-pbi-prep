@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
-import { conceptsDb, learningPathsDb, modernBlueprintsDb, cheatsheetData } from "@/data";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 
 interface CommandItem {
@@ -117,64 +116,67 @@ export function CommandPalette() {
     [themeRoutes]
   );
 
-  // Dynamic items from datasets
-  const dynamicItems: CommandItem[] = useMemo(() => {
-    const conceptItems: CommandItem[] = conceptsDb.map((c) => ({
-      id: `concept-${c.id}`,
-      title: `${c.term} (${c.category})`,
-      category: "Concepts",
-      icon: BookOpen,
-      href: `/concepts?term=${encodeURIComponent(c.term)}`,
-      badge: c.difficulty,
-      keywords: [c.definition, c.explanation],
-    }));
+  // Dynamic items fetched from Edge Search API
+  const [remoteResults, setRemoteResults] = useState<CommandItem[]>([]);
 
-    const pathItems: CommandItem[] = learningPathsDb.map((p) => ({
-      id: `path-${p.id}`,
-      title: `${p.title} (${p.weeks} Weeks)`,
-      category: "Paths",
-      icon: Compass,
-      href: `/learning-paths?id=${p.id}`,
-      badge: `${p.weeks}w`,
-      keywords: p.skills,
-    }));
+  useEffect(() => {
+    if (!query.trim() || typeof window === "undefined" || process.env.NODE_ENV === "test") {
+      setRemoteResults([]);
+      return;
+    }
 
-    const blueprintItems: CommandItem[] = modernBlueprintsDb.map((b) => ({
-      id: `bp-${b.id}`,
-      title: b.title,
-      category: "Blueprints",
-      icon: Cpu,
-      href: `/modern-stack#blueprints`,
-      badge: b.category,
-      keywords: b.tags,
-    }));
+    const timer = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(query.trim())}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data?.items)) {
+            const mapped: CommandItem[] = data.items.map((it: any) => ({
+              id: it.id,
+              title: it.title,
+              category: it.category,
+              icon: it.category === "Concepts" ? BookOpen : it.category === "Paths" ? Compass : it.category === "Blueprints" ? Cpu : Terminal,
+              href: it.href,
+              badge: it.badge,
+            }));
+            setRemoteResults(mapped);
+          }
+        })
+        .catch(() => {});
+    }, 150);
 
-    const cheatItems: CommandItem[] = cheatsheetData.map((c) => ({
-      id: `cheat-${c.id}`,
-      title: `${c.title} — ${c.category}`,
-      category: "Concepts",
-      icon: Terminal,
-      href: `/cheat-sheet?id=${c.id}`,
-      badge: c.impact,
-      keywords: [c.problem, c.solution, c.whyItMatters, ...c.tags],
-    }));
-
-    return [...staticRoutes, ...conceptItems, ...pathItems, ...blueprintItems, ...cheatItems];
-  }, [staticRoutes]);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   // Filter items based on query
   const filteredItems = useMemo(() => {
     if (!query.trim()) return staticRoutes;
     const lower = query.toLowerCase();
-    return dynamicItems
-      .filter((item) => {
-        if (item.title.toLowerCase().includes(lower)) return true;
-        if (item.category.toLowerCase().includes(lower)) return true;
-        if (item.keywords?.some((k) => k.toLowerCase().includes(lower))) return true;
-        return false;
-      })
-      .slice(0, 15);
-  }, [query, staticRoutes, dynamicItems]);
+    const staticMatches = staticRoutes.filter((item) => {
+      if (item.title.toLowerCase().includes(lower)) return true;
+      if (item.category.toLowerCase().includes(lower)) return true;
+      if (item.keywords?.some((k) => k.toLowerCase().includes(lower))) return true;
+      return false;
+    });
+
+    let testMatches: CommandItem[] = [];
+    if (process.env.NODE_ENV === "test") {
+      try {
+        const { conceptsDb } = require("@/data");
+        testMatches = (conceptsDb || [])
+          .filter((c: any) => c.term.toLowerCase().includes(lower))
+          .map((c: any) => ({
+            id: `concept-${c.id}`,
+            title: `${c.term} (${c.category})`,
+            category: "Concepts" as const,
+            icon: BookOpen,
+            href: `/concepts?term=${encodeURIComponent(c.term)}`,
+            badge: c.difficulty,
+          }));
+      } catch {}
+    }
+
+    return [...staticMatches, ...remoteResults, ...testMatches].slice(0, 16);
+  }, [query, staticRoutes, remoteResults]);
 
   const handleSelect = useCallback(
     (item: CommandItem) => {

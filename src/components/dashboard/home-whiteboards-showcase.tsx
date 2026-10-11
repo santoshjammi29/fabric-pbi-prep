@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import {
@@ -244,11 +245,15 @@ export function HomeWhiteboardsShowcase() {
 
               {/* Whiteboard Graphic */}
               <div className="relative w-full h-full flex items-center justify-center p-3 sm:p-5">
-                <img
+                <Image
                   src={featuredDiagram.image}
                   alt={featuredDiagram.title}
+                  width={1200}
+                  height={750}
+                  priority={true}
+                  sizes="(max-width: 1024px) 100vw, 65vw"
                   className={cn(
-                    "max-h-full max-w-full object-contain transition-transform duration-300 group-hover/img:scale-[1.018]",
+                    "max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 group-hover/img:scale-[1.018]",
                     isDark ? "whiteboard-dark" : "whiteboard-light"
                   )}
                 />
@@ -345,11 +350,14 @@ export function HomeWhiteboardsShowcase() {
                       isDark ? "whiteboard-container-dark" : "whiteboard-container-light"
                     )}
                   >
-                    <img
+                    <Image
                       src={d.image}
                       alt={d.title}
+                      width={120}
+                      height={80}
+                      sizes="120px"
                       className={cn(
-                        "max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200",
+                        "max-h-full max-w-full w-auto h-auto object-contain group-hover:scale-105 transition-transform duration-200",
                         isDark ? "whiteboard-dark" : "whiteboard-light"
                       )}
                     />
@@ -489,9 +497,13 @@ export function HomeWhiteboardsShowcase() {
                   style={{ transform: `scale(${zoomLevel})`, transformOrigin: "center center" }}
                   className="transition-transform duration-150 max-w-full"
                 >
-                  <img
+                  <Image
                     src={activeModalDiagram.image}
                     alt={activeModalDiagram.title}
+                    width={1400}
+                    height={900}
+                    sizes="(max-width: 768px) 100vw, 85vw"
+                    priority={true}
                     className={cn(
                       "object-contain max-h-[62vh] w-auto h-auto rounded-lg shadow-md transition-all duration-300",
                       isDark ? "whiteboard-dark" : "whiteboard-light"
