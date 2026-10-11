@@ -1,7 +1,17 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
-import { Copy, Check, Terminal, WrapText, AlignLeft } from "lucide-react";
+import React, { useState, useMemo, useCallback, useRef } from "react";
+import {
+  Copy,
+  Check,
+  Terminal,
+  WrapText,
+  AlignLeft,
+  Code2,
+  Eye,
+  RotateCcw,
+  Type,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Prism from "prismjs";
@@ -18,6 +28,7 @@ export interface CodeBlockProps {
   showLineNumbers?: boolean;
   className?: string;
   badge?: string;
+  allowEdit?: boolean;
 }
 
 interface LineToken {
@@ -25,29 +36,37 @@ interface LineToken {
   content: string;
 }
 
+type FontSize = "compact" | "normal" | "large";
+
 const tokenClasses: Record<string, string> = {
   comment: "text-slate-400/90 italic selection:text-slate-300",
   prolog: "text-slate-400 italic",
   doctype: "text-slate-400 italic",
   cdata: "text-slate-400 italic",
-  string: "text-emerald-400 font-normal selection:text-emerald-200",
+  string: "text-emerald-400 dark:text-emerald-400 font-normal selection:text-emerald-200",
   "triple-quoted-string": "text-emerald-300/95 font-normal selection:text-emerald-100",
   char: "text-emerald-400",
-  keyword: "text-purple-400 font-medium selection:text-purple-200",
-  boolean: "text-amber-300 font-medium selection:text-amber-100",
-  number: "text-amber-300 selection:text-amber-100",
+  keyword: "text-purple-400 dark:text-purple-300 font-semibold selection:text-purple-200",
+  boolean: "text-amber-300 font-semibold selection:text-amber-100",
+  number: "text-amber-300 font-mono selection:text-amber-100",
   builtin: "text-cyan-300 font-medium selection:text-cyan-100",
-  "class-name": "text-cyan-300 font-medium",
-  function: "text-sky-300 font-medium selection:text-sky-100",
+  "class-name": "text-cyan-300 font-semibold",
+  function: "text-sky-300 dark:text-sky-300 font-semibold selection:text-sky-100",
   decorator: "text-amber-400 font-medium selection:text-amber-200",
   operator: "text-pink-400 selection:text-pink-200",
   punctuation: "text-slate-400 selection:text-slate-200",
-  variable: "text-slate-100 selection:text-white",
+  variable: "text-slate-100 dark:text-slate-100 selection:text-white",
   property: "text-cyan-200",
-  text: "text-slate-200 selection:text-white",
+  text: "text-slate-200 dark:text-slate-100 selection:text-white",
 };
 
-function getLanguageConfig(lang: string): { label: string; ext: string; color: string; bg: string; prismGrammar: Prism.Grammar } {
+function getLanguageConfig(lang: string): {
+  label: string;
+  ext: string;
+  color: string;
+  bg: string;
+  prismGrammar: Prism.Grammar;
+} {
   const l = (lang || "").toLowerCase();
   if (l.includes("pyspark") || l.includes("polars") || l.includes("python") || l === "py") {
     return {
@@ -58,9 +77,23 @@ function getLanguageConfig(lang: string): { label: string; ext: string; color: s
       prismGrammar: Prism.languages.python || Prism.languages.javascript,
     };
   }
-  if (l.includes("sparksql") || l.includes("duckdb") || l.includes("sql") || l.includes("mssql") || l.includes("t-sql") || l.includes("bigquery") || l.includes("snowflake")) {
+  if (
+    l.includes("sparksql") ||
+    l.includes("duckdb") ||
+    l.includes("sql") ||
+    l.includes("mssql") ||
+    l.includes("t-sql") ||
+    l.includes("bigquery") ||
+    l.includes("snowflake")
+  ) {
     return {
-      label: l.includes("sparksql") ? "Spark SQL" : l.includes("duckdb") ? "DuckDB" : l.includes("mssql") || l.includes("t-sql") ? "T-SQL" : "SQL",
+      label: l.includes("sparksql")
+        ? "Spark SQL"
+        : l.includes("duckdb")
+        ? "DuckDB"
+        : l.includes("mssql") || l.includes("t-sql")
+        ? "T-SQL"
+        : "SQL",
       ext: ".sql",
       color: "text-purple-400",
       bg: "bg-purple-500/10 border-purple-500/20",
@@ -85,7 +118,12 @@ function getLanguageConfig(lang: string): { label: string; ext: string; color: s
       prismGrammar: Prism.languages.json || Prism.languages.javascript,
     };
   }
-  if (l.includes("typescript") || l.includes("ts") || l.includes("javascript") || l.includes("js")) {
+  if (
+    l.includes("typescript") ||
+    l.includes("ts") ||
+    l.includes("javascript") ||
+    l.includes("js")
+  ) {
     return {
       label: l.includes("ts") ? "TypeScript" : "JavaScript",
       ext: l.includes("ts") ? ".ts" : ".js",
@@ -152,41 +190,99 @@ export function CodeBlock({
   showLineNumbers = true,
   className,
   badge,
+  allowEdit = true,
 }: CodeBlockProps) {
+  const initialCode = useMemo(() => (code || "").trim(), [code]);
+  const [activeCode, setActiveCode] = useState<string>(initialCode);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
   const [isWrap, setIsWrap] = useState(false);
   const [lineNumbersEnabled, setLineNumbersEnabled] = useState(showLineNumbers);
+  const [fontSize, setFontSize] = useState<FontSize>("normal");
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const cleanCode = useMemo(() => (code || "").trim(), [code]);
+  // Sync if upstream code prop changes
+  React.useEffect(() => {
+    setActiveCode((code || "").trim());
+  }, [code]);
+
   const langConfig = useMemo(() => getLanguageConfig(language), [language]);
   const displayFilename =
     filename || `${langConfig.label.toLowerCase().replace(/\s+/g, "_")}_snippet${langConfig.ext}`;
 
   const tokenizedLines = useMemo(() => {
-    return tokenizeCodeToLines(cleanCode, langConfig.prismGrammar);
-  }, [cleanCode, langConfig.prismGrammar]);
+    return tokenizeCodeToLines(activeCode, langConfig.prismGrammar);
+  }, [activeCode, langConfig.prismGrammar]);
+
+  const hasModified = activeCode !== initialCode;
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(cleanCode);
+      await navigator.clipboard.writeText(activeCode);
       setCopied(true);
       toast.success("Code snippet copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Failed to copy code");
     }
-  }, [cleanCode]);
+  }, [activeCode]);
+
+  const handleReset = useCallback(() => {
+    setActiveCode(initialCode);
+    toast.info("Restored original code template");
+  }, [initialCode]);
+
+  // Handle Tab key in editor mode to indent 2 spaces instead of leaving textarea
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+
+        // Insert 2 spaces
+        const updated = value.substring(0, start) + "  " + value.substring(end);
+        setActiveCode(updated);
+
+        // Reposition cursor
+        setTimeout(() => {
+          if (textareaRef.current) {
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 2;
+          }
+        }, 0);
+      }
+    },
+    []
+  );
+
+  const cycleFontSize = useCallback(() => {
+    setFontSize((prev) => {
+      if (prev === "compact") return "normal";
+      if (prev === "normal") return "large";
+      return "compact";
+    });
+  }, []);
+
+  const fontSizeClasses = {
+    compact: "text-[12px] leading-[1.65]",
+    normal: "text-[13.5px] leading-[1.75]",
+    large: "text-[15px] leading-[1.85]",
+  }[fontSize];
 
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-sm my-4 font-mono transition-all",
+        "rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-sm my-3 sm:my-4 font-mono transition-all",
         className
       )}
     >
       {/* Code Header Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
-        {/* Left: Window Controls + Filename */}
+      <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
+        {/* Left: Window Controls + Filename + Badge */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500/70 inline-block" />
@@ -196,7 +292,9 @@ export function CodeBlock({
 
           <div className="flex items-center gap-2 truncate">
             <Terminal size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
-            <span className="text-slate-700 dark:text-slate-300 font-mono text-[11px] font-semibold truncate">{displayFilename}</span>
+            <span className="text-slate-700 dark:text-slate-300 font-mono text-[11px] font-semibold truncate">
+              {displayFilename}
+            </span>
             <span
               className={cn(
                 "hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0",
@@ -206,14 +304,63 @@ export function CodeBlock({
             >
               {badge || langConfig.label}
             </span>
+
+            {hasModified && (
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Modified
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Right: Actions with spring physics feedback */}
+        {/* Right: Code Editor Action Bar */}
         <div className="flex items-center gap-1.5 shrink-0 ml-2">
-          <span className="hidden md:inline text-[10px] text-slate-500 font-mono mr-1">
-            {tokenizedLines.length} {tokenizedLines.length === 1 ? "line" : "lines"}
-          </span>
+          {/* Edit / Scratchpad Mode Toggle */}
+          {allowEdit && (
+            <button
+              type="button"
+              onClick={() => setIsEditing((v) => !v)}
+              title={isEditing ? "Switch to syntax preview" : "Open scratchpad code editor"}
+              aria-label="Toggle scratchpad code editor"
+              className={cn(
+                "min-h-[28px] px-2 py-1 rounded-lg transition-all text-xs font-mono flex items-center gap-1.5 touch-manipulation cursor-pointer",
+                isEditing
+                  ? "bg-purple-600 text-white font-semibold shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
+              )}
+            >
+              {isEditing ? <Eye size={12} /> : <Code2 size={12} />}
+              <span className="hidden sm:inline text-[11px]">
+                {isEditing ? "Preview" : "Scratchpad"}
+              </span>
+            </button>
+          )}
+
+          {/* Reset button if modified */}
+          {hasModified && (
+            <button
+              type="button"
+              onClick={handleReset}
+              title="Reset code to original template"
+              aria-label="Reset code template"
+              className="min-h-[28px] px-2 py-1 rounded-lg text-amber-400 hover:bg-amber-500/10 transition-colors text-xs flex items-center gap-1"
+            >
+              <RotateCcw size={12} />
+              <span className="hidden sm:inline text-[10px]">Reset</span>
+            </button>
+          )}
+
+          {/* Font Size Adjuster Button */}
+          <button
+            type="button"
+            onClick={cycleFontSize}
+            title={`Font size: ${fontSize} (click to cycle 12px / 13.5px / 15px)`}
+            aria-label="Adjust font size"
+            className="min-h-[28px] px-2 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all text-xs font-mono flex items-center gap-1 cursor-pointer"
+          >
+            <Type size={12} />
+            <span className="text-[10px] uppercase font-bold">{fontSize[0]}</span>
+          </button>
 
           {/* Toggle Line Numbers */}
           <button
@@ -222,13 +369,13 @@ export function CodeBlock({
             title={lineNumbersEnabled ? "Hide line numbers" : "Show line numbers"}
             aria-label="Toggle line numbers"
             className={cn(
-              "min-h-[30px] px-2 py-1 rounded-lg transition-all text-xs font-mono flex items-center gap-1 touch-manipulation cursor-pointer",
+              "min-h-[28px] px-2 py-1 rounded-lg transition-all text-xs font-mono flex items-center gap-1 touch-manipulation cursor-pointer",
               lineNumbersEnabled
                 ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
             )}
           >
-            <AlignLeft size={13} />
+            <AlignLeft size={12} />
             <span className="hidden sm:inline text-[10px]">#</span>
           </button>
 
@@ -239,13 +386,13 @@ export function CodeBlock({
             title={isWrap ? "Disable wrap (scroll)" : "Enable word wrap"}
             aria-label="Toggle word wrap"
             className={cn(
-              "min-h-[30px] px-2.5 py-1 rounded-lg transition-all text-xs flex items-center gap-1.5 touch-manipulation cursor-pointer",
+              "min-h-[28px] px-2.5 py-1 rounded-lg transition-all text-xs flex items-center gap-1.5 touch-manipulation cursor-pointer",
               isWrap
                 ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
             )}
           >
-            <WrapText size={13} />
+            <WrapText size={12} />
             <span className="hidden sm:inline text-[11px]">Wrap</span>
           </button>
 
@@ -254,64 +401,114 @@ export function CodeBlock({
             type="button"
             onClick={handleCopy}
             aria-label="Copy code to clipboard"
-            className="min-h-[32px] flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 active:scale-95 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-500/30 shadow-xs transition-all touch-manipulation cursor-pointer"
+            className="min-h-[28px] flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 active:scale-95 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-500/30 shadow-xs transition-all touch-manipulation cursor-pointer"
           >
             {copied ? (
               <>
-                <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-700 dark:text-emerald-300 font-semibold">Copied</span>
+                <Check size={12} className="text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
+                  Copied
+                </span>
               </>
             ) : (
               <>
-                <Copy size={13} className="text-blue-700 dark:text-blue-300" />
-                <span>Copy</span>
+                <Copy size={12} className="text-blue-700 dark:text-blue-300" />
+                <span className="text-[11px]">Copy</span>
               </>
             )}
           </button>
         </div>
       </div>
 
-      {/* Code Body */}
+      {/* Code Body: Preview Mode vs Interactive Editor Mode */}
       <div className="relative">
-        <pre
-          className={cn(
-            "m-0 p-3.5 sm:p-4 text-[13px] sm:text-[13.5px] leading-[1.75] font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
-            isWrap && "whitespace-pre-wrap break-words"
-          )}
-          style={{
-            fontFamily: "var(--font-mono), 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace",
-            fontFeatureSettings: '"calt" 1, "liga" 1',
-          }}
-        >
-          <code>
-            {tokenizedLines.map((tokens, idx) => (
+        {isEditing ? (
+          <div className="relative flex bg-[#0A0A0B]">
+            {/* Editor Line Numbers */}
+            {lineNumbersEnabled && (
               <div
-                key={idx}
-                className="group/line flex items-baseline hover:bg-white/[0.03] -mx-3.5 sm:-mx-4 px-3.5 sm:px-4 py-0 rounded transition-colors"
+                className="select-none py-3.5 sm:py-4 px-2.5 sm:px-3 text-right text-slate-500 bg-[#07090c] border-r border-slate-800/80 font-mono tracking-normal text-[11px] sm:text-[12px]"
+                aria-hidden="true"
               >
-                {lineNumbersEnabled && (
-                  <span
-                    className="select-none shrink-0 w-8 sm:w-9 pr-3 sm:pr-3.5 text-right text-[11.5px] sm:text-[12px] text-slate-500 group-hover/line:text-slate-400 font-mono tracking-normal"
-                    aria-hidden="true"
-                  >
-                    {idx + 1}
-                  </span>
-                )}
-                <span className="flex-1">
-                  {tokens.map((t, ti) => {
-                    const tokenClass = tokenClasses[t.type] || tokenClasses.text;
-                    return (
-                      <span key={ti} className={tokenClass}>
-                        {t.content}
-                      </span>
-                    );
-                  })}
-                </span>
+                {activeCode.split("\n").map((_, i) => (
+                  <div key={i} className="leading-[1.75]">
+                    {i + 1}
+                  </div>
+                ))}
               </div>
-            ))}
-          </code>
-        </pre>
+            )}
+
+            {/* Editable Textarea */}
+            <textarea
+              ref={textareaRef}
+              value={activeCode}
+              onChange={(e) => setActiveCode(e.target.value)}
+              onKeyDown={handleKeyDown}
+              spellCheck={false}
+              className={cn(
+                "w-full bg-[#0A0A0B] text-slate-100 font-mono p-3.5 sm:p-4 outline-none resize-y min-h-[160px] tracking-normal border-none focus:ring-0 selection:bg-purple-500/30",
+                fontSizeClasses,
+                isWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto"
+              )}
+              style={{
+                fontFamily:
+                  "var(--font-mono), 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace",
+                fontFeatureSettings: '"calt" 1, "liga" 1',
+              }}
+              placeholder="Edit code snippet here or test your modifications..."
+            />
+          </div>
+        ) : (
+          <pre
+            className={cn(
+              "m-0 p-3.5 sm:p-4 font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
+              fontSizeClasses,
+              isWrap && "whitespace-pre-wrap break-words"
+            )}
+            style={{
+              fontFamily:
+                "var(--font-mono), 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace",
+              fontFeatureSettings: '"calt" 1, "liga" 1',
+            }}
+          >
+            <code>
+              {tokenizedLines.map((tokens, idx) => (
+                <div
+                  key={idx}
+                  className="group/line flex items-baseline hover:bg-white/[0.03] -mx-3.5 sm:-mx-4 px-3.5 sm:px-4 py-0 rounded transition-colors"
+                >
+                  {lineNumbersEnabled && (
+                    <span
+                      className="select-none shrink-0 w-8 sm:w-9 pr-3 sm:pr-3.5 text-right text-[11px] sm:text-[12px] text-slate-500 group-hover/line:text-slate-400 font-mono tracking-normal"
+                      aria-hidden="true"
+                    >
+                      {idx + 1}
+                    </span>
+                  )}
+                  <span className="flex-1">
+                    {tokens.map((t, ti) => {
+                      const tokenClass = tokenClasses[t.type] || tokenClasses.text;
+                      return (
+                        <span key={ti} className={tokenClass}>
+                          {t.content}
+                        </span>
+                      );
+                    })}
+                  </span>
+                </div>
+              ))}
+            </code>
+          </pre>
+        )}
       </div>
+
+      {/* Editor Footer Status Bar */}
+      {isEditing && (
+        <div className="flex items-center justify-between px-3 py-1.5 bg-[#0e1217] border-t border-slate-800 text-[10px] text-slate-400 font-mono">
+          <span>Scratchpad mode enabled · Press Tab to indent (2 spaces)</span>
+          <span>{activeCode.split("\n").length} lines · {activeCode.length} chars</span>
+        </div>
+      )}
     </div>
   );
 }

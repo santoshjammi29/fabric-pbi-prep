@@ -522,17 +522,42 @@ body {
   100% { background-position: -200% 0; }
 }
 
-/* ═══ TERMINAL CODE BLOCK ═══ */
+/* ═══ TERMINAL CODE BLOCK & INLINE CODE TYPOGRAPHY ═══ */
+code, kbd, samp, pre {
+  font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, Menlo, Monaco, Consolas, monospace);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "calt" 1, "liga" 1;
+}
+
+code:not(pre code) {
+  font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace);
+  font-size: 0.86em;
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #38bdf8;
+  word-break: break-word;
+}
+
+.light code:not(pre code) {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0284c7;
+}
+
 .code-block {
   background: #0d1117;
   color: #e6edf3;
   padding: 1rem 1.25rem;
   border-radius: 12px;
   font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', monospace);
-  font-size: 0.82rem;
-  line-height: 1.7;
+  font-size: 0.84rem;
+  line-height: 1.75;
+  letter-spacing: -0.01em;
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Modern Thin Scrollbars for Code Blocks */

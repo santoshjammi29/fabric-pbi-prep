@@ -69,17 +69,26 @@ const markdownComponents = {
     if (match) {
       const lang = match[1];
       const codeString = String(children || "").replace(/\n$/, "");
+      const ext =
+        lang === "sql"
+          ? "sql"
+          : lang === "bash" || lang === "shell"
+          ? "sh"
+          : lang === "json"
+          ? "json"
+          : "py";
       return (
         <CodeBlock
           code={codeString}
           language={lang}
-          filename={`${lang}_impl.${lang === "sql" ? "sql" : "py"}`}
+          filename={`${lang}_solution.${ext}`}
+          showLineNumbers={true}
         />
       );
     }
     return (
       <code
-        className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-100 dark:bg-[#161618] text-blue-700 dark:text-blue-300 font-mono text-[11px] sm:text-[12px] border border-slate-200 dark:border-slate-800"
+        className="px-1.5 py-0.5 mx-0.5 rounded-md bg-slate-100 dark:bg-[#1c1c20] text-sky-700 dark:text-sky-300 font-mono text-[11.5px] sm:text-[12.5px] border border-slate-200 dark:border-white/10 font-medium tracking-tight"
         {...props}
       >
         {children}
