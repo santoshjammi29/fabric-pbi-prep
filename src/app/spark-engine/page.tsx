@@ -269,11 +269,11 @@ export default function SparkEnginePage() {
   return (
     <div className="space-y-6 pb-20">
       <HubSubnav
-        hubTitle="Knowledge Base"
+        hubTitle="Concepts & Engines"
         items={[
-          { label: "Key Concepts (Glossary)", href: "/concepts", icon: BookOpen, badge: "290 Concepts" },
-          { label: "Spark Engine Internals", href: "/spark-engine", icon: Zap, badge: "Deep Dive" },
-          { label: "Modern Data Stack", href: "/modern-stack", icon: Layers, badge: "Multi-Cloud" },
+          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "436 Terms" },
+          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
+          { label: "Modern Stack & FinOps", href: "/modern-stack", icon: Layers, badge: "Playbooks" },
         ]}
       />
 

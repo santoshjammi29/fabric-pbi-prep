@@ -785,11 +785,11 @@ function ArchitectureHubContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-in fade-in duration-300">
       <HubSubnav
-        hubTitle="Architectural Mastery"
+        hubTitle="Architecture Hub"
         items={[
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "2,520 Scenarios" },
-          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "Visual Hub" },
-          { label: "DE Mindmap Topography", href: "/mindmap", icon: Globe, badge: "Interactive" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3,104 Scenarios" },
+          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "25+ Visuals" },
+          { label: "Interactive Mindmap", href: "/mindmap", icon: Globe, badge: "Topography" },
         ]}
       />
 

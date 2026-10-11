@@ -17,6 +17,7 @@ import {
   Building2,
   Globe,
   Flame,
+  FileCode2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,9 +39,9 @@ interface PillarItem {
 
 const PILLARS: PillarItem[] = [
   {
-    id: "curriculum",
-    title: "Learning Journeys",
-    badge: "12 Curricula · 4 Tiers",
+    id: "journey",
+    title: "1. Learning Journey",
+    badge: "12 Curricula · 9 Topics",
     badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
     icon: Compass,
     iconColor: "text-blue-400",
@@ -48,23 +49,23 @@ const PILLARS: PillarItem[] = [
     borderColor: "border-blue-500/20",
     hoverBorder: "hover:border-blue-500/50",
     description:
-      "Structured week-by-week roadmaps from Microsoft Fabric DP-600 to 32-Week Principal Lakehouse Mastery with capstones.",
+      "Structured tech tracks and week-by-week role curricula from Fabric DP-600 to 32-Week Principal Lakehouse Mastery.",
     features: [
-      "Microsoft Fabric DP-600",
-      "Databricks Lakehouse & Unity",
-      "Apache Airflow Orchestration",
-      "dbt Modern Analytics DAGs",
+      "Guided Tech Topics",
+      "12 Career Roadmaps",
+      "10-Q Skill Diagnostic",
+      "Multi-Hop Learning Plan",
     ],
-    primaryLink: { label: "Explore Curricula Tracks", href: "/learning-paths" },
+    primaryLink: { label: "Launch Learning Journey", href: "/guided-learning" },
     secondaryLinks: [
-      { label: "Guided Topics", href: "/guided-learning" },
-      { label: "10-Q Diagnostic", href: "/diagnostic" },
+      { label: "Career Curricula", href: "/learning-paths" },
+      { label: "Skill Diagnostic", href: "/diagnostic" },
     ],
   },
   {
-    id: "knowledge",
-    title: "Knowledge & Engines",
-    badge: "290 Concepts · Spark 4.0",
+    id: "concepts",
+    title: "2. Concepts & Engines",
+    badge: "436 Concepts · Spark Lab",
     badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     icon: BookOpen,
     iconColor: "text-emerald-400",
@@ -72,23 +73,23 @@ const PILLARS: PillarItem[] = [
     borderColor: "border-emerald-500/20",
     hoverBorder: "hover:border-emerald-500/50",
     description:
-      "Architectural glossaries, Spark 4.0 physical execution simulator, Tungsten memory calculator, and cross-cloud translation matrices.",
+      "Architectural glossaries, Spark 4.0 physical execution simulator, Tungsten memory calculator, and FinOps playbooks.",
     features: [
       "Spark Catalyst & Photon C++",
       "Tungsten Memory Allocation",
       "Delta Lake vs Iceberg Internals",
-      "Multi-Cloud Matrix (AWS/GCP/Azure)",
+      "Modern Stack Matrix & FinOps",
     ],
-    primaryLink: { label: "Open Knowledge Base", href: "/concepts" },
+    primaryLink: { label: "Explore Key Concepts", href: "/concepts" },
     secondaryLinks: [
-      { label: "Spark Engine Hub", href: "/spark-engine" },
+      { label: "Spark Engine Lab", href: "/spark-engine" },
       { label: "Modern Data Stack", href: "/modern-stack" },
     ],
   },
   {
     id: "architecture",
-    title: "System Architecture",
-    badge: "2,520 Scenarios · 21 Blueprints",
+    title: "3. Architecture Hub",
+    badge: "3,104 Scenarios · 25+ Blueprints",
     badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
     icon: Layers,
     iconColor: "text-purple-400",
@@ -96,23 +97,47 @@ const PILLARS: PillarItem[] = [
     borderColor: "border-purple-500/20",
     hoverBorder: "hover:border-purple-500/50",
     description:
-      "Real-world enterprise system design problems, failure recovery trade-offs, and hand-drawn whiteboard blueprints.",
+      "Real-world enterprise system design problems, failure recovery trade-offs, whiteboard blueprints, and infinite mindmap.",
     features: [
-      "Medallion Lakehouse Topography",
-      "Kafka & CDC Streaming Pipelines",
-      "Vector RAG Architectures",
-      "Interactive Infinite Mindmap",
+      "System Design Scenarios",
+      "Whiteboard Blueprints Gallery",
+      "Interactive DE Mindmap",
+      "Zero-Downtime Partition Swaps",
     ],
     primaryLink: { label: "View Architecture Hub", href: "/architecture" },
     secondaryLinks: [
       { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams" },
-      { label: "DE Mindmap", href: "/mindmap" },
+      { label: "Interactive Mindmap", href: "/mindmap" },
     ],
   },
   {
-    id: "practice",
-    title: "Interview Drill & Code",
-    badge: "6,570+ Qs · Polyglot Code",
+    id: "code",
+    title: "4. Code & Runbooks",
+    badge: "67 Runbooks · 128+ Drills",
+    badgeColor: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+    icon: FileCode2,
+    iconColor: "text-cyan-400",
+    accentBg: "from-cyan-600/10 via-cyan-500/5 to-transparent",
+    borderColor: "border-cyan-500/20",
+    hoverBorder: "hover:border-cyan-500/50",
+    description:
+      "Production incident playbooks, P0 outage cheat codes, and runnable PySpark, Spark SQL, T-SQL, and Python drills.",
+    features: [
+      "Sev-1 Incident Runbooks",
+      "PySpark 3.4/4.0 Recipes",
+      "Synapse COPY INTO & T-SQL",
+      "Polars Rust Vectorized Drills",
+    ],
+    primaryLink: { label: "Open Code & Runbooks", href: "/code-practice" },
+    secondaryLinks: [
+      { label: "Production Cheat Sheet", href: "/cheat-sheet" },
+      { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
+    ],
+  },
+  {
+    id: "interview",
+    title: "5. Interview Drill Hub",
+    badge: "6,570+ Qs · Flashcards Mode",
     badgeColor: "bg-orange-500/15 text-orange-400 border-orange-500/30",
     icon: MessageSquare,
     iconColor: "text-orange-400",
@@ -120,17 +145,17 @@ const PILLARS: PillarItem[] = [
     borderColor: "border-orange-500/20",
     hoverBorder: "hover:border-orange-500/50",
     description:
-      "Interactive SM-2 spaced repetition question drill, production-ready code snippets, and verified BigTech/GCC salary benchmarks.",
+      "Interactive SM-2 spaced repetition question drill, domain question banks, and verified BigTech/GCC hiring playbooks.",
     features: [
-      "PySpark & Spark SQL Drills",
-      "Production Incident Runbooks",
-      "Tier-1 GCC Salary Benchmarks",
-      "Interactive Flashcards Mode",
+      "6,570+ Vetted Interview Q&As",
+      "Interactive SM-2 Flashcards",
+      "FAANG & Tier-1 GCC Intel",
+      "Architect Scenario Defenses",
     ],
     primaryLink: { label: "Launch Interview Drill", href: "/qa-prep" },
     secondaryLinks: [
-      { label: "Code Practice", href: "/code-practice" },
-      { label: "Production Cheat Sheet", href: "/cheat-sheet" },
+      { label: "Question Drill Bank", href: "/qa-prep" },
+      { label: "Target Company Intel", href: "/company-research" },
     ],
   },
 ];
@@ -214,12 +239,12 @@ export function HeroCommandCenter() {
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-green-400" />
-              <span><strong className="text-[var(--foreground)]">290</strong> Core Concepts</span>
+              <span><strong className="text-[var(--foreground)]">436+</strong> Core Concepts</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-green-400" />
-              <span><strong className="text-[var(--foreground)]">21</strong> Architecture Blueprints</span>
+              <span><strong className="text-[var(--foreground)]">25+</strong> Architecture Blueprints</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
@@ -230,7 +255,7 @@ export function HeroCommandCenter() {
         </div>
       </section>
 
-      {/* ── 2. THE 4 PILLARS OF MASTERY (CLEAN GATEWAY CARDS) ──────────────── */}
+      {/* ── 2. THE 5 PILLARS OF MASTERY (CLEAN GATEWAY CARDS) ──────────────── */}
       <section className="space-y-4">
         <div className="flex items-center justify-between px-1">
           <div>
@@ -242,11 +267,11 @@ export function HeroCommandCenter() {
             </h2>
           </div>
           <span className="text-xs text-[var(--muted-foreground)] hidden sm:inline">
-            4 unified learning gateways
+            5 unified learning gateways
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {PILLARS.map((pillar) => {
             const Icon = pillar.icon;
             return (

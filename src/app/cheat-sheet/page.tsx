@@ -242,10 +242,13 @@ function CheatSheetContent() {
       <section className="relative overflow-hidden border-b border-[var(--border)] bg-[var(--surface-0)] py-10 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <HubSubnav
-            hubTitle="Code & Reference"
+            hubTitle="Code & Runbooks"
             items={[
-              { label: "Code Practice Drills", href: "/code-practice", icon: FileCode2, badge: "PySpark & SQL" },
-              { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready" },
+              { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
+              { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
+              { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
+              { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
+              { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
             ]}
           />
 

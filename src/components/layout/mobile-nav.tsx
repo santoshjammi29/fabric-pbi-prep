@@ -19,22 +19,31 @@ import {
 
 import { Compass } from "lucide-react";
 
-// 4 Core tabs on small mobile screens (< 640px)
-const mobileCoreTabs = [
+interface MobileTabItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: string;
+  isNew?: boolean;
+}
+
+// 5 Core tabs on small mobile screens (< 640px)
+const mobileCoreTabs: MobileTabItem[] = [
   { label: "Home", href: "/", icon: Home },
-  { label: "Journey", href: "/learning-paths", icon: Compass, isNew: true },
+  { label: "Journey", href: "/guided-learning", icon: Compass },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
-  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.4k" },
+  { label: "Arch", href: "/architecture", icon: Layers },
+  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.5k" },
 ];
 
-// Extended tabs on tablet screens (640px - 1023px) — 7 Primary Hubs
-const tabletTabs = [
+// Extended tabs on tablet screens (640px - 1023px) — 5 Primary Hubs + Home & Studio
+const tabletTabs: MobileTabItem[] = [
   { label: "Home", href: "/", icon: Home },
-  { label: "Journey", href: "/learning-paths", icon: Compass, isNew: true },
+  { label: "Journey", href: "/guided-learning", icon: Compass },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
   { label: "Arch", href: "/architecture", icon: Layers },
   { label: "Code", href: "/code-practice", icon: FileCode2 },
-  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.4k" },
+  { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.5k" },
   { label: "Studio", href: "/studio", icon: User },
 ];
 

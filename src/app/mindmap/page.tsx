@@ -10,11 +10,11 @@ export default function MindmapPage() {
   return (
     <div className="space-y-6 pb-20">
       <HubSubnav
-        hubTitle="Architectural Mastery"
+        hubTitle="Architecture Hub"
         items={[
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "2,520 Scenarios" },
-          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "Visual Hub" },
-          { label: "DE Mindmap Topography", href: "/mindmap", icon: Globe, badge: "Interactive" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3,104 Scenarios" },
+          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "25+ Visuals" },
+          { label: "Interactive Mindmap", href: "/mindmap", icon: Globe, badge: "Topography" },
         ]}
       />
 

@@ -19,17 +19,14 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
   it('renders reorganized sidebar with new professional navigation groups', () => {
     render(<Sidebar />);
     expect(screen.getByText('Portal')).toBeDefined();
-    expect(screen.getByText('Knowledge Base')).toBeDefined();
-    expect(screen.getByText('Architectural Mastery')).toBeDefined();
-    expect(screen.getByText('Interview & Prep')).toBeDefined();
-    expect(screen.getByText('Studio')).toBeDefined();
+    expect(screen.getByText('Academy Pillars')).toBeDefined();
 
     // Check specific pill tags for streamlined primary hubs
-    expect(screen.getByText('The Map')).toBeDefined();
+    expect(screen.getByText('The Roadmap')).toBeDefined();
     expect(screen.getByText('Foundations')).toBeDefined();
     expect(screen.getByText('Principal')).toBeDefined();
     expect(screen.getByText('Prod Ready')).toBeDefined();
-    expect(screen.getByText('6.4k+ Qs')).toBeDefined();
+    expect(screen.getByText('6.5k+ Qs')).toBeDefined();
   });
 
   it('supports toggling collapsed and expanded states smoothly', () => {

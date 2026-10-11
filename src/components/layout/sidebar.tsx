@@ -41,41 +41,37 @@ const navGroups: NavGroup[] = [
   {
     title: "Portal",
     items: [
-      { label: "Home", href: "/", icon: Home },
-      {
-        label: "Learning Journey",
-        href: "/learning-paths",
-        icon: Compass,
-        pill: { text: "The Map", variant: "info" },
-        matches: ["/learning-paths", "/guided-learning", "/diagnostic"],
-        subItems: [
-          { label: "Career Curricula", href: "/learning-paths" },
-          { label: "Guided Topics", href: "/guided-learning" },
-          { label: "Diagnostic Exam", href: "/diagnostic" },
-        ],
-      },
+      { label: "Home Dashboard", href: "/", icon: Home },
+      { label: "My Studio", href: "/studio", icon: User, pill: { text: "Personal", variant: "info" } },
     ],
   },
   {
-    title: "Knowledge Base",
+    title: "Academy Pillars",
     items: [
       {
-        label: "Key Concepts & Engines",
+        label: "Learning Journey",
+        href: "/guided-learning",
+        icon: Compass,
+        pill: { text: "The Roadmap", variant: "info" },
+        matches: ["/guided-learning", "/learning-paths", "/diagnostic"],
+        subItems: [
+          { label: "Guided Topic Tracks", href: "/guided-learning" },
+          { label: "Career Curricula", href: "/learning-paths" },
+          { label: "Skill Diagnostic", href: "/diagnostic" },
+        ],
+      },
+      {
+        label: "Concepts & Engines",
         href: "/concepts",
         icon: BookOpen,
         pill: { text: "Foundations", variant: "easy" },
         matches: ["/concepts", "/spark-engine", "/modern-stack"],
         subItems: [
-          { label: "Glossary Concepts", href: "/concepts" },
-          { label: "Spark Engine", href: "/spark-engine" },
-          { label: "Modern Data Stack", href: "/modern-stack" },
+          { label: "Concepts Glossary", href: "/concepts" },
+          { label: "Spark Engine Lab", href: "/spark-engine" },
+          { label: "Modern Stack & FinOps", href: "/modern-stack" },
         ],
       },
-    ],
-  },
-  {
-    title: "Architectural Mastery",
-    items: [
       {
         label: "Architecture Hub",
         href: "/architecture",
@@ -83,44 +79,36 @@ const navGroups: NavGroup[] = [
         pill: { text: "Principal", variant: "architect" },
         matches: ["/architecture", "/mindmap"],
         subItems: [
-          { label: "System Scenarios", href: "/architecture" },
-          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams" },
-          { label: "DE Mindmap", href: "/mindmap" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios" },
+          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams" },
+          { label: "Interactive Mindmap", href: "/mindmap" },
         ],
       },
       {
-        label: "Code & Cheat Sheet",
+        label: "Code & Runbooks",
         href: "/code-practice",
         icon: FileCode2,
         pill: { text: "Prod Ready", variant: "medium" },
         matches: ["/code-practice", "/cheat-sheet"],
         subItems: [
-          { label: "Practice Snippets", href: "/code-practice" },
-          { label: "Cheat Sheet", href: "/cheat-sheet" },
+          { label: "Production Cheat Sheet", href: "/cheat-sheet" },
+          { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
+          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
+          { label: "T-SQL Drills", href: "/code-practice?db=mssql" },
+          { label: "Python & Polars", href: "/code-practice?db=python" },
         ],
       },
-    ],
-  },
-  {
-    title: "Interview & Prep",
-    items: [
       {
-        label: "Q&A Prep Hub",
+        label: "Interview Drill Hub",
         href: "/qa-prep",
         icon: MessageSquare,
-        pill: { text: "6.4k+ Qs", variant: "hard" },
+        pill: { text: "6.5k+ Qs", variant: "hard" },
         matches: ["/qa-prep", "/company-research"],
         subItems: [
-          { label: "Question Drill", href: "/qa-prep" },
-          { label: "Company Intel", href: "/company-research" },
+          { label: "Question Drill Bank", href: "/qa-prep" },
+          { label: "Target Company Intel", href: "/company-research" },
         ],
       },
-    ],
-  },
-  {
-    title: "Studio",
-    items: [
-      { label: "My Studio", href: "/studio", icon: User },
     ],
   },
 ];

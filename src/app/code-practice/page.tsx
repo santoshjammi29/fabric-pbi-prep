@@ -18,6 +18,7 @@ import {
   MessageSquare,
   Shuffle,
   Terminal,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -264,10 +265,13 @@ export default function CodePracticePage() {
   return (
     <div className="space-y-6 pb-20">
       <HubSubnav
-        hubTitle="Code & Reference"
+        hubTitle="Code & Runbooks"
         items={[
-          { label: "Code Practice Drills", href: "/code-practice", icon: FileCode2, badge: "PySpark & SQL" },
-          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Terminal, badge: "Prod Ready" },
+          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
+          { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
+          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
+          { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
+          { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
         ]}
       />
 

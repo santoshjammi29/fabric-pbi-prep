@@ -47,42 +47,38 @@ const navGroups: NavGroup[] = [
     title: "Portal",
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
-      {
-        label: "Learning Journey",
-        href: "/learning-paths",
-        icon: Compass,
-        badge: "The Map",
-        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        matches: ["/learning-paths", "/guided-learning", "/diagnostic"],
-        subItems: [
-          { label: "Career Curricula", href: "/learning-paths" },
-          { label: "Guided Topics", href: "/guided-learning" },
-          { label: "Diagnostic Exam", href: "/diagnostic" },
-        ],
-      },
+      { label: "My Studio", href: "/studio", icon: User, badge: "Personal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
     ],
   },
   {
-    title: "Knowledge Base",
+    title: "Academy Pillars",
     items: [
       {
-        label: "Key Concepts & Engines",
+        label: "Learning Journey",
+        href: "/guided-learning",
+        icon: Compass,
+        badge: "The Roadmap",
+        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+        matches: ["/guided-learning", "/learning-paths", "/diagnostic"],
+        subItems: [
+          { label: "Guided Topic Tracks", href: "/guided-learning" },
+          { label: "Career Curricula", href: "/learning-paths" },
+          { label: "Skill Diagnostic", href: "/diagnostic" },
+        ],
+      },
+      {
+        label: "Concepts & Engines",
         href: "/concepts",
         icon: BookOpen,
         badge: "Foundations",
         badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
         matches: ["/concepts", "/spark-engine", "/modern-stack"],
         subItems: [
-          { label: "Glossary Concepts", href: "/concepts" },
-          { label: "Spark Engine", href: "/spark-engine" },
-          { label: "Modern Data Stack", href: "/modern-stack" },
+          { label: "Concepts Glossary", href: "/concepts" },
+          { label: "Spark Engine Lab", href: "/spark-engine" },
+          { label: "Modern Stack & FinOps", href: "/modern-stack" },
         ],
       },
-    ],
-  },
-  {
-    title: "Architectural Mastery",
-    items: [
       {
         label: "Architecture Hub",
         href: "/architecture",
@@ -91,46 +87,38 @@ const navGroups: NavGroup[] = [
         badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
         matches: ["/architecture", "/mindmap"],
         subItems: [
-          { label: "System Scenarios", href: "/architecture" },
-          { label: "Blueprints Gallery", href: "/architecture?tab=diagrams" },
-          { label: "DE Mindmap", href: "/mindmap" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios" },
+          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams" },
+          { label: "Interactive Mindmap", href: "/mindmap" },
         ],
       },
       {
-        label: "Code & Cheat Sheet",
+        label: "Code & Runbooks",
         href: "/code-practice",
         icon: FileCode2,
         badge: "Prod Ready",
         badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
         matches: ["/code-practice", "/cheat-sheet"],
         subItems: [
-          { label: "Practice Snippets", href: "/code-practice" },
-          { label: "Cheat Sheet", href: "/cheat-sheet" },
+          { label: "Production Cheat Sheet", href: "/cheat-sheet" },
+          { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
+          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
+          { label: "T-SQL Drills", href: "/code-practice?db=mssql" },
+          { label: "Python & Polars", href: "/code-practice?db=python" },
         ],
       },
-    ],
-  },
-  {
-    title: "Interview & Prep",
-    items: [
       {
-        label: "Q&A Prep Hub",
+        label: "Interview Drill Hub",
         href: "/qa-prep",
         icon: MessageSquare,
-        badge: "6.4k+ Qs",
+        badge: "6.5k+ Qs",
         badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20",
         matches: ["/qa-prep", "/company-research"],
         subItems: [
-          { label: "Question Drill", href: "/qa-prep" },
-          { label: "Company Intel", href: "/company-research" },
+          { label: "Question Drill Bank", href: "/qa-prep" },
+          { label: "Target Company Intel", href: "/company-research" },
         ],
       },
-    ],
-  },
-  {
-    title: "Studio",
-    items: [
-      { label: "My Studio", href: "/studio", icon: User },
     ],
   },
 ];

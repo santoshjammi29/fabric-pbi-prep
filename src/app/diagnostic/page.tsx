@@ -20,9 +20,9 @@ export default function DiagnosticPage() {
       <HubSubnav
         hubTitle="Learning Journey"
         items={[
-          { label: "Career Curricula Tracks", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
           { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "9 Topics" },
-          { label: "10-Q Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q" },
+          { label: "Career Curricula", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
+          { label: "Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q Test" },
         ]}
       />
       <div className="min-h-[60vh] flex items-center justify-center p-4">

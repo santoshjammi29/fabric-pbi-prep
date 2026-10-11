@@ -151,9 +151,9 @@ export default function CompanyResearchPage() {
   return (
     <div className="space-y-6 pb-20">
       <HubSubnav
-        hubTitle="Interview & Career"
+        hubTitle="Interview Drill Hub"
         items={[
-          { label: "Interview Q&A Drill (6.4k+)", href: "/qa-prep", icon: MessageSquare, badge: "6,570+ Qs" },
+          { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, badge: "6,570+ Qs" },
           { label: "Target Company Intel", href: "/company-research", icon: Building2, badge: "FAANG & GCC" },
         ]}
       />
