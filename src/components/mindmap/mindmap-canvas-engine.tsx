@@ -23,9 +23,9 @@ export interface MindmapCanvasEngineProps {
   selectedSubtopic: MindmapSubtopic | null;
   searchMatches: Set<string>;
   collapsedDomains: Set<string>;
-  onSelectDomain: (domain: MindmapDomain) => void;
-  onSelectSubtopic: (subtopic: MindmapSubtopic, domain: MindmapDomain) => void;
-  onPanChange: (newPan: { x: number; y: number }) => void;
+  onSelectDomain?: (domain: MindmapDomain) => void;
+  onSelectSubtopic?: (subtopic: MindmapSubtopic, domain: MindmapDomain) => void;
+  onPanChange?: (newPan: { x: number; y: number }) => void;
   onNodeDrag?: (nodeId: string, deltaX: number, deltaY: number) => void;
 }
 
@@ -50,33 +50,11 @@ export function MindmapCanvasEngine({
   selectedSubtopic,
   searchMatches,
   collapsedDomains,
-  onSelectDomain,
-  onSelectSubtopic,
-  onPanChange,
 }: MindmapCanvasEngineProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const animFrameRef = useRef<number | null>(null);
   const flowOffsetRef = useRef<number>(0);
 
-  // Helper to draw rounded rectangle
-  const drawRoundedRect = (
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    r: number
-  ) => {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  };
-
-  // Main 60 FPS Render Loop
+  // Main 60 FPS Render Callback
   const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -180,8 +158,6 @@ export function MindmapCanvasEngine({
     });
 
     ctx.restore();
-
-    animFrameRef.current = requestAnimationFrame(render);
   }, [
     domains,
     layoutNodes,
@@ -195,6 +171,7 @@ export function MindmapCanvasEngine({
     collapsedDomains,
   ]);
 
+  // Handle Resize
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
@@ -204,17 +181,37 @@ export function MindmapCanvasEngine({
       canvas.height = canvas.parentElement.clientHeight * dpr;
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.scale(dpr, dpr);
+      render();
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
-    animFrameRef.current = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, [render]);
+
+  // 60 FPS Animation Loop
+  useEffect(() => {
+    let animId: number;
+    let isRunning = true;
+
+    const loop = () => {
+      if (!isRunning) return;
+      render();
+      if (isFlowMode) {
+        animId = requestAnimationFrame(loop);
+      }
+    };
+
+    loop();
+
+    return () => {
+      isRunning = false;
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, [render, isFlowMode]);
 
   return (
     <canvas

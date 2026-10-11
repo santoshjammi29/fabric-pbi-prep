@@ -9,8 +9,6 @@
 
 import {
   conceptsDb,
-  questionsDb,
-  questionsDeDb,
   architectureData,
   pysparkData,
   sparksqlData,

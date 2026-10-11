@@ -161,6 +161,7 @@ export function CommandPalette() {
     let testMatches: CommandItem[] = [];
     if (process.env.NODE_ENV === "test") {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { conceptsDb } = require("@/data");
         testMatches = (conceptsDb || [])
           .filter((c: any) => c.term.toLowerCase().includes(lower))
