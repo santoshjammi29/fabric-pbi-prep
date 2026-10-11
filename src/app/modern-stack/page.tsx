@@ -819,35 +819,33 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                     />
                   </button>
 
-                  <SmoothAccordion isOpen={isOpen}>
-                    <div className="p-3.5 pt-0 border-t border-[var(--border)] space-y-3 bg-[var(--surface-2)]/40 text-xs">
-                      {concept.details && (
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">
-                            Deep Implementation Mechanics
-                          </span>
-                          <p className="text-[var(--foreground)] opacity-90 leading-relaxed text-xs">
-                            {concept.details}
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]/60 text-[11px]">
-                        <Link
-                          href={`/qa-prep?q=${encodeURIComponent(concept.title)}`}
-                          className="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 font-semibold"
-                        >
-                          <Terminal size={12} />
-                          <span>Practice Related Interview Questions &rarr;</span>
-                        </Link>
-                        <Link
-                          href={`/architecture?scenario=${encodeURIComponent(concept.title)}`}
-                          className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold"
-                        >
-                          <Layers size={12} />
-                          <span>Architectural Scenarios &rarr;</span>
-                        </Link>
+                  <SmoothAccordion isOpen={isOpen} innerClassName="px-3 pb-3 pt-2 space-y-2 text-xs bg-[var(--surface-2)]/40 border-t border-[var(--border)]">
+                    {concept.details && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">
+                          Deep Implementation Mechanics
+                        </span>
+                        <p className="text-[var(--foreground)] opacity-90 leading-relaxed text-xs">
+                          {concept.details}
+                        </p>
                       </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1.5 border-t border-[var(--border)]/60 text-[11px]">
+                      <Link
+                        href={`/qa-prep?q=${encodeURIComponent(concept.title)}`}
+                        className="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 font-semibold"
+                      >
+                        <Terminal size={12} />
+                        <span>Practice Related Interview Questions &rarr;</span>
+                      </Link>
+                      <Link
+                        href={`/architecture?scenario=${encodeURIComponent(concept.title)}`}
+                        className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold"
+                      >
+                        <Layers size={12} />
+                        <span>Architectural Scenarios &rarr;</span>
+                      </Link>
                     </div>
                   </SmoothAccordion>
                 </div>
@@ -1508,16 +1506,14 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                     </Link>
                   </div>
 
-                  <SmoothAccordion isOpen={isInspecting}>
-                    <div className="p-3 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] space-y-2 text-xs text-[var(--muted-foreground)]">
-                      <div className="font-semibold text-[var(--foreground)]">Architectural Implementation Notes:</div>
-                      <p className="leading-relaxed text-[11px]">
-                        This pattern uses decoupled storage and independent compute nodes to guarantee high availability and zero vendor lock-in.
-                        All components communicate via asynchronous event queues and metadata catalogs without point-to-point hard dependencies.
-                      </p>
-                      <div className="text-[10px] text-purple-300 pt-1 border-t border-[var(--border)]">
-                        Target SLA: 99.95% Availability · Failover Time: &lt; 2 minutes
-                      </div>
+                  <SmoothAccordion isOpen={isInspecting} innerClassName="p-2.5 space-y-1.5 text-xs text-[var(--muted-foreground)] bg-[var(--surface-2)]/60 border-t border-[var(--border)]">
+                    <div className="font-semibold text-[var(--foreground)] text-xs">Architectural Implementation Notes:</div>
+                    <p className="leading-relaxed text-[11px]">
+                      This pattern uses decoupled storage and independent compute nodes to guarantee high availability and zero vendor lock-in.
+                      All components communicate via asynchronous event queues and metadata catalogs without point-to-point hard dependencies.
+                    </p>
+                    <div className="text-[10px] text-purple-300 pt-1 border-t border-[var(--border)]">
+                      Target SLA: 99.95% Availability · Failover Time: &lt; 2 minutes
                     </div>
                   </SmoothAccordion>
                 </div>

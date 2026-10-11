@@ -990,7 +990,7 @@ export default function SparkEnginePage() {
                     />
                   </div>
 
-                  <SmoothAccordion isOpen={isExpanded} innerClassName="p-3.5 space-y-3 text-xs sm:text-sm border-t border-[var(--border)] bg-[var(--surface-2)]">
+                  <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 py-3 space-y-2.5 text-xs sm:text-sm border-t border-[var(--border)] bg-[var(--surface-2)]/40">
                     {item.use_case && (
                       <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs">
                         <strong>Enterprise Scenario:</strong> {item.use_case}

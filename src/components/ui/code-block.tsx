@@ -276,28 +276,28 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-sm my-3 sm:my-4 font-mono transition-all",
+        "rounded-xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-xs my-2 sm:my-2.5 font-mono transition-all",
         className
       )}
     >
       {/* Code Header Bar */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
         {/* Left: Window Controls + Filename + Badge */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500/70 inline-block" />
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70 inline-block" />
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70 inline-block" />
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-1 shrink-0" aria-hidden="true">
+            <span className="w-2 h-2 rounded-full bg-red-500/70 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-amber-500/70 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500/70 inline-block" />
           </div>
 
-          <div className="flex items-center gap-2 truncate">
-            <Terminal size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
+          <div className="flex items-center gap-1.5 truncate">
+            <Terminal size={12} className="text-slate-500 dark:text-slate-400 shrink-0" />
             <span className="text-slate-700 dark:text-slate-300 font-mono text-[11px] font-semibold truncate">
               {displayFilename}
             </span>
             <span
               className={cn(
-                "hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0",
+                "hidden sm:inline-block px-1.5 py-0.5 rounded-full text-[9px] font-semibold border shrink-0",
                 langConfig.bg,
                 langConfig.color
               )}
@@ -306,7 +306,7 @@ export function CodeBlock({
             </span>
 
             {hasModified && (
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 Modified
               </span>
             )}
@@ -314,7 +314,7 @@ export function CodeBlock({
         </div>
 
         {/* Right: Code Editor Action Bar */}
-        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+        <div className="flex items-center gap-1 shrink-0 ml-2">
           {/* Edit / Scratchpad Mode Toggle */}
           {allowEdit && (
             <button
@@ -323,14 +323,14 @@ export function CodeBlock({
               title={isEditing ? "Switch to syntax preview" : "Open scratchpad code editor"}
               aria-label="Toggle scratchpad code editor"
               className={cn(
-                "min-h-[28px] px-2 py-1 rounded-lg transition-all text-xs font-mono flex items-center gap-1.5 touch-manipulation cursor-pointer",
+                "h-6 px-1.5 py-0.5 rounded-md transition-all text-xs font-mono flex items-center gap-1 touch-manipulation cursor-pointer",
                 isEditing
                   ? "bg-purple-600 text-white font-semibold shadow-xs"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
               )}
             >
-              {isEditing ? <Eye size={12} /> : <Code2 size={12} />}
-              <span className="hidden sm:inline text-[11px]">
+              {isEditing ? <Eye size={11} /> : <Code2 size={11} />}
+              <span className="hidden sm:inline text-[10px]">
                 {isEditing ? "Preview" : "Scratchpad"}
               </span>
             </button>
@@ -343,10 +343,10 @@ export function CodeBlock({
               onClick={handleReset}
               title="Reset code to original template"
               aria-label="Reset code template"
-              className="min-h-[28px] px-2 py-1 rounded-lg text-amber-400 hover:bg-amber-500/10 transition-colors text-xs flex items-center gap-1"
+              className="h-6 px-1.5 py-0.5 rounded-md text-amber-400 hover:bg-amber-500/10 transition-colors text-xs flex items-center gap-1"
             >
-              <RotateCcw size={12} />
-              <span className="hidden sm:inline text-[10px]">Reset</span>
+              <RotateCcw size={11} />
+              <span className="hidden sm:inline text-[9px]">Reset</span>
             </button>
           )}
 
@@ -356,10 +356,10 @@ export function CodeBlock({
             onClick={cycleFontSize}
             title={`Font size: ${fontSize} (click to cycle 12px / 13.5px / 15px)`}
             aria-label="Adjust font size"
-            className="min-h-[28px] px-2 py-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all text-xs font-mono flex items-center gap-1 cursor-pointer"
+            className="h-6 px-1.5 py-0.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all text-xs font-mono flex items-center gap-1 cursor-pointer"
           >
-            <Type size={12} />
-            <span className="text-[10px] uppercase font-bold">{fontSize[0]}</span>
+            <Type size={11} />
+            <span className="text-[9px] uppercase font-bold">{fontSize[0]}</span>
           </button>
 
           {/* Toggle Line Numbers */}
@@ -369,14 +369,14 @@ export function CodeBlock({
             title={lineNumbersEnabled ? "Hide line numbers" : "Show line numbers"}
             aria-label="Toggle line numbers"
             className={cn(
-              "min-h-[28px] px-2 py-1 rounded-lg transition-all text-xs font-mono flex items-center gap-1 touch-manipulation cursor-pointer",
+              "h-6 px-1.5 py-0.5 rounded-md transition-all text-xs font-mono flex items-center gap-1 touch-manipulation cursor-pointer",
               lineNumbersEnabled
                 ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
             )}
           >
-            <AlignLeft size={12} />
-            <span className="hidden sm:inline text-[10px]">#</span>
+            <AlignLeft size={11} />
+            <span className="hidden sm:inline text-[9px]">#</span>
           </button>
 
           {/* Toggle Word Wrap */}
@@ -386,14 +386,14 @@ export function CodeBlock({
             title={isWrap ? "Disable wrap (scroll)" : "Enable word wrap"}
             aria-label="Toggle word wrap"
             className={cn(
-              "min-h-[28px] px-2.5 py-1 rounded-lg transition-all text-xs flex items-center gap-1.5 touch-manipulation cursor-pointer",
+              "h-6 px-2 py-0.5 rounded-md transition-all text-xs flex items-center gap-1 touch-manipulation cursor-pointer",
               isWrap
                 ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
             )}
           >
-            <WrapText size={12} />
-            <span className="hidden sm:inline text-[11px]">Wrap</span>
+            <WrapText size={11} />
+            <span className="hidden sm:inline text-[10px]">Wrap</span>
           </button>
 
           {/* Copy Button */}
@@ -401,19 +401,19 @@ export function CodeBlock({
             type="button"
             onClick={handleCopy}
             aria-label="Copy code to clipboard"
-            className="min-h-[28px] flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 active:scale-95 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-500/30 shadow-xs transition-all touch-manipulation cursor-pointer"
+            className="h-6 flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-blue-500/10 hover:bg-blue-500/20 active:scale-95 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-500/30 shadow-xs transition-all touch-manipulation cursor-pointer"
           >
             {copied ? (
               <>
-                <Check size={12} className="text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
+                <Check size={11} className="text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-700 dark:text-emerald-300 font-semibold text-[10px]">
                   Copied
                 </span>
               </>
             ) : (
               <>
-                <Copy size={12} className="text-blue-700 dark:text-blue-300" />
-                <span className="text-[11px]">Copy</span>
+                <Copy size={11} className="text-blue-700 dark:text-blue-300" />
+                <span className="text-[10px]">Copy</span>
               </>
             )}
           </button>
@@ -427,11 +427,11 @@ export function CodeBlock({
             {/* Editor Line Numbers */}
             {lineNumbersEnabled && (
               <div
-                className="select-none py-3.5 sm:py-4 px-2.5 sm:px-3 text-right text-slate-500 bg-[#07090c] border-r border-slate-800/80 font-mono tracking-normal text-[11px] sm:text-[12px]"
+                className="select-none py-2.5 px-2 text-right text-slate-500 bg-[#07090c] border-r border-slate-800/80 font-mono tracking-normal text-[11px]"
                 aria-hidden="true"
               >
                 {activeCode.split("\n").map((_, i) => (
-                  <div key={i} className="leading-[1.75]">
+                  <div key={i} className="leading-[1.65]">
                     {i + 1}
                   </div>
                 ))}
@@ -446,7 +446,7 @@ export function CodeBlock({
               onKeyDown={handleKeyDown}
               spellCheck={false}
               className={cn(
-                "w-full bg-[#0A0A0B] text-slate-100 font-mono p-3.5 sm:p-4 outline-none resize-y min-h-[160px] tracking-normal border-none focus:ring-0 selection:bg-purple-500/30",
+                "w-full bg-[#0A0A0B] text-slate-100 font-mono p-2.5 sm:p-3 outline-none resize-y min-h-[120px] tracking-normal border-none focus:ring-0 selection:bg-purple-500/30",
                 fontSizeClasses,
                 isWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto"
               )}
@@ -461,7 +461,7 @@ export function CodeBlock({
         ) : (
           <pre
             className={cn(
-              "m-0 p-3.5 sm:p-4 font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
+              "m-0 p-2.5 sm:p-3 font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
               fontSizeClasses,
               isWrap && "whitespace-pre-wrap break-words"
             )}
@@ -475,11 +475,11 @@ export function CodeBlock({
               {tokenizedLines.map((tokens, idx) => (
                 <div
                   key={idx}
-                  className="group/line flex items-baseline hover:bg-white/[0.03] -mx-3.5 sm:-mx-4 px-3.5 sm:px-4 py-0 rounded transition-colors"
+                  className="group/line flex items-baseline hover:bg-white/[0.03] -mx-2.5 sm:-mx-3 px-2.5 sm:px-3 py-0 rounded transition-colors"
                 >
                   {lineNumbersEnabled && (
                     <span
-                      className="select-none shrink-0 w-8 sm:w-9 pr-3 sm:pr-3.5 text-right text-[11px] sm:text-[12px] text-slate-500 group-hover/line:text-slate-400 font-mono tracking-normal"
+                      className="select-none shrink-0 w-7 sm:w-8 pr-2 sm:pr-2.5 text-right text-[11px] text-slate-500 group-hover/line:text-slate-400 font-mono tracking-normal"
                       aria-hidden="true"
                     >
                       {idx + 1}

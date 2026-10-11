@@ -552,21 +552,21 @@ function ConceptsContent() {
                     key={concept.id}
                     id={`concept-${concept.id}`}
                     className={cn(
-                      "rounded-2xl border transition-all duration-200 overflow-hidden",
+                      "rounded-xl border transition-all duration-200 overflow-hidden",
                       isExpanded
-                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
+                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xs"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                     )}
                   >
                     {/* Concept Header Card */}
                     <div
                       onClick={() => toggleConceptExpand(concept.id)}
-                      className="p-5 cursor-pointer select-none space-y-3"
+                      className="p-3.5 sm:px-4 sm:py-3 cursor-pointer select-none space-y-1.5"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[10px] sm:text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
                               {concept.category}
                             </span>
                             <span
@@ -580,7 +580,7 @@ function ConceptsContent() {
                               {concept.difficulty}
                             </span>
                           </div>
-                          <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight">
+                          <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight">
                             {concept.term}
                           </h3>
                         </div>
@@ -589,33 +589,33 @@ function ConceptsContent() {
                           <button
                             onClick={(e) => toggleBookmark(concept.id, e)}
                             className={cn(
-                              "p-2 rounded-xl transition-colors",
+                              "p-1.5 rounded-lg transition-colors",
                               isBookmarked
                                 ? "text-amber-400 bg-amber-400/10"
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                             )}
                             title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
-                            {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                            {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
                           </button>
 
                           <button
                             onClick={(e) => copyDefinition(concept, e)}
-                            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
                             title="Copy Definition"
                           >
                             {copiedId === concept.id ? (
-                              <Check size={16} className="text-green-400" />
+                              <Check size={15} className="text-green-400" />
                             ) : (
-                              <Copy size={16} />
+                              <Copy size={15} />
                             )}
                           </button>
 
-                          <div className="p-2 text-[var(--muted-foreground)]">
+                          <div className="p-1.5 text-[var(--muted-foreground)]">
                             <ChevronDown
-                              size={16}
+                              size={15}
                               className={cn(
-                                "transition-transform duration-300",
+                                "transition-transform duration-200",
                                 isExpanded && "rotate-180 text-purple-400"
                               )}
                             />
@@ -630,7 +630,7 @@ function ConceptsContent() {
                     </div>
 
                     {/* Expanded Details Body */}
-                    <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-4 text-xs sm:text-sm">
+                    <SmoothAccordion isOpen={isExpanded} innerClassName="px-4 py-3 sm:px-5 sm:py-3.5 space-y-2.5 text-xs sm:text-sm bg-[var(--surface-2)]/30">
                       {/* Deep-dive Explanation */}
                       <div className="space-y-1.5">
                         <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">

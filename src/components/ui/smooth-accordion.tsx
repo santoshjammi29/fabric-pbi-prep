@@ -15,7 +15,7 @@ export function SmoothAccordion({
   isOpen,
   children,
   className,
-  innerClassName = "p-5 space-y-3",
+  innerClassName = "px-4 py-3 sm:px-5 sm:py-3.5 space-y-2.5",
 }: SmoothAccordionProps) {
   return (
     <AnimatePresence initial={false}>

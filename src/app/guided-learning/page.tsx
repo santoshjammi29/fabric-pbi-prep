@@ -1206,7 +1206,7 @@ export default function GuidedLearningPage() {
                               </div>
 
                               {/* Expanded Content Accordion */}
-                              <SmoothAccordion isOpen={isExpanded} innerClassName="px-4 sm:px-8 pb-3.5 pt-1 space-y-3">
+                              <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 sm:px-5 pb-3 pt-1 space-y-2 bg-[var(--surface-2)]/30">
                                 {item.type === "concept" ? (
                                   <div className="space-y-2.5">
                                     <div className="text-xs text-[var(--foreground)] leading-relaxed whitespace-pre-line">

@@ -597,13 +597,13 @@ export default function CodePracticePage() {
                 </div>
 
                 {/* Expanded Code & Notes Body */}
-                <SmoothAccordion isOpen={isExpanded} innerClassName="p-3.5 sm:p-4 pt-0 space-y-3 text-xs sm:text-sm">
+                <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 pb-3.5 pt-2 space-y-2.5 text-xs sm:text-sm bg-[var(--surface-2)]/30">
                   {/* Use Case Scenario */}
                   {item.use_case && (
-                    <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2.5">
-                      <Briefcase size={16} className="text-purple-400 mt-0.5 shrink-0" />
+                    <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2">
+                      <Briefcase size={14} className="text-purple-400 mt-0.5 shrink-0" />
                       <div className="space-y-0.5">
-                        <span className="font-bold text-[11px] uppercase tracking-wider text-purple-300">
+                        <span className="font-bold text-[10px] uppercase tracking-wider text-purple-300">
                           Enterprise Scenario:
                         </span>
                         <p className="text-xs text-purple-200/90 leading-relaxed">{item.use_case}</p>

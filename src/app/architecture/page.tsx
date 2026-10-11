@@ -136,15 +136,15 @@ const RunbookCard = React.memo(function RunbookCard({
     <div
       id={`python-${item.id}`}
       className={cn(
-        "rounded-2xl border transition-all duration-200 overflow-hidden",
+        "rounded-xl border transition-all duration-200 overflow-hidden",
         isExpanded
-          ? "bg-[var(--surface-1)] border-emerald-500/50 shadow-md ring-1 ring-emerald-500/20"
+          ? "bg-[var(--surface-1)] border-emerald-500/50 shadow-xs ring-1 ring-emerald-500/20"
           : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
       )}
     >
       <div
         onClick={() => onToggle(item.id)}
-        className="p-4 sm:p-5 cursor-pointer select-none space-y-3"
+        className="p-3.5 sm:px-4 sm:py-3 cursor-pointer select-none space-y-2"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1.5 flex-1 min-w-0">
@@ -228,17 +228,17 @@ const RunbookCard = React.memo(function RunbookCard({
         )}
       </div>
 
-      <SmoothAccordion isOpen={isExpanded} innerClassName="p-4 sm:p-6 space-y-5 text-sm">
-        <div className="space-y-1.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] opacity-90 flex items-center gap-1.5">
-            <BookOpen size={14} className="text-emerald-400" /> Architecture Overview
+      <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 py-3 sm:px-4 sm:py-3.5 space-y-3 text-xs sm:text-sm bg-[var(--surface-2)]/30">
+        <div className="space-y-1">
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--foreground)] opacity-90 flex items-center gap-1.5">
+            <BookOpen size={13} className="text-emerald-400" /> Architecture Overview
           </h4>
-          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
             {item.description}
           </p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
             <span className="font-mono text-emerald-400 text-[11px]">
               {item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 42)}.py
@@ -254,14 +254,14 @@ const RunbookCard = React.memo(function RunbookCard({
         </div>
 
         {notesList.length > 0 && (
-          <div className="space-y-2 pt-3 border-t border-[var(--border)]">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <Sparkles size={14} /> Production Tuning &amp; Gotchas
+          <div className="space-y-1.5 pt-2 border-t border-[var(--border)]">
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <Sparkles size={13} /> Production Tuning &amp; Gotchas
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {notesList.map((note, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-[var(--muted-foreground)]">
-                  <CheckCircle2 size={15} className="text-emerald-400 mt-0.5 shrink-0" />
+                <li key={idx} className="flex items-start gap-1.5 text-xs text-[var(--muted-foreground)]">
+                  <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
                   <span className="leading-snug text-slate-300">{note}</span>
                 </li>
               ))}
@@ -270,13 +270,13 @@ const RunbookCard = React.memo(function RunbookCard({
         )}
 
         {item.use_case && (
-          <div className="pt-3 border-t border-[var(--border)]">
-            <div className="p-3 sm:p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs sm:text-sm space-y-1">
-              <div className="font-bold text-purple-300 flex items-center gap-1.5">
-                <Target size={14} className="text-purple-400 shrink-0" />
+          <div className="pt-2 border-t border-[var(--border)]">
+            <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs space-y-1">
+              <div className="font-bold text-purple-300 flex items-center gap-1.5 text-[11px]">
+                <Target size={13} className="text-purple-400 shrink-0" />
                 <span>Enterprise Scenario:</span>
               </div>
-              <p className="text-purple-200/90 leading-relaxed text-xs sm:text-sm">{item.use_case}</p>
+              <p className="text-purple-200/90 leading-relaxed text-xs">{item.use_case}</p>
             </div>
           </div>
         )}
@@ -1111,20 +1111,20 @@ function ArchitectureHubContent() {
                     key={item.id}
                     id={`arch-${item.id}`}
                     className={cn(
-                      "rounded-2xl border transition-all duration-200 overflow-hidden",
+                      "rounded-xl border transition-all duration-200 overflow-hidden",
                       isExpanded
-                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
+                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xs"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                     )}
                   >
                     <div
                       onClick={() => toggleExpand(item.id)}
-                      className="p-5 cursor-pointer select-none space-y-2.5"
+                      className="p-3.5 sm:px-4 sm:py-3 cursor-pointer select-none space-y-1.5"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1.5 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[10px] sm:text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
                               {item.category} {item.niche ? `· ${item.niche}` : ""}
                             </span>
                             <span
@@ -1138,7 +1138,7 @@ function ArchitectureHubContent() {
                               {item.difficulty}
                             </span>
                           </div>
-                          <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight leading-snug break-words">
+                          <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] tracking-tight leading-snug break-words">
                             {item.question}
                           </h3>
                         </div>
@@ -1147,33 +1147,33 @@ function ArchitectureHubContent() {
                           <button
                             onClick={(e) => toggleBookmark(item.id, e)}
                             className={cn(
-                              "p-2 rounded-xl transition-colors",
+                              "p-1.5 rounded-lg transition-colors",
                               isBookmarked
                                 ? "text-amber-400 bg-amber-400/10"
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                             )}
                             title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
-                            {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                            {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
                           </button>
 
                           <button
                             onClick={(e) => copyScenario(item, e)}
-                            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
                             title="Copy Scenario"
                           >
                             {copiedId === item.id ? (
-                              <Check size={16} className="text-green-400" />
+                              <Check size={15} className="text-green-400" />
                             ) : (
-                              <Copy size={16} />
+                              <Copy size={15} />
                             )}
                           </button>
 
-                          <div className="p-2 text-[var(--muted-foreground)]">
+                          <div className="p-1.5 text-[var(--muted-foreground)]">
                             <ChevronDown
-                              size={16}
+                              size={15}
                               className={cn(
-                                "transition-transform duration-300",
+                                "transition-transform duration-200",
                                 isExpanded && "rotate-180 text-purple-400"
                               )}
                             />
@@ -1182,12 +1182,12 @@ function ArchitectureHubContent() {
                       </div>
                     </div>
 
-                    <SmoothAccordion isOpen={isExpanded} innerClassName="p-5 space-y-3 text-xs sm:text-sm">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300">
-                        <Sparkles size={14} className="text-purple-400" />
-                        <span>Principal Architect Blueprint:</span>
+                    <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 py-3 sm:px-4 sm:py-3.5 space-y-2 text-xs sm:text-sm bg-[var(--surface-2)]/30">
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-purple-400 pb-0.5">
+                        <Sparkles size={13} className="shrink-0" />
+                        <span>Principal Architect Blueprint</span>
                       </div>
-                      <div className="pt-2">
+                      <div className="pt-0.5">
                         <AnswerRenderer text={item.answer} />
                       </div>
                     </SmoothAccordion>

@@ -763,12 +763,12 @@ export default function QaPrepPage() {
                     {/* Question Header Card */}
                     <div
                       onClick={() => toggleExpand(q.id)}
-                      className="p-3.5 sm:p-4 cursor-pointer select-none space-y-1.5"
+                      className="p-3 sm:px-4 sm:py-2.5 cursor-pointer select-none space-y-1"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[10px] sm:text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
                               {q.category} {q.niche ? `· ${q.niche}` : ""}
                             </span>
                             <span
@@ -793,7 +793,7 @@ export default function QaPrepPage() {
                               </Link>
                             )}
                           </div>
-                          <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight leading-snug">
+                          <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] tracking-tight leading-snug">
                             {q.question}
                           </h3>
                         </div>
@@ -832,7 +832,7 @@ export default function QaPrepPage() {
                             <ChevronDown
                               size={15}
                               className={cn(
-                                "transition-transform duration-300",
+                                "transition-transform duration-200",
                                 isExpanded && "rotate-180 text-purple-400"
                               )}
                             />
@@ -842,12 +842,12 @@ export default function QaPrepPage() {
                     </div>
 
                     {/* Answer Expanded Body */}
-                    <SmoothAccordion isOpen={isExpanded} innerClassName="p-3.5 sm:p-4 pt-0 space-y-3 text-xs sm:text-sm">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-green-400">
-                        <Zap size={14} />
-                        <span>Principal Architect Explanation:</span>
+                    <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 pb-3 pt-2 space-y-2 text-xs sm:text-sm bg-[var(--surface-2)]/30">
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-green-400">
+                        <Zap size={13} className="shrink-0" />
+                        <span>Principal Architect Explanation</span>
                       </div>
-                      <div className="pt-2">
+                      <div className="pt-0.5">
                         <AnswerRenderer text={q.answer} />
                       </div>
 
