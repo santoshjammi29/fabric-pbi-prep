@@ -478,5 +478,70 @@
       "Check the Spark UI Storage tab to verify caching efficiency, and the Executor tab to identify skewed tasks."
     ],
     "use_case": "Diagnosing a slow monthly aggregation query by reviewing its physical plan to locate disk spill bottlenecks and optimize shuffle partitioning."
+  },
+  {
+    "id": "pyspark-recipe-dedup-timestamp",
+    "title": "Deduplication Retaining Latest Timestamp via Window Functions",
+    "level": "intermediate",
+    "category": "Window Functions & Deduplication",
+    "description": "Deterministically removes duplicate records for an entity by ranking rows based on timestamp descending and filtering for rank 1.",
+    "code": "from pyspark.sql import functions as F\nfrom pyspark.sql.window import Window\n\n# Sample dataset with customer updates\ndata = [\n    (\"cust_101\", \"2026-10-01 10:00:00\", \"Logged In\"),\n    (\"cust_101\", \"2026-10-01 14:30:00\", \"Purchased Item\"),  # Latest for 101\n    (\"cust_102\", \"2026-10-01 09:15:00\", \"Added to Cart\"),\n    (\"cust_102\", \"2026-10-01 09:00:00\", \"Viewed Page\")\n]\ndf = spark.createDataFrame(data, [\"customer_id\", \"event_time\", \"activity\"])\n\n# Define partition window ordered by event_time descending\nwindow_spec = Window.partitionBy(\"customer_id\").orderBy(F.col(\"event_time\").desc())\n\n# Assign row number and retain only the latest record\ndf_latest = df.withColumn(\"row_num\", F.row_number().over(window_spec)) \\\n    .filter(F.col(\"row_num\") == 1) \\\n    .drop(\"row_num\")\n\ndf_latest.show(truncate=False)",
+    "notes": [
+      "Avoid using dropDuplicates(['customer_id']) when you need the most recent row, as dropDuplicates drops non-deterministically.",
+      "Add a secondary column in orderBy() to break exact timestamp ties consistently."
+    ],
+    "use_case": "Ensuring dimensional tables reflect the most recent state of a customer profile during real-time or batch event ingestion."
+  },
+  {
+    "id": "pyspark-recipe-autoloader-stream",
+    "title": "Databricks Auto Loader Streaming with Rescued Data Protection",
+    "level": "advanced",
+    "category": "Streaming & Ingestion",
+    "description": "Ingests continuous file streams with automated schema evolution while routing corrupted or unexpected schema drift into the _rescued_data column.",
+    "code": "from pyspark.sql import functions as F\n\nsource_path = \"abfss://raw@datalake.dfs.core.windows.net/events_landing/\"\ncheckpoint_path = \"abfss://checkpoints@datalake.dfs.core.windows.net/events_checkpoint/\"\nschema_path = \"abfss://checkpoints@datalake.dfs.core.windows.net/events_schema/\"\n\n# Configure resilient Auto Loader stream\nstreaming_df = spark.readStream \\\n    .format(\"cloudFiles\") \\\n    .option(\"cloudFiles.format\", \"json\") \\\n    .option(\"cloudFiles.schemaLocation\", schema_path) \\\n    .option(\"cloudFiles.schemaEvolutionMode\", \"addNewColumns\") \\\n    .option(\"cloudFiles.inferColumnTypes\", \"true\") \\\n    .load(source_path)\n\n# Write to Delta table with append mode and schema merging\nquery = streaming_df.writeStream \\\n    .format(\"delta\") \\\n    .option(\"checkpointLocation\", checkpoint_path) \\\n    .option(\"mergeSchema\", \"true\") \\\n    .outputMode(\"append\") \\\n    .toTable(\"bronze_events\")",
+    "notes": [
+      "cloudFiles.schemaEvolutionMode supports 'addNewColumns', 'rescue', 'failOnNewColumns', and 'none'.",
+      "_rescued_data stores any column that fails type casting as raw JSON text, preventing pipeline crashes."
+    ],
+    "use_case": "Mission-critical continuous cloud storage file ingestion where upstream schemas frequently change without notice."
+  },
+  {
+    "id": "pyspark-recipe-salting-skew",
+    "title": "Distributed Join Salting Pattern for Skewed Keys",
+    "level": "architect",
+    "category": "Performance Tuning & Optimization",
+    "description": "Appends random numerical salt keys to skewed DataFrames to eliminate straggler tasks and balance partition distribution across executors.",
+    "code": "from pyspark.sql import functions as F\n\n# Assume df_large is heavily skewed on 'country_code' (e.g. 80% 'US')\nSALT_FACTOR = 4\n\n# Step 1: Append random salt [0..3] to skewed table\ndf_large_salted = df_large.withColumn(\n    \"salt\",\n    F.concat(F.col(\"country_code\"), F.lit(\"_\"), (F.rand() * SALT_FACTOR).cast(\"int\"))\n)\n\n# Step 2: Explode the lookup table across matching salt range [0..3]\nsalt_df = spark.range(SALT_FACTOR).withColumnRenamed(\"id\", \"salt_id\")\ndf_lookup_salted = df_lookup.crossJoin(salt_df) \\\n    .withColumn(\"salt\", F.concat(F.col(\"country_code\"), F.lit(\"_\"), F.col(\"salt_id\")))\n\n# Step 3: Execute join on balanced composite salt key\ndf_joined = df_large_salted.join(df_lookup_salted, on=\"salt\", how=\"inner\") \\\n    .drop(\"salt\", \"salt_id\")",
+    "notes": [
+      "Eliminates the classic '199 tasks finish in seconds, 1 task hangs for hours' bottleneck in large shuffles.",
+      "Spark 3.x+ Adaptive Query Execution (AQE) handles moderate skew automatically via spark.sql.adaptive.skewJoin.enabled."
+    ],
+    "use_case": "High-volume joins against tables with severe key skew (e.g., default IDs, popular countries, anonymous users)."
+  },
+  {
+    "id": "pyspark-recipe-delta-scd2-merge",
+    "title": "Delta Lake SCD Type 2 Dimension Upsert via MERGE INTO",
+    "level": "architect",
+    "category": "Delta Lake & Lakehouse Storage",
+    "description": "Performs an atomic SCD Type 2 dimension merge, expiring outdated records and inserting active versions with effective dates in a single transaction.",
+    "code": "from delta.tables import DeltaTable\nfrom pyspark.sql import functions as F\n\ntarget_table = DeltaTable.forName(spark, \"dim_customer\")\n\n# Prepare staged updates with dummy null keys to trigger both update & insert\nstaged_updates = df_updates.select(\n    F.col(\"customer_id\").alias(\"merge_key\"),\n    F.col(\"*\")\n).unionByName(\n    df_updates.select(F.lit(None).alias(\"merge_key\"), F.col(\"*\"))\n)\n\n# Atomic Merge execution\ntarget_table.alias(\"t\").merge(\n    source=staged_updates.alias(\"s\"),\n    condition=\"t.customer_id = s.merge_key AND t.is_current = true\"\n).whenMatchedUpdate(\n    condition=\"t.city <> s.city OR t.segment <> s.segment\",\n    set={\"is_current\": \"false\", \"end_date\": \"current_timestamp()\"}\n).whenNotMatchedInsert(\n    values={\n        \"customer_id\": \"s.customer_id\",\n        \"name\": \"s.name\",\n        \"city\": \"s.city\",\n        \"segment\": \"s.segment\",\n        \"is_current\": \"true\",\n        \"start_date\": \"current_timestamp()\",\n        \"end_date\": \"null\"\n    }\n).execute()",
+    "notes": [
+      "The union with a null merge_key forces Spark to match active records for expiration while also triggering the insert branch for new records.",
+      "Guarantees ACID transactional consistency with zero duplicate active records."
+    ],
+    "use_case": "Historical dimension tracking in enterprise data warehouses and lakehouses."
+  },
+  {
+    "id": "pyspark-recipe-oop-dynamic-utility",
+    "title": "Object-Oriented Dynamic PySpark Transformation Utility",
+    "level": "advanced",
+    "category": "Design Patterns & OOP",
+    "description": "A reusable, modular Python class applying method chaining and dynamic column aggregation expressions to eliminate hardcoded PySpark logic.",
+    "code": "from pyspark.sql import DataFrame, functions as F\nfrom typing import List, Dict\n\nclass DynamicPipelineTransformer:\n    def __init__(self, df: DataFrame):\n        self.df = df\n        \n    def add_audit_columns(self) -> 'DynamicPipelineTransformer':\n        self.df = self.df.withColumn(\"ingested_at\", F.current_timestamp()) \\\n                         .withColumn(\"source_system\", F.lit(\"ADLS_RAW\"))\n        return self\n        \n    def dynamic_aggregate(self, group_by_cols: List[str], agg_mapping: Dict[str, str]) -> DataFrame:\n        \"\"\"\n        Dynamically builds aggregation expressions from a dictionary.\n        agg_mapping: {'revenue': 'sum', 'order_id': 'count', 'discount': 'avg'}\n        \"\"\"\n        expressions = []\n        for col_name, func_name in agg_mapping.items():\n            spark_func = getattr(F, func_name.lower())\n            expressions.append(spark_func(F.col(col_name)).alias(f\"{func_name}_{col_name}\"))\n            \n        return self.df.groupBy(*group_by_cols).agg(*expressions)\n\n# Pipeline usage:\ntransformer = DynamicPipelineTransformer(df_raw_sales)\ndf_gold = transformer.add_audit_columns() \\\n    .dynamic_aggregate(\n        group_by_cols=[\"region\", \"product_category\"],\n        agg_mapping={\"sale_amount\": \"sum\", \"order_id\": \"count\"}\n    )\n\ndf_gold.show()",
+    "notes": [
+      "Employs Python's getattr(F, func_name) to resolve PySpark SQL functions dynamically at runtime.",
+      "Method chaining (returning self) creates expressive, testable, and reusable ETL pipelines."
+    ],
+    "use_case": "Building enterprise-wide PySpark utility libraries and shared data engineering modules across distributed teams."
   }
 ]
