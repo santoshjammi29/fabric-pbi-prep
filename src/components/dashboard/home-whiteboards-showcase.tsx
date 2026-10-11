@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { m, AnimatePresence } from "framer-motion";
 import {
   Workflow,
@@ -21,6 +20,8 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { architectureDiagrams, ArchitectureDiagramItem } from "@/data/diagrams";
+import { useDiagramTheme } from "@/lib/diagram-theme";
+import { WhiteboardThemeToggle, WhiteboardFloatingThemeToggle } from "@/components/architecture/whiteboard-theme-toggle";
 
 // Map diagrams to guided learning topics for deep-linking
 const DIAGRAM_TO_TOPIC: Record<string, { topicKey: string; topicName: string }> = {
@@ -63,6 +64,9 @@ export function HomeWhiteboardsShowcase() {
   const [activeModalDiagram, setActiveModalDiagram] = useState<ArchitectureDiagramItem | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isShuffling, setIsShuffling] = useState(false);
+  const [theme] = useDiagramTheme();
+
+  const isDark = theme === "dark";
 
   // Filter diagrams by selected category
   const filteredDiagrams = useMemo(() => {
@@ -117,6 +121,9 @@ export function HomeWhiteboardsShowcase() {
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
+          {/* Whiteboard Global Theme Toggle Option */}
+          <WhiteboardThemeToggle size="sm" showLabel={true} className="hidden sm:inline-flex" />
+
           {/* Shuffle button */}
           <button
             type="button"
@@ -129,7 +136,7 @@ export function HomeWhiteboardsShowcase() {
           </button>
 
           <Link
-            href="/architecture"
+            href="/architecture?tab=diagrams"
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-sm shadow-purple-600/20 transition-all cursor-pointer"
           >
             <span>All 21 Blueprints</span>
@@ -159,15 +166,15 @@ export function HomeWhiteboardsShowcase() {
         ))}
       </div>
 
-      {/* Main Showcase Layout: Featured Large Blueprint + Secondary Cards */}
+      {/* Main Showcase Layout: Featured Large Blueprint (Second Layout Style) + Secondary Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left: Featured Large Interactive Blueprint Card */}
         {featuredDiagram && (
-          <div className="lg:col-span-8 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-3.5 sm:p-5 space-y-3.5 shadow-sm relative overflow-hidden group">
-            {/* Top row: Badge + Categories */}
+          <div className="lg:col-span-8 rounded-2xl sm:rounded-3xl border border-[var(--border)] bg-[var(--surface-1)] p-3.5 sm:p-5 space-y-3.5 shadow-sm relative overflow-hidden group">
+            {/* Top row: Category indicator + Topics */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
                   {featuredDiagram.category}
                 </span>
                 <span className="text-[10px] text-[var(--muted-foreground)] font-mono">
@@ -178,7 +185,7 @@ export function HomeWhiteboardsShowcase() {
               {pairedTopic && (
                 <Link
                   href={`/guided-learning?topic=${pairedTopic.topicKey}`}
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-500 hover:underline"
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-400 hover:text-purple-300 hover:underline"
                 >
                   <Compass size={12} />
                   <span>Guided Track: {pairedTopic.topicName} &rarr;</span>
@@ -188,7 +195,7 @@ export function HomeWhiteboardsShowcase() {
 
             {/* Title & Subtitle */}
             <div className="space-y-1">
-              <h3 className="text-lg sm:text-xl font-bold text-[var(--foreground)] leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+              <h3 className="text-lg sm:text-xl font-bold text-[var(--foreground)] leading-snug group-hover:text-purple-400 transition-colors">
                 {featuredDiagram.title}
               </h3>
               <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
@@ -196,23 +203,59 @@ export function HomeWhiteboardsShowcase() {
               </p>
             </div>
 
-            {/* Diagram Image Container with interactive zoom preview */}
+            {/* Diagram Image Container with Image 2 Layout Style & Dark Mode */}
             <div
               onClick={() => {
                 setActiveModalDiagram(featuredDiagram);
                 setZoomLevel(1);
               }}
-              className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white cursor-pointer shadow-inner group/img"
+              className={cn(
+                "relative w-full aspect-[16/9] rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 cursor-pointer shadow-inner group/img transition-colors duration-300",
+                isDark ? "whiteboard-container-dark" : "whiteboard-container-light"
+              )}
             >
-              <Image
-                src={featuredDiagram.image}
-                alt={featuredDiagram.title}
-                fill
-                className="object-contain p-2 sm:p-3 transition-transform duration-300 group-hover/img:scale-[1.02]"
-                priority
-              />
+              {/* Floating Category Pill (Top-Left) */}
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 pointer-events-none">
+                <span className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-xl bg-black/75 backdrop-blur-md text-[10px] sm:text-xs font-bold tracking-wider text-purple-300 uppercase border border-white/15 shadow-lg flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                  {featuredDiagram.category}
+                </span>
+              </div>
+
+              {/* Floating Controls (Top-Right): Dark Mode Toggle + Maximize */}
+              <div
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <WhiteboardFloatingThemeToggle />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveModalDiagram(featuredDiagram);
+                    setZoomLevel(1);
+                  }}
+                  className="p-1.5 sm:p-2 rounded-xl bg-black/75 hover:bg-black/90 text-white/90 hover:text-white backdrop-blur-md border border-white/15 transition-all shadow-md cursor-pointer flex items-center gap-1 text-[11px] font-semibold touch-manipulation"
+                  title="Inspect Full Blueprint"
+                >
+                  <Maximize2 size={13} />
+                  <span className="hidden sm:inline">Inspect</span>
+                </button>
+              </div>
+
+              {/* Whiteboard Graphic */}
+              <div className="relative w-full h-full flex items-center justify-center p-3 sm:p-5">
+                <img
+                  src={featuredDiagram.image}
+                  alt={featuredDiagram.title}
+                  className={cn(
+                    "max-h-full max-w-full object-contain transition-transform duration-300 group-hover/img:scale-[1.018]",
+                    isDark ? "whiteboard-dark" : "whiteboard-light"
+                  )}
+                />
+              </div>
+
               <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/15 transition-colors flex items-center justify-center pointer-events-none">
-                <div className="px-3.5 py-1.5 rounded-full bg-black/70 text-white text-xs font-semibold backdrop-blur-sm opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center gap-1.5 shadow-lg">
+                <div className="px-3.5 py-1.5 rounded-xl bg-black/75 text-white text-xs font-semibold backdrop-blur-sm opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center gap-1.5 shadow-lg border border-white/15">
                   <Maximize2 size={13} />
                   <span>Click to Inspect Full Blueprint</span>
                 </div>
@@ -221,7 +264,7 @@ export function HomeWhiteboardsShowcase() {
 
             {/* Key Mechanisms Checklist */}
             <div className="pt-2 border-t border-[var(--border)] space-y-2">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
                 <Sparkles size={12} /> Architectural Takeaways &amp; Internals:
               </div>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[var(--muted-foreground)]">
@@ -293,15 +336,22 @@ export function HomeWhiteboardsShowcase() {
                     setActiveModalDiagram(d);
                     setZoomLevel(1);
                   }}
-                  className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] transition-all cursor-pointer group flex items-start gap-3 shadow-xs hover:border-purple-500/40"
+                  className="p-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] transition-all cursor-pointer group flex items-start gap-3 shadow-xs hover:border-purple-500/40"
                 >
-                  {/* Thumbnail */}
-                  <div className="relative w-24 h-18 sm:w-28 sm:h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white shrink-0 shadow-inner">
-                    <Image
+                  {/* Thumbnail with Dark/Light Canvas Transition */}
+                  <div
+                    className={cn(
+                      "relative w-24 h-18 sm:w-28 sm:h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 shadow-inner flex items-center justify-center p-1 transition-colors duration-300",
+                      isDark ? "whiteboard-container-dark" : "whiteboard-container-light"
+                    )}
+                  >
+                    <img
                       src={d.image}
                       alt={d.title}
-                      fill
-                      className="object-contain p-1 group-hover:scale-105 transition-transform duration-200"
+                      className={cn(
+                        "max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200",
+                        isDark ? "whiteboard-dark" : "whiteboard-light"
+                      )}
                     />
                   </div>
 
@@ -311,10 +361,10 @@ export function HomeWhiteboardsShowcase() {
                       <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--surface-3)] text-[var(--muted-foreground)] truncate max-w-[120px]">
                         {d.category}
                       </span>
-                      <Maximize2 size={11} className="text-[var(--muted-foreground)] group-hover:text-purple-500 transition-colors shrink-0" />
+                      <Maximize2 size={11} className="text-[var(--muted-foreground)] group-hover:text-purple-400 transition-colors shrink-0" />
                     </div>
 
-                    <h4 className="text-xs font-bold text-[var(--foreground)] line-clamp-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    <h4 className="text-xs font-bold text-[var(--foreground)] line-clamp-1 group-hover:text-purple-400 transition-colors">
                       {d.title}
                     </h4>
 
@@ -324,10 +374,10 @@ export function HomeWhiteboardsShowcase() {
 
                     {subTopic && (
                       <div className="pt-1 flex items-center justify-between text-[10px]">
-                        <span className="text-purple-600 dark:text-purple-400 font-semibold truncate">
+                        <span className="text-purple-400 font-semibold truncate">
                           Track: {subTopic.topicName}
                         </span>
-                        <span className="text-[var(--muted-foreground)] group-hover:text-purple-500 transition-colors">
+                        <span className="text-[var(--muted-foreground)] group-hover:text-purple-400 transition-colors">
                           &rarr;
                         </span>
                       </div>
@@ -342,19 +392,19 @@ export function HomeWhiteboardsShowcase() {
             href="/guided-learning"
             className="p-3.5 rounded-2xl border border-dashed border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 text-center transition-colors group"
           >
-            <div className="text-xs font-bold text-purple-600 dark:text-purple-300 flex items-center justify-center gap-1.5">
+            <div className="text-xs font-bold text-purple-400 flex items-center justify-center gap-1.5">
               <Compass size={13} />
               <span>Explore All 13 Guided Tracks with Blueprints</span>
               <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
             </div>
             <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5">
-              Each track is cross-linked with detailed hand-drawn architecture sketches.
+              Deep-dive into end-to-end architectures and production implementation guides
             </p>
           </Link>
         </div>
       </div>
 
-      {/* ── LIGHTBOX MODAL FOR BLUEPRINT INSPECTION ─────────────────── */}
+      {/* ── LIGHTBOX MODAL FOR BLUEPRINT INSPECTION WITH DARK/LIGHT OPTION ─── */}
       <AnimatePresence>
         {activeModalDiagram && (
           <m.div
@@ -369,54 +419,58 @@ export function HomeWhiteboardsShowcase() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#101014] shadow-2xl overflow-hidden"
+              className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 bg-[var(--surface-1)] shadow-2xl overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#16161a] shrink-0">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--border)] bg-[var(--surface-2)] shrink-0">
                 <div className="space-y-0.5 min-w-0 pr-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-purple-500/15 text-purple-400 border border-purple-500/30">
                       {activeModalDiagram.category}
                     </span>
-                    <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+                    <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] truncate">
                       {activeModalDiagram.title}
                     </h3>
                   </div>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 truncate hidden sm:block">
+                  <p className="text-[11px] text-[var(--muted-foreground)] truncate hidden sm:block">
                     {activeModalDiagram.subtitle}
                   </p>
                 </div>
 
-                {/* Controls */}
+                {/* Controls: Theme Toggle + Zoom + Close */}
                 <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="hidden sm:block">
+                    <WhiteboardThemeToggle size="xs" showLabel={false} />
+                  </div>
+
                   <button
                     onClick={() => setZoomLevel((z) => Math.max(0.6, z - 0.2))}
-                    className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
                     title="Zoom Out"
                   >
                     <ZoomOut size={16} />
                   </button>
-                  <span className="text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-400 w-10 text-center">
+                  <span className="text-[10px] font-mono font-semibold text-[var(--muted-foreground)] w-10 text-center">
                     {Math.round(zoomLevel * 100)}%
                   </span>
                   <button
                     onClick={() => setZoomLevel((z) => Math.min(2.5, z + 0.2))}
-                    className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
                     title="Zoom In"
                   >
                     <ZoomIn size={16} />
                   </button>
                   <button
                     onClick={() => setZoomLevel(1)}
-                    className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
                     title="Reset Zoom"
                   >
                     <RotateCcw size={15} />
                   </button>
-                  <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
+                  <div className="w-px h-4 bg-[var(--border)] mx-1" />
                   <button
                     onClick={() => setActiveModalDiagram(null)}
-                    className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
                     title="Close (Esc)"
                   >
                     <X size={18} />
@@ -424,47 +478,52 @@ export function HomeWhiteboardsShowcase() {
                 </div>
               </div>
 
-              {/* Modal Image Viewport */}
-              <div className="flex-1 overflow-auto bg-white p-4 sm:p-6 flex items-center justify-center min-h-[350px]">
+              {/* Modal Image Viewport with Dark/Light Blueprint Mode */}
+              <div
+                className={cn(
+                  "flex-1 overflow-auto p-4 sm:p-8 flex items-center justify-center min-h-[350px] transition-colors duration-300",
+                  isDark ? "whiteboard-container-dark" : "whiteboard-container-light"
+                )}
+              >
                 <div
                   style={{ transform: `scale(${zoomLevel})`, transformOrigin: "center center" }}
                   className="transition-transform duration-150 max-w-full"
                 >
-                  <Image
+                  <img
                     src={activeModalDiagram.image}
                     alt={activeModalDiagram.title}
-                    width={1400}
-                    height={900}
-                    className="object-contain max-h-[62vh] w-auto h-auto rounded-lg shadow-md"
-                    priority
+                    className={cn(
+                      "object-contain max-h-[62vh] w-auto h-auto rounded-lg shadow-md transition-all duration-300",
+                      isDark ? "whiteboard-dark" : "whiteboard-light"
+                    )}
                   />
                 </div>
               </div>
 
               {/* Modal Footer with Architecture Mechanisms */}
-              <div className="px-4 sm:px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#16161a] shrink-0 space-y-2">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+              <div className="px-4 sm:px-6 py-3 border-t border-[var(--border)] bg-[var(--surface-2)] shrink-0 space-y-2">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-purple-400">
                   Key Architecture Mechanisms:
                 </div>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[var(--foreground)]">
                   {activeModalDiagram.keyPoints.map((kp, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-purple-600 dark:text-purple-400 font-bold shrink-0 mt-0.5">•</span>
+                      <span className="text-purple-400 font-bold shrink-0 mt-0.5">•</span>
                       <span>{kp}</span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="flex items-center justify-between pt-1 text-[11px] text-slate-600 dark:text-slate-400">
+                <div className="flex items-center justify-between pt-1 text-[11px] text-[var(--muted-foreground)]">
                   {activeModalDiagram.docLink && (
                     <a
                       href={activeModalDiagram.docLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-semibold"
+                      className="text-purple-400 hover:underline flex items-center gap-1 font-semibold"
                     >
                       <ExternalLink size={12} />
-                      <span>Official Microsoft / Apache Architecture Spec</span>
+                      <span>Official Architecture Spec</span>
                     </a>
                   )}
 
@@ -472,7 +531,7 @@ export function HomeWhiteboardsShowcase() {
                     <Link
                       href={`/guided-learning?topic=${DIAGRAM_TO_TOPIC[activeModalDiagram.id].topicKey}`}
                       onClick={() => setActiveModalDiagram(null)}
-                      className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold flex items-center gap-1 transition-colors"
+                      className="px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold flex items-center gap-1 transition-colors"
                     >
                       <span>Study This Track</span>
                       <ArrowRight size={12} />

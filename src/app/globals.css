@@ -880,3 +880,25 @@ code:not(pre code) {
 .sidebar {
   contain: layout style;
 }
+
+/* Whiteboard Blueprint Themes (Interactive Dark Mode / Light Canvas) */
+.whiteboard-dark {
+  filter: invert(0.92) hue-rotate(180deg) contrast(1.12) brightness(1.02);
+  transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whiteboard-light {
+  filter: none;
+  transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whiteboard-container-dark {
+  background-color: #0A0E17 !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whiteboard-container-light {
+  background-color: #FFFFFF !important;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+

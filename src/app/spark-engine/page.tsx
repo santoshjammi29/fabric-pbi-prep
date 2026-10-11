@@ -15,9 +15,19 @@ import {
   MessageSquare,
   FileCode2,
   GitMerge,
+  X,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Download,
 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { pysparkData } from "@/data";
+import { architectureDiagrams, ArchitectureDiagramItem } from "@/data/diagrams";
+import { WhiteboardCard } from "@/components/architecture/whiteboard-card";
+import { WhiteboardThemeToggle } from "@/components/architecture/whiteboard-theme-toggle";
+import { useDiagramTheme } from "@/lib/diagram-theme";
 import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { PrerequisiteBanner } from "@/components/ui/prerequisite-banner";
@@ -103,6 +113,23 @@ export default function SparkEnginePage() {
   const [heapSize, setHeapSize] = useState(16);
   const [memFraction, setMemFraction] = useState(0.6);
   const [storageFraction, setStorageFraction] = useState(0.5);
+
+  // Whiteboard Blueprint State & Filtering
+  const [diagramTheme] = useDiagramTheme();
+  const [activeModalDiagram, setActiveModalDiagram] = useState<ArchitectureDiagramItem | null>(null);
+  const [modalZoomLevel, setModalZoomLevel] = useState(1);
+
+  const sparkDiagrams = useMemo(() => {
+    const ids = [
+      "spark-catalyst-photon-engine",
+      "spark-shuffle-memory-execution",
+      "delta-lake-under-the-hood",
+      "databricks-platform-master",
+    ];
+    return ids
+      .map((id) => architectureDiagrams.find((d) => d.id === id))
+      .filter((d): d is ArchitectureDiagramItem => !!d);
+  }, []);
 
   const handleTabChange = useCallback((tabId: SparkSubtab) => {
     setActiveTab(tabId);
@@ -459,14 +486,14 @@ export default function SparkEnginePage() {
             </div>
           </div>
 
-          {/* Whiteboard Architecture Blueprints Showcase */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
+          {/* Whiteboard Architecture Blueprints Showcase (Second Layout Style with Interactive Dark Mode) */}
+          <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
                   <Layers size={13} /> Visual System Blueprints
                 </span>
-                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
+                <h3 className="text-base sm:text-xl font-bold text-[var(--foreground)] mt-0.5">
                   Databricks &amp; Spark Engine Architecture Blueprints
                 </h3>
                 <p className="text-xs text-[var(--muted-foreground)]">
@@ -474,115 +501,30 @@ export default function SparkEnginePage() {
                 </p>
               </div>
 
-              <Link
-                href="/architecture?tab=diagrams"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-sm shrink-0"
-              >
-                <span>View Full Diagrams Hub</span>
-                <ChevronDown size={13} className="-rotate-90" />
-              </Link>
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <WhiteboardThemeToggle size="sm" showLabel={true} />
+                <Link
+                  href="/architecture?tab=diagrams"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-sm shrink-0"
+                >
+                  <span>All 21 Blueprints</span>
+                  <ChevronDown size={13} className="-rotate-90" />
+                </Link>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Link
-                href="/architecture?tab=diagrams&diagram=spark-catalyst-photon-engine"
-                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
-              >
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
-                  <img
-                    src="/diagrams/catalyst_photon_engine.jpg"
-                    alt="Catalyst and Photon Engine"
-                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
-                    Compute &amp; Optimization
-                  </div>
-                </div>
-                <div className="px-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Catalyst Optimizer, AQE &amp; Photon Engine
-                  </h4>
-                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
-                    4-phase Catalyst query compilation pipeline, runtime Adaptive Query Execution re-planning, and vectorized C++ execution.
-                  </p>
-                </div>
-              </Link>
-
-              <Link
-                href="/architecture?tab=diagrams&diagram=spark-shuffle-memory-execution"
-                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
-              >
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
-                  <img
-                    src="/diagrams/spark_shuffle_memory_execution.jpg"
-                    alt="Spark Memory Architecture and Shuffle Mechanics"
-                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
-                    Memory &amp; Shuffle
-                  </div>
-                </div>
-                <div className="px-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Spark Executor Memory &amp; Shuffle Mechanics
-                  </h4>
-                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
-                    Unified Memory Manager dynamic borrowing, Tungsten off-heap memory, and sort-based shuffle spilling to disk.
-                  </p>
-                </div>
-              </Link>
-
-              <Link
-                href="/architecture?tab=diagrams&diagram=delta-lake-under-the-hood"
-                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
-              >
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
-                  <img
-                    src="/diagrams/delta_lake_mechanism.jpg"
-                    alt="Delta Lake Storage Engine"
-                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
-                    Storage Engine
-                  </div>
-                </div>
-                <div className="px-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Delta Lake ACID &amp; Transaction Log Mechanics
-                  </h4>
-                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
-                    3-panel mechanism contrasting raw Parquet limitations with _delta_log JSON commits, OCC, and Liquid Clustering.
-                  </p>
-                </div>
-              </Link>
-
-              <Link
-                href="/architecture?tab=diagrams&diagram=databricks-platform-master"
-                className="group rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 p-2.5 overflow-hidden transition-all flex flex-col space-y-2"
-              >
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-white relative flex items-center justify-center border border-[var(--border)]">
-                  <img
-                    src="/diagrams/databricks_ecosystem_landscape.jpg"
-                    alt="Databricks Unified Platform"
-                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-bold text-white uppercase">
-                    Master Platform Landscape
-                  </div>
-                </div>
-                <div className="px-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors">
-                    Databricks Unified Data Intelligence Platform
-                  </h4>
-                  <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 mt-0.5">
-                    Complete multi-tier architectural map spanning Auto Loader, Delta Lake, Unity Catalog, Photon, DLT, BI, and Mosaic AI.
-                  </p>
-                </div>
-              </Link>
+            {/* Blueprints Grid (Layout Style matching Image 2) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+              {sparkDiagrams.map((d) => (
+                <WhiteboardCard
+                  key={d.id}
+                  diagram={d}
+                  onExpand={(diagram) => {
+                    setActiveModalDiagram(diagram);
+                    setModalZoomLevel(1);
+                  }}
+                />
+              ))}
             </div>
           </div>
 
@@ -1138,6 +1080,141 @@ export default function SparkEnginePage() {
                 <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{term.def}</p>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox / Fullscreen Modal for Spark Blueprints */}
+      {activeModalDiagram && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 animate-in fade-in duration-200"
+          onClick={() => {
+            setActiveModalDiagram(null);
+            setModalZoomLevel(1);
+          }}
+        >
+          <div
+            className="relative w-full max-w-6xl max-h-[96vh] sm:max-h-[92vh] bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-4 border-b border-[var(--border)] bg-[var(--surface-2)] gap-2">
+              <div className="space-y-0.5 min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-purple-400 px-2 py-0.5 rounded-lg bg-purple-500/10 border border-purple-500/20 shrink-0">
+                    {activeModalDiagram.category}
+                  </span>
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-[var(--foreground)] truncate">
+                    {activeModalDiagram.title}
+                  </h3>
+                </div>
+                <p className="text-[10px] sm:text-xs text-[var(--muted-foreground)] truncate hidden xs:block">
+                  {activeModalDiagram.subtitle}
+                </p>
+              </div>
+
+              {/* Modal Toolbar: Theme Switch + Zoom + Download + Close */}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div className="hidden sm:block">
+                  <WhiteboardThemeToggle size="xs" showLabel={false} />
+                </div>
+
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-[var(--surface-1)] border border-[var(--border)] rounded-lg sm:rounded-xl p-0.5 sm:p-1">
+                  <button
+                    onClick={() => setModalZoomLevel((z) => Math.max(0.75, z - 0.25))}
+                    className="p-1 sm:p-1.5 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] touch-manipulation cursor-pointer"
+                    title="Zoom Out"
+                    aria-label="Zoom Out"
+                  >
+                    <ZoomOut size={14} className="sm:w-4 sm:h-4" />
+                  </button>
+                  <span className="text-[10px] sm:text-xs font-mono px-1 sm:px-2 text-[var(--muted-foreground)] select-none">
+                    {Math.round(modalZoomLevel * 100)}%
+                  </span>
+                  <button
+                    onClick={() => setModalZoomLevel((z) => Math.min(2.5, z + 0.25))}
+                    className="p-1 sm:p-1.5 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] touch-manipulation cursor-pointer"
+                    title="Zoom In"
+                    aria-label="Zoom In"
+                  >
+                    <ZoomIn size={14} className="sm:w-4 sm:h-4" />
+                  </button>
+                  <button
+                    onClick={() => setModalZoomLevel(1)}
+                    className="p-1 sm:p-1.5 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] touch-manipulation hidden sm:inline-flex cursor-pointer"
+                    title="Reset Zoom"
+                    aria-label="Reset Zoom"
+                  >
+                    <RotateCcw size={13} />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = activeModalDiagram.image;
+                    link.download = `${activeModalDiagram.id}.jpg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    toast.success("Downloading blueprint image");
+                  }}
+                  className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center gap-1 text-[11px] sm:text-xs font-medium touch-manipulation cursor-pointer"
+                  title="Download blueprint"
+                >
+                  <Download size={14} />
+                  <span className="hidden sm:inline">Download</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveModalDiagram(null);
+                    setModalZoomLevel(1);
+                  }}
+                  className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors touch-manipulation cursor-pointer"
+                  title="Close modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / Blueprint View with Dark/Light Mode Filter */}
+            <div
+              className={cn(
+                "flex-1 overflow-auto p-3 sm:p-8 flex items-center justify-center min-h-[240px] sm:min-h-[380px] touch-pan-x touch-pan-y transition-colors duration-300",
+                diagramTheme === "dark" ? "whiteboard-container-dark" : "whiteboard-container-light"
+              )}
+            >
+              <div
+                className="transition-transform duration-200 origin-center max-w-full"
+                style={{ transform: `scale(${modalZoomLevel})` }}
+              >
+                <img
+                  src={activeModalDiagram.image}
+                  alt={activeModalDiagram.title}
+                  className={cn(
+                    "max-h-[60vh] sm:max-h-[66vh] w-auto object-contain mx-auto shadow-sm transition-all duration-300",
+                    diagramTheme === "dark" ? "whiteboard-dark" : "whiteboard-light"
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-3 sm:p-6 border-t border-[var(--border)] bg-[var(--surface-2)] space-y-2 sm:space-y-3 max-h-[32vh] sm:max-h-none overflow-y-auto">
+              <p className="text-xs sm:text-sm text-[var(--foreground)] leading-relaxed">
+                {activeModalDiagram.description}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 pt-1 border-t border-[var(--border)] text-[11px] sm:text-xs text-[var(--muted-foreground)]">
+                {activeModalDiagram.keyPoints.map((point, idx) => (
+                  <div key={idx} className="flex items-start gap-1.5">
+                    <span className="text-purple-400 font-bold shrink-0">✔</span>
+                    <span>{point}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
