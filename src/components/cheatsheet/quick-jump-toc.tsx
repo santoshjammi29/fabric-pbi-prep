@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   ListTree,
   Zap,
@@ -14,6 +14,8 @@ import {
   Flame,
   Activity,
   ArrowLeftRight,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CheatCodeCategory } from "@/types/data";
@@ -27,6 +29,7 @@ interface QuickJumpTOCProps {
   onSelectCategory: (cat: string) => void;
   activeScenario?: string;
   onSelectScenario?: (scen: string) => void;
+  defaultMinimized?: boolean;
 }
 
 const CATEGORY_ICONS: Record<CheatCodeCategory, React.ElementType> = {
@@ -44,13 +47,58 @@ export function QuickJumpTOC({
   onSelectCategory,
   activeScenario = "ALL",
   onSelectScenario,
+  defaultMinimized = true,
 }: QuickJumpTOCProps) {
+  const [isMinimized, setIsMinimized] = useState(defaultMinimized);
   const totalCount = categories.reduce((sum, c) => sum + c.count, 0);
 
+  // Minimized Rail View (default)
+  if (isMinimized) {
+    return (
+      <aside
+        className="hidden xl:flex flex-col items-center sticky top-24 self-start rounded-2xl border border-[var(--border)] bg-[var(--card)] p-2.5 shadow-sm transition-all duration-200 cursor-pointer hover:border-blue-500/40 hover:bg-[var(--surface-2)] group select-none shrink-0"
+        onClick={() => setIsMinimized(false)}
+        title="Click to expand Quick Jump Index"
+        aria-label="Quick Jump Index"
+        aria-expanded={false}
+        role="region"
+      >
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsMinimized(false);
+          }}
+          className="p-2 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-105 group-hover:bg-blue-500/20 transition-all cursor-pointer"
+          aria-label="Expand Quick Jump Index"
+          title="Expand Quick Jump Index"
+        >
+          <ListTree size={16} />
+        </button>
+
+        <div className="my-2 h-px w-6 bg-[var(--border)]" />
+
+        <span className="text-[10px] font-bold text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 py-2 transition-colors">
+          Quick Jump Index
+        </span>
+
+        <span className="mt-1 text-[9px] font-mono font-bold text-blue-400 px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
+          {totalCount}
+        </span>
+
+        <div className="mt-3 p-1 rounded-lg text-[var(--muted-foreground)] group-hover:text-blue-400 group-hover:translate-x-[-2px] transition-all">
+          <ChevronLeft size={16} />
+        </div>
+      </aside>
+    );
+  }
+
+  // Expanded View
   return (
     <aside
-      className="hidden xl:block w-72 shrink-0 sticky top-24 self-start rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm space-y-4"
+      className="hidden xl:block w-72 shrink-0 sticky top-24 self-start rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm space-y-4 animate-in fade-in slide-in-from-right-2 duration-150"
       aria-label="Table of Contents"
+      aria-expanded={true}
     >
       <div>
         <div className="flex items-center justify-between pb-3 mb-2 border-b border-[var(--border)] text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
@@ -58,9 +106,20 @@ export function QuickJumpTOC({
             <ListTree size={14} className="text-blue-400" />
             <span>Quick Jump Index</span>
           </div>
-          <span className="text-[10px] font-mono text-blue-400 font-bold px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
-            {totalCount} Codes
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-mono text-blue-400 font-bold px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
+              {totalCount} Codes
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsMinimized(true)}
+              className="p-1 rounded-lg hover:bg-[var(--surface-3)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+              title="Minimize Quick Jump Index"
+              aria-label="Minimize Quick Jump Index"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
         </div>
 
         <nav className="space-y-1">

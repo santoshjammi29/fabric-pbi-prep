@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
 import { cheatsheetData } from "@/data";
 import { OptimizationFlow } from "@/components/cheatsheet/optimization-flow";
 import { CheatCard } from "@/components/cheatsheet/cheat-card";
+import { QuickJumpTOC } from "@/components/cheatsheet/quick-jump-toc";
 
 describe("Production Cheat Sheet Data Integrity", () => {
   it("cheatsheetData is defined and non-empty", () => {
@@ -65,5 +66,48 @@ describe("Cheat Sheet Components", () => {
     render(<CheatCard cheat={sample} />);
     expect(screen.getByText(sample.title)).toBeDefined();
     expect(screen.getByText(sample.metrics)).toBeDefined();
+  });
+
+  it("QuickJumpTOC is minimized by default and expands/minimizes manually", () => {
+    const mockCategories = [
+      { category: "Spark Core" as const, count: 8 },
+      { category: "Spark Optimization" as const, count: 11 },
+    ];
+
+    const { rerender } = render(
+      <QuickJumpTOC
+        categories={mockCategories}
+        activeCategory="ALL"
+        onSelectCategory={() => {}}
+      />
+    );
+
+    // Should be minimized by default
+    const expandBtn = screen.getByLabelText("Expand Quick Jump Index");
+    expect(expandBtn).toBeDefined();
+    expect(screen.queryByText("All Cheat Codes")).toBeNull();
+
+    // Click to expand
+    fireEvent.click(expandBtn);
+    expect(screen.getByText("All Cheat Codes")).toBeDefined();
+    expect(screen.getByText("Incident Triage")).toBeDefined();
+
+    // Click minimize button
+    const minimizeBtn = screen.getByLabelText("Minimize Quick Jump Index");
+    fireEvent.click(minimizeBtn);
+    expect(screen.queryByText("All Cheat Codes")).toBeNull();
+    expect(screen.getByLabelText("Expand Quick Jump Index")).toBeDefined();
+
+    // Can also accept defaultMinimized={false}
+    const { unmount } = render(
+      <QuickJumpTOC
+        categories={mockCategories}
+        activeCategory="ALL"
+        onSelectCategory={() => {}}
+        defaultMinimized={false}
+      />
+    );
+    expect(screen.getAllByText("All Cheat Codes").length).toBeGreaterThan(0);
+    unmount();
   });
 });
