@@ -98,6 +98,37 @@ function getInitialLegacyData(): Partial<UserStoreState> {
   }
 }
 
+// Debounced Edge Sync for global low-latency state persistence
+let edgeSyncTimeout: any = null;
+function queueEdgeProgressSync(state: UserStoreState) {
+  if (typeof window === "undefined" || process.env.NODE_ENV === "test") return;
+  if (edgeSyncTimeout) clearTimeout(edgeSyncTimeout);
+  edgeSyncTimeout = setTimeout(() => {
+    try {
+      let userId = localStorage.getItem("dataprep_user_id");
+      if (!userId) {
+        userId = "usr_" + Math.random().toString(36).substring(2, 11);
+        localStorage.setItem("dataprep_user_id", userId);
+      }
+      fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          progress: {
+            experienceTier: state.experienceTier,
+            bookmarks: state.bookmarks,
+            lastTopic: state.lastTopic,
+            userData: state.userData,
+            decisionLedger: state.decisionLedger,
+            diagnosticScore: state.diagnosticScore,
+          },
+        }),
+      }).catch(() => {});
+    } catch {}
+  }, 800);
+}
+
 export const useUserStore = create<UserStoreState>()(
   persist(
     (set, get) => ({
@@ -132,6 +163,7 @@ export const useUserStore = create<UserStoreState>()(
             localStorage.setItem("dataprep_experience_tier", tier);
           } catch {}
         }
+        queueEdgeProgressSync(get());
       },
 
       toggleBookmark: (id) => {
@@ -145,6 +177,7 @@ export const useUserStore = create<UserStoreState>()(
             localStorage.setItem("dataprep_bookmarks", JSON.stringify(updated));
           } catch {}
         }
+        queueEdgeProgressSync(get());
         return !exists; // true if newly added, false if removed
       },
 
@@ -160,6 +193,7 @@ export const useUserStore = create<UserStoreState>()(
             localStorage.setItem("dataprep_bookmarks", JSON.stringify(safe));
           } catch {}
         }
+        queueEdgeProgressSync(get());
       },
 
       recordLastTopic: (topic) => {
@@ -179,6 +213,7 @@ export const useUserStore = create<UserStoreState>()(
             );
           } catch {}
         }
+        queueEdgeProgressSync(get());
       },
 
       recordReviewedCard: (xpGain = 25) => {
@@ -195,6 +230,7 @@ export const useUserStore = create<UserStoreState>()(
           }
           return { userData: nextData };
         });
+        queueEdgeProgressSync(get());
       },
 
       recordDecision: (decisionId, choiceId) => {
@@ -204,6 +240,7 @@ export const useUserStore = create<UserStoreState>()(
             [decisionId]: choiceId,
           },
         }));
+        queueEdgeProgressSync(get());
       },
 
       setDiagnosticScore: (score, recommendedTier) => {
@@ -219,6 +256,7 @@ export const useUserStore = create<UserStoreState>()(
             experienceTier: tier,
           };
         });
+        queueEdgeProgressSync(get());
       },
 
       resetProgress: () => {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { ThemeCycleButton, ThemeSegmentedPills } from "@/components/ui/theme-switcher";
+import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import {
   Search,
   Menu,
@@ -247,7 +248,7 @@ export function MobileHeader() {
                   <Search size={14} />
                   <span>Search all topics &amp; code...</span>
                 </span>
-                <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--surface-3)]">⌘K</kbd>
+                <KbdShortcut shortcutKey="k" className="bg-[var(--surface-3)]" />
               </button>
             </div>
 

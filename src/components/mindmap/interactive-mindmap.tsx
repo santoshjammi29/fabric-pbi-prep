@@ -33,7 +33,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { conceptsDb } from "@/data";
 import {
   MINDMAP_DOMAINS,
   MindmapDomain,
@@ -99,6 +98,29 @@ export function InteractiveMindmap() {
   const [drawerTab, setDrawerTab] = useState<"rubric" | "concept">("rubric");
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
   const [isFlowMode, setIsFlowMode] = useState(true);
+  const [linkedConcept, setLinkedConcept] = useState<{ id: string; term: string; category?: string; definition: string; explanation: string; keyPoints?: string[] } | null>(null);
+
+  useEffect(() => {
+    if (!selectedSubtopic?.conceptId || typeof window === "undefined" || !window.location?.host || process.env.NODE_ENV === "test") {
+      setLinkedConcept(null);
+      return;
+    }
+    let active = true;
+    try {
+      fetch(`/api/concepts?q=${encodeURIComponent(selectedSubtopic.conceptId)}`)
+        .then((res) => res.json())
+        .then((resData) => {
+          if (active && resData?.data) {
+            const found = resData.data.find((c: any) => c.id === selectedSubtopic.conceptId) || resData.data[0];
+            setLinkedConcept(found || null);
+          }
+        })
+        .catch(() => {});
+    } catch {}
+    return () => {
+      active = false;
+    };
+  }, [selectedSubtopic?.conceptId]);
 
   // Movable node drag offsets: { [nodeId]: { x: number; y: number } }
   const [nodeOffsets, setNodeOffsets] = useState<Record<string, { x: number; y: number }>>({});
@@ -1177,13 +1199,7 @@ export function InteractiveMindmap() {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute top-0 right-0 bottom-0 z-40 w-full sm:w-[440px] bg-[var(--surface-1)] border-l border-[var(--border)] shadow-2xl p-6 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
             >
-              {(() => {
-                const linkedConcept = selectedSubtopic.conceptId
-                  ? conceptsDb.find((c) => c.id === selectedSubtopic.conceptId)
-                  : null;
-
-                return (
-                  <div className="space-y-6">
+              <div className="space-y-6">
                     {/* Drawer Header */}
                     <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
                       <div className="flex items-center gap-2">
@@ -1377,8 +1393,6 @@ export function InteractiveMindmap() {
                       </p>
                     </div>
                   </div>
-                );
-              })()}
             </m.div>
           )}
         </AnimatePresence>

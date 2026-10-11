@@ -1,57 +1,37 @@
 import { NextResponse } from "next/server";
-import { getUnifiedQuestions } from "@/data";
-import { UnifiedQuestion } from "@/types/data";
-
-// Module-level cached unified questions to eliminate repeated flattening across requests
-let cachedQuestions: UnifiedQuestion[] | null = null;
-
-function getCachedUnifiedQuestions(): UnifiedQuestion[] {
-  if (!cachedQuestions) {
-    cachedQuestions = getUnifiedQuestions();
-  }
-  return cachedQuestions;
-}
+import { queryQuestionsDAL } from "@/lib/dal";
+import { Difficulty } from "@/types/data";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const q = searchParams.get("q")?.toLowerCase() || "";
-  const difficulty = searchParams.get("difficulty")?.toUpperCase() || "ALL";
+  const q = searchParams.get("q") || "";
+  const difficulty = (searchParams.get("difficulty")?.toUpperCase() || "ALL") as Difficulty | "ALL";
   const domain = searchParams.get("domain") || "ALL";
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "25", 10);
 
-  const allQuestions = getCachedUnifiedQuestions();
-
-  const filtered = allQuestions.filter((item) => {
-    if (difficulty !== "ALL" && item.difficulty !== difficulty) {
-      return false;
-    }
-    if (domain !== "ALL") {
-      const cat = (item.category || "").toUpperCase();
-      const niche = (item.niche || "").toUpperCase();
-      const dom = (item.domain || "").toUpperCase();
-      const target = domain.toUpperCase();
-      if (!cat.includes(target) && !niche.includes(target) && !dom.includes(target)) {
-        return false;
-      }
-    }
-    if (q) {
-      const qMatch = item.question.toLowerCase().includes(q);
-      const aMatch = item.answer.toLowerCase().includes(q);
-      const catMatch = item.category?.toLowerCase().includes(q);
-      return qMatch || aMatch || catMatch;
-    }
-    return true;
-  });
-
-  const startIndex = (page - 1) * limit;
-  const paginated = filtered.slice(startIndex, startIndex + limit);
-
-  return NextResponse.json({
-    total: filtered.length,
+  const result = await queryQuestionsDAL({
+    query: q,
+    difficulty,
+    domain,
     page,
     limit,
-    totalPages: Math.ceil(filtered.length / limit),
-    data: paginated,
   });
+
+  return NextResponse.json(
+    {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
+      data: result.items,
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400, max-age=60",
+        "CDN-Cache-Control": "public, s-maxage=86400",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=86400",
+      },
+    }
+  );
 }

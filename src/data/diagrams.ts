@@ -28,7 +28,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Microsoft Fabric Unified Architecture & OneLake",
     subtitle: "Single SaaS Lakehouse with Zero Data Duplication, Multi-Engine Compute, and Cross-Cloud Shortcuts",
     category: "Fabric & Power BI",
-    image: "/diagrams/fabric_onelake_architecture.jpg",
+    image: "/diagrams/fabric_onelake_architecture.webp",
     tags: ["Microsoft Fabric", "OneLake", "Delta Lake", "Direct Lake", "Shortcuts", "Synapse Data Warehouse", "Fabric Spark", "Purview"],
     description: "End-to-end Microsoft Fabric architecture showing the single SaaS data lake (OneLake), universal Delta Parquet storage format with V-Order optimization, zero-copy shortcuts linking AWS S3 and GCP, and multi-engine compute integration (Spark, Synapse DW, Power BI Direct Lake, KQL, and Data Factory).",
     keyPoints: [
@@ -44,7 +44,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Power BI Direct Lake Mode & VertiPaq Semantic Engine",
     subtitle: "Memory-Mapped Delta Parquet vs Legacy Import and DirectQuery Modes",
     category: "Fabric & Power BI",
-    image: "/diagrams/powerbi_direct_lake_vertipaq.jpg",
+    image: "/diagrams/powerbi_direct_lake_vertipaq.webp",
     tags: ["Power BI", "Direct Lake", "VertiPaq", "DAX", "Fabric Semantic Model", "Delta Parquet", "Import vs DirectQuery"],
     description: "Architectural comparison of Power BI Direct Lake mode against legacy Import and DirectQuery. Illustrates how the VertiPaq in-memory analytics engine directly memory-maps Delta Parquet column chunks from OneLake storage into RAM on-demand, achieving sub-second DAX query response times with real-time data freshness and zero data duplication.",
     keyPoints: [
@@ -60,7 +60,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Power BI DAX Engine Mechanics & Context Transition",
     subtitle: "Formula Engine (FE), VertiPaq Storage Engine (SE), Filter Context, Row Context & CALCULATE()",
     category: "Fabric & Power BI",
-    image: "/diagrams/powerbi_dax_engine_context.jpg",
+    image: "/diagrams/powerbi_dax_engine_context.webp",
     tags: ["Power BI", "DAX", "Formula Engine", "VertiPaq", "Storage Engine", "Context Transition", "CALCULATE", "Filter Context"],
     description: "Deep dive into Power BI's dual-engine query execution model. Depicts how the single-threaded Formula Engine parses DAX syntax and coordinates evaluation, while the multi-threaded VertiPaq Storage Engine executes parallel column scans, bit-packing, and dictionary lookups, mediated by Context Transition via CALCULATE().",
     keyPoints: [
@@ -76,7 +76,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Apache Airflow Distributed Production Architecture",
     subtitle: "Multi-Threaded Scheduler, Metadata DB, Kubernetes/Celery Executors, and Triggerer",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/apache_airflow_architecture.jpg",
+    image: "/diagrams/apache_airflow_architecture.webp",
     tags: ["Apache Airflow", "Orchestration", "DAG", "CeleryExecutor", "KubernetesExecutor", "Triggerer", "PostgreSQL", "Operators"],
     description: "Production distributed architecture of Apache Airflow showing the multi-process scheduler parsing DAG directories, PostgreSQL metadata database managing task states, Celery/Redis queue or Kubernetes API dispatcher, asynchronous Triggerer event loop for deferrable operators, and auto-scaling worker pods orchestrating Spark, Databricks, and dbt jobs.",
     keyPoints: [
@@ -92,7 +92,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "dbt (Data Build Tool) Modern Analytics Engineering DAG",
     subtitle: "From Raw Sources to Production Data Marts with Incremental Models, Tests & Semantic Layer",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/dbt_analytics_engineering_dag.jpg",
+    image: "/diagrams/dbt_analytics_engineering_dag.webp",
     tags: ["dbt", "Analytics Engineering", "DAG", "Incremental Models", "Snapshots", "SCD Type 2", "Semantic Layer", "Data Testing"],
     description: "Complete dbt transformation DAG pipeline illustrating the progression from Raw Landing Sources through Staging views (stg_), Intermediate business logic (int_), to production Star Schema Marts (fct_ and dim_). Highlights dbt incremental strategies (is_incremental()), SCD Type 2 history snapshots, automated schema tests, and the dbt Semantic Layer.",
     keyPoints: [
@@ -108,7 +108,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Azure Data Factory Enterprise Hybrid Ingestion Architecture",
     subtitle: "Hybrid Data Integration, Self-Hosted Integration Runtime (SHIR), Private Endpoints & CDC",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/adf_hybrid_architecture.jpg",
+    image: "/diagrams/adf_hybrid_architecture.webp",
     tags: ["Azure Data Factory", "ADF", "SHIR", "Integration Runtime", "Hybrid Cloud", "Private Endpoints", "CDC", "Tumbling Window"],
     description: "Enterprise hybrid data movement and ingestion framework using Azure Data Factory. Contrasts cloud-native Azure IR with multi-node Self-Hosted Integration Runtime (SHIR) clusters behind corporate firewalls, demonstrating outbound-only TLS 443 connectivity, Managed Private Endpoints, and tumbling window micro-batch CDC.",
     keyPoints: [
@@ -124,7 +124,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Real-Time Event Streaming & Kafka Architecture",
     subtitle: "Event Producers, Kafka Topic Partitions, Consumer Groups, Spark Structured Streaming & Exactly-Once Sinks",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/kafka_event_streaming_pipeline.jpg",
+    image: "/diagrams/kafka_event_streaming_pipeline.webp",
     tags: ["Apache Kafka", "Streaming", "Spark Structured Streaming", "Watermarking", "Schema Registry", "Exactly-Once", "Event-Driven"],
     description: "End-to-end real-time event streaming pipeline architecture. Shows event producers publishing to partitioned Kafka brokers with Confluent Schema Registry enforcement, parallel Spark Structured Streaming micro-batch workers handling late-arriving data via watermarking, and idempotent commits to Delta Lake Silver tables.",
     keyPoints: [
@@ -140,7 +140,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Real-Time Change Data Capture (CDC) Architecture",
     subtitle: "OLTP Write-Ahead Logs (WAL), Debezium Connect, Kafka Change Stream & Delta APPLY CHANGES INTO",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/cdc_debezium_lakehouse_pipeline.jpg",
+    image: "/diagrams/cdc_debezium_lakehouse_pipeline.webp",
     tags: ["CDC", "Debezium", "Kafka Connect", "Delta Lake", "APPLY CHANGES INTO", "SCD Type 1", "SCD Type 2", "WAL"],
     description: "Production log-based Change Data Capture (CDC) pipeline. Illustrates non-intrusive transaction log reading (WAL/Binlog) via Debezium Kafka Connect, structured change event payload publishing to Kafka topics, and automated Lakehouse SCD Type 1 and Type 2 upserts using Delta Live Tables APPLY CHANGES INTO.",
     keyPoints: [
@@ -156,7 +156,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Databricks Medallion Lakehouse Architecture",
     subtitle: "End-to-End Enterprise Data Flow & Unified Governance Pipeline",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/databricks_medallion_architecture.jpg",
+    image: "/diagrams/databricks_medallion_architecture.webp",
     tags: ["Medallion", "Bronze", "Silver", "Gold", "Auto Loader", "MERGE INTO", "Liquid Clustering"],
     description: "Dual-plane enterprise architecture: Top-level orchestration (Airflow/Databricks Workflows/Job Clusters) coordinating with bottom-level storage layers (Bronze, Silver, Gold) and Unity Catalog.",
     keyPoints: [
@@ -172,7 +172,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Delta Live Tables (DLT) Pipeline Architecture",
     subtitle: "Declarative Multi-Hop Lakehouse Ingestion, Automated CDC & Data Quality Expectations",
     category: "Data Pipelines & Ingestion",
-    image: "/diagrams/databricks_dlt_pipeline.jpg",
+    image: "/diagrams/databricks_dlt_pipeline.webp",
     tags: ["Delta Live Tables", "Declarative ETL", "Data Quality", "APPLY CHANGES INTO", "CDC", "Streaming"],
     description: "Declarative ETL framework managing cluster infrastructure, DAG dependencies, checkpointing, and scaling with built-in expectation checks and automated Change Data Capture.",
     keyPoints: [
@@ -188,7 +188,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Databricks Unified Data Intelligence Platform",
     subtitle: "Comprehensive Landscape: Ingestion, Storage, Governance, Compute, BI & Mosaic AI",
     category: "Platform Landscape",
-    image: "/diagrams/databricks_ecosystem_landscape.jpg",
+    image: "/diagrams/databricks_ecosystem_landscape.webp",
     tags: ["Lakehouse", "Unity Catalog", "Photon", "Mosaic AI", "Delta Live Tables", "Serverless SQL"],
     description: "Complete architectural map spanning raw ingestion (Auto Loader, Lakeflow), open lakehouse storage (Delta Lake, UniForm), central governance (Unity Catalog), scalable compute (Photon), and enterprise workload pillars.",
     keyPoints: [
@@ -204,7 +204,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Enterprise RAG & Vector Data Architecture",
     subtitle: "Document Chunking, Embedding Models, Vector DB Indexing (HNSW/IVF), Semantic Retrieval & LLM Augmentation",
     category: "Platform Landscape",
-    image: "/diagrams/rag_vector_search_data_pipeline.jpg",
+    image: "/diagrams/rag_vector_search_data_pipeline.webp",
     tags: ["Generative AI", "RAG", "Vector Search", "Embeddings", "HNSW", "LLM", "Data Engineering for AI"],
     description: "Production Retrieval-Augmented Generation (RAG) and Vector Data Architecture. Details both the offline ingestion pipeline (document extraction, text chunking, embedding generation, and vector indexing) and the online inference pipeline (semantic search, cross-encoder reranking, and context-augmented LLM synthesis).",
     keyPoints: [
@@ -220,7 +220,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Unity Catalog Unified Governance & 3-Level Namespace",
     subtitle: "Centralized Multi-Workspace Governance, 3-Level Namespace & Fine-Grained Security",
     category: "Governance & Security",
-    image: "/diagrams/unity_catalog_architecture.jpg",
+    image: "/diagrams/unity_catalog_architecture.webp",
     tags: ["Unity Catalog", "Governance", "Row Filtering", "Column Masking", "Lineage", "Delta Sharing"],
     description: "Centralized metastore governing all workspaces and cloud regions with standardized 3-level namespace (catalog.schema.table), dynamic row filters, column masks, and automated lineage.",
     keyPoints: [
@@ -236,7 +236,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Microsoft Purview Enterprise Governance Architecture",
     subtitle: "Unified Data Map, Automated Scanning, End-to-End Lineage, Sensitivity Labels & ABAC Access Policies",
     category: "Governance & Security",
-    image: "/diagrams/purview_governance_catalog.jpg",
+    image: "/diagrams/purview_governance_catalog.webp",
     tags: ["Microsoft Purview", "Governance", "Data Catalog", "Lineage", "Sensitivity Labels", "ABAC", "Data Map"],
     description: "Enterprise data governance, discovery, and compliance framework using Microsoft Purview. Explains how the unified Data Map automatically scans multi-cloud and on-premise data estates, extracts column-level lineage from pipelines, classifies sensitive data (PII/PCI), and enforces attribute-based access control.",
     keyPoints: [
@@ -252,7 +252,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "How Delta Lake Works Under the Hood",
     subtitle: "ACID Transactions, Transaction Log Protocol (_delta_log), & Liquid Clustering",
     category: "Storage Engine",
-    image: "/diagrams/delta_lake_mechanism.jpg",
+    image: "/diagrams/delta_lake_mechanism.webp",
     tags: ["Delta Lake", "ACID", "_delta_log", "Liquid Clustering", "OCC", "Time Travel", "CDF"],
     description: "3-panel under-the-hood mechanism contrasting raw Parquet file limitations with Delta Lake's ACID transaction log protocol, Optimistic Concurrency Control, and dynamic Liquid Clustering.",
     keyPoints: [
@@ -268,7 +268,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Apache Iceberg Open Table Format Mechanics",
     subtitle: "Iceberg Catalog, Metadata Pointers, Snapshot Manifest Lists, Manifest Files, and Data/Delete Files",
     category: "Storage Engine",
-    image: "/diagrams/apache_iceberg_open_table_format.jpg",
+    image: "/diagrams/apache_iceberg_open_table_format.webp",
     tags: ["Apache Iceberg", "Table Format", "Metadata Tree", "Snapshots", "Manifests", "Hidden Partitioning", "ACID"],
     description: "Under-the-hood 4-tier tree architecture of Apache Iceberg. Shows how the Iceberg Catalog maintains the current metadata pointer, which points to immutable snapshot manifest lists, partitioned manifest files, and underlying Parquet data and position-delete files, enabling O(1) query planning without directory listing.",
     keyPoints: [
@@ -284,7 +284,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Databricks Compute: Catalyst Optimizer, AQE & Photon",
     subtitle: "Query Optimization Pipeline, Runtime Adaptive Query Execution (AQE), and Vectorized C++ Execution",
     category: "Compute & Optimization",
-    image: "/diagrams/catalyst_photon_engine.jpg",
+    image: "/diagrams/catalyst_photon_engine.webp",
     tags: ["Catalyst Optimizer", "AQE", "Photon", "SIMD", "Vectorized Engine", "Tungsten Engine"],
     description: "4-phase Catalyst query compilation pipeline, runtime re-planning via Adaptive Query Execution (AQE), and execution branching between JVM Tungsten and native C++ Photon.",
     keyPoints: [
@@ -299,7 +299,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Apache Spark Memory Architecture & Shuffle Mechanics",
     subtitle: "Unified Memory Manager, Storage vs Execution Pool, Tungsten Off-Heap & Sort-Based Shuffle Spilling",
     category: "Compute & Optimization",
-    image: "/diagrams/spark_shuffle_memory_execution.jpg",
+    image: "/diagrams/spark_shuffle_memory_execution.webp",
     tags: ["Apache Spark", "Memory Management", "Unified Memory", "Shuffle", "Tungsten", "Off-Heap", "Spill to Disk"],
     description: "Comprehensive breakdown of Spark executor memory layout and shuffle mechanics. Contrasts JVM on-heap user memory with the Unified Memory Manager (Execution vs Storage dynamic boundary), Tungsten off-heap memory, and the sort-based shuffle pipeline showing memory buffers spilling to disk.",
     keyPoints: [
@@ -315,7 +315,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "SQL Server & Relational Query Engine Architecture",
     subtitle: "Parsing, Cost-Based Optimizer, Join Operators, Memory Grants & Clustered Columnstore",
     category: "Compute & Optimization",
-    image: "/diagrams/sql_server_query_engine_optimization.jpg",
+    image: "/diagrams/sql_server_query_engine_optimization.webp",
     tags: ["SQL Server", "T-SQL", "Query Optimizer", "Cardinality Estimation", "Columnstore", "Batch Mode", "Memory Grants"],
     description: "Relational database internals and execution mechanics for SQL Server and Azure SQL. Explains query parsing and algebrization, the cost-based optimizer searching trivial/quick/full plans, physical join operators (Nested Loops, Hash Match, Merge Join), memory workspace grants, and Clustered Columnstore batch mode execution.",
     keyPoints: [
@@ -331,7 +331,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Kimball Dimensional Modeling & Enterprise Star Schema",
     subtitle: "Atomic Grain, Central Fact Tables, Conformed Dimensions, SCD Type 1 & 2, and Bus Architecture",
     category: "Data Modeling & Architecture",
-    image: "/diagrams/kimball_dimensional_star_schema.jpg",
+    image: "/diagrams/kimball_dimensional_star_schema.webp",
     tags: ["Kimball", "Dimensional Modeling", "Star Schema", "Fact Tables", "Conformed Dimensions", "SCD Type 2", "Bus Matrix"],
     description: "Enterprise dimensional modeling master blueprint based on Kimball methodology. Details atomic fact table grain declaration, foreign key relationship links to conformed dimensions, Slowly Changing Dimensions (SCD Type 1 overwrite vs SCD Type 2 history tracking), role-playing dimensions, and the Enterprise Data Bus Matrix.",
     keyPoints: [
@@ -347,7 +347,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     title: "Data Vault 2.0 Architecture & Lakehouse Modeling",
     subtitle: "Raw Staging, Hubs (Business Keys), Links (Relationships), Satellites (Context), Business Vault & Info Marts",
     category: "Data Modeling & Architecture",
-    image: "/diagrams/data_vault_enterprise_architecture.jpg",
+    image: "/diagrams/data_vault_enterprise_architecture.webp",
     tags: ["Data Vault 2.0", "Hubs", "Links", "Satellites", "Hash Keys", "Auditability", "Business Vault", "Information Marts"],
     description: "Enterprise Data Vault 2.0 modeling architecture designed for massive scalability, auditability, and parallel data loading. Illustrates Raw Vault Hubs (business keys), Links (transactions and associations), and Satellites (contextual history), connecting to Business Vault PIT/Bridge tables and downstream Star Schema Information Marts.",
     keyPoints: [

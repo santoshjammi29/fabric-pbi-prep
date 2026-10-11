@@ -36,7 +36,7 @@ html.dark {
   --card-foreground: #f0f0f5;
   --card-hover: #1c1c20;
   --muted: #1a1a1f;
-  --muted-foreground: #8888a0;
+  --muted-foreground: #9da4b4;
   --border: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.15);
   --accent: #3B82F6;
@@ -89,7 +89,7 @@ html.light {
   --card-foreground: #1a1a2e;
   --card-hover: #f5f5ff;
   --muted: #f0effc;
-  --muted-foreground: #6b7280;
+  --muted-foreground: #596172;
   --border: rgba(0, 0, 0, 0.08);
   --border-hover: rgba(0, 0, 0, 0.15);
   --accent: #7c3aed;

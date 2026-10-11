@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 import {
   Search,
   Maximize2,
@@ -273,13 +274,17 @@ export function ArchitectureDiagramsGallery() {
                 className="transition-transform duration-200 origin-center max-w-full"
                 style={{ transform: `scale(${zoomLevel})` }}
               >
-                <img
+                <Image
                   src={activeDiagram.image}
                   alt={activeDiagram.title}
+                  width={1400}
+                  height={788}
+                  sizes="(max-width: 768px) 100vw, 85vw"
                   className={cn(
-                    "max-h-[60vh] sm:max-h-[66vh] w-auto object-contain mx-auto shadow-sm transition-all duration-300",
+                    "max-h-[60vh] sm:max-h-[66vh] w-auto h-auto object-contain mx-auto shadow-sm transition-all duration-300",
                     isDark ? "whiteboard-dark" : "whiteboard-light"
                   )}
+                  priority
                 />
               </div>
             </div>

@@ -99,15 +99,17 @@ export function WhiteboardCard({
         </div>
 
         {/* Diagram Image with Hardware-Accelerated Theme Transition */}
-        <div className="relative w-full h-full flex items-center justify-center">
-          <img
+        <div className="relative w-full h-full min-h-[220px] flex items-center justify-center">
+          <Image
             src={diagram.image}
             alt={diagram.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={cn(
-              "max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-[1.018]",
+              "object-contain transition-transform duration-500 group-hover:scale-[1.018]",
               isDark ? "whiteboard-dark" : "whiteboard-light"
             )}
-            loading={priority ? "eager" : "lazy"}
+            priority={priority}
           />
         </div>
 

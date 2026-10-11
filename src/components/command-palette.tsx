@@ -27,6 +27,7 @@ import {
   Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { conceptsDb, learningPathsDb, modernBlueprintsDb, cheatsheetData } from "@/data";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 
@@ -248,13 +249,11 @@ export function CommandPalette() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 lg:bottom-8 lg:right-8 z-40 hidden md:flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-purple-500/40 shadow-xl transition-all hover:scale-105 group"
-        aria-label="Open Command Palette (Cmd+K)"
+        aria-label="Open Command Palette (Cmd/Ctrl+K)"
       >
         <Search size={14} className="text-purple-400 group-hover:rotate-12 transition-transform" />
         <span>Quick search...</span>
-        <kbd className="px-2 py-0.5 rounded bg-[var(--surface-3)] text-[10px] font-mono font-semibold text-purple-300 border border-[var(--border)]">
-          ⌘K
-        </kbd>
+        <KbdShortcut shortcutKey="k" className="px-2 py-0.5 text-purple-300" />
       </button>
     );
   }
@@ -280,7 +279,7 @@ export function CommandPalette() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search concepts, blueprints, simulators, topics, routes (⌘K)..."
+            placeholder="Search concepts, blueprints, simulators, topics, routes (Cmd/Ctrl+K)..."
             aria-label="Search concepts, blueprints, simulators, topics, and routes"
             className="flex-1 bg-transparent text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none"
             autoFocus

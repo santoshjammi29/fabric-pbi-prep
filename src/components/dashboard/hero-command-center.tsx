@@ -20,6 +20,7 @@ import {
   FileCode2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 
 interface PillarItem {
   id: string;
@@ -224,9 +225,7 @@ export function HeroCommandCenter() {
             >
               <Search size={14} />
               <span>Quick Search</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono rounded bg-[var(--surface-3)] text-[var(--muted-foreground)] border border-[var(--border)]">
-                ⌘K
-              </kbd>
+              <KbdShortcut shortcutKey="k" className="hidden sm:inline-flex bg-[var(--surface-3)]" />
             </button>
           </div>
 
