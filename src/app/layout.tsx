@@ -69,20 +69,19 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      style={{ colorScheme: "dark", backgroundColor: "#0A0A0B" }}
-      className={`${inter.variable} ${jetbrainsMono.variable} dark antialiased bg-[#0A0A0B] text-[#f0f0f5]`}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark antialiased bg-[var(--background)] text-[var(--foreground)]`}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;c.remove('dark','light','grey','e-ink');if(t==='light'){c.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else if(t==='grey'){c.add('grey');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#18191c';}else if(t==='e-ink'){c.add('e-ink');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f7f6f2';}else{c.add('dark');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}}catch(e){}})();`,
           }}
         />
         <style dangerouslySetInnerHTML={{ __html: `
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
         `}} />
       </head>
-      <body className="min-h-dvh bg-[#0A0A0B] text-[#f0f0f5]">
+      <body className="min-h-dvh bg-[var(--background)] text-[var(--foreground)]">
 
         <ThemeProvider>
           <LazyMotion features={domAnimation}>

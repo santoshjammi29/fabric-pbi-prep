@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import {
   Search,
@@ -22,16 +24,19 @@ import {
   Globe,
   Terminal,
   BookMarked,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { conceptsDb, learningPathsDb, modernBlueprintsDb, cheatsheetData } from "@/data";
+import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 
 interface CommandItem {
   id: string;
   title: string;
-  category: "Navigation" | "Concepts" | "Paths" | "Simulators" | "Blueprints";
+  category: "Navigation" | "Concepts" | "Paths" | "Simulators" | "Blueprints" | "Theme";
   icon: React.ElementType;
-  href: string;
+  href?: string;
+  action?: () => void;
   badge?: string;
   keywords?: string[];
 }
@@ -41,6 +46,45 @@ export function CommandPalette() {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
+  const { setTheme } = useTheme();
+
+  // Theme quick-switch options
+  const themeRoutes: CommandItem[] = useMemo(
+    () =>
+      THEME_OPTIONS.map((t) => ({
+        id: `theme-${t.id}`,
+        title: `Switch Theme: ${t.label} (${t.tagline})`,
+        category: "Theme" as const,
+        icon: t.icon,
+        badge: t.badge,
+        keywords: [
+          "theme",
+          "themes",
+          "mode",
+          "appearance",
+          "color",
+          "switch",
+          t.id,
+          t.label.toLowerCase(),
+          t.tagline.toLowerCase(),
+          t.id === "grey" ? "gray" : "",
+          t.id === "grey" ? "slate" : "",
+          t.id === "grey" ? "graphite" : "",
+          t.id === "e-ink" ? "eink" : "",
+          t.id === "e-ink" ? "reader" : "",
+          t.id === "e-ink" ? "kindle" : "",
+          t.id === "e-ink" ? "paper" : "",
+          t.id === "dark" ? "night" : "",
+          t.id === "dark" ? "oled" : "",
+          t.id === "light" ? "day" : "",
+        ].filter(Boolean),
+        action: () => {
+          setTheme(t.id);
+          toast.success(`Theme switched to ${t.label} mode`);
+        },
+      })),
+    [setTheme]
+  );
 
   // Static navigation routes
   const staticRoutes: CommandItem[] = useMemo(
@@ -65,8 +109,11 @@ export function CommandPalette() {
       { id: "sim-shuffle", title: "Simulator: Spark Shuffle & Partition Estimator", category: "Simulators", icon: Calculator, href: "/modern-stack#simulators", badge: "Tool" },
       { id: "sim-delta", title: "Simulator: Iceberg vs Delta Decision Tree", category: "Simulators", icon: Layers, href: "/modern-stack#simulators", badge: "Tool" },
       { id: "sim-cost", title: "Simulator: Serverless Cloud Cost Calculator", category: "Simulators", icon: Flame, href: "/modern-stack#simulators", badge: "Tool" },
+
+      // Quick Theme Switching
+      ...themeRoutes,
     ],
-    []
+    [themeRoutes]
   );
 
   // Dynamic items from datasets
@@ -132,7 +179,11 @@ export function CommandPalette() {
     (item: CommandItem) => {
       setIsOpen(false);
       setQuery("");
-      router.push(item.href);
+      if (item.action) {
+        item.action();
+      } else if (item.href) {
+        router.push(item.href);
+      }
     },
     [router]
   );
@@ -286,7 +337,11 @@ export function CommandPalette() {
                         {item.badge}
                       </span>
                     )}
-                    <ExternalLink size={14} className="text-[var(--muted-foreground)] opacity-50" />
+                    {item.action ? (
+                      <Palette size={14} className="text-purple-400 opacity-80" />
+                    ) : (
+                      <ExternalLink size={14} className="text-[var(--muted-foreground)] opacity-50" />
+                    )}
                   </div>
                 </button>
               );

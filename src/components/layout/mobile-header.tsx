@@ -2,28 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useState, useEffect, useRef } from "react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
+import { ThemeCycleButton, ThemeSegmentedPills } from "@/components/ui/theme-switcher";
 import {
-  Sun,
-  Moon,
   Search,
   Menu,
   X,
   Home,
   BookOpen,
   FileCode2,
-  Zap,
   Layers,
-  Globe,
   MessageSquare,
-  Building2,
   Compass,
   User,
-  Terminal,
-  BookMarked,
-  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -124,17 +116,11 @@ const navGroups: NavGroup[] = [
 ];
 
 export function MobileHeader() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(drawerRef, drawerOpen, () => setDrawerOpen(false));
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Close drawer on navigation
   useEffect(() => {
@@ -162,11 +148,6 @@ export function MobileHeader() {
 
   const openSearch = () => {
     window.dispatchEvent(new CustomEvent("open-command-palette"));
-  };
-
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
   };
 
   return (
@@ -211,14 +192,7 @@ export function MobileHeader() {
             <Search size={18} />
           </button>
 
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
-            aria-label="Toggle light and dark theme"
-            title="Toggle theme"
-          >
-            {mounted && (theme === "dark" ? <Sun size={18} /> : <Moon size={18} />)}
-          </button>
+          <ThemeCycleButton size={18} />
         </div>
       </header>
 
@@ -348,15 +322,12 @@ export function MobileHeader() {
             </nav>
 
             {/* Drawer Footer */}
-            <div className="p-3 border-t border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-between text-xs">
-              <span className="text-[var(--muted-foreground)]">Theme:</span>
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] text-[var(--foreground)]"
-              >
-                {theme === "dark" ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} className="text-purple-400" />}
-                <span className="capitalize">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-              </button>
+            <div className="p-3 border-t border-[var(--border)] bg-[var(--surface-2)] space-y-2">
+              <div className="flex items-center justify-between text-xs px-1">
+                <span className="font-semibold text-[var(--foreground)]">Theme</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">4 appearance modes</span>
+              </div>
+              <ThemeSegmentedPills />
             </div>
           </div>
         </div>

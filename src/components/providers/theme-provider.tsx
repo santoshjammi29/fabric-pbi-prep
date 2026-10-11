@@ -9,6 +9,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       defaultTheme="dark"
       enableSystem={false}
       storageKey="theme"
+      themes={["dark", "light", "grey", "e-ink"]}
     >
       {children}
     </NextThemesProvider>

@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-@custom-variant light (&:where(.light, .light *));
+@custom-variant dark (&:where(.dark, .dark *, .grey, .grey *));
+@custom-variant light (&:where(.light, .light *, .e-ink, .e-ink *));
+@custom-variant grey (&:where(.grey, .grey *));
+@custom-variant e-ink (&:where(.e-ink, .e-ink *));
 
 /* ═══════════════════════════════════════════════════════
    DESIGN TOKENS — FAANG-Grade Design System
@@ -109,10 +111,106 @@ html.light {
   --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.1);
 }
 
+/* ── Grey Theme (Neutral Graphite & Slate) ────────── */
+.grey,
+html.grey {
+  color-scheme: dark;
+  --background: #18191c;
+  --foreground: #e4e4e9;
+  --card: #202227;
+  --card-foreground: #e4e4e9;
+  --card-hover: #262930;
+  --muted: #24262d;
+  --muted-foreground: #9ca3af;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --accent: #60a5fa;
+  --accent-foreground: #ffffff;
+  --accent-gradient: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+
+  --surface-0: #18191c;
+  --surface-1: #202227;
+  --surface-2: #282a31;
+  --surface-3: #30333b;
+  --surface-4: #393d47;
+
+  --color-easy: #34d399;
+  --color-medium: #60a5fa;
+  --color-hard: #fb923c;
+  --color-architect: #818cf8;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #60a5fa;
+
+  --stat-green: #22c55e;
+  --stat-orange: #f97316;
+  --stat-amber: #f59e0b;
+  --stat-red: #ef4444;
+  --stat-purple: #818cf8;
+  --stat-sky: #38bdf8;
+
+  --glass-bg: rgba(32, 34, 39, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.09);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(96, 165, 250, 0.1);
+}
+
+/* ── E-Ink Reader Theme (Paper & High Contrast Ink) ── */
+.e-ink,
+html.e-ink {
+  color-scheme: light;
+  --background: #f7f6f2;
+  --foreground: #111111;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --card-hover: #f0eee6;
+  --muted: #eae8e0;
+  --muted-foreground: #444444;
+  --border: rgba(0, 0, 0, 0.18);
+  --border-hover: rgba(0, 0, 0, 0.35);
+  --accent: #111111;
+  --accent-foreground: #ffffff;
+  --accent-gradient: linear-gradient(135deg, #111111 0%, #333333 100%);
+
+  --surface-0: #f7f6f2;
+  --surface-1: #ffffff;
+  --surface-2: #eeebe3;
+  --surface-3: #e3dfd5;
+  --surface-4: #d8d3c7;
+
+  --color-easy: #156525;
+  --color-medium: #114273;
+  --color-hard: #823405;
+  --color-architect: #2b2b2b;
+  --color-success: #156525;
+  --color-warning: #704402;
+  --color-danger: #8a1515;
+  --color-info: #114273;
+
+  --stat-green: #156525;
+  --stat-orange: #823405;
+  --stat-amber: #704402;
+  --stat-red: #8a1515;
+  --stat-purple: #2b2b2b;
+  --stat-sky: #114273;
+
+  --glass-bg: rgba(247, 246, 242, 0.96);
+  --glass-border: rgba(0, 0, 0, 0.16);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.12);
+  --shadow-glow: none;
+}
+
 /* ═══ BASE STYLES ═══ */
 html {
-  background-color: #0A0A0B;
-  color: #f0f0f5;
+  background-color: var(--background, #0A0A0B);
+  color: var(--foreground, #f0f0f5);
   color-scheme: dark;
 }
 
@@ -125,6 +223,18 @@ html.dark {
 html.light {
   background-color: #f8f8fc;
   color: #1a1a2e;
+  color-scheme: light;
+}
+
+html.grey {
+  background-color: #18191c;
+  color: #e4e4e9;
+  color-scheme: dark;
+}
+
+html.e-ink {
+  background-color: #f7f6f2;
+  color: #111111;
   color-scheme: light;
 }
 
@@ -185,6 +295,40 @@ body {
 
 .light ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(124, 58, 237, 0.75);
+}
+
+.grey html {
+  scrollbar-color: rgba(96, 165, 250, 0.35) rgba(0, 0, 0, 0.02);
+}
+
+.grey ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.grey ::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+.grey ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.7);
+}
+
+.e-ink html {
+  scrollbar-color: rgba(0, 0, 0, 0.4) rgba(0, 0, 0, 0.02);
+}
+
+.e-ink ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.e-ink ::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 9999px;
+}
+
+.e-ink ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.65);
 }
 
 /* High-performance scroll container utilities */
@@ -312,6 +456,16 @@ body {
   border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
+.grey .magazine-card-featured {
+  background: linear-gradient(145deg, #1e2025 0%, #262930 100%);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+.e-ink .magazine-card-featured {
+  background: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+}
+
 .author-pill {
   display: inline-flex;
   align-items: center;
@@ -389,6 +543,15 @@ body {
 
 .light .aurora-orb {
   opacity: 0.06;
+}
+
+.grey .aurora-orb {
+  opacity: 0.05;
+}
+
+.e-ink .aurora-bg,
+.e-ink .aurora-orb {
+  display: none !important;
 }
 
 .aurora-orb-1 {
@@ -605,165 +768,227 @@ code:not(pre code) {
 
 /* ── Light Mode High-Contrast Text Tokens ─────────── */
 .light .text-purple-400,
-.light .text-purple-300 {
+.light .text-purple-300,
+.e-ink .text-purple-400,
+.e-ink .text-purple-300 {
   color: #6b21a8 !important; /* purple-800: 7.8:1 contrast on white */
 }
 
 .light .text-blue-400,
-.light .text-blue-300 {
+.light .text-blue-300,
+.e-ink .text-blue-400,
+.e-ink .text-blue-300 {
   color: #1d4ed8 !important; /* blue-700: 6.2:1 contrast on white */
 }
 
 .light .text-green-400,
-.light .text-green-300 {
+.light .text-green-300,
+.e-ink .text-green-400,
+.e-ink .text-green-300 {
   color: #15803d !important; /* green-700: 5.1:1 contrast on white */
 }
 
 .light .text-emerald-400,
-.light .text-emerald-300 {
+.light .text-emerald-300,
+.e-ink .text-emerald-400,
+.e-ink .text-emerald-300 {
   color: #047857 !important; /* emerald-700 */
 }
 
 .light .text-orange-400,
-.light .text-orange-300 {
+.light .text-orange-300,
+.e-ink .text-orange-400,
+.e-ink .text-orange-300 {
   color: #c2410c !important; /* orange-700: 4.8:1 contrast on white */
 }
 
 .light .text-amber-400,
-.light .text-amber-300 {
+.light .text-amber-300,
+.e-ink .text-amber-400,
+.e-ink .text-amber-300 {
   color: #b45309 !important; /* amber-700: 5.3:1 contrast on white */
 }
 
 .light .text-yellow-400,
-.light .text-yellow-300 {
+.light .text-yellow-300,
+.e-ink .text-yellow-400,
+.e-ink .text-yellow-300 {
   color: #a16207 !important; /* yellow-700 */
 }
 
 .light .text-red-400,
-.light .text-red-300 {
+.light .text-red-300,
+.e-ink .text-red-400,
+.e-ink .text-red-300 {
   color: #b91c1c !important; /* red-700: 6.1:1 contrast on white */
 }
 
 .light .text-pink-400,
-.light .text-pink-300 {
+.light .text-pink-300,
+.e-ink .text-pink-400,
+.e-ink .text-pink-300 {
   color: #be185d !important; /* pink-700: 5.6:1 contrast on white */
 }
 
 .light .text-cyan-400,
-.light .text-cyan-300 {
+.light .text-cyan-300,
+.e-ink .text-cyan-400,
+.e-ink .text-cyan-300 {
   color: #0e7490 !important; /* cyan-700: 5.2:1 contrast on white */
 }
 
 .light .text-sky-400,
-.light .text-sky-300 {
+.light .text-sky-300,
+.e-ink .text-sky-400,
+.e-ink .text-sky-300 {
   color: #0369a1 !important; /* sky-700 */
 }
 
 .light .text-indigo-400,
-.light .text-indigo-300 {
+.light .text-indigo-300,
+.e-ink .text-indigo-400,
+.e-ink .text-indigo-300 {
   color: #4338ca !important; /* indigo-700 */
 }
 
-.light .text-slate-400 {
+.light .text-slate-400,
+.e-ink .text-slate-400 {
   color: #475569 !important; /* slate-600 */
 }
 
-.light .text-slate-300 {
+.light .text-slate-300,
+.e-ink .text-slate-300 {
   color: #334155 !important; /* slate-700 */
 }
 
-.light .text-gray-400 {
+.light .text-gray-400,
+.e-ink .text-gray-400 {
   color: #4b5563 !important; /* gray-600 */
 }
 
-.light .text-zinc-400 {
+.light .text-zinc-400,
+.e-ink .text-zinc-400 {
   color: #52525b !important; /* zinc-600 */
 }
 
-/* ── Light Mode Pill & Badge Backgrounds ──────────── */
+/* ── Light & E-Ink Pill & Badge Backgrounds ───────── */
 .light .bg-purple-500\/10,
-.light .bg-purple-500\/20 {
+.light .bg-purple-500\/20,
+.e-ink .bg-purple-500\/10,
+.e-ink .bg-purple-500\/20 {
   background-color: #f3e8ff !important; /* soft purple tint */
 }
 
 .light .bg-blue-500\/10,
-.light .bg-blue-500\/20 {
+.light .bg-blue-500\/20,
+.e-ink .bg-blue-500\/10,
+.e-ink .bg-blue-500\/20 {
   background-color: #dbeafe !important; /* soft blue tint */
 }
 
 .light .bg-green-500\/10,
-.light .bg-green-500\/20 {
+.light .bg-green-500\/20,
+.e-ink .bg-green-500\/10,
+.e-ink .bg-green-500\/20 {
   background-color: #dcfce7 !important; /* soft green tint */
 }
 
 .light .bg-orange-500\/10,
-.light .bg-orange-500\/20 {
+.light .bg-orange-500\/20,
+.e-ink .bg-orange-500\/10,
+.e-ink .bg-orange-500\/20 {
   background-color: #ffedd5 !important; /* soft orange tint */
 }
 
 .light .bg-amber-500\/10,
-.light .bg-amber-500\/20 {
+.light .bg-amber-500\/20,
+.e-ink .bg-amber-500\/10,
+.e-ink .bg-amber-500\/20 {
   background-color: #fef3c7 !important; /* soft amber tint */
 }
 
 .light .bg-red-500\/10,
-.light .bg-red-500\/20 {
+.light .bg-red-500\/20,
+.e-ink .bg-red-500\/10,
+.e-ink .bg-red-500\/20 {
   background-color: #fee2e2 !important; /* soft red tint */
 }
 
 .light .bg-pink-500\/10,
-.light .bg-pink-500\/20 {
+.light .bg-pink-500\/20,
+.e-ink .bg-pink-500\/10,
+.e-ink .bg-pink-500\/20 {
   background-color: #fce7f3 !important; /* soft pink tint */
 }
 
 .light .bg-cyan-500\/10,
-.light .bg-cyan-500\/20 {
+.light .bg-cyan-500\/20,
+.e-ink .bg-cyan-500\/10,
+.e-ink .bg-cyan-500\/20 {
   background-color: #cffafe !important; /* soft cyan tint */
 }
 
 .light .bg-sky-500\/10,
-.light .bg-sky-500\/20 {
+.light .bg-sky-500\/20,
+.e-ink .bg-sky-500\/10,
+.e-ink .bg-sky-500\/20 {
   background-color: #e0f2fe !important; /* soft sky tint */
 }
 
-/* ── Light Mode Pill & Badge Borders ──────────────── */
+/* ── Light & E-Ink Pill & Badge Borders ───────────── */
 .light .border-purple-500\/20,
-.light .border-purple-500\/30 {
+.light .border-purple-500\/30,
+.e-ink .border-purple-500\/20,
+.e-ink .border-purple-500\/30 {
   border-color: #d8b4fe !important;
 }
 
 .light .border-blue-500\/20,
-.light .border-blue-500\/30 {
+.light .border-blue-500\/30,
+.e-ink .border-blue-500\/20,
+.e-ink .border-blue-500\/30 {
   border-color: #bfdbfe !important;
 }
 
 .light .border-green-500\/20,
-.light .border-green-500\/30 {
+.light .border-green-500\/30,
+.e-ink .border-green-500\/20,
+.e-ink .border-green-500\/30 {
   border-color: #bbf7d0 !important;
 }
 
 .light .border-orange-500\/20,
-.light .border-orange-500\/30 {
+.light .border-orange-500\/30,
+.e-ink .border-orange-500\/20,
+.e-ink .border-orange-500\/30 {
   border-color: #fed7aa !important;
 }
 
 .light .border-amber-500\/20,
-.light .border-amber-500\/30 {
+.light .border-amber-500\/30,
+.e-ink .border-amber-500\/20,
+.e-ink .border-amber-500\/30 {
   border-color: #fde68a !important;
 }
 
 .light .border-red-500\/20,
-.light .border-red-500\/30 {
+.light .border-red-500\/30,
+.e-ink .border-red-500\/20,
+.e-ink .border-red-500\/30 {
   border-color: #fecaca !important;
 }
 
 .light .border-pink-500\/20,
-.light .border-pink-500\/30 {
+.light .border-pink-500\/30,
+.e-ink .border-pink-500\/20,
+.e-ink .border-pink-500\/30 {
   border-color: #fbcfe8 !important;
 }
 
 .light .border-cyan-500\/20,
-.light .border-cyan-500\/30 {
+.light .border-cyan-500\/30,
+.e-ink .border-cyan-500\/20,
+.e-ink .border-cyan-500\/30 {
   border-color: #a5f3fc !important;
 }
 
@@ -813,13 +1038,105 @@ code:not(pre code) {
   background: #e2e8f0 !important;
 }
 
-/* ── Code Blocks in Light Mode ────────────────────── */
+/* ── Grey Mode Category Capsules & Cards ──────────── */
+.grey .category-capsule-active {
+  background: rgba(96, 165, 250, 0.2) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(96, 165, 250, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.12) !important;
+}
+
+.grey .category-capsule-idle {
+  background: #202227 !important;
+  color: #9ca3af !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+}
+
+.grey .category-capsule-idle:hover {
+  background: #282a31 !important;
+  color: #f3f4f6 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.grey .magazine-card {
+  background: #202227 !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+.grey .magazine-card:hover {
+  border-color: rgba(96, 165, 250, 0.4) !important;
+}
+
+/* ── E-Ink Reader Category Capsules & Cards ───────── */
+.e-ink .category-capsule-active {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border: 1px solid #111111 !important;
+  box-shadow: none !important;
+}
+
+.e-ink .category-capsule-idle {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid rgba(0, 0, 0, 0.22) !important;
+}
+
+.e-ink .category-capsule-idle:hover {
+  background: #eeebe3 !important;
+  color: #000000 !important;
+  border-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+.e-ink .magazine-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+.e-ink .magazine-card:hover {
+  border-color: rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+.e-ink .section-divider span {
+  color: #111111 !important;
+  font-weight: 800;
+}
+
+.e-ink .section-divider::before,
+.e-ink .section-divider::after {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ── Code Blocks Across Themes ────────────────────── */
 .light .code-block,
 .light pre.code-block,
 .light pre {
   background: #0f172a !important;
   color: #f8fafc !important;
   border-color: #334155 !important;
+}
+
+.grey .code-block,
+.grey pre.code-block,
+.grey pre {
+  background: #141518 !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.e-ink .code-block,
+.e-ink pre.code-block,
+.e-ink pre {
+  background: #eeebe3 !important;
+  color: #111111 !important;
+  border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.e-ink code:not(pre code) {
+  background: #eae7de !important;
+  color: #111111 !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
 }
 
 /* ═══════════════════════════════════════════════════════

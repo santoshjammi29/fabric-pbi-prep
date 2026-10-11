@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import {
   Home,
   BookOpen,
@@ -13,8 +13,6 @@ import {
   MessageSquare,
   Compass,
   User,
-  Sun,
-  Moon,
   ChevronLeft,
 } from "lucide-react";
 
@@ -124,12 +122,9 @@ const pillVariants: Record<string, string> = {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") setCollapsed(true);
   }, []);
@@ -282,20 +277,9 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer — Theme toggle */}
+      {/* Footer — Theme switcher */}
       <div className="p-3 border-t border-[var(--border)] shrink-0">
-        <button
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className={cn(
-            "flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm font-medium transition-colors",
-            "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]",
-            collapsed && "justify-center px-0"
-          )}
-          aria-label="Toggle theme"
-        >
-          {mounted && (theme === "dark" ? <Sun size={18} /> : <Moon size={18} />)}
-          {!collapsed && <span>{mounted ? (theme === "dark" ? "Light Theme" : "Dark Theme") : "Theme"}</span>}
-        </button>
+        <ThemeSwitcher collapsed={collapsed} direction="up" align="start" />
       </div>
     </aside>
   );
