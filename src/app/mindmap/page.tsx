@@ -12,7 +12,7 @@ export default function MindmapPage() {
       <HubSubnav
         hubTitle="Architecture Hub"
         items={[
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3,104 Scenarios" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3,124 Scenarios" },
           { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "25+ Visuals" },
           { label: "Interactive Mindmap", href: "/mindmap", icon: Globe, badge: "Topography" },
         ]}

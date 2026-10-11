@@ -851,6 +851,13 @@ code:not(pre code) {
   color: #4338ca !important; /* indigo-700 */
 }
 
+.e-ink .text-slate-100,
+.e-ink .text-slate-200,
+.e-ink .text-slate-50,
+.e-ink .text-white {
+  color: #111111 !important; /* Deep carbon black ink */
+}
+
 .light .text-slate-400,
 .e-ink .text-slate-400 {
   color: #475569 !important; /* slate-600 */
@@ -859,6 +866,20 @@ code:not(pre code) {
 .light .text-slate-300,
 .e-ink .text-slate-300 {
   color: #334155 !important; /* slate-700 */
+}
+
+.e-ink .text-slate-500 {
+  color: #555555 !important;
+}
+
+.light .text-cyan-200,
+.e-ink .text-cyan-200 {
+  color: #0e7490 !important; /* deep cyan-700 */
+}
+
+.light .text-sky-200,
+.e-ink .text-sky-200 {
+  color: #0369a1 !important; /* deep sky-700 */
 }
 
 .light .text-gray-400,
@@ -1108,6 +1129,31 @@ code:not(pre code) {
   background: rgba(0, 0, 0, 0.2) !important;
 }
 
+/* ── E-Ink Hub Subnav Navigation Pills ─────────────── */
+.e-ink .hub-subnav-item-active {
+  background-color: #111111 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  border-color: #111111 !important;
+}
+
+.e-ink .hub-subnav-item-active span {
+  color: #ffffff !important;
+}
+
+.e-ink .hub-subnav-item-active svg {
+  color: #ffffff !important;
+}
+
+.e-ink .hub-subnav-item-idle {
+  color: #333333 !important;
+}
+
+.e-ink .hub-subnav-item-idle:hover {
+  background-color: #e3dfd5 !important;
+  color: #000000 !important;
+}
+
 /* ── Code Blocks Across Themes ────────────────────── */
 .light .code-block,
 .light pre.code-block,
@@ -1115,6 +1161,46 @@ code:not(pre code) {
   background: #0f172a !important;
   color: #f8fafc !important;
   border-color: #334155 !important;
+}
+
+/* Maintain crisp light tokens on dark slate background in light mode code blocks */
+.light pre span.text-purple-400,
+.light pre span.text-purple-300 {
+  color: #d8b4fe !important;
+}
+.light pre span.text-blue-400,
+.light pre span.text-blue-300 {
+  color: #93c5fd !important;
+}
+.light pre span.text-green-400,
+.light pre span.text-green-300,
+.light pre span.text-emerald-400,
+.light pre span.text-emerald-300 {
+  color: #6ee7b7 !important;
+}
+.light pre span.text-orange-400,
+.light pre span.text-orange-300 {
+  color: #fdba74 !important;
+}
+.light pre span.text-amber-400,
+.light pre span.text-amber-300 {
+  color: #fcd34d !important;
+}
+.light pre span.text-cyan-400,
+.light pre span.text-cyan-300 {
+  color: #67e8f9 !important;
+}
+.light pre span.text-sky-400,
+.light pre span.text-sky-300 {
+  color: #7dd3fc !important;
+}
+.light pre span.text-pink-400,
+.light pre span.text-pink-300 {
+  color: #f472b6 !important;
+}
+.light pre span.text-slate-100,
+.light pre span.text-slate-200 {
+  color: #f1f5f9 !important;
 }
 
 .grey .code-block,
@@ -1125,12 +1211,140 @@ code:not(pre code) {
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
+/* E-Ink Paper Code Box & Syntax Highlighting */
+.e-ink .code-block-container {
+  background: #eeebe3 !important;
+  border-color: rgba(0, 0, 0, 0.22) !important;
+}
+
+.e-ink .code-block-header {
+  background: #e3dfd5 !important;
+  border-color: rgba(0, 0, 0, 0.18) !important;
+  color: #111111 !important;
+}
+
+.e-ink .code-block-header span {
+  color: #111111 !important;
+}
+
+.e-ink .code-block-header svg {
+  color: #333333 !important;
+}
+
+.e-ink .code-block-header button {
+  color: #222222 !important;
+}
+
+.e-ink .code-block-header button:hover {
+  background: #d8d3c7 !important;
+  color: #000000 !important;
+}
+
 .e-ink .code-block,
 .e-ink pre.code-block,
 .e-ink pre {
   background: #eeebe3 !important;
   color: #111111 !important;
-  border-color: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(0, 0, 0, 0.22) !important;
+}
+
+.e-ink .code-block-editor,
+.e-ink .code-block-textarea,
+.e-ink textarea.code-block-textarea {
+  background: #eeebe3 !important;
+  color: #111111 !important;
+}
+
+.e-ink .code-block-linenumbers {
+  background: #e3dfd5 !important;
+  color: #555555 !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+.e-ink .code-block-footer {
+  background: #e3dfd5 !important;
+  color: #444444 !important;
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+/* E-Ink High-Contrast Token Overrides for Variables, Functions, and Literals */
+.e-ink pre span.text-slate-100,
+.e-ink pre span.text-slate-200,
+.e-ink pre span.text-slate-50,
+.e-ink pre span.text-white {
+  color: #111111 !important; /* Deep carbon black ink */
+}
+
+.e-ink pre span.text-slate-300 {
+  color: #2b2b2b !important;
+}
+
+.e-ink pre span.text-slate-400 {
+  color: #475569 !important;
+}
+
+.e-ink pre span.text-slate-500 {
+  color: #555555 !important;
+}
+
+.e-ink pre span.text-cyan-200,
+.e-ink pre span.text-cyan-300,
+.e-ink pre span.text-cyan-400 {
+  color: #0e7490 !important; /* Deep Cyan-700 */
+}
+
+.e-ink pre span.text-sky-200,
+.e-ink pre span.text-sky-300,
+.e-ink pre span.text-sky-400 {
+  color: #0369a1 !important; /* Deep Sky-700 */
+}
+
+.e-ink pre span.text-emerald-100,
+.e-ink pre span.text-emerald-200,
+.e-ink pre span.text-emerald-300,
+.e-ink pre span.text-emerald-400 {
+  color: #047857 !important; /* Deep Emerald-700 */
+}
+
+.e-ink pre span.text-purple-100,
+.e-ink pre span.text-purple-200,
+.e-ink pre span.text-purple-300,
+.e-ink pre span.text-purple-400 {
+  color: #6b21a8 !important; /* Deep Purple-800 */
+}
+
+.e-ink pre span.text-amber-100,
+.e-ink pre span.text-amber-200,
+.e-ink pre span.text-amber-300,
+.e-ink pre span.text-amber-400 {
+  color: #b45309 !important; /* Deep Amber-700 */
+}
+
+.e-ink pre span.text-pink-100,
+.e-ink pre span.text-pink-200,
+.e-ink pre span.text-pink-300,
+.e-ink pre span.text-pink-400 {
+  color: #be185d !important; /* Deep Pink-700 */
+}
+
+.e-ink pre span.text-orange-100,
+.e-ink pre span.text-orange-200,
+.e-ink pre span.text-orange-300,
+.e-ink pre span.text-orange-400 {
+  color: #c2410c !important; /* Deep Orange-700 */
+}
+
+.e-ink pre span.text-blue-100,
+.e-ink pre span.text-blue-200,
+.e-ink pre span.text-blue-300,
+.e-ink pre span.text-blue-400 {
+  color: #1d4ed8 !important; /* Deep Blue-700 */
+}
+
+.e-ink pre ::selection,
+.e-ink textarea.code-block-textarea::selection {
+  background-color: #d8d3c7 !important;
+  color: #111111 !important;
 }
 
 .e-ink code:not(pre code) {

@@ -276,12 +276,12 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "rounded-xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-xs my-2 sm:my-2.5 font-mono transition-all",
+        "code-block-container rounded-xl border border-slate-200 dark:border-slate-800 bg-[#0A0A0B] overflow-hidden shadow-xs my-2 sm:my-2.5 font-mono transition-all",
         className
       )}
     >
       {/* Code Header Bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
+      <div className="code-block-header flex items-center justify-between px-3 py-1.5 bg-slate-100 dark:bg-[#161618] border-b border-slate-200 dark:border-slate-800 text-xs select-none">
         {/* Left: Window Controls + Filename + Badge */}
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex items-center gap-1 shrink-0" aria-hidden="true">
@@ -423,11 +423,11 @@ export function CodeBlock({
       {/* Code Body: Preview Mode vs Interactive Editor Mode */}
       <div className="relative">
         {isEditing ? (
-          <div className="relative flex bg-[#0A0A0B]">
+          <div className="code-block-editor relative flex bg-[#0A0A0B]">
             {/* Editor Line Numbers */}
             {lineNumbersEnabled && (
               <div
-                className="select-none py-2.5 px-2 text-right text-slate-500 bg-[#07090c] border-r border-slate-800/80 font-mono tracking-normal text-[11px]"
+                className="code-block-linenumbers select-none py-2.5 px-2 text-right text-slate-500 bg-[#07090c] border-r border-slate-800/80 font-mono tracking-normal text-[11px]"
                 aria-hidden="true"
               >
                 {activeCode.split("\n").map((_, i) => (
@@ -446,7 +446,7 @@ export function CodeBlock({
               onKeyDown={handleKeyDown}
               spellCheck={false}
               className={cn(
-                "w-full bg-[#0A0A0B] text-slate-100 font-mono p-2.5 sm:p-3 outline-none resize-y min-h-[120px] tracking-normal border-none focus:ring-0 selection:bg-purple-500/30",
+                "code-block-textarea w-full bg-[#0A0A0B] text-slate-100 font-mono p-2.5 sm:p-3 outline-none resize-y min-h-[120px] tracking-normal border-none focus:ring-0 selection:bg-purple-500/30",
                 fontSizeClasses,
                 isWrap ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto"
               )}
@@ -461,7 +461,7 @@ export function CodeBlock({
         ) : (
           <pre
             className={cn(
-              "m-0 p-2.5 sm:p-3 font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
+              "code-block m-0 p-2.5 sm:p-3 font-mono tracking-normal text-slate-200 overflow-x-auto bg-[#0A0A0B] selection:bg-blue-500/30 selection:text-blue-100 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent",
               fontSizeClasses,
               isWrap && "whitespace-pre-wrap break-words"
             )}
@@ -504,7 +504,7 @@ export function CodeBlock({
 
       {/* Editor Footer Status Bar */}
       {isEditing && (
-        <div className="flex items-center justify-between px-3 py-1.5 bg-[#0e1217] border-t border-slate-800 text-[10px] text-slate-400 font-mono">
+        <div className="code-block-footer flex items-center justify-between px-3 py-1.5 bg-[#0e1217] border-t border-slate-800 text-[10px] text-slate-400 font-mono">
           <span>Scratchpad mode enabled · Press Tab to indent (2 spaces)</span>
           <span>{activeCode.split("\n").length} lines · {activeCode.length} chars</span>
         </div>

@@ -521,14 +521,26 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     } catch {}
   }, []);
 
+  const tabParam = searchParams.get("tab") as ArchHubTab | null;
+
+  // Reactively sync activeTab whenever URL searchParams tab changes (e.g. via Link or router)
+  useEffect(() => {
+    const validTabs: ArchHubTab[] = ["scenarios", "diagrams", "python", "polyglot", "distributed"];
+    if (tabParam && validTabs.includes(tabParam)) {
+      setActiveTab(tabParam);
+    } else if (!tabParam) {
+      setActiveTab("scenarios");
+    }
+  }, [tabParam]);
+
   // Sync URL parameters on initial load & popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
     const syncFromUrl = () => {
       const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab") as ArchHubTab | null;
-      if (tabParam && ["scenarios", "diagrams", "python", "polyglot", "distributed"].includes(tabParam)) {
-        setActiveTab(tabParam);
+      const qTab = params.get("tab") as ArchHubTab | null;
+      if (qTab && ["scenarios", "diagrams", "python", "polyglot", "distributed"].includes(qTab)) {
+        setActiveTab(qTab);
       }
 
       const cardParam = params.get("card") || params.get("id");
@@ -592,13 +604,20 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     } else {
       url.searchParams.delete(key);
     }
-    window.history.replaceState({}, "", url.toString());
-  }, []);
+    router.replace(url.pathname + url.search, { scroll: false });
+  }, [router]);
 
-  const handleTabChange = (tab: ArchHubTab) => {
+  const handleTabChange = useCallback((tab: ArchHubTab) => {
     setActiveTab(tab);
-    updateUrlParam("tab", tab === "scenarios" ? null : tab);
-  };
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (tab === "scenarios") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", tab);
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  }, [router]);
 
   // Distinct categories for System Scenarios
   const categories = useMemo(() => {
@@ -810,8 +829,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       <HubSubnav
         hubTitle="Architecture Hub"
         items={[
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3,104 Scenarios" },
-          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "25+ Visuals" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: `${architectureData.length.toLocaleString()} Scenarios` },
+          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: `${architectureDiagrams.length}+ Visuals` },
           { label: "Interactive Mindmap", href: "/mindmap", icon: Globe, badge: "Topography" },
         ]}
       />

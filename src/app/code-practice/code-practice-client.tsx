@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { m, AnimatePresence } from "framer-motion";
 import {
   FileCode2,
@@ -102,6 +103,17 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const searchParams = useSearchParams();
+  const dbParam = searchParams.get("db")?.toLowerCase() as LanguageKey | null;
+
+  // Reactively sync activeLang whenever searchParams ?db= changes
+  useEffect(() => {
+    const validLangs: LanguageKey[] = ["pyspark", "sparksql", "mssql", "python"];
+    if (dbParam && validLangs.includes(dbParam)) {
+      setActiveLang(dbParam);
+    }
+  }, [dbParam]);
 
   // Synchronize language tab and item target from URL search parameter (?db=, ?id=, ?q=) or hash (#...)
   useEffect(() => {

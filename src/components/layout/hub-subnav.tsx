@@ -28,14 +28,18 @@ function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
     const pathMatches = pathname === itemPath;
 
     if (!pathMatches) return false;
+
     if (!itemQuery) {
       const currentTab = searchParams?.get("tab");
-      if (!currentTab) return true;
+      const currentDb = searchParams?.get("db");
+      if (!currentTab && !currentDb) return true;
       const otherMatches = items.some((it) => {
         const [, otherQuery] = it.href.split("?");
         if (!otherQuery) return false;
         const otherParams = new URLSearchParams(otherQuery);
-        return otherParams.get("tab") === currentTab;
+        if (currentTab && otherParams.get("tab") === currentTab) return true;
+        if (currentDb && otherParams.get("db") === currentDb) return true;
+        return false;
       });
       return !otherMatches;
     }
@@ -43,7 +47,20 @@ function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
     const itemSearchParams = new URLSearchParams(itemQuery);
     const expectedTab = itemSearchParams.get("tab");
     if (expectedTab) {
-      return searchParams?.get("tab") === expectedTab;
+      const currentTab = searchParams?.get("tab") || (pathname === "/architecture" ? "scenarios" : null);
+      return currentTab === expectedTab;
+    }
+
+    const expectedDb = itemSearchParams.get("db");
+    if (expectedDb) {
+      const currentDb = searchParams?.get("db") || (pathname === "/code-practice" ? "pyspark" : null);
+      return currentDb === expectedDb;
+    }
+
+    for (const [key, val] of itemSearchParams.entries()) {
+      if (searchParams?.get(key) !== val) {
+        return false;
+      }
     }
 
     return true;
@@ -52,7 +69,7 @@ function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)]/80 border border-[var(--border)] overflow-x-auto scrollbar-none mb-3 sm:mb-4",
+        "flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none mb-3 sm:mb-4",
         className
       )}
       role="navigation"
@@ -71,11 +88,12 @@ function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
           <Link
             key={item.href}
             href={item.href}
+            scroll={false}
             className={cn(
-              "flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 shrink-0 whitespace-nowrap",
+              "hub-subnav-item flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 shrink-0 whitespace-nowrap",
               active
-                ? "bg-purple-600 text-white font-semibold shadow-sm shadow-purple-500/25"
-                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                ? "hub-subnav-item-active bg-purple-600 text-white font-semibold shadow-sm shadow-purple-500/25"
+                : "hub-subnav-item-idle text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
             )}
           >
             {Icon && <Icon size={14} className={cn(active ? "text-white" : "text-[var(--muted-foreground)]")} />}
