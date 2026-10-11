@@ -25,15 +25,20 @@ import {
   Terminal,
   BookMarked,
   Palette,
+  Type,
+  Plus,
+  Minus,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
+import { useTextSize, TEXT_SIZE_OPTIONS } from "@/components/providers/text-size-provider";
 
 interface CommandItem {
   id: string;
   title: string;
-  category: "Navigation" | "Concepts" | "Paths" | "Simulators" | "Blueprints" | "Theme";
+  category: "Navigation" | "Concepts" | "Paths" | "Simulators" | "Blueprints" | "Theme" | "Text Size";
   icon: React.ElementType;
   href?: string;
   action?: () => void;
@@ -47,6 +52,58 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const { setTheme } = useTheme();
+  const { setTextSize, increaseTextSize, decreaseTextSize, resetTextSize } = useTextSize();
+
+  // Text size quick commands
+  const textSizeRoutes: CommandItem[] = useMemo(
+    () => [
+      {
+        id: "text-size-increase",
+        title: "Increase Text Size (A+)",
+        category: "Text Size" as const,
+        icon: Plus,
+        badge: "Alt +",
+        keywords: ["text", "font", "size", "bigger", "increase", "larger", "zoom in", "scale", "accessibility"],
+        action: () => {
+          increaseTextSize(true);
+        },
+      },
+      {
+        id: "text-size-decrease",
+        title: "Decrease Text Size (A-)",
+        category: "Text Size" as const,
+        icon: Minus,
+        badge: "Alt -",
+        keywords: ["text", "font", "size", "smaller", "decrease", "compact", "zoom out", "scale", "accessibility"],
+        action: () => {
+          decreaseTextSize(true);
+        },
+      },
+      {
+        id: "text-size-reset",
+        title: "Reset Text Size to Default (100%)",
+        category: "Text Size" as const,
+        icon: RotateCcw,
+        badge: "Alt 0",
+        keywords: ["text", "font", "size", "reset", "default", "normal", "100%", "scale"],
+        action: () => {
+          resetTextSize(true);
+        },
+      },
+      ...TEXT_SIZE_OPTIONS.map((opt) => ({
+        id: `text-size-${opt.id}`,
+        title: `Text Size: ${opt.label} (${opt.scaleLabel}) - ${opt.tagline}`,
+        category: "Text Size" as const,
+        icon: Type,
+        badge: opt.scaleLabel,
+        keywords: ["text", "font", "size", "scale", opt.label.toLowerCase(), opt.scaleLabel, "readability"],
+        action: () => {
+          setTextSize(opt.id, true);
+        },
+      })),
+    ],
+    [increaseTextSize, decreaseTextSize, resetTextSize, setTextSize]
+  );
 
   // Theme quick-switch options
   const themeRoutes: CommandItem[] = useMemo(
@@ -112,8 +169,11 @@ export function CommandPalette() {
 
       // Quick Theme Switching
       ...themeRoutes,
+
+      // Text Size adjustments
+      ...textSizeRoutes,
     ],
-    [themeRoutes]
+    [themeRoutes, textSizeRoutes]
   );
 
   // Dynamic items fetched from Edge Search API
@@ -340,7 +400,11 @@ export function CommandPalette() {
                       </span>
                     )}
                     {item.action ? (
-                      <Palette size={14} className="text-purple-400 opacity-80" />
+                      item.category === "Text Size" ? (
+                        <Type size={14} className="text-purple-400 opacity-80" />
+                      ) : (
+                        <Palette size={14} className="text-purple-400 opacity-80" />
+                      )
                     ) : (
                       <ExternalLink size={14} className="text-[var(--muted-foreground)] opacity-50" />
                     )}

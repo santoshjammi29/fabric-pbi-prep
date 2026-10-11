@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { ThemeCycleButton, ThemeSegmentedPills } from "@/components/ui/theme-switcher";
+import { TextSizeQuickToggle, TextSizeSegmentedPills } from "@/components/ui/text-size-controller";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import {
   Search,
@@ -193,6 +194,8 @@ export function MobileHeader() {
             <Search size={18} />
           </button>
 
+          <TextSizeQuickToggle size={18} />
+
           <ThemeCycleButton size={18} />
         </div>
       </header>
@@ -323,12 +326,22 @@ export function MobileHeader() {
             </nav>
 
             {/* Drawer Footer */}
-            <div className="p-3 border-t border-[var(--border)] bg-[var(--surface-2)] space-y-2">
-              <div className="flex items-center justify-between text-xs px-1">
-                <span className="font-semibold text-[var(--foreground)]">Theme</span>
-                <span className="text-[10px] text-[var(--muted-foreground)]">4 appearance modes</span>
+            <div className="p-3 border-t border-[var(--border)] bg-[var(--surface-2)] space-y-3">
+              <div>
+                <div className="flex items-center justify-between text-xs px-1 mb-1.5">
+                  <span className="font-semibold text-[var(--foreground)]">Text Size</span>
+                  <span className="text-[10px] text-[var(--muted-foreground)]">Readability &amp; Scale</span>
+                </div>
+                <TextSizeSegmentedPills />
               </div>
-              <ThemeSegmentedPills />
+
+              <div>
+                <div className="flex items-center justify-between text-xs px-1 mb-1.5">
+                  <span className="font-semibold text-[var(--foreground)]">Theme</span>
+                  <span className="text-[10px] text-[var(--muted-foreground)]">4 appearance modes</span>
+                </div>
+                <ThemeSegmentedPills />
+              </div>
             </div>
           </div>
         </div>

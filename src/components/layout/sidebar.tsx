@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { TextSizeController } from "@/components/ui/text-size-controller";
 import {
   Home,
   BookOpen,
@@ -277,8 +278,9 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer — Theme switcher */}
-      <div className="p-3 border-t border-[var(--border)] shrink-0">
+      {/* Footer — Text Size & Theme switchers */}
+      <div className={cn("p-3 border-t border-[var(--border)] shrink-0", collapsed ? "space-y-2" : "space-y-2.5")}>
+        <TextSizeController collapsed={collapsed} direction="up" align="start" />
         <ThemeSwitcher collapsed={collapsed} direction="up" align="start" />
       </div>
     </aside>

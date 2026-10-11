@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { TextSizeProvider } from "@/components/providers/text-size-provider";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -74,7 +75,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;c.remove('dark','light','grey','e-ink');if(t==='light'){c.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else if(t==='grey'){c.add('grey');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#18191c';}else if(t==='e-ink'){c.add('e-ink');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f7f6f2';}else{c.add('dark');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;c.remove('dark','light','grey','e-ink');if(t==='light'){c.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else if(t==='grey'){c.add('grey');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#18191c';}else if(t==='e-ink'){c.add('e-ink');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f7f6f2';}else{c.add('dark');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}var s=localStorage.getItem('fabric_text_size');c.remove('text-size-sm','text-size-base','text-size-lg','text-size-xl','text-size-2xl');if(s&&['sm','base','lg','xl','2xl'].indexOf(s)!==-1){c.add('text-size-'+s);var pct={sm:'90%',base:'100%',lg:'110%',xl:'120%','2xl':'130%'}[s];if(pct)document.documentElement.style.setProperty('--text-scale',pct);}else{c.add('text-size-base');}}catch(e){}})();`,
           }}
         />
         <style dangerouslySetInnerHTML={{ __html: `
@@ -84,6 +85,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-[var(--background)] text-[var(--foreground)]">
 
         <ThemeProvider>
+          <TextSizeProvider>
           <LazyMotion features={domAnimation}>
           {/* Top scroll progress indicator across all interfaces */}
           <ScrollProgressBar />
@@ -157,6 +159,7 @@ export default function RootLayout({
               __html: `{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prerender": [{"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}]}`
             }}
           />
+          </TextSizeProvider>
         </ThemeProvider>
       </body>
     </html>

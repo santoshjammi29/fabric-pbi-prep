@@ -246,12 +246,43 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ═══ SCROLLBAR & FLUID ENGINE (Modern Chrome, Safari, Firefox) ═══ */
+/* ═══ DYNAMIC TEXT SIZING SYSTEM ═══ */
+:root {
+  --text-scale: 100%;
+}
+
 html {
+  font-size: var(--text-scale, 100%);
   scrollbar-width: thin;
   scrollbar-color: rgba(168, 85, 247, 0.4) rgba(255, 255, 255, 0.02);
   scrollbar-gutter: stable;
 }
+
+html.text-size-sm {
+  --text-scale: 90%;
+  font-size: 90%;
+}
+
+html.text-size-base {
+  --text-scale: 100%;
+  font-size: 100%;
+}
+
+html.text-size-lg {
+  --text-scale: 110%;
+  font-size: 110%;
+}
+
+html.text-size-xl {
+  --text-scale: 120%;
+  font-size: 120%;
+}
+
+html.text-size-2xl {
+  --text-scale: 130%;
+  font-size: 130%;
+}
+
 
 body {
   overscroll-behavior-y: none;
