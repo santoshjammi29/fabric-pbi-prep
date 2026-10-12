@@ -24,6 +24,7 @@ describe('guided-learning data', () => {
     expect(keys).toContain('modeling');
     expect(keys).toContain('governance');
     expect(keys).toContain('python');
+    expect(keys).toContain('system-design');
   });
 
   it('GUIDED_DOMAINS contains standard architectural domains', () => {
@@ -114,7 +115,7 @@ describe('guided-learning data', () => {
 
   it('getPlatformOverviewStats returns comprehensive platform totals', () => {
     const overview = getPlatformOverviewStats();
-    expect(overview.totalTopics).toBe(13);
+    expect(overview.totalTopics).toBe(GUIDED_TOPICS.length);
     expect(overview.totalUniqueItems).toBeGreaterThan(500);
     expect(overview.totalWhiteboards).toBe(21);
     expect(overview.domainsCount).toBeGreaterThanOrEqual(4);

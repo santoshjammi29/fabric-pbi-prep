@@ -167,7 +167,10 @@ export function getStandardizedDomain(item: {
     cat.includes('STORAGE') ||
     cat.includes('ARCHITECTURE') ||
     cat.includes('MEDALLION') ||
-    cat.includes('FORMAT')
+    cat.includes('FORMAT') ||
+    cat.includes('SYSTEM DESIGN') ||
+    cat.includes('BACKEND') ||
+    cat.includes('DISTRIBUTED SYSTEMS')
   ) {
     return 'Data Lakehouse & Architecture';
   }

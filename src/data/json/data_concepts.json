@@ -6031,5 +6031,680 @@
       "Limits Time Travel availability to the retention window (queries beyond the vacuum horizon will fail).",
       "Safety checks prevent zero-hour retention to ensure concurrent active read/write jobs are not corrupted."
     ]
+  },
+  {
+    "id": "sd-cap-theorem",
+    "term": "CAP Theorem",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A distributed systems theorem stating that a system can guarantee at most two of three properties: Consistency, Availability, and Partition Tolerance simultaneously.",
+    "explanation": "CAP Theorem, proven by Eric Brewer and formally by Seth Gilbert and Nancy Lynch, defines the fundamental trade-offs in distributed databases. Consistency means every read receives the most recent write or an error. Availability means every request receives a (non-error) response — though not necessarily the most recent write. Partition Tolerance means the system continues operating despite arbitrary network partitions. In practice, network partitions always occur (P is mandatory), so architects choose between CP (e.g., ZooKeeper, HBase) or AP (e.g., Cassandra, DynamoDB) systems.",
+    "keyPoints": [
+      "Partition Tolerance is unavoidable in real distributed systems — P is always chosen",
+      "CP systems (ZooKeeper, HBase): sacrifice availability during partitions for consistency",
+      "AP systems (Cassandra, DynamoDB): remain available but may return stale data",
+      "PACELC extends CAP to also consider Latency vs Consistency tradeoffs even without partitions",
+      "Real-world: UPI transactions need CP; social media feeds tolerate AP"
+    ]
+  },
+  {
+    "id": "sd-acid-properties",
+    "term": "ACID Properties",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "EASY",
+    "definition": "A set of four guarantees (Atomicity, Consistency, Isolation, Durability) that ensure database transactions are processed reliably, even in the event of errors or failures.",
+    "explanation": "ACID properties are the cornerstone of reliable relational database systems. Atomicity ensures a transaction is all-or-nothing — if any step fails, the entire transaction rolls back. Consistency ensures transactions bring the database from one valid state to another. Isolation ensures concurrent transactions do not interfere with each other. Durability ensures committed transactions are permanently persisted even after system crashes. PostgreSQL, MySQL, and Oracle enforce full ACID. Distributed systems often relax these guarantees in favor of BASE (Basically Available, Soft state, Eventually consistent).",
+    "keyPoints": [
+      "Atomicity: all-or-nothing execution — partial writes never persist",
+      "Consistency: constraints, triggers, and referential integrity are always enforced",
+      "Isolation levels: Read Uncommitted → Read Committed → Repeatable Read → Serializable",
+      "Durability: Write-Ahead Log (WAL) ensures commits survive crashes",
+      "BASE is the relaxed alternative used in high-scale NoSQL systems"
+    ]
+  },
+  {
+    "id": "sd-consistent-hashing",
+    "term": "Consistent Hashing",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A distributed hashing technique that minimizes data redistribution when nodes are added or removed from a cluster by mapping both nodes and keys onto a hash ring.",
+    "explanation": "In traditional modulo hashing (key % N), adding or removing a node requires rehashing almost all keys — extremely costly at scale. Consistent hashing places both nodes and keys on a circular ring using the same hash function. Each key is assigned to the nearest node clockwise. When a node is added or removed, only the keys between that node and its predecessor need to be redistributed. Virtual nodes (vnodes) are used to prevent hot spots — each physical node is mapped to multiple ring positions, ensuring even distribution even with heterogeneous node capacities.",
+    "keyPoints": [
+      "Only O(K/N) keys are remapped when a node is added/removed (K=keys, N=nodes)",
+      "Virtual nodes prevent hot spots and allow weighted distribution across heterogeneous hardware",
+      "Used in: Redis Cluster, Cassandra, DynamoDB, Memcached, CDN edge caches",
+      "Hash ring uses SHA-256 or MD5 as the hash function for node/key placement",
+      "Amazon DynamoDB uses consistent hashing as its core partitioning mechanism"
+    ]
+  },
+  {
+    "id": "sd-cache-aside-pattern",
+    "term": "Cache-Aside Pattern",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "EASY",
+    "definition": "A caching strategy where the application code is responsible for loading data into the cache on cache misses, reading from cache first and falling back to the database only when needed.",
+    "explanation": "Cache-Aside (also called Lazy Loading) is the most common caching pattern. On a read, the application first checks the cache. If the data is present (cache hit), it is returned directly. If absent (cache miss), the application reads from the database, stores the result in the cache with a TTL, and returns it to the caller. The advantage is that only actually-requested data is cached, avoiding unnecessary memory usage. The downside is that the first request after a cache miss incurs extra latency. This pattern is used extensively with Redis and Memcached in web applications.",
+    "keyPoints": [
+      "Read flow: Check cache → if miss, read DB → write to cache → return data",
+      "Write flow: Update DB directly; optionally invalidate or update the cache",
+      "Risk: stale data if cache is not invalidated after DB writes",
+      "Used in: Django cache framework, Spring Cache, Rails caching layer",
+      "Best for read-heavy workloads where data does not change frequently"
+    ]
+  },
+  {
+    "id": "sd-cache-stampede",
+    "term": "Cache Stampede (Thundering Herd)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A distributed systems failure pattern where many cache misses occur simultaneously for the same key, causing all clients to query the database concurrently and overwhelming it.",
+    "explanation": "Cache Stampede occurs when a popular cached key expires and many concurrent requests all miss the cache simultaneously. All of them then hammer the database with identical queries, potentially causing database overload or timeout cascades. Mitigations include: (1) Probabilistic Early Expiry — refresh the cache slightly before TTL expires to prevent a hard expiry cliff; (2) Request Coalescing (Request Collapsing) — use a mutex/lock so only one request queries the DB while others wait; (3) Background refresh — an async job refreshes popular keys before they expire. Tools like Redis implement locking primitives via SET NX (set if not exists) to enable request coalescing.",
+    "keyPoints": [
+      "Triggered by expiry of high-traffic cached keys under heavy concurrent load",
+      "Probabilistic Early Expiry: refresh cache with probability increasing as TTL approaches zero",
+      "Request Coalescing: Redis SETNX mutex ensures only one thread queries the DB",
+      "Cache Avalanche: variant where ALL keys expire simultaneously (use staggered TTLs)",
+      "Cache Penetration: queries for non-existent keys bypass cache — defend with Bloom Filters"
+    ]
+  },
+  {
+    "id": "sd-saga-pattern",
+    "term": "SAGA Pattern",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A design pattern for managing distributed transactions across multiple microservices without using 2PC, instead using a sequence of local transactions with compensating actions for rollback.",
+    "explanation": "SAGA breaks a distributed transaction into a series of smaller local transactions, each updating a single service and publishing an event or message to trigger the next step. If a step fails, compensating transactions are executed in reverse to undo the previous successful steps. There are two approaches: (1) Orchestration — a central SAGA Orchestrator service controls the workflow and sends commands to each service; (2) Choreography — each service reacts to events and publishes new events, with no central coordinator. SAGAs trade ACID isolation for availability and independence. The main challenge is handling partial failures gracefully with idempotent compensating transactions.",
+    "keyPoints": [
+      "Orchestration: central coordinator (e.g., Step Functions, Temporal) sends commands",
+      "Choreography: event-driven — services react to events via Kafka/RabbitMQ autonomously",
+      "Compensating transactions must be idempotent and semantically undoable",
+      "Does NOT provide ACID isolation — concurrent SAGAs can see each other partial state",
+      "Real-world use: e-commerce order flow (inventory reserve → payment → ship → confirm)"
+    ]
+  },
+  {
+    "id": "sd-outbox-pattern",
+    "term": "Outbox Pattern",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A pattern that ensures reliable event publishing by atomically writing both the business entity change and the event to be published in the same database transaction, preventing dual-write inconsistency.",
+    "explanation": "The Outbox Pattern solves the dual-write problem: you cannot atomically write to a database AND publish to a message broker (e.g., Kafka) in a single transaction. If the DB write succeeds but the Kafka publish fails, the system is inconsistent. The solution is to write the event to an outbox table in the same DB transaction as the business data change. A separate message relay process (or CDC-based tool like Debezium) polls the outbox table and publishes events to the message broker, deleting them after confirmation. This guarantees at-least-once delivery with exactly-once business effect (via idempotency).",
+    "keyPoints": [
+      "Writes event + business entity atomically in a single DB transaction",
+      "Outbox table stores: event_id, event_type, payload, created_at, published_at",
+      "Message Relay publishes events and marks them published (or deletes them)",
+      "Debezium can CDC-capture outbox table changes directly into Kafka",
+      "Prevents lost events when message broker is temporarily unavailable"
+    ]
+  },
+  {
+    "id": "sd-rate-limiting",
+    "term": "Rate Limiting",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A technique for controlling the rate of requests a client can make to an API or service, used to prevent abuse, DDoS, and resource exhaustion.",
+    "explanation": "Rate limiting is critical for production API stability. Common algorithms include: (1) Token Bucket — a bucket holds N tokens; each request consumes one token; tokens refill at a fixed rate; allows burst traffic up to bucket size; (2) Leaky Bucket — requests enter a queue and are processed at a fixed rate, smoothing out bursts; (3) Fixed Window Counter — count requests per fixed time window; edge attacks double traffic at window boundaries; (4) Sliding Window Log — track precise timestamps of each request; memory-intensive; (5) Sliding Window Counter — weighted combination of adjacent fixed windows; best balance of accuracy and memory. In distributed systems, Redis atomic operations (Lua scripts or INCR + EXPIRE) maintain shared state across multiple API gateway instances.",
+    "keyPoints": [
+      "Token Bucket: allows controlled bursting; used by AWS API Gateway",
+      "Sliding Window Counter: most production-ready for distributed rate limiting",
+      "Redis INCR + EXPIRE provides atomic counter for distributed rate limiters",
+      "Response headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset",
+      "Applied at: API Gateway (Kong, Envoy), Load Balancer, Nginx, application middleware"
+    ]
+  },
+  {
+    "id": "sd-circuit-breaker",
+    "term": "Circuit Breaker Pattern",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A resilience design pattern that prevents cascading failures by automatically stopping requests to a failing downstream service and allowing it time to recover.",
+    "explanation": "The Circuit Breaker wraps calls to a remote service and monitors for failures. It operates in three states: (1) Closed — normal operation; requests flow through; failures are counted; (2) Open — failure threshold exceeded; all requests fail immediately without calling the service; a timer starts; (3) Half-Open — after the timeout, a limited number of test requests are allowed through; if they succeed, the circuit closes; if they fail, it opens again. This prevents cascading failures where a slow or failing service causes all upstream services to exhaust their thread pools waiting for timeouts. Libraries: Resilience4j (Java), Polly (.NET), PyBreaker (Python).",
+    "keyPoints": [
+      "Three states: Closed (normal) → Open (fail fast) → Half-Open (probe recovery)",
+      "Failure threshold: circuit opens after N failures in a rolling window",
+      "Timeout: circuit stays open for T seconds before entering half-open",
+      "Combined with: fallback responses, retry with exponential backoff, bulkhead isolation",
+      "Resilience4j and Hystrix implement Circuit Breaker for JVM microservices"
+    ]
+  },
+  {
+    "id": "sd-event-sourcing",
+    "term": "Event Sourcing",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "An architectural pattern where the state of a system is derived by replaying a sequence of immutable events stored in an append-only event log, rather than persisting current state directly.",
+    "explanation": "Event Sourcing stores every state change as an immutable event in an append-only log. The current state is derived by replaying all events from the beginning (or from a snapshot). This provides complete audit history, enables temporal queries (what was the state at time T?), supports event-driven projections, and simplifies debugging. Snapshots are used to avoid replaying the entire history. Event Sourcing is commonly paired with CQRS: commands generate events that update the write model; projections build read models optimized for specific queries. Apache Kafka is commonly used as the event store. Challenges include event schema evolution and maintaining projections.",
+    "keyPoints": [
+      "Events are immutable facts: \"OrderPlaced\", \"PaymentProcessed\", \"ItemShipped\"",
+      "Current state = replay all events from initial state",
+      "Snapshots periodically checkpoint state to avoid full history replay",
+      "Naturally pairs with CQRS — events update write model, projections build read models",
+      "Used in: banking systems, order management, audit-critical applications"
+    ]
+  },
+  {
+    "id": "sd-cqrs",
+    "term": "CQRS (Command Query Responsibility Segregation)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "An architectural pattern that separates read (query) and write (command) operations into distinct models, allowing each to be independently scaled and optimized.",
+    "explanation": "CQRS separates the data model used for writes (commands that mutate state) from the data model used for reads (queries that retrieve data). The command side uses a normalized, transaction-optimized write store (often relational). The query side uses a denormalized, query-optimized read store (often a document store, search index, or materialized view) tailored to specific UI or API read patterns. The two models are synchronized asynchronously via events. This allows the read side to be independently scaled (reads are typically 10–100x more frequent than writes), cached aggressively, and optimized without touching the write model. The trade-off is eventual consistency between write and read stores.",
+    "keyPoints": [
+      "Commands mutate state; Queries never mutate — strict separation",
+      "Write store: normalized, ACID, optimized for transactional integrity",
+      "Read store: denormalized, replicated, optimized per specific query pattern",
+      "Synchronization: domain events published on writes update read projections asynchronously",
+      "Pairs with Event Sourcing for full auditability and temporal query capability"
+    ]
+  },
+  {
+    "id": "sd-database-sharding",
+    "term": "Database Sharding",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A horizontal database scaling technique that partitions data across multiple independent database servers (shards), where each shard holds a disjoint subset of the total data.",
+    "explanation": "Sharding distributes rows across multiple database instances based on a shard key. Common sharding strategies: (1) Range-based — keys 1–1000 on shard 1, 1001–2000 on shard 2; simple but creates hot spots for sequential keys; (2) Hash-based — shard = hash(key) % N; even distribution but inflexible when N changes; (3) Consistent Hashing — overcomes the inflexibility of modulo hashing. Challenges include cross-shard joins (requires scatter-gather or application-level aggregation), cross-shard transactions (use SAGA or 2PC), and rebalancing when shards fill up. Shard key selection is the most critical architectural decision — a poor shard key creates hot shards.",
+    "keyPoints": [
+      "Shard key selection is critical: user_id is better than timestamp for hot-shard avoidance",
+      "Range sharding: simple queries; hash sharding: even distribution; consistent hashing: flexible",
+      "Cross-shard queries require scatter-gather: fan out to all shards, merge results",
+      "Cross-shard transactions: avoid 2PC at scale; prefer SAGA pattern with compensation",
+      "Examples: Vitess (MySQL sharding at YouTube), Citus (PostgreSQL sharding)"
+    ]
+  },
+  {
+    "id": "sd-replication",
+    "term": "Database Replication",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "The process of copying and maintaining database data across multiple servers (replicas) to achieve high availability, disaster recovery, and read scalability.",
+    "explanation": "Database replication keeps copies of data synchronized across multiple nodes. Leader-Follower (Master-Replica): all writes go to the leader; followers replicate and serve reads. This scales read throughput but introduces replication lag — followers may return stale data. Multi-Leader: multiple nodes accept writes; conflict resolution required (last-write-wins, vector clocks, CRDTs). Leaderless (Dynamo-style): any node accepts reads and writes; quorum reads/writes (W + R > N) ensure consistency. Synchronous replication: leader waits for at least one follower to confirm before acknowledging write — durable but slower. Asynchronous replication: leader immediately acknowledges — faster but risks losing committed data on leader failure.",
+    "keyPoints": [
+      "Leader-Follower: read scalability + HA; but replication lag causes stale reads",
+      "Synchronous replication: stronger durability guarantee; adds write latency",
+      "Asynchronous replication: lower write latency; risk of data loss on leader failure",
+      "Read-Your-Writes consistency: route reads after writes to the same leader or wait for replication",
+      "Semi-synchronous: at least one follower confirms before leader acks (MySQL default)"
+    ]
+  },
+  {
+    "id": "sd-two-phase-commit",
+    "term": "Two-Phase Commit (2PC)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A distributed consensus protocol that ensures all participating nodes in a distributed transaction either all commit or all abort, providing atomicity across multiple databases.",
+    "explanation": "2PC has two phases: (1) Prepare Phase — the coordinator sends a \"prepare\" message to all participants; each participant executes the transaction locally, writes to a WAL, and votes YES or NO; (2) Commit Phase — if all vote YES, the coordinator sends \"commit\"; if any vote NO, it sends \"abort\"; participants execute accordingly. Problems with 2PC: (1) Blocking — if the coordinator crashes after sending prepare but before commit, participants are left in an uncertain state, holding locks indefinitely; (2) Single point of failure — coordinator failure stalls the protocol; (3) Performance — two round trips add significant latency. For these reasons, SAGA pattern is preferred in modern microservice architectures.",
+    "keyPoints": [
+      "Phase 1 (Prepare): coordinator asks all participants to vote YES or NO",
+      "Phase 2 (Commit/Abort): coordinator sends final decision based on unanimous YES",
+      "Blocking failure: if coordinator crashes in phase 2, participants hold locks indefinitely",
+      "Three-Phase Commit (3PC) partially solves blocking but increases complexity",
+      "Modern alternative: SAGA Pattern avoids 2PC by using compensating transactions"
+    ]
+  },
+  {
+    "id": "sd-idempotency",
+    "term": "Idempotency in Distributed APIs",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "The property of an operation where performing it multiple times produces the same result as performing it once, making it safe to retry without causing unintended side effects.",
+    "explanation": "Idempotency is critical for reliable distributed systems where retries are inevitable (due to network failures, timeouts, or transient errors). HTTP GET, PUT, and DELETE are idempotent; POST is not by default. To make POST idempotent, clients include a unique Idempotency-Key header (UUID). The server stores the response for that key in Redis with a TTL; on retry, it returns the stored response without re-processing. This prevents double charges in payment systems, duplicate orders in e-commerce, and duplicate emails in notification systems. Idempotent operations must be designed carefully — side effects (like charging a card or sending a notification) must be deduplicated.",
+    "keyPoints": [
+      "Idempotency-Key: unique UUID per request stored in Redis with TTL",
+      "Server returns cached response on retry without re-executing business logic",
+      "Critical for: payment APIs (prevent double-charge), order placement, notification dispatch",
+      "Database upsert (INSERT ... ON CONFLICT DO UPDATE) is an idempotent write operation",
+      "Kafka consumer idempotency: track processed message IDs to prevent duplicate processing"
+    ]
+  },
+  {
+    "id": "sd-kafka-internals",
+    "term": "Apache Kafka Architecture",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A distributed event streaming platform based on a distributed commit log, providing high-throughput, durable, and fault-tolerant publish-subscribe messaging with configurable delivery guarantees.",
+    "explanation": "Kafka organizes data into Topics, which are split into Partitions (the unit of parallelism and ordering). Each partition is an ordered, immutable append-only log. Producers publish records to partitions; Consumers in Consumer Groups read from partitions (one partition is assigned to at most one consumer per group). Offsets track the position of each consumer within a partition. Brokers store partitions; a partition has one leader and N-1 followers (ISR — In-Sync Replicas). Kafka guarantees ordering within a partition, not across partitions. Delivery semantics: at-most-once (acks=0), at-least-once (acks=1 or acks=all with retry), exactly-once (idempotent producer + transactional API).",
+    "keyPoints": [
+      "Partitions are the unit of parallelism — more partitions = more consumer parallelism",
+      "Consumer Groups: each partition assigned to exactly one consumer per group",
+      "ISR (In-Sync Replicas): brokers that are fully caught up with the leader partition",
+      "acks=all + min.insync.replicas=2: strongest durability guarantee",
+      "Exactly-once semantics: enable.idempotence=true + transactional producer API"
+    ]
+  },
+  {
+    "id": "sd-vector-database",
+    "term": "Vector Database",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A database system optimized for storing, indexing, and querying high-dimensional vector embeddings, enabling semantic similarity search using approximate nearest neighbor algorithms.",
+    "explanation": "Vector databases store embeddings — numerical representations of data (text, images, audio) produced by ML models. Unlike traditional databases that search by exact match or range, vector DBs search by similarity in high-dimensional space. The core challenge is ANN (Approximate Nearest Neighbor) search — finding the K most similar vectors without scanning all vectors. Common ANN algorithms: HNSW (Hierarchical Navigable Small World) — graph-based, fast, high recall; IVF (Inverted File Index) — cluster-based, memory-efficient. Use cases: RAG pipelines, semantic search, recommendation systems, image similarity. Leading vector DBs: Pinecone, Weaviate, Qdrant, Chroma, Milvus, pgvector (PostgreSQL extension).",
+    "keyPoints": [
+      "Embeddings: dense float32/float16 vectors of 768–3072 dimensions from transformer models",
+      "HNSW: graph-based ANN index; best recall/speed tradeoff for most production use cases",
+      "Similarity metrics: Cosine similarity (normalized), Dot Product, Euclidean distance (L2)",
+      "Hybrid search: combines vector similarity with keyword BM25 for best of both worlds",
+      "pgvector: PostgreSQL extension for vector storage — good for small-scale (<1M vectors)"
+    ]
+  },
+  {
+    "id": "sd-rag-pipeline",
+    "term": "RAG (Retrieval-Augmented Generation)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "An AI architecture pattern that enhances LLM responses by first retrieving relevant context from an external knowledge base using semantic search, then passing it to the LLM as grounding context.",
+    "explanation": "RAG addresses LLM hallucinations and knowledge cutoffs by grounding responses in retrieved facts. The pipeline has two phases: (1) Indexing — documents are chunked, each chunk is embedded via an embedding model (e.g., text-embedding-3-large), and vectors are stored in a vector DB; (2) Querying — the user query is embedded, ANN search retrieves K most relevant chunks, the chunks plus the query are assembled into a prompt, and the LLM generates a grounded response. Key design decisions: chunk size (larger = more context, but retrieval precision drops), overlap (sliding window between chunks), embedding model dimensionality, reranking (use a cross-encoder to rerank top-K candidates), and query expansion.",
+    "keyPoints": [
+      "Chunking strategies: fixed-size, sentence-aware, semantic, document-structure-aware",
+      "Embedding models: text-embedding-3-small (1536-dim), text-embedding-3-large (3072-dim)",
+      "Reranking: cross-encoder rerankers significantly improve final retrieval precision",
+      "Hybrid retrieval: combine dense vector search with sparse BM25 for recall improvement",
+      "Hallucination mitigation: cite sources, answer-grounding check, self-consistency prompting"
+    ]
+  },
+  {
+    "id": "sd-load-balancing",
+    "term": "Load Balancing",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "The process of distributing incoming network traffic across multiple backend servers to ensure no single server is overwhelmed, improving throughput, availability, and fault tolerance.",
+    "explanation": "Load balancers operate at different layers: Layer 4 (transport) — routes based on IP/TCP without reading payload; fast but no application-aware routing. Layer 7 (application) — reads HTTP headers, URLs, and cookies to make routing decisions; enables path-based routing, sticky sessions, A/B testing. Algorithms: Round Robin (equal turn), Weighted Round Robin (based on capacity), Least Connections (send to server with fewest active connections), IP Hash (consistent routing for session affinity), Consistent Hashing (for caching layers). Types: Hardware (F5), Software (NGINX, HAProxy), Cloud-native (AWS ALB/NLB, Azure Load Balancer, GCP Cloud Load Balancing).",
+    "keyPoints": [
+      "Layer 4 (TCP/UDP): fast; no application awareness; used for database load balancing",
+      "Layer 7 (HTTP): path-based routing, A/B testing, header-based routing, SSL termination",
+      "Least Connections: optimal for long-lived requests (WebSocket, gRPC streaming)",
+      "Health checks: active (periodic probe) vs passive (circuit breaking on error rate)",
+      "Consistent Hashing in load balancers: used by Nginx upstream with hash $request_uri"
+    ]
+  },
+  {
+    "id": "sd-api-gateway",
+    "term": "API Gateway",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A server that acts as the single entry point for all API requests to a system, handling cross-cutting concerns like authentication, rate limiting, routing, load balancing, and observability.",
+    "explanation": "An API Gateway sits between clients and backend microservices, handling cross-cutting concerns that would otherwise be duplicated across every service. Functions: authentication/authorization (JWT validation, OAuth token introspection), rate limiting, request routing, SSL termination, request/response transformation, circuit breaking, observability (logging, metrics, distributed tracing), API versioning, and caching. Unlike a Load Balancer (which routes to identical server instances), an API Gateway routes to different microservices based on the request path. Examples: Kong (open-source, plugin-based), AWS API Gateway, Azure API Management, NGINX, Envoy (service mesh data plane), Apigee.",
+    "keyPoints": [
+      "Authentication: validates JWT or introspects OAuth token before routing to services",
+      "Rate Limiting: per-client, per-endpoint, or global rate limits enforced at edge",
+      "SSL Termination: decrypts HTTPS at gateway; backend services use plain HTTP internally",
+      "Request transformation: add/remove headers, reshape request body before forwarding",
+      "Kong, AWS APIGW, Azure APIM, Envoy are the dominant enterprise API Gateway solutions"
+    ]
+  },
+  {
+    "id": "sd-websocket",
+    "term": "WebSockets",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A full-duplex communication protocol over a single persistent TCP connection, enabling real-time bidirectional data exchange between client and server.",
+    "explanation": "WebSockets upgrade a standard HTTP connection (via the Upgrade header) to a persistent TCP connection. Unlike HTTP, which is request-response (client initiates every communication), WebSocket allows both client and server to push messages at any time. This enables real-time applications: chat systems, live dashboards, collaborative editing, gaming, stock tickers. Challenges at scale: WebSocket connections are stateful — a client must be connected to the same server. This requires sticky sessions (IP Hash load balancing) or a message broker (Redis Pub/Sub, Kafka) to fan out messages across server instances. Connection limits: a typical server can handle 100K–1M concurrent WebSocket connections with proper tuning.",
+    "keyPoints": [
+      "Upgrade from HTTP: client sends Upgrade: websocket header; server responds 101 Switching Protocols",
+      "Full-duplex: server can push without client request — enables real-time push notifications",
+      "Stateful: client connects to specific server — requires sticky sessions or shared message broker",
+      "Scale: use Redis Pub/Sub or Kafka to fan out messages across all connected gateway servers",
+      "Socket.io adds reconnection, rooms, namespaces, and fallback to long-polling over WebSockets"
+    ]
+  },
+  {
+    "id": "sd-grpc",
+    "term": "gRPC",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A high-performance, open-source RPC framework developed by Google using Protocol Buffers for serialization and HTTP/2 for transport, supporting four communication patterns including bidirectional streaming.",
+    "explanation": "gRPC uses Protocol Buffers (protobuf) as the interface definition language and wire format — binary, typed, and ~10x smaller than equivalent JSON. HTTP/2 provides multiplexing (multiple streams over one connection), header compression, and binary framing. Four communication patterns: (1) Unary RPC — single request, single response (like REST); (2) Server Streaming — one request, multiple responses; (3) Client Streaming — multiple requests, single response; (4) Bidirectional Streaming — both sides stream concurrently. Advantages: strongly typed contracts, code generation across 10+ languages, built-in deadlines/cancellation, interceptors (middleware). Disadvantages: harder to debug than REST JSON; requires protobuf tooling; limited browser support.",
+    "keyPoints": [
+      "Protocol Buffers: binary serialization — 3–10x smaller and faster than JSON",
+      "HTTP/2 multiplexing: multiple concurrent streams over one TCP connection",
+      "Four patterns: Unary, Server Streaming, Client Streaming, Bidirectional Streaming",
+      "Interceptors: middleware for auth, logging, metrics, retries in gRPC",
+      "Ideal for: internal microservice communication; ML model serving; high-throughput data APIs"
+    ]
+  },
+  {
+    "id": "sd-microservices",
+    "term": "Microservices Architecture",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "An architectural style where an application is built as a suite of small, independently deployable services, each running in its own process and communicating via well-defined APIs.",
+    "explanation": "Microservices decompose a monolithic application into small services, each owning its domain data, deployable independently, and scalable individually. Each service is responsible for a bounded context — a distinct business capability. Communication is via REST, gRPC, or asynchronous events (Kafka). Benefits: independent deployment, technology heterogeneity, fault isolation, targeted scaling. Challenges: distributed systems complexity (CAP theorem, eventual consistency), service discovery, distributed tracing, network latency, data consistency across services (requires SAGA), operational overhead (service mesh, container orchestration). Conway's Law: teams build systems that mirror their communication structure — microservices must align with team boundaries.",
+    "keyPoints": [
+      "Each service owns its data — no shared databases across service boundaries",
+      "Service-to-service: synchronous (REST/gRPC) or asynchronous (Kafka event bus)",
+      "Service Discovery: Consul, Kubernetes DNS, Eureka for dynamic service location",
+      "Distributed Tracing: Jaeger, Zipkin, OpenTelemetry for cross-service request tracking",
+      "Anti-pattern: Distributed Monolith — microservices that deploy together and share databases"
+    ]
+  },
+  {
+    "id": "sd-service-mesh",
+    "term": "Service Mesh",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "ARCHITECT",
+    "definition": "A dedicated infrastructure layer for handling service-to-service communication in a microservices architecture, implemented as a network of sidecar proxies deployed alongside each service.",
+    "explanation": "A service mesh (e.g., Istio, Linkerd) addresses the complexity of microservice communication by offloading cross-cutting concerns from application code to a proxy layer (sidecar). Each service pod has a proxy sidecar (e.g., Envoy) injected alongside it. The data plane handles: mTLS (mutual TLS) for service-to-service encryption and authentication, traffic management (retries, timeouts, circuit breaking), observability (distributed traces, metrics, access logs). The control plane (Istiod) distributes routing rules and certificates to all sidecars. This removes the need for service-specific resilience code (no more Hystrix per service) and enables fine-grained traffic policies without deployment changes.",
+    "keyPoints": [
+      "Sidecar proxy (Envoy): intercepts all network traffic in/out of the service container",
+      "mTLS: automatic mutual TLS between all services — zero-trust service identity",
+      "Traffic management: canary deployments, A/B testing, retries, fault injection via config",
+      "Observability: automatic distributed traces, metrics, access logs without code changes",
+      "Istio and Linkerd are the dominant service meshes in Kubernetes environments"
+    ]
+  },
+  {
+    "id": "sd-bloom-filter",
+    "term": "Bloom Filter",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A space-efficient probabilistic data structure used to test whether an element is a member of a set, with zero false negatives but a configurable false positive rate.",
+    "explanation": "A Bloom Filter uses multiple hash functions and a bit array. To add an element, hash it K times and set those K bits to 1. To check membership, hash the element K times and check if all K bits are 1 — if any bit is 0, the element is definitely NOT in the set; if all bits are 1, the element is PROBABLY in the set (false positive possible). False positives can be tuned by adjusting the bit array size (m) and number of hash functions (k). Bloom filters cannot delete elements (use Counting Bloom Filters for deletion). Use cases: database query optimization (avoid disk reads for keys that don't exist), cache penetration defense, distributed deduplication, Google BigTable (used per SSTable to avoid unnecessary disk reads).",
+    "keyPoints": [
+      "False negatives: impossible — if the filter says NO, the element is definitely absent",
+      "False positives: tunable — larger bit array = lower false positive rate",
+      "Space-efficient: 10 bits per element achieves ~1% false positive rate",
+      "Cannot delete elements from standard Bloom Filters (use Counting Bloom Filters instead)",
+      "Used in: BigTable, Cassandra (SSTable index), Redis, Chrome malware URL checker"
+    ]
+  },
+  {
+    "id": "sd-write-ahead-log",
+    "term": "Write-Ahead Log (WAL)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "An append-only log that records every database change before it is applied to the actual data files, providing durability and enabling crash recovery.",
+    "explanation": "WAL is the mechanism behind database durability in PostgreSQL, MySQL InnoDB, and most ACID-compliant databases. Before modifying a data page, the database writes the change to the WAL (a sequential append-only file on disk). On a crash, the database replays the WAL from the last checkpoint to restore uncommitted changes. WAL also enables replication: followers continuously tail the primary leader WAL stream to stay synchronized. Logical Decoding in PostgreSQL allows CDC tools (Debezium) to read WAL as a stream of logical changes (INSERT/UPDATE/DELETE) for event-driven architectures.",
+    "keyPoints": [
+      "WAL ensures Durability in ACID: changes survive crashes by being persisted before data pages",
+      "Checkpoint: periodic flush of dirty pages + WAL position; recovery replays from last checkpoint",
+      "Streaming replication: followers consume WAL stream from the primary in real-time",
+      "Logical Decoding: CDC tools (Debezium) read WAL as INSERT/UPDATE/DELETE event stream",
+      "WAL files are sequential writes — extremely fast even on HDDs due to disk seek elimination"
+    ]
+  },
+  {
+    "id": "sd-mvcc",
+    "term": "MVCC (Multi-Version Concurrency Control)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A concurrency control mechanism used by databases to allow multiple transactions to read and write data simultaneously without blocking each other, by maintaining multiple versions of each row.",
+    "explanation": "MVCC enables non-blocking reads in PostgreSQL, MySQL InnoDB, Oracle, and MongoDB. Each transaction sees a snapshot of the database at the moment the transaction started (snapshot isolation). Write transactions create new row versions rather than overwriting existing ones; old versions are kept until no transaction needs them. Readers never block writers; writers never block readers. Each row version has a creation transaction ID (xmin) and expiration transaction ID (xmax). PostgreSQL uses a background process (VACUUM / AUTOVACUUM) to clean up dead row versions (dead tuples) and reclaim storage.",
+    "keyPoints": [
+      "Readers never block writers; writers never block readers — maximum concurrency",
+      "Snapshot isolation: each transaction sees a consistent point-in-time snapshot of the DB",
+      "Dead tuples: old row versions accumulate and must be cleaned by AUTOVACUUM",
+      "xmin/xmax: PostgreSQL row-level timestamps determine visibility for each transaction",
+      "Serializable Snapshot Isolation (SSI): PostgreSQL detects phantom reads using MVCC"
+    ]
+  },
+  {
+    "id": "sd-connection-pooling",
+    "term": "Connection Pooling",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A technique that maintains a pool of pre-established database connections that are reused by multiple clients, reducing the overhead of creating and tearing down connections for each request.",
+    "explanation": "Creating a PostgreSQL connection is expensive: it forks a new backend process, performs SSL handshake, authenticates, and allocates ~5MB of shared memory. Under load, thousands of direct connections overwhelm the database server. Connection poolers (PgBouncer, HikariCP, pgpool-II) sit between the application and database, maintaining a small pool of long-lived connections and multiplexing thousands of application requests over them. PgBouncer modes: Session pooling (safest), Transaction pooling (most efficient — connection returned to pool at end of transaction), Statement pooling (least compatible). For PostgreSQL at scale, limiting to 200–400 database connections via PgBouncer is standard practice.",
+    "keyPoints": [
+      "PostgreSQL max_connections default is 100; each connection uses ~5MB RAM",
+      "PgBouncer transaction-mode pooling: most efficient; 10K app connections → 50 DB connections",
+      "HikariCP: Java JDBC connection pool; considered the fastest in the JVM ecosystem",
+      "Connection storms: all instances restart simultaneously and spike DB connections — stagger startups",
+      "Cloud-native: RDS Proxy (AWS), Cloud SQL Proxy (GCP) provide managed connection pooling"
+    ]
+  },
+  {
+    "id": "sd-gossip-protocol",
+    "term": "Gossip Protocol",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A peer-to-peer communication protocol where nodes periodically exchange state information with random peers, enabling fast dissemination of information across a cluster without a central coordinator.",
+    "explanation": "Gossip (also called epidemic protocol) works like rumor spreading: each node periodically selects K random peers and exchanges its known state. Information propagates exponentially fast — in O(log N) rounds, all N nodes learn new information. Properties: highly available (no single point of failure), self-healing (node failures automatically detected via heartbeat age), eventual consistency (all nodes eventually converge). Used in: Apache Cassandra (ring topology, token ownership, node health), Redis Cluster (cluster state propagation), AWS DynamoDB (membership management), Serf (cluster membership), Hashicorp Consul.",
+    "keyPoints": [
+      "Convergence time: O(log N) rounds to propagate info to all N nodes",
+      "Failure detection: nodes stop receiving gossip heartbeats from failed nodes",
+      "Anti-entropy: nodes periodically sync full state to repair missed gossip messages",
+      "Used in: Cassandra (token ring topology), Redis Cluster, Consul, Serf, AWS DynamoDB",
+      "Fan-out: each node gossips to K peers per round; higher K = faster convergence, more bandwidth"
+    ]
+  },
+  {
+    "id": "sd-raft-consensus",
+    "term": "Raft Consensus Algorithm",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "ARCHITECT",
+    "definition": "A distributed consensus algorithm designed for understandability, providing leader election and replicated log management to ensure all nodes in a cluster agree on the same state sequence.",
+    "explanation": "Raft decomposes consensus into three sub-problems: (1) Leader Election — nodes start as followers; after an election timeout, a follower becomes a candidate and requests votes; whichever gets a majority becomes leader; (2) Log Replication — the leader appends entries to its log and replicates to followers; an entry is committed once a majority acknowledges it; (3) Safety — a leader with an incomplete log cannot be elected (vote restriction based on log completeness). Terms are monotonically increasing integers — each leadership period is a term. Raft is used in etcd (Kubernetes), CockroachDB, TiKV, HashiCorp Consul, and InfluxDB.",
+    "keyPoints": [
+      "Leader Election: majority vote required; split votes trigger new election after timeout",
+      "Log Replication: leader sends AppendEntries RPC; entry committed when majority acknowledges",
+      "Safety: candidates with stale logs cannot win elections — prevents log divergence",
+      "Split-brain prevention: majority quorum means only one partition can elect a leader",
+      "Used in: etcd (Kubernetes state store), CockroachDB, TiKV, Consul, InfluxDB"
+    ]
+  },
+  {
+    "id": "sd-redis-data-structures",
+    "term": "Redis Data Structures",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "Redis provides rich server-side data structures (Strings, Hashes, Lists, Sets, Sorted Sets, HyperLogLog, Streams, Geospatial indexes) that enable it to solve a wide range of use cases beyond simple caching.",
+    "explanation": "Redis is not just a key-value store — its data structures enable complex operations server-side without round trips: Strings for counters, sessions, feature flags; Hashes for user profiles (field-level updates without full rewrite); Lists for activity feeds, job queues (LPUSH/RPOP); Sets for unique visitor tracking, tag systems (SADD, SMEMBERS, SINTERSTORE); Sorted Sets for leaderboards, rate limiting by score (ZADD, ZRANGE, ZREVRANGE); HyperLogLog for cardinality estimation (10K unique visitors uses only 12KB); Streams for durable event log (persistent pub/sub, consumer groups); Geospatial for location-based queries (GEOADD, GEODIST, GEOSEARCH).",
+    "keyPoints": [
+      "Sorted Sets: O(log N) insert and range query — perfect for real-time leaderboards",
+      "HyperLogLog: probabilistic cardinality estimation with <1% error using only 12KB RAM",
+      "Redis Streams: durable event log with consumer groups — lightweight Kafka alternative",
+      "Lua scripting: execute multi-command operations atomically without external transaction",
+      "BITFIELD: compact storage for boolean arrays; BitMap for user activity tracking (DAU counting)"
+    ]
+  },
+  {
+    "id": "sd-distributed-tracing",
+    "term": "Distributed Tracing",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "An observability technique that tracks the flow of a request through multiple services in a distributed system, correlating all spans into a single trace to identify latency bottlenecks and failure points.",
+    "explanation": "In a microservices system, a single user request may pass through 10+ services. Distributed tracing assigns a unique trace ID to each request and propagates it via HTTP headers (W3C TraceContext standard). Each service creates a span — a timed operation within the trace. Spans are linked by parent-child relationships, forming a tree (trace). Collected spans are sent to a tracing backend (Jaeger, Zipkin, AWS X-Ray, Datadog APM) for visualization. This reveals: which service is the slowest, where errors originate, and which downstream calls contribute most to tail latency. OpenTelemetry is the vendor-neutral standard for instrumenting services with traces, metrics, and logs.",
+    "keyPoints": [
+      "Trace ID: unique identifier propagated across all services via HTTP headers",
+      "Span: a named, timed unit of work within a trace (one span per service boundary)",
+      "W3C TraceContext: standard format for trace propagation headers (traceparent, tracestate)",
+      "OpenTelemetry: CNCF standard SDK for traces + metrics + logs — vendor-neutral",
+      "Jaeger and Zipkin: open-source tracing backends; Datadog/NewRelic for enterprise"
+    ]
+  },
+  {
+    "id": "sd-cdn",
+    "term": "Content Delivery Network (CDN)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "EASY",
+    "definition": "A geographically distributed network of proxy servers (Points of Presence) that cache and serve static and dynamic content closer to end users, reducing latency and origin server load.",
+    "explanation": "CDNs work by replicating content across hundreds of PoPs (Points of Presence) globally. User requests are routed via Anycast DNS to the nearest PoP. If the PoP has the content cached (cache hit), it serves directly — sub-10ms latency for static assets. On a cache miss, the PoP fetches from the origin server, caches the response, and serves the user. CDNs serve: static assets (JS, CSS, images, fonts), large file downloads, video streaming (adaptive bitrate), and increasingly dynamic content via edge compute (Cloudflare Workers, Lambda@Edge). Cache invalidation: URL versioning (content hashing), cache purge API calls, Cache-Control headers (max-age, stale-while-revalidate).",
+    "keyPoints": [
+      "Anycast DNS: routes user to geographically nearest PoP automatically",
+      "Cache-Control: max-age, s-maxage, stale-while-revalidate control CDN caching behavior",
+      "Purge API: invalidate specific URLs from CDN cache on content update",
+      "Edge compute: Cloudflare Workers, Lambda@Edge for dynamic logic at CDN edge",
+      "Providers: Cloudflare, AWS CloudFront, Akamai, Fastly, Azure CDN, Google Cloud CDN"
+    ]
+  },
+  {
+    "id": "sd-dns-resolution",
+    "term": "DNS Resolution & Load Balancing",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "The process by which domain names are translated to IP addresses through a hierarchical distributed database, and how DNS is used for traffic distribution and failover in large-scale systems.",
+    "explanation": "DNS resolution: browser cache → OS cache → Recursive Resolver (ISP) → Root Nameserver → TLD Nameserver → Authoritative Nameserver. TTL controls how long DNS entries are cached — short TTL enables fast failover but increases DNS query load. DNS-based load balancing: return multiple A records; clients round-robin across IPs. Weighted routing: AWS Route 53 can return different IPs based on weights (A/B traffic split), latency (route to nearest region), health checks (automatic failover). Geo DNS: return different IPs based on user geography for multi-region routing. Anycast: same IP announced from multiple locations — BGP routes to nearest PoP.",
+    "keyPoints": [
+      "DNS TTL: short TTL enables fast failover; long TTL reduces DNS query load but slows updates",
+      "AWS Route 53: supports latency-based, geolocation, weighted, and failover routing policies",
+      "Anycast: same IP from multiple PoPs — BGP routing directs to geographically nearest server",
+      "Split-horizon DNS: return private IPs to internal clients, public IPs to external clients",
+      "DNS propagation delay: TTL expiry required for changes to propagate across all resolvers"
+    ]
+  },
+  {
+    "id": "sd-token-bucket",
+    "term": "Token Bucket Algorithm",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "A rate limiting algorithm that models a bucket holding a maximum of N tokens, where tokens are added at a fixed rate and each request consumes one token, allowing controlled burst traffic.",
+    "explanation": "The Token Bucket algorithm is the most widely used rate limiting algorithm. A bucket with capacity B tokens refills at rate R tokens/second. Each incoming request consumes one token. If the bucket has tokens available, the request is processed; if empty, the request is rejected (or queued). Key property: burst traffic is allowed up to the bucket capacity, making it suitable for APIs that need to absorb temporary spikes. Implementation: store the current token count and last refill timestamp in Redis; on each request, calculate tokens earned since last refill (elapsed_time × rate), cap at max capacity, deduct one, and update Redis atomically via Lua script. AWS API Gateway, GCP Cloud Endpoints, and most API gateways use token bucket internally.",
+    "keyPoints": [
+      "Bucket capacity B: maximum burst allowed at once; refill rate R: sustained request rate",
+      "Lua script in Redis: atomic check-and-decrement prevents race conditions across instances",
+      "Allows bursts up to B requests immediately — better UX than leaky bucket for APIs",
+      "Leaky Bucket: processes at fixed rate regardless of burst — smooths output, no burst tolerance",
+      "AWS API Gateway, GCP, Azure APIM all use token bucket for default rate limiting"
+    ]
+  },
+  {
+    "id": "sd-horizontal-vs-vertical",
+    "term": "Horizontal vs Vertical Scaling",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "EASY",
+    "definition": "Two fundamental scaling strategies: vertical scaling adds more resources (CPU, RAM) to a single server; horizontal scaling adds more servers to distribute the load.",
+    "explanation": "Vertical Scaling (Scale Up): upgrade the server to more powerful hardware — more CPU cores, more RAM, faster SSD. Simple (no application changes needed), but has a hardware ceiling, single point of failure, and requires downtime for upgrades. Cost grows non-linearly with scale. Horizontal Scaling (Scale Out): add more servers of the same size and distribute load across them via a load balancer. No theoretical ceiling, fault-tolerant (losing one server does not take down the system), enables geographic distribution. Requires the application to be stateless (no session state on individual servers) or use shared state (Redis for sessions, S3 for files). Databases are harder to scale horizontally (sharding required).",
+    "keyPoints": [
+      "Vertical: simple; no app changes; but has ceiling, SPOF, and requires downtime",
+      "Horizontal: no ceiling; fault-tolerant; but requires stateless design and load balancer",
+      "Stateless horizontal scaling: store sessions in Redis, files in S3/blob storage",
+      "Databases: vertical scaling hits IOPS limits quickly; horizontal requires sharding",
+      "Auto-scaling: Kubernetes HPA and AWS Auto Scaling Groups automate horizontal scaling"
+    ]
+  },
+  {
+    "id": "sd-data-replication-strategies",
+    "term": "Replication Strategies: Leader-Follower vs Multi-Leader vs Leaderless",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "Three fundamental approaches to replicating data across distributed nodes, each with different consistency guarantees, write scaling properties, and conflict handling requirements.",
+    "explanation": "Leader-Follower: one node accepts all writes (leader); followers replicate and serve reads. Simple, no conflicts, but write throughput limited to leader capacity. Used by PostgreSQL, MySQL, MongoDB. Multi-Leader (Active-Active): multiple nodes accept writes independently; requires conflict resolution (last-write-wins, CRDTs, or manual merge). Used in geographically distributed systems (CockroachDB, Cassandra multi-DC). Leaderless (Dynamo-style): any node accepts reads and writes; quorum-based consistency — W write confirmations + R read confirmations must satisfy W + R > N (total replicas). Amazon DynamoDB, Cassandra, Riak. Sloppy Quorum: during network partition, accept writes on non-designated replicas and sync later (hinted handoff).",
+    "keyPoints": [
+      "Leader-Follower: simple, consistent; write bottleneck at leader; replication lag on reads",
+      "Multi-Leader: multi-region write scaling; requires conflict resolution strategy",
+      "Leaderless: quorum reads/writes — W+R>N ensures reading at least one up-to-date replica",
+      "Hinted Handoff: during partition, accept writes on available node and sync when partitioned node recovers",
+      "CRDT: conflict-free replicated data type — mathematically guaranteed to converge without coordination"
+    ]
+  },
+  {
+    "id": "sd-change-data-capture",
+    "term": "Change Data Capture (CDC in Distributed Systems)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A design pattern that captures and streams every row-level INSERT, UPDATE, and DELETE event from a source database as a continuous event stream, enabling real-time data integration and event-driven architectures.",
+    "explanation": "CDC extracts changes from a database transaction log (WAL in PostgreSQL, binlog in MySQL) rather than polling tables, providing low-latency (sub-second) change propagation. Debezium is the dominant open-source CDC platform: it reads PostgreSQL WAL via logical replication slots, or MySQL binlog, and publishes events to Kafka topics. Use cases: event sourcing (Kafka as system of record), cache invalidation (invalidate Redis on DB change), search index sync (Elasticsearch real-time indexing), data warehouse ingestion (stream to BigQuery/Snowflake without batch ETL), microservice sync. Each CDC event contains: before state, after state, operation type, timestamp, and transaction ID.",
+    "keyPoints": [
+      "Debezium: CDC connector for PostgreSQL, MySQL, SQL Server, MongoDB → Kafka",
+      "PostgreSQL CDC: uses logical replication slots; output plugin: pgoutput (native) or wal2json",
+      "CDC event structure: before/after row state + op type (c=create, u=update, d=delete, r=read)",
+      "Snapshot mode: initial snapshot of existing table data before streaming ongoing changes",
+      "Use cases: cache invalidation, search index sync, event sourcing, data lake ingestion"
+    ]
+  },
+  {
+    "id": "sd-monolith-to-microservices",
+    "term": "Monolith to Microservices Migration",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "ARCHITECT",
+    "definition": "The incremental decomposition of a monolithic application into microservices using patterns like Strangler Fig, anti-corruption layers, and domain-driven design bounded contexts.",
+    "explanation": "The Strangler Fig Pattern (Martin Fowler) is the safest migration strategy: incrementally extract functionality from the monolith service by service, routing specific traffic to new services via a facade/proxy. The monolith shrinks as services are extracted. Steps: (1) Identify bounded contexts using DDD; (2) Extract a single service (start with lowest-risk, least-coupled feature); (3) Route traffic to the new service via the proxy; (4) Validate; (5) Repeat. Anti-corruption Layer: an adapter between the old monolith API contracts and new service APIs, preventing legacy data models from contaminating new services. Database decomposition: start with logical separation (schema-per-service in the same DB), then physical separation (separate DB servers).",
+    "keyPoints": [
+      "Strangler Fig: route traffic through facade; incrementally extract services without big bang",
+      "Start with least-coupled, least-risky bounded context for first extraction",
+      "Anti-corruption Layer: adapter/translator between legacy and new service data models",
+      "Database decomposition: logical → physical separation; use SAGA for cross-service transactions",
+      "Conway Law: team structure must evolve alongside service structure — align teams to services"
+    ]
+  },
+  {
+    "id": "sd-feature-flag",
+    "term": "Feature Flags (Feature Toggles)",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "EASY",
+    "definition": "A software development technique that allows features to be enabled or disabled at runtime without deploying new code, enabling safe rollouts, A/B testing, and instant rollback.",
+    "explanation": "Feature flags decouple deployment from release. Types: (1) Release flags — enable features for gradual rollout (1% → 10% → 100% of users); (2) Experiment flags — A/B test different feature variants; (3) Ops flags — operational kill switches for emergency disabling of features; (4) Permission flags — enable features for specific user segments (beta users, premium subscribers). Implementation: flags are stored in a fast config store (Redis, LaunchDarkly, Unleash) evaluated on each request. Best practices: flags have owners, TTLs, and are cleaned up after rollout. Never leave permanent code littered with old flags — technical debt accumulates rapidly.",
+    "keyPoints": [
+      "Release flags: progressive rollout — 1% canary → 10% → 50% → 100% of traffic",
+      "Ops flags: emergency kill switch to disable a misbehaving feature without deployment",
+      "A/B testing: route users to variant A or B; measure conversion metrics",
+      "LaunchDarkly, Unleash, Split, Flagsmith: dedicated feature flag management platforms",
+      "Flag cleanup: set expiry date on all flags; review and remove after full rollout"
+    ]
+  },
+  {
+    "id": "sd-distributed-id",
+    "term": "Distributed ID Generation",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "Strategies for generating globally unique, sortable identifiers across multiple distributed nodes without coordination, avoiding the single-point-of-failure of auto-increment sequences.",
+    "explanation": "Traditional auto-increment IDs require a central database sequence — a single point of failure and a write bottleneck. Distributed ID strategies: (1) UUID v4 — 128-bit random; globally unique but not sortable, large index footprint, poor cache locality; (2) Twitter Snowflake — 64-bit ID: 41-bit timestamp + 10-bit machine ID + 12-bit sequence; sortable by time, compact, no coordination; (3) ULID — 128-bit: 48-bit timestamp + 80-bit random; URL-safe, sortable, monotonic within a millisecond; (4) NanoID — URL-safe, compact, customizable alphabet; (5) Database Sequence with range allocation — nodes claim ranges from a central sequence table (e.g., range [1001–2000]) and exhaust them locally.",
+    "keyPoints": [
+      "UUID v4: truly random; not sortable; causes B-Tree index fragmentation at scale",
+      "Twitter Snowflake: 41-bit timestamp + 10-bit machineID + 12-bit seq; sortable, no coordination",
+      "ULID: URL-safe Base32; sortable; monotonic ordering within same millisecond",
+      "Range allocation: node claims range [N, N+1000] from central table; no per-request coordination",
+      "Sortable IDs improve B-Tree index locality and reduce page splits in PostgreSQL"
+    ]
+  },
+  {
+    "id": "sd-bulkhead-pattern",
+    "term": "Bulkhead Pattern",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "HARD",
+    "definition": "A resilience pattern that isolates critical resources (thread pools, connection pools) into separate compartments so that failure in one part does not cascade to consume all resources and bring down other parts.",
+    "explanation": "Named after the watertight compartments in ships (bulkheads prevent flooding the whole ship if one compartment is breached), this pattern applies resource isolation at the service level. Thread Pool Bulkhead: each downstream service call gets its own fixed-size thread pool; if Service B is slow and exhausts its thread pool, Service C operations are unaffected. Connection Pool Bulkhead: separate DB connection pools for read-heavy and write-heavy operations. Semaphore Bulkhead: limit concurrent calls to a downstream service via a semaphore count. Combined with Circuit Breaker and Rate Limiting, Bulkhead prevents the most common cascading failure mode — thread pool saturation propagating across service boundaries.",
+    "keyPoints": [
+      "Thread Pool Bulkhead: isolated fixed-size thread pool per downstream dependency",
+      "Semaphore Bulkhead: lightweight alternative — limits concurrent calls without thread overhead",
+      "Prevents cascading failure from slow/failed downstream service consuming all shared threads",
+      "Resilience4j: @Bulkhead annotation for thread pool and semaphore bulkheads in Java",
+      "Combined with Circuit Breaker: Bulkhead limits in-flight calls; CB stops failed calls"
+    ]
+  },
+  {
+    "id": "sd-zero-downtime-deployment",
+    "term": "Zero-Downtime Deployment",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "Deployment strategies that update production services without interrupting user traffic or causing downtime, using techniques like Blue-Green, Canary, and Rolling deployments.",
+    "explanation": "Blue-Green: maintain two identical production environments (blue=live, green=new version); after validation, switch load balancer to point all traffic to green; instant rollback by switching back to blue. Canary: route a small percentage (1–5%) of traffic to the new version while the rest uses the old; gradually increase if metrics are healthy; rollback by routing all traffic back. Rolling: incrementally replace old instances with new ones; at any point, both old and new serve traffic simultaneously. Feature Flags decouple deployment from release — deploy code with the feature disabled, then enable it independently. Database migrations require backward compatibility: use the expand-contract pattern for schema changes (add new column → migrate data → remove old column).",
+    "keyPoints": [
+      "Blue-Green: instant rollback; requires 2x infrastructure cost for the switch period",
+      "Canary: progressive risk; real user traffic validates; automated rollback on error rate spike",
+      "Rolling: resource-efficient; mixed versions serve simultaneously — requires backward compatibility",
+      "Expand-Contract: add new column → populate → migrate code → remove old column (schema safety)",
+      "Kubernetes: RollingUpdate strategy, Argo Rollouts for canary/blue-green with analysis"
+    ]
+  },
+  {
+    "id": "sd-observability",
+    "term": "Observability: Metrics, Logs, Traces",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "The three pillars of production system observability that provide visibility into system health and behaviour: Metrics (quantitative time-series), Logs (structured event records), and Traces (request-path visualization).",
+    "explanation": "Metrics: numerical time-series data aggregated over time — latency percentiles (p50/p95/p99), error rate, throughput (RPS), saturation (CPU, memory). Prometheus scrapes metrics in pull model; Grafana visualizes. Logs: structured or unstructured text records of discrete events — request logs, error logs, audit logs. ELK stack (Elasticsearch, Logstash, Kibana) or Loki+Grafana for log aggregation. Distributed Traces: request flow visualization across services — OpenTelemetry instrumentation + Jaeger/Zipkin backend. The four Golden Signals (Google SRE): Latency, Traffic, Errors, Saturation. SLI (Service Level Indicator) + SLO (Service Level Objective) + SLA (Service Level Agreement) framework for reliability contracts.",
+    "keyPoints": [
+      "Four Golden Signals (Google SRE): Latency, Traffic (RPS), Errors (rate), Saturation (util%)",
+      "Prometheus + Grafana: standard open-source stack for metrics collection and visualization",
+      "OpenTelemetry: vendor-neutral SDK for traces + metrics + logs — auto-instrumentation available",
+      "SLO: internal reliability target (99.9% availability); SLA: external contractual guarantee",
+      "Cardinality problem: high-cardinality labels (user_id) in metrics cause Prometheus memory explosion"
+    ]
+  },
+  {
+    "id": "sd-postgres-indexing",
+    "term": "PostgreSQL Index Types & Optimization",
+    "category": "SYSTEM DESIGN",
+    "difficulty": "MEDIUM",
+    "definition": "PostgreSQL provides multiple index types (B-Tree, Hash, GIN, GiST, BRIN, SP-GiST) each optimized for different data types and query patterns, with strategic indexing being critical for query performance.",
+    "explanation": "B-Tree: the default; supports equality, range, ORDER BY, and LIKE prefix queries; balanced tree structure for O(log N) lookups. Hash: equality-only; faster than B-Tree for point lookups but cannot do range queries; not WAL-logged prior to PG10. GIN (Generalized Inverted Index): for multi-valued attributes — full-text search (tsvector), JSONB fields, arrays; fast lookup but slow to update. GiST: for geometric data, full-text search, network addresses; extensible structure. BRIN (Block Range Index): for large, naturally ordered tables (timestamps, sequential IDs); tiny index footprint at the cost of lower precision. Partial Index: index only rows matching a WHERE clause — smaller, faster. Covering Index: INCLUDE additional columns to enable index-only scans.",
+    "keyPoints": [
+      "B-Tree: default; equality + range + ORDER BY; use for most columns with selective queries",
+      "GIN: multi-valued types (JSONB, full-text tsvector, arrays); fast lookup, slow writes",
+      "BRIN: block-range index for naturally ordered large tables; tiny size, moderate selectivity",
+      "Partial Index: CREATE INDEX ON orders(status) WHERE status != closed — much smaller index",
+      "EXPLAIN ANALYZE: always inspect actual execution plan before and after adding indexes"
+    ]
   }
 ]

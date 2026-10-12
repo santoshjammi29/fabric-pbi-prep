@@ -303,4 +303,26 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
       architect: 'Distributed Python runtime topologies, high-throughput streaming consumers, polyglot Arrow IPC pipelines, and Petabyte-scale Python microservice architecture.'
     }
   },
+  {
+    key: 'system-design',
+    label: 'System Design & Distributed Systems',
+    icon: '🏛️',
+    domain: 'Distributed Compute',
+    gradient: 'from-blue-600 to-indigo-700',
+    description: 'CAP theorem, distributed caching, SAGA transactions, sharding & high-scale HLD',
+    executiveSummary: 'Master end-to-end distributed system design and data architecture: CAP/PACELC trade-offs, SAGA orchestration vs choreography, consistent hashing rings, Redis caching resilience (stampede/avalanche/penetration), database sharding, and zero-downtime migrations.',
+    diagramId: 'kafka-event-streaming-pipeline',
+    relatedDiagramIds: ['cdc-debezium-lakehouse-pipeline', 'sql-server-query-engine-optimization', 'rag-vector-search-data-pipeline'],
+    conceptCategories: ['SYSTEM DESIGN', 'DATABASE ARCHITECTURE'],
+    questionCategories: ['SYSTEM DESIGN', 'MODERN DATABASE ARCHITECTURE', 'KAFKA'],
+    archKeywords: ['MODERN DATABASE ARCHITECTURE', 'MODERN ARCHITECTURE PARADIGMS', 'APACHE KAFKA & REAL-TIME CDC ARCHITECTURE', 'LLM & RAG INFRASTRUCTURE PIPELINES'],
+    deKeywords: ['DATA ENGINEERING', 'BIG DATA'],
+    stages: {
+      foundations: 'Horizontal vs vertical scaling, basic load balancing (L4 vs L7), Cache-Aside pattern, connection pooling, and ACID vs BASE.',
+      core: 'CAP Theorem trade-offs, Redis data structures (Sorted Sets, Hashes), Rate limiting (Token Bucket/Sliding Window), and Read Replicas.',
+      advanced: 'Consistent hashing rings with virtual nodes, SAGA pattern with compensating transactions, Outbox pattern with CDC, and Circuit Breakers.',
+      architect: 'Multi-region active-active distributed databases, Raft consensus split-brain mitigation, 10M DAU scaling blueprints, and zero-downtime expand-contract migrations.'
+    }
+  },
 ];
+
