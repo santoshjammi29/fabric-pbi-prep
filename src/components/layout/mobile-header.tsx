@@ -41,7 +41,6 @@ const navGroups: NavGroup[] = [
     title: "Portal",
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
-      { label: "My Studio", href: "/studio", icon: User, badge: "Personal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
     ],
   },
   {
@@ -53,11 +52,10 @@ const navGroups: NavGroup[] = [
         icon: Compass,
         badge: "The Roadmap",
         badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        matches: ["/guided-learning", "/learning-paths", "/diagnostic"],
+        matches: ["/guided-learning", "/learning-paths"],
         subItems: [
           { label: "Guided Topic Tracks", href: "/guided-learning" },
           { label: "Career Curricula", href: "/learning-paths" },
-          { label: "Skill Diagnostic", href: "/diagnostic" },
         ],
       },
       {
@@ -113,6 +111,12 @@ const navGroups: NavGroup[] = [
           { label: "Target Company Intel", href: "/company-research" },
         ],
       },
+    ],
+  },
+  {
+    title: "Workspace",
+    items: [
+      { label: "My Studio", href: "/studio", icon: User, badge: "Personal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
     ],
   },
 ];

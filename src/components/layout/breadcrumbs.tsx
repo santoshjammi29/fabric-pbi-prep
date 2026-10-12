@@ -25,7 +25,6 @@ const ROUTE_LABELS: Record<string, string> = {
   "/de-mindmap": "Data Engineering Mindmap",
   "/company-research": "Company Research",
   "/studio": "My Learning Studio",
-  "/diagnostic": "Skill Diagnostic",
   "/guided-learning": "Guided Learning",
   "/cheat-sheet": "Production Cheat Sheet",
 };

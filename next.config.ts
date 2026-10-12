@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
         destination: "/guided-learning?topic=python",
         permanent: true,
       },
+      {
+        source: "/diagnostic",
+        destination: "/learning-paths",
+        permanent: true,
+      },
     ];
   },
 };

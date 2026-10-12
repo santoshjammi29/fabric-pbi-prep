@@ -4,13 +4,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import {
   Search,
-  Maximize2,
   X,
-  Share2,
   Download,
-  Check,
   Sparkles,
-  ChevronRight,
   ZoomIn,
   ZoomOut,
   RotateCcw,
@@ -114,7 +110,7 @@ export function ArchitectureDiagramsGallery() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search whiteboard diagrams (e.g., Unity Catalog, Liquid Clustering, DLT, Photon, Medallion)..."
-            className="w-full pl-10 pr-12 py-2.5 sm:py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+            className="w-full pl-10 pr-12 py-2.5 sm:py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -129,7 +125,7 @@ export function ArchitectureDiagramsGallery() {
         {/* Global Dark Mode / Light Canvas Option Switch */}
         <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
           <div className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)] hidden md:flex">
-            <Sparkles size={13} className="text-purple-400" />
+            <Sparkles size={13} className="text-blue-500 dark:text-blue-400" />
             <span>Canvas View:</span>
           </div>
           <WhiteboardThemeToggle size="sm" showLabel={true} />
@@ -147,7 +143,7 @@ export function ArchitectureDiagramsGallery() {
               className={cn(
                 "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 touch-manipulation cursor-pointer",
                 isSelected
-                  ? "bg-purple-600 border-purple-500 text-white shadow-sm"
+                  ? "bg-blue-600 border-blue-500 text-white shadow-xs"
                   : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
               )}
             >
@@ -189,7 +185,7 @@ export function ArchitectureDiagramsGallery() {
             <div className="flex items-center justify-between px-3 py-2.5 sm:px-6 sm:py-4 border-b border-[var(--border)] bg-[var(--surface-2)] gap-2">
               <div className="space-y-0.5 min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-purple-400 px-2 py-0.5 rounded-lg bg-purple-500/10 border border-purple-500/20 shrink-0">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20 shrink-0">
                     {activeDiagram.category}
                   </span>
                   <h3 className="text-sm sm:text-base md:text-lg font-bold text-[var(--foreground)] truncate">

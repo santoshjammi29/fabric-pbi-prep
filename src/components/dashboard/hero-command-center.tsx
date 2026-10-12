@@ -9,14 +9,8 @@ import {
   MessageSquare,
   Sparkles,
   ArrowRight,
-  GraduationCap,
   Search,
   CheckCircle2,
-  Terminal,
-  Zap,
-  Building2,
-  Globe,
-  Flame,
   FileCode2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -54,13 +48,13 @@ const PILLARS: PillarItem[] = [
     features: [
       "Guided Tech Topics",
       "12 Career Roadmaps",
-      "10-Q Skill Diagnostic",
+      "Milestone Checklists",
       "Multi-Hop Learning Plan",
     ],
     primaryLink: { label: "Launch Learning Journey", href: "/guided-learning" },
     secondaryLinks: [
       { label: "Career Curricula", href: "/learning-paths" },
-      { label: "Skill Diagnostic", href: "/diagnostic" },
+      { label: "Guided Tracks", href: "/guided-learning" },
     ],
   },
   {
@@ -201,11 +195,11 @@ export function HeroCommandCenter() {
           {/* High-Intent Motivational Action Buttons */}
           <div className="flex flex-wrap items-center gap-2.5 pt-1">
             <Link
-              href="/diagnostic"
+              href="/learning-paths"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-purple-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              <GraduationCap size={16} />
-              <span>Take 10-Q Skill Diagnostic</span>
+              <Compass size={16} />
+              <span>Explore Career Curricula</span>
               <ArrowRight size={14} className="text-purple-200" />
             </Link>
 

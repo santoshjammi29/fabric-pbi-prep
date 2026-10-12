@@ -29,14 +29,14 @@ interface ParsedPhase {
 const markdownComponents = {
   h3({ children }: { children?: React.ReactNode }) {
     return (
-      <h3 className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300 mt-2.5 mb-1 flex items-center gap-1.5">
+      <h3 className="text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400 mt-2.5 mb-1 flex items-center gap-1.5">
         {children}
       </h3>
     );
   },
   table({ children }: { children?: React.ReactNode }) {
     return (
-      <div className="overflow-x-auto my-2 rounded-lg border border-slate-200 dark:border-[var(--border)] bg-slate-50/80 dark:bg-[#121214]">
+      <div className="overflow-x-auto my-2 rounded-lg border border-[var(--border)] bg-[var(--surface-1)]">
         <table className="w-full text-left border-collapse text-xs">
           {children}
         </table>
@@ -45,35 +45,35 @@ const markdownComponents = {
   },
   thead({ children }: { children?: React.ReactNode }) {
     return (
-      <thead className="bg-slate-100 dark:bg-[var(--surface-2)] text-purple-700 dark:text-purple-300 font-semibold border-b border-slate-200 dark:border-[var(--border)]">
+      <thead className="bg-[var(--surface-2)] text-[var(--foreground)] font-semibold border-b border-[var(--border)]">
         {children}
       </thead>
     );
   },
   tbody({ children }: { children?: React.ReactNode }) {
     return (
-      <tbody className="divide-y divide-slate-200 dark:divide-[var(--border)] text-slate-700 dark:text-slate-200">
+      <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
         {children}
       </tbody>
     );
   },
   tr({ children }: { children?: React.ReactNode }) {
     return (
-      <tr className="hover:bg-slate-100/60 dark:hover:bg-white/[0.02] transition-colors">
+      <tr className="hover:bg-[var(--surface-2)]/60 transition-colors">
         {children}
       </tr>
     );
   },
   th({ children }: { children?: React.ReactNode }) {
     return (
-      <th className="px-2.5 py-1.5 font-semibold text-purple-700 dark:text-purple-300 text-[11px] sm:text-xs tracking-wider border-b border-slate-200 dark:border-[var(--border)]">
+      <th className="px-2.5 py-1.5 font-semibold text-[var(--foreground)] text-[11px] sm:text-xs tracking-wider border-b border-[var(--border)]">
         {children}
       </th>
     );
   },
   td({ children }: { children?: React.ReactNode }) {
     return (
-      <td className="px-2.5 py-1.5 text-xs leading-relaxed text-slate-700 dark:text-slate-200 border-t border-slate-200 dark:border-[var(--border)]/30">
+      <td className="px-2.5 py-1.5 text-xs leading-relaxed text-[var(--foreground)]/90 border-t border-[var(--border)]/30">
         {children}
       </td>
     );
@@ -112,7 +112,7 @@ const markdownComponents = {
     }
     return (
       <code
-        className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-100 dark:bg-[#1c1c20] text-sky-700 dark:text-sky-300 font-mono text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 font-medium tracking-tight"
+        className="px-1.5 py-0.5 mx-0.5 rounded bg-[var(--surface-2)] text-blue-600 dark:text-blue-300 font-mono text-[11px] sm:text-xs border border-[var(--border)] font-medium tracking-tight"
         {...props}
       >
         {children}
@@ -120,21 +120,21 @@ const markdownComponents = {
     );
   },
   strong({ children }: { children?: React.ReactNode }) {
-    return <strong className="font-semibold text-slate-900 dark:text-white">{children}</strong>;
+    return <strong className="font-semibold text-[var(--foreground)]">{children}</strong>;
   },
   p({ children }: { children?: React.ReactNode }) {
-    return <p className="leading-relaxed my-1 text-slate-700 dark:text-slate-200 text-xs sm:text-sm">{children}</p>;
+    return <p className="leading-relaxed my-1 text-[var(--foreground)]/90 text-xs sm:text-sm">{children}</p>;
   },
   ul({ children }: { children?: React.ReactNode }) {
     return (
-      <ul className="space-y-1 my-1.5 list-disc list-outside pl-5 marker:text-purple-500 dark:marker:text-purple-400">
+      <ul className="space-y-1 my-1.5 list-disc list-outside pl-5 marker:text-blue-500 dark:marker:text-blue-400">
         {children}
       </ul>
     );
   },
   ol({ children }: { children?: React.ReactNode }) {
     return (
-      <ol className="space-y-1.5 my-1.5 list-decimal list-outside pl-5 marker:text-purple-500 dark:marker:text-purple-400 marker:font-semibold">
+      <ol className="space-y-1.5 my-1.5 list-decimal list-outside pl-5 marker:text-blue-500 dark:marker:text-blue-400 marker:font-semibold">
         {children}
       </ol>
     );

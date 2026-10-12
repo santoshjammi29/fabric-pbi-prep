@@ -41,7 +41,6 @@ const navGroups: NavGroup[] = [
     title: "Portal",
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
-      { label: "My Studio", href: "/studio", icon: User, pill: { text: "Personal", variant: "info" } },
     ],
   },
   {
@@ -52,11 +51,10 @@ const navGroups: NavGroup[] = [
         href: "/guided-learning",
         icon: Compass,
         pill: { text: "The Roadmap", variant: "info" },
-        matches: ["/guided-learning", "/learning-paths", "/diagnostic"],
+        matches: ["/guided-learning", "/learning-paths"],
         subItems: [
           { label: "Guided Topic Tracks", href: "/guided-learning" },
           { label: "Career Curricula", href: "/learning-paths" },
-          { label: "Skill Diagnostic", href: "/diagnostic" },
         ],
       },
       {
@@ -108,6 +106,12 @@ const navGroups: NavGroup[] = [
           { label: "Target Company Intel", href: "/company-research" },
         ],
       },
+    ],
+  },
+  {
+    title: "Workspace",
+    items: [
+      { label: "My Studio", href: "/studio", icon: User, pill: { text: "Personal", variant: "info" } },
     ],
   },
 ];
@@ -223,7 +227,7 @@ export function Sidebar() {
                         "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150",
                         "hover:bg-[var(--surface-3)]",
                         active
-                          ? "bg-purple-500/10 text-purple-400 font-semibold shadow-[inset_2px_0_0_rgb(139,92,246)]"
+                          ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold shadow-[inset_2px_0_0_rgb(59,130,246)]"
                           : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
                         collapsed && "justify-center px-0"
                       )}

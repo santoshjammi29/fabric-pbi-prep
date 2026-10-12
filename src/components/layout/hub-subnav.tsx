@@ -92,7 +92,7 @@ function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
             className={cn(
               "hub-subnav-item flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 shrink-0 whitespace-nowrap",
               active
-                ? "hub-subnav-item-active bg-purple-600 text-white font-semibold shadow-sm shadow-purple-500/25"
+                ? "hub-subnav-item-active bg-blue-600 text-white font-semibold shadow-xs shadow-blue-500/20"
                 : "hub-subnav-item-idle text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
             )}
           >

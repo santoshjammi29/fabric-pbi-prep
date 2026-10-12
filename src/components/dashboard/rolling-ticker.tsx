@@ -165,7 +165,7 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     { label: "Spark Engine Simulator",       href: "/spark-engine" },
     { label: "Data Engineering Mindmap",     href: "/mindmap" },
     { label: "Company Research Hub",         href: "/company-research" },
-    { label: "Architecture Diagnostic",      href: "/diagnostic" },
+    { label: "Career Learning Paths",        href: "/learning-paths" },
     { label: "Medallion Architecture",       href: "/concepts?term=Medallion%20Architecture&id=lakehouse-medallion-architecture" },
     { label: "Delta Lake Deep Dive",         href: "/concepts?term=Delta%20Lake&id=spark-delta-lake" },
     { label: "Microsoft Fabric Lakehouse",   href: "/concepts?term=Microsoft%20Fabric&id=fabric-onelake-overview" },

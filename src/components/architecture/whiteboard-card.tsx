@@ -60,7 +60,7 @@ export function WhiteboardCard({
       id={`diagram-${diagram.id}`}
       onClick={handleCardClick}
       className={cn(
-        "group rounded-2xl sm:rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer shadow-sm hover:shadow-xl hover:shadow-purple-500/5",
+        "group rounded-2xl sm:rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer shadow-sm hover:shadow-xl hover:shadow-blue-500/5",
         className
       )}
     >
@@ -73,8 +73,8 @@ export function WhiteboardCard({
       >
         {/* Floating Category Pill (Top-Left) */}
         <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 pointer-events-none">
-          <span className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-black/75 dark:bg-black/85 backdrop-blur-md text-[10px] sm:text-xs font-bold tracking-wider text-purple-300 uppercase border border-white/15 shadow-lg flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+          <span className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-black/75 dark:bg-black/85 backdrop-blur-md text-[10px] sm:text-xs font-bold tracking-wider text-blue-300 uppercase border border-white/15 shadow-lg flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             {diagram.category}
           </span>
         </div>
@@ -116,7 +116,7 @@ export function WhiteboardCard({
         {/* Hover inspection pill */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
           <span className="px-3.5 py-2 rounded-xl bg-black/80 backdrop-blur-md text-white text-xs font-semibold flex items-center gap-2 shadow-xl border border-white/15">
-            <Maximize2 size={14} className="text-purple-300" />
+            <Maximize2 size={14} className="text-blue-300" />
             <span>Tap to Inspect High-Res</span>
           </span>
         </div>
@@ -128,7 +128,7 @@ export function WhiteboardCard({
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] group-hover:text-purple-400 transition-colors leading-snug">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug">
                   {diagram.title}
                 </h3>
                 <p className="text-[11px] sm:text-xs text-[var(--muted-foreground)] font-medium mt-0.5">
@@ -173,7 +173,7 @@ export function WhiteboardCard({
             {diagram.keyPoints && diagram.keyPoints.length > 0 && (
               <div className="pt-2.5 space-y-1.5 border-t border-[var(--border)]">
                 <div className="text-[11px] font-bold text-[var(--foreground)] uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-purple-400" /> Key Architectural Pillars
+                  <Sparkles size={12} className="text-blue-500 dark:text-blue-400" /> Key Architectural Pillars
                 </div>
                 <ul className="space-y-1">
                   {diagram.keyPoints.slice(0, 3).map((point, idx) => (
@@ -181,7 +181,7 @@ export function WhiteboardCard({
                       key={idx}
                       className="text-[11px] text-[var(--muted-foreground)] flex items-start gap-1.5 leading-relaxed"
                     >
-                      <span className="text-purple-400 font-bold shrink-0">•</span>
+                      <span className="text-blue-500 dark:text-blue-400 font-bold shrink-0">•</span>
                       <span>{point}</span>
                     </li>
                   ))}
@@ -202,7 +202,7 @@ export function WhiteboardCard({
                 </span>
               ))}
             </div>
-            <span className="text-xs font-semibold text-purple-400 group-hover:translate-x-1 transition-transform flex items-center gap-1 shrink-0">
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform flex items-center gap-1 shrink-0">
               Inspect <ChevronRight size={14} />
             </span>
           </div>

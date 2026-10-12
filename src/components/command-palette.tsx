@@ -14,7 +14,6 @@ import {
   MessageSquare,
   Building2,
   Compass,
-  GraduationCap,
   User,
   ExternalLink,
   Sparkles,
@@ -159,7 +158,6 @@ export function CommandPalette() {
       { id: "nav-cheatsheet", title: "Production Cheat Sheet (Spark, dbt, Airflow, SQL)", category: "Navigation", icon: Terminal, href: "/cheat-sheet", badge: "PROD" },
       { id: "nav-gcc", title: "Company Research (GCC Profiles)", category: "Navigation", icon: Building2, href: "/company-research", badge: "Enterprise" },
       { id: "nav-paths", title: "Learning Paths (12 Structured Tracks)", category: "Navigation", icon: Compass, href: "/learning-paths", badge: "Curriculum" },
-      { id: "nav-diagnostic", title: "Diagnostic Assessment (10-Q Architecture Evaluation)", category: "Navigation", icon: GraduationCap, href: "/diagnostic", badge: "10-Q" },
       { id: "nav-studio", title: "My Studio & Progress", category: "Navigation", icon: User, href: "/studio", badge: "Account" },
       
       // Simulators

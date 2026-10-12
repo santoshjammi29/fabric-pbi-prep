@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   GitBranch,
   BookMarked,
-  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LearningPath, Difficulty } from "@/types/data";
@@ -58,7 +57,6 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
         items={[
           { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "13 Tracks" },
           { label: "Career Curricula", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
-          { label: "Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q Test" },
         ]}
       />
 
@@ -80,14 +78,7 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0 text-center">
-            <Link
-              href="/diagnostic"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition-colors shadow-xs"
-            >
-              <GraduationCap size={14} />
-              <span>10-Q Diagnostic</span>
-            </Link>
-            <div className="px-3 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+            <div className="px-3.5 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
               <div className="text-base font-bold text-blue-400">12</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium leading-none">Curricula Tracks</div>
             </div>

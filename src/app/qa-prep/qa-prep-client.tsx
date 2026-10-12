@@ -181,7 +181,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
       {/* Header Hub Banner */}
       <div className="relative rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 overflow-hidden">
         <div className="relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             <MessageSquare size={13} />
             <span>Interview Practice &amp; Architect Q&amp;A Hub</span>
           </div>
@@ -200,7 +200,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
               className={cn(
                 "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs",
                 isStudyMode
-                  ? "bg-purple-600 border-purple-500 text-white"
+                  ? "bg-blue-600 border-blue-500 text-white"
                   : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
               )}
             >
@@ -221,7 +221,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
           className={cn(
             "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
             selectedDomain === "ALL"
-              ? "bg-purple-600 border-purple-500 text-white shadow-sm"
+              ? "bg-blue-600 border-blue-500 text-white shadow-xs"
               : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
           )}
         >
@@ -234,7 +234,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
             className={cn(
               "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
               selectedDomain === dom
-                ? "bg-purple-600 border-purple-500 text-white shadow-sm"
+                ? "bg-blue-600 border-blue-500 text-white shadow-xs"
                 : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
             )}
           >
@@ -252,7 +252,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions by topic, failure modes, code syntax..."
-            className="w-full pl-9 pr-12 py-2.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+            className="w-full pl-9 pr-12 py-2.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -273,7 +273,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
               className={cn(
                 "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer",
                 selectedDifficulty === diff
-                  ? "bg-purple-600 text-white shadow-xs"
+                  ? "bg-blue-600 text-white shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
@@ -285,9 +285,9 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
 
       {/* Study Flashcard Mode */}
       {isStudyMode && currentStudyCard && (
-        <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-purple-500/40 shadow-xl space-y-5">
+        <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-blue-500/30 shadow-xl space-y-5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span className="font-semibold text-purple-400 uppercase tracking-wider">
+            <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               Question {studyIndex + 1} of {filteredQuestions.length.toLocaleString()}
             </span>
             <span className="font-mono text-[10px]">{currentStudyCard.category}</span>
@@ -295,11 +295,11 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
 
           <div
             onClick={() => setIsCardFlipped(!isCardFlipped)}
-            className="min-h-[260px] p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col justify-center items-center text-center cursor-pointer select-none space-y-4 hover:border-purple-500/30 transition-all"
+            className="min-h-[260px] p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col justify-center items-center text-center cursor-pointer select-none space-y-4 hover:border-blue-500/30 transition-all"
           >
             {!isCardFlipped ? (
               <div className="space-y-3 max-w-2xl">
-                <span className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">Interview Question</span>
+                <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Interview Question</span>
                 <h3 className="text-lg sm:text-xl font-bold text-[var(--foreground)] leading-relaxed">
                   {currentStudyCard.question}
                 </h3>
@@ -350,7 +350,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
                 onClick={handleShuffle}
                 className={cn(
                   "inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer",
-                  isShuffled ? "bg-purple-600 text-white border-purple-500" : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)]"
+                  isShuffled ? "bg-blue-600 text-white border-blue-500" : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)]"
                 )}
               >
                 <Shuffle size={12} />
@@ -403,7 +403,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
                       id={`question-${q.id}`}
                       className={cn(
                         "rounded-2xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)]",
-                        isExpanded ? "border-purple-500/40 shadow-sm" : "border-[var(--border)] hover:border-[var(--border-hover)]"
+                        isExpanded ? "border-blue-500/40 shadow-xs" : "border-[var(--border)] hover:border-[var(--border-hover)]"
                       )}
                     >
                       <div
@@ -413,7 +413,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
                         <div className="flex items-start justify-between gap-3">
                           <div className="space-y-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[10px] font-bold text-purple-400 tracking-wider uppercase">
+                              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 tracking-wider uppercase">
                                 {q.category || "Data Engineering"}
                               </span>
                               {q.niche && (

@@ -367,7 +367,6 @@ export default function GuidedLearningPage() {
         items={[
           { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "13 Tracks" },
           { label: "Career Curricula", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
-          { label: "Skill Diagnostic", href: "/diagnostic", icon: GraduationCap, badge: "10-Q Test" },
         ]}
       />
 

@@ -491,7 +491,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
                 isSelected
-                  ? "bg-purple-600 text-white shadow-sm shadow-purple-500/20"
+                  ? "bg-blue-600 text-white shadow-xs shadow-blue-500/20 font-semibold"
                   : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
               )}
             >
@@ -756,7 +756,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                 placeholder="Search concepts by name, mechanism, or trade-off..."
                 value={conceptSearch}
                 onChange={(e) => setConceptSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
               />
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
@@ -776,7 +776,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                   className={cn(
                     "px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer",
                     selectedSubdomain === sub.id
-                      ? "bg-purple-600 text-white"
+                      ? "bg-blue-600 text-white shadow-xs"
                       : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >
@@ -1018,7 +1018,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                         className={cn(
                           "py-1 text-[10px] font-semibold rounded-md transition-all cursor-pointer",
                           targetCatalogEngine === c.id
-                            ? "bg-purple-600 text-white shadow-xs"
+                            ? "bg-blue-600 text-white shadow-xs"
                             : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                         )}
                       >
@@ -1420,7 +1420,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
             </div>
             <Link
               href="/architecture?tab=diagrams"
-              className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-xs whitespace-nowrap inline-flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-xs whitespace-nowrap inline-flex items-center gap-1.5"
             >
               <span>Open Whiteboard Hub</span>
               <ArrowRight size={13} />
@@ -1436,7 +1436,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                 placeholder="Search blueprints by name, category, or technology..."
                 value={blueprintSearch}
                 onChange={(e) => setBlueprintSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
               />
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
@@ -1447,7 +1447,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                   className={cn(
                     "px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer",
                     blueprintCategory === cat
-                      ? "bg-purple-600 text-white"
+                      ? "bg-blue-600 text-white shadow-xs"
                       : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >
@@ -1573,7 +1573,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                   className={cn(
                     "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
                     matrixEngineFilter === tab.id
-                      ? "bg-purple-600 text-white shadow-xs"
+                      ? "bg-blue-600 text-white shadow-xs font-semibold"
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                   )}
                 >
@@ -2022,7 +2022,7 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
                 placeholder="Search Python solutions by topic, library, or keyword..."
                 value={pythonQSearch}
                 onChange={(e) => setPythonQSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
               />
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
@@ -2033,7 +2033,7 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
                   className={cn(
                     "px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer",
                     pythonCategory === cat
-                      ? "bg-purple-600 text-white"
+                      ? "bg-blue-600 text-white shadow-xs"
                       : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >

@@ -340,7 +340,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
               className={cn(
                 "flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border transition-all text-left group",
                 isSelected
-                  ? "bg-purple-600/15 border-purple-500/50 shadow-sm"
+                  ? "bg-blue-600/15 border-blue-500/50 shadow-xs"
                   : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)]"
               )}
             >
@@ -349,7 +349,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                 <div
                   className={cn(
                     "text-xs sm:text-sm font-bold truncate",
-                    isSelected ? "text-purple-300" : "text-[var(--foreground)]"
+                    isSelected ? "text-blue-600 dark:text-blue-300" : "text-[var(--foreground)]"
                   )}
                 >
                   {cfg.name}
@@ -367,14 +367,14 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
         <Link
           href={`/concepts?term=${activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark"}`}
-          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2.5 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <BookOpen size={15} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">
+            <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500 dark:group-hover:text-blue-300">
               {activeLang === "mssql" ? "T-SQL Definitions" : activeLang === "pyspark" ? "PySpark Core" : "Engine Concepts"}
             </div>
           </div>
@@ -435,7 +435,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -456,7 +456,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
               className={cn(
                 "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize",
                 selectedLevel === lvl
-                  ? "bg-purple-600 text-white shadow-sm font-semibold"
+                  ? "bg-blue-600 text-white shadow-xs font-semibold"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
               )}
             >
@@ -477,8 +477,8 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             className={cn(
               "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
               isShuffled
-                ? "bg-purple-600 text-white border-purple-500 shadow-sm"
-                : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+                ? "bg-blue-600 text-white border-blue-500 shadow-xs"
+                : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-blue-500/40 hover:bg-[var(--surface-2)]"
             )}
             title="Shuffle or randomize coding templates"
           >
@@ -525,7 +525,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
               setSelectedLevel("ALL");
               setIsShuffled(false);
             }}
-            className="mt-4 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
+            className="mt-4 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors shadow-xs"
           >
             Reset Filters
           </button>
@@ -544,7 +544,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                 className={cn(
                   "rounded-xl border transition-all duration-200 overflow-hidden",
                   isExpanded
-                    ? "bg-[var(--surface-1)] border-purple-500/40 shadow-sm"
+                    ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xs"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                 )}
               >
@@ -554,9 +554,9 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                   className="p-3.5 sm:p-4 cursor-pointer select-none space-y-1.5"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1 min-w-0">
+                      <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                        <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 tracking-wide uppercase">
                           {item.category || languageConfigs[activeLang].name}
                         </span>
                         <span
@@ -606,7 +606,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                           size={15}
                           className={cn(
                             "transition-transform duration-300",
-                            isExpanded && "rotate-180 text-purple-400"
+                            isExpanded && "rotate-180 text-blue-500 dark:text-blue-400"
                           )}
                         />
                       </div>
@@ -622,13 +622,13 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                 <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 pb-3.5 pt-2 space-y-2.5 text-xs sm:text-sm bg-[var(--surface-2)]/30">
                   {/* Use Case Scenario */}
                   {item.use_case && (
-                    <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 flex items-start gap-2">
-                      <Briefcase size={14} className="text-purple-400 mt-0.5 shrink-0" />
+                    <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[var(--foreground)] flex items-start gap-2">
+                      <Briefcase size={14} className="text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" />
                       <div className="space-y-0.5">
-                        <span className="font-bold text-[10px] uppercase tracking-wider text-purple-300">
+                        <span className="font-bold text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400">
                           Enterprise Scenario:
                         </span>
-                        <p className="text-xs text-purple-200/90 leading-relaxed">{item.use_case}</p>
+                        <p className="text-xs text-[var(--foreground)]/90 leading-relaxed">{item.use_case}</p>
                       </div>
                     </div>
                   )}

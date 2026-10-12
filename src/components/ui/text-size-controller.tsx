@@ -5,15 +5,12 @@ import {
   Type,
   Minus,
   Plus,
-  RotateCcw,
   Check,
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   useTextSize,
-  TEXT_SIZE_OPTIONS,
-  type TextSizeKey,
 } from "@/components/providers/text-size-provider";
 
 interface TextSizeControllerProps {
@@ -128,16 +125,15 @@ export function TextSizeController({
                 onClick={() => decreaseTextSize(true)}
                 disabled={!canDecrease}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-1 py-1 px-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer",
+                  "flex-1 flex items-center justify-center py-1 px-2 rounded-lg text-xs font-bold transition-colors cursor-pointer",
                   canDecrease
-                    ? "hover:bg-[var(--surface-3)] text-[var(--foreground)]"
+                    ? "hover:bg-[var(--surface-3)] text-[var(--foreground)] active:scale-95"
                     : "opacity-40 cursor-not-allowed text-[var(--muted-foreground)]"
                 )}
                 title="Decrease text size (Alt + -)"
                 aria-label="Decrease text size"
               >
-                <Minus size={12} />
-                <span>A-</span>
+                <span>A−</span>
               </button>
 
               <button
@@ -155,16 +151,15 @@ export function TextSizeController({
                 onClick={() => increaseTextSize(true)}
                 disabled={!canIncrease}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-1 py-1 px-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer",
+                  "flex-1 flex items-center justify-center py-1 px-2 rounded-lg text-xs font-bold transition-colors cursor-pointer",
                   canIncrease
-                    ? "hover:bg-[var(--surface-3)] text-[var(--foreground)]"
+                    ? "hover:bg-[var(--surface-3)] text-[var(--foreground)] active:scale-95"
                     : "opacity-40 cursor-not-allowed text-[var(--muted-foreground)]"
                 )}
                 title="Increase text size (Alt + +)"
                 aria-label="Increase text size"
               >
                 <span>A+</span>
-                <Plus size={12} />
               </button>
             </div>
 
@@ -232,7 +227,7 @@ export function TextSizeController({
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
-          className="flex items-center gap-2 text-xs font-semibold text-[var(--foreground)] hover:text-purple-400 transition-colors cursor-pointer select-none"
+          className="flex items-center gap-2 text-xs font-semibold text-[var(--foreground)] hover:text-blue-500 dark:hover:text-blue-400 transition-colors cursor-pointer select-none"
           aria-expanded={isOpen}
           aria-label="Text size options menu"
         >
@@ -247,39 +242,41 @@ export function TextSizeController({
           />
         </button>
 
-        <span
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
           className={cn(
-            "text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-md border",
+            "text-[10px] font-mono font-semibold px-2 py-0.5 rounded-lg border transition-colors cursor-pointer",
             textSize === "base"
-              ? "bg-[var(--surface-2)] text-[var(--muted-foreground)] border-[var(--border)]"
-              : "bg-purple-500/10 text-purple-400 border-purple-500/30"
+              ? "bg-[var(--surface-2)] text-[var(--muted-foreground)] border-[var(--border)] hover:bg-[var(--surface-3)]"
+              : "bg-blue-500/10 text-blue-500 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/20"
           )}
+          title="Change text size preset"
         >
           {currentOption.scaleLabel}
-        </span>
+        </button>
       </div>
 
-      {/* Stepper Control Row: [ A- ] [ Reset/Current ] [ A+ ] */}
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shadow-xs">
+      {/* Stepper Control Row: [ A− ] [ 100% / Reset ] [ A+ ] */}
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
         {/* Decrease button */}
         <button
           type="button"
           onClick={() => decreaseTextSize(true)}
           disabled={!canDecrease}
           className={cn(
-            "flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer select-none",
+            "flex-1 flex items-center justify-center py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer select-none",
             canDecrease
-              ? "bg-[var(--surface-1)] text-[var(--foreground)] hover:bg-[var(--surface-3)] hover:text-purple-400 border border-[var(--border)] shadow-xs active:scale-95"
+              ? "bg-[var(--surface-1)] text-[var(--foreground)] hover:bg-[var(--surface-3)] hover:text-blue-500 dark:hover:text-blue-400 border border-[var(--border)] shadow-xs active:scale-95"
               : "opacity-40 cursor-not-allowed text-[var(--muted-foreground)]"
           )}
           title="Decrease text size (Alt + -)"
           aria-label="Decrease text size"
         >
-          <Minus size={11} strokeWidth={2.5} />
-          <span>A-</span>
+          <span>A−</span>
         </button>
 
-        {/* Center reset or menu button */}
+        {/* Center reset button */}
         <button
           type="button"
           onClick={() => resetTextSize(true)}
@@ -287,15 +284,12 @@ export function TextSizeController({
             "px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors cursor-pointer select-none text-center",
             textSize === "base"
               ? "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              : "text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 font-semibold"
+              : "text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-500/10 font-semibold"
           )}
           title="Reset to 100% Default (Alt + 0)"
           aria-label="Reset text size to default 100%"
         >
-          <div className="flex items-center gap-1">
-            <RotateCcw size={10} />
-            <span className="text-[10px]">Reset</span>
-          </div>
+          <span>Reset</span>
         </button>
 
         {/* Increase button */}
@@ -304,16 +298,15 @@ export function TextSizeController({
           onClick={() => increaseTextSize(true)}
           disabled={!canIncrease}
           className={cn(
-            "flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer select-none",
+            "flex-1 flex items-center justify-center py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer select-none",
             canIncrease
-              ? "bg-[var(--surface-1)] text-[var(--foreground)] hover:bg-[var(--surface-3)] hover:text-purple-400 border border-[var(--border)] shadow-xs active:scale-95"
+              ? "bg-[var(--surface-1)] text-[var(--foreground)] hover:bg-[var(--surface-3)] hover:text-blue-500 dark:hover:text-blue-400 border border-[var(--border)] shadow-xs active:scale-95"
               : "opacity-40 cursor-not-allowed text-[var(--muted-foreground)]"
           )}
           title="Increase text size (Alt + +)"
           aria-label="Increase text size"
         >
           <span>A+</span>
-          <Plus size={11} strokeWidth={2.5} />
         </button>
       </div>
 

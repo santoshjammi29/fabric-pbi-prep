@@ -197,7 +197,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
       {/* Hero Header */}
       <div className="relative rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 overflow-hidden">
         <div className="relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             <BookOpen size={13} />
             <span>Foundations &amp; Technical Lexicon</span>
           </div>
@@ -216,7 +216,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
               className={cn(
                 "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs",
                 isStudyMode
-                  ? "bg-purple-600 border-purple-500 text-white"
+                  ? "bg-blue-600 border-blue-500 text-white"
                   : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
               )}
             >
@@ -237,7 +237,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
           className={cn(
             "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
             selectedCategory === "ALL"
-              ? "bg-purple-600 border-purple-500 text-white shadow-sm"
+              ? "bg-blue-600 border-blue-500 text-white shadow-xs"
               : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
           )}
         >
@@ -250,7 +250,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             className={cn(
               "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
               selectedCategory === cat
-                ? "bg-purple-600 border-purple-500 text-white shadow-sm"
+                ? "bg-blue-600 border-blue-500 text-white shadow-xs"
                 : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
             )}
           >
@@ -268,7 +268,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search concepts by term, keyword, or mechanism..."
-            className="w-full pl-9 pr-12 py-2.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+            className="w-full pl-9 pr-12 py-2.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -289,7 +289,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
               className={cn(
                 "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer",
                 selectedDifficulty === diff
-                  ? "bg-purple-600 text-white shadow-xs"
+                  ? "bg-blue-600 text-white shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
@@ -301,9 +301,9 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
       {/* Study Flashcard Mode */}
       {isStudyMode && currentStudyCard && (
-        <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-purple-500/40 shadow-xl space-y-5">
+        <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-blue-500/30 shadow-xl space-y-5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span className="font-semibold text-purple-400 uppercase tracking-wider">
+            <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               Flashcard {studyIndex + 1} of {filteredConcepts.length}
             </span>
             <span className="font-mono text-[10px]">{currentStudyCard.category}</span>
@@ -311,11 +311,11 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
           <div
             onClick={() => setIsCardFlipped(!isCardFlipped)}
-            className="min-h-[220px] p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col justify-center items-center text-center cursor-pointer select-none space-y-4 hover:border-purple-500/30 transition-all"
+            className="min-h-[220px] p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col justify-center items-center text-center cursor-pointer select-none space-y-4 hover:border-blue-500/30 transition-all"
           >
             {!isCardFlipped ? (
               <div className="space-y-2">
-                <span className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">Term</span>
+                <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Term</span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[var(--foreground)]">
                   {currentStudyCard.term}
                 </h3>
@@ -371,7 +371,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                 onClick={handleShuffle}
                 className={cn(
                   "inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer",
-                  isShuffled ? "bg-purple-600 text-white border-purple-500" : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)]"
+                  isShuffled ? "bg-blue-600 text-white border-blue-500" : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)]"
                 )}
               >
                 <Shuffle size={12} />
@@ -424,7 +424,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                       id={`concept-${concept.id}`}
                       className={cn(
                         "rounded-2xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)]",
-                        isExpanded ? "border-purple-500/40 shadow-sm" : "border-[var(--border)] hover:border-[var(--border-hover)]"
+                        isExpanded ? "border-blue-500/40 shadow-xs" : "border-[var(--border)] hover:border-[var(--border-hover)]"
                       )}
                     >
                       <div
@@ -434,7 +434,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                         <div className="flex items-start justify-between gap-3">
                           <div className="space-y-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[10px] font-bold text-purple-400 tracking-wider uppercase">
+                              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 tracking-wider uppercase">
                                 {concept.category}
                               </span>
                               <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", diffStyle.bg, diffStyle.text, diffStyle.border)}>
@@ -474,17 +474,23 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                           </div>
                         </div>
 
-                        <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-                          {concept.definition}
-                        </p>
+                        {/* Distinguishable Definition Callout Container */}
+                        <div className="rounded-xl border-l-2 border-blue-500 bg-[var(--surface-2)]/60 px-3.5 py-2.5 my-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1">
+                            Official Definition
+                          </span>
+                          <p className="text-xs sm:text-sm text-[var(--foreground)] font-medium leading-relaxed">
+                            {concept.definition}
+                          </p>
+                        </div>
                       </div>
 
                       {/* Expanded View */}
                       {isExpanded && (
                         <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 border-t border-[var(--border)]/60 bg-[var(--surface-2)]/30 space-y-3">
-                          <div className="space-y-1.5 pt-2">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400">
-                              Detailed Explanation:
+                          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)]/50 p-3.5 space-y-1.5 mt-2">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                              <Sparkles size={13} /> Detailed Explanation:
                             </span>
                             <p className="text-xs sm:text-sm text-[var(--foreground)] leading-relaxed">
                               {concept.explanation}
@@ -492,9 +498,9 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                           </div>
 
                           {concept.keyPoints && concept.keyPoints.length > 0 && (
-                            <div className="space-y-1.5 pt-2">
-                              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                                Architectural Key Points:
+                            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)]/50 p-3.5 space-y-1.5">
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
+                                <Zap size={13} /> Architectural Key Points:
                               </span>
                               <ul className="space-y-1 text-xs text-[var(--foreground)] list-disc pl-4">
                                 {concept.keyPoints.map((pt, idx) => (
@@ -509,7 +515,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                           <div className="pt-2 flex items-center justify-between">
                             <Link
                               href={`/qa-prep?q=${encodeURIComponent(concept.term)}`}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-400 hover:text-purple-300 transition-colors"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors"
                             >
                               <MessageSquare size={13} />
                               <span>Practice Q&amp;As on {concept.term}</span>
