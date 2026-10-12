@@ -181,7 +181,7 @@ function BreadcrumbsInner() {
               {idx === 0 ? (
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-1 hover:text-[var(--foreground)] transition-colors p-0.5 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="inline-flex items-center gap-1 hover:text-[var(--foreground)] transition-colors p-0.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   title="Return to Home"
                 >
                   <Home size={13} className="shrink-0" />

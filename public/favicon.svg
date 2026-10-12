@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#0A0A0B"/>
+  <rect x="8" y="8" width="496" height="496" rx="120" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="4"/>
+  <!-- D shape -->
+  <path d="M128 144h96c61.856 0 112 50.144 112 112s-50.144 112-112 112h-96V144zm56 168h40c30.928 0 56-25.072 56-56s-25.072-56-56-56h-40v112z" fill="url(#blueGrad)"/>
+  <!-- P shape overlap -->
+  <path d="M264 144h88c44.183 0 80 35.817 80 80s-35.817 80-80 80h-48v64h-40V144zm40 116h48c22.091 0 40-17.909 40-40s-17.909-40-40-40h-48v80z" fill="url(#cyanGrad)" opacity="0.95"/>
+</svg>

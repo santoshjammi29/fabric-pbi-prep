@@ -47,7 +47,20 @@ export const metadata: Metadata = {
     card: "summary_large_image",
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/favicon.svg",
+  },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Fabric Prep",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -58,6 +71,8 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 
@@ -82,7 +97,7 @@ export default function RootLayout({
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
         `}} />
       </head>
-      <body className="min-h-dvh bg-[var(--background)] text-[var(--foreground)]">
+      <body className="min-h-dvh overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
 
         <ThemeProvider>
           <TextSizeProvider>

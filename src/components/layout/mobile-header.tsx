@@ -280,12 +280,12 @@ export function MobileHeader() {
                             className={cn(
                               "flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all",
                               active
-                                ? "bg-purple-600 text-white font-semibold shadow-md shadow-purple-500/20"
+                                ? "bg-blue-600 text-white font-semibold shadow-xs"
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                             )}
                           >
                             <div className="flex items-center gap-3">
-                              <Icon size={16} className={cn(active ? "text-white" : "text-purple-400")} />
+                              <Icon size={16} className={cn(active ? "text-white" : "text-blue-500 dark:text-blue-400")} />
                               <span>{item.label}</span>
                             </div>
                             {item.badge && (
@@ -311,7 +311,7 @@ export function MobileHeader() {
                                     className={cn(
                                       "block px-2 py-1 text-xs rounded-lg transition-colors truncate",
                                       isSubActive
-                                        ? "text-purple-400 font-semibold bg-purple-500/10"
+                                        ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-500/10"
                                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                                     )}
                                   >

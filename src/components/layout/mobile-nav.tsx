@@ -27,12 +27,11 @@ interface MobileTabItem {
   isNew?: boolean;
 }
 
-// 5 Core tabs on small mobile screens (< 640px)
+// 4 Core tabs on small mobile screens (< 640px) + Explore button = 5 perfect equal columns
 const mobileCoreTabs: MobileTabItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Journey", href: "/guided-learning", icon: Compass },
   { label: "Concepts", href: "/concepts", icon: BookOpen },
-  { label: "Arch", href: "/architecture", icon: Layers },
   { label: "Q&A", href: "/qa-prep", icon: MessageSquare, badge: "6.5k" },
 ];
 
@@ -52,12 +51,13 @@ export function MobileNav() {
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
+    if (href === "/guided-learning") return pathname === "/guided-learning" || pathname.startsWith("/learning-paths");
     return pathname.startsWith(href);
   };
 
   const isOtherActive =
     !isActive("/") &&
-    !isActive("/learning-paths") &&
+    !isActive("/guided-learning") &&
     !isActive("/concepts") &&
     !isActive("/qa-prep");
 
@@ -87,7 +87,7 @@ export function MobileNav() {
               className={cn(
                 "flex-1 flex flex-col items-center justify-center py-1.5 px-0.5 min-h-[48px] rounded-xl transition-all relative touch-manipulation",
                 active
-                  ? "text-purple-400 font-semibold"
+                  ? "text-blue-600 dark:text-blue-400 font-semibold"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] active:scale-95"
               )}
             >
@@ -99,7 +99,7 @@ export function MobileNav() {
                   </span>
                 )}
                 {tab.badge && (
-                  <span className="absolute -top-1 -right-3 px-1 py-0.2 rounded-full bg-orange-500/80 text-[8px] font-extrabold text-white leading-none">
+                  <span className="absolute -top-1 -right-3 px-1 py-0.2 rounded-full bg-blue-600 text-[8px] font-extrabold text-white leading-none">
                     {tab.badge}
                   </span>
                 )}
@@ -108,35 +108,35 @@ export function MobileNav() {
                 {tab.label}
               </span>
               {active && (
-                <span className="absolute bottom-0.5 w-4 h-0.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                <span className="absolute bottom-0.5 w-4 h-0.5 rounded-full bg-blue-600 dark:bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
               )}
             </Link>
           );
         })}
 
-        {/* 5th Tab: Explore All 11+ Modules Button */}
+        {/* 5th Tab: Explore All Hubs & Modules Button */}
         <button
           type="button"
           onClick={openDrawer}
           className={cn(
-            "flex-1 flex flex-col items-center justify-center py-1.5 px-0.5 min-h-[48px] rounded-xl transition-all relative touch-manipulation",
+            "flex-1 flex flex-col items-center justify-center py-1.5 px-0.5 min-h-[48px] rounded-xl transition-all relative touch-manipulation cursor-pointer",
             isOtherActive
-              ? "text-purple-400 font-semibold"
+              ? "text-blue-600 dark:text-blue-400 font-semibold"
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] active:scale-95"
           )}
           aria-label="Open all modules menu"
         >
           <div className="relative">
             <LayoutGrid size={20} strokeWidth={isOtherActive ? 2.5 : 1.8} />
-            <span className="absolute -top-1 -right-2 px-1 py-0.2 rounded-full bg-purple-500 text-[8px] font-extrabold text-white leading-none">
-              11+
+            <span className="absolute -top-1 -right-2 px-1 py-0.2 rounded-full bg-blue-600 text-[8px] font-extrabold text-white leading-none">
+              All
             </span>
           </div>
           <span className="text-[10px] font-medium leading-none mt-1 whitespace-nowrap">
             Explore
           </span>
           {isOtherActive && (
-            <span className="absolute bottom-0.5 w-4 h-0.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+            <span className="absolute bottom-0.5 w-4 h-0.5 rounded-full bg-blue-600 dark:bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
           )}
         </button>
       </div>
@@ -153,7 +153,7 @@ export function MobileNav() {
               className={cn(
                 "flex-1 flex flex-col items-center justify-center py-1.5 px-1 min-h-[48px] rounded-xl transition-all relative touch-manipulation shrink-0",
                 active
-                  ? "text-purple-400 font-semibold"
+                  ? "text-blue-600 dark:text-blue-400 font-semibold"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] active:scale-95"
               )}
             >
@@ -169,7 +169,7 @@ export function MobileNav() {
                 {tab.label}
               </span>
               {active && (
-                <span className="absolute bottom-0.5 w-4 h-0.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                <span className="absolute bottom-0.5 w-4 h-0.5 rounded-full bg-blue-600 dark:bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
               )}
             </Link>
           );
