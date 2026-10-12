@@ -144,17 +144,17 @@ const RunbookCard = React.memo(function RunbookCard({
     >
       <div
         onClick={() => onToggle(item.id)}
-        className="p-3.5 sm:px-4 sm:py-3 cursor-pointer select-none space-y-2"
+        className="p-3 sm:p-3.5 cursor-pointer select-none space-y-1.5"
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1.5 flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] sm:text-[11px] font-bold text-emerald-400 tracking-wider uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="space-y-1 flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] font-bold text-emerald-400 tracking-wider uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
                 {item.category}
               </span>
               <span
                 className={cn(
-                  "text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1.5",
+                  "text-[10px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1",
                   lvlMeta.bg,
                   lvlMeta.text,
                   lvlMeta.border
@@ -165,33 +165,33 @@ const RunbookCard = React.memo(function RunbookCard({
               </span>
               <span
                 className={cn(
-                  "text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1.5",
+                  "text-[10px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1",
                   fwMeta.badgeColor
                 )}
               >
-                {fwMeta.topicKey ? <TopicIcon topic={fwMeta.topicKey} size={12} /> : <Sparkles size={11} />}
+                {fwMeta.topicKey ? <TopicIcon topic={fwMeta.topicKey} size={11} /> : <Sparkles size={11} />}
                 <span>{fwMeta.label}</span>
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight break-words pt-0.5">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight break-words pt-0.5 leading-snug">
               {item.title}
             </h3>
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 pt-0.5">
+          <div className="flex items-center gap-1 shrink-0 pt-0.5">
             <button
               onClick={(e) => onShare(item.id, e)}
-              className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+              className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
               title="Copy direct link to this runbook"
               aria-label="Copy direct link"
             >
-              <Share2 size={16} />
+              <Share2 size={14} />
             </button>
             <button
               onClick={(e) => onBookmark(item.id, e)}
               className={cn(
-                "p-2 rounded-xl transition-colors",
+                "p-1.5 rounded-lg transition-colors",
                 bookmarked
                   ? "text-amber-400 bg-amber-400/10"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
@@ -199,15 +199,15 @@ const RunbookCard = React.memo(function RunbookCard({
               title={bookmarked ? "Remove Bookmark" : "Save Bookmark"}
               aria-label={bookmarked ? "Remove Bookmark" : "Save Bookmark"}
             >
-              {bookmarked ? <BookmarkCheck size={16} className="text-amber-400" /> : <Bookmark size={16} />}
+              {bookmarked ? <BookmarkCheck size={14} className="text-amber-400" /> : <Bookmark size={14} />}
             </button>
             <button
               onClick={(e) => onCopy(item.code, item.id, e)}
-              className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+              className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
               title="Copy Code"
               aria-label="Copy Code"
             >
-              {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
             </button>
             <div className="p-2 text-[var(--muted-foreground)]">
               <ChevronDown
@@ -988,12 +988,12 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       {activeTab === "scenarios" && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Controls Deck */}
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row gap-2.5">
               <div className="relative flex-1">
                 <Search
-                  size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
                 />
                 <input
                   type="text"
@@ -1003,7 +1003,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                     setVisibleCount(initialBatch);
                   }}
                   placeholder="Search 3,080+ architecture blueprints (e.g., Vitess sharding, Spanner TrueTime, gh-ost, CoW branching, Little's Law)..."
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+                  className="w-full pl-9 pr-4 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -1011,7 +1011,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       setSearchQuery("");
                       setVisibleCount(initialBatch);
                     }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-2)]"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)]"
                   >
                     Clear
                   </button>
@@ -1019,7 +1019,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               </div>
 
               {/* Difficulty chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)]">
+              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
                 {["ALL", "ARCHITECT", "HARD", "MEDIUM", "EASY"].map((diff) => (
                   <button
                     key={diff}
@@ -1029,9 +1029,9 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       updateUrlParam("difficulty", diff);
                     }}
                     className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0",
+                      "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer",
                       selectedDifficulty === diff
-                        ? "bg-purple-600 text-white shadow-md font-semibold"
+                        ? "bg-blue-600 text-white shadow-xs font-semibold"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                     )}
                   >
@@ -1042,9 +1042,9 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
             </div>
 
             {/* Spec / Category horizontal chip scroll */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-                <Filter size={12} /> Spec:
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+                <Filter size={11} /> Spec:
               </span>
               {categories.map((cat) => (
                 <button
@@ -1055,10 +1055,10 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                     updateUrlParam("category", cat);
                   }}
                   className={cn(
-                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0",
+                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer",
                     selectedCategory === cat
-                      ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold shadow-sm"
-                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
+                      ? "bg-blue-600 text-white shadow-xs font-semibold"
+                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] hover:bg-[var(--surface-2)]"
                   )}
                 >
                   {cat === "ALL" ? `⚡ All ${categories.length - 1} Specs` : cat}
@@ -1069,7 +1069,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
 
           {/* Results Meta */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <span>
                 Showing <strong className="text-[var(--foreground)]">{paginatedItems.length}</strong> of{" "}
                 <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> scenarios
@@ -1077,14 +1077,14 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               <button
                 onClick={handleShuffle}
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
+                  "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all shrink-0 cursor-pointer",
                   isShuffled
-                    ? "bg-purple-600 text-white border-purple-500 shadow-sm"
-                    : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
+                    ? "bg-blue-600 text-white border-blue-500 shadow-xs"
+                    : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-blue-500/40 hover:bg-[var(--surface-2)]"
                 )}
                 title="Shuffle or randomize architecture scenarios"
               >
-                <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
+                <Shuffle size={12} className={cn(isShuffled && "rotate-180 transition-transform")} />
                 <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
               </button>
               {isShuffled && (
@@ -1146,23 +1146,23 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                     className={cn(
                       "rounded-xl border transition-all duration-200 overflow-hidden",
                       isExpanded
-                        ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xs"
+                        ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xs"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
                     )}
                   >
                     <div
                       onClick={() => toggleExpand(item.id)}
-                      className="p-3.5 sm:px-4 sm:py-3 cursor-pointer select-none space-y-1.5"
+                      className="p-3 sm:p-3.5 cursor-pointer select-none space-y-1"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2.5">
+                        <div className="space-y-0.5 min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[10px] sm:text-[11px] font-semibold text-purple-400 tracking-wide uppercase">
+                            <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 tracking-wide uppercase">
                               {item.category} {item.niche ? `· ${item.niche}` : ""}
                             </span>
                             <span
                               className={cn(
-                                "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
+                                "text-[9px] font-semibold px-1.5 py-0.5 rounded border",
                                 diffStyle.bg,
                                 diffStyle.text,
                                 diffStyle.border
@@ -1171,7 +1171,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                               {item.difficulty}
                             </span>
                           </div>
-                          <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] tracking-tight leading-snug break-words">
+                          <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight leading-snug break-words">
                             {item.question}
                           </h3>
                         </div>
@@ -1180,25 +1180,25 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                           <button
                             onClick={(e) => toggleBookmark(item.id, e)}
                             className={cn(
-                              "p-1.5 rounded-lg transition-colors",
+                              "p-1.5 rounded-lg transition-colors cursor-pointer",
                               isBookmarked
                                 ? "text-amber-400 bg-amber-400/10"
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                             )}
                             title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
-                            {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
+                            {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                           </button>
 
                           <button
                             onClick={(e) => copyScenario(item, e)}
-                            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                            className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
                             title="Copy Scenario"
                           >
                             {copiedId === item.id ? (
-                              <Check size={15} className="text-green-400" />
+                              <Check size={14} className="text-green-400" />
                             ) : (
-                              <Copy size={15} />
+                              <Copy size={14} />
                             )}
                           </button>
 
@@ -1207,7 +1207,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                               size={15}
                               className={cn(
                                 "transition-transform duration-200",
-                                isExpanded && "rotate-180 text-purple-400"
+                                isExpanded && "rotate-180 text-blue-500 dark:text-blue-400"
                               )}
                             />
                           </div>
@@ -1215,9 +1215,9 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       </div>
                     </div>
 
-                    <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 py-3 sm:px-4 sm:py-3.5 space-y-2 text-xs sm:text-sm bg-[var(--surface-2)]/30">
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-purple-400 pb-0.5">
-                        <Sparkles size={13} className="shrink-0" />
+                    <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 py-2.5 sm:px-4 sm:py-3 space-y-1.5 text-xs sm:text-sm bg-[var(--surface-2)]/30">
+                      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 pb-0.5">
+                        <Sparkles size={12} className="shrink-0" />
                         <span>Principal Architect Blueprint</span>
                       </div>
                       <div className="pt-0.5">
@@ -1229,10 +1229,10 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               })}
 
               {paginatedItems.length < filteredItems.length && (
-                <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
                     onClick={() => setVisibleCount((prev) => prev * 2)}
-                    className="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg hover:shadow-purple-500/25 flex items-center gap-2"
+                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                   >
                     <span>⚡ Load More (+{Math.min(paginatedItems.length, filteredItems.length - paginatedItems.length).toLocaleString()})</span>
                     <span className="opacity-75 font-normal">· {(filteredItems.length - paginatedItems.length).toLocaleString()} remaining</span>

@@ -329,7 +329,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       </div>
 
       {/* Language Selector Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {(Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
           const cfg = languageConfigs[key];
           const isSelected = activeLang === key;
@@ -338,23 +338,23 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
               key={key}
               onClick={() => handleLangChange(key)}
               className={cn(
-                "flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border transition-all text-left group",
+                "flex items-center gap-2 p-2 sm:p-2.5 rounded-lg border transition-all text-left group cursor-pointer",
                 isSelected
                   ? "bg-blue-600/15 border-blue-500/50 shadow-xs"
                   : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)]"
               )}
             >
-              <TopicIcon topic={cfg.topicKey} size={22} className="group-hover:scale-110 transition-transform shrink-0" />
+              <TopicIcon topic={cfg.topicKey} size={18} className="group-hover:scale-105 transition-transform shrink-0" />
               <div className="min-w-0 flex-1">
                 <div
                   className={cn(
-                    "text-xs sm:text-sm font-bold truncate",
+                    "text-xs sm:text-[13px] font-bold truncate leading-tight",
                     isSelected ? "text-blue-600 dark:text-blue-300" : "text-[var(--foreground)]"
                   )}
                 >
                   {cfg.name}
                 </div>
-                <div className="text-[11px] text-[var(--muted-foreground)]">
+                <div className="text-[10px] text-[var(--muted-foreground)]">
                   {cfg.data.length} Templates
                 </div>
               </div>
@@ -364,28 +364,28 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       </div>
 
       {/* 4-Layer Integrated Domain Navigation */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <Link
           href={`/concepts?term=${activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark"}`}
-          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2 sm:p-2.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <BookOpen size={15} />
+          <div className="w-7 h-7 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <BookOpen size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 1 · Concepts</div>
+            <div className="text-[9px] uppercase font-bold text-blue-600 dark:text-blue-400 leading-tight">Layer 1 · Concepts</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500 dark:group-hover:text-blue-300">
               {activeLang === "mssql" ? "T-SQL Definitions" : activeLang === "pyspark" ? "PySpark Core" : "Engine Concepts"}
             </div>
           </div>
         </Link>
 
-        <div className="p-2.5 sm:p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 font-bold">
-            <FileCode2 size={15} />
+        <div className="p-2 sm:p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center gap-2">
+          <div className="w-7 h-7 rounded-md bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 font-bold">
+            <FileCode2 size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code Active</div>
+            <div className="text-[9px] uppercase font-bold text-blue-400 leading-tight">Layer 2 · Code Active</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate">
               {languageConfigs[activeLang].data.length} Templates Active
             </div>
@@ -394,13 +394,13 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
         <Link
           href={`/qa-prep?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : activeLang === "pyspark" ? "PySpark" : "Spark")}`}
-          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2 sm:p-2.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
-            <MessageSquare size={15} />
+          <div className="w-7 h-7 rounded-md bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-[9px] uppercase font-bold text-orange-400 leading-tight">Layer 3 · Q&amp;A Prep</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">
               Related Interview Q&As
             </div>
@@ -409,13 +409,13 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
         <Link
           href={`/architecture?q=${encodeURIComponent(activeLang === "mssql" ? "SQL" : "Spark")}`}
-          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2 sm:p-2.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-            <Layers size={15} />
+          <div className="w-7 h-7 rounded-md bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <Layers size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
+            <div className="text-[9px] uppercase font-bold text-amber-400 leading-tight">Layer 4 · Architecture</div>
             <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">
               System Scenarios
             </div>
@@ -424,10 +424,10 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       </div>
 
       {/* Search & Level Filters */}
-      <div className="flex flex-col sm:flex-row gap-2.5">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search
-            size={16}
+            size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
           />
           <input
@@ -435,7 +435,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-9 pr-4 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -448,19 +448,19 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
         </div>
 
         {/* Level Filters */}
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
-          {["ALL", "beginner", "intermediate", "advanced", "architect"].map((lvl) => (
+        <div className="flex items-center gap-1 p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0 overflow-x-auto scrollbar-none">
+          {["ALL", "beginner", "intermediate", "advanced", "architect"].map((level) => (
             <button
-              key={lvl}
-              onClick={() => setSelectedLevel(lvl)}
+              key={level}
+              onClick={() => setSelectedLevel(level)}
               className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize",
-                selectedLevel === lvl
-                  ? "bg-blue-600 text-white shadow-xs font-semibold"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                "px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer",
+                selectedLevel === level
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
-              {lvl === "ALL" ? "All Levels" : lvl}
+              {level}
             </button>
           ))}
         </div>
@@ -531,7 +531,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2 sm:space-y-2.5">
           {displayedItems.map((item, index) => {
             const isExpanded = expandedIds.has(item.id);
             const isBookmarked = bookmarks.includes(item.id);
@@ -551,7 +551,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                 {/* Header */}
                 <div
                   onClick={() => toggleExpand(item.id)}
-                  className="p-3.5 sm:p-4 cursor-pointer select-none space-y-1.5"
+                  className="p-3 sm:p-3.5 cursor-pointer select-none space-y-1.5"
                 >
                   <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1 min-w-0">

@@ -177,7 +177,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
   }, []);
 
   return (
-    <div className="space-y-4 pb-20 max-w-7xl mx-auto px-2 sm:px-4">
+    <div className="space-y-3.5 pb-20 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Subnav */}
       <HubSubnav
         hubTitle="Interview Drill Hub"
@@ -193,7 +193,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
             href: "/company-research",
             icon: Building2,
             badge: "156 Targets",
-            badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+            badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
           },
           {
             label: "Production Cheat Sheet",
@@ -205,18 +205,17 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
       />
 
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-4 sm:p-5 isolate shadow-sm">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-1.5 max-w-3xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-              <Building2 size={13} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 isolate shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-3xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+              <Building2 size={12} />
               <span>Enterprise Hiring &amp; Compensation Intel</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
               Target Company Intel &amp; Architectural Rubrics
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
               In-depth architectural dossiers across <strong className="text-[var(--foreground)]">156 verified enterprises</strong>.
               Review production tech stacks, verified Senior DE &amp; Principal Architect salary benchmarks (USD + INR),
               system design archetypes, and real interview prompts asked in hiring loops.
@@ -225,20 +224,20 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-3 gap-2 shrink-0 text-center">
-            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base sm:text-lg font-bold text-purple-400">156</div>
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">156</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">
                 Companies
               </div>
             </div>
-            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base sm:text-lg font-bold text-emerald-400">3 Tiers</div>
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-base sm:text-lg font-bold text-emerald-500 dark:text-emerald-400">3 Tiers</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">
                 50+ Per Tier
               </div>
             </div>
-            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base sm:text-lg font-bold text-cyan-400">312+</div>
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-base sm:text-lg font-bold text-cyan-500 dark:text-cyan-400">312+</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">
                 Design Qs
               </div>
@@ -264,7 +263,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                 setVisibleCount(ITEMS_PER_PAGE);
               }}
               placeholder="Search by company, tech (e.g. Databricks, Flink, Iceberg), hub, or interview topic..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 transition-all"
+              className="w-full pl-9 pr-8 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 transition-all"
             />
             {searchQuery && (
               <button
@@ -278,7 +277,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
           </div>
 
           {/* Tier Switcher */}
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0">
             {[
               { key: "ALL", label: "All Companies", count: tierCounts.ALL },
               {
@@ -304,9 +303,9 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                   setVisibleCount(ITEMS_PER_PAGE);
                 }}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 whitespace-nowrap",
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 whitespace-nowrap cursor-pointer",
                   selectedTier === t.key
-                    ? "bg-purple-600 text-white shadow-sm font-semibold"
+                    ? "bg-blue-600 text-white shadow-xs font-semibold"
                     : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                 )}
               >
@@ -327,7 +326,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
         </div>
 
         {/* Row 2: Secondary Quick Filters (Tech Stack & Hiring Hubs) */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1 text-xs">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-0.5 text-xs">
           <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full sm:w-auto py-0.5">
             <span className="text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
               <SlidersHorizontal size={11} /> Tech:
@@ -340,9 +339,9 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                   setVisibleCount(ITEMS_PER_PAGE);
                 }}
                 className={cn(
-                  "px-2 py-0.5 rounded-md text-[11px] font-medium transition-all shrink-0 whitespace-nowrap border",
+                  "px-2 py-0.5 rounded-md text-[11px] font-medium transition-all shrink-0 whitespace-nowrap border cursor-pointer",
                   selectedTech === tech
-                    ? "bg-purple-500/20 text-purple-300 border-purple-500/40 font-semibold"
+                    ? "bg-blue-600 text-white border-blue-500 shadow-xs font-semibold"
                     : "bg-[var(--surface-1)] text-[var(--muted-foreground)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
                 )}
               >
@@ -363,9 +362,9 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                   setVisibleCount(ITEMS_PER_PAGE);
                 }}
                 className={cn(
-                  "px-2 py-0.5 rounded-md text-[11px] font-medium transition-all shrink-0 whitespace-nowrap border",
+                  "px-2 py-0.5 rounded-md text-[11px] font-medium transition-all shrink-0 whitespace-nowrap border cursor-pointer",
                   selectedHub === hub
-                    ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-semibold"
+                    ? "bg-cyan-600 text-white border-cyan-500 shadow-xs font-semibold"
                     : "bg-[var(--surface-1)] text-[var(--muted-foreground)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
                 )}
               >
@@ -381,13 +380,13 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
             Showing <strong className="text-[var(--foreground)]">{displayedCompanies.length}</strong> of{" "}
             <strong className="text-[var(--foreground)]">{filteredCompanies.length}</strong> companies
             {selectedTier !== "ALL" && (
-              <span> in <span className="text-purple-400 font-medium">{selectedTier}</span></span>
+              <span> in <span className="text-blue-500 dark:text-blue-400 font-medium">{selectedTier}</span></span>
             )}
             {selectedTech !== "All" && (
-              <span> with <span className="text-purple-400 font-medium">{selectedTech}</span></span>
+              <span> with <span className="text-blue-500 dark:text-blue-400 font-medium">{selectedTech}</span></span>
             )}
             {selectedHub !== "All Hubs" && (
-              <span> in <span className="text-cyan-400 font-medium">{selectedHub}</span></span>
+              <span> in <span className="text-cyan-500 dark:text-cyan-400 font-medium">{selectedHub}</span></span>
             )}
           </div>
 
@@ -397,7 +396,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
             searchQuery) && (
             <button
               onClick={handleResetFilters}
-              className="text-xs text-purple-400 hover:text-purple-300 underline font-medium"
+              className="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 underline font-medium cursor-pointer"
             >
               Reset all filters
             </button>
@@ -415,7 +414,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
           </p>
           <button
             onClick={handleResetFilters}
-            className="px-4 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500 transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors shadow-xs cursor-pointer"
           >
             Clear Filters
           </button>
@@ -423,22 +422,22 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
       )}
 
       {/* Company Cards Grid (Dense 2-column layout adhering to nextjs-compact-ui) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-3.5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 sm:gap-3">
         {displayedCompanies.map((company) => {
           const isExpanded = !!expandedIds[company.id];
 
           // Semantic Tier styling
-          let tierBadgeStyle = "bg-purple-500/10 text-purple-300 border-purple-500/20";
+          let tierBadgeStyle = "bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20";
           if (company.tier === "Tier 1 Global FinTech") {
-            tierBadgeStyle = "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+            tierBadgeStyle = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20";
           } else if (company.tier === "Global Capability Center (GCC)") {
-            tierBadgeStyle = "bg-amber-500/10 text-amber-300 border-amber-500/20";
+            tierBadgeStyle = "bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20";
           }
 
           return (
             <div
               key={company.id}
-              className="rounded-xl border transition-all duration-200 bg-[var(--surface-1)] border-[var(--border)] hover:border-purple-500/40 p-3.5 sm:p-4 space-y-3 shadow-xs flex flex-col justify-between"
+              className="rounded-xl border transition-all duration-200 bg-[var(--surface-1)] border-[var(--border)] hover:border-blue-500/40 p-3 sm:p-3.5 space-y-2.5 shadow-xs flex flex-col justify-between"
             >
               {/* Header: Logo, Name, Tier, Location, GCC Hubs */}
               <div className="space-y-2">
@@ -492,7 +491,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                 {/* System Design Archetype Pill */}
                 {company.systemDesignArchetype && (
                   <div className="p-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center gap-2 text-xs">
-                    <Layers size={13} className="text-purple-400 shrink-0" />
+                    <Layers size={13} className="text-blue-500 dark:text-blue-400 shrink-0" />
                     <div className="truncate">
                       <span className="text-[10px] uppercase font-bold text-[var(--muted-foreground)] mr-1">
                         System Design Archetype:
@@ -509,20 +508,20 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="p-2.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] space-y-0.5">
                   <div className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold flex items-center gap-1">
-                    <TrendingUp size={10} className="text-emerald-400" />
+                    <TrendingUp size={10} className="text-emerald-500 dark:text-emerald-400" />
                     <span>Senior Data Engineer</span>
                   </div>
-                  <div className="font-bold text-emerald-400 font-mono text-[11px] sm:text-xs">
+                  <div className="font-bold text-emerald-600 dark:text-emerald-400 font-mono text-[11px] sm:text-xs">
                     {company.seniorDeSalary}
                   </div>
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] space-y-0.5">
                   <div className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold flex items-center gap-1">
-                    <Briefcase size={10} className="text-purple-400" />
+                    <Briefcase size={10} className="text-blue-500 dark:text-blue-400" />
                     <span>Principal Architect</span>
                   </div>
-                  <div className="font-bold text-purple-400 font-mono text-[11px] sm:text-xs">
+                  <div className="font-bold text-blue-600 dark:text-blue-400 font-mono text-[11px] sm:text-xs">
                     {company.architectSalary}
                   </div>
                 </div>
@@ -548,13 +547,13 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
               {/* Architectural Interview Focus Topics */}
               <div className="space-y-1.5 pt-2 border-t border-[var(--border)] text-xs">
                 <div className="text-[11px] font-bold text-[var(--foreground)] flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-purple-400 shrink-0" />
+                  <Sparkles size={12} className="text-blue-500 dark:text-blue-400 shrink-0" />
                   <span>Key Architectural Interview Topics:</span>
                 </div>
                 <ul className="space-y-1 text-[var(--muted-foreground)] pl-1 text-[11px] sm:text-xs">
                   {company.interviewFocus.map((focus, i) => (
                     <li key={i} className="flex items-start gap-1.5 leading-snug">
-                      <span className="text-purple-400 font-bold shrink-0">•</span>
+                      <span className="text-blue-500 dark:text-blue-400 font-bold shrink-0">•</span>
                       <span>{focus}</span>
                     </li>
                   ))}
@@ -572,10 +571,10 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                 <div className="pt-1">
                   <button
                     onClick={() => toggleExpand(company.id)}
-                    className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/15 text-purple-300 text-xs font-semibold transition-all"
+                    className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/15 text-blue-600 dark:text-blue-300 text-xs font-semibold transition-all cursor-pointer"
                   >
                     <span className="flex items-center gap-1.5">
-                      <HelpCircle size={13} className="text-purple-400" />
+                      <HelpCircle size={13} className="text-blue-500 dark:text-blue-400" />
                       <span>Real Interview System Design Prompts ({company.sampleQuestions.length})</span>
                     </span>
                     {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -593,12 +592,12 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                             className="p-2 rounded-md bg-[var(--surface-1)] border border-[var(--border)] space-y-1.5 text-xs"
                           >
                             <div className="flex items-start justify-between gap-2">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                                 Scenario Prompt #{qIdx + 1}
                               </span>
                               <button
                                 onClick={() => handleCopyPrompt(copyKey, prompt)}
-                                className="flex items-center gap-1 text-[10px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                                className="flex items-center gap-1 text-[10px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
                                 title="Copy prompt to clipboard"
                               >
                                 {isCopied ? (
@@ -624,7 +623,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                       <div className="pt-1 flex items-center justify-end">
                         <Link
                           href={`/architecture?category=${encodeURIComponent("Databricks Lakehouse Architecture")}`}
-                          className="inline-flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300 font-medium"
+                          className="inline-flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium"
                         >
                           <span>Practice architecture blueprints</span>
                           <ArrowRight size={11} />
@@ -648,13 +647,13 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
           <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-sm transition-all"
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
             >
               Load More Companies (+{ITEMS_PER_PAGE})
             </button>
             <button
               onClick={() => setVisibleCount(filteredCompanies.length)}
-              className="px-4 py-2 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--foreground)] border border-[var(--border)] text-xs font-semibold transition-all"
+              className="px-4 py-2 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--foreground)] border border-[var(--border)] text-xs font-semibold transition-all cursor-pointer"
             >
               Show All ({filteredCompanies.length})
             </button>

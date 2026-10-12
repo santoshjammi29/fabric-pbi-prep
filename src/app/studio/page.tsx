@@ -15,16 +15,6 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  conceptsDb,
-  questionsDb,
-  questionsDeDb,
-  architectureData,
-  pythonData,
-  pysparkData,
-  sparksqlData,
-  mssqlData,
-} from "@/data";
 
 interface StudioUserData {
   streak: number;
@@ -47,7 +37,7 @@ export default function StudioPage() {
     Array<{ id: string; title: string; type: string; href: string }>
   >([]);
 
-  // Load user data & bookmarks
+  // Load user data & bookmarks asynchronously
   useEffect(() => {
     try {
       let bmList: string[] = [];
@@ -76,52 +66,31 @@ export default function StudioPage() {
         setUserData((prev) => ({ ...prev, bookmarks: bmList }));
       }
 
-      // Resolve bookmarked items across all databases
-      const resolved: Array<{ id: string; title: string; type: string; href: string }> = [];
-      bmList.forEach((id) => {
-        const c = conceptsDb.find((item) => item.id === id);
-        if (c) {
-          resolved.push({ id: c.id, title: c.term, type: "concept", href: `/concepts?term=${encodeURIComponent(c.term)}` });
-          return;
-        }
-        const q = questionsDb.find((item) => item.id === id);
-        if (q) {
-          resolved.push({ id: q.id, title: q.question, type: "q&a", href: "/qa-prep" });
-          return;
-        }
-        const de = questionsDeDb.find((item) => item.id === id);
-        if (de) {
-          resolved.push({ id: de.id, title: de.question, type: "de q&a", href: "/qa-prep" });
-          return;
-        }
-        const arch = architectureData.find((item) => item.id === id);
-        if (arch) {
-          resolved.push({ id: arch.id, title: arch.question, type: "scenario", href: "/architecture" });
-          return;
-        }
-        const py = pythonData.find((item) => item.id === id);
-        if (py) {
-          resolved.push({ id: py.id, title: py.title, type: "python", href: "/code-practice?db=python" });
-          return;
-        }
-        const psp = pysparkData.find((item) => item.id === id);
-        if (psp) {
-          resolved.push({ id: psp.id, title: psp.title, type: "pyspark", href: "/code-practice?db=pyspark" });
-          return;
-        }
-        const ssql = sparksqlData.find((item) => item.id === id);
-        if (ssql) {
-          resolved.push({ id: ssql.id, title: ssql.title, type: "spark sql", href: "/code-practice?db=sparksql" });
-          return;
-        }
-        const msql = mssqlData.find((item) => item.id === id);
-        if (msql) {
-          resolved.push({ id: msql.id, title: msql.title, type: "t-sql", href: "/code-practice?db=mssql" });
-          return;
-        }
-        resolved.push({ id, title: `Saved Item (${id})`, type: "saved", href: "/studio" });
-      });
-      setBookmarkedItems(resolved);
+      // Resolve bookmarked items via zero-bundle DAL API
+      if (bmList.length > 0) {
+        fetch("/api/bookmarks/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: bmList }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success && Array.isArray(data.items)) {
+              setBookmarkedItems(data.items);
+            }
+          })
+          .catch(() => {
+            // Fallback placeholder list if network is offline
+            setBookmarkedItems(
+              bmList.map((id) => ({
+                id,
+                title: `Saved Item (${id})`,
+                type: "saved",
+                href: "/studio",
+              }))
+            );
+          });
+      }
     } catch {
       // ignore
     }
@@ -200,19 +169,19 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
+    <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-              <User size={13} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 isolate shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+              <User size={12} />
               <span>Personal Learning Studio</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
               My Progress &amp; Architect Studio
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
               Track your daily review streak, active SM-2 retention levels, saved code templates, and
               manage offline JSON data backups.
             </p>
@@ -221,9 +190,9 @@ export default function StudioPage() {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={exportBackupJSON}
-              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
+              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
-              <Download size={14} />
+              <Download size={13} />
               <span>Export JSON</span>
             </button>
           </div>
@@ -231,75 +200,75 @@ export default function StudioPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
-        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-0.5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
             <span className="text-[11px] font-medium">Daily Streak</span>
-            <Flame size={16} className="text-orange-400" />
+            <Flame size={15} className="text-orange-400" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{userData.streak} Days</div>
-          <div className="text-[10px] text-green-400 font-medium">Active streak</div>
+          <div className="text-lg sm:text-xl font-bold text-[var(--foreground)]">{userData.streak} Days</div>
+          <div className="text-[10px] text-green-500 font-medium">Active streak</div>
         </div>
 
-        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-0.5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
             <span className="text-[11px] font-medium">Weekly XP</span>
-            <Zap size={16} className="text-purple-400" />
+            <Zap size={15} className="text-blue-500 dark:text-blue-400" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{userData.xp} XP</div>
-          <div className="text-[10px] text-purple-400 font-medium">Top 5% Learner</div>
+          <div className="text-lg sm:text-xl font-bold text-[var(--foreground)]">{userData.xp} XP</div>
+          <div className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">Top 5% Learner</div>
         </div>
 
-        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-0.5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
             <span className="text-[11px] font-medium">Saved Bookmarks</span>
-            <Bookmark size={16} className="text-amber-400" />
+            <Bookmark size={15} className="text-amber-400" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{bookmarkedItems.length} Saved</div>
-          <div className="text-[10px] text-[var(--muted-foreground)] font-medium">Concepts &amp; Q&As</div>
+          <div className="text-lg sm:text-xl font-bold text-[var(--foreground)]">{bookmarkedItems.length} Saved</div>
+          <div className="text-[10px] text-[var(--muted-foreground)] font-medium">Concepts &amp; Q&amp;As</div>
         </div>
 
-        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1">
+        <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-0.5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
             <span className="text-[11px] font-medium">Mastery Rank</span>
-            <Award size={16} className="text-blue-400" />
+            <Award size={15} className="text-blue-500 dark:text-blue-400" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-blue-400">Principal</div>
-          <div className="text-[10px] text-blue-300 font-medium">Level 4 Architect</div>
+          <div className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400">Principal</div>
+          <div className="text-[10px] text-blue-500/80 font-medium">Level 4 Architect</div>
         </div>
       </div>
 
       {/* Bookmarks & Storage Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 sm:gap-3">
         {/* Bookmarks List */}
-        <div className="lg:col-span-2 p-3.5 sm:p-5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+        <div className="lg:col-span-2 p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2.5">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2">
-              <Bookmark size={16} className="text-amber-400" />
+            <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] flex items-center gap-1.5">
+              <Bookmark size={15} className="text-amber-400" />
               Saved Bookmarks ({bookmarkedItems.length})
             </h3>
           </div>
 
           {bookmarkedItems.length === 0 ? (
-            <div className="py-8 text-center text-xs text-[var(--muted-foreground)] space-y-1.5">
+            <div className="py-8 text-center text-xs text-[var(--muted-foreground)] space-y-1">
               <p>No bookmarks saved yet.</p>
-              <p>Click the bookmark ribbon on any Concept or Q&A card to save it here for quick access.</p>
+              <p>Click the bookmark ribbon on any Concept or Q&amp;A card to save it here for quick access.</p>
             </div>
           ) : (
             <div className="space-y-1.5 max-h-[400px] overflow-y-auto pr-1">
               {bookmarkedItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-purple-500/40 text-xs transition-all group"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] hover:border-blue-500/40 text-xs transition-all group"
                 >
                   <Link
                     href={item.href}
-                    className="flex items-center gap-2 min-w-0 pr-2 flex-1 hover:text-purple-300 transition-colors"
+                    className="flex items-center gap-2 min-w-0 pr-2 flex-1 hover:text-blue-500 transition-colors"
                   >
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 uppercase shrink-0">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 uppercase shrink-0">
                       {item.type}
                     </span>
-                    <span className="font-semibold text-[var(--foreground)] group-hover:text-purple-300 transition-colors truncate">
+                    <span className="font-semibold text-[var(--foreground)] group-hover:text-blue-500 transition-colors truncate">
                       {item.title}
                     </span>
                   </Link>
@@ -317,19 +286,19 @@ export default function StudioPage() {
         </div>
 
         {/* Local Storage & Backup Tools */}
-        <div className="p-3.5 sm:p-5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 flex flex-col justify-between">
-          <div className="space-y-3">
-            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
+        <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">
               Data &amp; Local Persistence
             </h3>
             <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
               All your study progress, SM-2 ratings, and bookmarks are securely stored in your browser&rsquo;s local storage.
             </p>
 
-            <div className="space-y-2 pt-1">
+            <div className="space-y-1.5 pt-1">
               <label className="block w-full">
                 <input type="file" accept=".json" onChange={importBackupJSON} className="hidden" />
-                <div className="w-full py-2 px-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer flex items-center justify-center gap-2 transition-colors">
+                <div className="w-full py-1.5 px-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
                   <Upload size={13} />
                   <span>Import JSON Backup</span>
                 </div>
@@ -337,7 +306,7 @@ export default function StudioPage() {
 
               <button
                 onClick={resetAllProgress}
-                className="w-full py-2 px-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-1.5 px-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <RotateCcw size={13} />
                 <span>Reset All Data</span>
@@ -345,8 +314,8 @@ export default function StudioPage() {
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-[var(--surface-2)] text-[10px] text-[var(--muted-foreground)] flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-green-400 shrink-0" />
+          <div className="p-2 rounded-xl bg-[var(--surface-2)] text-[10px] text-[var(--muted-foreground)] flex items-center gap-1.5">
+            <CheckCircle2 size={12} className="text-green-500 shrink-0" />
             <span>Zero cloud tracking. 100% private offline-first app.</span>
           </div>
         </div>

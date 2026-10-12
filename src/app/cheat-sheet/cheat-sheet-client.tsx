@@ -270,37 +270,37 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
           </p>
 
           {/* Quick Metrics Bar */}
-          <div className="pt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 max-w-3xl">
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+          <div className="pt-1 grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
               <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Production Codes</span>
-              <div className="mt-0.5 flex items-baseline gap-1.5">
-                <span className="text-lg sm:text-xl font-bold font-mono text-[var(--foreground)]">
+              <div className="mt-0.5 flex items-baseline gap-1">
+                <span className="text-base sm:text-lg font-bold font-mono text-[var(--foreground)]">
                   {cheatsheetData.length}
                 </span>
-                <span className="text-[10px] text-blue-400 font-medium">Battle-Tested</span>
+                <span className="text-[10px] text-blue-500 dark:text-blue-400 font-medium">Battle-Tested</span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
               <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Emergency Triage</span>
-              <div className="mt-0.5 flex items-baseline gap-1.5">
-                <span className="text-lg sm:text-xl font-bold font-mono text-emerald-400">10+ Sev-1</span>
+              <div className="mt-0.5 flex items-baseline gap-1">
+                <span className="text-base sm:text-lg font-bold font-mono text-emerald-400">10+ Sev-1</span>
                 <span className="text-[10px] text-[var(--muted-foreground)]">Runbooks</span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
               <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Shuffle Reduction</span>
-              <div className="mt-0.5 flex items-baseline gap-1.5">
-                <span className="text-lg sm:text-xl font-bold font-mono text-purple-400">80%-100%</span>
+              <div className="mt-0.5 flex items-baseline gap-1">
+                <span className="text-base sm:text-lg font-bold font-mono text-blue-400">80%-100%</span>
                 <span className="text-[10px] text-[var(--muted-foreground)]">BHJ</span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2.5 sm:p-3 shadow-sm">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
               <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Core Domains</span>
-              <div className="mt-0.5 flex items-baseline gap-1.5">
-                <span className="text-lg sm:text-xl font-bold font-mono text-cyan-400">
+              <div className="mt-0.5 flex items-baseline gap-1">
+                <span className="text-base sm:text-lg font-bold font-mono text-cyan-400">
                   {ALL_CATEGORIES.length}
                 </span>
                 <span className="text-[10px] text-[var(--muted-foreground)]">End-to-End</span>
@@ -311,17 +311,17 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="space-y-4" id="main-content">
+      <div className="space-y-3.5" id="main-content">
         {/* Interactive Optimization Flow Diagram */}
         <section aria-labelledby="optimization-flow-heading">
           <OptimizationFlow onSelectCheatCode={handleJumpToCode} />
         </section>
 
         {/* Whiteboard Blueprints Reference Banner */}
-        <div className="p-3 sm:p-3.5 rounded-xl border border-purple-500/30 bg-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+        <div className="p-2.5 sm:p-3 rounded-xl border border-blue-500/30 bg-blue-500/5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
-              <Layers size={16} />
+            <div className="w-7 h-7 rounded-lg bg-blue-500/15 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <Layers size={15} />
             </div>
             <div className="min-w-0">
               <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Looking for visual system design blueprints?</h4>
@@ -330,7 +330,7 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
           </div>
           <Link
             href="/architecture?tab=diagrams"
-            className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
+            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-xs"
           >
             Explore 21 Blueprints &rarr;
           </Link>

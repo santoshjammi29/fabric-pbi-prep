@@ -161,87 +161,86 @@ export function HeroCommandCenter() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-300">
       {/* ── 1. FOCUSED, MOTIVATIONAL HERO BANNER ───────────────────────────── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-5 sm:p-8 isolate shadow-md">
+      <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate shadow-xs">
         {/* Ambient atmospheric lighting */}
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.18)_0%,transparent_70%)] blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 -mb-20 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.15)_0%,transparent_70%)] blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 left-0 -ml-16 w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(34,197,94,0.1)_0%,transparent_70%)] blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.12)_0%,transparent_70%)] blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 -mb-20 w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.08)_0%,transparent_70%)] blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl space-y-4">
+        <div className="relative z-10 max-w-4xl space-y-3">
           {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/25 text-xs font-semibold text-purple-300 backdrop-blur-md">
-            <Sparkles size={13} className="text-purple-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/25 text-[11px] font-semibold text-blue-600 dark:text-blue-300 backdrop-blur-md">
+            <Sparkles size={12} className="text-blue-500 dark:text-blue-400 animate-pulse" />
             <span className="tracking-wide">2026 ARCHITECT PREPARATION PLATFORM</span>
-            <span className="w-1 h-1 rounded-full bg-purple-400" />
-            <span className="text-[11px] text-purple-400/80 font-mono">6,570+ SCENARIOS</span>
+            <span className="w-1 h-1 rounded-full bg-blue-400" />
+            <span className="text-[10px] text-blue-500/80 font-mono">6,570+ SCENARIOS</span>
           </div>
 
           {/* Main motivational title */}
-          <div className="space-y-2">
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[var(--foreground)] leading-[1.15]">
+          <div className="space-y-1.5">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[var(--foreground)] leading-[1.2]">
               Master the Modern Data Platform.
-              <span className="block mt-1 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
+              <span className="block mt-0.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-400">
                 From Internal Mechanics to Principal Architecture.
               </span>
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed max-w-3xl">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed max-w-3xl">
               An open, production-grade learning operating system for Data Engineers and Architects.
               Vetted curricula across Microsoft Fabric, Databricks Lakehouse, Apache Spark, and Distributed Systems.
             </p>
           </div>
 
           {/* High-Intent Motivational Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
             <Link
               href="/learning-paths"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-purple-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
             >
-              <Compass size={16} />
+              <Compass size={15} />
               <span>Explore Career Curricula</span>
-              <ArrowRight size={14} className="text-purple-200" />
+              <ArrowRight size={13} />
             </Link>
 
             <Link
-              href="/learning-paths"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] hover:border-purple-500/40 text-[var(--foreground)] text-xs sm:text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+              href="/guided-learning"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] hover:border-blue-500/40 text-[var(--foreground)] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
             >
-              <Compass size={15} className="text-blue-400" />
-              <span>Explore 12 Curricula Tracks</span>
+              <Compass size={15} className="text-blue-500 dark:text-blue-400" />
+              <span>Guided Tech Tracks</span>
             </Link>
 
             <button
               type="button"
               onClick={openSearch}
-              className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[var(--surface-2)]/60 hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
               aria-label="Quick search all questions and concepts"
             >
-              <Search size={14} />
+              <Search size={13} />
               <span>Quick Search</span>
               <KbdShortcut shortcutKey="k" className="hidden sm:inline-flex bg-[var(--surface-3)]" />
             </button>
           </div>
 
           {/* Proof of Value Badges */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-2.5 border-t border-[var(--border)]/60 text-xs text-[var(--muted-foreground)]">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-2 border-t border-[var(--border)]/60 text-xs text-[var(--muted-foreground)]">
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-green-400" />
+              <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
               <span><strong className="text-[var(--foreground)]">6,570+</strong> Verified Questions</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-green-400" />
+              <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
               <span><strong className="text-[var(--foreground)]">436+</strong> Core Concepts</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-green-400" />
+              <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
               <span><strong className="text-[var(--foreground)]">25+</strong> Architecture Blueprints</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-green-400" />
+              <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
               <span><strong className="text-[var(--foreground)]">100%</strong> Free &amp; Open Access</span>
             </div>
           </div>
@@ -249,13 +248,13 @@ export function HeroCommandCenter() {
       </section>
 
       {/* ── 2. THE 5 PILLARS OF MASTERY (CLEAN GATEWAY CARDS) ──────────────── */}
-      <section className="space-y-3">
+      <section className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <div>
-            <div className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">
+            <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               Core Study Pillars
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-[var(--foreground)] tracking-tight">
+            <h2 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
               Choose Your Architectural Focus
             </h2>
           </div>
@@ -264,14 +263,14 @@ export function HeroCommandCenter() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
           {PILLARS.map((pillar) => {
             const Icon = pillar.icon;
             return (
               <div
                 key={pillar.id}
                 className={cn(
-                  "relative rounded-xl bg-[var(--surface-1)] border p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 group overflow-hidden shadow-sm",
+                  "relative rounded-xl bg-[var(--surface-1)] border p-3.5 sm:p-4 flex flex-col justify-between transition-all duration-200 group overflow-hidden shadow-xs",
                   pillar.borderColor,
                   pillar.hoverBorder
                 )}
@@ -279,20 +278,20 @@ export function HeroCommandCenter() {
                 {/* Subtle top gradient accent */}
                 <div
                   className={cn(
-                    "absolute inset-x-0 top-0 h-24 bg-gradient-to-b opacity-40 pointer-events-none transition-opacity group-hover:opacity-75",
+                    "absolute inset-x-0 top-0 h-20 bg-gradient-to-b opacity-40 pointer-events-none transition-opacity group-hover:opacity-75",
                     pillar.accentBg
                   )}
                 />
 
-                <div className="relative space-y-3">
+                <div className="relative space-y-2.5">
                   {/* Card Header */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Icon size={18} className={pillar.iconColor} />
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Icon size={16} className={pillar.iconColor} />
                       </div>
                       <div>
-                        <h3 className="text-base font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
+                        <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] group-hover:text-blue-500 transition-colors">
                           {pillar.title}
                         </h3>
                         <span
@@ -319,7 +318,7 @@ export function HeroCommandCenter() {
                         key={feature}
                         className="flex items-center gap-1.5 text-[11px] text-[var(--muted-foreground)] truncate"
                       >
-                        <span className="w-1 h-1 rounded-full bg-purple-400 shrink-0" />
+                        <span className="w-1 h-1 rounded-full bg-blue-500 shrink-0" />
                         <span className="truncate">{feature}</span>
                       </div>
                     ))}
@@ -327,16 +326,16 @@ export function HeroCommandCenter() {
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="relative pt-3.5 mt-3.5 border-t border-[var(--border)]/60 flex flex-wrap items-center justify-between gap-2.5">
+                <div className="relative pt-3 mt-3 border-t border-[var(--border)]/60 flex flex-wrap items-center justify-between gap-2">
                   <Link
                     href={pillar.primaryLink.href}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-purple-400 hover:text-purple-300 transition-colors group-hover:translate-x-0.5 transition-transform"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors group-hover:translate-x-0.5 transition-transform"
                   >
                     <span>{pillar.primaryLink.label}</span>
                     <ArrowRight size={13} />
                   </Link>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1">
                     {pillar.secondaryLinks.map((sec) => (
                       <Link
                         key={sec.href}

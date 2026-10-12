@@ -301,7 +301,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
   }, [selectedLexiconCat, lexiconQuery]);
 
   return (
-    <div className="space-y-4 pb-16">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-3.5 pb-16">
       <HubSubnav
         hubTitle="Concepts & Engines"
         items={[
@@ -312,29 +312,29 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400">
-              <Zap size={13} />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 shadow-xs isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-[10px] font-semibold text-red-400">
+              <Zap size={12} />
               <span>Step 3 · Distributed Engine Internals</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
               Apache Spark &amp; Tungsten Engine Hub
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
               Deep-dive into Spark physical execution plans, memory management, Catalyst optimizers,
               live partition flow simulators, and the 32-level PySpark curriculum.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl font-bold text-red-400 leading-none">Spark 4.0</div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-base sm:text-lg font-bold text-red-400 leading-none">Spark 4.0</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Ready Engine</div>
             </div>
-            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-xl font-bold text-amber-400 leading-none">32</div>
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-base sm:text-lg font-bold text-amber-400 leading-none">32</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Curriculum Levels</div>
             </div>
           </div>
@@ -364,62 +364,62 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
       />
 
       {/* 4-Layer Integrated Domain Taxonomy */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <Link
           href="/concepts?term=Spark"
-          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-            <BookOpen size={15} />
+          <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <BookOpen size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-purple-400">Layer 1 · Concepts</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-purple-300">Spark Definitions</div>
+            <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 1 · Concepts</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">Spark Definitions</div>
           </div>
         </Link>
 
         <Link
           href="/code-practice?db=pyspark"
-          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-            <FileCode2 size={15} />
+          <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <FileCode2 size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-blue-400">Layer 2 · Code</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-300">PySpark & SQL Sheets</div>
+            <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 2 · Code</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">PySpark &amp; SQL Sheets</div>
           </div>
         </Link>
 
         <Link
           href="/qa-prep?q=Spark"
-          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-orange-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
-            <MessageSquare size={15} />
+          <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-orange-400">Layer 3 · Q&amp;A Prep</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-orange-300">Spark Interview Bank</div>
+            <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 3 · Q&amp;A Prep</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">Spark Interview Bank</div>
           </div>
         </Link>
 
         <Link
           href="/architecture?q=Spark"
-          className="p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-amber-500/40 transition-all flex items-center gap-2.5 group"
+          className="p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-            <Layers size={15} />
+          <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <Layers size={14} />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold text-amber-400">Layer 4 · Architecture</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-amber-300">Cluster & FinOps Specs</div>
+            <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 4 · Architecture</div>
+            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">Cluster &amp; FinOps Specs</div>
           </div>
         </Link>
       </div>
 
       {/* Subtab Navigation Chips */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
         {[
           { id: "architecture", label: "Engine Architecture", icon: Cpu },
           { id: "simulator", label: "Live Physical Simulator", icon: Activity },
@@ -434,13 +434,13 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as SparkSubtab)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0",
+                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
                 isSelected
-                  ? "bg-purple-600 text-white shadow-sm shadow-purple-500/20"
+                  ? "bg-blue-600 text-white shadow-xs"
                   : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
               )}
             >
-              <Icon size={14} />
+              <Icon size={13} />
               <span>{tab.label}</span>
             </button>
           );
@@ -449,12 +449,12 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
       {/* 1. ENGINE ARCHITECTURE VIEW */}
       {activeTab === "architecture" && (
-        <div id="architecture" className="space-y-4 animate-in fade-in duration-300">
+        <div id="architecture" className="space-y-3.5 animate-in fade-in duration-300">
           {/* 3 Milestones */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold">
-                <GitMerge size={16} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+            <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold">
+                <GitMerge size={15} />
               </div>
               <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
                 Unification Breakthrough
@@ -465,11 +465,11 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
-                <Cpu size={16} />
+            <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center font-bold">
+                <Cpu size={15} />
               </div>
-              <div className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
                 Memory Paradigm Shift
               </div>
               <h3 className="text-sm font-bold text-[var(--foreground)]">Lineage vs Replication</h3>
@@ -478,9 +478,9 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
-                <Zap size={16} />
+            <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-1.5">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                <Zap size={15} />
               </div>
               <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
                 Optimized Compilation
@@ -493,13 +493,13 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
 
           {/* Whiteboard Architecture Blueprints Showcase (Second Layout Style with Interactive Dark Mode) */}
-          <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-5">
+          <div className="p-3.5 sm:p-4.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                   <Layers size={13} /> Visual System Blueprints
                 </span>
-                <h3 className="text-base sm:text-xl font-bold text-[var(--foreground)] mt-0.5">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
                   Databricks &amp; Spark Engine Architecture Blueprints
                 </h3>
                 <p className="text-xs text-[var(--muted-foreground)]">
@@ -511,7 +511,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                 <WhiteboardThemeToggle size="sm" showLabel={true} />
                 <Link
                   href="/architecture?tab=diagrams"
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-sm shrink-0"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-xs shrink-0"
                 >
                   <span>All 21 Blueprints</span>
                   <ChevronDown size={13} className="-rotate-90" />
@@ -604,7 +604,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               <button
                 onClick={runSimulation}
                 disabled={isSimRunning}
-                className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-sm hover:shadow-purple-500/25 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Activity size={14} className={cn(isSimRunning && "animate-pulse")} />
                 <span>{isSimRunning ? "Running..." : "Run Plan"}</span>
@@ -927,9 +927,9 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                   key={phase}
                   onClick={() => setSelectedPhase(phase as any)}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize",
+                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize cursor-pointer",
                     selectedPhase === phase
-                      ? "bg-purple-600 text-white shadow-sm font-semibold"
+                      ? "bg-blue-600 text-white shadow-xs font-semibold"
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >
@@ -962,7 +962,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
 
           {/* Curriculum items */}
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {pysparkData.map((item, index) => {
               const isExpanded = expandedLevels.has(item.id);
               return (
@@ -971,7 +971,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                   className={cn(
                     "rounded-xl border transition-all duration-150 overflow-hidden",
                     isExpanded
-                      ? "bg-[var(--surface-1)] border-purple-500/40 shadow-xs"
+                      ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xs"
                       : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)]"
                   )}
                 >
@@ -980,11 +980,11 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                     className="p-3 sm:p-3.5 cursor-pointer flex items-center justify-between gap-3 select-none"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs shrink-0 border border-purple-500/20">
+                      <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 border border-blue-500/20">
                         L{index + 1}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-[10px] text-purple-400 font-semibold uppercase">{item.category}</div>
+                        <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold uppercase">{item.category}</div>
                         <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">
                           {item.title}
                         </h4>
@@ -992,7 +992,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                     </div>
                     <ChevronDown
                       size={15}
-                      className={cn("text-[var(--muted-foreground)] transition-transform duration-150 shrink-0", isExpanded && "rotate-180 text-purple-400")}
+                      className={cn("text-[var(--muted-foreground)] transition-transform duration-150 shrink-0", isExpanded && "rotate-180 text-blue-500 dark:text-blue-400")}
                     />
                   </div>
 
@@ -1028,10 +1028,10 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
       {/* 5. ARCHITECT'S LEXICON VIEW */}
       {activeTab === "lexicon" && (
-        <div id="lexicon" className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-300">
+        <div id="lexicon" className="p-3.5 sm:p-4.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 Core Terminology Encyclopedia
               </span>
               <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
@@ -1039,7 +1039,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               </h3>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2.5">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative">
                 <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
@@ -1057,9 +1057,9 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                     key={cat}
                     onClick={() => setSelectedLexiconCat(cat)}
                     className={cn(
-                      "px-2 py-0.5 rounded-lg text-xs font-medium capitalize",
+                      "px-2.5 py-1 rounded-lg text-xs font-medium capitalize cursor-pointer",
                       selectedLexiconCat === cat
-                        ? "bg-purple-600 text-white font-semibold"
+                        ? "bg-blue-600 text-white font-semibold shadow-xs"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                     )}
                   >
@@ -1071,14 +1071,14 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
 
           {/* Lexicon Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
             {filteredLexicon.map((term) => (
-              <div key={term.term} className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5">
+              <div key={term.term} className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wide">
+                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
                     {term.category}
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 dark:text-blue-400 border border-blue-500/20">
                     {term.badge}
                   </span>
                 </div>

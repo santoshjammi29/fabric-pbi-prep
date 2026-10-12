@@ -60,7 +60,7 @@ export function CheatCard({
   onSelectTag,
   onSelectCategory,
 }: CheatCardProps) {
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
   const Icon = CATEGORY_ICONS[cheat.category] || Zap;
@@ -83,15 +83,15 @@ export function CheatCard({
     <article
       id={cheat.id}
       className={cn(
-        "group relative flex flex-col rounded-xl border bg-[var(--card)] p-3.5 sm:p-4 transition-all duration-200 shadow-sm hover:shadow-md",
+        "group relative flex flex-col rounded-xl border bg-[var(--card)] p-3 sm:p-3.5 transition-all duration-200 shadow-xs hover:shadow-sm",
         isHighlighted
           ? "border-blue-500 ring-2 ring-blue-500/30 bg-blue-950/10"
           : "border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--card-hover)]"
       )}
     >
       {/* Top Header Row */}
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2.5 flex-wrap">
+      <div className="flex items-start justify-between gap-2.5 mb-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Category Pill */}
           <button
             type="button"
@@ -141,32 +141,32 @@ export function CheatCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-base font-bold text-[var(--foreground)] tracking-tight group-hover:text-blue-400 transition-colors">
+      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight group-hover:text-blue-400 transition-colors leading-snug">
         {cheat.title}
       </h3>
 
       {/* Production Metrics Pill */}
       {cheat.metrics && (
-        <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start">
-          <Flame size={13} className="text-emerald-400 animate-pulse" />
+        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start">
+          <Flame size={12} className="text-emerald-400 animate-pulse" />
           <span>{cheat.metrics}</span>
         </div>
       )}
 
       {/* Problem Callout */}
-      <div className="mt-3.5 p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] leading-relaxed">
-        <span className="font-semibold text-rose-400 block mb-1">Problem / Challenge:</span>
+      <div className="mt-2 p-2.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] leading-relaxed">
+        <span className="font-semibold text-rose-400 block mb-0.5">Problem / Challenge:</span>
         {cheat.problem}
       </div>
 
       {/* Solution Description */}
-      <div className="mt-2.5 text-xs text-[var(--foreground)] leading-relaxed">
+      <div className="mt-2 text-xs text-[var(--foreground)] leading-relaxed">
         <span className="font-semibold text-blue-400">Production Solution: </span>
         {cheat.solution}
       </div>
 
       {/* Syntax-Highlighted Code Block */}
-      <div className="mt-3">
+      <div className="mt-2.5">
         <CodeBlock
           code={cheat.codeSnippet}
           language={cheat.language}
@@ -176,29 +176,29 @@ export function CheatCard({
       </div>
 
       {/* Deep-Dive Expandable Section */}
-      <div className="mt-2 pt-2 border-t border-[var(--border)]">
+      <div className="mt-2 pt-1.5 border-t border-[var(--border)]">
         <button
           type="button"
           onClick={() => setIsExpanded((v) => !v)}
-          className="w-full flex items-center justify-between text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] py-1.5 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] py-1 transition-colors cursor-pointer"
         >
-          <span>Production Impact & Gotchas</span>
-          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          <span>Production Impact &amp; Gotchas</span>
+          {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         </button>
 
         {isExpanded && (
-          <div className="space-y-3 pt-2 text-xs">
+          <div className="space-y-2 pt-1.5 text-xs">
             {/* The Why */}
-            <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/15">
-              <span className="font-bold text-blue-400 block mb-1">The &quot;Why&quot; (Production ROI):</span>
+            <div className="p-2.5 rounded-lg bg-blue-500/5 border border-blue-500/15">
+              <span className="font-bold text-blue-400 block mb-0.5">The &quot;Why&quot; (Production ROI):</span>
               <p className="text-[var(--foreground)] leading-relaxed">{cheat.whyItMatters}</p>
             </div>
 
             {/* Anti-Pattern Gotcha */}
             {cheat.antiPattern && (
-              <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
-                <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-1">
-                  <AlertTriangle size={13} />
+              <div className="p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-0.5">
+                  <AlertTriangle size={12} />
                   <span>Production Anti-Pattern to Avoid:</span>
                 </div>
                 <p className="text-[var(--foreground)] leading-relaxed">{cheat.antiPattern}</p>
@@ -210,8 +210,8 @@ export function CheatCard({
 
       {/* Tags footer */}
       {cheat.tags && cheat.tags.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-[var(--border)] flex flex-wrap items-center gap-1.5">
-          <Tag size={11} className="text-[var(--muted-foreground)] mr-1" />
+        <div className="mt-2.5 pt-2 border-t border-[var(--border)] flex flex-wrap items-center gap-1">
+          <Tag size={10} className="text-[var(--muted-foreground)] mr-1" />
           {cheat.tags.map((t) => (
             <button
               key={t}

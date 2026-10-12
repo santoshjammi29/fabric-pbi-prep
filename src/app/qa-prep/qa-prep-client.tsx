@@ -131,7 +131,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
   // Window Virtualization for Questions List
   const virtualizer = useWindowVirtualizer({
     count: filteredQuestions.length,
-    estimateSize: () => 160,
+    estimateSize: () => 110,
     overscan: 5,
   });
 
@@ -168,7 +168,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
   const currentStudyCard = filteredQuestions[studyIndex];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-16">
       <HubSubnav
         hubTitle="Interview Prep & Architecture"
         items={[
@@ -179,35 +179,35 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
       />
 
       {/* Header Hub Banner */}
-      <div className="relative rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-6 sm:p-8 overflow-hidden">
-        <div className="relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-            <MessageSquare size={13} />
+      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 overflow-hidden shadow-xs">
+        <div className="relative z-10 space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+            <MessageSquare size={12} />
             <span>Interview Practice &amp; Architect Q&amp;A Hub</span>
           </div>
-          <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--foreground)] tracking-tight">
+          <div className="space-y-1">
+            <h1 className="text-lg sm:text-xl font-bold text-[var(--foreground)] tracking-tight">
               6,500+ Production Interview Scenarios
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] max-w-3xl leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
               Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, and Lakehouse architectures.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
             <button
               onClick={() => setIsStudyMode(!isStudyMode)}
               className={cn(
-                "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer shadow-xs",
                 isStudyMode
                   ? "bg-blue-600 border-blue-500 text-white"
                   : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
               )}
             >
-              <Zap size={14} />
+              <Zap size={13} />
               <span>{isStudyMode ? "Exit Study Mode" : "Interactive Study Mode (Flashcards)"}</span>
             </button>
-            <span className="text-xs text-[var(--muted-foreground)]">
+            <span className="text-[11px] text-[var(--muted-foreground)]">
               Showing {filteredQuestions.length.toLocaleString()} of {initialQuestions.length.toLocaleString()} questions
             </span>
           </div>
@@ -215,11 +215,11 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
       </div>
 
       {/* Standardized Domain Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
         <button
           onClick={() => setSelectedDomain("ALL")}
           className={cn(
-            "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+            "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
             selectedDomain === "ALL"
               ? "bg-blue-600 border-blue-500 text-white shadow-xs"
               : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -232,7 +232,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
             key={dom}
             onClick={() => setSelectedDomain(dom)}
             className={cn(
-              "px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+              "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
               selectedDomain === dom
                 ? "bg-blue-600 border-blue-500 text-white shadow-xs"
                 : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -244,20 +244,20 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
       </div>
 
       {/* Search & Difficulty Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions by topic, failure modes, code syntax..."
-            className="w-full pl-9 pr-12 py-2.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-9 pr-12 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
             >
               Clear
             </button>
@@ -265,13 +265,13 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
         </div>
 
         {/* Difficulty Selector */}
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1 p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0 overflow-x-auto scrollbar-none">
           {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
             <button
               key={diff}
               onClick={() => setSelectedDifficulty(diff)}
               className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer",
+                "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
                 selectedDifficulty === diff
                   ? "bg-blue-600 text-white shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
@@ -285,9 +285,9 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
 
       {/* Study Flashcard Mode */}
       {isStudyMode && currentStudyCard && (
-        <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-blue-500/30 shadow-xl space-y-5">
+        <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-blue-500/30 shadow-md space-y-3.5">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+            <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider text-[11px]">
               Question {studyIndex + 1} of {filteredQuestions.length.toLocaleString()}
             </span>
             <span className="font-mono text-[10px]">{currentStudyCard.category}</span>
@@ -295,20 +295,20 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
 
           <div
             onClick={() => setIsCardFlipped(!isCardFlipped)}
-            className="min-h-[260px] p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col justify-center items-center text-center cursor-pointer select-none space-y-4 hover:border-blue-500/30 transition-all"
+            className="min-h-[200px] p-4 sm:p-5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col justify-center items-center text-center cursor-pointer select-none space-y-3 hover:border-blue-500/30 transition-all"
           >
             {!isCardFlipped ? (
-              <div className="space-y-3 max-w-2xl">
-                <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Interview Question</span>
-                <h3 className="text-lg sm:text-xl font-bold text-[var(--foreground)] leading-relaxed">
+              <div className="space-y-2 max-w-2xl">
+                <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Interview Question</span>
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] leading-snug">
                   {currentStudyCard.question}
                 </h3>
-                <p className="text-xs text-[var(--muted-foreground)] pt-4">Click card or spacebar to reveal architect answer</p>
+                <p className="text-[11px] text-[var(--muted-foreground)] pt-2">Click card or spacebar to reveal architect answer</p>
               </div>
             ) : (
-              <div className="space-y-3 max-w-3xl text-left w-full max-h-[400px] overflow-y-auto pr-2">
-                <span className="text-[11px] font-semibold text-green-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles size={13} /> Architect Solution
+              <div className="space-y-2 max-w-3xl text-left w-full max-h-[360px] overflow-y-auto pr-2">
+                <span className="text-[10px] font-semibold text-green-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles size={12} /> Architect Solution
                 </span>
                 <AnswerRenderer text={currentStudyCard.answer} compact />
               </div>
@@ -321,18 +321,18 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
                 setIsCardFlipped(false);
                 setStudyIndex((i) => (i === 0 ? filteredQuestions.length - 1 : i - 1));
               }}
-              className="px-4 py-2 rounded-xl bg-[var(--surface-2)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center gap-1 cursor-pointer"
             >
-              <ChevronLeft size={16} /> Prev
+              <ChevronLeft size={14} /> Prev
             </button>
             <button
               onClick={() => {
                 setIsCardFlipped(false);
                 setStudyIndex((i) => (i + 1) % filteredQuestions.length);
               }}
-              className="px-4 py-2 rounded-xl bg-[var(--surface-2)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors flex items-center gap-1 cursor-pointer"
             >
-              Next <ChevronRight size={16} />
+              Next <ChevronRight size={14} />
             </button>
           </div>
         </div>
@@ -402,58 +402,58 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
                     <div
                       id={`question-${q.id}`}
                       className={cn(
-                        "rounded-2xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)]",
+                        "rounded-xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)]",
                         isExpanded ? "border-blue-500/40 shadow-xs" : "border-[var(--border)] hover:border-[var(--border-hover)]"
                       )}
                     >
                       <div
                         onClick={() => toggleExpand(q.id)}
-                        className="p-4 sm:p-5 cursor-pointer select-none space-y-2"
+                        className="p-3 sm:p-3.5 cursor-pointer select-none space-y-1.5"
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-start justify-between gap-2.5">
+                          <div className="space-y-0.5 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 tracking-wider uppercase">
                                 {q.category || "Data Engineering"}
                               </span>
                               {q.niche && (
-                                <span className="text-[10px] text-[var(--muted-foreground)] font-mono">
+                                <span className="text-[9px] text-[var(--muted-foreground)] font-mono">
                                   · {q.niche}
                                 </span>
                               )}
-                              <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", diffStyle.bg, diffStyle.text, diffStyle.border)}>
+                              <span className={cn("text-[9px] font-semibold px-1.5 py-0.5 rounded border", diffStyle.bg, diffStyle.text, diffStyle.border)}>
                                 {q.difficulty}
                               </span>
                             </div>
-                            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] leading-snug">
+                            <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] leading-snug">
                               {q.question}
                             </h3>
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="flex items-center gap-1 shrink-0">
                             <button
                               type="button"
                               onClick={(e) => toggleBookmark(q.id, e)}
                               className={cn(
-                                "p-2 rounded-xl border transition-colors cursor-pointer",
+                                "p-1.5 rounded-lg border transition-colors cursor-pointer",
                                 isBookmarked
                                   ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
                                   : "bg-[var(--surface-2)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]"
                               )}
                               title={isBookmarked ? "Bookmarked" : "Bookmark"}
                             >
-                              {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                              {isBookmarked ? <BookmarkCheck size={13} /> : <Bookmark size={13} />}
                             </button>
                             <button
                               type="button"
                               onClick={(e) => copyToClipboard(q.question, q.id, e)}
-                              className="p-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+                              className="p-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
                               title="Copy Question"
                             >
-                              {copiedId === q.id ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+                              {copiedId === q.id ? <Check size={13} className="text-green-400" /> : <Copy size={13} />}
                             </button>
-                            <span className="p-2 text-[var(--muted-foreground)]">
-                              <ChevronDown size={16} className={cn("transition-transform duration-200", isExpanded && "rotate-180")} />
+                            <span className="p-1 text-[var(--muted-foreground)]">
+                              <ChevronDown size={15} className={cn("transition-transform duration-200", isExpanded && "rotate-180")} />
                             </span>
                           </div>
                         </div>
@@ -461,8 +461,8 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
 
                       {/* Expanded Answer */}
                       {isExpanded && (
-                        <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 border-t border-[var(--border)]/60 bg-[var(--surface-2)]/30 space-y-3">
-                          <div className="pt-2 text-xs sm:text-sm text-[var(--foreground)] leading-relaxed">
+                        <div className="px-3.5 pb-3.5 sm:px-4 sm:pb-4 pt-1 border-t border-[var(--border)]/60 bg-[var(--surface-2)]/30 space-y-2">
+                          <div className="pt-1 text-xs sm:text-[13px] text-[var(--foreground)] leading-relaxed">
                             <AnswerRenderer text={q.answer} />
                           </div>
                         </div>
