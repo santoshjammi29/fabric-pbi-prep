@@ -67,7 +67,6 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const listContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync bookmarks
   useEffect(() => {
@@ -134,7 +133,6 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
     count: filteredQuestions.length,
     estimateSize: () => 110,
     overscan: 5,
-    scrollMargin: listContainerRef.current?.offsetTop ?? 0,
     scrollToFn: (offset, options) => {
       if (options.adjustments !== undefined && options.adjustments !== 0) {
         return;
@@ -384,7 +382,6 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
             </div>
           ) : (
             <div
-              ref={listContainerRef}
               data-virtual-container="true"
               style={{
                 height: `${virtualizer.getTotalSize()}px`,

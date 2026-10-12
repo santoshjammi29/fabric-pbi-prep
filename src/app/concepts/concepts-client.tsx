@@ -87,7 +87,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const listContainerRef = useRef<HTMLDivElement>(null);
 
   const handleShuffle = useCallback(() => {
     setIsShuffled(true);
@@ -149,7 +148,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     count: filteredConcepts.length,
     estimateSize: () => 120,
     overscan: 4,
-    scrollMargin: listContainerRef.current?.offsetTop ?? 0,
     scrollToFn: (offset, options) => {
       if (options.adjustments !== undefined && options.adjustments !== 0) {
         return;
@@ -404,7 +402,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             </div>
           ) : (
             <div
-              ref={listContainerRef}
               data-virtual-container="true"
               style={{
                 height: `${virtualizer.getTotalSize()}px`,
