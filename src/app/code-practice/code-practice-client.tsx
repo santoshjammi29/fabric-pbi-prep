@@ -155,7 +155,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
           if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
           scrollTimerRef.current = setTimeout(() => {
             const el = document.getElementById(`code-${matched.id}`);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
           }, 300);
         } else if (qParam) {
           setSearchQuery(qParam);
@@ -542,7 +542,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                 key={item.id}
                 id={`code-${item.id}`}
                 className={cn(
-                  "rounded-xl border transition-all duration-200 overflow-hidden",
+                  "rounded-xl border transition-all duration-200 overflow-hidden scroll-mt-20",
                   isExpanded
                     ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xs"
                     : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"

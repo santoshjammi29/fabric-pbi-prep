@@ -49,7 +49,7 @@ export function ArchitectureDiagramsGallery() {
           setActiveDiagram(match);
           setTimeout(() => {
             const el = document.getElementById(`diagram-${match.id}`);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
           }, 150);
         }
       }

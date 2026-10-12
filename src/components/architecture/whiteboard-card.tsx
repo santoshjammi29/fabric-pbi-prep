@@ -60,7 +60,7 @@ export function WhiteboardCard({
       id={`diagram-${diagram.id}`}
       onClick={handleCardClick}
       className={cn(
-        "group rounded-2xl sm:rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer shadow-sm hover:shadow-xl hover:shadow-blue-500/5",
+        "group rounded-2xl sm:rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-blue-500/40 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer shadow-sm hover:shadow-xl hover:shadow-blue-500/5 scroll-mt-20",
         className
       )}
     >

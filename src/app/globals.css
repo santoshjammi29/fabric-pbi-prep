@@ -1541,3 +1541,18 @@ code:not(pre code) {
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Prevent layout shift and jumpy scrolling on card expansion */
+[data-virtual-container] {
+  overflow-anchor: none;
+}
+
+[id^="question-"],
+[id^="concept-"],
+[id^="arch-"],
+[id^="python-"],
+[id^="code-"],
+[id^="diagram-"],
+[id^="gl-item-"] {
+  scroll-margin-top: 5rem;
+}
+

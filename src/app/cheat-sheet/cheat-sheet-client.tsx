@@ -63,7 +63,7 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
       setTimeout(() => {
         const el = document.getElementById(idParam);
         if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       }, 250);
     }
@@ -216,7 +216,7 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
     setTimeout(() => {
       const el = document.getElementById(targetId);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
     }, 100);
   };

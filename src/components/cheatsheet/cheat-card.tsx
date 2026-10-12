@@ -83,7 +83,7 @@ export function CheatCard({
     <article
       id={cheat.id}
       className={cn(
-        "group relative flex flex-col rounded-xl border bg-[var(--card)] p-3 sm:p-3.5 transition-all duration-200 shadow-xs hover:shadow-sm",
+        "group relative flex flex-col rounded-xl border bg-[var(--card)] p-3 sm:p-3.5 transition-all duration-200 shadow-xs hover:shadow-sm scroll-mt-20",
         isHighlighted
           ? "border-blue-500 ring-2 ring-blue-500/30 bg-blue-950/10"
           : "border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--card-hover)]"

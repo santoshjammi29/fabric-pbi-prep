@@ -67,6 +67,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync bookmarks
   useEffect(() => {
@@ -133,7 +134,18 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
     count: filteredQuestions.length,
     estimateSize: () => 110,
     overscan: 5,
+    scrollMargin: listContainerRef.current?.offsetTop ?? 0,
+    scrollToFn: (offset, options) => {
+      if (options.adjustments !== undefined && options.adjustments !== 0) {
+        return;
+      }
+      window.scrollTo({
+        top: offset,
+        behavior: options.behavior,
+      });
+    },
   });
+  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -372,10 +384,13 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
             </div>
           ) : (
             <div
+              ref={listContainerRef}
+              data-virtual-container="true"
               style={{
                 height: `${virtualizer.getTotalSize()}px`,
                 width: "100%",
                 position: "relative",
+                overflowAnchor: "none",
               }}
             >
               {virtualizer.getVirtualItems().map((virtualRow) => {
@@ -402,7 +417,7 @@ export function QaPrepClient({ initialQuestions }: QaPrepClientProps) {
                     <div
                       id={`question-${q.id}`}
                       className={cn(
-                        "rounded-xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)]",
+                        "rounded-xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)] scroll-mt-20",
                         isExpanded ? "border-blue-500/40 shadow-xs" : "border-[var(--border)] hover:border-[var(--border-hover)]"
                       )}
                     >

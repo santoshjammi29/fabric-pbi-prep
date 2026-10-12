@@ -136,7 +136,7 @@ const RunbookCard = React.memo(function RunbookCard({
     <div
       id={`python-${item.id}`}
       className={cn(
-        "rounded-xl border transition-all duration-200 overflow-hidden",
+        "rounded-xl border transition-all duration-200 overflow-hidden scroll-mt-20",
         isExpanded
           ? "bg-[var(--surface-1)] border-emerald-500/50 shadow-xs ring-1 ring-emerald-500/20"
           : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
@@ -568,7 +568,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
           scrollTimerRef.current = setTimeout(() => {
             const el = document.getElementById(`python-${cleanId}`);
             if (el) {
-              el.scrollIntoView({ behavior: "smooth", block: "center" });
+              el.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
           }, 350);
         } else {
@@ -579,7 +579,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
           scrollTimerRef.current = setTimeout(() => {
             const el = document.getElementById(`arch-${cleanId}`);
             if (el) {
-              el.scrollIntoView({ behavior: "smooth", block: "center" });
+              el.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
           }, 350);
         }
@@ -1144,7 +1144,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                     key={item.id}
                     id={`arch-${item.id}`}
                     className={cn(
-                      "rounded-xl border transition-all duration-200 overflow-hidden",
+                      "rounded-xl border transition-all duration-200 overflow-hidden scroll-mt-20",
                       isExpanded
                         ? "bg-[var(--surface-1)] border-blue-500/40 shadow-xs"
                         : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"

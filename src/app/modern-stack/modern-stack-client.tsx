@@ -121,7 +121,7 @@ export function ModernStackClient(props: ModernStackClientProps) {
         if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
         scrollTimerRef.current = setTimeout(() => {
           const el = document.getElementById(hash);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }, 200);
       }
     };

@@ -149,7 +149,18 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     count: filteredConcepts.length,
     estimateSize: () => 120,
     overscan: 4,
+    scrollMargin: listContainerRef.current?.offsetTop ?? 0,
+    scrollToFn: (offset, options) => {
+      if (options.adjustments !== undefined && options.adjustments !== 0) {
+        return;
+      }
+      window.scrollTo({
+        top: offset,
+        behavior: options.behavior,
+      });
+    },
   });
+  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -361,7 +372,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
       {/* VIRTUALIZED CONCEPTS LIST */}
       {!isStudyMode && (
-        <div ref={listContainerRef} className="space-y-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
             <span>
               Showing <strong className="text-[var(--foreground)]">{filteredConcepts.length}</strong> matching concepts
@@ -393,10 +404,13 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             </div>
           ) : (
             <div
+              ref={listContainerRef}
+              data-virtual-container="true"
               style={{
                 height: `${virtualizer.getTotalSize()}px`,
                 width: "100%",
                 position: "relative",
+                overflowAnchor: "none",
               }}
             >
               {virtualizer.getVirtualItems().map((virtualRow) => {
@@ -423,7 +437,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                     <div
                       id={`concept-${concept.id}`}
                       className={cn(
-                        "rounded-xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)]",
+                        "rounded-xl border transition-all duration-200 overflow-hidden bg-[var(--surface-1)] scroll-mt-20",
                         isExpanded ? "border-blue-500/40 shadow-xs" : "border-[var(--border)] hover:border-[var(--border-hover)]"
                       )}
                     >
