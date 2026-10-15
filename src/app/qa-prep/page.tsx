@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getUnifiedQuestionsDAL } from "@/lib/dal";
+import { architectureDiagrams } from "@/data";
 import { QaPrepClient } from "./qa-prep-client";
 import { buildPageMetadata, generateCourseSchema, generateFAQSchema } from "@/lib/seo";
 
@@ -51,7 +52,7 @@ export default async function QaPrepPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
       />
       <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--muted-foreground)]">Loading Interview Practice Hub...</div>}>
-        <QaPrepClient initialQuestions={questions} />
+        <QaPrepClient initialQuestions={questions} diagrams={architectureDiagrams} />
       </Suspense>
     </>
   );

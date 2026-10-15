@@ -18,6 +18,7 @@ import {
   MessageSquare,
   Compass,
   User,
+  Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -97,6 +98,20 @@ const navGroups: NavGroup[] = [
           { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
           { label: "T-SQL Drills", href: "/code-practice?db=mssql" },
           { label: "Python & Polars", href: "/code-practice?db=python" },
+        ],
+      },
+      {
+        label: "DataOps & Lifecycle",
+        href: "/dataops",
+        icon: Workflow,
+        badge: "CI/CD & E2E",
+        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+        matches: ["/dataops"],
+        subItems: [
+          { label: "Tool Connectivity & Secrets", href: "/dataops?tab=connectivity" },
+          { label: "CI/CD Alternatives & Pipelines", href: "/dataops?tab=cicd" },
+          { label: "End-to-End Lifecycle Playbook", href: "/dataops?tab=lifecycle" },
+          { label: "Whiteboard Architecture Flow", href: "/dataops?tab=diagram" },
         ],
       },
       {

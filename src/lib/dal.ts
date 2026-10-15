@@ -7,6 +7,7 @@ import {
   CheatCode,
   UnifiedQuestion,
   Difficulty,
+  DataOpsDataset,
 } from "@/types/data";
 
 /**
@@ -114,4 +115,9 @@ export const getModernStackDAL = cache(async () => {
 // --- 7. COMPANY PROFILES ---
 export const getCompanyProfilesDAL = cache(async () => {
   return await serverlessDb.getCompanyProfiles();
+});
+
+// --- 8. DATAOPS, CONNECTIVITY & CI/CD LIFECYCLE ---
+export const getDataOpsDataDAL = cache(async (): Promise<DataOpsDataset> => {
+  return await serverlessDb.getDataOpsData();
 });

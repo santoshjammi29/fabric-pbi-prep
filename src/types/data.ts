@@ -367,3 +367,77 @@ export interface CompanyProfile {
   sampleQuestions?: string[];
 }
 
+// ==========================================
+// 14. DataOps, Connectivity & CI/CD Lifecycle
+// ==========================================
+
+export type DataOpsTool =
+  | 'ADF'
+  | 'Databricks'
+  | 'Apache Airflow'
+  | 'dbt'
+  | 'SQL / Synapse'
+  | 'Azure DevOps & GitHub Actions'
+  | 'Azure Key Vault & Secrets';
+
+export interface DataOpsConnectivityItem {
+  id: string;
+  sourceTool: string;
+  targetTool: string;
+  connectionProtocol: string;
+  authMethod: 'OAuth M2M' | 'Managed Identity' | 'Service Principal' | 'Key Vault Secret Scope' | 'Workload Identity (OIDC)' | 'PAT (Legacy)';
+  securityLevel: 'Enterprise Zero-Trust' | 'High Security' | 'Dev Only';
+  summary: string;
+  configPathOrKey: string;
+  configLanguage: 'yaml' | 'json' | 'python' | 'bash' | 'sql';
+  configSnippet: string;
+  setupSteps: string[];
+  keyVaultIntegration: string;
+  securityPitfalls: string[];
+  interviewDefenseTip: string;
+  tags: string[];
+}
+
+export interface CicdAlternativeItem {
+  id: string;
+  name: string;
+  category: 'Databricks' | 'Airflow' | 'dbt' | 'ADF' | 'Database / Lakehouse';
+  recommendedApproach: string;
+  legacyOrAlternative: string;
+  tradeOffSummary: string;
+  pros: string[];
+  cons: string[];
+  speedRating: 'Ultra Fast (<2m)' | 'Fast (3-5m)' | 'Moderate (5-15m)' | 'Slow (>20m)';
+  costEfficiency: 'Very High (Slim Compute)' | 'High' | 'Medium' | 'Low (Full Rebuild)';
+  workflowYaml: string;
+  workflowLanguage: 'yaml' | 'bash' | 'powershell';
+  architectureDescription: string;
+  keyGotchas: string[];
+  interviewSoundbite: string;
+}
+
+export interface LifecycleDeliverable {
+  name: string;
+  description: string;
+  artifacts: string[];
+}
+
+export interface ProjectLifecycleStage {
+  stageNumber: number;
+  stageName: string;
+  phase: 'Architecture & Design' | 'Ingestion & Storage' | 'Processing & Quality' | 'Serving & Semantic' | 'Release & CI/CD' | 'Operations & FinOps';
+  objective: string;
+  keyArchitecturalDecisions: string[];
+  primaryTools: string[];
+  concreteDeliverables: LifecycleDeliverable[];
+  gatekeeperChecklist: string[];
+  interviewExplanationScript: string;
+  commonFailureModes: string[];
+}
+
+export interface DataOpsDataset {
+  connectivity: DataOpsConnectivityItem[];
+  cicdAlternatives: CicdAlternativeItem[];
+  lifecycleStages: ProjectLifecycleStage[];
+}
+

@@ -78,6 +78,7 @@ export const modernStackDataset: ModernStackDataset = {
 };
 
 export const learningPathsDb: LearningPath[] = dataPathsJson as LearningPath[];
+export { dataOpsData } from './dataops-data';
 
 /**
  * Standardize difficulty string to enum value

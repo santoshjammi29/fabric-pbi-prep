@@ -42,7 +42,7 @@ export function ArchitectureDiagramsGallery() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const diagramParam = params.get("diagram");
+      const diagramParam = params.get("diagram") || params.get("id");
       if (diagramParam) {
         const match = architectureDiagrams.find((d) => d.id === diagramParam);
         if (match) {

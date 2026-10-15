@@ -599,21 +599,21 @@ export default function GuidedLearningPage() {
                   href="/architecture?tab=diagrams"
                   className="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors self-start sm:self-auto"
                 >
-                  <span>Explore all 25+ Blueprints</span>
+                  <span>Explore all {overviewStats.totalWhiteboards} Blueprints</span>
                   <ArrowRight size={12} />
                 </Link>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { key: "airflow", title: "Airflow Distributed Engine", desc: "Multi-threaded scheduler, metadata DB, triggerers, and workers." },
+                  { key: "system-design", title: "Distributed Resilient System", desc: "API Gateway, Token Bucket, Redis cluster, SAGA & Sharding." },
+                  { key: "python", title: "Python Arrow & Polars SIMD", desc: "Columnar memory, release GIL, PyArrow Flight zero-copy IPC." },
+                  { key: "spark", title: "Catalyst & Photon Execution", desc: "Logical plan optimization, AQE, and C++ vectorization." },
+                  { key: "databricks", title: "Databricks Lakehouse & DABs", desc: "Medallion pipeline, Unity Catalog, and CI/CD Asset Bundles." },
                   { key: "fabric", title: "Fabric OneLake Architecture", desc: "Universal Delta Parquet, shortcuts, and multi-engine compute." },
-                  { key: "adf", title: "ADF Hybrid Ingestion", desc: "Self-Hosted IR gateways, private endpoints, and CDC." },
                   { key: "streaming", title: "Kafka & Streaming Engine", desc: "Partition brokers, schema registry, and watermarking." },
                   { key: "dbt", title: "dbt Analytics Engineering", desc: "Incremental models, SCD2 snapshots, and Semantic Layer." },
-                  { key: "spark", title: "Catalyst & Photon Execution", desc: "Logical plan optimization, AQE, and C++ vectorization." },
-                  { key: "modeling", title: "Kimball Star Schema", desc: "Atomic grain facts, conformed dims, SCD1 & 2." },
-                  { key: "governance", title: "Purview Enterprise Catalog", desc: "Automated data map, lineage graph, and ABAC policies." },
+                  { key: "modeling", title: "Kimball & Data Mesh", desc: "Enterprise star schema, conformed dimensions, and Data Products." },
                 ].map((bp) => (
                   <div
                     key={bp.key}

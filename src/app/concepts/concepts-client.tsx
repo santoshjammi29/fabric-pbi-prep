@@ -23,6 +23,7 @@ import {
   Shuffle,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,97 @@ function getCategoryTopicKey(cat: string): string {
   if (c.includes("power bi") || c.includes("powerbi")) return "powerbi";
   if (c.includes("python")) return "python";
   return "architecture";
+}
+
+function getConceptMatchingDiagram(concept: Concept, diagrams: ArchitectureDiagramItem[]): ArchitectureDiagramItem | undefined {
+  if (!diagrams || diagrams.length === 0) return undefined;
+  const text = `${concept.term} ${concept.category} ${concept.explanation}`.toLowerCase();
+  
+  if (text.includes("polars") || text.includes("arrow") || text.includes("gil") || text.includes("flight ipc")) {
+    return diagrams.find((d) => d.id === "python-arrow-polars-architecture");
+  }
+  if (text.includes("saga") || text.includes("token bucket") || text.includes("sharding") || text.includes("circuit breaker") || text.includes("system design") || text.includes("redis cluster")) {
+    return diagrams.find((d) => d.id === "distributed-systems-resilience-architecture");
+  }
+  if (text.includes("data mesh") || text.includes("data product") || text.includes("data contract")) {
+    return diagrams.find((d) => d.id === "data-mesh-enterprise-architecture");
+  }
+  if (text.includes("skew") || text.includes("salting") || text.includes("skewjoin")) {
+    return diagrams.find((d) => d.id === "spark-data-skew-aqe-optimization");
+  }
+  if (text.includes("finops") || text.includes("cost") || text.includes("spot instance") || text.includes("billing.usage")) {
+    return diagrams.find((d) => d.id === "lakehouse-finops-cost-optimization");
+  }
+  if (text.includes("bundle") || text.includes("dab") || (text.includes("databricks") && text.includes("ci/cd"))) {
+    return diagrams.find((d) => d.id === "databricks-dabs-devops-pipeline");
+  }
+  if (text.includes("onelake") || text.includes("shortcut") || (concept.category.includes("FABRIC") && text.includes("lakehouse"))) {
+    return diagrams.find((d) => d.id === "fabric-onelake-architecture");
+  }
+  if (text.includes("direct lake") || text.includes("vertipaq") || text.includes("directquery")) {
+    return diagrams.find((d) => d.id === "powerbi-direct-lake-vertipaq");
+  }
+  if (text.includes("dax") || text.includes("calculate") || text.includes("context transition")) {
+    return diagrams.find((d) => d.id === "powerbi-dax-engine-context");
+  }
+  if (text.includes("airflow") || text.includes("dag") || text.includes("triggerer")) {
+    return diagrams.find((d) => d.id === "apache-airflow-distributed-architecture");
+  }
+  if (text.includes("dbt") || text.includes("snapshot") || text.includes("semantic layer")) {
+    return diagrams.find((d) => d.id === "dbt-analytics-engineering-dag");
+  }
+  if (text.includes("adf") || text.includes("integration runtime") || text.includes("shir")) {
+    return diagrams.find((d) => d.id === "adf-hybrid-integration-runtime");
+  }
+  if (text.includes("kafka") || text.includes("streaming") || text.includes("watermark")) {
+    return diagrams.find((d) => d.id === "kafka-event-streaming-pipeline");
+  }
+  if (text.includes("debezium") || text.includes("cdc") || text.includes("apply changes into")) {
+    return diagrams.find((d) => d.id === "cdc-debezium-lakehouse-pipeline");
+  }
+  if (text.includes("medallion") || text.includes("bronze") || text.includes("silver") || text.includes("gold")) {
+    return diagrams.find((d) => d.id === "databricks-medallion-pipeline");
+  }
+  if (text.includes("delta live tables") || text.includes("dlt")) {
+    return diagrams.find((d) => d.id === "delta-live-tables-pipeline");
+  }
+  if (text.includes("unity catalog") || text.includes("3-level namespace") || text.includes("delta sharing")) {
+    return diagrams.find((d) => d.id === "unity-catalog-governance");
+  }
+  if (text.includes("purview") || text.includes("governance") || text.includes("lineage")) {
+    return diagrams.find((d) => d.id === "purview-governance-catalog");
+  }
+  if (text.includes("delta lake") || text.includes("_delta_log") || text.includes("acid")) {
+    return diagrams.find((d) => d.id === "delta-lake-under-the-hood");
+  }
+  if (text.includes("iceberg") || text.includes("manifest")) {
+    return diagrams.find((d) => d.id === "apache-iceberg-open-table-format");
+  }
+  if (text.includes("catalyst") || text.includes("photon") || text.includes("aqe")) {
+    return diagrams.find((d) => d.id === "spark-catalyst-photon-engine");
+  }
+  if (text.includes("shuffle") || text.includes("spill") || text.includes("off-heap") || text.includes("tungsten")) {
+    return diagrams.find((d) => d.id === "spark-shuffle-memory-execution");
+  }
+  if (text.includes("sql server") || text.includes("query optimizer") || text.includes("columnstore") || text.includes("cardinality")) {
+    return diagrams.find((d) => d.id === "sql-server-query-engine-optimization");
+  }
+  if (text.includes("kimball") || text.includes("star schema") || text.includes("scd") || text.includes("fact")) {
+    return diagrams.find((d) => d.id === "kimball-dimensional-star-schema");
+  }
+  if (text.includes("data vault") || text.includes("hub") || text.includes("satellite")) {
+    return diagrams.find((d) => d.id === "data-vault-enterprise-architecture");
+  }
+  if (text.includes("rag") || text.includes("vector") || text.includes("embedding") || text.includes("hnsw")) {
+    return diagrams.find((d) => d.id === "rag-vector-search-data-pipeline");
+  }
+  if (text.includes("edge") || text.includes("isr") || text.includes("dal")) {
+    return diagrams.find((d) => d.id === "enterprise-edge-client-architecture");
+  }
+  if (text.includes("databricks")) {
+    return diagrams.find((d) => d.id === "databricks-platform-master");
+  }
+  return undefined;
 }
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
@@ -523,7 +615,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                             </div>
                           )}
 
-                          <div className="pt-2 flex items-center justify-between">
+                          <div className="pt-2 flex items-center justify-between flex-wrap gap-2">
                             <Link
                               href={`/qa-prep?q=${encodeURIComponent(concept.term)}`}
                               className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors"
@@ -531,6 +623,19 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                               <MessageSquare size={13} />
                               <span>Practice Q&amp;As on {concept.term}</span>
                             </Link>
+                            {(() => {
+                              const matchingDiagram = getConceptMatchingDiagram(concept, diagrams);
+                              if (!matchingDiagram) return null;
+                              return (
+                                <Link
+                                  href={`/architecture?tab=diagrams&id=${matchingDiagram.id}`}
+                                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-500 transition-colors"
+                                >
+                                  <span>📐 Blueprint: {matchingDiagram.title}</span>
+                                  <ArrowRight size={12} />
+                                </Link>
+                              );
+                            })()}
                           </div>
                         </div>
                       )}

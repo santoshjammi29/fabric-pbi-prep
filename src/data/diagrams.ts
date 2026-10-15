@@ -357,5 +357,117 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
       "Business Vault uses Point-in-Time (PIT) and Bridge tables to resolve temporal joins, projecting virtual Star Schema Information Marts directly to Power BI."
     ],
     docLink: "https://datavaultalliance.com/architecture/"
+  },
+  {
+    id: "enterprise-edge-client-architecture",
+    title: "Enterprise Edge Architecture: Data, Edge & Client Flow",
+    subtitle: "Global Edge Network with Sub-100ms Redis Sync, Server-Side DAL, and Web Worker Compute Offloading",
+    category: "Platform Landscape",
+    image: "/diagrams/enterprise_edge_architecture.webp",
+    tags: ["Edge Computing", "Next.js", "Redis Cache", "Web Workers", "Server-Side DAL", "ISR", "Client Performance"],
+    description: "High-concurrency data platform edge architecture illustrating end-to-end data delivery across three tiers: Data Layer & Persistence (Raw Lakehouse JSONs, Server-Side DAL with React cache(), Upstash Global Redis Cache), Edge Optimization & Compute (Vercel Edge Node Proxy, SWR Edge Cache, Next.js Server Components SSG/ISR, Dynamic Semantic SEO Engine), and Client Runtime & UI (GPU-Accelerated Canvas Mindmaps, TanStack Virtual 60fps windowing, Background Web Workers for SIMD Cosine Distance & Spark Simulation).",
+    keyPoints: [
+      "Server-Side Data Access Layer (DAL) leverages React cache() and zero-bundle server memory for sub-millisecond retrieval without client overhead.",
+      "Global Upstash Redis Cache delivers sub-100ms TTL state synchronization across multi-region Vercel Edge nodes.",
+      "Incremental Static Regeneration (ISR) and stale-while-revalidate edge caching minimize database pressure while maintaining real-time freshness.",
+      "Client Web Workers offload heavy computational algorithms (vector cosine similarity, Spark execution simulations) to background threads, guaranteeing 60fps main thread responsiveness."
+    ],
+    docLink: "https://vercel.com/docs/edge-network/overview"
+  },
+  {
+    id: "distributed-systems-resilience-architecture",
+    title: "Distributed Systems Design: High-Throughput & Resilient Architecture",
+    subtitle: "API Gateway, Rate Limiting (Token Bucket), Distributed Cache (Redis), SAGA Orchestrator & Sharded Databases",
+    category: "Platform Landscape",
+    image: "/diagrams/distributed_systems_resilience_architecture.webp",
+    tags: ["System Design", "Distributed Systems", "API Gateway", "Rate Limiting", "Redis Cluster", "SAGA Pattern", "Sharding", "Kafka Outbox"],
+    description: "Enterprise distributed systems architecture designed for high availability and resilient multi-service coordination. Highlights ingress traffic shaping via API Gateway and Token Bucket rate limiting, distributed caching with Cache-Aside and Bloom Filter protection against stampedes/penetration, SAGA transaction orchestration with compensating transactions on failure, and horizontal database sharding via consistent hashing paired with the Transactional Outbox pattern.",
+    keyPoints: [
+      "API Gateway & Rate Limiting: Manages TLS termination, JWT validation, and dynamic routing while Token Bucket algorithms protect downstream microservices from traffic surges.",
+      "Distributed Cache Resilience: Redis Cluster with Cache-Aside, Bloom Filters, and TTL jitter mitigates cache penetration, avalanche, and thundering herd stampedes.",
+      "SAGA Orchestration: Coordinates complex multi-service distributed transactions across Order, Payment, and Inventory services, automatically issuing compensating undo transactions upon failure.",
+      "Horizontal Sharding & Outbox: Databases are horizontally partitioned using consistent hashing, while the Transactional Outbox pattern and Debezium CDC guarantee reliable asynchronous event publishing to Kafka."
+    ],
+    docLink: "https://microservices.io/patterns/data/saga.html"
+  },
+  {
+    id: "python-arrow-polars-architecture",
+    title: "Modern Python Data Architecture: Apache Arrow, Polars & Zero-Copy IPC",
+    subtitle: "Columnar Memory Layout, Multi-Threaded Rust Engine, SIMD Vectorization & Zero-Copy PyArrow Flight IPC",
+    category: "Compute & Optimization",
+    image: "/diagrams/python_arrow_polars_architecture.webp",
+    tags: ["Python", "Apache Arrow", "Polars", "PyArrow Flight", "Zero-Copy IPC", "SIMD", "Rust", "Pydantic"],
+    description: "Deep dive into next-generation Python data engineering architectures. Contrasts CPython Global Interpreter Lock (GIL) constraints, row-oriented pointer overhead, and single-threaded Pandas memory fragmentation with Apache Arrow's standardized contiguous columnar format, Polars multi-threaded work-stealing Rust engine with lazy predicate pushdown, and zero-serialization PyArrow Flight IPC buffer sharing between Python, Spark, Ray, and DuckDB.",
+    keyPoints: [
+      "Apache Arrow Standard: Contiguous 64-byte aligned columnar memory enables zero-copy slicing, cache locality, and hardware CPU SIMD vectorization.",
+      "Polars Rust Engine: Releases the CPython GIL, utilizing multi-threaded parallel work-stealing and lazy query compilation (.lazy()) with projection and predicate pushdown.",
+      "Out-of-Core Streaming: Polars processes datasets larger than available RAM by streaming data in Arrow record batches, eliminating out-of-memory crashes.",
+      "PyArrow Flight & IPC: Enables high-throughput zero-copy memory interchange (/dev/shm) across polyglot engines (PySpark, Ray, DuckDB) without costly JSON/Pickle serialization."
+    ],
+    docLink: "https://arrow.apache.org/overview/"
+  },
+  {
+    id: "data-mesh-enterprise-architecture",
+    title: "Enterprise Data Mesh: Decentralized Domains & Data Products",
+    subtitle: "Domain-Driven Ownership, Data as a Product (DaaP), Self-Serve Infrastructure & Federated Computational Governance",
+    category: "Data Modeling & Architecture",
+    image: "/diagrams/data_mesh_enterprise_architecture.webp",
+    tags: ["Data Mesh", "Data Products", "Domain-Driven Design", "Data Contracts", "Federated Governance", "Self-Serve Platform", "Delta Sharing"],
+    description: "Decentralized enterprise architectural paradigm shifting data ownership from centralized monoliths to autonomous domain teams. Details the 4 core pillars of Data Mesh: Domain-Driven Data Ownership, Data as a Product (DaaP) with standardized input/output/control ports, Self-Serve Data Infrastructure Platform plane, and Federated Computational Governance enforcing declarative Data Contracts (YAML) across multi-cloud lakehouses.",
+    keyPoints: [
+      "Domain Data Products: Autonomous business domains (Orders, Customer 360, Marketing) own end-to-end data lifecycle, publishing discoverable datasets via SQL, REST, and Delta Sharing output ports.",
+      "Declarative Data Contracts: Semantic YAML/JSON schemas define explicit expectations, SLOs/SLAs, and schema evolution rules between data producers and analytical consumers.",
+      "Federated Computational Governance: Unified catalogs (Purview / Unity Catalog) enforce automated compliance audits, role-based access control, and column-level lineage globally.",
+      "Self-Serve Platform Plane: Infrastructure abstraction automates cluster provisioning, CI/CD pipelines, automated testing, and FinOps cost attribution across all domain products."
+    ],
+    docLink: "https://martinfowler.com/articles/data-mesh-principles.html"
+  },
+  {
+    id: "spark-data-skew-aqe-optimization",
+    title: "Apache Spark Data Skew Remediation & AQE Optimization",
+    subtitle: "Runtime Skew Detection, Partition Splitting, Key Salting Techniques & Dynamic Broadcast Joins",
+    category: "Compute & Optimization",
+    image: "/diagrams/spark_data_skew_aqe_optimization.webp",
+    tags: ["Apache Spark", "Data Skew", "AQE", "Adaptive Query Execution", "Key Salting", "Skew Join", "SortMergeJoin", "BroadcastHashJoin"],
+    description: "Comprehensive blueprint resolving the single biggest performance killer in distributed Spark workloads: Data Skew. Contrasts severe skew bottlenecks (99% single-task stragglers, executor OOMs, and massive shuffle spill) with runtime Adaptive Query Execution (spark.sql.adaptive.skewJoin.enabled) that dynamically splits giant partitions into sub-partitions, and developer-side Salted Join techniques that evenly distribute skewed keys across all worker cores.",
+    keyPoints: [
+      "Data Skew Bottleneck: Hot join keys (e.g. NULL, 'US', defaults) concentrate gigabytes into a single partition, causing straggler tasks, executor timeouts, and severe disk spill.",
+      "AQE Dynamic Skew Join Splitting: Spark 3.x inspects completed map shuffle files at runtime, automatically splitting partitions exceeding skew thresholds into balanced 40–128MB chunks.",
+      "Dynamic Broadcast Hash Join (BHJ): AQE dynamically converts costly SortMergeJoins to broadcast joins at runtime if stage statistics reveal the filtered right-side table is under 10MB.",
+      "Two-Phase Key Salting Pattern: Appending random salt suffixes (rand(0, N-1)) to skewed join keys and replicating the lookup table N times redistributes data with 100% uniform cluster utilization."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/sql-performance-tuning.html#adaptive-query-execution"
+  },
+  {
+    id: "lakehouse-finops-cost-optimization",
+    title: "Enterprise Lakehouse FinOps & Cloud Cost Optimization",
+    subtitle: "Compute Auto-Termination, Spot vs On-Demand, Storage Tiering (Hot/Cool/Archive) & Query Pruning",
+    category: "Platform Landscape",
+    image: "/diagrams/lakehouse_finops_cost_optimization.webp",
+    tags: ["FinOps", "Cost Optimization", "Databricks", "Azure", "Serverless SQL", "Spot Instances", "Liquid Clustering", "VACUUM", "Storage Tiering"],
+    description: "Strategic FinOps framework and operational cost governance architecture for enterprise cloud lakehouses. Spans cost allocation tagging and telemetry (Databricks System Tables system.billing.usage, Azure Cost Management API), compute right-sizing (aggressive 10-15 min auto-termination, Spot worker nodes with on-demand driver fallback, Serverless SQL auto-scaling), and storage cost reduction via Delta Lake OPTIMIZE, Liquid Clustering read pruning, and automated lifecycle archiving.",
+    keyPoints: [
+      "FinOps Tagging & System Tables: Enforces strict metadata tags (CostCenter, Environment, Owner) to track granular DBU burning velocity and trigger automated anomaly budget alerts.",
+      "Spot Worker Compute Arbitrage: Leveraging Spot instances for ephemeral worker nodes cuts cluster compute expenses by 60%–80%, with On-Demand driver nodes safeguarding against cluster termination.",
+      "Serverless SQL Warehouse Auto-Scaling: 5-second rapid cold-starts and intelligent query queuing automatically scale clusters to zero during query lulls, eliminating idle compute waste.",
+      "Storage Lifecycle & VACUUM: Delta VACUUM purges obsolete historical snapshots beyond retention windows, while cloud lifecycle policies migrate cold raw Bronze files to cost-effective archive tiers."
+    ],
+    docLink: "https://docs.databricks.com/en/admin/account-settings/system-tables/index.html"
+  },
+  {
+    id: "databricks-dabs-devops-pipeline",
+    title: "Databricks Asset Bundles (DABs) & Serverless CI/CD Architecture",
+    subtitle: "Declarative Infrastructure as Code (IaC), Git Multi-Environment Promotion & Serverless Workflows",
+    category: "Data Pipelines & Ingestion",
+    image: "/diagrams/databricks_dabs_devops_pipeline.webp",
+    tags: ["Databricks", "DABs", "CI/CD", "DevOps", "Infrastructure as Code", "GitHub Actions", "Serverless Workflows", "Unity Catalog"],
+    description: "Modern enterprise DevOps and Infrastructure-as-Code (IaC) lifecycle using Databricks Asset Bundles (DABs). Illustrates local developer authoring in VS Code with databricks.yml bundle definitions, automated CI/CD validation and ephemeral integration testing via GitHub Actions / Azure DevOps runners, and automated zero-downtime promotion across isolated development, staging, and production Unity Catalog catalogs.",
+    keyPoints: [
+      "Declarative databricks.yml Specification: Defines pipelines, notebooks, serverless workflows, cluster configurations, and access permissions in human-readable version-controlled YAML.",
+      "Shift-Left CI Automation: CI runners trigger `databricks bundle validate`, static code linting (ruff, black), and execute automated pytest suites against ephemeral development clusters before PR merge.",
+      "Multi-Environment Target Promotion: Enables isolated deployment targets (-t dev, -t staging, -t prod) binding to dedicated Unity Catalog catalogs (dev_catalog vs prod_catalog) and service principals.",
+      "Zero-Downtime Serverless Deployment: Automated production deployment updates Serverless Workflows and Delta Live Tables pipelines with automated rollback upon smoke test failure."
+    ],
+    docLink: "https://docs.databricks.com/en/dev-tools/bundles/index.html"
   }
 ];

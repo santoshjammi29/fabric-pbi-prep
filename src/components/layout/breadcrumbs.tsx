@@ -27,6 +27,14 @@ const ROUTE_LABELS: Record<string, string> = {
   "/studio": "My Learning Studio",
   "/guided-learning": "Guided Learning",
   "/cheat-sheet": "Production Cheat Sheet",
+  "/dataops": "DataOps & CI/CD Lifecycle",
+};
+
+const DATAOPS_TABS: Record<string, string> = {
+  connectivity: "Tool Connectivity & Secrets",
+  cicd: "CI/CD Alternatives & Pipelines",
+  lifecycle: "End-to-End Project Lifecycle",
+  diagram: "Interactive Whiteboard Flow",
 };
 
 const SPARK_TABS: Record<string, string> = {
@@ -111,6 +119,14 @@ function BreadcrumbsInner() {
         list.push({
           label: MODERN_TABS[tab],
           href: `/modern-stack?tab=${tab}`,
+        });
+      }
+    } else if (pathname === "/dataops") {
+      const tab = searchParams.get("tab")?.toLowerCase();
+      if (tab && DATAOPS_TABS[tab]) {
+        list.push({
+          label: DATAOPS_TABS[tab],
+          href: `/dataops?tab=${tab}`,
         });
       }
     } else if (pathname === "/concepts") {

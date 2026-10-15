@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getConceptsDAL, getConceptsCategoriesDAL } from "@/lib/dal";
+import { architectureDiagrams } from "@/data";
 import { ConceptsClient } from "./concepts-client";
 import { buildPageMetadata, generateCourseSchema, generateHowToSchema } from "@/lib/seo";
 
@@ -51,7 +52,7 @@ export default async function ConceptsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
       <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--muted-foreground)]">Loading Concepts Library...</div>}>
-        <ConceptsClient initialConcepts={concepts} categories={categories} />
+        <ConceptsClient initialConcepts={concepts} categories={categories} diagrams={architectureDiagrams} />
       </Suspense>
     </>
   );

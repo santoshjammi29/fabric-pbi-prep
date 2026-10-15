@@ -24,6 +24,7 @@ import {
   modernSubdomains,
   companyProfiles,
   getUnifiedQuestions,
+  dataOpsData,
 } from "@/data";
 
 export interface DatabaseConfig {
@@ -189,5 +190,10 @@ export const serverlessDb = {
   // Companies
   async getCompanyProfiles() {
     return companyProfiles;
+  },
+
+  // DataOps, Connectivity & CI/CD Lifecycle
+  async getDataOpsData() {
+    return dataOpsData;
   },
 };
