@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { TextSizeController } from "@/components/ui/text-size-controller";
@@ -140,8 +140,9 @@ const pillVariants: Record<string, string> = {
   info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
 };
 
-export function Sidebar() {
+function SidebarInner() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -165,8 +166,33 @@ export function Sidebar() {
 
   const isSubActive = (subHref: string) => {
     if (!pathname) return false;
-    const [subPath] = subHref.split("?");
-    return pathname === subPath;
+    const [subPath, subQuery] = subHref.split("?");
+    if (pathname !== subPath) return false;
+
+    if (!subQuery) {
+      if (!searchParams) return true;
+      const currentTab = searchParams.get("tab");
+      const currentDb = searchParams.get("db");
+      if (!currentTab && !currentDb) return true;
+      return false;
+    }
+
+    if (!searchParams) return false;
+    const subParams = new URLSearchParams(subQuery);
+    for (const [key, val] of subParams.entries()) {
+      const currentVal = searchParams.get(key);
+      if (pathname === "/architecture" && key === "tab" && val === "scenarios" && !currentVal) {
+        return true;
+      }
+      if (pathname === "/code-practice" && key === "db" && val === "pyspark" && !currentVal) {
+        return true;
+      }
+      if (pathname === "/dataops" && key === "tab" && val === "connectivity" && !currentVal) {
+        return true;
+      }
+      if (currentVal !== val) return false;
+    }
+    return true;
   };
 
   return (
@@ -303,5 +329,20 @@ export function Sidebar() {
         <ThemeSwitcher collapsed={collapsed} direction="up" align="start" />
       </div>
     </aside>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <Suspense
+      fallback={
+        <aside
+          className="hidden lg:flex flex-col h-dvh sticky top-0 border-r w-[260px] bg-[var(--surface-1)] border-[var(--border)]"
+          aria-hidden="true"
+        />
+      }
+    >
+      <SidebarInner />
+    </Suspense>
   );
 }

@@ -560,7 +560,10 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
 
       if (cardParam) {
-        if (cardParam.startsWith("py-") || cardParam.startsWith("python-")) {
+        const isDiagram = qTab === "diagrams" || architectureDiagrams.some((d) => d.id === cardParam);
+        if (isDiagram) {
+          setActiveTab("diagrams");
+        } else if (cardParam.startsWith("py-") || cardParam.startsWith("python-")) {
           setActiveTab("python");
           const cleanId = cardParam.replace(/^python-/, "");
           setPyExpandedIds((prev) => new Set([...prev, cleanId]));
@@ -572,7 +575,9 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
             }
           }, 350);
         } else {
-          setActiveTab("scenarios");
+          if (!qTab || qTab === "scenarios") {
+            setActiveTab("scenarios");
+          }
           const cleanId = cardParam.replace(/^arch-/, "");
           setExpandedIds((prev) => new Set([...prev, cleanId]));
           if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);

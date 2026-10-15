@@ -34,6 +34,7 @@ import {
   Info,
 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
@@ -79,6 +80,7 @@ export function ModernStackClient(props: ModernStackClientProps) {
     subdomains: modernSubdomains,
   } = props.initialModernStack;
   const pythonData = props.initialPython;
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<ModernSubtab>("overview");
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -135,6 +137,31 @@ export function ModernStackClient(props: ModernStackClientProps) {
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
   }, []);
+
+  // Reactively synchronize from Next.js router searchParams (?tab=, ?view=)
+  useEffect(() => {
+    const queryTab = searchParams.get("tab")?.toLowerCase() || searchParams.get("view")?.toLowerCase();
+    const validTabs: ModernSubtab[] = [
+      "overview",
+      "concepts",
+      "matrix",
+      "simulators",
+      "blueprints",
+      "ai",
+      "cost",
+      "compatibility",
+      "python",
+    ];
+
+    if (queryTab && validTabs.includes(queryTab as ModernSubtab)) {
+      setActiveTab(queryTab as ModernSubtab);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => {
+        const el = document.getElementById(queryTab);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 150);
+    }
+  }, [searchParams]);
 
   // ──────────────────────────────────────────────────────────
   // 1. OVERVIEW: 7-STAGE INTERACTIVE CANVAS

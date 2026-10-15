@@ -200,6 +200,47 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     } catch {}
   }, []);
 
+  // Reactively synchronize URL search parameters (term, q, search, category, difficulty, card, id)
+  useEffect(() => {
+    const termParam = searchParams.get("term") || searchParams.get("q") || searchParams.get("search");
+    const catParam = searchParams.get("category");
+    const diffParam = searchParams.get("difficulty");
+    const cardParam = searchParams.get("card") || searchParams.get("id");
+
+    if (termParam !== null) {
+      setSearchQuery(termParam);
+    }
+
+    if (catParam) {
+      const match = categories.find((c) => c.toLowerCase() === catParam.toLowerCase());
+      if (match) {
+        setSelectedCategory(match);
+      } else {
+        setSelectedCategory(catParam);
+      }
+    }
+
+    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT", "ALL"].includes(diffParam.toUpperCase())) {
+      setSelectedDifficulty(diffParam.toUpperCase());
+    }
+
+    if (cardParam) {
+      const target = initialConcepts.find(
+        (c) => c.id === cardParam || c.term.toLowerCase() === cardParam.toLowerCase()
+      );
+      if (target) {
+        setExpandedIds((prev) => new Set([...prev, target.id]));
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+        scrollTimerRef.current = setTimeout(() => {
+          const el = document.getElementById(`concept-${target.id}`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 250);
+      }
+    }
+  }, [searchParams, categories, initialConcepts]);
+
   // Filter concepts
   const filteredConcepts = useMemo(() => {
     let result = initialConcepts;

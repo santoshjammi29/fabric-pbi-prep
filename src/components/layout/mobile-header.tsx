@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { ThemeCycleButton, ThemeSegmentedPills } from "@/components/ui/theme-switcher";
 import { TextSizeQuickToggle, TextSizeSegmentedPills } from "@/components/ui/text-size-controller";
@@ -94,6 +94,7 @@ const navGroups: NavGroup[] = [
         matches: ["/code-practice", "/cheat-sheet"],
         subItems: [
           { label: "Production Cheat Sheet", href: "/cheat-sheet" },
+          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks" },
           { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
           { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
           { label: "T-SQL Drills", href: "/code-practice?db=mssql" },
@@ -136,17 +137,18 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-export function MobileHeader() {
+function MobileHeaderInner() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(drawerRef, drawerOpen, () => setDrawerOpen(false));
 
-  // Close drawer on navigation
+  // Close drawer on navigation (both pathname and searchParams)
   useEffect(() => {
     setDrawerOpen(false);
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   // Listen for open-mobile-menu event from mobile bottom nav
   useEffect(() => {
@@ -169,6 +171,37 @@ export function MobileHeader() {
 
   const openSearch = () => {
     window.dispatchEvent(new CustomEvent("open-command-palette"));
+  };
+
+  const isSubActive = (subHref: string) => {
+    if (!pathname) return false;
+    const [subPath, subQuery] = subHref.split("?");
+    if (pathname !== subPath) return false;
+
+    if (!subQuery) {
+      if (!searchParams) return true;
+      const currentTab = searchParams.get("tab");
+      const currentDb = searchParams.get("db");
+      if (!currentTab && !currentDb) return true;
+      return false;
+    }
+
+    if (!searchParams) return false;
+    const subParams = new URLSearchParams(subQuery);
+    for (const [key, val] of subParams.entries()) {
+      const currentVal = searchParams.get(key);
+      if (pathname === "/architecture" && key === "tab" && val === "scenarios" && !currentVal) {
+        return true;
+      }
+      if (pathname === "/code-practice" && key === "db" && val === "pyspark" && !currentVal) {
+        return true;
+      }
+      if (pathname === "/dataops" && key === "tab" && val === "connectivity" && !currentVal) {
+        return true;
+      }
+      if (currentVal !== val) return false;
+    }
+    return true;
   };
 
   return (
@@ -292,6 +325,7 @@ export function MobileHeader() {
                         <div key={item.href}>
                           <Link
                             href={item.href}
+                            onClick={() => setDrawerOpen(false)}
                             className={cn(
                               "flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all",
                               active
@@ -318,14 +352,15 @@ export function MobileHeader() {
                           {active && item.subItems && (
                             <div className="ml-6 my-1 space-y-0.5 border-l border-[var(--border)] pl-2.5">
                               {item.subItems.map((sub) => {
-                                const isSubActive = pathname === sub.href.split("?")[0];
+                                const subActive = isSubActive(sub.href);
                                 return (
                                   <Link
                                     key={sub.href}
                                     href={sub.href}
+                                    onClick={() => setDrawerOpen(false)}
                                     className={cn(
                                       "block px-2 py-1 text-xs rounded-lg transition-colors truncate",
-                                      isSubActive
+                                      subActive
                                         ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-500/10"
                                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                                     )}
@@ -366,5 +401,20 @@ export function MobileHeader() {
         </div>
       )}
     </>
+  );
+}
+
+export function MobileHeader() {
+  return (
+    <Suspense
+      fallback={
+        <header
+          className="lg:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-3 sm:px-4 bg-[var(--glass-bg)] backdrop-blur-xl border-b border-[var(--glass-border)]"
+          aria-hidden="true"
+        />
+      }
+    >
+      <MobileHeaderInner />
+    </Suspense>
   );
 }

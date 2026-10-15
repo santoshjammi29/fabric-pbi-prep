@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useDeferredValue, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useDeferredValue, useCallback, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { m, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -145,7 +146,8 @@ const stages = [
   },
 ] as const;
 
-export default function GuidedLearningPage() {
+function GuidedLearningContent() {
+  const searchParams = useSearchParams();
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string>("All Tracks");
   const [searchQuery, setSearchQuery] = useState("");
@@ -165,20 +167,23 @@ export default function GuidedLearningPage() {
 
   const pageSize = 15;
 
-  // Initialize from URL search params
+  // Reactively sync from URL search params whenever ?topic= changes
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const topicParam = params.get("topic");
+    const topicParam = searchParams.get("topic");
     if (topicParam && GUIDED_TOPICS.some((t) => t.key === topicParam)) {
-      setSelectedTopic(topicParam);
+      setSelectedTopic((prev) => (prev !== topicParam ? topicParam : prev));
+    } else if (!topicParam) {
+      setSelectedTopic(null);
     }
-  }, []);
+  }, [searchParams]);
 
-  // Sync state when topic changes
+  // Sync state and push browser history when topic changes
   useEffect(() => {
     if (selectedTopic) {
-      window.history.replaceState(null, "", `?topic=${selectedTopic}`);
+      const currentUrlTopic = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("topic") : null;
+      if (currentUrlTopic !== selectedTopic && typeof window !== "undefined") {
+        window.history.pushState(null, "", `?topic=${selectedTopic}`);
+      }
       try {
         const saved = localStorage.getItem(`gl-completed-${selectedTopic}`);
         if (saved) {
@@ -198,10 +203,29 @@ export default function GuidedLearningPage() {
       setExpandedIds(new Set());
       setIsShuffled(false);
       setCollapsedStages({});
-    } else {
-      window.history.replaceState(null, "", window.location.pathname);
+    } else if (typeof window !== "undefined") {
+      const currentUrlTopic = new URLSearchParams(window.location.search).get("topic");
+      if (currentUrlTopic) {
+        window.history.pushState(null, "", window.location.pathname);
+      }
     }
   }, [selectedTopic]);
+
+  // Listen to browser popstate for back/forward navigation
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const top = params.get("topic");
+      if (top && GUIDED_TOPICS.some((t) => t.key === top)) {
+        setSelectedTopic(top);
+      } else {
+        setSelectedTopic(null);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const activeTopicObj = useMemo(
     () => GUIDED_TOPICS.find((t) => t.key === selectedTopic),
@@ -1372,5 +1396,19 @@ export default function GuidedLearningPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function GuidedLearningPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-20 text-center text-sm text-[var(--muted-foreground)]">
+          Loading Guided Learning Journeys...
+        </div>
+      }
+    >
+      <GuidedLearningContent />
+    </Suspense>
   );
 }

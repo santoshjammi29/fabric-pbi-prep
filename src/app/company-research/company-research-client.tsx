@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Building2,
   Search,
@@ -55,6 +56,7 @@ const TOP_HUBS = [
 const ITEMS_PER_PAGE = 24;
 
 export function CompanyResearchClient({ initialProfiles }: { initialProfiles: CompanyProfile[] }) {
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTier, setSelectedTier] = useState<string>("ALL");
   const [selectedTech, setSelectedTech] = useState<string>("All");
@@ -62,6 +64,27 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
+
+  // Reactively synchronize from searchParams
+  useEffect(() => {
+    const qParam = searchParams.get("q") || searchParams.get("company") || searchParams.get("search");
+    const tierParam = searchParams.get("tier");
+    const techParam = searchParams.get("tech");
+    const hubParam = searchParams.get("hub");
+
+    if (qParam !== null) {
+      setSearchQuery(qParam);
+    }
+    if (tierParam) {
+      setSelectedTier(tierParam);
+    }
+    if (techParam) {
+      setSelectedTech(techParam);
+    }
+    if (hubParam) {
+      setSelectedHub(hubParam);
+    }
+  }, [searchParams]);
 
   // Compute counts per tier
   const tierCounts = useMemo(() => {

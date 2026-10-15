@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Zap,
   Cpu,
@@ -102,6 +103,7 @@ export interface SparkEngineClientProps {
 
 export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
   const pysparkData = initialPyspark;
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<SparkSubtab>("architecture");
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const simTimersRef = useRef<NodeJS.Timeout[]>([]);
@@ -215,6 +217,33 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
       clearSimTimers();
     };
   }, [clearSimTimers]);
+
+  // Reactively synchronize from Next.js router searchParams (?tab=, ?flow=)
+  useEffect(() => {
+    const queryTab = searchParams.get("tab")?.toLowerCase();
+    const queryFlow = searchParams.get("flow")?.toLowerCase();
+
+    const validTabs: SparkSubtab[] = [
+      "architecture",
+      "simulator",
+      "memory",
+      "curriculum",
+      "lexicon",
+    ];
+
+    if (queryTab && validTabs.includes(queryTab as SparkSubtab)) {
+      setActiveTab(queryTab as SparkSubtab);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => {
+        const el = document.getElementById(queryTab);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
+
+    if (queryFlow && ["narrow", "wide", "broadcast", "aggregation"].includes(queryFlow)) {
+      setFlowType(queryFlow as "narrow" | "wide" | "broadcast" | "aggregation");
+    }
+  }, [searchParams]);
 
   // Lexicon Search State
   const [lexiconQuery, setLexiconQuery] = useState("");

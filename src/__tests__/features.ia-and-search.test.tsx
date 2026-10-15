@@ -8,6 +8,7 @@ import path from 'path';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),

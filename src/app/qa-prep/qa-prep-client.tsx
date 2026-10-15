@@ -161,6 +161,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync bookmarks
   useEffect(() => {
@@ -170,6 +171,40 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
       if (saved) setBookmarks(JSON.parse(saved));
     } catch {}
   }, []);
+
+  // Reactively synchronize URL search parameters (q, search, domain, category, difficulty, card, id)
+  useEffect(() => {
+    const qParam = searchParams.get("q") || searchParams.get("search");
+    const domainParam = searchParams.get("domain") || searchParams.get("category");
+    const diffParam = searchParams.get("difficulty");
+    const cardParam = searchParams.get("card") || searchParams.get("id");
+
+    if (qParam !== null) {
+      setSearchQuery(qParam);
+    }
+
+    if (domainParam) {
+      setSelectedDomain(domainParam);
+    }
+
+    if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT", "ALL"].includes(diffParam.toUpperCase())) {
+      setSelectedDifficulty(diffParam.toUpperCase());
+    }
+
+    if (cardParam) {
+      const target = initialQuestions.find((item) => item.id === cardParam);
+      if (target) {
+        setExpandedIds((prev) => new Set([...prev, target.id]));
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+        scrollTimerRef.current = setTimeout(() => {
+          const el = document.getElementById(`question-${target.id}`) || document.getElementById(target.id);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 250);
+      }
+    }
+  }, [searchParams, initialQuestions]);
 
   const handleShuffle = useCallback(() => {
     setIsShuffled(true);

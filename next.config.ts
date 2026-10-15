@@ -50,6 +50,51 @@ const nextConfig: NextConfig = {
         destination: "/learning-paths",
         permanent: true,
       },
+      {
+        source: "/data-engineering-mindmap",
+        destination: "/mindmap",
+        permanent: true,
+      },
+      {
+        source: "/de-mindmap",
+        destination: "/mindmap",
+        permanent: true,
+      },
+      {
+        source: "/cheatsheet",
+        destination: "/cheat-sheet",
+        permanent: true,
+      },
+      {
+        source: "/practice",
+        destination: "/code-practice",
+        permanent: true,
+      },
+      {
+        source: "/scenarios",
+        destination: "/architecture?tab=scenarios",
+        permanent: true,
+      },
+      {
+        source: "/diagrams",
+        destination: "/architecture?tab=diagrams",
+        permanent: true,
+      },
+      {
+        source: "/questions",
+        destination: "/qa-prep",
+        permanent: true,
+      },
+      {
+        source: "/spark",
+        destination: "/spark-engine",
+        permanent: true,
+      },
+      {
+        source: "/gcc",
+        destination: "/company-research",
+        permanent: true,
+      },
     ];
   },
 };

@@ -22,12 +22,33 @@ const ROUTE_LABELS: Record<string, string> = {
   "/code-practice": "Code Practice",
   "/python": "Python Data Hub",
   "/qa-prep": "Q&A Prep",
+  "/mindmap": "Interactive Mindmap",
   "/de-mindmap": "Data Engineering Mindmap",
   "/company-research": "Company Research",
   "/studio": "My Learning Studio",
   "/guided-learning": "Guided Learning",
   "/cheat-sheet": "Production Cheat Sheet",
   "/dataops": "DataOps & CI/CD Lifecycle",
+};
+
+const ARCHITECTURE_TABS: Record<string, string> = {
+  scenarios: "System Scenarios",
+  diagrams: "Whiteboard Blueprints",
+  python: "Python Runbooks",
+  polyglot: "Polyglot Translation Matrix",
+  distributed: "Distributed Systems",
+};
+
+const CHEATSHEET_TABS: Record<string, string> = {
+  runbooks: "Production Runbooks",
+  databricks: "Databricks Cheat Sheets",
+};
+
+const CODE_PRACTICE_DBS: Record<string, string> = {
+  pyspark: "PySpark Drills",
+  sparksql: "Spark SQL Drills",
+  mssql: "T-SQL Drills",
+  python: "Python & Polars",
 };
 
 const DATAOPS_TABS: Record<string, string> = {
@@ -132,10 +153,6 @@ function BreadcrumbsInner() {
     } else if (pathname === "/concepts") {
       const term = searchParams.get("term");
       const category = searchParams.get("category");
-      const tab = searchParams.get("tab");
-      if (tab === "python") {
-        list.push({ label: "Python Reference", href: "/concepts?tab=python" });
-      }
       if (category && category !== "ALL") {
         list.push({ label: category, href: `/concepts?category=${encodeURIComponent(category)}` });
       }
@@ -143,6 +160,10 @@ function BreadcrumbsInner() {
         list.push({ label: term });
       }
     } else if (pathname === "/architecture") {
+      const tab = searchParams.get("tab")?.toLowerCase();
+      if (tab && ARCHITECTURE_TABS[tab]) {
+        list.push({ label: ARCHITECTURE_TABS[tab], href: `/architecture?tab=${tab}` });
+      }
       const category = searchParams.get("category");
       const difficulty = searchParams.get("difficulty");
       const card = searchParams.get("card") || searchParams.get("id");
@@ -158,12 +179,21 @@ function BreadcrumbsInner() {
       } else if (card) {
         list.push({ label: `Scenario #${card}` });
       }
+    } else if (pathname === "/cheat-sheet") {
+      const tab = searchParams.get("tab")?.toLowerCase();
+      if (tab && CHEATSHEET_TABS[tab]) {
+        list.push({ label: CHEATSHEET_TABS[tab], href: `/cheat-sheet?tab=${tab}` });
+      }
     } else if (pathname === "/guided-learning") {
       const topic = searchParams.get("topic");
       if (topic) {
         list.push({ label: `${topic.toUpperCase()} Track` });
       }
     } else if (pathname === "/code-practice") {
+      const db = searchParams.get("db")?.toLowerCase();
+      if (db && CODE_PRACTICE_DBS[db]) {
+        list.push({ label: CODE_PRACTICE_DBS[db], href: `/code-practice?db=${db}` });
+      }
       const cat = searchParams.get("category");
       if (cat && cat !== "ALL") {
         list.push({ label: cat });
@@ -171,7 +201,11 @@ function BreadcrumbsInner() {
     } else if (pathname === "/qa-prep") {
       const domain = searchParams.get("domain") || searchParams.get("category");
       if (domain && domain !== "ALL") {
-        list.push({ label: domain });
+        list.push({ label: domain, href: `/qa-prep?domain=${encodeURIComponent(domain)}` });
+      }
+      const q = searchParams.get("q") || searchParams.get("search");
+      if (q) {
+        list.push({ label: `"${q.length > 25 ? q.slice(0, 25) + "..." : q}"` });
       }
     }
 
