@@ -280,6 +280,38 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     docLink: "https://iceberg.apache.org/docs/latest/spec/"
   },
   {
+    id: "open-table-formats-lakehouse",
+    title: "Open Table Formats Blueprint: Lakehouse Storage Engines",
+    subtitle: "Under-the-Hood Architectural Comparison: Delta Lake, Apache Iceberg & Apache Hudi",
+    category: "Storage Engine",
+    image: "/diagrams/open_table_formats_lakehouse_architecture.webp",
+    tags: ["Open Table Formats", "Delta Lake", "Apache Iceberg", "Apache Hudi", "Lakehouse", "ACID", "Liquid Clustering", "Hidden Partitioning", "Timeline"],
+    description: "Multi-engine architectural blueprint comparing Delta Lake, Apache Iceberg, and Apache Hudi across a unified query layer (Spark, Trino, Flink, DuckDB, Snowflake). Contrasts Delta Lake's monotonic ACID commit log (_delta_log) and Liquid Clustering, Apache Iceberg's hierarchical snapshot tree and hidden partitioning, and Apache Hudi's timeline instants and record-level indexing.",
+    keyPoints: [
+      "Multi-Engine Interoperability: Decouples table metadata from compute engines, allowing Spark, Trino, Flink, and DuckDB to execute concurrent ACID reads and writes.",
+      "Delta Lake: Manages transactions via _delta_log JSON commits, periodic Parquet checkpoints, Liquid Clustering, and automatic UniForm metadata emission for Iceberg/Hudi.",
+      "Apache Iceberg: Employs a 4-tier snapshot metadata tree (Catalog -> Metadata File -> Manifest List -> Manifests -> Data Files) with Hidden Partitioning and in-place Partition Evolution.",
+      "Apache Hudi: Optimized for low-latency streaming ingestion and CDC via .hoodie timeline actions (commit, deltacommit, compaction), COW vs MOR table types, and record-level Bloom/Bucket indexes."
+    ],
+    docLink: "/guided-learning?topic=datalake"
+  },
+  {
+    id: "open-file-formats-storage",
+    title: "Open File Formats Blueprint: Physical Storage Engines",
+    subtitle: "Under-the-Hood Internal Architecture: Apache Parquet, Apache ORC & Apache Avro",
+    category: "Storage Engine",
+    image: "/diagrams/open_file_formats_storage_architecture.webp",
+    tags: ["Open File Formats", "Apache Parquet", "Apache ORC", "Apache Avro", "Columnar Storage", "Row-Oriented", "Predicate Pushdown", "Schema Evolution", "Bloom Filter"],
+    description: "Physical byte layout, compression encodings, and pushdown optimizations comparing analytical columnar formats (Parquet, ORC) against streaming row-oriented serialization (Avro). Details Parquet's Row Groups and footer statistics, ORC's Stripes and 10,000-row group Bloom filters, and Avro's sync markers and JSON schema evolution.",
+    keyPoints: [
+      "Apache Parquet (OLAP Standard): Columnar layout with PAR1 magic headers, 128MB-512MB Row Groups, Column Chunks, and footer metadata enabling Predicate Pushdown and Column Projection.",
+      "Apache ORC (Enterprise DW): Organizes data into 64MB-256MB Stripes with built-in Stripe-level Indexes (10,000-row groups with Bloom filters) for micro-skipping without stream decompression.",
+      "Apache Avro (Streaming Standard): Row-oriented binary serialization with magic bytes Obj1, embedded JSON schema, and 16-byte cryptographic sync markers for fast row appends and Kafka integration.",
+      "Schema Evolution: Avro provides full backward/forward schema resolution with Confluent Schema Registry; Parquet and ORC leverage footer metadata and column IDs."
+    ],
+    docLink: "/concepts?category=DATALAKE+ARCHITECTURE"
+  },
+  {
     id: "spark-catalyst-photon-engine",
     title: "Databricks Compute: Catalyst Optimizer, AQE & Photon",
     subtitle: "Query Optimization Pipeline, Runtime Adaptive Query Execution (AQE), and Vectorized C++ Execution",

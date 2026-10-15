@@ -165,7 +165,7 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     description: 'Medallion architecture, open table formats (Delta, Iceberg), and data mesh',
     executiveSummary: 'Design resilient multi-hop lakehouses across Bronze (raw immutable append), Silver (cleansed, conformed CDC), and Gold (Kimball dimensional marts), comparing Delta Lake, Apache Iceberg, and Hudi.',
     diagramId: 'databricks-medallion-pipeline',
-    relatedDiagramIds: ['apache-iceberg-open-table-format', 'delta-lake-under-the-hood', 'data-mesh-enterprise-architecture'],
+    relatedDiagramIds: ['open-table-formats-lakehouse', 'open-file-formats-storage', 'apache-iceberg-open-table-format', 'delta-lake-under-the-hood', 'data-mesh-enterprise-architecture'],
     conceptCategories: ['DATALAKE ARCHITECTURE', 'GENERAL DE'],
     questionCategories: ['DATALAKE ARCHITECTURE', 'LAKEHOUSE', 'CDC', 'INGESTION'],
     archKeywords: ['LAKEHOUSE', 'DATA MESH', 'MODELING', 'ARCHITECTURE', 'DATA VAULT'],

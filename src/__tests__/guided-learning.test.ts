@@ -131,7 +131,7 @@ describe('guided-learning data', () => {
     const overview = getPlatformOverviewStats();
     expect(overview.totalTopics).toBe(GUIDED_TOPICS.length);
     expect(overview.totalUniqueItems).toBeGreaterThan(500);
-    expect(overview.totalWhiteboards).toBe(28);
+    expect(overview.totalWhiteboards).toBe(30);
     expect(overview.domainsCount).toBeGreaterThanOrEqual(4);
   });
 });
