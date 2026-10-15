@@ -12,6 +12,7 @@ import {
   Search,
   CheckCircle2,
   FileCode2,
+  Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
@@ -130,8 +131,33 @@ const PILLARS: PillarItem[] = [
     ],
   },
   {
+    id: "dataops",
+    title: "5. DataOps & Lifecycle",
+    badge: "Tool Secrets · CI/CD · 5 Stages",
+    badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+    icon: Workflow,
+    iconColor: "text-blue-400",
+    accentBg: "from-blue-600/10 via-blue-500/5 to-transparent",
+    borderColor: "border-blue-500/20",
+    hoverBorder: "hover:border-blue-500/50",
+    description:
+      "Production-grade tool connectivity & secrets, CI/CD comparisons (DABs, Slim CI), and the 5-stage lakehouse lifecycle playbook.",
+    features: [
+      "Key Vault & Managed Identity",
+      "Databricks Asset Bundles (DABs)",
+      "5-Stage Project Playbook",
+      "Whiteboard CI/CD Architecture",
+    ],
+    primaryLink: { label: "Open DataOps Hub", href: "/dataops" },
+    secondaryLinks: [
+      { label: "Tool Secrets", href: "/dataops?tab=connectivity" },
+      { label: "CI/CD", href: "/dataops?tab=cicd" },
+      { label: "Lifecycle", href: "/dataops?tab=lifecycle" },
+    ],
+  },
+  {
     id: "interview",
-    title: "5. Interview Drill Hub",
+    title: "6. Interview Drill Hub",
     badge: "6,570+ Qs · Flashcards Mode",
     badgeColor: "bg-orange-500/15 text-orange-400 border-orange-500/30",
     icon: MessageSquare,
@@ -226,17 +252,22 @@ export function HeroCommandCenter() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-2 border-t border-[var(--border)]/60 text-xs text-[var(--muted-foreground)]">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
-              <span><strong className="text-[var(--foreground)]">6,570+</strong> Verified Questions</span>
+              <span><strong className="text-[var(--foreground)]">6,570+</strong> Questions</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
-              <span><strong className="text-[var(--foreground)]">436+</strong> Core Concepts</span>
+              <span><strong className="text-[var(--foreground)]">3,124+</strong> Scenarios</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
-              <span><strong className="text-[var(--foreground)]">25+</strong> Architecture Blueprints</span>
+              <span><strong className="text-[var(--foreground)]">32</strong> Blueprints</span>
+            </div>
+            <span className="hidden sm:inline text-[var(--border)]">•</span>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
+              <span><strong className="text-[var(--foreground)]">21</strong> Subpages Across 8 Hubs</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
@@ -247,7 +278,7 @@ export function HeroCommandCenter() {
         </div>
       </section>
 
-      {/* ── 2. THE 5 PILLARS OF MASTERY (CLEAN GATEWAY CARDS) ──────────────── */}
+      {/* ── 2. THE 6 PILLARS OF MASTERY (CLEAN GATEWAY CARDS) ──────────────── */}
       <section className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <div>
@@ -259,7 +290,7 @@ export function HeroCommandCenter() {
             </h2>
           </div>
           <span className="text-xs text-[var(--muted-foreground)] hidden sm:inline">
-            5 unified learning gateways
+            6 unified learning gateways
           </span>
         </div>
 
