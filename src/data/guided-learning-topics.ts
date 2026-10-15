@@ -43,7 +43,7 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     conceptCategories: ['SPARK & DATABRICKS'],
     questionCategories: ['SPARK & DATABRICKS', 'SPARK_PYSPARK'],
     archKeywords: ['PYSPARK', 'SPARK'],
-    deKeywords: ['BIG DATA'],
+    deKeywords: ['BIG DATA', 'SPARK', 'DATABRICKS'],
     stages: {
       foundations: 'RDD vs DataFrame APIs, lazy evaluation, transformations vs actions, and basic cluster topology.',
       core: 'Catalyst logical/physical optimization plans, broadcast joins, partition sizing, and PySpark UDF pitfalls.',
@@ -64,7 +64,7 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     conceptCategories: ['DATABRICKS', 'SPARK & DATABRICKS'],
     questionCategories: ['DATABRICKS', 'SPARK & DATABRICKS', 'SPARK_PYSPARK'],
     archKeywords: ['DATABRICKS', 'DELTA', 'PYSPARK', 'SPARK'],
-    deKeywords: ['BIG DATA'],
+    deKeywords: ['BIG DATA', 'DATABRICKS', 'SPARK'],
     stages: {
       foundations: 'Workspace architecture, cluster runtimes, notebook workflows, and DBFS storage primitives.',
       core: 'Delta Lake ACID transaction log (_delta_log), Auto Loader directory listing vs file notification, and DLT expectations.',
