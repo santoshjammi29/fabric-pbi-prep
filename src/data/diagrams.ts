@@ -312,6 +312,24 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     docLink: "/concepts?category=DATALAKE+ARCHITECTURE"
   },
   {
+    id: "databricks-optimization-techniques-architecture",
+    title: "6 Delta Lake Optimization Techniques: Lakehouse Performance & Storage Hygiene",
+    subtitle: "Physical Partitioning, Z-Ordering, Compaction (OPTIMIZE), Auto Optimize, Liquid Clustering & VACUUM",
+    category: "Storage Engine",
+    image: "/diagrams/databricks_optimization_techniques_architecture.webp",
+    tags: ["Delta Lake", "Liquid Clustering", "Z-Ordering", "OPTIMIZE", "Auto Optimize", "VACUUM", "Partitioning", "Databricks", "Storage Hygiene", "Performance Tuning"],
+    description: "Under-the-hood architectural blueprint and decision framework detailing the 6 core Delta Lake optimization techniques. Covers physical directory partitioning, multi-dimensional Z-Ordering space-filling curves, bin-packing file compaction via OPTIMIZE, write-time Auto Optimize (optimizeWrites & autoCompact), next-generation Liquid Clustering (CLUSTER BY) Hilbert curves, and safe storage lifecycle management via VACUUM with 7-day retention safety.",
+    keyPoints: [
+      "Physical Partitioning (PARTITIONED BY): Segregates data into rigid Hive directory trees. Best for low-cardinality keys (<10,000 distinct values, >1GB/partition); causes small file sprawl and skew on high cardinality.",
+      "Multi-Dimensional Z-Ordering: Space-filling Z-curves cluster 1–4 high-cardinality columns within files to maximize multi-column min/max data skipping, but incurs high write amplification on incremental updates.",
+      "Bin-Packing Compaction (OPTIMIZE): Coalesces thousands of fragmented 1MB–10MB Parquet files from streaming or frequent writes into optimal ~1GB target files, drastically reducing metastore lookup and read I/O overhead.",
+      "Auto Optimize (Write-Time Sizing): Dynamically tunes partition file sizing during streaming micro-batches and high-frequency writes using optimizeWrites (adaptive write partitions) and autoCompact (automatic 128MB compaction).",
+      "Liquid Clustering (CLUSTER BY ★): Databricks recommended standard. Replaces partitioning and Z-Order using Hilbert space-filling curves. Eliminates directory skew, supports dynamic non-destructive key changes, and clusters incrementally during writes.",
+      "VACUUM Lifecycle Hygiene: Permanently deletes unreferenced, tombstoned Parquet files past the safety retention window (default 168 hours / 7 days), preventing storage bloat while guaranteeing snapshot isolation for concurrent readers."
+    ],
+    docLink: "/concepts?category=DATABRICKS"
+  },
+  {
     id: "spark-catalyst-photon-engine",
     title: "Databricks Compute: Catalyst Optimizer, AQE & Photon",
     subtitle: "Query Optimization Pipeline, Runtime Adaptive Query Execution (AQE), and Vectorized C++ Execution",

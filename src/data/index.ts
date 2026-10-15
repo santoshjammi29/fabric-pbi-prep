@@ -48,11 +48,28 @@ import dataPathsJson from './json/data_paths.json';
 import dataCheatsheetJson from './json/data_cheatsheet.json';
 import databricksCheatsheetsJson from './json/databricks_cheatsheets.json';
 import companyProfilesJson from './json/company_profiles.json';
+import databricks100Json from './json/databricks_100.json';
+
+export interface Databricks100Concept {
+  id: string;
+  num: number;
+  day: number;
+  concept: string;
+  category: string;
+  categoryId: number;
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  summary: string;
+  explanation: string;
+  keyPoints: string[];
+  codeSnippet: string;
+  certificationMapping: string;
+}
 
 // Cast datasets to typed arrays
 export const companyProfiles: CompanyProfile[] = companyProfilesJson as CompanyProfile[];
 export const cheatsheetData: CheatCode[] = dataCheatsheetJson as CheatCode[];
 export const databricksCheatsheetData: DatabricksSuiteData = databricksCheatsheetsJson as DatabricksSuiteData;
+export const databricks100Data: Databricks100Concept[] = databricks100Json as Databricks100Concept[];
 export const questionsDb: Question[] = questionsJson as Question[];
 export const architectureData: ArchitectureQuestion[] = dataArchitectureJson as ArchitectureQuestion[];
 export const conceptsDb: Concept[] = dataConceptsJson as Concept[];

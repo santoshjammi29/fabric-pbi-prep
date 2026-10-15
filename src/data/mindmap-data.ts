@@ -98,12 +98,12 @@ val streamDf = spark.readStream
       },
       {
         id: "ingestion-batch",
-        conceptId: "fabric-dataflows-gen2",
-        name: "Edge & Polyglot Batch Connectors",
-        desc: "Managed orchestrator endpoints, REST API webhooks, SFTP file listeners, and high-concurrency staging pools.",
-        tradeOffs: "Simple implementation and schema validation vs poll latency and duplicate record deduplication overhead.",
-        protocols: ["ADF Copy Activity", "Airbyte", "Fivetran", "Webhooks", "SFTP"],
-        practiceLink: "/qa-prep?q=Copy%20Activity",
+        conceptId: "databricks-auto-loader-file-discovery",
+        name: "Auto Loader & Polyglot Batch Connectors",
+        desc: "Managed event-driven file discovery (cloudFiles), Lakeflow Connect for SaaS/DB sources, REST webhooks, and scalable staging queues.",
+        tradeOffs: "Idempotent exactly-once ingestion with schema evolution vs queue subscription setup and notification latency.",
+        protocols: ["Auto Loader (cloudFiles)", "Lakeflow Connect", "ADF Copy Activity", "Airbyte", "Fivetran"],
+        practiceLink: "/qa-prep?q=Auto%20Loader",
       },
     ],
   },
@@ -142,16 +142,26 @@ ALTER TABLE gold_sales SET TBLPROPERTIES (
       {
         id: "storage-clustering",
         conceptId: "delta-liquid-clustering",
-        name: "Liquid Clustering & Z-Ordering",
-        desc: "Multi-dimensional file indexing grouping co-queried data into identical Parquet files to eliminate file scan I/O.",
-        tradeOffs: "Dramatic query speedups (10x-50x) vs write-time shuffle overhead and periodic OPTIMIZE execution.",
-        protocols: ["Liquid Clustering", "Z-Order", "Bin-packing Compaction", "Partition Pruning"],
-        practiceLink: "/concepts?term=Liquid%20Clustering",
-        codeSnippet: `-- Databricks / Fabric Liquid Clustering
-ALTER TABLE silver_telemetry
-CLUSTER BY (device_id, event_date);
+        name: "6 Delta Optimization Levers & Liquid Clustering",
+        desc: "Empirical layout engineering comparing Physical Partitioning, multi-dimensional Z-Ordering, Bin-Packing OPTIMIZE, write-time Auto Optimize, Liquid Clustering (Hilbert curves), and VACUUM 7-day retention safety.",
+        tradeOffs: "Eliminates small-file sprawl and partition skew (10x-50x query speedup) vs write shuffle overhead and OCC commit retries.",
+        protocols: ["Liquid Clustering (CLUSTER BY)", "Z-Order", "Bin-Packing OPTIMIZE", "Auto Optimize", "VACUUM RETAIN 168 HOURS"],
+        practiceLink: "/concepts?category=DATABRICKS",
+        codeSnippet: `-- 6 Delta Lake Optimization Levers
+-- 1. Liquid Clustering (Recommended Standard)
+CREATE TABLE sales_events USING DELTA CLUSTER BY (sale_date, customer_id);
 
-OPTIMIZE silver_telemetry;`,
+-- 2. Compaction & Incremental Clustering
+OPTIMIZE sales_events;
+
+-- 3. Auto Optimize Table Configuration
+ALTER TABLE sales_events SET TBLPROPERTIES (
+  'delta.autoOptimize.optimizeWrite' = 'true',
+  'delta.autoOptimize.autoCompact' = 'true'
+);
+
+-- 4. VACUUM Lifecycle Hygiene (7-day safety retention)
+VACUUM sales_events RETAIN 168 HOURS;`,
       },
       {
         id: "storage-uniform",
@@ -353,12 +363,12 @@ DEFINE
       },
       {
         id: "orchestration-cicd",
-        conceptId: "fabric-capacities",
-        name: "Data CI/CD & Deployment Pipelines",
-        desc: "Automated PR testing with ephemeral staging schemas, PBIP git synchronization, and Azure DevOps / GitHub Actions.",
+        conceptId: "databricks-databricks-asset-bundles-dabs",
+        name: "Data CI/CD & Asset Bundles (DABs)",
+        desc: "Declarative Infrastructure as Code (IaC) via databricks.yml, ephemeral integration testing on PR, PBIP git sync, and automated multi-environment promotion.",
         tradeOffs: "Zero production regressions and automated rollbacks vs pipeline build time and dev sandbox costs.",
-        protocols: ["Fabric Git Integration", "Azure DevOps", "GitHub Actions", "Terraform", "Bicep"],
-        practiceLink: "/architecture?q=CI%2FCD",
+        protocols: ["Databricks Asset Bundles (DABs)", "GitHub Actions", "Azure DevOps", "Terraform", "Fabric Git"],
+        practiceLink: "/architecture?q=DABs",
       },
       {
         id: "orchestration-bluegreen",
@@ -471,12 +481,12 @@ WITH (m = 16, ef_construction = 64);`,
       },
       {
         id: "ai-text2sql",
-        conceptId: "fabric-semantic-link",
-        name: "Deterministic Text-to-SQL Systems",
-        desc: "Combining LLMs with semantic metadata schemas, golden query few-shot examples, and automated SQL AST validation.",
-        tradeOffs: "Enables natural language business analytics vs hallucinations on complex joins requiring guardrail verification.",
-        protocols: ["Semantic Parsing", "Golden SQL Few-Shot", "SQLGlot AST Validator", "Spider Benchmark"],
-        practiceLink: "/qa-prep?q=Text-to-SQL",
+        conceptId: "databricks-ai-functions-for-data-engineers",
+        name: "Databricks Genie & Deterministic Text-to-SQL",
+        desc: "Autonomous AI/BI conversational spaces (Databricks Genie) combined with Unity Catalog semantic instructions, star schema PK/FK metadata, and certified benchmark SQL pairs.",
+        tradeOffs: "Empowers non-technical executives with instant analytical self-service vs metric ambiguity requiring instructions calibration.",
+        protocols: ["Databricks Genie", "AI/BI Spaces", "Semantic Instructions", "Certified Benchmark SQL", "SQLGlot AST"],
+        practiceLink: "/qa-prep?q=Genie",
       },
       {
         id: "ai-rag",

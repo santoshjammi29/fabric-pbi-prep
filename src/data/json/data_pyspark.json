@@ -543,5 +543,95 @@
       "Method chaining (returning self) creates expressive, testable, and reusable ETL pipelines."
     ],
     "use_case": "Building enterprise-wide PySpark utility libraries and shared data engineering modules across distributed teams."
+  },
+  {
+    "id": "py-adv-delta-optimization-benchmark",
+    "title": "Benchmarking 6 Delta Lake Optimization Levers at Scale",
+    "level": "advanced",
+    "category": "Delta Lake & Storage Optimization",
+    "description": "Hands-on empirical benchmarking comparing 6 Delta Lake layout and file management techniques (Baseline small files, Physical Partitioning, Z-Ordering, Manual Compaction, Auto Optimize, and Liquid Clustering) across a 50M-row dataset, measuring scan time, input files, and bytes read via the Spark UI.",
+    "code": "from pyspark.sql import SparkSession\nimport pyspark.sql.functions as F\nfrom pyspark.sql.functions import col\n\nspark = SparkSession.builder.getOrCreate()\nCATALOG = \"delta_opt\"\nSCHEMA = \"sales\"\n\n# 1. Baseline unoptimized table with fragmented small files\n# spark.sql(f\"CREATE TABLE {CATALOG}.{SCHEMA}.sales_raw ...\")\n\n# 2. Physical Partitioning (low-cardinality country column)\ndf_raw = spark.table(f\"{CATALOG}.{SCHEMA}.sales_raw\")\ndf_raw.write.format(\"delta\") \\\n    .mode(\"overwrite\") \\\n    .partitionBy(\"country\") \\\n    .saveAsTable(f\"{CATALOG}.{SCHEMA}.sales_partitioned\")\n\n# 3. Multi-dimensional Z-Ordering on high-cardinality keys\nspark.sql(f\"\"\"\n    CREATE TABLE {CATALOG}.{SCHEMA}.sales_zorder AS \n    SELECT * FROM {CATALOG}.{SCHEMA}.sales_raw;\n\"\"\")\nspark.sql(f\"OPTIMIZE {CATALOG}.{SCHEMA}.sales_zorder ZORDER BY (customer_id, product_id)\")\n\n# 4. Liquid Clustering (modern recommended standard - Hilbert curve)\nspark.sql(f\"\"\"\n    CREATE TABLE {CATALOG}.{SCHEMA}.sales_liquid \n    USING DELTA \n    CLUSTER BY (sale_date, customer_id)\n    AS SELECT * FROM {CATALOG}.{SCHEMA}.sales_raw;\n\"\"\")\n# Incrementally clusters new appends without full-table rewrites\nspark.sql(f\"OPTIMIZE {CATALOG}.{SCHEMA}.sales_liquid\")\n\n# 5. Profile metrics in Spark UI & metadata\ndetail_df = spark.sql(f\"DESCRIBE DETAIL {CATALOG}.{SCHEMA}.sales_liquid\")\ndetail_df.select(\"numFiles\", \"sizeInBytes\", \"clusteringColumns\").show()",
+    "notes": [
+      "Liquid Clustering replaces both partitioning and Z-Order, supporting dynamic clustering key alterations.",
+      "Z-Ordering is effective for multi-column queries on legacy tables but suffers from high write amplification on frequent appends.",
+      "Physical partitioning on high-cardinality columns (>10,000 values) leads to severe small-file sprawl and metadata overhead.",
+      "Use DESCRIBE DETAIL to verify file count reduction and average file size approaching the ~1GB sweet spot."
+    ],
+    "use_case": "Optimizing a 50M-row retail sales fact table in Databricks to eliminate query scan bottlenecks and compare empirical performance across layout strategies."
+  },
+  {
+    "id": "py-int-autoloader-production-streaming",
+    "title": "Auto Loader (cloudFiles) Streaming Ingestion with Rescued Data",
+    "level": "intermediate",
+    "category": "Streaming & Ingestion",
+    "description": "Production Auto Loader pattern for high-throughput, low-latency file ingestion from cloud object storage (ADLS Gen2 / S3). Implements automatic schema inference, directory notification mode, schema evolution, and bad-data isolation via _rescued_data.",
+    "code": "from pyspark.sql.functions import col, current_timestamp\n\n# Configure Auto Loader streaming source\nraw_stream_df = spark.readStream.format(\"cloudFiles\") \\\n    .option(\"cloudFiles.format\", \"json\") \\\n    .option(\"cloudFiles.schemaLocation\", \"abfss://checkpoints@datalake.dfs.core.windows.net/orders/schema\") \\\n    .option(\"cloudFiles.schemaEvolutionMode\", \"addNewColumns\") \\\n    .option(\"cloudFiles.inferColumnTypes\", \"true\") \\\n    .option(\"cloudFiles.useNotifications\", \"true\") \\\n    .load(\"abfss://landing@datalake.dfs.core.windows.net/inbound_orders/*/*.json\")\n\n# Add ingestion audit metadata\nenriched_stream = raw_stream_df \\\n    .withColumn(\"ingestion_timestamp\", current_timestamp()) \\\n    .withColumn(\"file_source\", col(\"_metadata.file_name\"))\n\n# Stream write to Bronze Delta Table with checkpointing\nquery = enriched_stream.writeStream \\\n    .format(\"delta\") \\\n    .outputMode(\"append\") \\\n    .option(\"checkpointLocation\", \"abfss://checkpoints@datalake.dfs.core.windows.net/orders/bronze_chk\") \\\n    .trigger(availableNow=True) \\\n    .toTable(\"bronze.orders_raw\")\n\nquery.awaitTermination()",
+    "notes": [
+      "cloudFiles.useNotifications uses cloud queue events (Event Grid / SNS) to discover millions of files without expensive directory listings.",
+      "addNewColumns schema evolution automatically adapts to new incoming JSON attributes without failing the streaming job.",
+      "_rescued_data automatically captures malformed rows or type mismatches for audit without dropping records.",
+      "trigger(availableNow=True) gives micro-batch serverless cost efficiency with streaming semantics."
+    ],
+    "use_case": "Ingesting millions of daily order events arriving as nested JSON blobs into a Bronze Delta table with zero schema drift failures."
+  },
+  {
+    "id": "py-adv-structured-streaming-watermarking",
+    "title": "Event-Time Watermarking & Windowed Stateful Aggregations",
+    "level": "advanced",
+    "category": "Structured Streaming",
+    "description": "Implements event-time stateful streaming aggregations with watermarking to handle out-of-order and late data cleanly. Uses tumbling and sliding windows with state eviction to prevent executor out-of-memory errors.",
+    "code": "from pyspark.sql.functions import col, window, sum, count\n\n# Read clickstream events from Kafka or Delta Bronze\nevents_df = spark.readStream.format(\"delta\").table(\"bronze.clickstream\")\n\n# Define 10-minute watermark for late data handling\nwindowed_metrics = events_df \\\n    .withWatermark(\"event_time\", \"10 minutes\") \\\n    .groupBy(\n        window(col(\"event_time\"), \"1 hour\", \"15 minutes\"), # Sliding 1-hr window every 15 mins\n        col(\"campaign_id\"),\n        col(\"country\")\n    ) \\\n    .agg(\n        count(\"click_id\").alias(\"total_clicks\"),\n        sum(\"conversion_value\").alias(\"gross_revenue\")\n    )\n\n# Write to Silver Gold aggregated layer with Update output mode\nquery = windowed_metrics.writeStream \\\n    .format(\"delta\") \\\n    .outputMode(\"update\") \\\n    .option(\"checkpointLocation\", \"/mnt/checkpoints/campaign_hourly_metrics\") \\\n    .toTable(\"silver.campaign_hourly_metrics\")\n\nquery.awaitTermination()",
+    "notes": [
+      "withWatermark('event_time', '10 minutes') instructs Spark that events arriving older than 10 mins past current max event time can be dropped.",
+      "Watermarking is mandatory for stateful streaming operations to allow the RocksDB/HDFS state store to purge expired state buffers.",
+      "Update mode writes only updated aggregate windows per micro-batch, whereas Append mode emits only finalized closed windows.",
+      "Sliding windows (duration, slide) allow tracking moving trends with overlapping time boundaries."
+    ],
+    "use_case": "Tracking real-time ad campaign conversions and revenue in sliding 1-hour windows while bounding state store memory usage."
+  },
+  {
+    "id": "py-adv-foreachbatch-idempotent-upsert",
+    "title": "foreachBatch Idempotent Upsert & Deduplication Pattern",
+    "level": "advanced",
+    "category": "Structured Streaming",
+    "description": "Production pattern using foreachBatch to execute multi-table writes and ACID MERGE INTO operations within a streaming pipeline. Solves duplicate delivery issues in streaming CDC pipelines using batch deduplication.",
+    "code": "from delta.tables import DeltaTable\nfrom pyspark.sql.functions import col, row_number\nfrom pyspark.sql.window import Window\n\ntarget_delta = DeltaTable.forName(spark, \"silver.customer_accounts\")\n\ndef process_micro_batch(micro_batch_df, batch_id):\n    # 1. Deduplicate within the micro-batch window (take latest updated record)\n    window_spec = Window.partitionBy(\"account_id\").orderBy(col(\"last_modified_ts\").desc())\n    deduped_batch = micro_batch_df \\\n        .withColumn(\"row_num\", row_number().over(window_spec)) \\\n        .filter(col(\"row_num\") == 1) \\\n        .drop(\"row_num\")\n        \n    # 2. Idempotent MERGE into Target Silver Delta Table\n    target_delta.alias(\"tgt\").merge(\n        deduped_batch.alias(\"src\"),\n        \"tgt.account_id = src.account_id\"\n    ).whenMatchedUpdate(\n        condition=\"src.last_modified_ts > tgt.last_modified_ts\",\n        set={\n            \"balance\": \"src.balance\",\n            \"status\": \"src.status\",\n            \"last_modified_ts\": \"src.last_modified_ts\"\n        }\n    ).whenNotMatchedInsert(\n        values={\n            \"account_id\": \"src.account_id\",\n            \"balance\": \"src.balance\",\n            \"status\": \"src.status\",\n            \"created_ts\": \"src.last_modified_ts\",\n            \"last_modified_ts\": \"src.last_modified_ts\"\n        }\n    ).execute()\n\n# Stream processor calling foreachBatch\nstreaming_query = spark.readStream.table(\"bronze.cdc_accounts\") \\\n    .writeStream \\\n    .foreachBatch(process_micro_batch) \\\n    .option(\"checkpointLocation\", \"/mnt/checkpoints/accounts_upsert\") \\\n    .start()\n\nstreaming_query.awaitTermination()",
+    "notes": [
+      "foreachBatch allows applying arbitrary batch operations (like DeltaTable.merge) to streaming micro-batch DataFrames.",
+      "Batch deduplication with Window.partitionBy ensures multiple CDC updates for the same key in one micro-batch don't cause MERGE conflict errors.",
+      "Provides end-to-end exactly-once idempotent semantics even when micro-batches are re-executed upon cluster failure.",
+      "Enables updating multiple target tables (e.g. Silver fact + quarantine audit table) in a single streaming job."
+    ],
+    "use_case": "Consuming real-time banking CDC account updates from Kafka into a Silver dimensional table without duplicate record conflicts."
+  },
+  {
+    "id": "py-adv-dlt-expectations-apparel-streaming",
+    "title": "Lakeflow / Delta Live Tables (DLT) Streaming with Expectations",
+    "level": "advanced",
+    "category": "Lakeflow Declarative Pipelines",
+    "description": "End-to-end Lakeflow Declarative Pipeline (formerly DLT) in Python implementing Bronze-to-Silver-to-Gold streaming medallion architecture with rigorous data quality expectations (@dlt.expect, @dlt.expect_or_drop, @dlt.expect_or_fail).",
+    "code": "import dlt\nfrom pyspark.sql.functions import col, current_timestamp, to_date\n\n# 1. Bronze Layer: Ingest streaming apparel events\n@dlt.table(\n    name=\"bronze_apparel_sales\",\n    comment=\"Raw streaming apparel sales transactions\"\n)\ndef bronze_apparel_sales():\n    return spark.readStream.format(\"cloudFiles\") \\\n        .option(\"cloudFiles.format\", \"json\") \\\n        .load(\"/mnt/landing/apparel_sales/\")\n\n# 2. Silver Layer: Cleanse data with strict Quality Expectations\n@dlt.table(\n    name=\"silver_apparel_sales\",\n    comment=\"Cleansed apparel sales with quality validations\"\n)\n@dlt.expect_or_drop(\"valid_order_id\", \"order_id IS NOT NULL\")\n@dlt.expect_or_drop(\"positive_amount\", \"item_price > 0 AND quantity > 0\")\n@dlt.expect(\"valid_email\", \"customer_email RLIKE '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$'\")\ndef silver_apparel_sales():\n    return dlt.read_stream(\"bronze_apparel_sales\") \\\n        .select(\n            col(\"order_id\"),\n            col(\"customer_id\"),\n            col(\"customer_email\"),\n            col(\"item_sku\"),\n            col(\"quantity\").cast(\"int\"),\n            col(\"item_price\").cast(\"decimal(10,2)\"),\n            (col(\"quantity\") * col(\"item_price\")).alias(\"total_sale_amount\"),\n            to_date(col(\"transaction_ts\")).alias(\"sale_date\")\n        )\n\n# 3. Gold Layer: Live Materialized View for Daily Apparel Revenue\n@dlt.table(\n    name=\"gold_daily_apparel_revenue\",\n    comment=\"Daily aggregated sales by product category\"\n)\ndef gold_daily_apparel_revenue():\n    return dlt.read(\"silver_apparel_sales\") \\\n        .groupBy(\"sale_date\", \"item_sku\") \\\n        .agg(\n            F.sum(\"total_sale_amount\").alias(\"daily_revenue\"),\n            F.sum(\"quantity\").alias(\"units_sold\")\n        )",
+    "notes": [
+      "@dlt.expect records invalid rows in the DLT event log without dropping records (warn only).",
+      "@dlt.expect_or_drop filters out bad rows from the downstream table while logging metric counts.",
+      "@dlt.expect_or_fail halts pipeline execution immediately if invalid data is detected (critical regulatory data).",
+      "dlt.read_stream creates an incremental streaming pipeline; dlt.read creates a batch materialized view."
+    ],
+    "use_case": "Building an automated enterprise retail pipeline where invalid sales records are quarantined and live KPIs refresh incrementally."
+  },
+  {
+    "id": "py-adv-genie-star-schema-tuning",
+    "title": "Databricks Genie Space Setup & Star Schema Optimization",
+    "level": "advanced",
+    "category": "GenAI & AI BI",
+    "description": "Architecting and calibrating a Databricks Genie AI/BI space on top of a Kimball dimensional star schema (Sales Fact, Customer Dim, Product Dim, Date Dim), defining semantic instructions, benchmark evaluation questions, and trusted SQL definitions.",
+    "code": "# Databricks Genie Space Semantic Configuration Pattern\n# 1. Ensure Star Schema tables have rich column comments and PRIMARY/FOREIGN keys in Unity Catalog:\nspark.sql(\"\"\"\n    ALTER TABLE gold.fct_sales \n    ALTER COLUMN customer_id COMMENT 'Unique foreign key referencing dim_customer.customer_id';\n\"\"\")\n\n# 2. Informational Primary & Foreign Key constraints help Genie resolve join paths accurately:\nspark.sql(\"\"\"\n    ALTER TABLE gold.dim_customer ADD CONSTRAINT pk_dim_customer PRIMARY KEY (customer_id);\n    ALTER TABLE gold.fct_sales ADD CONSTRAINT fk_sales_customer FOREIGN KEY (customer_id) REFERENCES gold.dim_customer(customer_id);\n\"\"\")\n\n# 3. Genie Space Semantic Instructions (YAML / System Prompt specification):\ngenie_space_config = {\n    \"space_name\": \"Executive Sales Analytics Space\",\n    \"tables\": [\"gold.fct_sales\", \"gold.dim_customer\", \"gold.dim_product\", \"gold.dim_date\"],\n    \"general_instructions\": \"\"\"\n        - Always join fct_sales with dim_date on date_id to filter by calendar year and quarter.\n        - 'Revenue' or 'Sales' refers to SUM(net_amount), excluding tax and shipping fees.\n        - 'Active Customers' refers to COUNT(DISTINCT customer_id) with at least 1 order in the period.\n        - Format currency outputs to 2 decimal places.\n        - Never generate CROSS JOIN; always use explicit foreign key relationships.\n    \"\"\",\n    \"certified_sql_queries\": [\n        {\n            \"question\": \"What is the top-selling product category by revenue this quarter?\",\n            \"verified_sql\": \"\"\"\n                SELECT p.category_name, SUM(f.net_amount) AS total_revenue\n                FROM gold.fct_sales f\n                JOIN gold.dim_product p ON f.product_id = p.product_id\n                JOIN gold.dim_date d ON f.date_id = d.date_id\n                WHERE d.quarter = '2026-Q3'\n                GROUP BY p.category_name\n                ORDER BY total_revenue DESC LIMIT 5;\n            \"\"\"\n        }\n    ]\n}",
+    "notes": [
+      "Genie spaces leverage Unity Catalog table comments, column descriptions, and informational PK/FK constraints to infer join paths.",
+      "Providing certified SQL query pairs anchors the underlying foundation model to verified business metric logic.",
+      "Clear natural language synonyms in instructions prevent hallucinations on domain acronyms like ARR, NRR, or GMV.",
+      "Run benchmark suites across 20-50 business questions to measure deterministic Text-to-SQL accuracy."
+    ],
+    "use_case": "Empowering business executives and non-technical stakeholders to ask self-service natural language questions against curated Lakehouse gold marts."
   }
 ]

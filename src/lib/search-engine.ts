@@ -13,6 +13,7 @@ import {
   getUnifiedQuestions,
 } from "@/data";
 import { GUIDED_TOPICS, GuidedTopic } from "@/data/guided-learning-topics";
+import { architectureDiagrams } from "@/data/diagrams";
 
 export type SearchCategory =
   | "All"
@@ -62,7 +63,7 @@ export interface SearchResponse {
 
 export const TOPIC_SYNONYMS: Record<string, string[]> = {
   spark: ["spark", "pyspark", "catalyst", "aqe", "tungsten", "photon", "rdd", "shuffle", "broadcast", "skew"],
-  databricks: ["databricks", "delta", "unity catalog", "dlt", "delta live tables", "auto loader", "liquid clustering", "zorder", "z-order", "dbfs"],
+  databricks: ["databricks", "delta", "unity catalog", "dlt", "delta live tables", "auto loader", "liquid clustering", "zorder", "z-order", "dbfs", "vacuum", "dabs", "databricks 100", "genie", "lakeflow"],
   fabric: ["fabric", "onelake", "direct lake", "directlake", "v-order", "synapse dw", "capacity", "shortcuts", "mirrored"],
   airflow: ["airflow", "dag", "taskflow", "operator", "sensor", "triggerer", "xcom", "celery", "astronomer", "mwaa"],
   dbt: ["dbt", "jinja", "ref", "snapshot", "semantic layer", "macro", "materialization", "dbt mesh", "scd type 2"],
@@ -462,6 +463,32 @@ export function executePortalSearch(query: string, maxResults = 30): SearchRespo
         snippet: snippet || `Blueprint: ${b.category} (${b.costEstimate || "Serverless"})`,
         score: score + 20,
         iconType: "cpu",
+      });
+    }
+  }
+
+  // 7b. Architecture Whiteboard Diagrams
+  for (const diag of architectureDiagrams) {
+    const { matched, score, snippet } = scoreItem(
+      diag.title,
+      diag.category,
+      [...(diag.tags || []), "whiteboard", "diagram", "blueprint", "architecture"],
+      `${diag.subtitle || ""} ${diag.description || ""} ${diag.keyPoints?.join(" ") || ""}`,
+      tokens,
+      trimmed
+    );
+
+    if (matched) {
+      results.push({
+        id: `diagram-${diag.id}`,
+        title: `${diag.title} (Whiteboard)`,
+        category: "Blueprints",
+        page: "Architecture",
+        href: `/architecture#${diag.id}`,
+        badge: "Whiteboard",
+        snippet: snippet || diag.subtitle,
+        score: score + 30,
+        iconType: "layout",
       });
     }
   }

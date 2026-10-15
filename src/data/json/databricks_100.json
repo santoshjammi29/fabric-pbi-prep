@@ -1,0 +1,1802 @@
+[
+  {
+    "id": "db100-001-acid-transactions",
+    "num": 1,
+    "day": 1,
+    "concept": "ACID Transactions",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "EASY",
+    "summary": "How Delta Lake guarantees atomicity, consistency, isolation, and durability on top of cloud object storage. Optimistic concurrency control. Why this matters vs. raw Parquet.",
+    "explanation": "In enterprise Databricks lakehouses, ACID Transactions is an essential mechanism under Delta Lake. How Delta Lake guarantees atomicity, consistency, isolation, and durability on top of cloud object storage. Optimistic concurrency control. Why this matters vs. raw Parquet.",
+    "keyPoints": [
+      "Delta Lake enforces ACID semantics on top of raw object storage (S3, ADLS Gen2, GCS).",
+      "Uses Optimistic Concurrency Control (OCC) to detect write-write conflicts at commit time.",
+      "Eliminates dirty reads and partial failures by committing changes atomically to the transaction log."
+    ],
+    "codeSnippet": "-- ACID guarantees via optimistic concurrency control\nBEGIN TRANSACTION;\nINSERT INTO delta.`/mnt/gold/sales` VALUES (101, 'Widget', 29.99, current_timestamp());\nCOMMIT;",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-002-transaction-log-delta-log",
+    "num": 2,
+    "day": 2,
+    "concept": "Transaction Log (`_delta_log`)",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "EASY",
+    "summary": "How the JSON-based transaction log tracks every change. What happens during reads (snapshot isolation). Log checkpoints every 100 commits. How the log enables time travel.",
+    "explanation": "In enterprise Databricks lakehouses, Transaction Log (`_delta_log`) is an essential mechanism under Delta Lake. How the JSON-based transaction log tracks every change. What happens during reads (snapshot isolation). Log checkpoints every 100 commits. How the log enables time travel.",
+    "keyPoints": [
+      "_delta_log holds sequential JSON commit files tracking added, modified, and deleted Parquet files.",
+      "Every 10 commits, Delta automatically writes a multi-part Parquet checkpoint file for fast state reconstruction.",
+      "Snapshot isolation allows concurrent readers to query consistent states without acquiring file locks."
+    ],
+    "codeSnippet": "-- Inspecting the transaction log commits\nDESCRIBE HISTORY delta.`/mnt/gold/sales`;\n-- Reading raw log metadata JSON\n-- dbfs:/mnt/gold/sales/_delta_log/00000000000000000000.json",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-003-time-travel-restore",
+    "num": 3,
+    "day": 3,
+    "concept": "Time Travel & RESTORE",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "EASY",
+    "summary": "Querying previous versions with `VERSION AS OF` and `TIMESTAMP AS OF`. Restoring tables with `RESTORE`. When time travel stops working (after VACUUM). Retention configuration.",
+    "explanation": "In enterprise Databricks lakehouses, Time Travel & RESTORE is an essential mechanism under Delta Lake. Querying previous versions with `VERSION AS OF` and `TIMESTAMP AS OF`. Restoring tables with `RESTORE`. When time travel stops working (after VACUUM). Retention configuration.",
+    "keyPoints": [
+      "Time travel queries read historical states defined by the transaction log and referenced Parquet files.",
+      "RESTORE TABLE rolls back a table to a specific version or timestamp instantaneously.",
+      "Historical time travel is bounded by the VACUUM retention window (default 7 days / 168 hours)."
+    ],
+    "codeSnippet": "-- Querying historical snapshot\nSELECT * FROM sales VERSION AS OF 12;\nSELECT * FROM sales TIMESTAMP AS OF '2026-10-10 12:00:00';\n-- Rollback accidental modification\nRESTORE TABLE sales TO VERSION AS OF 11;",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-004-schema-enforcement-vs-evolution",
+    "num": 4,
+    "day": 4,
+    "concept": "Schema Enforcement vs. Evolution",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "MEDIUM",
+    "summary": "How `mergeSchema` and `overwriteSchema` work. What happens when a write doesn't match the schema. When to use enforcement vs. evolution in production.",
+    "explanation": "In enterprise Databricks lakehouses, Schema Enforcement vs. Evolution is an essential mechanism under Delta Lake. How `mergeSchema` and `overwriteSchema` work. What happens when a write doesn't match the schema. When to use enforcement vs. evolution in production.",
+    "keyPoints": [
+      "Schema enforcement rejects writes that contain unexpected columns or mismatched data types.",
+      "option('mergeSchema', 'true') automatically appends new columns to the Delta table schema without rewriting files.",
+      "overwriteSchema allows completely replacing schema during full table overwrites."
+    ],
+    "codeSnippet": "# PySpark Schema Evolution on write\ndf_new.write \\\n  .format('delta') \\\n  .mode('append') \\\n  .option('mergeSchema', 'true') \\\n  .saveAsTable('sales')",
+    "certificationMapping": "Databricks Associate Data Engineer"
+  },
+  {
+    "id": "db100-005-liquid-clustering",
+    "num": 5,
+    "day": 5,
+    "concept": "Liquid Clustering",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "MEDIUM",
+    "summary": "The recommended layout strategy for all new tables. How `CLUSTER BY` works. Replaces legacy partitioning and Z-ORDER. Clustering triggered on writes that exceed size thresholds. Why OPTIMIZE is still recommended for comprehensive clustering.",
+    "explanation": "In enterprise Databricks lakehouses, Liquid Clustering is an essential mechanism under Delta Lake. The recommended layout strategy for all new tables. How `CLUSTER BY` works. Replaces legacy partitioning and Z-ORDER. Clustering triggered on writes that exceed size thresholds. Why OPTIMIZE is still recommended for comprehensive clustering.",
+    "keyPoints": [
+      "Liquid Clustering uses Hilbert space-filling curves, eliminating rigid Hive directory partitioning.",
+      "Prevents small file fragmentation and data skew on high-cardinality clustering keys.",
+      "Allows altering clustering keys via ALTER TABLE CLUSTER BY without rewriting existing data files."
+    ],
+    "codeSnippet": "-- Next-generation layout optimization\nCREATE TABLE sales_events (\n  event_id BIGINT, event_date DATE, customer_id STRING, amount DOUBLE\n) USING DELTA\nCLUSTER BY (event_date, customer_id);\n\n-- Dynamic clustering re-clustering\nOPTIMIZE sales_events;",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-006-optimize-file-compaction",
+    "num": 6,
+    "day": 6,
+    "concept": "OPTIMIZE & File Compaction",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "MEDIUM",
+    "summary": "Why small files kill read performance (causes: frequent appends, streaming micro-batches). How OPTIMIZE rewrites files and triggers Liquid Clustering. Auto Compaction as a lighter-weight alternative. When to rely on Predictive Optimization (#53) vs. running manually.",
+    "explanation": "In enterprise Databricks lakehouses, OPTIMIZE & File Compaction is an essential mechanism under Delta Lake. Why small files kill read performance (causes: frequent appends, streaming micro-batches). How OPTIMIZE rewrites files and triggers Liquid Clustering. Auto Compaction as a lighter-weight alternative. When to rely on Predictive Optimization (#53) vs. running manually.",
+    "keyPoints": [
+      "OPTIMIZE performs bin-packing to coalesce small 1MB-10MB files into optimal ~1GB target files.",
+      "Significantly reduces cloud object storage API calls and query scanning latency.",
+      "Predictive Optimization in Unity Catalog automates OPTIMIZE runs without manual cron jobs."
+    ],
+    "codeSnippet": "-- Compacting fragmented files into ~1GB files\nOPTIMIZE sales;\n-- Compacting specific partition or range\nOPTIMIZE sales WHERE event_date >= '2026-10-01';",
+    "certificationMapping": "Databricks Associate Data Engineer"
+  },
+  {
+    "id": "db100-007-vacuum-storage-lifecycle",
+    "num": 7,
+    "day": 7,
+    "concept": "VACUUM & Storage Lifecycle",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "MEDIUM",
+    "summary": "How VACUUM removes unreferenced files. The 7-day default retention and why lowering it breaks time travel. Interaction with concurrent readers. How Predictive Optimization automates VACUUM on managed tables.",
+    "explanation": "In enterprise Databricks lakehouses, VACUUM & Storage Lifecycle is an essential mechanism under Delta Lake. How VACUUM removes unreferenced files. The 7-day default retention and why lowering it breaks time travel. Interaction with concurrent readers. How Predictive Optimization automates VACUUM on managed tables.",
+    "keyPoints": [
+      "VACUUM permanently purges unreferenced physical data files that were marked for deletion by UPDATE/DELETE/OPTIMIZE.",
+      "Enforces a default 7-day (168-hour) safety threshold to prevent deleting files needed by concurrent active readers.",
+      "Disabling retention safety (spark.databricks.delta.vacuum.parallelDelete.enabled) is strongly discouraged in production."
+    ],
+    "codeSnippet": "-- Storage hygiene: removing tombstoned Parquet files past 7 days\nVACUUM sales RETAIN 168 HOURS;\n-- Dry run check\nVACUUM sales DRY RUN;",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-008-change-data-feed-cdf",
+    "num": 8,
+    "day": 8,
+    "concept": "Change Data Feed (CDF)",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "MEDIUM",
+    "summary": "How to enable and query `table_changes()`. The `_change_type` column (insert, update_preimage, update_postimage, delete). Use cases: incremental downstream processing, audit trails, replication.",
+    "explanation": "In enterprise Databricks lakehouses, Change Data Feed (CDF) is an essential mechanism under Delta Lake. How to enable and query `table_changes()`. The `_change_type` column (insert, update_preimage, update_postimage, delete). Use cases: incremental downstream processing, audit trails, replication.",
+    "keyPoints": [
+      "CDF exposes row-level changes with metadata: _change_type (insert, update_preimage, update_postimage, delete).",
+      "Powers downstream incremental ETL pipelines and real-time Kafka/event-driven replication.",
+      "Stores change logs inside _delta_log or inline within committed data files."
+    ],
+    "codeSnippet": "-- Enable Change Data Feed\nALTER TABLE sales SET TBLPROPERTIES (delta.enableChangeDataFeed = true);\n-- Querying CDC events\nSELECT * FROM table_changes('sales', 2, 5);",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-009-deletion-vectors",
+    "num": 9,
+    "day": 9,
+    "concept": "Deletion Vectors",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "MEDIUM",
+    "summary": "Soft-delete markers that avoid rewriting files on DELETE, UPDATE, and MERGE. Enabled by default on new tables (rolling out). Physical deletion happens at OPTIMIZE/compaction. Compatibility considerations for external readers.",
+    "explanation": "In enterprise Databricks lakehouses, Deletion Vectors is an essential mechanism under Delta Lake. Soft-delete markers that avoid rewriting files on DELETE, UPDATE, and MERGE. Enabled by default on new tables (rolling out). Physical deletion happens at OPTIMIZE/compaction. Compatibility considerations for external readers.",
+    "keyPoints": [
+      "Deletion Vectors use Roaring Bitmaps to record deleted row indices within an existing Parquet file.",
+      "Turns write-heavy row deletes and MERGE updates into lightweight bitmap appends, cutting write amplification.",
+      "Physical file rewriting is deferred until OPTIMIZE compaction is executed."
+    ],
+    "codeSnippet": "-- Deletion Vectors enable soft-deletes\nALTER TABLE sales SET TBLPROPERTIES (delta.enableDeletionVectors = true);\n-- Soft delete modifies DV bitmap without rewriting the full Parquet file\nDELETE FROM sales WHERE status = 'CANCELLED';",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-010-delta-table-properties-configuration",
+    "num": 10,
+    "day": 10,
+    "concept": "Delta Table Properties & Configuration",
+    "category": "Delta Lake",
+    "categoryId": 1,
+    "difficulty": "HARD",
+    "summary": "Key table properties every DE manages: `delta.enableChangeDataFeed`, `delta.enableDeletionVectors`, `delta.columnMapping.mode`, `delta.minReaderVersion`/`minWriterVersion`, `delta.checkpointInterval`. How these affect compatibility, performance, and feature availability. Checking and setting with `ALTER TABLE SET TBLPROPERTIES`.",
+    "explanation": "In enterprise Databricks lakehouses, Delta Table Properties & Configuration is an essential mechanism under Delta Lake. Key table properties every DE manages: `delta.enableChangeDataFeed`, `delta.enableDeletionVectors`, `delta.columnMapping.mode`, `delta.minReaderVersion`/`minWriterVersion`, `delta.checkpointInterval`. How these affect compatibility, performance, and feature availability. Checking and setting with `ALTER TABLE SET TBLPROPERTIES`.",
+    "keyPoints": [
+      "delta.minReaderVersion / minWriterVersion govern engine compatibility and protocols.",
+      "delta.columnMapping.mode = 'name' allows renaming and dropping columns without rewriting underlying Parquet files.",
+      "delta.checkpointInterval tunes the frequency of Parquet checkpoint generation (default every 10 commits)."
+    ],
+    "codeSnippet": "-- Delta table configuration & feature flags\nALTER TABLE sales SET TBLPROPERTIES (\n  'delta.minReaderVersion' = '2',\n  'delta.minWriterVersion' = '5',\n  'delta.columnMapping.mode' = 'name',\n  'delta.checkpointInterval' = '10'\n);",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-011-lazy-evaluation-actions",
+    "num": 11,
+    "day": 11,
+    "concept": "Lazy Evaluation & Actions",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "EASY",
+    "summary": "Why transformations build a plan but don't execute. Which operations are actions (collect, count, write, show) vs. transformations (filter, select, join). Why this enables optimization.",
+    "explanation": "In enterprise Databricks lakehouses, Lazy Evaluation & Actions is an essential mechanism under Spark Execution. Why transformations build a plan but don't execute. Which operations are actions (collect, count, write, show) vs. transformations (filter, select, join). Why this enables optimization.",
+    "keyPoints": [
+      "Transformations (map, filter, join, groupBy) are lazily recorded into a logical execution DAG.",
+      "Actions (count, collect, write, show) trigger physical query compilation and distributed execution.",
+      "Lazy evaluation enables whole-stage code generation, filter pushdown, and partition pruning optimizations."
+    ],
+    "codeSnippet": "# Transformations build DAG; Action triggers execution\ndf_filtered = df.filter(df.amount > 100).select('customer_id', 'amount') # Lazy\ntotal_records = df_filtered.count() # Action: triggers Catalyst & Spark jobs",
+    "certificationMapping": "Databricks Associate Data Engineer"
+  },
+  {
+    "id": "db100-012-photon-engine",
+    "num": 12,
+    "day": 12,
+    "concept": "Photon Engine",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "EASY",
+    "summary": "Native vectorized C++ query engine for SQL and DataFrame operations. Which operations benefit most (scans, filters, aggregations, joins). How to verify Photon is active in query plans. Automatically enabled on serverless compute.",
+    "explanation": "In enterprise Databricks lakehouses, Photon Engine is an essential mechanism under Spark Execution. Native vectorized C++ query engine for SQL and DataFrame operations. Which operations benefit most (scans, filters, aggregations, joins). How to verify Photon is active in query plans. Automatically enabled on serverless compute.",
+    "keyPoints": [
+      "Photon is Databricks' vectorized query engine written from scratch in modern C++.",
+      "Executes directly on CPU registers and SIMD instructions, bypassing JVM garbage collection and bytecode overhead.",
+      "Enabled automatically on Serverless SQL Warehouses and modern Databricks runtimes."
+    ],
+    "codeSnippet": "-- Verify Photon in query plan\nEXPLAIN FORMATTED SELECT sum(amount) FROM sales GROUP BY country;\n-- Look for 'PhotonGroupingAgg' and 'PhotonScan'",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-013-catalyst-optimizer-query-plans",
+    "num": 13,
+    "day": 13,
+    "concept": "Catalyst Optimizer & Query Plans",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "MEDIUM",
+    "summary": "How Catalyst transforms logical plans into physical plans. Reading `EXPLAIN` output. Recognizing when the optimizer makes good vs. poor decisions.",
+    "explanation": "In enterprise Databricks lakehouses, Catalyst Optimizer & Query Plans is an essential mechanism under Spark Execution. How Catalyst transforms logical plans into physical plans. Reading `EXPLAIN` output. Recognizing when the optimizer makes good vs. poor decisions.",
+    "keyPoints": [
+      "Catalyst pipeline has 4 phases: Analysis (catalog resolution), Logical Optimization, Physical Planning, and Code Generation.",
+      "Performs cost-based optimizations (CBO) including projection pruning, constant folding, and predicate pushdown.",
+      "Physical planning selects optimal join algorithms based on data size, broadcast thresholds, and sorting."
+    ],
+    "codeSnippet": "# Reading Catalyst Optimizer Physical Plan\ndf.explain(extended=True)\n# Outputs: Parsed Logical Plan -> Analyzed Logical Plan -> Optimized Logical Plan -> Physical Plan",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-014-adaptive-query-execution-aqe",
+    "num": 14,
+    "day": 14,
+    "concept": "Adaptive Query Execution (AQE)",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "MEDIUM",
+    "summary": "How AQE adjusts plans at runtime based on actual data statistics. Three key optimizations: coalescing shuffle partitions, converting sort-merge joins to broadcast, optimizing skew joins. Enabled by default.",
+    "explanation": "In enterprise Databricks lakehouses, Adaptive Query Execution (AQE) is an essential mechanism under Spark Execution. How AQE adjusts plans at runtime based on actual data statistics. Three key optimizations: coalescing shuffle partitions, converting sort-merge joins to broadcast, optimizing skew joins. Enabled by default.",
+    "keyPoints": [
+      "AQE re-optimizes query execution plans dynamically at runtime based on actual stage shuffle statistics.",
+      "Automatically coalesces small shuffle partitions to avoid over-partitioning overhead.",
+      "Converts sort-merge joins into broadcast hash joins at runtime if stage outputs are below broadcast thresholds."
+    ],
+    "codeSnippet": "-- Adaptive Query Execution (AQE) enabled by default in Spark 3.x\nSET spark.sql.adaptive.enabled = true;\nSET spark.sql.adaptive.coalescePartitions.enabled = true;\nSET spark.sql.adaptive.skewJoin.enabled = true;",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-015-shuffle-operations",
+    "num": 15,
+    "day": 15,
+    "concept": "Shuffle Operations",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "MEDIUM",
+    "summary": "What triggers a shuffle (groupBy, join, repartition, distinct). Why shuffles are expensive (serialization + network + disk I/O). Reading shuffle metrics in Spark UI.",
+    "explanation": "In enterprise Databricks lakehouses, Shuffle Operations is an essential mechanism under Spark Execution. What triggers a shuffle (groupBy, join, repartition, distinct). Why shuffles are expensive (serialization + network + disk I/O). Reading shuffle metrics in Spark UI.",
+    "keyPoints": [
+      "Shuffle redistributes data across cluster executor nodes via disk serialization and network transfer.",
+      "Triggered by wide transformations: groupBy, distinct, join, repartition, and window functions.",
+      "Shuffle is often the primary bottleneck in distributed compute; minimizing shuffle volume maximizes throughput."
+    ],
+    "codeSnippet": "# Operations that cause shuffles across cluster network\ndf_shuffled = df.groupBy('department').agg({'salary': 'avg'})\n# Inspect shuffle read/write sizes in Spark UI Stages tab",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-016-join-strategies",
+    "num": 16,
+    "day": 16,
+    "concept": "Join Strategies",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "MEDIUM",
+    "summary": "The three join types: broadcast hash join (small table fits in memory), sort-merge join (default for large-large), shuffle hash join (rare). The 10MB broadcast threshold (higher with Photon). Using `broadcast()` hints. How AQE dynamically converts at runtime.",
+    "explanation": "In enterprise Databricks lakehouses, Join Strategies is an essential mechanism under Spark Execution. The three join types: broadcast hash join (small table fits in memory), sort-merge join (default for large-large), shuffle hash join (rare). The 10MB broadcast threshold (higher with Photon). Using `broadcast()` hints. How AQE dynamically converts at runtime.",
+    "keyPoints": [
+      "Broadcast Hash Join (BHJ): Copies small table (<10MB default) to all executors, eliminating network shuffle entirely.",
+      "Sort-Merge Join (SMJ): Standard distributed join for large datasets; requires full key sorting and hash partitioning.",
+      "Shuffle Hash Join (SHJ): Hashes one side into memory per partition when sorting overhead exceeds hash build cost."
+    ],
+    "codeSnippet": "# Forcing Broadcast Hash Join for small lookup table\nfrom pyspark.sql.functions import broadcast\ndf_joined = df_large.join(broadcast(df_small), 'dim_key')",
+    "certificationMapping": "Databricks Associate / Professional Data Engineer"
+  },
+  {
+    "id": "db100-017-reading-the-spark-ui",
+    "num": 17,
+    "day": 17,
+    "concept": "Reading the Spark UI",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "MEDIUM",
+    "summary": "The tabs that matter: Jobs, Stages, Tasks, SQL. What to look for: task duration variance, spill metrics, shuffle read/write sizes, scan statistics. Diagnosing bottlenecks from the UI.",
+    "explanation": "In enterprise Databricks lakehouses, Reading the Spark UI is an essential mechanism under Spark Execution. The tabs that matter: Jobs, Stages, Tasks, SQL. What to look for: task duration variance, spill metrics, shuffle read/write sizes, scan statistics. Diagnosing bottlenecks from the UI.",
+    "keyPoints": [
+      "Spark UI Stages tab reveals task duration percentiles; high Max vs Median indicates data skew.",
+      "Spill (Memory) vs Spill (Disk) indicates executor memory exhaustion during shuffles or aggregations.",
+      "SQL tab provides graphical Directed Acyclic Graphs (DAGs) with row counts and scan durations."
+    ],
+    "codeSnippet": "# Spark UI Diagnostics Checklist:\n# 1. Jobs & Stages: Identify longest stage duration.\n# 2. Tasks: Compare Min, Median, Max task runtimes (detect skew).\n# 3. Storage & Shuffle: Check Spill (Memory) and Spill (Disk).",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-018-partitioning-parallelism",
+    "num": 18,
+    "day": 18,
+    "concept": "Partitioning & Parallelism",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "MEDIUM",
+    "summary": "How `spark.sql.shuffle.partitions` controls parallelism after shuffles. When to repartition vs. coalesce. The relationship between partition count, core count, and task parallelism. How to diagnose over/under-partitioning from Spark UI task metrics.",
+    "explanation": "In enterprise Databricks lakehouses, Partitioning & Parallelism is an essential mechanism under Spark Execution. How `spark.sql.shuffle.partitions` controls parallelism after shuffles. When to repartition vs. coalesce. The relationship between partition count, core count, and task parallelism. How to diagnose over/under-partitioning from Spark UI task metrics.",
+    "keyPoints": [
+      "spark.sql.shuffle.partitions defaults to 200; optimal sizing targets 100MB-200MB per shuffle partition.",
+      "coalesce() combines local partitions without triggering a network shuffle (only reduces partition count).",
+      "repartition() triggers a full cluster shuffle to evenly redistribute or increase partition count."
+    ],
+    "codeSnippet": "# Controlling shuffle parallelism\nspark.conf.set('spark.sql.shuffle.partitions', '400')\n# Coalesce vs Repartition\ndf.coalesce(10) # Combines partitions without full shuffle\ndf.repartition(100, 'region') # Forces full hash shuffle",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-019-data-skew-detection-mitigation",
+    "num": 19,
+    "day": 19,
+    "concept": "Data Skew: Detection & Mitigation",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "HARD",
+    "summary": "Recognizing skew in Spark UI (one task takes 10x longer). Why skew kills parallelism. Salting technique for skewed keys. AQE's automatic skew join optimization. When manual salting is still needed.",
+    "explanation": "In enterprise Databricks lakehouses, Data Skew: Detection & Mitigation is an essential mechanism under Spark Execution. Recognizing skew in Spark UI (one task takes 10x longer). Why skew kills parallelism. Salting technique for skewed keys. AQE's automatic skew join optimization. When manual salting is still needed.",
+    "keyPoints": [
+      "Data skew concentrates disproportionate data volume on a few worker tasks, causing 99% single-task stragglers.",
+      "AQE Skew Join optimization dynamically splits skewed partitions at runtime without code changes.",
+      "Manual key salting appends randomized suffixes to disperse hot keys evenly across all worker cores."
+    ],
+    "codeSnippet": "# Key Salting pattern for skewed join keys\nfrom pyspark.sql.functions import concat, lit, floor, rand\ndf_skewed = df_large.withColumn('salted_key', concat('key', lit('_'), floor(rand() * 10)))\ndf_lookup_salted = df_lookup.withColumn('salt', explode(array([lit(i) for i in range(10)]))) \\\n  .withColumn('salted_key', concat('key', lit('_'), 'salt'))",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-020-memory-management-spill",
+    "num": 20,
+    "day": 20,
+    "concept": "Memory Management & Spill",
+    "category": "Spark Execution",
+    "categoryId": 2,
+    "difficulty": "HARD",
+    "summary": "The unified memory model (execution + storage pool). What causes spill to disk. How to diagnose spill from Spark UI. Tuning `spark.sql.shuffle.partitions` and executor memory.",
+    "explanation": "In enterprise Databricks lakehouses, Memory Management & Spill is an essential mechanism under Spark Execution. The unified memory model (execution + storage pool). What causes spill to disk. How to diagnose spill from Spark UI. Tuning `spark.sql.shuffle.partitions` and executor memory.",
+    "keyPoints": [
+      "Spark Unified Memory dynamically shares memory between Execution (shuffles/joins) and Storage (caching).",
+      "When memory pool is exhausted, Spark spills excess in-memory buffers to local NVMe/SSD disks.",
+      "Spill severely degrades performance due to serialization and disk I/O; mitigate by tuning partition counts."
+    ],
+    "codeSnippet": "# Diagnosing memory spill: Spark unified memory divides into Storage (cache) and Execution (shuffle/join)\n# Increase executor memory or reduce shuffle partitions to prevent Spill (Disk)",
+    "certificationMapping": "Databricks Professional Data Engineer"
+  },
+  {
+    "id": "db100-021-dataframe-api-core-operations",
+    "num": 21,
+    "day": 21,
+    "concept": "DataFrame API: Core Operations",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "EASY",
+    "summary": "select, filter, withColumn, groupBy, agg, join. Method chaining patterns. When to use DataFrame API vs. Spark SQL (same execution plan either way).",
+    "explanation": "In enterprise Databricks lakehouses, DataFrame API: Core Operations is an essential mechanism under SQL & DataFrames. select, filter, withColumn, groupBy, agg, join. Method chaining patterns. When to use DataFrame API vs. Spark SQL (same execution plan either way).",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "select, filter, withColumn, groupBy, agg, join. Method chaining patterns. When to use DataFrame API vs. Spark SQL (same execution plan either way).",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for DataFrame API: Core Operations\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-022-temp-views-global-temp-views",
+    "num": 22,
+    "day": 22,
+    "concept": "Temp Views & Global Temp Views",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "EASY",
+    "summary": "Scope: temp views live in the SparkSession, global temp views in `global_temp` and survive across notebooks on the same cluster. Neither persists across restarts.",
+    "explanation": "In enterprise Databricks lakehouses, Temp Views & Global Temp Views is an essential mechanism under SQL & DataFrames. Scope: temp views live in the SparkSession, global temp views in `global_temp` and survive across notebooks on the same cluster. Neither persists across restarts.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "Scope: temp views live in the SparkSession, global temp views in `global_temp` and survive across notebooks on the same cluster. Neither persists across restarts.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Temp Views & Global Temp Views\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-023-window-functions",
+    "num": 23,
+    "day": 23,
+    "concept": "Window Functions",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, running totals with SUM OVER. Partition and ordering clauses. How these translate to physical execution (shuffles on partition keys).",
+    "explanation": "In enterprise Databricks lakehouses, Window Functions is an essential mechanism under SQL & DataFrames. ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, running totals with SUM OVER. Partition and ordering clauses. How these translate to physical execution (shuffles on partition keys).",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, running totals with SUM OVER. Partition and ordering clauses. How these translate to physical execution (shuffles on partition keys).",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Window Functions\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-024-complex-types-array-struct-map",
+    "num": 24,
+    "day": 24,
+    "concept": "Complex Types: ARRAY, STRUCT, MAP",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "Creating and querying nested structures. Exploding arrays with `explode()` and `posexplode()`. Struct field access with dot notation. Flattening deeply nested JSON.",
+    "explanation": "In enterprise Databricks lakehouses, Complex Types: ARRAY, STRUCT, MAP is an essential mechanism under SQL & DataFrames. Creating and querying nested structures. Exploding arrays with `explode()` and `posexplode()`. Struct field access with dot notation. Flattening deeply nested JSON.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "Creating and querying nested structures. Exploding arrays with `explode()` and `posexplode()`. Struct field access with dot notation. Flattening deeply nested JSON.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Complex Types: ARRAY, STRUCT, MAP\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-025-higher-order-functions",
+    "num": 25,
+    "day": 25,
+    "concept": "Higher-Order Functions",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "`transform()`, `filter()`, `exists()`, `aggregate()` for array manipulation without exploding. When these outperform explode + groupBy. Real patterns: cleaning arrays, conditional filtering.",
+    "explanation": "In enterprise Databricks lakehouses, Higher-Order Functions is an essential mechanism under SQL & DataFrames. `transform()`, `filter()`, `exists()`, `aggregate()` for array manipulation without exploding. When these outperform explode + groupBy. Real patterns: cleaning arrays, conditional filtering.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "`transform()`, `filter()`, `exists()`, `aggregate()` for array manipulation without exploding. When these outperform explode + groupBy. Real patterns: cleaning arrays, conditional filtering.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Higher-Order Functions\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-026-ctes-pivot-subqueries",
+    "num": 26,
+    "day": 26,
+    "concept": "CTEs, PIVOT & Subqueries",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "Writing CTEs for readable multi-step queries. PIVOT for wide-format reshaping. Correlated vs. uncorrelated subqueries. How these map to physical plans.",
+    "explanation": "In enterprise Databricks lakehouses, CTEs, PIVOT & Subqueries is an essential mechanism under SQL & DataFrames. Writing CTEs for readable multi-step queries. PIVOT for wide-format reshaping. Correlated vs. uncorrelated subqueries. How these map to physical plans.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "Writing CTEs for readable multi-step queries. PIVOT for wide-format reshaping. Correlated vs. uncorrelated subqueries. How these map to physical plans.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for CTEs, PIVOT & Subqueries\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-027-udfs-vs-native-functions",
+    "num": 27,
+    "day": 27,
+    "concept": "UDFs vs. Native Functions",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "Why Python UDFs break Catalyst and force row-by-row execution. The 10-100x performance gap. Pandas UDFs (vectorized) as a middle ground. When a UDF is genuinely the right choice.",
+    "explanation": "In enterprise Databricks lakehouses, UDFs vs. Native Functions is an essential mechanism under SQL & DataFrames. Why Python UDFs break Catalyst and force row-by-row execution. The 10-100x performance gap. Pandas UDFs (vectorized) as a middle ground. When a UDF is genuinely the right choice.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "Why Python UDFs break Catalyst and force row-by-row execution. The 10-100x performance gap. Pandas UDFs (vectorized) as a middle ground. When a UDF is genuinely the right choice.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for UDFs vs. Native Functions\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-028-variant-type",
+    "num": 28,
+    "day": 28,
+    "concept": "VARIANT Type",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "Storing semi-structured data (JSON) in a native binary format. Schema-on-read without parsing overhead. Querying with `:` path syntax. When VARIANT outperforms STRING or STRUCT columns for JSON data.",
+    "explanation": "In enterprise Databricks lakehouses, VARIANT Type is an essential mechanism under SQL & DataFrames. Storing semi-structured data (JSON) in a native binary format. Schema-on-read without parsing overhead. Querying with `:` path syntax. When VARIANT outperforms STRING or STRUCT columns for JSON data.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "Storing semi-structured data (JSON) in a native binary format. Schema-on-read without parsing overhead. Querying with `:` path syntax. When VARIANT outperforms STRING or STRUCT columns for JSON data.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for VARIANT Type\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-029-merge-into-upsert-patterns",
+    "num": 29,
+    "day": 29,
+    "concept": "MERGE INTO & Upsert Patterns",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "HARD",
+    "summary": "The MERGE syntax for insert/update/delete in one statement. Clause ordering (MATCHED before NOT MATCHED). Write amplification and why MERGE rewrites entire files. Optimization: match on Liquid Clustering keys. How deletion vectors reduce cost.",
+    "explanation": "In enterprise Databricks lakehouses, MERGE INTO & Upsert Patterns is an essential mechanism under SQL & DataFrames. The MERGE syntax for insert/update/delete in one statement. Clause ordering (MATCHED before NOT MATCHED). Write amplification and why MERGE rewrites entire files. Optimization: match on Liquid Clustering keys. How deletion vectors reduce cost.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "The MERGE syntax for insert/update/delete in one statement. Clause ordering (MATCHED before NOT MATCHED). Write amplification and why MERGE rewrites entire files. Optimization: match on Liquid Clustering keys. How deletion vectors reduce cost.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for MERGE INTO & Upsert Patterns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-030-table-constraints-generated-columns",
+    "num": 30,
+    "day": 30,
+    "concept": "Table Constraints & Generated Columns",
+    "category": "SQL & DataFrames",
+    "categoryId": 3,
+    "difficulty": "MEDIUM",
+    "summary": "CHECK constraints, NOT NULL, PRIMARY KEY (informational), FOREIGN KEY (informational). Generated columns with expressions (e.g., `date GENERATED ALWAYS AS CAST(timestamp AS DATE)`). How constraints enforce data quality at the write layer.",
+    "explanation": "In enterprise Databricks lakehouses, Table Constraints & Generated Columns is an essential mechanism under SQL & DataFrames. CHECK constraints, NOT NULL, PRIMARY KEY (informational), FOREIGN KEY (informational). Generated columns with expressions (e.g., `date GENERATED ALWAYS AS CAST(timestamp AS DATE)`). How constraints enforce data quality at the write layer.",
+    "keyPoints": [
+      "Core production concept in Databricks SQL & DataFrames.",
+      "CHECK constraints, NOT NULL, PRIMARY KEY (informational), FOREIGN KEY (informational). Generated columns with expressions (e.g., `date GENERATED ALWAYS AS CAST(timestamp AS DATE)`). How constraints enforce data quality at the write layer.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Table Constraints & Generated Columns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-031-copy-into-vs-auto-loader",
+    "num": 31,
+    "day": 31,
+    "concept": "COPY INTO vs. Auto Loader",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "EASY",
+    "summary": "COPY INTO for ad-hoc/batch loads (idempotent, simpler). Auto Loader for continuous/streaming ingestion (exactly-once, scalable, schema evolution). Why Auto Loader is preferred for production.",
+    "explanation": "In enterprise Databricks lakehouses, COPY INTO vs. Auto Loader is an essential mechanism under Data Ingestion. COPY INTO for ad-hoc/batch loads (idempotent, simpler). Auto Loader for continuous/streaming ingestion (exactly-once, scalable, schema evolution). Why Auto Loader is preferred for production.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "COPY INTO for ad-hoc/batch loads (idempotent, simpler). Auto Loader for continuous/streaming ingestion (exactly-once, scalable, schema evolution). Why Auto Loader is preferred for production.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for COPY INTO vs. Auto Loader\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-032-file-formats-in-the-lakehouse",
+    "num": 32,
+    "day": 32,
+    "concept": "File Formats in the Lakehouse",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "EASY",
+    "summary": "Why Parquet is the default (columnar, compressed, schema-embedded). Delta stores Parquet under the hood. When to use JSON, CSV, or Avro for ingestion sources. Schema-on-read vs. schema-on-write.",
+    "explanation": "In enterprise Databricks lakehouses, File Formats in the Lakehouse is an essential mechanism under Data Ingestion. Why Parquet is the default (columnar, compressed, schema-embedded). Delta stores Parquet under the hood. When to use JSON, CSV, or Avro for ingestion sources. Schema-on-read vs. schema-on-write.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "Why Parquet is the default (columnar, compressed, schema-embedded). Delta stores Parquet under the hood. When to use JSON, CSV, or Avro for ingestion sources. Schema-on-read vs. schema-on-write.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for File Formats in the Lakehouse\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-033-volumes",
+    "num": 33,
+    "day": 33,
+    "concept": "Volumes",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "EASY",
+    "summary": "Governed access to non-tabular files (CSVs, images, ML models) within Unity Catalog. Managed vs. external volumes. Using Volumes as landing zones and staging areas.",
+    "explanation": "In enterprise Databricks lakehouses, Volumes is an essential mechanism under Data Ingestion. Governed access to non-tabular files (CSVs, images, ML models) within Unity Catalog. Managed vs. external volumes. Using Volumes as landing zones and staging areas.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "Governed access to non-tabular files (CSVs, images, ML models) within Unity Catalog. Managed vs. external volumes. Using Volumes as landing zones and staging areas.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Volumes\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-034-auto-loader-file-discovery",
+    "num": 34,
+    "day": 34,
+    "concept": "Auto Loader: File Discovery",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "MEDIUM",
+    "summary": "File notification mode (cloud events, efficient at scale, requires setup) vs. directory listing mode (simpler, slower with millions of files). When to use each. Why Auto Loader is the default for production ingestion.",
+    "explanation": "In enterprise Databricks lakehouses, Auto Loader: File Discovery is an essential mechanism under Data Ingestion. File notification mode (cloud events, efficient at scale, requires setup) vs. directory listing mode (simpler, slower with millions of files). When to use each. Why Auto Loader is the default for production ingestion.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "File notification mode (cloud events, efficient at scale, requires setup) vs. directory listing mode (simpler, slower with millions of files). When to use each. Why Auto Loader is the default for production ingestion.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Auto Loader: File Discovery\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-035-auto-loader-schema-evolution-rescued-data",
+    "num": 35,
+    "day": 35,
+    "concept": "Auto Loader: Schema Evolution & Rescued Data",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "MEDIUM",
+    "summary": "How schema inference works from the first batch. `cloudFiles.schemaEvolutionMode` options (addNewColumns, rescue, failOnNewColumns, none). The `_rescued_data` column for capturing mismatches instead of failing.",
+    "explanation": "In enterprise Databricks lakehouses, Auto Loader: Schema Evolution & Rescued Data is an essential mechanism under Data Ingestion. How schema inference works from the first batch. `cloudFiles.schemaEvolutionMode` options (addNewColumns, rescue, failOnNewColumns, none). The `_rescued_data` column for capturing mismatches instead of failing.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "How schema inference works from the first batch. `cloudFiles.schemaEvolutionMode` options (addNewColumns, rescue, failOnNewColumns, none). The `_rescued_data` column for capturing mismatches instead of failing.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Auto Loader: Schema Evolution & Rescued Data\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-036-multi-hop-medallion-architecture",
+    "num": 36,
+    "day": 36,
+    "concept": "Multi-Hop Medallion Architecture",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "MEDIUM",
+    "summary": "Bronze (raw, append-only), Silver (cleaned, deduplicated, typed), Gold (business aggregates). Why this pattern exists. When it's overkill. How each layer serves different consumers with different freshness requirements.",
+    "explanation": "In enterprise Databricks lakehouses, Multi-Hop Medallion Architecture is an essential mechanism under Data Ingestion. Bronze (raw, append-only), Silver (cleaned, deduplicated, typed), Gold (business aggregates). Why this pattern exists. When it's overkill. How each layer serves different consumers with different freshness requirements.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "Bronze (raw, append-only), Silver (cleaned, deduplicated, typed), Gold (business aggregates). Why this pattern exists. When it's overkill. How each layer serves different consumers with different freshness requirements.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Multi-Hop Medallion Architecture\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-037-incremental-processing-patterns",
+    "num": 37,
+    "day": 37,
+    "concept": "Incremental Processing Patterns",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "MEDIUM",
+    "summary": "Processing only new/changed data. Techniques: Auto Loader (file-level), Change Data Feed (row-level), watermark-based (time-based), merge keys (hash-based). Cost vs. latency tradeoffs for each.",
+    "explanation": "In enterprise Databricks lakehouses, Incremental Processing Patterns is an essential mechanism under Data Ingestion. Processing only new/changed data. Techniques: Auto Loader (file-level), Change Data Feed (row-level), watermark-based (time-based), merge keys (hash-based). Cost vs. latency tradeoffs for each.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "Processing only new/changed data. Techniques: Auto Loader (file-level), Change Data Feed (row-level), watermark-based (time-based), merge keys (hash-based). Cost vs. latency tradeoffs for each.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Incremental Processing Patterns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-038-lakehouse-federation",
+    "num": 38,
+    "day": 38,
+    "concept": "Lakehouse Federation",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "MEDIUM",
+    "summary": "Querying external databases (PostgreSQL, MySQL, SQL Server, Snowflake) without copying data. Query pushdown optimization. Connection objects and security. When federation beats ETL and when it doesn't.",
+    "explanation": "In enterprise Databricks lakehouses, Lakehouse Federation is an essential mechanism under Data Ingestion. Querying external databases (PostgreSQL, MySQL, SQL Server, Snowflake) without copying data. Query pushdown optimization. Connection objects and security. When federation beats ETL and when it doesn't.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "Querying external databases (PostgreSQL, MySQL, SQL Server, Snowflake) without copying data. Query pushdown optimization. Connection objects and security. When federation beats ETL and when it doesn't.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Lakehouse Federation\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-039-idempotent-pipeline-design",
+    "num": 39,
+    "day": 39,
+    "concept": "Idempotent Pipeline Design",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "HARD",
+    "summary": "Why every production pipeline must produce the same result when re-run. Databricks-specific techniques: MERGE with natural keys, `INSERT OVERWRITE` with `replaceWhere`, Auto Loader checkpoint recovery, Workflows retry policies. How streaming checkpoints provide built-in idempotency.",
+    "explanation": "In enterprise Databricks lakehouses, Idempotent Pipeline Design is an essential mechanism under Data Ingestion. Why every production pipeline must produce the same result when re-run. Databricks-specific techniques: MERGE with natural keys, `INSERT OVERWRITE` with `replaceWhere`, Auto Loader checkpoint recovery, Workflows retry policies. How streaming checkpoints provide built-in idempotency.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "Why every production pipeline must produce the same result when re-run. Databricks-specific techniques: MERGE with natural keys, `INSERT OVERWRITE` with `replaceWhere`, Auto Loader checkpoint recovery, Workflows retry policies. How streaming checkpoints provide built-in idempotency.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Idempotent Pipeline Design\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-040-scd-type-1-type-2-patterns",
+    "num": 40,
+    "day": 40,
+    "concept": "SCD Type 1 & Type 2 Patterns",
+    "category": "Data Ingestion",
+    "categoryId": 4,
+    "difficulty": "HARD",
+    "summary": "SCD1 (overwrite current values) vs. SCD2 (maintain full history with effective dates). Implementing SCD2 with MERGE. Why Lakeflow Declarative Pipelines' `AUTO CDC INTO` (#75) is simpler for SCD2 at scale.",
+    "explanation": "In enterprise Databricks lakehouses, SCD Type 1 & Type 2 Patterns is an essential mechanism under Data Ingestion. SCD1 (overwrite current values) vs. SCD2 (maintain full history with effective dates). Implementing SCD2 with MERGE. Why Lakeflow Declarative Pipelines' `AUTO CDC INTO` (#75) is simpler for SCD2 at scale.",
+    "keyPoints": [
+      "Core production concept in Databricks Data Ingestion.",
+      "SCD1 (overwrite current values) vs. SCD2 (maintain full history with effective dates). Implementing SCD2 with MERGE. Why Lakeflow Declarative Pipelines' `AUTO CDC INTO` (#75) is simpler for SCD2 at scale.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for SCD Type 1 & Type 2 Patterns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-041-structured-streaming-fundamentals",
+    "num": 41,
+    "day": 41,
+    "concept": "Structured Streaming Fundamentals",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "How Structured Streaming on Databricks uses Delta Lake as both source and sink. The `readStream`/`writeStream` API. Why Delta-to-Delta streaming is the most common production pattern. Integration with Auto Loader as a file source.",
+    "explanation": "In enterprise Databricks lakehouses, Structured Streaming Fundamentals is an essential mechanism under Streaming. How Structured Streaming on Databricks uses Delta Lake as both source and sink. The `readStream`/`writeStream` API. Why Delta-to-Delta streaming is the most common production pattern. Integration with Auto Loader as a file source.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "How Structured Streaming on Databricks uses Delta Lake as both source and sink. The `readStream`/`writeStream` API. Why Delta-to-Delta streaming is the most common production pattern. Integration with Auto Loader as a file source.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Structured Streaming Fundamentals\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-042-triggers",
+    "num": 42,
+    "day": 42,
+    "concept": "Triggers",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "`processingTime` (recurring micro-batches at fixed intervals). `availableNow` (process all available data then stop; replaces deprecated `once`). Choosing the right trigger for latency vs. cost.",
+    "explanation": "In enterprise Databricks lakehouses, Triggers is an essential mechanism under Streaming. `processingTime` (recurring micro-batches at fixed intervals). `availableNow` (process all available data then stop; replaces deprecated `once`). Choosing the right trigger for latency vs. cost.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "`processingTime` (recurring micro-batches at fixed intervals). `availableNow` (process all available data then stop; replaces deprecated `once`). Choosing the right trigger for latency vs. cost.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Triggers\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-043-output-modes",
+    "num": 43,
+    "day": 43,
+    "concept": "Output Modes",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "Append (new rows only, default). Complete (full result table, aggregations only). Update (changed rows only). Which modes work with which operations and sinks.",
+    "explanation": "In enterprise Databricks lakehouses, Output Modes is an essential mechanism under Streaming. Append (new rows only, default). Complete (full result table, aggregations only). Update (changed rows only). Which modes work with which operations and sinks.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "Append (new rows only, default). Complete (full result table, aggregations only). Update (changed rows only). Which modes work with which operations and sinks.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Output Modes\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-044-stream-static-joins",
+    "num": 44,
+    "day": 44,
+    "concept": "Stream-Static Joins",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "Joining streaming DataFrames with batch DataFrames. Static side re-read each micro-batch. Use cases: enriching events with dimension data. Outer join limitations on the streaming side.",
+    "explanation": "In enterprise Databricks lakehouses, Stream-Static Joins is an essential mechanism under Streaming. Joining streaming DataFrames with batch DataFrames. Static side re-read each micro-batch. Use cases: enriching events with dimension data. Outer join limitations on the streaming side.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "Joining streaming DataFrames with batch DataFrames. Static side re-read each micro-batch. Use cases: enriching events with dimension data. Outer join limitations on the streaming side.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Stream-Static Joins\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-045-windowed-aggregations",
+    "num": 45,
+    "day": 45,
+    "concept": "Windowed Aggregations",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "Tumbling windows (fixed, non-overlapping), sliding windows (fixed, overlapping), session windows (gap-based). Combining windows with watermarks for bounded state.",
+    "explanation": "In enterprise Databricks lakehouses, Windowed Aggregations is an essential mechanism under Streaming. Tumbling windows (fixed, non-overlapping), sliding windows (fixed, overlapping), session windows (gap-based). Combining windows with watermarks for bounded state.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "Tumbling windows (fixed, non-overlapping), sliding windows (fixed, overlapping), session windows (gap-based). Combining windows with watermarks for bounded state.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Windowed Aggregations\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-046-foreachbatch-pattern",
+    "num": 46,
+    "day": 46,
+    "concept": "foreachBatch Pattern",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "Using `foreachBatch()` to apply arbitrary batch logic to each micro-batch. Use cases: writing to multiple sinks, MERGE operations in streaming, calling external APIs. Exactly-once considerations.",
+    "explanation": "In enterprise Databricks lakehouses, foreachBatch Pattern is an essential mechanism under Streaming. Using `foreachBatch()` to apply arbitrary batch logic to each micro-batch. Use cases: writing to multiple sinks, MERGE operations in streaming, calling external APIs. Exactly-once considerations.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "Using `foreachBatch()` to apply arbitrary batch logic to each micro-batch. Use cases: writing to multiple sinks, MERGE operations in streaming, calling external APIs. Exactly-once considerations.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for foreachBatch Pattern\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-047-streaming-tables-in-lakeflow-pipelines",
+    "num": 47,
+    "day": 47,
+    "concept": "Streaming Tables in Lakeflow Pipelines",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "MEDIUM",
+    "summary": "How streaming tables in Lakeflow Declarative Pipelines abstract away checkpoint and state management. The difference between streaming tables and raw Structured Streaming. When to use each approach.",
+    "explanation": "In enterprise Databricks lakehouses, Streaming Tables in Lakeflow Pipelines is an essential mechanism under Streaming. How streaming tables in Lakeflow Declarative Pipelines abstract away checkpoint and state management. The difference between streaming tables and raw Structured Streaming. When to use each approach.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "How streaming tables in Lakeflow Declarative Pipelines abstract away checkpoint and state management. The difference between streaming tables and raw Structured Streaming. When to use each approach.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Streaming Tables in Lakeflow Pipelines\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-048-checkpointing-exactly-once",
+    "num": 48,
+    "day": 48,
+    "concept": "Checkpointing & Exactly-Once",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "HARD",
+    "summary": "How checkpoint directories track processing state. Stream restart behavior (replay from checkpoint). Why checkpoint location must be stable and unique per query. Limitations of exactly-once guarantees.",
+    "explanation": "In enterprise Databricks lakehouses, Checkpointing & Exactly-Once is an essential mechanism under Streaming. How checkpoint directories track processing state. Stream restart behavior (replay from checkpoint). Why checkpoint location must be stable and unique per query. Limitations of exactly-once guarantees.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "How checkpoint directories track processing state. Stream restart behavior (replay from checkpoint). Why checkpoint location must be stable and unique per query. Limitations of exactly-once guarantees.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Checkpointing & Exactly-Once\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-049-watermarks-late-data",
+    "num": 49,
+    "day": 49,
+    "concept": "Watermarks & Late Data",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "HARD",
+    "summary": "How `withWatermark()` bounds how late data can arrive. The tradeoff: longer watermark = more complete results but higher memory/state. How Spark drops state for expired windows.",
+    "explanation": "In enterprise Databricks lakehouses, Watermarks & Late Data is an essential mechanism under Streaming. How `withWatermark()` bounds how late data can arrive. The tradeoff: longer watermark = more complete results but higher memory/state. How Spark drops state for expired windows.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "How `withWatermark()` bounds how late data can arrive. The tradeoff: longer watermark = more complete results but higher memory/state. How Spark drops state for expired windows.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Watermarks & Late Data\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-050-stream-stream-joins",
+    "num": 50,
+    "day": 50,
+    "concept": "Stream-Stream Joins",
+    "category": "Streaming",
+    "categoryId": 5,
+    "difficulty": "HARD",
+    "summary": "Joining two streaming DataFrames. Watermark requirements for state cleanup. Inner, left outer, and right outer join semantics. State management implications.",
+    "explanation": "In enterprise Databricks lakehouses, Stream-Stream Joins is an essential mechanism under Streaming. Joining two streaming DataFrames. Watermark requirements for state cleanup. Inner, left outer, and right outer join semantics. State management implications.",
+    "keyPoints": [
+      "Core production concept in Databricks Streaming.",
+      "Joining two streaming DataFrames. Watermark requirements for state cleanup. Inner, left outer, and right outer join semantics. State management implications.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Stream-Stream Joins\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-051-serverless-compute-economics",
+    "num": 51,
+    "day": 51,
+    "concept": "Serverless Compute Economics",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "EASY",
+    "summary": "How serverless pricing works (DBU-based, pay per query/task vs. per cluster-hour). When serverless is cheaper vs. classic (bursty workloads vs. sustained compute). Why serverless eliminates idle cluster waste.",
+    "explanation": "In enterprise Databricks lakehouses, Serverless Compute Economics is an essential mechanism under Performance & Cost. How serverless pricing works (DBU-based, pay per query/task vs. per cluster-hour). When serverless is cheaper vs. classic (bursty workloads vs. sustained compute). Why serverless eliminates idle cluster waste.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "How serverless pricing works (DBU-based, pay per query/task vs. per cluster-hour). When serverless is cheaper vs. classic (bursty workloads vs. sustained compute). Why serverless eliminates idle cluster waste.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Serverless Compute Economics\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-052-predicate-pushdown-data-skipping",
+    "num": 52,
+    "day": 52,
+    "concept": "Predicate Pushdown & Data Skipping",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "How Spark skips reading files/partitions that can't match filter predicates. File-level min/max column statistics. What breaks pushdown (casting, functions on filter columns). How Liquid Clustering keys maximize skipping.",
+    "explanation": "In enterprise Databricks lakehouses, Predicate Pushdown & Data Skipping is an essential mechanism under Performance & Cost. How Spark skips reading files/partitions that can't match filter predicates. File-level min/max column statistics. What breaks pushdown (casting, functions on filter columns). How Liquid Clustering keys maximize skipping.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "How Spark skips reading files/partitions that can't match filter predicates. File-level min/max column statistics. What breaks pushdown (casting, functions on filter columns). How Liquid Clustering keys maximize skipping.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Predicate Pushdown & Data Skipping\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-053-predictive-optimization",
+    "num": 53,
+    "day": 53,
+    "concept": "Predictive Optimization",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "Databricks automatically runs OPTIMIZE, VACUUM, and ANALYZE on managed tables based on query patterns. Enabled by default on new accounts. Why you rarely need manual maintenance jobs on managed tables. Monitoring via system tables.",
+    "explanation": "In enterprise Databricks lakehouses, Predictive Optimization is an essential mechanism under Performance & Cost. Databricks automatically runs OPTIMIZE, VACUUM, and ANALYZE on managed tables based on query patterns. Enabled by default on new accounts. Why you rarely need manual maintenance jobs on managed tables. Monitoring via system tables.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "Databricks automatically runs OPTIMIZE, VACUUM, and ANALYZE on managed tables based on query patterns. Enabled by default on new accounts. Why you rarely need manual maintenance jobs on managed tables. Monitoring via system tables.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Predictive Optimization\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-054-column-statistics-file-pruning",
+    "num": 54,
+    "day": 54,
+    "concept": "Column Statistics & File Pruning",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "Per-file min/max statistics collected for the first 32 columns by default (managed tables with Predictive Optimization choose columns intelligently). Why column order matters. How `ANALYZE TABLE` refreshes stats for the cost-based optimizer.",
+    "explanation": "In enterprise Databricks lakehouses, Column Statistics & File Pruning is an essential mechanism under Performance & Cost. Per-file min/max statistics collected for the first 32 columns by default (managed tables with Predictive Optimization choose columns intelligently). Why column order matters. How `ANALYZE TABLE` refreshes stats for the cost-based optimizer.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "Per-file min/max statistics collected for the first 32 columns by default (managed tables with Predictive Optimization choose columns intelligently). Why column order matters. How `ANALYZE TABLE` refreshes stats for the cost-based optimizer.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Column Statistics & File Pruning\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-055-write-optimization",
+    "num": 55,
+    "day": 55,
+    "concept": "Write Optimization",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "`optimizeWrite` for automatic file sizing on write. `maxRecordsPerFile` for controlling output file sizes. When to coalesce before writing. Target file sizes for different workloads. How write optimization prevents the small file problem before it starts.",
+    "explanation": "In enterprise Databricks lakehouses, Write Optimization is an essential mechanism under Performance & Cost. `optimizeWrite` for automatic file sizing on write. `maxRecordsPerFile` for controlling output file sizes. When to coalesce before writing. Target file sizes for different workloads. How write optimization prevents the small file problem before it starts.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "`optimizeWrite` for automatic file sizing on write. `maxRecordsPerFile` for controlling output file sizes. When to coalesce before writing. Target file sizes for different workloads. How write optimization prevents the small file problem before it starts.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Write Optimization\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-056-cluster-sizing-autoscaling",
+    "num": 56,
+    "day": 56,
+    "concept": "Cluster Sizing & Autoscaling",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "Right-sizing for ETL vs. ML vs. SQL analytics workloads. Autoscaling min/max workers. Spot instances for cost savings. The relationship between partition count, core count, and parallelism.",
+    "explanation": "In enterprise Databricks lakehouses, Cluster Sizing & Autoscaling is an essential mechanism under Performance & Cost. Right-sizing for ETL vs. ML vs. SQL analytics workloads. Autoscaling min/max workers. Spot instances for cost savings. The relationship between partition count, core count, and parallelism.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "Right-sizing for ETL vs. ML vs. SQL analytics workloads. Autoscaling min/max workers. Spot instances for cost savings. The relationship between partition count, core count, and parallelism.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Cluster Sizing & Autoscaling\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-057-dbu-cost-model-billing",
+    "num": 57,
+    "day": 57,
+    "concept": "DBU Cost Model & Billing",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "How Databricks bills (DBUs by SKU: Jobs, SQL, All-Purpose, Serverless). Understanding the billing system tables (`system.billing.usage`). Cluster policies and budgets to prevent runaway costs. Tagging jobs for cost allocation and chargeback.",
+    "explanation": "In enterprise Databricks lakehouses, DBU Cost Model & Billing is an essential mechanism under Performance & Cost. How Databricks bills (DBUs by SKU: Jobs, SQL, All-Purpose, Serverless). Understanding the billing system tables (`system.billing.usage`). Cluster policies and budgets to prevent runaway costs. Tagging jobs for cost allocation and chargeback.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "How Databricks bills (DBUs by SKU: Jobs, SQL, All-Purpose, Serverless). Understanding the billing system tables (`system.billing.usage`). Cluster policies and budgets to prevent runaway costs. Tagging jobs for cost allocation and chargeback.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for DBU Cost Model & Billing\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-058-query-profile-execution-plans",
+    "num": 58,
+    "day": 58,
+    "concept": "Query Profile & Execution Plans",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "MEDIUM",
+    "summary": "Reading the DBSQL Query Profile (visual plan, statistics, bottleneck identification). The difference between logical and physical plans. Identifying slow operators: scans, joins, aggregations, sorts.",
+    "explanation": "In enterprise Databricks lakehouses, Query Profile & Execution Plans is an essential mechanism under Performance & Cost. Reading the DBSQL Query Profile (visual plan, statistics, bottleneck identification). The difference between logical and physical plans. Identifying slow operators: scans, joins, aggregations, sorts.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "Reading the DBSQL Query Profile (visual plan, statistics, bottleneck identification). The difference between logical and physical plans. Identifying slow operators: scans, joins, aggregations, sorts.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Query Profile & Execution Plans\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-059-join-performance-diagnosis",
+    "num": 59,
+    "day": 59,
+    "concept": "Join Performance Diagnosis",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "HARD",
+    "summary": "When a join is the bottleneck: reading shuffle sizes, spill metrics, and task skew in Spark UI for join stages. Tuning `spark.sql.autoBroadcastJoinThreshold`. Choosing between forcing broadcast hints vs. redesigning the query. When to pre-aggregate or filter before joining to reduce shuffle volume.",
+    "explanation": "In enterprise Databricks lakehouses, Join Performance Diagnosis is an essential mechanism under Performance & Cost. When a join is the bottleneck: reading shuffle sizes, spill metrics, and task skew in Spark UI for join stages. Tuning `spark.sql.autoBroadcastJoinThreshold`. Choosing between forcing broadcast hints vs. redesigning the query. When to pre-aggregate or filter before joining to reduce shuffle volume.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "When a join is the bottleneck: reading shuffle sizes, spill metrics, and task skew in Spark UI for join stages. Tuning `spark.sql.autoBroadcastJoinThreshold`. Choosing between forcing broadcast hints vs. redesigning the query. When to pre-aggregate or filter before joining to reduce shuffle volume.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Join Performance Diagnosis\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-060-merge-write-amplification",
+    "num": 60,
+    "day": 60,
+    "concept": "MERGE Write Amplification",
+    "category": "Performance & Cost",
+    "categoryId": 6,
+    "difficulty": "HARD",
+    "summary": "Why MERGE rewrites entire files containing matched rows. Optimization: match on Liquid Clustering keys, leverage deletion vectors, right-size target files. Measuring amplification with `DESCRIBE HISTORY`.",
+    "explanation": "In enterprise Databricks lakehouses, MERGE Write Amplification is an essential mechanism under Performance & Cost. Why MERGE rewrites entire files containing matched rows. Optimization: match on Liquid Clustering keys, leverage deletion vectors, right-size target files. Measuring amplification with `DESCRIBE HISTORY`.",
+    "keyPoints": [
+      "Core production concept in Databricks Performance & Cost.",
+      "Why MERGE rewrites entire files containing matched rows. Optimization: match on Liquid Clustering keys, leverage deletion vectors, right-size target files. Measuring amplification with `DESCRIBE HISTORY`.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for MERGE Write Amplification\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-061-three-level-namespace",
+    "num": 61,
+    "day": 61,
+    "concept": "Three-Level Namespace",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "EASY",
+    "summary": "`catalog.schema.table` hierarchy. How it maps to organizational structure. Default catalog and schema settings. Migrating from the legacy Hive Metastore.",
+    "explanation": "In enterprise Databricks lakehouses, Three-Level Namespace is an essential mechanism under Unity Catalog & Governance. `catalog.schema.table` hierarchy. How it maps to organizational structure. Default catalog and schema settings. Migrating from the legacy Hive Metastore.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "`catalog.schema.table` hierarchy. How it maps to organizational structure. Default catalog and schema settings. Migrating from the legacy Hive Metastore.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Three-Level Namespace\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-062-permission-model-inheritance",
+    "num": 62,
+    "day": 62,
+    "concept": "Permission Model & Inheritance",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "How privileges cascade down (catalog -> schema -> table). Key privileges: USE CATALOG, USE SCHEMA, SELECT, MODIFY, CREATE TABLE. Owner vs. granted access. GRANT and REVOKE syntax.",
+    "explanation": "In enterprise Databricks lakehouses, Permission Model & Inheritance is an essential mechanism under Unity Catalog & Governance. How privileges cascade down (catalog -> schema -> table). Key privileges: USE CATALOG, USE SCHEMA, SELECT, MODIFY, CREATE TABLE. Owner vs. granted access. GRANT and REVOKE syntax.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "How privileges cascade down (catalog -> schema -> table). Key privileges: USE CATALOG, USE SCHEMA, SELECT, MODIFY, CREATE TABLE. Owner vs. granted access. GRANT and REVOKE syntax.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Permission Model & Inheritance\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-063-dynamic-views-for-security",
+    "num": 63,
+    "day": 63,
+    "concept": "Dynamic Views for Security",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "Using `CURRENT_USER()` and `IS_MEMBER()` in view definitions. Column masking patterns (full SSN for HR, masked for everyone else). When to use dynamic views vs. row filters/column masks.",
+    "explanation": "In enterprise Databricks lakehouses, Dynamic Views for Security is an essential mechanism under Unity Catalog & Governance. Using `CURRENT_USER()` and `IS_MEMBER()` in view definitions. Column masking patterns (full SSN for HR, masked for everyone else). When to use dynamic views vs. row filters/column masks.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "Using `CURRENT_USER()` and `IS_MEMBER()` in view definitions. Column masking patterns (full SSN for HR, masked for everyone else). When to use dynamic views vs. row filters/column masks.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Dynamic Views for Security\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-064-data-lineage",
+    "num": 64,
+    "day": 64,
+    "concept": "Data Lineage",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "How Unity Catalog automatically tracks column-level lineage across notebooks, jobs, and SQL. Viewing lineage in Catalog Explorer. Using lineage for impact analysis before schema changes.",
+    "explanation": "In enterprise Databricks lakehouses, Data Lineage is an essential mechanism under Unity Catalog & Governance. How Unity Catalog automatically tracks column-level lineage across notebooks, jobs, and SQL. Viewing lineage in Catalog Explorer. Using lineage for impact analysis before schema changes.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "How Unity Catalog automatically tracks column-level lineage across notebooks, jobs, and SQL. Viewing lineage in Catalog Explorer. Using lineage for impact analysis before schema changes.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Data Lineage\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-065-information-schema-metadata-queries",
+    "num": 65,
+    "day": 65,
+    "concept": "Information Schema & Metadata Queries",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "Querying `system.information_schema.tables`, `.columns`, `.table_privileges` to discover and audit catalog contents. Building compliance reports from metadata. Automating governance checks.",
+    "explanation": "In enterprise Databricks lakehouses, Information Schema & Metadata Queries is an essential mechanism under Unity Catalog & Governance. Querying `system.information_schema.tables`, `.columns`, `.table_privileges` to discover and audit catalog contents. Building compliance reports from metadata. Automating governance checks.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "Querying `system.information_schema.tables`, `.columns`, `.table_privileges` to discover and audit catalog contents. Building compliance reports from metadata. Automating governance checks.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Information Schema & Metadata Queries\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-066-external-locations-storage-credentials",
+    "num": 66,
+    "day": 66,
+    "concept": "External Locations & Storage Credentials",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "Mapping cloud storage paths to Unity Catalog governance. Storage credentials (IAM roles, service principals). When to use managed vs. external tables based on data ownership requirements.",
+    "explanation": "In enterprise Databricks lakehouses, External Locations & Storage Credentials is an essential mechanism under Unity Catalog & Governance. Mapping cloud storage paths to Unity Catalog governance. Storage credentials (IAM roles, service principals). When to use managed vs. external tables based on data ownership requirements.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "Mapping cloud storage paths to Unity Catalog governance. Storage credentials (IAM roles, service principals). When to use managed vs. external tables based on data ownership requirements.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for External Locations & Storage Credentials\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-067-service-principals-managed-identity",
+    "num": 67,
+    "day": 67,
+    "concept": "Service Principals & Managed Identity",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "Using service principals for automated jobs instead of personal credentials. Managed identity on Azure, instance profiles on AWS. Why production workloads must never run under personal accounts.",
+    "explanation": "In enterprise Databricks lakehouses, Service Principals & Managed Identity is an essential mechanism under Unity Catalog & Governance. Using service principals for automated jobs instead of personal credentials. Managed identity on Azure, instance profiles on AWS. Why production workloads must never run under personal accounts.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "Using service principals for automated jobs instead of personal credentials. Managed identity on Azure, instance profiles on AWS. Why production workloads must never run under personal accounts.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Service Principals & Managed Identity\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-068-audit-logging",
+    "num": 68,
+    "day": 68,
+    "concept": "Audit Logging",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "MEDIUM",
+    "summary": "`system.access.audit` for tracking who did what and when. Querying audit logs for compliance, access reviews, and security investigations. Building audit dashboards.",
+    "explanation": "In enterprise Databricks lakehouses, Audit Logging is an essential mechanism under Unity Catalog & Governance. `system.access.audit` for tracking who did what and when. Querying audit logs for compliance, access reviews, and security investigations. Building audit dashboards.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "`system.access.audit` for tracking who did what and when. Querying audit logs for compliance, access reviews, and security investigations. Building audit dashboards.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Audit Logging\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-069-row-filters-column-masks",
+    "num": 69,
+    "day": 69,
+    "concept": "Row Filters & Column Masks",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "HARD",
+    "summary": "Applying row-level and column-level security directly to tables via SQL UDFs. `ALTER TABLE SET ROW FILTER`. `ALTER TABLE ALTER COLUMN SET MASK`. When to use these vs. dynamic views.",
+    "explanation": "In enterprise Databricks lakehouses, Row Filters & Column Masks is an essential mechanism under Unity Catalog & Governance. Applying row-level and column-level security directly to tables via SQL UDFs. `ALTER TABLE SET ROW FILTER`. `ALTER TABLE ALTER COLUMN SET MASK`. When to use these vs. dynamic views.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "Applying row-level and column-level security directly to tables via SQL UDFs. `ALTER TABLE SET ROW FILTER`. `ALTER TABLE ALTER COLUMN SET MASK`. When to use these vs. dynamic views.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Row Filters & Column Masks\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-070-delta-sharing",
+    "num": 70,
+    "day": 70,
+    "concept": "Delta Sharing",
+    "category": "Unity Catalog & Governance",
+    "categoryId": 7,
+    "difficulty": "HARD",
+    "summary": "Secure, cross-organization data sharing without copying data. Open protocol (works with non-Databricks recipients). Share objects, recipients, activation links. Sharing live tables vs. snapshots.",
+    "explanation": "In enterprise Databricks lakehouses, Delta Sharing is an essential mechanism under Unity Catalog & Governance. Secure, cross-organization data sharing without copying data. Open protocol (works with non-Databricks recipients). Share objects, recipients, activation links. Sharing live tables vs. snapshots.",
+    "keyPoints": [
+      "Core production concept in Databricks Unity Catalog & Governance.",
+      "Secure, cross-organization data sharing without copying data. Open protocol (works with non-Databricks recipients). Share objects, recipients, activation links. Sharing live tables vs. snapshots.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Delta Sharing\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-071-python-vs-sql-pipeline-syntax",
+    "num": 71,
+    "day": 71,
+    "concept": "Python vs. SQL Pipeline Syntax",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "EASY",
+    "summary": "SQL: `CREATE STREAMING TABLE`, `CREATE MATERIALIZED VIEW`. Python: `@table`, `@materialized_view`, `@temporary_view` decorators (from `pyspark.pipelines`). Old `import dlt` syntax still works. Choosing based on team skills.",
+    "explanation": "In enterprise Databricks lakehouses, Python vs. SQL Pipeline Syntax is an essential mechanism under Lakeflow Declarative Pipelines. SQL: `CREATE STREAMING TABLE`, `CREATE MATERIALIZED VIEW`. Python: `@table`, `@materialized_view`, `@temporary_view` decorators (from `pyspark.pipelines`). Old `import dlt` syntax still works. Choosing based on team skills.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "SQL: `CREATE STREAMING TABLE`, `CREATE MATERIALIZED VIEW`. Python: `@table`, `@materialized_view`, `@temporary_view` decorators (from `pyspark.pipelines`). Old `import dlt` syntax still works. Choosing based on team skills.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Python vs. SQL Pipeline Syntax\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-072-streaming-tables-vs-materialized-views",
+    "num": 72,
+    "day": 72,
+    "concept": "Streaming Tables vs. Materialized Views",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "MEDIUM",
+    "summary": "Streaming tables for append-only ingestion with exactly-once guarantees. Materialized views for aggregations that need full recomputation. How the engine manages refresh, schema, and state automatically.",
+    "explanation": "In enterprise Databricks lakehouses, Streaming Tables vs. Materialized Views is an essential mechanism under Lakeflow Declarative Pipelines. Streaming tables for append-only ingestion with exactly-once guarantees. Materialized views for aggregations that need full recomputation. How the engine manages refresh, schema, and state automatically.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Streaming tables for append-only ingestion with exactly-once guarantees. Materialized views for aggregations that need full recomputation. How the engine manages refresh, schema, and state automatically.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Streaming Tables vs. Materialized Views\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-073-expectations-quality-rules",
+    "num": 73,
+    "day": 73,
+    "concept": "Expectations (Quality Rules)",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "MEDIUM",
+    "summary": "Defining data quality constraints that warn, drop, or fail on violation. Monitoring expectation pass/fail rates in the pipeline UI. Using expectations as production data quality gates.",
+    "explanation": "In enterprise Databricks lakehouses, Expectations (Quality Rules) is an essential mechanism under Lakeflow Declarative Pipelines. Defining data quality constraints that warn, drop, or fail on violation. Monitoring expectation pass/fail rates in the pipeline UI. Using expectations as production data quality gates.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Defining data quality constraints that warn, drop, or fail on violation. Monitoring expectation pass/fail rates in the pipeline UI. Using expectations as production data quality gates.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Expectations (Quality Rules)\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-074-pipeline-development-testing",
+    "num": 74,
+    "day": 74,
+    "concept": "Pipeline Development & Testing",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "MEDIUM",
+    "summary": "Development vs. production modes. Incremental vs. full refresh. Testing pipeline logic locally before deployment. The pipeline settings and configuration options.",
+    "explanation": "In enterprise Databricks lakehouses, Pipeline Development & Testing is an essential mechanism under Lakeflow Declarative Pipelines. Development vs. production modes. Incremental vs. full refresh. Testing pipeline logic locally before deployment. The pipeline settings and configuration options.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Development vs. production modes. Incremental vs. full refresh. Testing pipeline logic locally before deployment. The pipeline settings and configuration options.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Pipeline Development & Testing\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-075-pipeline-monitoring-event-log",
+    "num": 75,
+    "day": 75,
+    "concept": "Pipeline Monitoring & Event Log",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "MEDIUM",
+    "summary": "Reading the event log for pipeline run history, data quality metrics, and lineage. Setting up alerts on pipeline failures or expectation violations. Integration with Databricks SQL dashboards.",
+    "explanation": "In enterprise Databricks lakehouses, Pipeline Monitoring & Event Log is an essential mechanism under Lakeflow Declarative Pipelines. Reading the event log for pipeline run history, data quality metrics, and lineage. Setting up alerts on pipeline failures or expectation violations. Integration with Databricks SQL dashboards.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Reading the event log for pipeline run history, data quality metrics, and lineage. Setting up alerts on pipeline failures or expectation violations. Integration with Databricks SQL dashboards.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Pipeline Monitoring & Event Log\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-076-pipeline-modes-triggered-vs-continuous",
+    "num": 76,
+    "day": 76,
+    "concept": "Pipeline Modes: Triggered vs. Continuous",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "MEDIUM",
+    "summary": "Triggered pipelines (batch-like, process available data then stop) vs. continuous pipelines (always-on, sub-second latency). Cost and latency tradeoffs. When each mode is appropriate.",
+    "explanation": "In enterprise Databricks lakehouses, Pipeline Modes: Triggered vs. Continuous is an essential mechanism under Lakeflow Declarative Pipelines. Triggered pipelines (batch-like, process available data then stop) vs. continuous pipelines (always-on, sub-second latency). Cost and latency tradeoffs. When each mode is appropriate.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Triggered pipelines (batch-like, process available data then stop) vs. continuous pipelines (always-on, sub-second latency). Cost and latency tradeoffs. When each mode is appropriate.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Pipeline Modes: Triggered vs. Continuous\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-077-cdc-processing-auto-cdc-into",
+    "num": 77,
+    "day": 77,
+    "concept": "CDC Processing: AUTO CDC INTO",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "HARD",
+    "summary": "Processing Change Data Capture feeds with `AUTO CDC INTO` (SQL) or `create_auto_cdc_flow()` (Python). Formerly `APPLY CHANGES INTO`. Automatic SCD Type 1 and Type 2 handling. Sequencing columns and deduplication.",
+    "explanation": "In enterprise Databricks lakehouses, CDC Processing: AUTO CDC INTO is an essential mechanism under Lakeflow Declarative Pipelines. Processing Change Data Capture feeds with `AUTO CDC INTO` (SQL) or `create_auto_cdc_flow()` (Python). Formerly `APPLY CHANGES INTO`. Automatic SCD Type 1 and Type 2 handling. Sequencing columns and deduplication.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Processing Change Data Capture feeds with `AUTO CDC INTO` (SQL) or `create_auto_cdc_flow()` (Python). Formerly `APPLY CHANGES INTO`. Automatic SCD Type 1 and Type 2 handling. Sequencing columns and deduplication.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for CDC Processing: AUTO CDC INTO\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-078-error-handling-dead-letter-patterns",
+    "num": 78,
+    "day": 78,
+    "concept": "Error Handling & Dead Letter Patterns",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "HARD",
+    "summary": "Routing bad records to quarantine tables instead of failing the pipeline. Using expectations with `ON VIOLATION DROP ROW` plus a separate quality monitoring table. Building observability into pipeline design.",
+    "explanation": "In enterprise Databricks lakehouses, Error Handling & Dead Letter Patterns is an essential mechanism under Lakeflow Declarative Pipelines. Routing bad records to quarantine tables instead of failing the pipeline. Using expectations with `ON VIOLATION DROP ROW` plus a separate quality monitoring table. Building observability into pipeline design.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Routing bad records to quarantine tables instead of failing the pipeline. Using expectations with `ON VIOLATION DROP ROW` plus a separate quality monitoring table. Building observability into pipeline design.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Error Handling & Dead Letter Patterns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-079-pipeline-parameters-configuration",
+    "num": 79,
+    "day": 79,
+    "concept": "Pipeline Parameters & Configuration",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "HARD",
+    "summary": "Parameterizing pipelines for dev/staging/prod environments. Configuration management patterns. Passing runtime settings. Managing pipeline dependencies across environments.",
+    "explanation": "In enterprise Databricks lakehouses, Pipeline Parameters & Configuration is an essential mechanism under Lakeflow Declarative Pipelines. Parameterizing pipelines for dev/staging/prod environments. Configuration management patterns. Passing runtime settings. Managing pipeline dependencies across environments.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Parameterizing pipelines for dev/staging/prod environments. Configuration management patterns. Passing runtime settings. Managing pipeline dependencies across environments.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Pipeline Parameters & Configuration\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-080-multi-pipeline-architecture",
+    "num": 80,
+    "day": 80,
+    "concept": "Multi-Pipeline Architecture",
+    "category": "Lakeflow Declarative Pipelines",
+    "categoryId": 8,
+    "difficulty": "HARD",
+    "summary": "Splitting large pipelines into smaller, focused pipelines with clear boundaries. Sharing tables between pipelines. Managing dependencies and execution ordering. When a single pipeline becomes too complex to maintain.",
+    "explanation": "In enterprise Databricks lakehouses, Multi-Pipeline Architecture is an essential mechanism under Lakeflow Declarative Pipelines. Splitting large pipelines into smaller, focused pipelines with clear boundaries. Sharing tables between pipelines. Managing dependencies and execution ordering. When a single pipeline becomes too complex to maintain.",
+    "keyPoints": [
+      "Core production concept in Databricks Lakeflow Declarative Pipelines.",
+      "Splitting large pipelines into smaller, focused pipelines with clear boundaries. Sharing tables between pipelines. Managing dependencies and execution ordering. When a single pipeline becomes too complex to maintain.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Multi-Pipeline Architecture\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-081-choosing-compute-for-jobs",
+    "num": 81,
+    "day": 81,
+    "concept": "Choosing Compute for Jobs",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "EASY",
+    "summary": "Serverless compute as the default for new jobs (no cluster management, Photon auto-enabled). When to use job clusters instead (custom init scripts, GPU workloads, unsupported task types). Why all-purpose clusters are for development, not production. Instance pools for fast classic cluster startup.",
+    "explanation": "In enterprise Databricks lakehouses, Choosing Compute for Jobs is an essential mechanism under Workflows, CI/CD & Operations. Serverless compute as the default for new jobs (no cluster management, Photon auto-enabled). When to use job clusters instead (custom init scripts, GPU workloads, unsupported task types). Why all-purpose clusters are for development, not production. Instance pools for fast classic cluster startup.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "Serverless compute as the default for new jobs (no cluster management, Photon auto-enabled). When to use job clusters instead (custom init scripts, GPU workloads, unsupported task types). Why all-purpose clusters are for development, not production. Instance pools for fast classic cluster startup.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Choosing Compute for Jobs\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-082-secrets-management",
+    "num": 82,
+    "day": 82,
+    "concept": "Secrets Management",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "EASY",
+    "summary": "Databricks Secret Scopes for credentials (API keys, database passwords). `dbutils.secrets.get()` in notebooks. Key-vault backed scopes (Azure Key Vault, AWS Secrets Manager). Why secrets must never be hardcoded.",
+    "explanation": "In enterprise Databricks lakehouses, Secrets Management is an essential mechanism under Workflows, CI/CD & Operations. Databricks Secret Scopes for credentials (API keys, database passwords). `dbutils.secrets.get()` in notebooks. Key-vault backed scopes (Azure Key Vault, AWS Secrets Manager). Why secrets must never be hardcoded.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "Databricks Secret Scopes for credentials (API keys, database passwords). `dbutils.secrets.get()` in notebooks. Key-vault backed scopes (Azure Key Vault, AWS Secrets Manager). Why secrets must never be hardcoded.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Secrets Management\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-083-parameterization-widgets-job-parameters-task-values",
+    "num": 83,
+    "day": 83,
+    "concept": "Parameterization: Widgets, Job Parameters, Task Values",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "EASY",
+    "summary": "`dbutils.widgets` for notebook parameters. Job parameters passed from Workflows. Task values for inter-task communication. Databricks SQL parameters for parameterized queries.",
+    "explanation": "In enterprise Databricks lakehouses, Parameterization: Widgets, Job Parameters, Task Values is an essential mechanism under Workflows, CI/CD & Operations. `dbutils.widgets` for notebook parameters. Job parameters passed from Workflows. Task values for inter-task communication. Databricks SQL parameters for parameterized queries.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "`dbutils.widgets` for notebook parameters. Job parameters passed from Workflows. Task values for inter-task communication. Databricks SQL parameters for parameterized queries.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Parameterization: Widgets, Job Parameters, Task Values\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-084-notebook-development-patterns",
+    "num": 84,
+    "day": 84,
+    "concept": "Notebook Development Patterns",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "EASY",
+    "summary": "`%run` for shared utilities. `dbutils.notebook.run()` for orchestration. Magic commands (`%sql`, `%python`, `%md`). Notebook-scoped libraries. When to use notebooks vs. Python files in production.",
+    "explanation": "In enterprise Databricks lakehouses, Notebook Development Patterns is an essential mechanism under Workflows, CI/CD & Operations. `%run` for shared utilities. `dbutils.notebook.run()` for orchestration. Magic commands (`%sql`, `%python`, `%md`). Notebook-scoped libraries. When to use notebooks vs. Python files in production.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "`%run` for shared utilities. `dbutils.notebook.run()` for orchestration. Magic commands (`%sql`, `%python`, `%md`). Notebook-scoped libraries. When to use notebooks vs. Python files in production.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Notebook Development Patterns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-085-databricks-workflows-multi-task-jobs",
+    "num": 85,
+    "day": 85,
+    "concept": "Databricks Workflows: Multi-Task Jobs",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "MEDIUM",
+    "summary": "Creating jobs with multiple tasks (notebooks, Python scripts, SQL, dbt, JARs). Task dependencies (linear, fan-out, fan-in). Run conditions and error handling.",
+    "explanation": "In enterprise Databricks lakehouses, Databricks Workflows: Multi-Task Jobs is an essential mechanism under Workflows, CI/CD & Operations. Creating jobs with multiple tasks (notebooks, Python scripts, SQL, dbt, JARs). Task dependencies (linear, fan-out, fan-in). Run conditions and error handling.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "Creating jobs with multiple tasks (notebooks, Python scripts, SQL, dbt, JARs). Task dependencies (linear, fan-out, fan-in). Run conditions and error handling.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Databricks Workflows: Multi-Task Jobs\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-086-task-dependencies-retries-conditional-logic",
+    "num": 86,
+    "day": 86,
+    "concept": "Task Dependencies, Retries & Conditional Logic",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "MEDIUM",
+    "summary": "Per-task retry policies and timeout limits. Conditional execution based on upstream task outcomes. Task values for passing data between tasks. Email and webhook alerting on failure.",
+    "explanation": "In enterprise Databricks lakehouses, Task Dependencies, Retries & Conditional Logic is an essential mechanism under Workflows, CI/CD & Operations. Per-task retry policies and timeout limits. Conditional execution based on upstream task outcomes. Task values for passing data between tasks. Email and webhook alerting on failure.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "Per-task retry policies and timeout limits. Conditional execution based on upstream task outcomes. Task values for passing data between tasks. Email and webhook alerting on failure.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Task Dependencies, Retries & Conditional Logic\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-087-git-integration-repos",
+    "num": 87,
+    "day": 87,
+    "concept": "Git Integration & Repos",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "MEDIUM",
+    "summary": "Connecting Databricks to GitHub/GitLab/Azure DevOps. Databricks Repos for version-controlled notebooks. Branch-based development. Pull request workflows for notebook code.",
+    "explanation": "In enterprise Databricks lakehouses, Git Integration & Repos is an essential mechanism under Workflows, CI/CD & Operations. Connecting Databricks to GitHub/GitLab/Azure DevOps. Databricks Repos for version-controlled notebooks. Branch-based development. Pull request workflows for notebook code.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "Connecting Databricks to GitHub/GitLab/Azure DevOps. Databricks Repos for version-controlled notebooks. Branch-based development. Pull request workflows for notebook code.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Git Integration & Repos\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-088-monitoring-alerting-sql-alerts",
+    "num": 88,
+    "day": 88,
+    "concept": "Monitoring, Alerting & SQL Alerts",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "MEDIUM",
+    "summary": "Setting up SQL alerts in DBSQL (threshold-based notifications). System tables for operational monitoring. Cluster event logs. Integrating with PagerDuty, Slack, or email for pipeline failures.",
+    "explanation": "In enterprise Databricks lakehouses, Monitoring, Alerting & SQL Alerts is an essential mechanism under Workflows, CI/CD & Operations. Setting up SQL alerts in DBSQL (threshold-based notifications). System tables for operational monitoring. Cluster event logs. Integrating with PagerDuty, Slack, or email for pipeline failures.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "Setting up SQL alerts in DBSQL (threshold-based notifications). System tables for operational monitoring. Cluster event logs. Integrating with PagerDuty, Slack, or email for pipeline failures.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Monitoring, Alerting & SQL Alerts\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-089-system-tables-for-operations",
+    "num": 89,
+    "day": 89,
+    "concept": "System Tables for Operations",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "MEDIUM",
+    "summary": "`system.billing.usage` for cost tracking and DBU consumption by SKU. `system.compute.clusters` for cluster lifecycle and utilization. Building operational dashboards for cost monitoring and capacity planning.",
+    "explanation": "In enterprise Databricks lakehouses, System Tables for Operations is an essential mechanism under Workflows, CI/CD & Operations. `system.billing.usage` for cost tracking and DBU consumption by SKU. `system.compute.clusters` for cluster lifecycle and utilization. Building operational dashboards for cost monitoring and capacity planning.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "`system.billing.usage` for cost tracking and DBU consumption by SKU. `system.compute.clusters` for cluster lifecycle and utilization. Building operational dashboards for cost monitoring and capacity planning.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for System Tables for Operations\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-090-databricks-asset-bundles-dabs",
+    "num": 90,
+    "day": 90,
+    "concept": "Databricks Asset Bundles (DABs)",
+    "category": "Workflows, CI/CD & Operations",
+    "categoryId": 9,
+    "difficulty": "HARD",
+    "summary": "The `databricks.yml` configuration file. Defining jobs, pipelines, and models as code. Environment targets (dev/staging/prod). `databricks bundle validate/deploy/destroy`. GitHub Actions integration.",
+    "explanation": "In enterprise Databricks lakehouses, Databricks Asset Bundles (DABs) is an essential mechanism under Workflows, CI/CD & Operations. The `databricks.yml` configuration file. Defining jobs, pipelines, and models as code. Environment targets (dev/staging/prod). `databricks bundle validate/deploy/destroy`. GitHub Actions integration.",
+    "keyPoints": [
+      "Core production concept in Databricks Workflows, CI/CD & Operations.",
+      "The `databricks.yml` configuration file. Defining jobs, pipelines, and models as code. Environment targets (dev/staging/prod). `databricks bundle validate/deploy/destroy`. GitHub Actions integration.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Databricks Asset Bundles (DABs)\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-091-shallow-vs-deep-clones",
+    "num": 91,
+    "day": 91,
+    "concept": "Shallow vs. Deep Clones",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "EASY",
+    "summary": "SHALLOW CLONE (zero-copy, references source files) vs. DEEP CLONE (full copy, independent). Use cases: dev/test environments, table migration, disaster recovery snapshots, schema evolution testing.",
+    "explanation": "In enterprise Databricks lakehouses, Shallow vs. Deep Clones is an essential mechanism under Architecture & Advanced Patterns. SHALLOW CLONE (zero-copy, references source files) vs. DEEP CLONE (full copy, independent). Use cases: dev/test environments, table migration, disaster recovery snapshots, schema evolution testing.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "SHALLOW CLONE (zero-copy, references source files) vs. DEEP CLONE (full copy, independent). Use cases: dev/test environments, table migration, disaster recovery snapshots, schema evolution testing.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Shallow vs. Deep Clones\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-092-managed-vs-external-tables-architecture-tradeoffs",
+    "num": 92,
+    "day": 92,
+    "concept": "Managed vs. External Tables: Architecture Tradeoffs",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "MEDIUM",
+    "summary": "When managed tables are the right default (governance, Predictive Optimization, automatic lifecycle). When external tables are necessary (multi-engine access, data ownership boundaries, regulatory requirements).",
+    "explanation": "In enterprise Databricks lakehouses, Managed vs. External Tables: Architecture Tradeoffs is an essential mechanism under Architecture & Advanced Patterns. When managed tables are the right default (governance, Predictive Optimization, automatic lifecycle). When external tables are necessary (multi-engine access, data ownership boundaries, regulatory requirements).",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "When managed tables are the right default (governance, Predictive Optimization, automatic lifecycle). When external tables are necessary (multi-engine access, data ownership boundaries, regulatory requirements).",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Managed vs. External Tables: Architecture Tradeoffs\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-093-legacy-partitioning-z-order",
+    "num": 93,
+    "day": 93,
+    "concept": "Legacy: Partitioning & Z-ORDER",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "MEDIUM",
+    "summary": "Why these are legacy approaches superseded by Liquid Clustering. When partitioning still makes sense (very large tables, low-cardinality columns, non-Databricks reader compatibility). Z-ORDER mechanics for maintaining legacy tables. Migration planning.",
+    "explanation": "In enterprise Databricks lakehouses, Legacy: Partitioning & Z-ORDER is an essential mechanism under Architecture & Advanced Patterns. Why these are legacy approaches superseded by Liquid Clustering. When partitioning still makes sense (very large tables, low-cardinality columns, non-Databricks reader compatibility). Z-ORDER mechanics for maintaining legacy tables. Migration planning.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "Why these are legacy approaches superseded by Liquid Clustering. When partitioning still makes sense (very large tables, low-cardinality columns, non-Databricks reader compatibility). Z-ORDER mechanics for maintaining legacy tables. Migration planning.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Legacy: Partitioning & Z-ORDER\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-094-lakehouse-table-design-patterns",
+    "num": 94,
+    "day": 94,
+    "concept": "Lakehouse Table Design Patterns",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "MEDIUM",
+    "summary": "When to denormalize vs. normalize in a lakehouse (wide tables for analytics, normalized for transactional). Star schema in Gold layer. Choosing between many small tables vs. fewer wide tables. Clustering key selection and column ordering for statistics.",
+    "explanation": "In enterprise Databricks lakehouses, Lakehouse Table Design Patterns is an essential mechanism under Architecture & Advanced Patterns. When to denormalize vs. normalize in a lakehouse (wide tables for analytics, normalized for transactional). Star schema in Gold layer. Choosing between many small tables vs. fewer wide tables. Clustering key selection and column ordering for statistics.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "When to denormalize vs. normalize in a lakehouse (wide tables for analytics, normalized for transactional). Star schema in Gold layer. Choosing between many small tables vs. fewer wide tables. Clustering key selection and column ordering for statistics.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Lakehouse Table Design Patterns\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-095-delta-uniform-multi-engine-interoperability",
+    "num": 95,
+    "day": 95,
+    "concept": "Delta UniForm & Multi-Engine Interoperability",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "MEDIUM",
+    "summary": "How UniForm enables a single Delta table to be read as Apache Iceberg or Apache Hudi. When to use UniForm vs. Delta Sharing vs. Lakehouse Federation for cross-platform access. Enabling and configuring.",
+    "explanation": "In enterprise Databricks lakehouses, Delta UniForm & Multi-Engine Interoperability is an essential mechanism under Architecture & Advanced Patterns. How UniForm enables a single Delta table to be read as Apache Iceberg or Apache Hudi. When to use UniForm vs. Delta Sharing vs. Lakehouse Federation for cross-platform access. Enabling and configuring.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "How UniForm enables a single Delta table to be read as Apache Iceberg or Apache Hudi. When to use UniForm vs. Delta Sharing vs. Lakehouse Federation for cross-platform access. Enabling and configuring.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Delta UniForm & Multi-Engine Interoperability\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-096-compute-policies-cluster-governance",
+    "num": 96,
+    "day": 96,
+    "concept": "Compute Policies & Cluster Governance",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "MEDIUM",
+    "summary": "Using cluster policies to control what users can provision (instance types, max workers, spot ratios, auto-termination). Preventing cost overruns. Balancing developer freedom with budget discipline.",
+    "explanation": "In enterprise Databricks lakehouses, Compute Policies & Cluster Governance is an essential mechanism under Architecture & Advanced Patterns. Using cluster policies to control what users can provision (instance types, max workers, spot ratios, auto-termination). Preventing cost overruns. Balancing developer freedom with budget discipline.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "Using cluster policies to control what users can provision (instance types, max workers, spot ratios, auto-termination). Preventing cost overruns. Balancing developer freedom with budget discipline.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Compute Policies & Cluster Governance\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-097-ai-functions-for-data-engineers",
+    "num": 97,
+    "day": 97,
+    "concept": "AI Functions for Data Engineers",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "MEDIUM",
+    "summary": "Using `ai_query()` and `ai_generate()` SQL functions for data enrichment, classification, and extraction within pipelines. When AI functions replace complex regex/UDF logic. Cost and latency considerations.",
+    "explanation": "In enterprise Databricks lakehouses, AI Functions for Data Engineers is an essential mechanism under Architecture & Advanced Patterns. Using `ai_query()` and `ai_generate()` SQL functions for data enrichment, classification, and extraction within pipelines. When AI functions replace complex regex/UDF logic. Cost and latency considerations.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "Using `ai_query()` and `ai_generate()` SQL functions for data enrichment, classification, and extraction within pipelines. When AI functions replace complex regex/UDF logic. Cost and latency considerations.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for AI Functions for Data Engineers\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-098-multi-workspace-architecture",
+    "num": 98,
+    "day": 98,
+    "concept": "Multi-Workspace Architecture",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "HARD",
+    "summary": "When to use one workspace vs. many (team isolation, compliance boundaries, regional deployment). Sharing Unity Catalog metastore across workspaces. Cross-workspace job orchestration. Account-level vs. workspace-level governance.",
+    "explanation": "In enterprise Databricks lakehouses, Multi-Workspace Architecture is an essential mechanism under Architecture & Advanced Patterns. When to use one workspace vs. many (team isolation, compliance boundaries, regional deployment). Sharing Unity Catalog metastore across workspaces. Cross-workspace job orchestration. Account-level vs. workspace-level governance.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "When to use one workspace vs. many (team isolation, compliance boundaries, regional deployment). Sharing Unity Catalog metastore across workspaces. Cross-workspace job orchestration. Account-level vs. workspace-level governance.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Multi-Workspace Architecture\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-099-performance-troubleshooting-methodology",
+    "num": 99,
+    "day": 99,
+    "concept": "Performance Troubleshooting Methodology",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "HARD",
+    "summary": "A structured approach to diagnosing slow pipelines: check Spark UI stage breakdown, identify shuffle/spill bottlenecks, examine query plan for full scans or bad joins, verify clustering/statistics, check cluster utilization. Building runbooks for common performance patterns.",
+    "explanation": "In enterprise Databricks lakehouses, Performance Troubleshooting Methodology is an essential mechanism under Architecture & Advanced Patterns. A structured approach to diagnosing slow pipelines: check Spark UI stage breakdown, identify shuffle/spill bottlenecks, examine query plan for full scans or bad joins, verify clustering/statistics, check cluster utilization. Building runbooks for common performance patterns.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "A structured approach to diagnosing slow pipelines: check Spark UI stage breakdown, identify shuffle/spill bottlenecks, examine query plan for full scans or bad joins, verify clustering/statistics, check cluster utilization. Building runbooks for common performance patterns.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Performance Troubleshooting Methodology\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  },
+  {
+    "id": "db100-100-testing-patterns-for-data-pipelines",
+    "num": 100,
+    "day": 100,
+    "concept": "Testing Patterns for Data Pipelines",
+    "category": "Architecture & Advanced Patterns",
+    "categoryId": 10,
+    "difficulty": "HARD",
+    "summary": "Unit testing transformations with sample DataFrames. Integration testing with representative data subsets. Data quality assertions beyond Lakeflow expectations. Testing schema evolution scenarios. CI/CD test pipelines with DABs.",
+    "explanation": "In enterprise Databricks lakehouses, Testing Patterns for Data Pipelines is an essential mechanism under Architecture & Advanced Patterns. Unit testing transformations with sample DataFrames. Integration testing with representative data subsets. Data quality assertions beyond Lakeflow expectations. Testing schema evolution scenarios. CI/CD test pipelines with DABs.",
+    "keyPoints": [
+      "Core production concept in Databricks Architecture & Advanced Patterns.",
+      "Unit testing transformations with sample DataFrames. Integration testing with representative data subsets. Data quality assertions beyond Lakeflow expectations. Testing schema evolution scenarios. CI/CD test pipelines with DABs.",
+      "Essential architectural pattern for enterprise lakehouse systems."
+    ],
+    "codeSnippet": "-- Example for Testing Patterns for Data Pipelines\nSELECT 1;",
+    "certificationMapping": "Databricks Certified Data Engineer Associate / Professional"
+  }
+]

@@ -58,8 +58,8 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
     fireEvent.change(input, { target: { value: lastConcept.term } });
 
     // Should find the concept in the search results
-    const matched = screen.getByText(new RegExp(lastConcept.term, 'i'));
-    expect(matched).toBeDefined();
+    const matched = screen.getAllByText(new RegExp(lastConcept.term, 'i'));
+    expect(matched.length).toBeGreaterThanOrEqual(1);
   });
 
   it('validates public/robots.txt and public/sitemap.xml exist with required content', () => {
