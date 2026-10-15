@@ -28,27 +28,81 @@ import {
   Plus,
   Minus,
   RotateCcw,
+  X,
+  ChevronRight,
+  Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 import { useTextSize, TEXT_SIZE_OPTIONS } from "@/components/providers/text-size-provider";
+import { executePortalSearch, TopicIdentification, SearchResultItem } from "@/lib/search-engine";
+
+export type CommandCategory =
+  | "Navigation"
+  | "Guided Track"
+  | "Concepts"
+  | "Q&A Prep"
+  | "Architecture"
+  | "Code Practice"
+  | "Cheat Sheets"
+  | "Blueprints"
+  | "Companies"
+  | "Learning Paths"
+  | "Simulators"
+  | "Theme"
+  | "Text Size";
 
 interface CommandItem {
   id: string;
   title: string;
-  category: "Navigation" | "Concepts" | "Paths" | "Simulators" | "Blueprints" | "Theme" | "Text Size";
+  category: CommandCategory;
+  page?: string;
   icon: React.ElementType;
   href?: string;
   action?: () => void;
   badge?: string;
+  snippet?: string;
   keywords?: string[];
+  score?: number;
 }
+
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  "Guided Track": Sparkles,
+  Concepts: BookOpen,
+  "Q&A Prep": MessageSquare,
+  Architecture: Cpu,
+  "Code Practice": Terminal,
+  "Cheat Sheets": FileCode2,
+  Blueprints: Layers,
+  Companies: Building2,
+  "Learning Paths": Compass,
+  Simulators: Calculator,
+  Navigation: Zap,
+  Theme: Palette,
+  "Text Size": Type,
+};
+
+const FILTER_TABS = [
+  { id: "all", label: "All" },
+  { id: "Guided Track", label: "Tracks" },
+  { id: "Concepts", label: "Concepts" },
+  { id: "Q&A Prep", label: "Q&A Prep" },
+  { id: "Architecture", label: "Architecture" },
+  { id: "Code Practice", label: "Code & Cheats" },
+  { id: "Navigation", label: "Tools & Nav" },
+];
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [identifiedTopics, setIdentifiedTopics] = useState<TopicIdentification[]>([]);
+  const [remoteResults, setRemoteResults] = useState<CommandItem[]>([]);
+  const [pageCounts, setPageCounts] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
   const { setTheme } = useTheme();
   const { setTextSize, increaseTextSize, decreaseTextSize, resetTextSize } = useTextSize();
@@ -123,17 +177,7 @@ export function CommandPalette() {
           t.id,
           t.label.toLowerCase(),
           t.tagline.toLowerCase(),
-          t.id === "grey" ? "gray" : "",
-          t.id === "grey" ? "slate" : "",
-          t.id === "grey" ? "graphite" : "",
-          t.id === "e-ink" ? "eink" : "",
-          t.id === "e-ink" ? "reader" : "",
-          t.id === "e-ink" ? "kindle" : "",
-          t.id === "e-ink" ? "paper" : "",
-          t.id === "dark" ? "night" : "",
-          t.id === "dark" ? "oled" : "",
-          t.id === "light" ? "day" : "",
-        ].filter(Boolean),
+        ],
         action: () => {
           setTheme(t.id);
           toast.success(`Theme switched to ${t.label} mode`);
@@ -145,25 +189,24 @@ export function CommandPalette() {
   // Static navigation routes
   const staticRoutes: CommandItem[] = useMemo(
     () => [
-      { id: "nav-home", title: "Home Dashboard", category: "Navigation", icon: Sparkles, href: "/", badge: "Main" },
-      { id: "nav-concepts", title: "Key Concepts (415+ Terms)", category: "Navigation", icon: BookOpen, href: "/concepts", badge: "Easy" },
-      { id: "nav-guided", title: "Guided Learning (13 Structured Tracks)", category: "Navigation", icon: BookMarked, href: "/guided-learning", badge: "Core" },
-      { id: "nav-python", title: "Python for Data Engineering (Guided Track)", category: "Navigation", icon: FileCode2, href: "/guided-learning?topic=python", badge: "Track" },
-      { id: "nav-code", title: "Code Practice (PySpark, SQL, Python)", category: "Navigation", icon: FileCode2, href: "/code-practice", badge: "Polyglot" },
-      { id: "nav-spark", title: "Spark Engine & Simulator", category: "Navigation", icon: Zap, href: "/spark-engine", badge: "Internals" },
-      { id: "nav-modern", title: "Modern Data Stack & AI Architecture", category: "Navigation", icon: Layers, href: "/modern-stack", badge: "Hard" },
-      { id: "nav-mindmap", title: "DE Mindmap (Visual Architecture Topography)", category: "Navigation", icon: Globe, href: "/mindmap", badge: "NEW" },
-      { id: "nav-qa", title: "Q&A Prep Hub (6,500+ Questions)", category: "Navigation", icon: MessageSquare, href: "/qa-prep", badge: "SM-2" },
-      { id: "nav-arch", title: "Architecture Hub (3,000+ Scenarios)", category: "Navigation", icon: Cpu, href: "/architecture", badge: "Architect" },
-      { id: "nav-cheatsheet", title: "Production Cheat Sheet (Spark, dbt, Airflow, SQL)", category: "Navigation", icon: Terminal, href: "/cheat-sheet", badge: "PROD" },
-      { id: "nav-gcc", title: "Company Research (GCC Profiles)", category: "Navigation", icon: Building2, href: "/company-research", badge: "Enterprise" },
-      { id: "nav-paths", title: "Learning Paths (12 Structured Tracks)", category: "Navigation", icon: Compass, href: "/learning-paths", badge: "Curriculum" },
-      { id: "nav-studio", title: "My Studio & Progress", category: "Navigation", icon: User, href: "/studio", badge: "Account" },
-      
+      { id: "nav-home", title: "Home Dashboard", category: "Navigation", page: "Home", icon: Sparkles, href: "/", badge: "Main" },
+      { id: "nav-guided", title: "Guided Learning (13 Structured Tracks)", category: "Navigation", page: "Guided Learning", icon: BookMarked, href: "/guided-learning", badge: "Core" },
+      { id: "nav-concepts", title: "Key Concepts (415+ Terms)", category: "Navigation", page: "Key Concepts", icon: BookOpen, href: "/concepts", badge: "Easy" },
+      { id: "nav-qa", title: "Q&A Prep Hub (6,500+ Questions)", category: "Navigation", page: "Q&A Prep", icon: MessageSquare, href: "/qa-prep", badge: "SM-2" },
+      { id: "nav-arch", title: "Architecture Hub (3,000+ Scenarios)", category: "Navigation", page: "Architecture Hub", icon: Cpu, href: "/architecture", badge: "Architect" },
+      { id: "nav-code", title: "Code Practice (PySpark, SQL, Python)", category: "Navigation", page: "Code Practice", icon: FileCode2, href: "/code-practice", badge: "Polyglot" },
+      { id: "nav-spark", title: "Spark Engine & Simulator", category: "Navigation", page: "Spark Engine", icon: Zap, href: "/spark-engine", badge: "Internals" },
+      { id: "nav-cheatsheet", title: "Production Cheat Sheet (Spark, dbt, Airflow, SQL)", category: "Navigation", page: "Cheat Sheets", icon: Terminal, href: "/cheat-sheet", badge: "PROD" },
+      { id: "nav-modern", title: "Modern Data Stack & AI Architecture", category: "Navigation", page: "Modern Stack", icon: Layers, href: "/modern-stack", badge: "Hard" },
+      { id: "nav-mindmap", title: "DE Mindmap (Visual Architecture Topography)", category: "Navigation", page: "DE Mindmap", icon: Globe, href: "/mindmap", badge: "NEW" },
+      { id: "nav-gcc", title: "Company Research (GCC Profiles)", category: "Navigation", page: "Company Research", icon: Building2, href: "/company-research", badge: "Enterprise" },
+      { id: "nav-paths", title: "Learning Paths (12 Structured Tracks)", category: "Learning Paths", page: "Learning Paths", icon: Compass, href: "/learning-paths", badge: "Curriculum" },
+      { id: "nav-studio", title: "My Studio & Progress", category: "Navigation", page: "Studio", icon: User, href: "/studio", badge: "Account" },
+
       // Simulators
-      { id: "sim-shuffle", title: "Simulator: Spark Shuffle & Partition Estimator", category: "Simulators", icon: Calculator, href: "/modern-stack#simulators", badge: "Tool" },
-      { id: "sim-delta", title: "Simulator: Iceberg vs Delta Decision Tree", category: "Simulators", icon: Layers, href: "/modern-stack#simulators", badge: "Tool" },
-      { id: "sim-cost", title: "Simulator: Serverless Cloud Cost Calculator", category: "Simulators", icon: Flame, href: "/modern-stack#simulators", badge: "Tool" },
+      { id: "sim-shuffle", title: "Simulator: Spark Shuffle & Partition Estimator", category: "Simulators", page: "Modern Stack", icon: Calculator, href: "/modern-stack#simulators", badge: "Tool" },
+      { id: "sim-delta", title: "Simulator: Iceberg vs Delta Decision Tree", category: "Simulators", page: "Modern Stack", icon: Layers, href: "/modern-stack#simulators", badge: "Tool" },
+      { id: "sim-cost", title: "Simulator: Serverless Cloud Cost Calculator", category: "Simulators", page: "Modern Stack", icon: Flame, href: "/modern-stack#simulators", badge: "Tool" },
 
       // Quick Theme Switching
       ...themeRoutes,
@@ -174,68 +217,125 @@ export function CommandPalette() {
     [themeRoutes, textSizeRoutes]
   );
 
-  // Dynamic items fetched from Edge Search API
-  const [remoteResults, setRemoteResults] = useState<CommandItem[]>([]);
+  const mapSearchResultToCommandItem = useCallback((it: SearchResultItem): CommandItem => ({
+    id: it.id,
+    title: it.title,
+    category: it.category as CommandCategory,
+    page: it.page,
+    icon: CATEGORY_ICONS[it.category] || BookOpen,
+    href: it.href,
+    badge: it.badge,
+    snippet: it.snippet,
+    score: it.score,
+  }), []);
 
+  // Unified Search Handler (Supports Local In-Memory & Server API)
   useEffect(() => {
-    if (!query.trim() || typeof window === "undefined" || process.env.NODE_ENV === "test") {
+    const q = query.trim();
+    if (!q) {
       setRemoteResults([]);
+      setIdentifiedTopics([]);
+      setPageCounts({});
+      setIsLoading(false);
       return;
     }
 
+    // In testing or synchronous environments, execute portal search directly
+    if (typeof window === "undefined" || process.env.NODE_ENV === "test") {
+      const searchRes = executePortalSearch(q, 40);
+      setIdentifiedTopics(searchRes.identifiedTopics);
+      setPageCounts(searchRes.pageCounts);
+      setRemoteResults(searchRes.items.map(mapSearchResultToCommandItem));
+      return;
+    }
+
+    // Client Debounced Fetch with Local Fallback
+    setIsLoading(true);
     const timer = setTimeout(() => {
-      fetch(`/api/search?q=${encodeURIComponent(query.trim())}`)
-        .then((res) => res.json())
+      fetch(`/api/search?q=${encodeURIComponent(q)}&limit=40`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Search API error");
+          return res.json();
+        })
         .then((data) => {
           if (Array.isArray(data?.items)) {
-            const mapped: CommandItem[] = data.items.map((it: any) => ({
-              id: it.id,
-              title: it.title,
-              category: it.category,
-              icon: it.category === "Concepts" ? BookOpen : it.category === "Paths" ? Compass : it.category === "Blueprints" ? Cpu : Terminal,
-              href: it.href,
-              badge: it.badge,
-            }));
-            setRemoteResults(mapped);
+            setIdentifiedTopics(data.identifiedTopics || []);
+            setPageCounts(data.pageCounts || {});
+            setRemoteResults(data.items.map(mapSearchResultToCommandItem));
           }
         })
-        .catch(() => {});
-    }, 150);
+        .catch(() => {
+          // Fallback to local synchronous engine if fetch fails
+          const fallback = executePortalSearch(q, 40);
+          setIdentifiedTopics(fallback.identifiedTopics);
+          setPageCounts(fallback.pageCounts);
+          setRemoteResults(fallback.items.map(mapSearchResultToCommandItem));
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }, 120);
 
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, mapSearchResultToCommandItem]);
 
-  // Filter items based on query
+  // Filter items based on active category filter tab & query
   const filteredItems = useMemo(() => {
-    if (!query.trim()) return staticRoutes;
-    const lower = query.toLowerCase();
+    const qLower = query.toLowerCase().trim();
+
+    if (!qLower) {
+      if (selectedFilter === "all") return staticRoutes;
+      return staticRoutes.filter((item) => {
+        if (selectedFilter === "Navigation") {
+          return item.category === "Navigation" || item.category === "Theme" || item.category === "Text Size";
+        }
+        return item.category === selectedFilter;
+      });
+    }
+
+    // Static matches for commands / routes
     const staticMatches = staticRoutes.filter((item) => {
-      if (item.title.toLowerCase().includes(lower)) return true;
-      if (item.category.toLowerCase().includes(lower)) return true;
-      if (item.keywords?.some((k) => k.toLowerCase().includes(lower))) return true;
+      if (item.title.toLowerCase().includes(qLower)) return true;
+      if (item.keywords?.some((k) => k.toLowerCase().includes(qLower))) return true;
       return false;
     });
 
-    let testMatches: CommandItem[] = [];
-    if (process.env.NODE_ENV === "test") {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { conceptsDb } = require("@/data");
-        testMatches = (conceptsDb || [])
-          .filter((c: any) => c.term.toLowerCase().includes(lower))
-          .map((c: any) => ({
-            id: `concept-${c.id}`,
-            title: `${c.term} (${c.category})`,
-            category: "Concepts" as const,
-            icon: BookOpen,
-            href: `/concepts?term=${encodeURIComponent(c.term)}`,
-            badge: c.difficulty,
-          }));
-      } catch {}
+    // Combine static matches with dynamic portal search results
+    const combined = [...remoteResults, ...staticMatches];
+
+    // Filter by tab if selected
+    const tabFiltered = combined.filter((item) => {
+      if (selectedFilter === "all") return true;
+      if (selectedFilter === "Guided Track") return item.category === "Guided Track";
+      if (selectedFilter === "Concepts") return item.category === "Concepts";
+      if (selectedFilter === "Q&A Prep") return item.category === "Q&A Prep";
+      if (selectedFilter === "Architecture") return item.category === "Architecture";
+      if (selectedFilter === "Code Practice") {
+        return item.category === "Code Practice" || item.category === "Cheat Sheets";
+      }
+      if (selectedFilter === "Navigation") {
+        return (
+          item.category === "Navigation" ||
+          item.category === "Theme" ||
+          item.category === "Text Size" ||
+          item.category === "Simulators"
+        );
+      }
+      return item.category === selectedFilter;
+    });
+
+    // Deduplicate by id
+    const seen = new Set<string>();
+    const deduplicated: CommandItem[] = [];
+    for (const item of tabFiltered) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        deduplicated.push(item);
+      }
     }
 
-    return [...staticMatches, ...remoteResults, ...testMatches].slice(0, 16);
-  }, [query, staticRoutes, remoteResults]);
+    return deduplicated.slice(0, 30);
+  }, [query, selectedFilter, staticRoutes, remoteResults]);
 
   const handleSelect = useCallback(
     (item: CommandItem) => {
@@ -250,7 +350,7 @@ export function CommandPalette() {
     [router]
   );
 
-  // Keyboard shortcut listener & custom event trigger for mobile
+  // Keyboard shortcut listener & custom event trigger
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -313,7 +413,7 @@ export function CommandPalette() {
         aria-label="Open Command Palette (Cmd/Ctrl+K)"
       >
         <Search size={14} className="text-purple-400 group-hover:rotate-12 transition-transform" />
-        <span>Quick search...</span>
+        <span>Universal Search...</span>
         <KbdShortcut shortcutKey="k" className="px-2 py-0.5 text-purple-300" />
       </button>
     );
@@ -321,40 +421,120 @@ export function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[8vh] sm:pt-[10vh] px-3 sm:px-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) setIsOpen(false);
       }}
       role="dialog"
       aria-modal="true"
-      aria-label="Command Palette"
+      aria-label="Universal Search Command Palette"
     >
       <div
         ref={modalRef}
-        className="w-full max-w-2xl bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="w-full max-w-3xl bg-[var(--surface-1)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[84vh]"
       >
         {/* Search Input Bar */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border)] bg-[var(--surface-2)]">
-          <Search size={18} className="text-purple-400 shrink-0" />
+          <Search size={18} className={cn("text-purple-400 shrink-0", isLoading && "animate-pulse")} />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search concepts, blueprints, simulators, topics, routes (Cmd/Ctrl+K)..."
-            aria-label="Search concepts, blueprints, simulators, topics, and routes"
+            placeholder="Search concepts, questions, architecture, topics (Cmd/Ctrl+K)..."
+            aria-label="Search concepts, questions, architecture, topics, and routes"
             className="flex-1 bg-transparent text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none"
             autoFocus
           />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="p-1 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
           <span className="text-[10px] font-mono px-2 py-1 rounded bg-[var(--surface-3)] text-[var(--muted-foreground)] border border-[var(--border)]">
             ESC
           </span>
         </div>
 
+        {/* Topic Identification Spotlight Card */}
+        {identifiedTopics.length > 0 && (
+          <div className="p-3 bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-950/40 border-b border-purple-500/20">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] font-semibold tracking-wider uppercase text-purple-400 flex items-center gap-1.5">
+                <Sparkles size={12} className="text-purple-400 animate-spin" />
+                Topic Identified
+              </span>
+              <span className="text-[10px] text-purple-300/70 font-mono">Cross-Page Discovery</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {identifiedTopics.map((topic) => (
+                <button
+                  key={topic.key}
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push(topic.href);
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs text-purple-200 transition-all group"
+                >
+                  <span className="text-sm">{topic.icon}</span>
+                  <span className="font-semibold">{topic.label}</span>
+                  <span className="text-[10px] text-purple-300/80 px-1.5 py-0.5 rounded bg-purple-900/60">
+                    {topic.domain}
+                  </span>
+                  <ChevronRight size={13} className="text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Filter Chips Bar */}
+        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-[var(--border)] bg-[var(--surface-1)] overflow-x-auto no-scrollbar text-xs">
+          <Filter size={12} className="text-[var(--muted-foreground)] shrink-0 mr-1" />
+          {FILTER_TABS.map((tab) => {
+            const isActive = selectedFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedFilter(tab.id)}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors",
+                  isActive
+                    ? "bg-purple-600/20 text-purple-300 border border-purple-500/40"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                )}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Cross-Page Result Stats Indicator */}
+        {query && Object.keys(pageCounts).length > 0 && (
+          <div className="px-4 py-1.5 bg-[var(--surface-2)]/50 border-b border-[var(--border)] text-[11px] text-[var(--muted-foreground)] flex items-center justify-between">
+            <span>
+              Found across <strong className="text-[var(--foreground)]">{Object.keys(pageCounts).length}</strong> pages:{" "}
+              {Object.entries(pageCounts)
+                .slice(0, 4)
+                .map(([pg, count]) => `${pg} (${count})`)
+                .join(" · ")}
+            </span>
+            <span className="font-mono">{filteredItems.length} results</span>
+          </div>
+        )}
+
         {/* Results List */}
-        <div className="max-h-[60vh] overflow-y-auto p-2 space-y-1">
+        <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {filteredItems.length === 0 ? (
-            <div className="py-12 text-center text-sm text-[var(--muted-foreground)]">
-              No matching commands or resources found for &ldquo;{query}&rdquo;.
+            <div className="py-14 text-center text-sm text-[var(--muted-foreground)] space-y-2">
+              <div>No matching topics, questions, or resources found for &ldquo;{query}&rdquo;.</div>
+              <div className="text-xs text-[var(--muted-foreground)]/70">
+                Try searching for topic keywords like &ldquo;Spark&rdquo;, &ldquo;Airflow&rdquo;, &ldquo;Delta Lake&rdquo;, &ldquo;dbt&rdquo;, or &ldquo;Fabric&rdquo;.
+              </div>
             </div>
           ) : (
             filteredItems.map((item, index) => {
@@ -366,16 +546,16 @@ export function CommandPalette() {
                   onClick={() => handleSelect(item)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={cn(
-                    "flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl text-left text-sm transition-all",
+                    "flex items-start justify-between w-full px-3.5 py-2.5 rounded-xl text-left text-sm transition-all group",
                     isSelected
-                      ? "bg-purple-600/15 text-purple-300 border border-purple-500/30"
+                      ? "bg-purple-600/15 text-purple-300 border border-purple-500/30 shadow-sm"
                       : "text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-transparent"
                   )}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
                     <div
                       className={cn(
-                        "p-1.5 rounded-lg shrink-0",
+                        "p-2 rounded-lg shrink-0 mt-0.5",
                         isSelected
                           ? "bg-purple-500/20 text-purple-300"
                           : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
@@ -383,15 +563,27 @@ export function CommandPalette() {
                     >
                       <Icon size={16} />
                     </div>
-                    <div className="truncate">
-                      <div className="font-medium truncate">{item.title}</div>
-                      <div className="text-[11px] text-[var(--muted-foreground)]">
-                        {item.category}
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm truncate text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
+                          {item.title}
+                        </span>
+                        {item.page && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--surface-3)] text-[var(--muted-foreground)] border border-[var(--border)] shrink-0">
+                            {item.page}
+                          </span>
+                        )}
                       </div>
+
+                      {item.snippet && (
+                        <p className="text-xs text-[var(--muted-foreground)] line-clamp-1 mt-0.5">
+                          {item.snippet}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                  <div className="flex items-center gap-2 shrink-0 ml-2 mt-1">
                     {item.badge && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-3)] text-[var(--muted-foreground)] border border-[var(--border)]">
                         {item.badge}
@@ -404,7 +596,7 @@ export function CommandPalette() {
                         <Palette size={14} className="text-purple-400 opacity-80" />
                       )
                     ) : (
-                      <ExternalLink size={14} className="text-[var(--muted-foreground)] opacity-50" />
+                      <ExternalLink size={14} className="text-[var(--muted-foreground)] opacity-50 group-hover:opacity-100 transition-opacity" />
                     )}
                   </div>
                 </button>
@@ -414,16 +606,19 @@ export function CommandPalette() {
         </div>
 
         {/* Footer shortcuts helper */}
-        <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface-2)] border-t border-[var(--border)] text-[11px] text-[var(--muted-foreground)]">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-[var(--surface-2)] border-t border-[var(--border)] text-[11px] text-[var(--muted-foreground)]">
           <div className="flex items-center gap-3">
-            <span>
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] font-mono">↑↓</kbd> to navigate
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] font-mono">↑↓</kbd> navigate
             </span>
-            <span>
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] font-mono">↵</kbd> to select
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] font-mono">↵</kbd> open
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] font-mono">ESC</kbd> close
             </span>
           </div>
-          <span>FAANG Learning OS</span>
+          <span className="font-semibold text-purple-400/80">Universal Lakehouse Search Engine</span>
         </div>
       </div>
     </div>

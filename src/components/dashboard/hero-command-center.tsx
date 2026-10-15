@@ -214,10 +214,10 @@ export function HeroCommandCenter() {
               type="button"
               onClick={openSearch}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
-              aria-label="Quick search all questions and concepts"
+              aria-label="Universal search across all topics, questions, architecture and concepts (Cmd/Ctrl+K)"
             >
               <Search size={13} />
-              <span>Quick Search</span>
+              <span>Universal Search</span>
               <KbdShortcut shortcutKey="k" className="hidden sm:inline-flex bg-[var(--surface-3)]" />
             </button>
           </div>
