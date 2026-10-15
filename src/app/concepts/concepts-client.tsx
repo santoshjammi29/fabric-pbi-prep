@@ -291,7 +291,10 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
       });
     },
   });
-  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
+
+  useEffect(() => {
+    virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
+  }, [virtualizer]);
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

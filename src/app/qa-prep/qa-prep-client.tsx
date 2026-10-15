@@ -272,7 +272,10 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
       });
     },
   });
-  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
+
+  useEffect(() => {
+    virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
+  }, [virtualizer]);
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

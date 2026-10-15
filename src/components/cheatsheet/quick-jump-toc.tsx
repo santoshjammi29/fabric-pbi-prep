@@ -60,7 +60,6 @@ export function QuickJumpTOC({
         onClick={() => setIsMinimized(false)}
         title="Click to expand Quick Jump Index"
         aria-label="Quick Jump Index"
-        aria-expanded={false}
         role="region"
       >
         <button
@@ -72,6 +71,7 @@ export function QuickJumpTOC({
           className="p-2 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-105 group-hover:bg-blue-500/20 transition-all cursor-pointer"
           aria-label="Expand Quick Jump Index"
           title="Expand Quick Jump Index"
+          aria-expanded={false}
         >
           <ListTree size={16} />
         </button>
@@ -98,7 +98,6 @@ export function QuickJumpTOC({
     <aside
       className="hidden xl:block w-72 shrink-0 sticky top-24 self-start rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm space-y-4 animate-in fade-in slide-in-from-right-2 duration-150"
       aria-label="Table of Contents"
-      aria-expanded={true}
     >
       <div>
         <div className="flex items-center justify-between pb-3 mb-2 border-b border-[var(--border)] text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
@@ -116,6 +115,7 @@ export function QuickJumpTOC({
               className="p-1 rounded-lg hover:bg-[var(--surface-3)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
               title="Minimize Quick Jump Index"
               aria-label="Minimize Quick Jump Index"
+              aria-expanded={true}
             >
               <ChevronRight size={14} />
             </button>

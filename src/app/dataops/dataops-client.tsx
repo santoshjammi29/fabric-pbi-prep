@@ -446,7 +446,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                             Architectural Interview Defense Soundbite
                           </span>
                           <p className="text-xs text-[var(--foreground)] mt-0.5 leading-relaxed italic">
-                            "{item.interviewDefenseTip}"
+                            &ldquo;{item.interviewDefenseTip}&rdquo;
                           </p>
                         </div>
                       </div>
@@ -833,7 +833,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                 </span>
               </div>
               <p className="text-xs text-[var(--foreground)] leading-relaxed italic pl-6">
-                "{activeStage.interviewExplanationScript}"
+                &ldquo;{activeStage.interviewExplanationScript}&rdquo;
               </p>
             </div>
           </div>
