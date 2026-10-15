@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Python in Databricks Master Cheat Sheet</title>
+<title>Python in Databricks Cheat Sheet</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -22,7 +22,7 @@ body {
   color: #e2e8f0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 7.2px;
-  line-height: 1.25;
+  line-height: 1.28;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -46,7 +46,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #3776AB;
+  border-bottom: 2px solid #3776ab;
   padding-bottom: 3.5px;
   margin-bottom: 4px;
 }
@@ -58,7 +58,7 @@ body {
 }
 
 .header-title-box h1 {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
   letter-spacing: -0.3px;
   color: #ffffff;
@@ -68,7 +68,7 @@ body {
 }
 
 .header-title-box p {
-  font-size: 7.2px;
+  font-size: 7.5px;
   color: #94a3b8;
   font-weight: 500;
 }
@@ -76,11 +76,11 @@ body {
 .header-badges {
   display: flex;
   align-items: center;
-  gap: 3.5px;
+  gap: 4px;
 }
 
 .badge {
-  padding: 1.5px 5.5px;
+  padding: 2px 6px;
   border-radius: 3px;
   font-size: 6.8px;
   font-weight: 700;
@@ -88,7 +88,7 @@ body {
   letter-spacing: 0.3px;
 }
 
-.badge-primary { background: #3776AB; color: #ffffff; }
+.badge-primary { background: #3776ab; color: #ffffff; }
 .badge-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
 .badge-dark { background: #0f172a; color: #a5b4fc; border: 1px solid #1e293b; }
 .badge-accent { background: #10b981; color: #042f2e; }
@@ -98,22 +98,22 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 1fr;
-  gap: 4px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
   margin-bottom: 3px;
 }
 
 .card {
   background: #0f172a;
   border: 1px solid #1e293b;
-  border-radius: 4px;
-  padding: 4px 5.5px;
+  border-radius: 5px;
+  padding: 4.5px 6.5px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 2px;
   overflow: hidden;
+  height: 100%;
 }
 
 .card-header {
@@ -121,23 +121,24 @@ body {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #1e293b;
-  padding-bottom: 2px;
+  padding-bottom: 2.5px;
+  margin-bottom: 1px;
 }
 
 .card-title {
-  font-size: 8.2px;
+  font-size: 8.8px;
   font-weight: 700;
-  color: #60A5FA;
+  color: #38bdf8;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .card-tag {
-  font-size: 6.2px;
+  font-size: 6.4px;
   background: #1e293b;
   color: #94a3b8;
-  padding: 1px 3px;
+  padding: 1.5px 4px;
   border-radius: 2px;
   font-weight: 600;
 }
@@ -147,10 +148,10 @@ pre.code {
   background: #040711;
   border: 1px solid #141e33;
   border-radius: 3px;
-  padding: 3px 4.5px;
+  padding: 3px 5px;
   font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
-  font-size: 6.5px;
-  line-height: 1.22;
+  font-size: 6.6px;
+  line-height: 1.24;
   color: #e2e8f0;
   overflow: hidden;
   white-space: pre-wrap;
@@ -167,15 +168,78 @@ pre.code {
 .var { color: #a78bfa; }                     /* variables */
 .typ { color: #facc15; }                     /* SQL types */
 
+/* Code Explanation Section (Below Every Code Block) */
+.code-explain {
+  background: rgba(4, 7, 17, 0.75);
+  border: 1px solid #1a253c;
+  border-left: 2px solid #3776ab;
+  border-radius: 3px;
+  padding: 3px 5px;
+  font-size: 6.5px;
+  line-height: 1.25;
+  color: #cbd5e1;
+}
+
+.explain-head {
+  font-size: 6.2px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.explain-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8px;
+}
+
+.explain-list li {
+  position: relative;
+  padding-left: 7px;
+  font-size: 6.4px;
+  line-height: 1.24;
+  color: #cbd5e1;
+}
+
+.explain-list li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: #3776ab;
+  font-weight: bold;
+  font-size: 7.5px;
+}
+
+.explain-list li b {
+  color: #f8fafc;
+}
+
+.explain-list li code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  font-size: 6.1px;
+  background: #141e33;
+  padding: 0.5px 2px;
+  border-radius: 2px;
+}
+
 /* Callout Alert Boxes */
 .alert {
-  padding: 2px 3.5px;
-  border-radius: 2px;
+  padding: 2.5px 4.5px;
+  border-radius: 3px;
   font-size: 6.5px;
   display: flex;
   align-items: flex-start;
   gap: 3.5px;
-  line-height: 1.18;
+  line-height: 1.2;
 }
 
 .alert-tip {
@@ -202,65 +266,6 @@ pre.code {
   color: #e9d5ff;
 }
 
-/* Mini Tables */
-.mini-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 6.5px;
-  margin: 1px 0;
-}
-
-.mini-table th {
-  text-align: left;
-  background: #141e33;
-  color: #94a3b8;
-  padding: 1.5px 3px;
-  font-weight: 600;
-  border-bottom: 1px solid #1e293b;
-}
-
-.mini-table td {
-  padding: 1.2px 3px;
-  border-bottom: 1px solid #141e33;
-  color: #cbd5e1;
-}
-
-.mini-table tr:last-child td {
-  border-bottom: none;
-}
-
-.mini-table code {
-  font-family: 'JetBrains Mono', monospace;
-  color: #38bdf8;
-  font-size: 6.2px;
-}
-
-/* Bullet list */
-ul.rules-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2px;
-}
-
-ul.rules-list li {
-  font-size: 6.5px;
-  position: relative;
-  padding-left: 6.5px;
-  color: #cbd5e1;
-  line-height: 1.18;
-}
-
-ul.rules-list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #3776AB;
-  font-weight: bold;
-}
-
 /* Footer */
 .page-footer {
   border-top: 1px solid #1e293b;
@@ -268,7 +273,7 @@ ul.rules-list li::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 6.5px;
+  font-size: 6.8px;
   color: #64748b;
 }
 
@@ -304,107 +309,139 @@ ul.rules-list li::before {
     </div>
 
     <div class="content-grid">
-      <!-- Card 1: Databricks Utilities (dbutils) Master Reference -->
+      <!-- Card 1: dbutils Reference -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🧰 Databricks Utilities (dbutils) Master Reference</span>
-          <span class="card-tag">dbutils</span>
+          <span class="card-title">🧰 dbutils Master Reference (fs, secrets, notebook)</span>
+          <span class="card-tag">Databricks Utilities</span>
         </div>
-        <pre class="code"><span class="cm"># 1. File System (dbutils.fs) & Volumes</span>
-<span class="var">dbutils</span>.fs.ls(<span class="str">"/Volumes/prod/finance/raw_files/"</span>)
-<span class="var">dbutils</span>.fs.cp(<span class="str">"abfss://landing@adls.dfs.core.windows.net/data.csv"</span>,
-              <span class="str">"/Volumes/prod/finance/raw_files/"</span>, recurse=<span class="kw">True</span>)
-<span class="var">dbutils</span>.fs.rm(<span class="str">"/tmp/scratch/"</span>, recurse=<span class="kw">True</span>)
-<span class="var">dbutils</span>.fs.put(<span class="str">"/tmp/config.json"</span>, <span class="str">'{"env":"prod"}'</span>, overwrite=<span class="kw">True</span>)
+        <pre class="code"><span class="cm"># 1. File System Operations (Cloud Storage Navigation)</span>
+<span class="var">files</span> = <span class="var">dbutils</span>.fs.ls(<span class="str">"/Volumes/prod_catalog/raw_landing/"</span>)
+<span class="var">dbutils</span>.fs.mv(<span class="str">"/tmp/source.csv"</span>, <span class="str">"/mnt/datalake/destination.csv"</span>)
 
-<span class="cm"># 2. Secrets & Azure Key Vault</span>
-<span class="var">secret_token</span> = <span class="var">dbutils</span>.secrets.get(scope=<span class="str">"akv-scope"</span>, key=<span class="str">"storage-key"</span>)
-<span class="var">scopes</span> = <span class="var">dbutils</span>.secrets.listScopes()
+<span class="cm"># 2. Secret Management (Azure Key Vault / AWS Secrets Manager)</span>
+<span class="var">api_token</span> = <span class="var">dbutils</span>.secrets.get(scope=<span class="str">"kv_fin_prod"</span>, key=<span class="str">"payment_gateway_key"</span>)
 
-<span class="cm"># 3. Notebook Workflows</span>
-<span class="var">res</span> = <span class="var">dbutils</span>.notebook.run(<span class="str">"sub_pipeline"</span>, timeout_seconds=<span class="num">1800</span>,
-                           arguments={"batch_id": "101"})
-<span class="var">dbutils</span>.notebook.exit(<span class="str">"SUCCESS: 154000 records processed"</span>)
+<span class="cm"># 3. Parameterized Widgets (Pass arguments to notebooks)</span>
+<span class="var">dbutils</span>.widgets.text(<span class="str">"env"</span>, <span class="str">"prod"</span>, <span class="str">"Environment"</span>)
+<span class="var">current_env</span> = <span class="var">dbutils</span>.widgets.get(<span class="str">"env"</span>)
 
-<span class="cm"># 4. Interactive Widgets</span>
-<span class="var">dbutils</span>.widgets.text(<span class="str">"env"</span>, <span class="str">"dev"</span>, <span class="str">"Target Environment"</span>)
-<span class="var">env_val</span> = <span class="var">dbutils</span>.widgets.get(<span class="str">"env"</span>)</pre>
+<span class="cm"># 4. Notebook Workflow Orchestration & Parameter Passing</span>
+<span class="var">result</span> = <span class="var">dbutils</span>.notebook.run(<span class="str">"sub_etl"</span>, timeout_seconds=<span class="num">1800</span>, arguments={<span class="str">"batch_id"</span>: <span class="str">"102"</span>})
+<span class="var">dbutils</span>.notebook.exit(<span class="str">'{"status": "SUCCESS", "records": 45000}'</span>)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>dbutils.fs:</b> Interacts directly with ADLS/S3 storage drivers, abstracting distributed cloud credentials and API calls.</li>
+            <li><b>dbutils.secrets.get():</b> Redacts sensitive API keys and database credentials automatically from notebook outputs and cluster logs.</li>
+            <li><b>dbutils.widgets:</b> Injects runtime parameters into notebook cells from Airflow, Azure Data Factory, or Databricks Workflows.</li>
+            <li><b>dbutils.notebook.exit():</b> Serializes structured JSON return payloads back to parent workflow orchestrators.</li>
+          </ul>
+        </div>
+        <div class="alert alert-sec">
+          🔒 <b>Security Hardening:</b> Never hardcode secrets in notebooks; always configure Unity Catalog Secret Scopes with Key Vault backing.
+        </div>
       </div>
 
-      <!-- Card 2: Delta Live Tables (DLT) Python Framework -->
+      <!-- Card 2: Delta Live Tables (DLT) -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🏗️ Delta Live Tables (DLT) Declarative Pipelines</span>
-          <span class="card-tag">DLT</span>
+          <span class="card-title">🧱 Delta Live Tables (DLT) Declarative Pipelines</span>
+          <span class="card-tag">Declarative ETL</span>
         </div>
         <pre class="code"><span class="kw">import</span> dlt
-<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> <span class="cls">F</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, expr
 
-<span class="cm"># Streaming Ingestion Table</span>
 <span class="kw">@dlt.table</span>(
-    name=<span class="str">"bronze_txns"</span>,
-    comment=<span class="str">"Raw transaction stream"</span>,
-    table_properties={"quality": "bronze"}
+    name=<span class="str">"bronze_raw_txns"</span>,
+    comment=<span class="str">"Raw incremental streaming transactions"</span>
 )
 <span class="kw">def</span> bronze_txns():
     <span class="kw">return</span> (<span class="var">spark</span>.readStream.format(<span class="str">"cloudFiles"</span>)
             .option(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
-            .load(<span class="str">"abfss://landing@adls.dfs.core.windows.net/txns/"</span>))
+            .load(<span class="str">"/Volumes/prod/raw/txns"</span>))
 
-<span class="cm"># Silver Table with Data Quality Expectations</span>
-<span class="kw">@dlt.table</span>(comment=<span class="str">"Validated transactions"</span>)
-<span class="kw">@dlt.expect_or_drop</span>(<span class="str">"valid_id"</span>, <span class="str">"txn_id IS NOT NULL"</span>)
-<span class="kw">@dlt.expect_or_fail</span>(<span class="str">"valid_amt"</span>, <span class="str">"amount &gt; 0.0"</span>)
+<span class="kw">@dlt.table</span>(name=<span class="str">"silver_clean_txns"</span>)
+<span class="kw">@dlt.expect_or_drop</span>(<span class="str">"valid_amount"</span>, <span class="str">"amount &gt; 0"</span>)
+<span class="kw">@dlt.expect_or_fail</span>(<span class="str">"valid_id"</span>, <span class="str">"txn_id IS NOT NULL"</span>)
 <span class="kw">def</span> silver_txns():
-    <span class="kw">return</span> <span class="var">dlt</span>.read_stream(<span class="str">"bronze_txns"</span>).filter(<span class="cls">F</span>.col(<span class="str">"status"</span>) != <span class="str">"REJECT"</span>)</pre>
-        <div class="alert alert-tip">
-          💡 <b>DLT Expectations:</b> <code>expect</code> (logs metric), <code>expect_or_drop</code> (drops bad rows), <code>expect_or_fail</code> (fails pipeline on violation).
+    <span class="kw">return</span> <span class="var">dlt</span>.read_stream(<span class="str">"bronze_raw_txns"</span>).filter(col(<span class="str">"status"</span>) == <span class="str">"SETTLED"</span>)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>@dlt.table:</b> Declares a managed Delta table; DLT constructs the global DAG dependency graph and manages cluster provisioning.</li>
+            <li><b>dlt.read_stream():</b> Binds streaming table dependencies, propagating schema changes and updates through the Medallion architecture.</li>
+            <li><b>@dlt.expect_or_drop:</b> Enforces data quality rules; drops invalid rows while recording violation metrics in the pipeline event log.</li>
+            <li><b>@dlt.expect_or_fail:</b> Halts pipeline execution immediately if critical schema or business invariants are breached.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Serverless DLT:</b> Serverless DLT pipelines eliminate cluster spin-up time and dynamically allocate compute as streaming queues fluctuate.
         </div>
       </div>
 
-      <!-- Card 3: Change Data Capture (CDC) with dlt.apply_changes -->
+      <!-- Card 3: Streaming CDC with dlt.apply_changes() -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🔄 CDC Ingestion with dlt.apply_changes()</span>
-          <span class="card-tag">SCD Type 1 & 2</span>
+          <span class="card-title">🔄 Streaming CDC with dlt.apply_changes() (SCD 1 & 2)</span>
+          <span class="card-tag">Change Data Capture</span>
         </div>
         <pre class="code"><span class="kw">import</span> dlt
 
-<span class="cm"># Automatic SCD Type 2 History Tracking</span>
-<span class="var">dlt</span>.create_streaming_table(<span class="str">"gold_customers_scd2"</span>)
+<span class="cm"># Declare destination streaming table</span>
+<span class="var">dlt</span>.create_streaming_table(<span class="str">"silver_dim_customers"</span>)
 
+<span class="cm"># Turnkey Slowly Changing Dimension (SCD Type 2)</span>
 <span class="var">dlt</span>.apply_changes(
-    target=<span class="str">"gold_customers_scd2"</span>,
-    source=<span class="str">"silver_customer_cdc"</span>,
+    target=<span class="str">"silver_dim_customers"</span>,
+    source=<span class="str">"bronze_cdc_customers"</span>,
     keys=[<span class="str">"customer_id"</span>],
-    sequence_by=<span class="str">"updated_timestamp"</span>,
-    apply_as_deletes=<span class="str">"operation = 'DELETE'"</span>,
-    except_column_list=[<span class="str">"operation"</span>],
-    stored_as_scd_type=<span class="num">2</span> <span class="cm"># Auto creates __START_AT and __END_AT</span>
+    sequence_by=<span class="str">"operation_timestamp"</span>,
+    apply_as_deletes=col(<span class="str">"op_type"</span>) == <span class="str">"D"</span>,
+    except_column_list=[<span class="str">"op_type"</span>, <span class="str">"ingested_at"</span>],
+    stored_as_scd_type=<span class="num">2</span> <span class="cm"># 1 = In-Place Overwrite; 2 = Historical Tracking</span>
 )</pre>
-        <ul class="rules-list">
-          <li><code>stored_as_scd_type=1</code> overwrites records in place (latest snapshot).</li>
-          <li><code>stored_as_scd_type=2</code> manages effective date ranges and active flags out-of-the-box!</li>
-        </ul>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>dlt.apply_changes():</b> Native declarative CDC engine supporting out-of-order Debezium / Fivetran / Oracle GoldenGate events.</li>
+            <li><b>sequence_by:</b> Monotonic sequence key or timestamp ensuring out-of-order CDC packets are resolved deterministically.</li>
+            <li><b>stored_as_scd_type=2:</b> Automatically maintains validity tracking columns: <code>__START_AT</code>, <code>__END_AT</code>, and active flags.</li>
+            <li><b>apply_as_deletes:</b> Evaluates soft or hard delete operations, setting <code>__END_AT</code> without physically corrupting history.</li>
+          </ul>
+        </div>
+        <div class="alert alert-tip">
+          💡 <b>SCD Type 1 vs 2:</b> Use SCD 1 for current-state lookup dimensions; use SCD 2 for point-in-time compliance and financial audits.
+        </div>
       </div>
 
-      <!-- Card 4: pandas API on Spark (ps) -->
+      <!-- Card 4: Pandas API on Spark -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🐼 pandas API on Spark (pyspark.pandas)</span>
-          <span class="card-tag">Scale pandas</span>
+          <span class="card-title">🐼 Pandas API on Spark (pyspark.pandas as ps)</span>
+          <span class="card-tag">Distributed Pandas</span>
         </div>
         <pre class="code"><span class="kw">import</span> pyspark.pandas <span class="kw">as</span> ps
 
-<span class="cm"># Read distributed data using familiar pandas syntax</span>
-<span class="var">psdf</span> = <span class="var">ps</span>.read_parquet(<span class="str">"abfss://gold@adls.../sales/"</span>)
+<span class="cm"># 100% Pandas Syntax executed across distributed Spark Cluster!</span>
+<span class="var">psdf</span> = <span class="var">ps</span>.read_parquet(<span class="str">"abfss://silver@adls.dfs.core.windows.net/orders"</span>)
 
-<span class="cm"># Distributed GroupBy & Summary Aggregations</span>
-<span class="var">summary</span> = <span class="var">psdf</span>.groupby(<span class="str">"country"</span>)[<span class="str">"revenue"</span>].agg([<span class="str">"mean"</span>, <span class="str">"sum"</span>, <span class="str">"count"</span>])
+<span class="cm"># High-level analytical calculations with no PySpark boilerplate</span>
+<span class="var">psdf</span>[<span class="str">"tax"</span>] = <span class="var">psdf</span>[<span class="str">"amount"</span>] * <span class="num">0.18</span>
+<span class="var">summary</span> = <span class="var">psdf</span>.groupby(<span class="str">"region"</span>)[<span class="str">"amount"</span>].agg([<span class="str">"mean"</span>, <span class="str">"sum"</span>, <span class="str">"std"</span>])
 
 <span class="cm"># Seamless Two-Way Conversion</span>
 <span class="var">spark_df</span> = <span class="var">psdf</span>.to_spark()
 <span class="var">ps_df_again</span> = <span class="var">spark_df</span>.to_pandas_on_spark()</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Distributed Pandas:</b> Translates standard Pandas method invocations directly into distributed Spark Catalyst query execution plans.</li>
+            <li><b>No Driver Memory Limit:</b> Unlike native Pandas, data remains distributed across worker executor memory; processes 100GB+ seamlessly.</li>
+            <li><b>to_spark() / to_pandas_on_spark():</b> Zero-copy conversion between PySpark DataFrames and Pandas-on-Spark representations.</li>
+            <li><b>Index Management:</b> Uses default distributed indexing; avoid setting sequential range indexes on huge datasets to prevent sorting shuffles.</li>
+          </ul>
+        </div>
         <div class="alert alert-warn">
           ⚠️ <b>Anti-Pattern:</b> Avoid calling <code>.to_pandas()</code> or <code>.iloc</code> on large DataFrames as it pulls all distributed data into driver RAM, risking OOM!
         </div>
@@ -427,6 +464,15 @@ ul.rules-list li::before {
 <span class="var">w</span> = <span class="cls">WorkspaceClient</span>()
 <span class="var">run</span> = <span class="var">w</span>.jobs.run_now(job_id=<span class="num">892145</span>)
 <span class="var">clusters</span> = <span class="var">w</span>.clusters.list()</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Databricks Connect v2:</b> Built on the open-source Spark Connect protocol; local Python code runs thin clients over secure gRPC to remote clusters.</li>
+            <li><b>Local IDE Debugging:</b> Set breakpoints in VS Code or PyCharm, step through code interactively, and execute against production cluster data.</li>
+            <li><b>WorkspaceClient:</b> Official SDK managing all Databricks REST API endpoints: Jobs, Clusters, Unity Catalog, Warehouses, and Secrets.</li>
+            <li><b>Unified Authentication:</b> Automatically resolves credentials from environment variables (<code>DATABRICKS_HOST</code>, <code>DATABRICKS_TOKEN</code>) or Azure CLI.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
           💡 <b>Thin Client:</b> Databricks Connect v2 sends unresolved DataFrame plans via gRPC; execution runs entirely on the remote Databricks cluster.
         </div>
@@ -438,15 +484,27 @@ ul.rules-list li::before {
           <span class="card-title">🪄 Databricks Magic Commands & Scoping</span>
           <span class="card-tag">Notebook Magic</span>
         </div>
-        <table class="mini-table">
-          <tr><th>Magic</th><th>Language / Action</th><th>Behavior & Scope</th></tr>
-          <tr><td><code>%python</code></td><td>Python 3</td><td>Default language; shares local variables across notebook cells</td></tr>
-          <tr><td><code>%sql</code></td><td>Spark SQL</td><td>Executes SQL query; accessible via <code>_sqldf</code> DataFrame</td></tr>
-          <tr><td><code>%sh</code></td><td>Bash Shell</td><td>Runs bash on the driver node container</td></tr>
-          <tr><td><code>%fs</code></td><td>Databricks FS</td><td>Shorthand for <code>dbutils.fs</code> (e.g. <code>%fs ls /Volumes</code>)</td></tr>
-          <tr><td><code>%pip</code></td><td>pip install</td><td>Installs library scoped to the current notebook session only</td></tr>
-          <tr><td><code>%run</code></td><td>Sub-notebook</td><td>Executes another notebook in-line and inherits all its variables</td></tr>
-        </table>
+        <pre class="code"><span class="cm"># 1. SQL Magic & Accessing Results in Python</span>
+<span class="kw">%sql</span>
+<span class="kw">SELECT</span> customer_id, <span class="fn">SUM</span>(amount) <span class="kw">AS</span> total <span class="kw">FROM</span> silver.orders <span class="kw">GROUP BY</span> customer_id
+
+<span class="cm"># Access SQL query output in next Python cell:</span>
+<span class="var">sql_df</span> = <span class="var">_sqldf</span>.filter(<span class="str">"total &gt; 5000"</span>)
+
+<span class="cm"># 2. Ephemeral Environment Setup</span>
+<span class="kw">%pip install</span> pydantic==<span class="num">2.8.2</span> tenacity==<span class="num">8.4.1</span>
+
+<span class="cm"># 3. Modular File Execution</span>
+<span class="kw">%run</span> ./common_utilities_notebook</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>%sql & _sqldf:</b> Running a <code>%sql</code> cell automatically binds the output DataFrame to the <code>_sqldf</code> variable in downstream Python cells.</li>
+            <li><b>%pip:</b> Installs isolated dependencies onto the cluster driver and worker environments for the duration of the notebook session only.</li>
+            <li><b>%run:</b> Executes external shared notebooks in-line, inheriting functions, imports, and variables directly into the current notebook session.</li>
+            <li><b>%sh & %fs:</b> Executes bash commands inside the driver container and navigates storage volumes via command-line utilities.</li>
+          </ul>
+        </div>
         <div class="alert alert-sec">
           🔒 <b>%run vs dbutils.notebook.run:</b> <code>%run</code> shares memory & variables in the same session; <code>dbutils.notebook.run</code> executes in an isolated ephemeral job context.
         </div>
@@ -497,6 +555,15 @@ ul.rules-list li::before {
 <span class="cm"># Import modular reusable package in notebook</span>
 <span class="kw">from</span> my_etl.transformers <span class="kw">import</span> BankingNormalizer
 <span class="var">normalizer</span> = BankingNormalizer(currency=<span class="str">"EUR"</span>)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Unity Catalog Volumes:</b> Governed storage locations in cloud storage supporting file-level RBAC, audit logging, and binary package versioning.</li>
+            <li><b>Custom Wheels (.whl):</b> Package enterprise business logic into modular Python wheels to enforce automated CI/CD unit testing and release tagging.</li>
+            <li><b>Cluster Libraries:</b> Attach volume paths to cluster configurations or Job task dependencies to pre-install packages across worker nodes.</li>
+            <li><b>Zero DBFS Root:</b> Completely replaces insecure legacy DBFS root paths with enterprise-governed Unity Catalog storage locations.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
           💡 <b>Volumes for Libraries:</b> Replacing legacy DBFS root with Unity Catalog Volumes ensures strict access control and auditing for third-party binary artifacts.
         </div>
@@ -523,17 +590,23 @@ targets:
 resources:
   jobs:
     nightly_settlement:
-      name: "[prod] Nightly Settlement Job"
+      name: <span class="str">"[prod] Nightly Settlement Job"</span>
       tasks:
         - task_key: run_dlt
           pipeline_task:
             pipeline_id: 489a-bc12-dlt-id</pre>
-        <table class="mini-table">
-          <tr><th>CLI Command</th><th>Action</th></tr>
-          <tr><td><code>databricks bundle validate</code></td><td>Lints and verifies bundle syntax</td></tr>
-          <tr><td><code>databricks bundle deploy -t prod</code></td><td>Deploys resources to target workspace</td></tr>
-          <tr><td><code>databricks bundle run nightly_settlement</code></td><td>Executes workflow immediately</td></tr>
-        </table>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Infrastructure-as-Code (IaC):</b> Declaratively defines Databricks workflows, notebooks, DLT pipelines, and permissions in source-controlled YAML.</li>
+            <li><b>Multi-Environment:</b> <code>targets: dev / prod</code> abstracts workspace host URLs and cluster settings, enabling clean promotion across stages.</li>
+            <li><b>CLI Commands:</b> <code>databricks bundle validate</code> (linting), <code>bundle deploy -t prod</code> (deployment), and <code>bundle run</code> (execution).</li>
+            <li><b>GitHub Actions / Azure DevOps:</b> Integrates directly into CI/CD runners using service principals without manual workspace UI clicking.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Modern DevOps:</b> Databricks Asset Bundles (DABs) are the standard for deploying enterprise data engineering projects in 2025/2026.
+        </div>
       </div>
 
       <!-- Card 9: Structured Logging & Observability -->
@@ -551,16 +624,28 @@ resources:
 
     <span class="kw">def</span> log_event(<span class="var">self</span>, event_name: str, records: int, duration_sec: float):
         payload = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "pipeline": self.name,
-            "event": event_name,
-            "records_processed": records,
-            "duration_sec": duration_sec
+            <span class="str">"timestamp"</span>: datetime.utcnow().isoformat(),
+            <span class="str">"pipeline"</span>: <span class="var">self</span>.name,
+            <span class="str">"event"</span>: event_name,
+            <span class="str">"records_processed"</span>: records,
+            <span class="str">"duration_sec"</span>: duration_sec
         }
-        print(json.dumps(payload)) <span class="cm"># Ingested into Azure Log Analytics</span>
+        <span class="fn">print</span>(json.dumps(payload)) <span class="cm"># Ingested into Azure Log Analytics</span>
 
 <span class="var">audit</span> = StructuredPipelineLogger(<span class="str">"SEPA_Payment_Processor"</span>)
 <span class="var">audit</span>.log_event(<span class="str">"STAGE_COMPLETED"</span>, records=<span class="num">845000</span>, duration_sec=<span class="num">14.2</span>)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Single-Line JSON:</b> Emitting serialized JSON to standard stdout ensures cloud observability scrapers (Datadog, Splunk, Azure Log Analytics) parse attributes automatically.</li>
+            <li><b>Metrics Tracking:</b> Records throughput metrics, processing duration, and stage identifiers for SLI/SLA compliance monitoring.</li>
+            <li><b>Distributed Driver Scoping:</b> Instantiated on the driver node to capture macro-level stage completions and pipeline milestones.</li>
+            <li><b>Alerting Triggers:</b> Enables automated incident triggers when duration spikes above historical 95th percentile thresholds.</li>
+          </ul>
+        </div>
+        <div class="alert alert-sec">
+          🔒 <b>Enterprise Standard:</b> Standardized JSON logging links cluster run IDs and pipeline commits directly into enterprise monitoring dashboards.
+        </div>
       </div>
 
       <!-- Card 10: Concurrency, API Ingestion & Retries -->
@@ -574,12 +659,23 @@ resources:
 
 <span class="kw">@retry</span>(stop=stop_after_attempt(<span class="num">3</span>), wait=wait_exponential(multiplier=<span class="num">1</span>, min=<span class="num">2</span>, max=<span class="num">10</span>))
 <span class="kw">def</span> fetch_api_page(page_id: int) -&gt; dict:
-    <span class="cm"># Resilient REST API caller</span>
-    <span class="kw">return</span> {"page": page_id, "data": [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]}
+    <span class="cm"># Resilient REST API caller with exponential backoff</span>
+    <span class="kw">return</span> {<span class="str">"page"</span>: page_id, <span class="str">"data"</span>: [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]}
 
-<span class="cm"># Parallelize lightweight API calls on Driver before Spark processing</span>
+<span class="cm"># Parallelize lightweight I/O on Driver before Spark processing</span>
 <span class="kw">with</span> ThreadPoolExecutor(max_workers=<span class="num">8</span>) <span class="kw">as</span> executor:
-    <span class="var">results</span> = list(executor.map(fetch_api_page, range(<span class="num">1</span>, <span class="num">50</span>)))</pre>
+    <span class="var">results</span> = list(executor.map(fetch_api_page, range(<span class="num">1</span>, <span class="num">50</span>)))
+
+<span class="var">df_api</span> = <span class="var">spark</span>.createDataFrame(<span class="var">results</span>)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Driver Multithreading:</b> Uses Python <code>ThreadPoolExecutor</code> on the driver node to parallelize I/O-bound REST API web requests efficiently.</li>
+            <li><b>tenacity @retry:</b> Catches transient HTTP 429 rate-limiting and 503 gateway timeout exceptions, backing off exponentially before retrying.</li>
+            <li><b>createDataFrame():</b> Converts accumulated JSON page dictionaries into a distributed PySpark DataFrame across worker executors.</li>
+            <li><b>Separation of Concerns:</b> Use Python threads for I/O fetching; use Spark distributed partitions for data transformations and writes.</li>
+          </ul>
+        </div>
         <div class="alert alert-perf">
           ⚡ <b>Thread Concurrency:</b> Use Python <code>ThreadPoolExecutor</code> on the driver for I/O-bound REST calls, then parallelize the dataset with <code>spark.createDataFrame()</code>.
         </div>
@@ -599,12 +695,21 @@ resources:
     primary_key: str,
     business_rule: Callable[[Column], Column]
 ) -&gt; DataFrame:
-    <span class="kw">assert</span> primary_key <span class="kw">in</span> df.columns, f"Missing required key: {primary_key}"
+    <span class="cm"># Pre-flight contract validation</span>
+    <span class="kw">assert</span> primary_key <span class="kw">in</span> df.columns, f<span class="str">"Missing required key: {primary_key}"</span>
     <span class="kw">return</span> df.filter(business_rule(df[primary_key]))</pre>
-        <ul class="rules-list">
-          <li>Enforce PEP 484 type hints across modular libraries.</li>
-          <li>Pre-flight assertions catch schema mismatch errors in milliseconds before distributed stages start.</li>
-        </ul>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>PEP 484 Typing:</b> Explicitly annotates PySpark DataFrames, Columns, and function callables to enable static type analysis with <code>mypy</code>.</li>
+            <li><b>Pre-Flight Assertions:</b> Validates input schemas before submitting heavy distributed compute jobs, failing in 10ms instead of 2 hours later.</li>
+            <li><b>Higher-Order Parameterization:</b> Accepts Column lambda functions (<code>Callable[[Column], Column]</code>) for modular rule composition.</li>
+            <li><b>Documentation Integrity:</b> Serves as self-documenting code contracts across enterprise data engineering squads.</li>
+          </ul>
+        </div>
+        <div class="alert alert-tip">
+          💡 <b>Fail Fast:</b> Pre-flight contract validation prevents pipelines from burning expensive compute hours on downstream schema errors.
+        </div>
       </div>
 
       <!-- Card 12: Unit Testing PySpark Pipelines in CI/CD -->
@@ -626,8 +731,17 @@ resources:
     result_df = input_df.filter(<span class="str">"status = 'ACTIVE'"</span>)
     <span class="cm"># Spark 3.5+ built-in test assertion</span>
     assertDataFrameEqual(result_df, expected_df)</pre>
-        <div class="alert alert-tip">
-          💡 <b>pyspark.testing:</b> Use <code>assertDataFrameEqual</code> and <code>assertSchemaEqual</code> in pytest to validate transformations without third-party libraries.
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>assertDataFrameEqual:</b> Built into PySpark 3.5+; compares distributed DataFrames, ignoring row ordering and providing detailed schema diffs.</li>
+            <li><b>Tolerance Support:</b> Supports <code>atol</code> and <code>rtol</code> arguments to accommodate floating-point precision differences across environments.</li>
+            <li><b>Zero External Dependencies:</b> Eliminates third-party test libraries (e.g. <code>chispa</code>), simplifying GitHub Actions / Azure DevOps CI runners.</li>
+            <li><b>Pytest Fixtures:</b> Pass a shared session-scoped <code>spark</code> fixture to run unit test suites locally in under 5 seconds.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>CI/CD Speed:</b> Run PySpark unit tests using local mode (<code>local[2]</code>) in CI runners to validate logic prior to deploying Asset Bundles.
         </div>
       </div>
     </div>

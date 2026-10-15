@@ -47,26 +47,26 @@
     display: flex;
     flex-direction: column;
   }
-  .card:hover { transform: translateY(-4px); border-color: #38bdf8; }
-  .card-img-wrapper {
-    background: #030712;
-    height: 220px;
+  .card:hover { transform: translateY(-3px); border-color: #38bdf8; }
+  .card-img-wrap {
+    height: 180px;
     overflow: hidden;
-    position: relative;
+    background: #040711;
     border-bottom: 1px solid #1e293b;
+    position: relative;
   }
-  .card-img-wrapper img {
+  .card-img-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: top;
+    object-position: top center;
     transition: transform 0.3s;
   }
-  .card:hover .card-img-wrapper img { transform: scale(1.03); }
+  .card:hover .card-img-wrap img { transform: scale(1.03); }
   .card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-  .card-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .card-desc { font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 15px; }
-  .card-actions { display: flex; gap: 8px; }
+  .card-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 16px; }
+  .card-actions { display: flex; gap: 10px; }
   .btn {
     flex: 1;
     text-align: center;
@@ -78,116 +78,124 @@
     transition: background 0.2s;
   }
   .btn-primary { background: #ff3621; color: #fff; }
-  .btn-primary:hover { background: #e02e1b; }
-  .btn-secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+  .btn-primary:hover { background: #e02f1d; }
+  .btn-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
   .btn-secondary:hover { background: #334155; }
 
-  .mega-banner {
-    background: linear-gradient(135deg, #1e1e2f, #111827);
-    border: 1px solid #3b82f6;
-    border-radius: 8px;
-    padding: 25px;
+  .master-banner {
+    background: linear-gradient(135deg, rgba(255, 54, 33, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%);
+    border: 1px solid rgba(255, 54, 33, 0.3);
+    border-radius: 12px;
+    padding: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
   }
-  .mega-banner h2 { font-size: 20px; color: #fff; margin-bottom: 6px; }
-  .mega-banner p { font-size: 13px; color: #94a3b8; }
+  .master-info h2 { font-size: 20px; color: #fff; margin-bottom: 6px; }
+  .master-info p { color: #94a3b8; font-size: 13px; max-width: 650px; }
+  .master-btn { background: #ff3621; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; }
+  .master-btn:hover { background: #e02f1d; }
+
+  footer { text-align: center; color: #64748b; font-size: 12px; margin-top: 50px; border-top: 1px solid #1e293b; padding-top: 20px; }
 </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>DATABRICKS DEVELOPER & ARCHITECT CHEAT SHEETS</h1>
-      <p>High-Density Executive Reference Guides for Spark SQL, PySpark, Spark Core & Python in Databricks</p>
-      <div class="badges">
-        <span class="badge badge-orange">Santosh Jammi | Principal Data Architect</span>
-        <span class="badge">DBR 15.4 / 16.0 LTS</span>
-        <span class="badge">Photon Engine</span>
-        <span class="badge">Unity Catalog</span>
-      </div>
-    </header>
+<div class="container">
+  <header>
+    <h1>Databricks Architecture & Coding Cheat Sheets Hub</h1>
+    <p>High-Density Production Reference Manuals for Principal Data Architects & Senior Engineers</p>
+    <div class="badges">
+      <span class="badge badge-orange">Databricks 15.4 / 16.0 LTS</span>
+      <span class="badge">Unity Catalog 3-Level Namespace</span>
+      <span class="badge">Photon C++ Engine</span>
+      <span class="badge">Delta Lake 3.x ACID</span>
+    </div>
+  </header>
 
-    <div class="mega-banner">
-      <div>
-        <h2>📚 Master Databricks Complete 8-Page Mega Cheat Sheet</h2>
-        <p>The unified all-in-one edition combining Spark SQL, PySpark, Spark Core & Python into a single comprehensive PDF & panoramic posters.</p>
+  <div class="master-banner">
+    <div class="master-info">
+      <h2>📘 Databricks Master Unified Cheat Sheet (8-Page Manual)</h2>
+      <p>All four domains bound into a single comprehensive, print-ready document with high-density code blocks, detailed mechanics explanations, and performance tuning rules.</p>
+    </div>
+    <a href="../pdf/databricks_master_cheatsheet.pdf" download class="master-btn">Download Master PDF (8 Pages)</a>
+  </div>
+
+  <div class="grid">
+    <!-- Card 1: Spark SQL -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <a href="../images/databricks_sparksql_poster.png" target="_blank"><img src="../images/databricks_sparksql_page_1.png" alt="Spark SQL Cheat Sheet"></a>
       </div>
-      <div>
-        <a href="../pdf/databricks_master_cheatsheet.pdf" target="_blank" class="btn btn-primary" style="padding: 10px 20px;">Download Master PDF</a>
+      <div class="card-body">
+        <div>
+          <div class="card-title">⚡ Spark SQL</div>
+          <div class="card-desc">12 Cards: DDL, Liquid Clustering, Delta MERGE INTO, QUALIFY Deduplication, Higher-Order Functions, Row Filters & Tuning.</div>
+        </div>
+        <div class="card-actions">
+          <a href="../pdf/databricks_sparksql_cheatsheet.pdf" download class="btn btn-primary">PDF (2 Pages)</a>
+          <a href="../images/databricks_sparksql_poster.png" target="_blank" class="btn btn-secondary">Wall Poster</a>
+        </div>
       </div>
     </div>
 
-    <div class="grid">
-      <!-- 1. Spark SQL -->
-      <div class="card">
-        <div class="card-img-wrapper">
-          <img src="../images/databricks_sparksql_page_1.png" alt="Spark SQL Cheat Sheet">
+    <!-- Card 2: PySpark -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <a href="../images/databricks_pyspark_poster.png" target="_blank"><img src="../images/databricks_pyspark_page_1.png" alt="PySpark Cheat Sheet"></a>
+      </div>
+      <div class="card-body">
+        <div>
+          <div class="card-title">⚡ PySpark DataFrame API</div>
+          <div class="card-desc">12 Cards: Strict Schemas, Standard Functions, Broadcast & Salting, Delta API, Auto Loader Streaming & Arrow UDFs.</div>
         </div>
-        <div class="card-body">
-          <div>
-            <h3 class="card-title">⚡ Spark SQL Cheat Sheet</h3>
-            <p class="card-desc">Unity Catalog 3-level namespace, Liquid Clustering, Delta Lake MERGE INTO, Time Travel, Windowing, QUALIFY deduplication, PIVOT & Row Filters.</p>
-          </div>
-          <div class="card-actions">
-            <a href="../pdf/databricks_sparksql_cheatsheet.pdf" target="_blank" class="btn btn-primary">PDF (2 Pages)</a>
-            <a href="../images/databricks_sparksql_poster.png" target="_blank" class="btn btn-secondary">Poster Image</a>
-          </div>
+        <div class="card-actions">
+          <a href="../pdf/databricks_pyspark_cheatsheet.pdf" download class="btn btn-primary">PDF (2 Pages)</a>
+          <a href="../images/databricks_pyspark_poster.png" target="_blank" class="btn btn-secondary">Wall Poster</a>
         </div>
       </div>
+    </div>
 
-      <!-- 2. PySpark -->
-      <div class="card">
-        <div class="card-img-wrapper">
-          <img src="../images/databricks_pyspark_page_1.png" alt="PySpark Cheat Sheet">
+    <!-- Card 3: Spark Core -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <a href="../images/databricks_spark_core_poster.png" target="_blank"><img src="../images/databricks_spark_core_page_1.png" alt="Spark Core Cheat Sheet"></a>
+      </div>
+      <div class="card-body">
+        <div>
+          <div class="card-title">⚙️ Spark Core & Architecture</div>
+          <div class="card-desc">12 Cards: Topography, JVM Unified Memory, Shuffle Spill, Catalyst Optimizer, Cluster Sizing Formula, Photon & AQE.</div>
         </div>
-        <div class="card-body">
-          <div>
-            <h3 class="card-title">🔥 PySpark Cheat Sheet</h3>
-            <p class="card-desc">DataFrame APIs, strict schemas (StructType), functions (F), Broadcast Joins, Skew Salting, DeltaTable API, Auto Loader Streaming & foreachBatch.</p>
-          </div>
-          <div class="card-actions">
-            <a href="../pdf/databricks_pyspark_cheatsheet.pdf" target="_blank" class="btn btn-primary">PDF (2 Pages)</a>
-            <a href="../images/databricks_pyspark_poster.png" target="_blank" class="btn btn-secondary">Poster Image</a>
-          </div>
+        <div class="card-actions">
+          <a href="../pdf/databricks_spark_core_cheatsheet.pdf" download class="btn btn-primary">PDF (2 Pages)</a>
+          <a href="../images/databricks_spark_core_poster.png" target="_blank" class="btn btn-secondary">Wall Poster</a>
         </div>
       </div>
+    </div>
 
-      <!-- 3. Spark Core -->
-      <div class="card">
-        <div class="card-img-wrapper">
-          <img src="../images/databricks_spark_core_page_1.png" alt="Spark Core Cheat Sheet">
-        </div>
-        <div class="card-body">
-          <div>
-            <h3 class="card-title">⚙️ Spark Core & Architecture</h3>
-            <p class="card-desc">Cluster Topology, JVM Memory Allocation, Shuffles & Spills, Catalyst Pipeline, Whole-Stage CodeGen, Photon C++, Sizing Math & Spark UI Triage.</p>
-          </div>
-          <div class="card-actions">
-            <a href="../pdf/databricks_spark_core_cheatsheet.pdf" target="_blank" class="btn btn-primary">PDF (2 Pages)</a>
-            <a href="../images/databricks_spark_core_poster.png" target="_blank" class="btn btn-secondary">Poster Image</a>
-          </div>
-        </div>
+    <!-- Card 4: Python in Databricks -->
+    <div class="card">
+      <div class="card-img-wrap">
+        <a href="../images/databricks_python_poster.png" target="_blank"><img src="../images/databricks_python_page_1.png" alt="Python in Databricks Cheat Sheet"></a>
       </div>
-
-      <!-- 4. Python in Databricks -->
-      <div class="card">
-        <div class="card-img-wrapper">
-          <img src="../images/databricks_python_page_1.png" alt="Python Cheat Sheet">
+      <div class="card-body">
+        <div>
+          <div class="card-title">🐍 Python in Databricks</div>
+          <div class="card-desc">12 Cards: DBUtils, Delta Live Tables (DLT), CDC apply_changes, Pandas on Spark, DABs CI/CD & Unit Testing.</div>
         </div>
-        <div class="card-body">
-          <div>
-            <h3 class="card-title">🐍 Python in Databricks</h3>
-            <p class="card-desc">DBUtils (fs, secrets, notebook, widgets), Delta Live Tables (DLT) & CDC, pandas on Spark, Magic Commands, DABs CI/CD, Observability & Pytest.</p>
-          </div>
-          <div class="card-actions">
-            <a href="../pdf/databricks_python_cheatsheet.pdf" target="_blank" class="btn btn-primary">PDF (2 Pages)</a>
-            <a href="../images/databricks_python_poster.png" target="_blank" class="btn btn-secondary">Poster Image</a>
-          </div>
+        <div class="card-actions">
+          <a href="../pdf/databricks_python_cheatsheet.pdf" download class="btn btn-primary">PDF (2 Pages)</a>
+          <a href="../images/databricks_python_poster.png" target="_blank" class="btn btn-secondary">Wall Poster</a>
         </div>
       </div>
     </div>
   </div>
+
+  <footer>
+    <p>Generated by Santosh Jammi | Principal Data Architect • Databricks Production Series 2026</p>
+  </footer>
+</div>
 </body>
 </html>

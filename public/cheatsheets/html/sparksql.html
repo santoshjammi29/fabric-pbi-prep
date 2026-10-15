@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Databricks Spark SQL Ultimate Cheat Sheet</title>
+<title>Databricks Spark SQL Cheat Sheet</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -22,7 +22,7 @@ body {
   color: #e2e8f0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 7.2px;
-  line-height: 1.25;
+  line-height: 1.28;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -46,7 +46,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #00A3E0;
+  border-bottom: 2px solid #ff3621;
   padding-bottom: 3.5px;
   margin-bottom: 4px;
 }
@@ -58,7 +58,7 @@ body {
 }
 
 .header-title-box h1 {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
   letter-spacing: -0.3px;
   color: #ffffff;
@@ -68,7 +68,7 @@ body {
 }
 
 .header-title-box p {
-  font-size: 7.2px;
+  font-size: 7.5px;
   color: #94a3b8;
   font-weight: 500;
 }
@@ -76,11 +76,11 @@ body {
 .header-badges {
   display: flex;
   align-items: center;
-  gap: 3.5px;
+  gap: 4px;
 }
 
 .badge {
-  padding: 1.5px 5.5px;
+  padding: 2px 6px;
   border-radius: 3px;
   font-size: 6.8px;
   font-weight: 700;
@@ -88,7 +88,7 @@ body {
   letter-spacing: 0.3px;
 }
 
-.badge-primary { background: #00A3E0; color: #ffffff; }
+.badge-primary { background: #ff3621; color: #ffffff; }
 .badge-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
 .badge-dark { background: #0f172a; color: #a5b4fc; border: 1px solid #1e293b; }
 .badge-accent { background: #10b981; color: #042f2e; }
@@ -98,22 +98,22 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 1fr;
-  gap: 4px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
   margin-bottom: 3px;
 }
 
 .card {
   background: #0f172a;
   border: 1px solid #1e293b;
-  border-radius: 4px;
-  padding: 4px 5.5px;
+  border-radius: 5px;
+  padding: 4.5px 6.5px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 2px;
   overflow: hidden;
+  height: 100%;
 }
 
 .card-header {
@@ -121,23 +121,24 @@ body {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #1e293b;
-  padding-bottom: 2px;
+  padding-bottom: 2.5px;
+  margin-bottom: 1px;
 }
 
 .card-title {
-  font-size: 8.2px;
+  font-size: 8.8px;
   font-weight: 700;
-  color: #38BDF8;
+  color: #38bdf8;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .card-tag {
-  font-size: 6.2px;
+  font-size: 6.4px;
   background: #1e293b;
   color: #94a3b8;
-  padding: 1px 3px;
+  padding: 1.5px 4px;
   border-radius: 2px;
   font-weight: 600;
 }
@@ -147,10 +148,10 @@ pre.code {
   background: #040711;
   border: 1px solid #141e33;
   border-radius: 3px;
-  padding: 3px 4.5px;
+  padding: 3px 5px;
   font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
-  font-size: 6.5px;
-  line-height: 1.22;
+  font-size: 6.6px;
+  line-height: 1.24;
   color: #e2e8f0;
   overflow: hidden;
   white-space: pre-wrap;
@@ -167,15 +168,78 @@ pre.code {
 .var { color: #a78bfa; }                     /* variables */
 .typ { color: #facc15; }                     /* SQL types */
 
+/* Code Explanation Section (Below Every Code Block) */
+.code-explain {
+  background: rgba(4, 7, 17, 0.75);
+  border: 1px solid #1a253c;
+  border-left: 2px solid #ff3621;
+  border-radius: 3px;
+  padding: 3px 5px;
+  font-size: 6.5px;
+  line-height: 1.25;
+  color: #cbd5e1;
+}
+
+.explain-head {
+  font-size: 6.2px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.explain-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8px;
+}
+
+.explain-list li {
+  position: relative;
+  padding-left: 7px;
+  font-size: 6.4px;
+  line-height: 1.24;
+  color: #cbd5e1;
+}
+
+.explain-list li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: #ff3621;
+  font-weight: bold;
+  font-size: 7.5px;
+}
+
+.explain-list li b {
+  color: #f8fafc;
+}
+
+.explain-list li code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  font-size: 6.1px;
+  background: #141e33;
+  padding: 0.5px 2px;
+  border-radius: 2px;
+}
+
 /* Callout Alert Boxes */
 .alert {
-  padding: 2px 3.5px;
-  border-radius: 2px;
+  padding: 2.5px 4.5px;
+  border-radius: 3px;
   font-size: 6.5px;
   display: flex;
   align-items: flex-start;
   gap: 3.5px;
-  line-height: 1.18;
+  line-height: 1.2;
 }
 
 .alert-tip {
@@ -202,65 +266,6 @@ pre.code {
   color: #e9d5ff;
 }
 
-/* Mini Tables */
-.mini-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 6.5px;
-  margin: 1px 0;
-}
-
-.mini-table th {
-  text-align: left;
-  background: #141e33;
-  color: #94a3b8;
-  padding: 1.5px 3px;
-  font-weight: 600;
-  border-bottom: 1px solid #1e293b;
-}
-
-.mini-table td {
-  padding: 1.2px 3px;
-  border-bottom: 1px solid #141e33;
-  color: #cbd5e1;
-}
-
-.mini-table tr:last-child td {
-  border-bottom: none;
-}
-
-.mini-table code {
-  font-family: 'JetBrains Mono', monospace;
-  color: #38bdf8;
-  font-size: 6.2px;
-}
-
-/* Bullet list */
-ul.rules-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2px;
-}
-
-ul.rules-list li {
-  font-size: 6.5px;
-  position: relative;
-  padding-left: 6.5px;
-  color: #cbd5e1;
-  line-height: 1.18;
-}
-
-ul.rules-list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #00A3E0;
-  font-weight: bold;
-}
-
 /* Footer */
 .page-footer {
   border-top: 1px solid #1e293b;
@@ -268,7 +273,7 @@ ul.rules-list li::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 6.5px;
+  font-size: 6.8px;
   color: #64748b;
 }
 
@@ -324,12 +329,20 @@ ul.rules-list li::before {
   txn_date <span class="typ">DATE</span>
 ) <span class="kw">USING DELTA CLUSTER BY</span> (txn_date, customer_id);
 
-<span class="cm">-- Zero-Copy Shallow Clone (instant pointer for dev/staging)</span>
+<span class="cm">-- Clones: Zero-copy pointer vs physical backup</span>
 <span class="kw">CREATE TABLE</span> dev_txns <span class="kw">SHALLOW CLONE</span> transactions;
-<span class="cm">-- Deep Clone (full independent storage copy for DR/backup)</span>
 <span class="kw">CREATE TABLE</span> dr_backup <span class="kw">DEEP CLONE</span> transactions;</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Liquid Clustering:</b> <code>CLUSTER BY (txn_date, customer_id)</code> groups data dynamically without rigid Hive directory trees, completely eliminating file fragmentation and partition skew.</li>
+            <li><b>Identity Sequences:</b> <code>BIGINT GENERATED ALWAYS AS IDENTITY</code> guarantees gapless monotonically increasing primary keys coordinated by the Delta ACID commit log.</li>
+            <li><b>Managed Storage:</b> <code>MANAGED LOCATION</code> grants Unity Catalog full lifecycle control over underlying ADLS Gen2 blob files; table drop purges storage automatically.</li>
+            <li><b>Zero-Copy Clone:</b> <code>SHALLOW CLONE</code> creates an instantaneous metadata-only pointer to Parquet data for dev/QA with 0 storage duplication; <code>DEEP CLONE</code> copies all physical bytes for DR.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
-          💡 <b>Liquid Clustering:</b> Avoids small-file skew, supports mutable keys, and re-clusters incrementally without full partition rewrites.
+          💡 <b>Architecture Rule:</b> Liquid clustering replaces Z-Order and static partitions. Cluster keys can be evolved at runtime without costly data restructurings.
         </div>
       </div>
 
@@ -355,8 +368,17 @@ ul.rules-list li::before {
           <span class="fn">current_timestamp</span>(), <span class="fn">current_timestamp</span>())
 <span class="kw">WHEN NOT MATCHED BY SOURCE AND</span> target.status = <span class="str">'ACTIVE'</span> <span class="kw">THEN</span>
   <span class="kw">UPDATE SET</span> target.status = <span class="str">'INACTIVE'</span>;</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Match Predicate:</b> <code>ON target.customer_id = source.customer_id</code> uses Delta min/max file statistics to prune non-matching Parquet files prior to shuffle join.</li>
+            <li><b>Delta Change Detection:</b> <code>target.hash_diff != source.hash_diff</code> prevents rewriting unchanged records, minimizing write amplification and storage I/O.</li>
+            <li><b>Soft Deletes:</b> <code>WHEN NOT MATCHED BY SOURCE</code> handles orphan target records in a single ACID commit, deprecating inactive rows without separate sweeps.</li>
+            <li><b>ACID Commit:</b> Writes new Parquet files with updated records and atomically logs file removals in the Delta transaction log <code>_delta_log/</code>.</li>
+          </ul>
+        </div>
         <div class="alert alert-perf">
-          ⚡ <b>Performance:</b> Always provide deterministic partition or cluster keys in the <code>ON</code> clause to enable Delta Dynamic File Pruning (DFP).
+          ⚡ <b>Performance:</b> Always cluster or Z-Order target tables by the MERGE join key to activate Dynamic File Pruning (DFP).
         </div>
       </div>
 
@@ -377,6 +399,15 @@ ul.rules-list li::before {
 
 <span class="cm">-- Collect CBO statistics for adaptive join planning</span>
 <span class="kw">ANALYZE TABLE</span> silver.transactions <span class="kw">COMPUTE STATISTICS FOR ALL COLUMNS</span>;</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>OPTIMIZE:</b> Bin-packs fragmented small files generated by streaming or concurrent writes into uniform ~1GB files, slashing cloud storage API read costs.</li>
+            <li><b>Z-ORDER BY:</b> Interleaves high-cardinality column bits using Hilbert curves, enabling massive file skipping during query predicate evaluation.</li>
+            <li><b>VACUUM RETAIN 168 HOURS:</b> Deletes orphaned physical Parquet files committed before the retention window, reclaiming storage without breaking concurrent queries.</li>
+            <li><b>ANALYZE TABLE:</b> Computes column cardinalities, null counts, and size metrics for Catalyst Cost-Based Optimization (CBO) and join reordering.</li>
+          </ul>
+        </div>
         <div class="alert alert-warn">
           ⚠️ <b>Vacuum Caution:</b> Never set retention &lt; 168 hours in production. Vacuuming 0 hours breaks concurrent active readers and invalidates time travel.
         </div>
@@ -400,10 +431,18 @@ ul.rules-list li::before {
 
 <span class="cm">-- Inspect full commit history & user audit trail</span>
 <span class="kw">DESCRIBE HISTORY</span> silver.transactions <span class="kw">LIMIT</span> <span class="num">10</span>;</pre>
-        <ul class="rules-list">
-          <li><code>DESCRIBE HISTORY</code> records exact user, notebook ID, cluster ID, and metrics.</li>
-          <li><code>RESTORE TABLE</code> takes milliseconds — updates Delta transaction log pointer.</li>
-        </ul>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>VERSION / TIMESTAMP AS OF:</b> Instructs the Delta reader to evaluate transaction log commit entries backward to the exact transaction ID requested.</li>
+            <li><b>RESTORE TABLE:</b> Executes instantaneous metadata rollback in under 1 second by creating a new forward commit pointing to prior file manifests.</li>
+            <li><b>DESCRIBE HISTORY:</b> Exposes granular operational telemetry including user identities, cluster IDs, job triggers, isolation levels, and write metrics.</li>
+            <li><b>Storage Safety:</b> Historical snapshots read preserved older Parquet files directly; no physical backups need to be unpacked or downloaded.</li>
+          </ul>
+        </div>
+        <div class="alert alert-sec">
+          🔒 <b>Auditability:</b> Delta time travel is guaranteed up to the VACUUM retention threshold. Use for reproducibility in regulatory reporting.
+        </div>
       </div>
 
       <!-- Card 5: Common Table Expressions & Set Operations -->
@@ -425,8 +464,17 @@ top_spenders <span class="kw">AS</span> (
 <span class="kw">SELECT</span> customer_id, region, amount <span class="kw">FROM</span> silver.manual_overrides
 <span class="kw">EXCEPT DISTINCT</span>
 <span class="kw">SELECT</span> customer_id, region, amount <span class="kw">FROM</span> silver.fraud_blacklist;</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Chained CTEs:</b> Modularizes complex analytical subqueries; Catalyst inlines CTE expressions into an unified execution plan without materialization.</li>
+            <li><b>DENSE_RANK():</b> Assigns consecutive rank integers across partition boundaries without gaps, ideal for top-N ranking per region.</li>
+            <li><b>UNION ALL:</b> Appends datasets without triggering an expensive distributed shuffle deduplication stage.</li>
+            <li><b>EXCEPT DISTINCT:</b> Computes set difference by executing a left anti-join under the hood, purging fraudulent IDs efficiently.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
-          💡 <b>Recursive CTE:</b> Use <code>WITH RECURSIVE</code> to traverse bill-of-materials or organizational hierarchies in a single SQL pass.
+          💡 <b>Catalyst Optimization:</b> Predicates applied after CTE definitions (e.g. <code>rk &lt;= 10</code>) are automatically pushed down to limit window processing.
         </div>
       </div>
 
@@ -452,8 +500,17 @@ top_spenders <span class="kw">AS</span> (
 <span class="kw">CREATE OR REPLACE TABLE</span> gold.customer_metrics <span class="kw">AS</span>
 <span class="kw">SELECT</span> customer_id, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> orders, <span class="fn">SUM</span>(amount) <span class="kw">AS</span> ltv
 <span class="kw">FROM</span> silver.orders_cleansed <span class="kw">GROUP BY</span> customer_id;</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>QUALIFY Clause:</b> Filters windowed calculations directly in the projection, replacing convoluted <code>SELECT * FROM (SELECT ..., ROW_NUMBER() ...) WHERE rn=1</code> subqueries.</li>
+            <li><b>Metadata Columns:</b> <code>_metadata.file_modification_time</code> retrieves file write timestamps directly from cloud storage headers without schema overhead.</li>
+            <li><b>Idempotent Deduplication:</b> Partitions by business key and orders by timestamp, ensuring late-arriving updates overwrite older state deterministically.</li>
+            <li><b>Gold Aggregation:</b> Pre-aggregates high-cardinality metrics for low-latency BI dashboards and Power BI Direct Lake consumption.</li>
+          </ul>
+        </div>
         <div class="alert alert-perf">
-          ⚡ <b>QUALIFY Clause:</b> Replaces expensive <code>SELECT * FROM (SELECT ..., ROW_NUMBER() ...) WHERE rn=1</code> subqueries cleanly!
+          ⚡ <b>Engine Performance:</b> QUALIFY enables Catalyst to execute top-1 window pruning during physical execution, reducing shuffle data transfer by up to 90%.
         </div>
       </div>
     </div>
@@ -506,6 +563,15 @@ top_spenders <span class="kw">AS</span> (
     <span class="kw">RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>) <span class="kw">AS</span> ytd_sum
 <span class="kw">FROM</span> silver.transactions
 <span class="kw">WINDOW</span> w_acct <span class="kw">AS</span> (<span class="kw">PARTITION BY</span> customer_id);</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Named Window:</b> <code>WINDOW w_acct AS (...)</code> defines reusable window specifications across multiple expressions, eliminating redundant partition declarations.</li>
+            <li><b>LAG / LEAD:</b> Offsets row values in constant time without self-joins; default fallback value handles edge null conditions gracefully.</li>
+            <li><b>ROWS vs RANGE:</b> <code>ROWS BETWEEN</code> operates on physical row offsets; <code>RANGE BETWEEN</code> operates on logical value boundaries (e.g. timestamps/dates).</li>
+            <li><b>Execution Plan:</b> Windowing routes through a single <code>WindowExec</code> physical operator; sorting occurs locally within partition boundaries.</li>
+          </ul>
+        </div>
         <div class="alert alert-perf">
           ⚡ <b>Pro Tip:</b> If source data is clustered/sorted by the window partition key, Catalyst executes windowing without any network shuffle!
         </div>
@@ -514,7 +580,7 @@ top_spenders <span class="kw">AS</span> (
       <!-- Card 8: Complex Types & Semi-Structured Data -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🧩 Complex Types: Structs, Arrays & JSON</span>
+          <span class="card-title">🧩 Complex Types: Structs, Arrays & Maps</span>
           <span class="card-tag">Semi-Structured</span>
         </div>
         <pre class="code"><span class="cm">-- Struct navigation, Array slicing, Map lookup</span>
@@ -532,10 +598,18 @@ top_spenders <span class="kw">AS</span> (
 <span class="kw">SELECT</span> order_id, item.sku, item.qty, item.unit_price
 <span class="kw">FROM</span> silver.orders
 <span class="kw">LATERAL VIEW EXPLODE</span>(line_items) lv <span class="kw">AS</span> item;</pre>
-        <ul class="rules-list">
-          <li><code>LATERAL VIEW OUTER EXPLODE</code> preserves rows with empty/null arrays.</li>
-          <li><code>schema_of_json()</code> dynamically extracts schema from a sample JSON string.</li>
-        </ul>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Struct & Map Navigation:</b> Dot syntax (<code>payload.user.id</code>) and bracket notation (<code>attributes['tier']</code>) access nested schema attributes with zero JSON parsing overhead.</li>
+            <li><b>from_json():</b> Parses stringified JSON into strongly-typed Catalyst native representations in C++ Photon; enables column pruning on individual fields.</li>
+            <li><b>named_struct() & to_json():</b> Dynamically generates composite structs and encodes them to compressed JSON payloads for egress streaming.</li>
+            <li><b>LATERAL VIEW EXPLODE:</b> Unrolls multi-valued array elements into multiple relational rows; use <code>EXPLODE_OUTER</code> to retain rows with null or empty arrays.</li>
+          </ul>
+        </div>
+        <div class="alert alert-tip">
+          💡 <b>Storage Recommendation:</b> Store semi-structured payloads as native Parquet STRUCTs to achieve column pruning and 10x faster query scans.
+        </div>
       </div>
 
       <!-- Card 9: Higher-Order Functions (Vectorized) -->
@@ -560,8 +634,17 @@ top_spenders <span class="kw">AS</span> (
   <span class="fn">AGGREGATE</span>(line_items, <span class="num">0.0</span>, (acc, x) -&gt; acc + x.price,
             acc -&gt; <span class="fn">ROUND</span>(acc, <span class="num">2</span>)) <span class="kw">AS</span> total_order_sum
 <span class="kw">FROM</span> silver.orders;</pre>
-        <div class="alert alert-tip">
-          💡 <b>Architect Rule:</b> Higher-Order functions run entirely in memory inside Tungsten/Photon C++ without row explosion or shuffle overhead.
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>TRANSFORM(arr, x -> ...):</b> Applies inline lambda transformations directly to elements inside nested arrays without exploding to intermediate rows.</li>
+            <li><b>FILTER(arr, x -> ...):</b> Prunes array elements matching the boolean condition entirely in-memory within CPU cache lines.</li>
+            <li><b>EXISTS(arr, x -> ...):</b> Performs fast short-circuit boolean evaluation, terminating the scan as soon as the first matching element is detected.</li>
+            <li><b>AGGREGATE(arr, zero, (acc, x) -> ..., finish):</b> Folds array elements into a scalar summary value, operating identically to functional fold/reduce.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          🚀 <b>Vectorized Speed:</b> Higher-Order functions run in CPU registers inside Tungsten/Photon C++, avoiding Java object allocations and row explosion shuffles.
         </div>
       </div>
 
@@ -573,69 +656,98 @@ top_spenders <span class="kw">AS</span> (
         </div>
         <pre class="code"><span class="cm">-- 1. Column Masking (Mask card PAN unless in finance)</span>
 <span class="kw">CREATE OR REPLACE FUNCTION</span> mask_card_pan(pan <span class="typ">STRING</span>)
-<span class="kw">RETURN IF</span>(<span class="fn">IS_ACCOUNT_GROUP_MEMBER</span>(<span class="str">'pci_auditors'</span>), pan,
-          <span class="fn">CONCAT</span>(<span class="str">'****-****-****-'</span>, <span class="fn">RIGHT</span>(pan, <span class="num">4</span>)));
+<span class="kw">RETURN CASE</span>
+  <span class="kw">WHEN</span> <span class="fn">is_account_group_member</span>(<span class="str">'finance_compliance'</span>) <span class="kw">THEN</span> pan
+  <span class="kw">ELSE</span> <span class="fn">CONCAT</span>(<span class="str">'****-****-****-'</span>, <span class="fn">RIGHT</span>(pan, <span class="num">4</span>))
+<span class="kw">END</span>;
 
-<span class="kw">ALTER TABLE</span> silver.payments
-<span class="kw">ALTER COLUMN</span> card_pan <span class="kw">SET MASK</span> mask_card_pan;
+<span class="kw">ALTER TABLE</span> silver.payments <span class="kw">ALTER COLUMN</span> card_number <span class="kw">SET MASK</span> mask_card_pan;
 
-<span class="cm">-- 2. Row Filtering (Regional multi-tenant isolation)</span>
-<span class="kw">CREATE OR REPLACE FUNCTION</span> filter_by_region(region <span class="typ">STRING</span>)
-<span class="kw">RETURN</span> <span class="fn">IS_ACCOUNT_GROUP_MEMBER</span>(<span class="str">'global_admin'</span>) <span class="kw">OR</span> region = <span class="fn">current_user</span>();
+<span class="cm">-- 2. Row Filtering (Multi-Tenant isolation)</span>
+<span class="kw">CREATE OR REPLACE FUNCTION</span> filter_regional_tenants(region <span class="typ">STRING</span>)
+<span class="kw">RETURN</span> <span class="fn">is_account_group_member</span>(<span class="str">'global_admin'</span>) <span class="kw">OR</span> region = <span class="fn">current_user</span>();
 
-<span class="kw">ALTER TABLE</span> silver.sales
-<span class="kw">SET ROW FILTER</span> filter_by_region <span class="kw">ON</span> (region);</pre>
+<span class="kw">ALTER TABLE</span> silver.payments <span class="kw">SET ROW FILTER</span> filter_regional_tenants <span class="kw">ON</span> (region);</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>SET MASK:</b> Enforces deterministic column-level data redaction in Unity Catalog; non-privileged roles view only masked suffixes across all query tools.</li>
+            <li><b>SET ROW FILTER:</b> Injects an invisible dynamic SQL predicate into every downstream query plan, guaranteeing multi-tenant data segregation.</li>
+            <li><b>is_account_group_member():</b> Checks SCIM/Entra ID directory group memberships in real time during query parsing.</li>
+            <li><b>Zero-Copy Security:</b> Security rules execute at the engine level without creating duplicate physical views or filtered tables.</li>
+          </ul>
+        </div>
         <div class="alert alert-sec">
-          🔒 <b>Fine-Grained Security:</b> Applied transparently at storage read-time for BI, SQL, Python, and R without maintaining separate secure views.
+          🔒 <b>Universal Governance:</b> Row filters and masks apply uniformly across SQL, PySpark, Power BI Direct Lake, and Databricks SQL Warehouses.
         </div>
       </div>
 
-      <!-- Card 11: PIVOT, UNPIVOT & Multi-Dimensional Grouping -->
+      <!-- Card 11: Dynamic Pivot, Unpivot & Grouping Sets -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🔄 PIVOT, UNPIVOT & Grouping Sets</span>
-          <span class="card-tag">Transformations</span>
+          <span class="card-title">🔄 Dynamic Pivot, Unpivot & Grouping Sets</span>
+          <span class="card-tag">Dimensional Modeling</span>
         </div>
-        <pre class="code"><span class="cm">-- PIVOT: Rotate row values into columnar KPIs</span>
+        <pre class="code"><span class="cm">-- Dynamic Pivot (Row categories to columnar metrics)</span>
 <span class="kw">SELECT</span> * <span class="kw">FROM</span> (
-  <span class="kw">SELECT</span> region, quarter, revenue <span class="kw">FROM</span> silver.sales
+  <span class="kw">SELECT</span> region, product_category, revenue <span class="kw">FROM</span> silver.sales
 ) <span class="kw">PIVOT</span> (
-  <span class="fn">SUM</span>(revenue) <span class="kw">FOR</span> quarter <span class="kw">IN</span> (<span class="str">'Q1'</span>, <span class="str">'Q2'</span>, <span class="str">'Q3'</span>, <span class="str">'Q4'</span>)
+  <span class="fn">SUM</span>(revenue) <span class="kw">FOR</span> product_category <span class="kw">IN</span> (
+    <span class="str">'Hardware'</span> <span class="kw">AS</span> hw, <span class="str">'Cloud'</span> <span class="kw">AS</span> cloud, <span class="str">'Services'</span> <span class="kw">AS</span> svc
+  )
 );
 
-<span class="cm">-- UNPIVOT: Rotate columnar metrics into tidy rows</span>
-<span class="kw">SELECT</span> * <span class="kw">FROM</span> silver.quarterly_kpis
-<span class="kw">UNPIVOT</span> (revenue <span class="kw">FOR</span> qtr <span class="kw">IN</span> (q1, q2, q3, q4));
+<span class="cm">-- Unpivot (Columnar metrics back to normalized rows)</span>
+<span class="kw">SELECT</span> region, category, revenue <span class="kw">FROM</span> silver.pivoted_sales
+<span class="kw">UNPIVOT</span> (revenue <span class="kw">FOR</span> category <span class="kw">IN</span> (hw, cloud, svc));
 
-<span class="cm">-- CUBE & ROLLUP: Multi-level executive aggregation</span>
-<span class="kw">SELECT</span> region, product, <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> total
-<span class="kw">FROM</span> silver.sales <span class="kw">GROUP BY ROLLUP</span> (region, product);</pre>
+<span class="cm">-- Multi-Dimensional Subtotals with CUBE</span>
+<span class="kw">SELECT</span> region, product, <span class="fn">SUM</span>(revenue) <span class="kw">FROM</span> silver.sales
+<span class="kw">GROUP BY CUBE</span>(region, product);</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>PIVOT:</b> Aggregates categorical dimension keys into horizontal columns in a single scan without chained conditional statements.</li>
+            <li><b>UNPIVOT:</b> Normalizes denormalized spreadsheet-style columns back into transactional rows suitable for dimensional modeling.</li>
+            <li><b>GROUP BY CUBE:</b> Computes all $2^N$ grouping permutations in a single pass: <code>(region, product)</code>, <code>(region)</code>, <code>(product)</code>, and Grand Total <code>()</code>.</li>
+            <li><b>Performance Note:</b> Explicitly supplying the <code>IN (...)</code> list avoids an expensive pre-aggregation scan to discover unique keys.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
-          💡 <b>ROLLUP vs CUBE:</b> <code>ROLLUP</code> produces hierarchical subtotals (Country &gt; State &gt; City); <code>CUBE</code> computes all 2^N combinations.
+          💡 <b>CUBE vs ROLLUP:</b> <code>CUBE</code> generates all combinatorial cross-product subtotals; <code>ROLLUP</code> generates strictly hierarchical rollups.
         </div>
       </div>
 
-      <!-- Card 12: Performance Hints & Spark SQL Engine Knobs -->
+      <!-- Card 12: Performance Hints & Configuration Knobs -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🚀 Join Strategy Hints & Session Performance Configuration</span>
-          <span class="card-tag">Engine Tuning</span>
+          <span class="card-title">⚡ Spark SQL Performance Hints & Config Knobs</span>
+          <span class="card-tag">Tuning & FinOps</span>
         </div>
-        <pre class="code"><span class="cm">-- Optimizer Join Hints</span>
-<span class="kw">SELECT</span> <span class="cm">/*+ BROADCAST(dim_cat) */</span>
-  f.txn_id, f.amount, dim_cat.category_name
-<span class="kw">FROM</span> silver.fact_sales f
-<span class="kw">JOIN</span> silver.dim_category dim_cat <span class="kw">ON</span> f.category_id = dim_cat.id;
+        <pre class="code"><span class="cm">-- Join & Skew Optimization Hints</span>
+<span class="kw">SELECT</span> <span class="cm">/*+ BROADCAST(dim), SKEW('fact', 'cust_id') */</span>
+  fact.order_id, fact.amount, dim.category_name
+<span class="kw">FROM</span> silver.orders fact
+<span class="kw">JOIN</span> silver.categories dim <span class="kw">ON</span> fact.cat_id = dim.cat_id;
 
-<span class="cm">-- Force Shuffle Hash Join</span>
-<span class="kw">SELECT</span> <span class="cm">/*+ SHUFFLE_HASH(orders) */</span> *
-<span class="kw">FROM</span> orders <span class="kw">JOIN</span> returns <span class="kw">ON</span> orders.id = returns.id;</pre>
-        <table class="mini-table">
-          <tr><th>Knob</th><th>Setting</th><th>Impact</th></tr>
-          <tr><td><code>spark.sql.shuffle.partitions</code></td><td><code>auto</code></td><td>Enables AQE dynamic partition sizing</td></tr>
-          <tr><td><code>spark.sql.adaptive.enabled</code></td><td><code>true</code></td><td>Runtime join re-planning & skew split</td></tr>
-          <tr><td><code>spark.databricks.delta.optimizeWrite.enabled</code></td><td><code>true</code></td><td>Pre-shuffle writes to prevent small files</td></tr>
-        </table>
+<span class="cm">-- Production Performance Session Knobs</span>
+<span class="kw">SET</span> spark.sql.shuffle.partitions = auto;
+<span class="kw">SET</span> spark.sql.adaptive.enabled = <span class="kw">true</span>;
+<span class="kw">SET</span> spark.sql.files.maxPartitionBytes = <span class="num">134217728</span>; <span class="cm">-- 128 MB</span>
+<span class="kw">SET</span> spark.databricks.delta.optimizeWrite.enabled = <span class="kw">true</span>;
+<span class="kw">SET</span> spark.databricks.delta.autoCompact.enabled = <span class="kw">true</span>;</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>BROADCAST Hint:</b> Replicates lookup tables (&lt;100MB) to all executors, converting expensive SortMergeJoin to shuffle-free BroadcastHashJoin.</li>
+            <li><b>SKEW Hint:</b> Forces Adaptive Query Execution (AQE) to detect and split oversized join partitions on the specified key into smaller sub-tasks.</li>
+            <li><b>maxPartitionBytes (128MB):</b> Sets target uncompressed split size when reading Parquet from cloud storage, controlling input task counts.</li>
+            <li><b>optimizeWrite & autoCompact:</b> Dynamically coalesces partitions during commits to prevent the small-file problem in high-frequency pipelines.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Engine Auto-Tuning:</b> In DBR 15.4+, <code>spark.sql.shuffle.partitions = auto</code> lets AQE dynamically tune shuffle partitions at runtime.
+        </div>
       </div>
     </div>
 
@@ -645,7 +757,7 @@ top_spenders <span class="kw">AS</span> (
         <span>•</span>
         <span>Databricks Lakehouse Cheat Sheet Series</span>
       </div>
-      <div class="page-footer-right">Page 2 of 2 — Analytical SQL & Tuning</div>
+      <div class="page-footer-right">Page 2 of 2 — Analytics, Functions & Engine Knobs</div>
     </div>
   </div>
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Databricks PySpark Enterprise Cheat Sheet</title>
+<title>Databricks PySpark Cheat Sheet</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -22,7 +22,7 @@ body {
   color: #e2e8f0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 7.2px;
-  line-height: 1.25;
+  line-height: 1.28;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -46,7 +46,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #E25A1C;
+  border-bottom: 2px solid #e25a1c;
   padding-bottom: 3.5px;
   margin-bottom: 4px;
 }
@@ -58,7 +58,7 @@ body {
 }
 
 .header-title-box h1 {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
   letter-spacing: -0.3px;
   color: #ffffff;
@@ -68,7 +68,7 @@ body {
 }
 
 .header-title-box p {
-  font-size: 7.2px;
+  font-size: 7.5px;
   color: #94a3b8;
   font-weight: 500;
 }
@@ -76,11 +76,11 @@ body {
 .header-badges {
   display: flex;
   align-items: center;
-  gap: 3.5px;
+  gap: 4px;
 }
 
 .badge {
-  padding: 1.5px 5.5px;
+  padding: 2px 6px;
   border-radius: 3px;
   font-size: 6.8px;
   font-weight: 700;
@@ -88,7 +88,7 @@ body {
   letter-spacing: 0.3px;
 }
 
-.badge-primary { background: #E25A1C; color: #ffffff; }
+.badge-primary { background: #e25a1c; color: #ffffff; }
 .badge-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
 .badge-dark { background: #0f172a; color: #a5b4fc; border: 1px solid #1e293b; }
 .badge-accent { background: #10b981; color: #042f2e; }
@@ -98,22 +98,22 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 1fr;
-  gap: 4px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
   margin-bottom: 3px;
 }
 
 .card {
   background: #0f172a;
   border: 1px solid #1e293b;
-  border-radius: 4px;
-  padding: 4px 5.5px;
+  border-radius: 5px;
+  padding: 4.5px 6.5px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 2px;
   overflow: hidden;
+  height: 100%;
 }
 
 .card-header {
@@ -121,23 +121,24 @@ body {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #1e293b;
-  padding-bottom: 2px;
+  padding-bottom: 2.5px;
+  margin-bottom: 1px;
 }
 
 .card-title {
-  font-size: 8.2px;
+  font-size: 8.8px;
   font-weight: 700;
-  color: #FB923C;
+  color: #38bdf8;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .card-tag {
-  font-size: 6.2px;
+  font-size: 6.4px;
   background: #1e293b;
   color: #94a3b8;
-  padding: 1px 3px;
+  padding: 1.5px 4px;
   border-radius: 2px;
   font-weight: 600;
 }
@@ -147,10 +148,10 @@ pre.code {
   background: #040711;
   border: 1px solid #141e33;
   border-radius: 3px;
-  padding: 3px 4.5px;
+  padding: 3px 5px;
   font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
-  font-size: 6.5px;
-  line-height: 1.22;
+  font-size: 6.6px;
+  line-height: 1.24;
   color: #e2e8f0;
   overflow: hidden;
   white-space: pre-wrap;
@@ -167,15 +168,78 @@ pre.code {
 .var { color: #a78bfa; }                     /* variables */
 .typ { color: #facc15; }                     /* SQL types */
 
+/* Code Explanation Section (Below Every Code Block) */
+.code-explain {
+  background: rgba(4, 7, 17, 0.75);
+  border: 1px solid #1a253c;
+  border-left: 2px solid #e25a1c;
+  border-radius: 3px;
+  padding: 3px 5px;
+  font-size: 6.5px;
+  line-height: 1.25;
+  color: #cbd5e1;
+}
+
+.explain-head {
+  font-size: 6.2px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.explain-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8px;
+}
+
+.explain-list li {
+  position: relative;
+  padding-left: 7px;
+  font-size: 6.4px;
+  line-height: 1.24;
+  color: #cbd5e1;
+}
+
+.explain-list li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: #e25a1c;
+  font-weight: bold;
+  font-size: 7.5px;
+}
+
+.explain-list li b {
+  color: #f8fafc;
+}
+
+.explain-list li code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  font-size: 6.1px;
+  background: #141e33;
+  padding: 0.5px 2px;
+  border-radius: 2px;
+}
+
 /* Callout Alert Boxes */
 .alert {
-  padding: 2px 3.5px;
-  border-radius: 2px;
+  padding: 2.5px 4.5px;
+  border-radius: 3px;
   font-size: 6.5px;
   display: flex;
   align-items: flex-start;
   gap: 3.5px;
-  line-height: 1.18;
+  line-height: 1.2;
 }
 
 .alert-tip {
@@ -202,65 +266,6 @@ pre.code {
   color: #e9d5ff;
 }
 
-/* Mini Tables */
-.mini-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 6.5px;
-  margin: 1px 0;
-}
-
-.mini-table th {
-  text-align: left;
-  background: #141e33;
-  color: #94a3b8;
-  padding: 1.5px 3px;
-  font-weight: 600;
-  border-bottom: 1px solid #1e293b;
-}
-
-.mini-table td {
-  padding: 1.2px 3px;
-  border-bottom: 1px solid #141e33;
-  color: #cbd5e1;
-}
-
-.mini-table tr:last-child td {
-  border-bottom: none;
-}
-
-.mini-table code {
-  font-family: 'JetBrains Mono', monospace;
-  color: #38bdf8;
-  font-size: 6.2px;
-}
-
-/* Bullet list */
-ul.rules-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2px;
-}
-
-ul.rules-list li {
-  font-size: 6.5px;
-  position: relative;
-  padding-left: 6.5px;
-  color: #cbd5e1;
-  line-height: 1.18;
-}
-
-ul.rules-list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #E25A1C;
-  font-weight: bold;
-}
-
 /* Footer */
 .page-footer {
   border-top: 1px solid #1e293b;
@@ -268,7 +273,7 @@ ul.rules-list li::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 6.5px;
+  font-size: 6.8px;
   color: #64748b;
 }
 
@@ -291,72 +296,88 @@ ul.rules-list li::before {
     <div class="header-bar">
       <div class="header-left">
         <div class="header-title-box">
-          <h1>🔥 DATABRICKS PYSPARK CHEAT SHEET</h1>
-          <p>Production Reference: SparkSession, DataFrame API, Schemas, Joins, Windowing & Aggregations</p>
+          <h1>⚡ DATABRICKS PYSPARK CHEAT SHEET</h1>
+          <p>Production Reference: DataFrame API, Strict Schemas, Joins, Windowing & Performance</p>
         </div>
       </div>
       <div class="header-badges">
         <span class="badge badge-primary">PySpark</span>
-        <span class="badge badge-secondary">DataFrame API</span>
-        <span class="badge badge-dark">Delta Lake 3.x</span>
-        <span class="badge badge-accent">Auto Loader</span>
+        <span class="badge badge-secondary">DBR 15.4+ LTS</span>
+        <span class="badge badge-dark">DataFrame API</span>
+        <span class="badge badge-accent">Delta Lake</span>
       </div>
     </div>
 
     <div class="content-grid">
-      <!-- Card 1: SparkSession & Imports -->
+      <!-- Card 1: SparkSession & Production Config -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🚀 SparkSession & Standard Imports</span>
-          <span class="card-tag">Setup</span>
+          <span class="card-title">🚀 SparkSession Initialization & DBR Sizing</span>
+          <span class="card-tag">Configuration</span>
         </div>
-        <pre class="code"><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession, Window <span class="kw">as</span> <span class="cls">W</span>
-<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> <span class="cls">F</span>, types <span class="kw">as</span> <span class="cls">T</span>
-<span class="kw">from</span> delta.tables <span class="kw">import</span> <span class="cls">DeltaTable</span>
+        <pre class="code"><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+<span class="kw">import</span> pyspark.sql.functions <span class="kw">as</span> <span class="cls">F</span>
+<span class="kw">import</span> pyspark.sql.types <span class="kw">as</span> <span class="cls">T</span>
+<span class="kw">from</span> pyspark.sql.window <span class="kw">import</span> <span class="cls">Window</span> <span class="kw">as</span> <span class="cls">W</span>
 
-<span class="cm"># Pre-initialized in Databricks as 'spark'; Configured for Medallion</span>
-<span class="var">spark</span>.conf.set(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"auto"</span>)
-<span class="var">spark</span>.conf.set(<span class="str">"spark.sql.adaptive.enabled"</span>, <span class="str">"true"</span>)
-<span class="var">spark</span>.conf.set(<span class="str">"spark.sql.adaptive.coalescePartitions.enabled"</span>, <span class="str">"true"</span>)
-<span class="var">spark</span>.conf.set(<span class="str">"spark.databricks.delta.optimizeWrite.enabled"</span>, <span class="str">"true"</span>)
-<span class="var">spark</span>.conf.set(<span class="str">"spark.databricks.delta.autoCompact.enabled"</span>, <span class="str">"true"</span>)</pre>
-        <ul class="rules-list">
-          <li><code>optimizeWrite</code> performs an exchange before writing to ensure 128MB-1GB files.</li>
-          <li><code>autoCompact</code> automatically checks and compacts files after individual write stages.</li>
-        </ul>
+<span class="var">spark</span> = (<span class="cls">SparkSession</span>.builder
+    .appName(<span class="str">"Databricks-Production-Pipeline"</span>)
+    .config(<span class="str">"spark.sql.extensions"</span>, <span class="str">"io.delta.sql.DeltaSparkSessionExtension"</span>)
+    .config(<span class="str">"spark.sql.catalog.spark_catalog"</span>, <span class="str">"org.apache.spark.sql.delta.catalog.DeltaCatalog"</span>)
+    .config(<span class="str">"spark.sql.execution.arrow.pyspark.enabled"</span>, <span class="str">"true"</span>)
+    .config(<span class="str">"spark.sql.adaptive.enabled"</span>, <span class="str">"true"</span>)
+    .getOrCreate())</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Delta Extensions:</b> <code>io.delta.sql.DeltaSparkSessionExtension</code> registers Delta ACID query parsing and catalog metadata handlers.</li>
+            <li><b>Catalog Delegation:</b> <code>DeltaCatalog</code> integrates local and Unity Catalog 3-level namespaces for ACID transactions.</li>
+            <li><b>PyArrow Optimization:</b> <code>arrow.pyspark.enabled</code> enables zero-copy vectorized serialization between JVM and Python worker processes.</li>
+            <li><b>AQE Enabled:</b> Activates Adaptive Query Execution for dynamic runtime join conversions and automatic partition coalescing.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Serverless Note:</b> On Databricks Serverless compute, the SparkSession is pre-initialized and instantly auto-tuned for sub-second scaling.
+        </div>
       </div>
 
-      <!-- Card 2: Essential DataFrame Transformations -->
+      <!-- Card 2: DataFrame Transformations -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">⚡ DataFrame Projections & Filtering</span>
-          <span class="card-tag">Core API</span>
+          <span class="card-title">🧱 DataFrame Projections, Transforms & Filters</span>
+          <span class="card-tag">DataFrame API</span>
         </div>
-        <pre class="code"><span class="cm"># Projections, Expressions & Casts</span>
-<span class="var">df_clean</span> = (<span class="var">df</span>
-    .select(
-        <span class="str">"customer_id"</span>,
-        <span class="cls">F</span>.col(<span class="str">"amount"</span>).cast(<span class="cls">T</span>.DecimalType(<span class="num">18</span>, <span class="num">2</span>)).alias(<span class="str">"amount_eur"</span>),
-        <span class="cls">F</span>.to_date(<span class="cls">F</span>.col(<span class="str">"created_at"</span>)).alias(<span class="str">"txn_date"</span>)
-    )
-    .withColumn(<span class="str">"tier"</span>,
-        <span class="cls">F</span>.when(<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>) &gt; <span class="num">5000</span>, <span class="str">"PLATINUM"</span>)
-         .when(<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>) &gt; <span class="num">1000</span>, <span class="str">"GOLD"</span>)
-         .otherwise(<span class="str">"STANDARD"</span>)
-    )
-    .filter((<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>) &gt; <span class="num">0</span>) &amp; <span class="cls">F</span>.col(<span class="str">"customer_id"</span>).isNotNull())
-    .dropDuplicates([<span class="str">"customer_id"</span>, <span class="str">"txn_date"</span>])
-    .orderBy(<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>).desc_nulls_last())
+        <pre class="code"><span class="var">df_curated</span> = (<span class="var">df_raw</span>
+    <span class="cm"># Filter with pushdown predicate</span>
+    .filter((<span class="cls">F</span>.col(<span class="str">"status"</span>) == <span class="str">"ACTIVE"</span>) & (<span class="cls">F</span>.col(<span class="str">"amount"</span>) &gt; <span class="num">0</span>))
+    <span class="cm"># Multi-column projection and derivation</span>
+    .withColumn(<span class="str">"tax_amt"</span>, <span class="cls">F</span>.round(<span class="cls">F</span>.col(<span class="str">"amount"</span>) * <span class="num">0.18</span>, <span class="num">2</span>))
+    .withColumn(<span class="str">"customer_tier"</span>,
+        <span class="cls">F</span>.when(<span class="cls">F</span>.col(<span class="str">"amount"</span>) &gt;= <span class="num">10000</span>, <span class="str">"PLATINUM"</span>)
+         .when(<span class="cls">F</span>.col(<span class="str">"amount"</span>) &gt;= <span class="num">2500</span>, <span class="str">"GOLD"</span>)
+         .otherwise(<span class="str">"STANDARD"</span>))
+    <span class="cm"># High-performance projection replacing select() + withColumn()</span>
+    .selectExpr(<span class="str">"customer_id"</span>, <span class="str">"amount"</span>, <span class="str">"tax_amt"</span>, <span class="str">"customer_tier"</span>,
+                <span class="str">"current_timestamp() as ingested_at"</span>)
 )</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Filter Pushdown:</b> <code>.filter(...)</code> generates a Catalyst Filter operator pushed down into Parquet footer metadata to skip non-matching row groups.</li>
+            <li><b>F.when().otherwise():</b> Compiles directly into native JVM conditional bytecode; avoids python UDF context switching.</li>
+            <li><b>selectExpr():</b> Evaluates mixed column projections and SQL expressions in a single projection pass without intermediate plans.</li>
+            <li><b>withColumns() in Spark 3.3+:</b> Pass a dictionary to add multiple derived columns simultaneously without rebuilding schema trees.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
-          💡 <b>withColumns():</b> In Spark 3.3+, pass a dictionary to <code>df.withColumns(...)</code> to add multiple columns in a single projection pass!
+          💡 <b>Optimization:</b> Chain transformations lazily; Catalyst combines consecutive filter and project operators into a single pipelined stage.
         </div>
       </div>
 
       <!-- Card 3: Strict Schema Definition -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">📐 Schema Definition (StructType & StructField)</span>
+          <span class="card-title">📐 Strict Schema Definition (StructType & StructField)</span>
           <span class="card-tag">Data Quality</span>
         </div>
         <pre class="code"><span class="cm"># Explicit schema avoids expensive inferSchema full-scans</span>
@@ -375,27 +396,49 @@ ul.rules-list li::before {
       .option(<span class="str">"mode"</span>, <span class="str">"PERMISSIVE"</span>)
       .option(<span class="str">"columnNameOfCorruptRecord"</span>, <span class="str">"_corrupt"</span>)
       .json(<span class="str">"abfss://landing@adls.dfs.core.windows.net/txns/"</span>))</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Explicit Schema:</b> Eliminates multi-pass storage scans required by <code>inferSchema=True</code>, reducing multi-terabyte ingestion time by 80%.</li>
+            <li><b>Nullable Guarantees:</b> Setting <code>nullable=False</code> enables Catalyst to optimize join plans and bypass redundant null-check branches.</li>
+            <li><b>PERMISSIVE Mode:</b> Captures malformed input JSON rows safely into a quarantine column without crashing distributed streaming tasks.</li>
+            <li><b>Nested Types:</b> <code>MapType</code> and <code>ArrayType</code> preserve schema structure while enabling downstream element-level indexing.</li>
+          </ul>
+        </div>
         <div class="alert alert-perf">
-          ⚡ <b>FinOps Sizing:</b> Enforcing schemas on read eliminates a 2-pass scan over multi-terabyte JSON/CSV landing zones.
+          ⚡ <b>FinOps Sizing:</b> Enforcing schemas on read eliminates full file body scans across cloud storage landing zones.
         </div>
       </div>
 
-      <!-- Card 4: Standard Functions (F) Quick Reference -->
+      <!-- Card 4: Standard Functions Reference -->
       <div class="card">
         <div class="card-header">
           <span class="card-title">🧰 pyspark.sql.functions (F) Master Reference</span>
           <span class="card-tag">Functions</span>
         </div>
-        <table class="mini-table">
-          <tr><th>Category</th><th>Top Functions</th></tr>
-          <tr><td><b>String</b></td><td><code>F.concat_ws('_', c1, c2)</code>, <code>F.regexp_replace()</code>, <code>F.split()</code>, <code>F.trim()</code></td></tr>
-          <tr><td><b>Date/Time</b></td><td><code>F.to_date()</code>, <code>F.date_add(c, 30)</code>, <code>F.datediff(c1, c2)</code>, <code>F.date_trunc('MM')</code></td></tr>
-          <tr><td><b>Nulls</b></td><td><code>F.coalesce(c1, c2, F.lit('N/A'))</code>, <code>df.na.fill(0)</code>, <code>df.na.drop()</code></td></tr>
-          <tr><td><b>Array</b></td><td><code>F.explode()</code>, <code>F.array_contains()</code>, <code>F.size()</code>, <code>F.array_distinct()</code></td></tr>
-          <tr><td><b>JSON</b></td><td><code>F.from_json(col, schema)</code>, <code>F.to_json(struct)</code>, <code>F.get_json_object()</code></td></tr>
-        </table>
+        <pre class="code"><span class="var">df_transformed</span> = (<span class="var">df</span>
+    <span class="cm"># String transforms</span>
+    .withColumn(<span class="str">"full_key"</span>, <span class="cls">F</span>.concat_ws(<span class="str">"_"</span>, <span class="cls">F</span>.col(<span class="str">"region"</span>), <span class="cls">F</span>.col(<span class="str">"cust_id"</span>)))
+    <span class="cm"># Date formatting & truncation</span>
+    .withColumn(<span class="str">"month_start"</span>, <span class="cls">F</span>.date_trunc(<span class="str">"MM"</span>, <span class="cls">F</span>.col(<span class="str">"txn_date"</span>)))
+    <span class="cm"># Null coalescing</span>
+    .withColumn(<span class="str">"clean_phone"</span>, <span class="cls">F</span>.coalesce(<span class="cls">F</span>.col(<span class="str">"phone"</span>), <span class="cls">F</span>.lit(<span class="str">"UNKNOWN"</span>)))
+    <span class="cm"># In-memory array deduplication</span>
+    .withColumn(<span class="str">"unique_tags"</span>, <span class="cls">F</span>.array_distinct(<span class="cls">F</span>.col(<span class="str">"tags"</span>)))
+    <span class="cm"># JSON string extraction</span>
+    .withColumn(<span class="str">"device_id"</span>, <span class="cls">F</span>.get_json_object(<span class="cls">F</span>.col(<span class="str">"raw_meta"</span>), <span class="str">"$.device.id"</span>))
+)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>JVM Native Execution:</b> Built-in <code>pyspark.sql.functions</code> map directly to Catalyst expressions executed in JVM/C++ Photon without Py4J bridge overhead.</li>
+            <li><b>concat_ws():</b> Joins strings using a delimiter and skips null arguments automatically, preventing unwanted null outputs.</li>
+            <li><b>date_trunc():</b> Truncates timestamps to the requested calendar boundary, accelerating time-series aggregations.</li>
+            <li><b>get_json_object():</b> Extracts scalar JSON path attributes using high-speed JSON path scanning without parsing entire payload schemas.</li>
+          </ul>
+        </div>
         <div class="alert alert-perf">
-          ⚡ <b>Vectorization:</b> Built-in <code>pyspark.sql.functions</code> execute natively in JVM/C++ Photon without Python serialization penalties!
+          ⚡ <b>Vectorization Rule:</b> Never implement custom Python UDFs when equivalent native <code>F.</code> functions exist.
         </div>
       </div>
 
@@ -418,6 +461,18 @@ ul.rules-list li::before {
     .withColumn(<span class="str">"salt_arr"</span>, <span class="cls">F</span>.array([<span class="cls">F</span>.lit(i) <span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">10</span>)]))
     .withColumn(<span class="str">"salt"</span>, <span class="cls">F</span>.explode(<span class="str">"salt_arr"</span>)))
 <span class="var">df_salted_join</span> = <span class="var">df_skewed</span>.join(<span class="var">df_dim_exploded</span>, on=[<span class="str">"key"</span>, <span class="str">"salt"</span>])</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Broadcast Hash Join (BHJ):</b> Replicates the small dimension to all executors, eliminating the expensive SortMergeJoin shuffle exchange.</li>
+            <li><b>Left Semi Join:</b> Evaluates existence without duplicating parent rows when child records match multiple times.</li>
+            <li><b>Left Anti Join:</b> Returns records from the left dataset having zero matches on the right; highly optimized alternative to <code>NOT IN</code>.</li>
+            <li><b>Synthetic Salting:</b> Distributes skewed hot keys across 10 virtual partition buckets, eliminating straggler tasks holding up the stage.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Threshold Knob:</b> Configure <code>spark.sql.autoBroadcastJoinThreshold = 104857600</code> (100MB) to tune auto-broadcast eligibility.
+        </div>
       </div>
 
       <!-- Card 6: Window Functions in PySpark -->
@@ -438,8 +493,17 @@ ul.rules-list li::before {
     .withColumn(<span class="str">"salary_diff"</span>, <span class="cls">F</span>.col(<span class="str">"salary"</span>) - <span class="cls">F</span>.col(<span class="str">"prev_salary"</span>))
     .withColumn(<span class="str">"rolling_7d_total"</span>, <span class="cls">F</span>.sum(<span class="str">"amount"</span>).over(<span class="var">w_roll_7d</span>))
 )</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>W.partitionBy().orderBy():</b> Directs Spark to sort rows within partitioned subsets without sorting the entire distributed dataset.</li>
+            <li><b>rangeBetween(offset, 0):</b> Computes rolling aggregate windows across epoch timestamps, properly accounting for days with missing records.</li>
+            <li><b>F.dense_rank():</b> Computes ranking without rank number gaps for tied values; ideal for identifying top-earners per department.</li>
+            <li><b>F.lag(col, offset, default):</b> Inspects prior record values in a single streaming pass across the partition window.</li>
+          </ul>
+        </div>
         <div class="alert alert-tip">
-          💡 <b>RangeBetween vs RowsBetween:</b> <code>rangeBetween</code> handles calendar days and gaps; <code>rowsBetween</code> operates strictly on physical row indices.
+          💡 <b>Range vs Rows:</b> <code>rangeBetween</code> handles continuous value ranges; <code>rowsBetween</code> operates strictly on physical row indices.
         </div>
       </div>
     </div>
@@ -459,14 +523,14 @@ ul.rules-list li::before {
     <div class="header-bar">
       <div class="header-left">
         <div class="header-title-box">
-          <h1>🔥 DATABRICKS PYSPARK CHEAT SHEET</h1>
-          <p>DeltaTable API, Auto Loader Streaming, Vectorized UDFs & Performance Tuning</p>
+          <h1>⚡ DATABRICKS PYSPARK CHEAT SHEET</h1>
+          <p>Delta API, Auto Loader Streaming, Arrow UDFs, Partitioning, Storage & Microbatching</p>
         </div>
       </div>
       <div class="header-badges">
-        <span class="badge badge-primary">Lakehouse API</span>
-        <span class="badge badge-secondary">PyArrow Vectorized</span>
-        <span class="badge badge-dark">Streaming</span>
+        <span class="badge badge-primary">Delta Lake API</span>
+        <span class="badge badge-secondary">Auto Loader</span>
+        <span class="badge badge-dark">Vectorized UDFs</span>
       </div>
     </div>
 
@@ -474,163 +538,196 @@ ul.rules-list li::before {
       <!-- Card 7: DeltaTable Python API -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">📦 DeltaTable Python API & Upserts</span>
-          <span class="card-tag">Lakehouse</span>
+          <span class="card-title">🔄 DeltaTable Python API & Upsert</span>
+          <span class="card-tag">Delta API</span>
         </div>
-        <pre class="code"><span class="kw">from</span> delta.tables <span class="kw">import</span> <span class="cls">DeltaTable</span>
+        <pre class="code"><span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
 
-<span class="var">dt</span> = <span class="cls">DeltaTable</span>.forName(<span class="var">spark</span>, <span class="str">"prod_catalog.silver.customers"</span>)
+<span class="var">delta_tbl</span> = <span class="cls">DeltaTable</span>.forName(<span class="var">spark</span>, <span class="str">"silver.customers"</span>)
 
-<span class="cm"># Pythonic ACID Merge / Upsert</span>
-(<span class="var">dt</span>.alias(<span class="str">"t"</span>)
-   .merge(<span class="var">source_df</span>.alias(<span class="str">"s"</span>), <span class="str">"t.cust_id = s.cust_id"</span>)
-   .whenMatchedUpdate(
-       condition=<span class="str">"s.op = 'U'"</span>,
-       set={"name": "s.name", "updated_at": "current_timestamp()"}
-   )
-   .whenMatchedDelete(condition=<span class="str">"s.op = 'D'"</span>)
-   .whenNotMatchedInsert(
-       values={"cust_id": "s.cust_id", "name": "s.name",
-               "created_at": "current_timestamp()"}
-   )
-   .execute())
-
-<span class="cm"># Maintenance & Time Travel</span>
-<span class="var">dt</span>.optimize().executeCompaction()
-<span class="var">dt</span>.vacuum(<span class="num">168</span>)  <span class="cm"># 7 days</span>
-<span class="var">hist_df</span> = <span class="var">dt</span>.history()</pre>
+(<span class="var">delta_tbl</span>.alias(<span class="str">"t"</span>)
+ .merge(<span class="var">df_updates</span>.alias(<span class="str">"s"</span>), <span class="str">"t.cust_id = s.cust_id"</span>)
+ .whenMatchedUpdate(condition=<span class="str">"s.hash != t.hash"</span>, set={
+     <span class="str">"email"</span>: <span class="str">"s.email"</span>,
+     <span class="str">"status"</span>: <span class="str">"s.status"</span>,
+     <span class="str">"updated_at"</span>: <span class="str">"current_timestamp()"</span>
+ })
+ .whenNotMatchedInsert(values={
+     <span class="str">"cust_id"</span>: <span class="str">"s.cust_id"</span>, <span class="str">"email"</span>: <span class="str">"s.email"</span>,
+     <span class="str">"status"</span>: <span class="str">"s.status"</span>, <span class="str">"created_at"</span>: <span class="str">"current_timestamp()"</span>
+ })
+ .execute())</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>DeltaTable.forName():</b> Binds programmatic Python handles directly to Unity Catalog registered tables without raw path references.</li>
+            <li><b>Declarative Merge:</b> Supports conditional updates and inserts; compiles into an atomic ACID commit updating the Delta transaction log.</li>
+            <li><b>Hash Comparison:</b> Skips rewriting unchanged rows, minimizing write amplification on Delta Deletion Vectors and Parquet storage.</li>
+            <li><b>Schema Evolution:</b> Pass <code>.withOption("mergeSchema", "true")</code> to automatically append new columns arriving from source DataFrames.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Deletion Vectors:</b> In DBR 14.1+, enable Deletion Vectors (<code>delta.enableDeletionVectors = true</code>) to execute row updates without file rewrites!
+        </div>
       </div>
 
       <!-- Card 8: Structured Streaming & Auto Loader -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🌊 Auto Loader & Structured Streaming</span>
-          <span class="card-tag">Streaming</span>
+          <span class="card-title">⚡ Structured Streaming with Auto Loader (cloudFiles)</span>
+          <span class="card-tag">Streaming Ingestion</span>
         </div>
-        <pre class="code"><span class="cm"># Ingestion with Databricks Auto Loader (cloudFiles)</span>
-<span class="var">stream_df</span> = (<span class="var">spark</span>.readStream
+        <pre class="code"><span class="var">df_stream</span> = (<span class="var">spark</span>.readStream
     .format(<span class="str">"cloudFiles"</span>)
     .option(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
-    .option(<span class="str">"cloudFiles.schemaLocation"</span>, <span class="str">"/checkpoints/schema"</span>)
-    .option(<span class="str">"cloudFiles.inferColumnTypes"</span>, <span class="str">"true"</span>)
+    .option(<span class="str">"cloudFiles.schemaLocation"</span>, <span class="str">"abfss://chk@adls.dfs.core.windows.net/schema"</span>)
     .option(<span class="str">"cloudFiles.schemaEvolutionMode"</span>, <span class="str">"addNewColumns"</span>)
-    .load(<span class="str">"abfss://raw@adls.dfs.core.windows.net/events/"</span>))
+    .option(<span class="str">"cloudFiles.inferColumnTypes"</span>, <span class="str">"true"</span>)
+    .load(<span class="str">"abfss://raw@adls.dfs.core.windows.net/landing/"</span>))
 
-<span class="cm"># Watermarked Sink write with AvailableNow trigger</span>
-<span class="var">query</span> = (<span class="var">stream_df</span>
-    .withWatermark(<span class="str">"event_time"</span>, <span class="str">"10 minutes"</span>)
-    .writeStream
+<span class="var">query</span> = (<span class="var">df_stream</span>.writeStream
     .format(<span class="str">"delta"</span>)
     .outputMode(<span class="str">"append"</span>)
-    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/checkpoints/bronze_events"</span>)
-    .trigger(availableNow=<span class="kw">True</span>) <span class="cm"># Incremental batch</span>
-    .toTable(<span class="str">"bronze.events"</span>))</pre>
-        <div class="alert alert-tip">
-          💡 <b>Trigger(availableNow=True):</b> Replaces legacy <code>once=True</code>. Processes all pending data in rate-limited micro-batches then stops, slashing cluster costs!
+    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"abfss://chk@adls.dfs.core.windows.net/chk_stream"</span>)
+    .trigger(availableNow=<span class="kw">True</span>)
+    .toTable(<span class="str">"bronze.events_stream"</span>))</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Auto Loader (cloudFiles):</b> Incrementally discovers and processes new cloud files without expensive file listing calls using cloud notifications.</li>
+            <li><b>Schema Evolution:</b> <code>addNewColumns</code> safely adapts to evolving JSON payloads without throwing runtime streaming validation errors.</li>
+            <li><b>Checkpoint Location:</b> Guarantees exactly-once processing state by persisting commit offsets and metadata in durable cloud storage.</li>
+            <li><b>trigger(availableNow=True):</b> Processes all pending backlogged data across microbatches, then automatically terminates compute for FinOps savings.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>FinOps Note:</b> <code>availableNow=True</code> achieves streaming exactly-once semantics with scheduled batch infrastructure costs.
         </div>
       </div>
 
-      <!-- Card 9: Vectorized Pandas UDFs vs Standard UDFs -->
+      <!-- Card 9: Vectorized Arrow UDFs -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">⚡ PyArrow Vectorized Pandas UDFs</span>
-          <span class="card-tag">Performance</span>
+          <span class="card-title">🏹 Vectorized Apache Arrow UDFs (@pandas_udf)</span>
+          <span class="card-tag">Vectorization</span>
         </div>
         <pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
 <span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> pandas_udf
 
-<span class="cm"># Vectorized Series-to-Series UDF (Uses Apache Arrow)</span>
 <span class="kw">@pandas_udf</span>(<span class="cls">T</span>.DoubleType())
-<span class="kw">def</span> calculate_vat(price: pd.Series, rate: pd.Series) -&gt; pd.Series:
-    <span class="kw">return</span> price * (<span class="num">1.0</span> + rate)
+<span class="kw">def</span> calculate_vat(amount: pd.Series, rate: pd.Series) -&gt; pd.Series:
+    <span class="cm"># SIMD Vectorized NumPy/Pandas calculation in Python worker</span>
+    <span class="kw">return</span> (amount * (rate / <span class="num">100.0</span>)).round(<span class="num">2</span>)
 
-<span class="var">df_taxed</span> = <span class="var">df</span>.withColumn(<span class="str">"gross"</span>, calculate_vat(<span class="cls">F</span>.col(<span class="str">"net"</span>), <span class="cls">F</span>.col(<span class="str">"rate"</span>)))
+<span class="var">df_with_tax</span> = <span class="var">df</span>.withColumn(<span class="str">"vat"</span>, calculate_vat(<span class="cls">F</span>.col(<span class="str">"amount"</span>), <span class="cls">F</span>.col(<span class="str">"tax_rate"</span>)))</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>Apache Arrow Zero-Copy:</b> Transmits column chunks between JVM and Python workers in Apache Arrow columnar format without row serialization.</li>
+            <li><b>Vectorized Execution:</b> Python calculations execute on whole Pandas Series using vectorized C/SIMD loops instead of slow row-by-row iteration.</li>
+            <li><b>Throughput Speed:</b> Executes up to <b>100x faster</b> than standard Python <code>@udf</code>, eliminating Py4J bottleneck latency.</li>
+            <li><b>Memory Batching:</b> Tune batch sizes via <code>spark.sql.execution.arrow.maxRecordsPerBatch</code> (e.g. 10,000) to balance RAM usage.</li>
+          </ul>
+        </div>
+        <div class="alert alert-tip">
+          💡 <b>Type Contract:</b> Python type hints <code>(pd.Series) -&gt; pd.Series</code> determine the vectorization execution model in PySpark 3.0+.
+        </div>
+      </div>
 
-<span class="cm"># Grouped Map Vectorized UDF (applyInPandas)</span>
-<span class="kw">def</span> normalize_group(pdf: pd.DataFrame) -&gt; pd.DataFrame:
-    pdf[<span class="str">"z_score"</span>] = (pdf[<span class="str">"val"</span>] - pdf[<span class="str">"val"</span>].mean()) / pdf[<span class="str">"val"</span>].std()
-    <span class="kw">return</span> pdf
+      <!-- Card 10: Partitioning Strategy -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📦 Partitioning Strategy (repartition vs coalesce)</span>
+          <span class="card-tag">Partitioning</span>
+        </div>
+        <pre class="code"><span class="cm"># repartition(N): Full shuffle, balances partitions uniformly</span>
+<span class="var">df_shuffled</span> = <span class="var">df</span>.repartition(<span class="num">200</span>, <span class="str">"region"</span>)
 
-<span class="var">df_norm</span> = <span class="var">df</span>.groupby(<span class="str">"device_id"</span>).applyInPandas(
-    normalize_group, schema=<span class="var">output_schema</span>
-)</pre>
+<span class="cm"># repartitionByRange: Sorts data across partitions for range queries</span>
+<span class="var">df_ranged</span> = <span class="var">df</span>.repartitionByRange(<span class="num">50</span>, <span class="cls">F</span>.col(<span class="str">"txn_date"</span>).desc())
+
+<span class="cm"># coalesce(N): Merges partitions locally WITHOUT full network shuffle!</span>
+<span class="var">df_collapsed</span> = <span class="var">df_shuffled</span>.coalesce(<span class="num">10</span>)
+
+<span class="cm"># Inspect partition distribution</span>
+<span class="fn">print</span>(<span class="str">"Partition Count:"</span>, <span class="var">df_collapsed</span>.rdd.getNumPartitions())</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>repartition():</b> Executes a full cluster network shuffle; essential when increasing partitions or redistributing skewed datasets.</li>
+            <li><b>repartitionByRange():</b> Uses sampling to determine partition split points, producing globally sorted outputs across partition boundaries.</li>
+            <li><b>coalesce():</b> Merges adjacent physical partitions within executors without network transfer; only use when decreasing partition count.</li>
+            <li><b>File Target Sizing:</b> Adjust partition counts prior to writing Delta tables to maintain 100MB-1GB target Parquet files.</li>
+          </ul>
+        </div>
         <div class="alert alert-warn">
-          ⚠️ <b>Avoid Standard @udf:</b> Regular Python UDFs force row-by-row Py4J socket serialization. Pandas UDFs process columnar Arrow batches up to 100x faster!
+          ⚠️ <b>Anti-Pattern:</b> Calling <code>coalesce(1)</code> on large datasets collapses upstream execution to a single executor, triggering Driver OOM!
         </div>
       </div>
 
-      <!-- Card 10: Partitioning & Memory Control -->
+      <!-- Card 11: Storage Levels & Memory Persistence -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">⚖️ Partition Management: Repartition vs Coalesce</span>
-          <span class="card-tag">FinOps / Sizing</span>
-        </div>
-        <pre class="code"><span class="cm"># Inspect current partitions</span>
-<span class="var">num_parts</span> = <span class="var">df</span>.rdd.getNumPartitions()
-
-<span class="cm"># Repartition: FULL SHUFFLE across cluster (Increase/Balance)</span>
-<span class="var">df_balanced</span> = <span class="var">df</span>.repartition(<span class="num">200</span>)
-<span class="var">df_hash</span> = <span class="var">df</span>.repartition(<span class="num">100</span>, <span class="str">"region"</span>)
-
-<span class="cm"># Coalesce: ZERO SHUFFLE (Shrinks local partition blocks)</span>
-<span class="var">df_shrunk</span> = <span class="var">df</span>.coalesce(<span class="num">10</span>) <span class="cm"># Use right before file write!</span></pre>
-        <table class="mini-table">
-          <tr><th>Operation</th><th>Network Shuffle</th><th>Partition Target</th></tr>
-          <tr><td><code>repartition(N)</code></td><td>Yes (Exchange)</td><td>Increase or redistribute evenly</td></tr>
-          <tr><td><code>coalesce(N)</code></td><td>No (Local merge)</td><td>Shrink only; avoids small files</td></tr>
-        </table>
-        <div class="alert alert-perf">
-          ⚡ <b>Rule of Thumb:</b> Target <b>100MB - 200MB</b> uncompressed data per partition.
-        </div>
-      </div>
-
-      <!-- Card 11: Caching, Persistence & Cleanup -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">💾 Caching, Persistence Levels & Cleanup</span>
+          <span class="card-title">💾 Storage Levels & Memory Persistence</span>
           <span class="card-tag">Memory Management</span>
         </div>
-        <pre class="code"><span class="kw">from</span> pyspark <span class="kw">import</span> <span class="cls">StorageLevel</span>
+        <pre class="code"><span class="kw">from</span> pyspark <span class="kw">import</span> StorageLevel
 
-<span class="cm"># Cache: MEMORY_AND_DISK_DESER (Default)</span>
-<span class="var">df_cached</span> = <span class="var">df</span>.cache()
+<span class="cm"># Deserialized in RAM (Fastest CPU, Highest RAM)</span>
+<span class="var">df</span>.cache() <span class="cm"># Shorthand for persist(StorageLevel.MEMORY_AND_DISK_DESER)</span>
 
-<span class="cm"># Persist with Serialized Kryo (Saves up to 3x RAM)</span>
-<span class="var">df_persisted</span> = <span class="var">df</span>.persist(<span class="cls">StorageLevel</span>.MEMORY_ONLY_SER)
+<span class="cm"># Serialized in RAM with Disk Spill (Production Recommended for Large DFs)</span>
+<span class="var">df</span>.persist(<span class="cls">StorageLevel</span>.MEMORY_AND_DISK_SER)
 
-<span class="cm"># MANDATORY: Evict from RAM when actions complete!</span>
-<span class="var">df_cached</span>.unpersist()</pre>
-        <ul class="rules-list">
-          <li><b>When to Cache:</b> Cache ONLY when a DataFrame is reused across 2+ separate downstream actions.</li>
-          <li><b>Over-caching Antipattern:</b> Starves Unified Execution Memory, forcing shuffle spills to disk!</li>
-        </ul>
+<span class="cm"># Trigger materialization with an action</span>
+<span class="var">record_count</span> = <span class="var">df</span>.count()
+
+<span class="cm"># Crucial: Unpersist when downstream processing completes!</span>
+<span class="var">df</span>.unpersist(blocking=<span class="kw">True</span>)</pre>
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>cache() vs persist():</b> <code>cache()</code> defaults to deserialized objects in memory; <code>persist()</code> allows customizing serialization and disk spill.</li>
+            <li><b>MEMORY_AND_DISK_SER:</b> Stores serialized byte arrays; reduces RAM consumption by ~3x and prevents out-of-memory errors via local disk spill.</li>
+            <li><b>Lazy Evaluation:</b> Persisting is registered lazily; data is only populated into cache blocks when the first action (e.g. <code>.count()</code>) is invoked.</li>
+            <li><b>unpersist(blocking=True):</b> Explicitly frees cluster memory immediately, preventing memory leaks across long-running pipelines.</li>
+          </ul>
+        </div>
+        <div class="alert alert-perf">
+          ⚡ <b>Off-Heap Option:</b> <code>StorageLevel.OFF_HEAP</code> stores data in Tungsten managed memory outside the JVM garbage collector, eliminating GC pauses!
+        </div>
       </div>
 
-      <!-- Card 12: Streaming ForeachBatch Sink & Microbatch Processing -->
+      <!-- Card 12: Streaming Microbatch Merges -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🔁 Streaming foreachBatch Microbatch Processing</span>
+          <span class="card-title">🌊 Streaming Microbatch Merges (foreachBatch)</span>
           <span class="card-tag">Streaming Sink</span>
         </div>
-        <pre class="code"><span class="kw">def</span> process_micro_batch(micro_df, batch_id):
-    <span class="cm"># Cache microbatch if referenced in multiple merges</span>
-    <span class="var">micro_df</span>.persist()
-    
-    <span class="cm"># ACID Merge microbatch directly into Delta Silver</span>
-    (<span class="cls">DeltaTable</span>.forName(<span class="var">spark</span>, <span class="str">"silver.txns"</span>).alias(<span class="str">"t"</span>)
-     .merge(<span class="var">micro_df</span>.alias(<span class="str">"s"</span>), <span class="str">"t.id = s.id"</span>)
+        <pre class="code"><span class="kw">def</span> upsert_microbatch(microbatch_df, batch_id):
+    <span class="cm"># Idempotent write per microbatch</span>
+    (<span class="cls">DeltaTable</span>.forName(<span class="var">spark</span>, <span class="str">"silver.realtime_orders"</span>).alias(<span class="str">"t"</span>)
+     .merge(microbatch_df.alias(<span class="str">"s"</span>), <span class="str">"t.order_id = s.order_id"</span>)
      .whenMatchedUpdateAll()
      .whenNotMatchedInsertAll()
      .execute())
-    
-    <span class="var">micro_df</span>.unpersist()
 
-<span class="var">query</span> = (<span class="var">stream_df</span>.writeStream
-    .foreachBatch(process_micro_batch)
-    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/chk/silver"</span>)
+<span class="var">query</span> = (<span class="var">df_stream</span>.writeStream
+    .format(<span class="str">"delta"</span>)
+    .foreachBatch(upsert_microbatch)
+    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"abfss://chk@adls.dfs.core.windows.net/orders_chk"</span>)
     .start())</pre>
-        <div class="alert alert-perf">
-          ⚡ <b>foreachBatch Superpower:</b> Allows writing a streaming pipeline into non-streaming sinks, running multi-table merges, and executing deduplications per microbatch.
+        <div class="code-explain">
+          <div class="explain-head">🔍 Code Breakdown & Engine Mechanics:</div>
+          <ul class="explain-list">
+            <li><b>foreachBatch:</b> Bridges Structured Streaming and standard batch APIs, allowing arbitrary Delta MERGE logic per microbatch partition.</li>
+            <li><b>Idempotent Commits:</b> Using <code>batch_id</code> guarantees exactly-once processing even if a microbatch fails and replays from the checkpoint.</li>
+            <li><b>Multi-Table Fan-Out:</b> A single stream can write to multiple Delta tables or external databases simultaneously within the microbatch function.</li>
+            <li><b>whenMatchedUpdateAll():</b> Dynamically syncs all columns between source and target without requiring explicit column-by-column mapping.</li>
+          </ul>
+        </div>
+        <div class="alert alert-tip">
+          💡 <b>Streaming Rule:</b> Cache <code>microbatch_df</code> inside <code>foreachBatch</code> if reading it multiple times to prevent re-evaluating the streaming plan.
         </div>
       </div>
     </div>
@@ -641,7 +738,7 @@ ul.rules-list li::before {
         <span>•</span>
         <span>Databricks Lakehouse Cheat Sheet Series</span>
       </div>
-      <div class="page-footer-right">Page 2 of 2 — DeltaTable, Streaming & Optimization</div>
+      <div class="page-footer-right">Page 2 of 2 — Delta API, Auto Loader & Streaming</div>
     </div>
   </div>
 
