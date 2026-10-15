@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Databricks Spark SQL Ultimate Cheat Sheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #080c15;
+  color: #e2e8f0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 7.2px;
+  line-height: 1.25;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  max-height: 297mm;
+  padding: 5mm 6.5mm 4.5mm 6.5mm;
+  background: #080c15;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Page Header */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #00A3E0;
+  padding-bottom: 3.5px;
+  margin-bottom: 4px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.header-title-box h1 {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-title-box p {
+  font-size: 7.2px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+}
+
+.badge {
+  padding: 1.5px 5.5px;
+  border-radius: 3px;
+  font-size: 6.8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-primary { background: #00A3E0; color: #ffffff; }
+.badge-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
+.badge-dark { background: #0f172a; color: #a5b4fc; border: 1px solid #1e293b; }
+.badge-accent { background: #10b981; color: #042f2e; }
+
+/* Grid Layout: 3 Rows of 2 Cards */
+.content-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 4px 5.5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 2px;
+}
+
+.card-title {
+  font-size: 8.2px;
+  font-weight: 700;
+  color: #38BDF8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-tag {
+  font-size: 6.2px;
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Code Blocks */
+pre.code {
+  background: #040711;
+  border: 1px solid #141e33;
+  border-radius: 3px;
+  padding: 3px 4.5px;
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 6.5px;
+  line-height: 1.22;
+  color: #e2e8f0;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Syntax Highlighting */
+.kw { color: #f43f5e; font-weight: 600; }    /* keywords */
+.fn { color: #38bdf8; font-weight: 600; }    /* functions */
+.str { color: #4ade80; }                     /* strings */
+.cm { color: #64748b; font-style: italic; }  /* comments */
+.num { color: #fb923c; }                     /* numbers */
+.cls { color: #fbbf24; font-weight: 600; }   /* classes/types */
+.var { color: #a78bfa; }                     /* variables */
+.typ { color: #facc15; }                     /* SQL types */
+
+/* Callout Alert Boxes */
+.alert {
+  padding: 2px 3.5px;
+  border-radius: 2px;
+  font-size: 6.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 3.5px;
+  line-height: 1.18;
+}
+
+.alert-tip {
+  background: rgba(14, 165, 233, 0.08);
+  border-left: 2px solid #0ea5e9;
+  color: #bae6fd;
+}
+
+.alert-perf {
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 2px solid #10b981;
+  color: #a7f3d0;
+}
+
+.alert-warn {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 2px solid #f59e0b;
+  color: #fde68a;
+}
+
+.alert-sec {
+  background: rgba(168, 85, 247, 0.08);
+  border-left: 2px solid #a855f7;
+  color: #e9d5ff;
+}
+
+/* Mini Tables */
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 6.5px;
+  margin: 1px 0;
+}
+
+.mini-table th {
+  text-align: left;
+  background: #141e33;
+  color: #94a3b8;
+  padding: 1.5px 3px;
+  font-weight: 600;
+  border-bottom: 1px solid #1e293b;
+}
+
+.mini-table td {
+  padding: 1.2px 3px;
+  border-bottom: 1px solid #141e33;
+  color: #cbd5e1;
+}
+
+.mini-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mini-table code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  font-size: 6.2px;
+}
+
+/* Bullet list */
+ul.rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2px;
+}
+
+ul.rules-list li {
+  font-size: 6.5px;
+  position: relative;
+  padding-left: 6.5px;
+  color: #cbd5e1;
+  line-height: 1.18;
+}
+
+ul.rules-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #00A3E0;
+  font-weight: bold;
+}
+
+/* Footer */
+.page-footer {
+  border-top: 1px solid #1e293b;
+  padding-top: 2.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 6.5px;
+  color: #64748b;
+}
+
+.page-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-footer-right {
+  font-weight: 600;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+    <div class="header-bar">
+      <div class="header-left">
+        <div class="header-title-box">
+          <h1>⚡ DATABRICKS SPARK SQL CHEAT SHEET</h1>
+          <p>Production Reference: DDL, DML, Liquid Clustering, Delta Lake ACID & Medallion Patterns</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">Spark SQL</span>
+        <span class="badge badge-secondary">DBR 15.4+ LTS</span>
+        <span class="badge badge-dark">Photon Engine</span>
+        <span class="badge badge-accent">Unity Catalog</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Card 1: Unity Catalog Namespace & DDL -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🏛️ Unity Catalog 3-Level Namespace & DDL</span>
+          <span class="card-tag">Governance</span>
+        </div>
+        <pre class="code"><span class="cm">-- 3-Level Hierarchy: catalog.schema.table</span>
+<span class="kw">CREATE CATALOG IF NOT EXISTS</span> prod_lakehouse;
+<span class="kw">CREATE SCHEMA IF NOT EXISTS</span> prod_lakehouse.silver_finance
+  <span class="kw">MANAGED LOCATION</span> <span class="str">'abfss://silver@storage.dfs.core.windows.net/'</span>;
+<span class="kw">USE CATALOG</span> prod_lakehouse; <span class="kw">USE SCHEMA</span> silver_finance;
+
+<span class="cm">-- Liquid Clustering (Modern replacement for PARTITION BY)</span>
+<span class="kw">CREATE TABLE</span> transactions (
+  txn_id <span class="typ">BIGINT GENERATED ALWAYS AS IDENTITY</span>,
+  customer_id <span class="typ">STRING</span>,
+  amount <span class="typ">DECIMAL(18,2)</span>,
+  txn_date <span class="typ">DATE</span>
+) <span class="kw">USING DELTA CLUSTER BY</span> (txn_date, customer_id);
+
+<span class="cm">-- Zero-Copy Shallow Clone (instant pointer for dev/staging)</span>
+<span class="kw">CREATE TABLE</span> dev_txns <span class="kw">SHALLOW CLONE</span> transactions;
+<span class="cm">-- Deep Clone (full independent storage copy for DR/backup)</span>
+<span class="kw">CREATE TABLE</span> dr_backup <span class="kw">DEEP CLONE</span> transactions;</pre>
+        <div class="alert alert-tip">
+          💡 <b>Liquid Clustering:</b> Avoids small-file skew, supports mutable keys, and re-clusters incrementally without full partition rewrites.
+        </div>
+      </div>
+
+      <!-- Card 2: Delta Lake Core DML & ACID Upsert -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔄 Delta Lake ACID Upsert (MERGE INTO)</span>
+          <span class="card-tag">DML / Medallion</span>
+        </div>
+        <pre class="code"><span class="kw">MERGE INTO</span> silver.customers <span class="kw">AS</span> target
+<span class="kw">USING</span> bronze.stg_customers <span class="kw">AS</span> source
+<span class="kw">ON</span> target.customer_id = source.customer_id
+<span class="kw">WHEN MATCHED AND</span> source.is_deleted = <span class="kw">true THEN</span>
+  <span class="kw">DELETE</span>
+<span class="kw">WHEN MATCHED AND</span> target.hash_diff != source.hash_diff <span class="kw">THEN</span>
+  <span class="kw">UPDATE SET</span>
+    target.email = source.email,
+    target.status = source.status,
+    target.updated_at = <span class="fn">current_timestamp</span>()
+<span class="kw">WHEN NOT MATCHED THEN</span>
+  <span class="kw">INSERT</span> (customer_id, email, status, created_at, updated_at)
+  <span class="kw">VALUES</span> (source.customer_id, source.email, source.status,
+          <span class="fn">current_timestamp</span>(), <span class="fn">current_timestamp</span>())
+<span class="kw">WHEN NOT MATCHED BY SOURCE AND</span> target.status = <span class="str">'ACTIVE'</span> <span class="kw">THEN</span>
+  <span class="kw">UPDATE SET</span> target.status = <span class="str">'INACTIVE'</span>;</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>Performance:</b> Always provide deterministic partition or cluster keys in the <code>ON</code> clause to enable Delta Dynamic File Pruning (DFP).
+        </div>
+      </div>
+
+      <!-- Card 3: Table Optimization & Maintenance -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🛠️ Compaction, Z-Order & Vacuum</span>
+          <span class="card-tag">FinOps / Performance</span>
+        </div>
+        <pre class="code"><span class="cm">-- Compact small files into ~1GB Parquet target files</span>
+<span class="kw">OPTIMIZE</span> silver.transactions;
+
+<span class="cm">-- Multidimensional Space-Filling Z-Order (Legacy/Static tables)</span>
+<span class="kw">OPTIMIZE</span> silver.transactions <span class="kw">ZORDER BY</span> (customer_id, txn_date);
+
+<span class="cm">-- Purge unreferenced historical parquet files older than 7 days</span>
+<span class="kw">VACUUM</span> silver.transactions <span class="kw">RETAIN</span> <span class="num">168</span> <span class="kw">HOURS</span>;
+
+<span class="cm">-- Collect CBO statistics for adaptive join planning</span>
+<span class="kw">ANALYZE TABLE</span> silver.transactions <span class="kw">COMPUTE STATISTICS FOR ALL COLUMNS</span>;</pre>
+        <div class="alert alert-warn">
+          ⚠️ <b>Vacuum Caution:</b> Never set retention &lt; 168 hours in production. Vacuuming 0 hours breaks concurrent active readers and invalidates time travel.
+        </div>
+      </div>
+
+      <!-- Card 4: Delta Time Travel & Audit History -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⏳ Delta Time Travel, Audit & Instant Rollback</span>
+          <span class="card-tag">Resilience</span>
+        </div>
+        <pre class="code"><span class="cm">-- Query historical snapshot by version integer</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> silver.transactions <span class="kw">VERSION AS OF</span> <span class="num">14</span>;
+
+<span class="cm">-- Query snapshot by UTC timestamp string</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> silver.transactions
+<span class="kw">TIMESTAMP AS OF</span> <span class="str">'2026-10-15 08:30:00'</span>;
+
+<span class="cm">-- Instant point-in-time recovery (Disaster Rollback)</span>
+<span class="kw">RESTORE TABLE</span> silver.transactions <span class="kw">TO VERSION AS OF</span> <span class="num">13</span>;
+
+<span class="cm">-- Inspect full commit history & user audit trail</span>
+<span class="kw">DESCRIBE HISTORY</span> silver.transactions <span class="kw">LIMIT</span> <span class="num">10</span>;</pre>
+        <ul class="rules-list">
+          <li><code>DESCRIBE HISTORY</code> records exact user, notebook ID, cluster ID, and metrics.</li>
+          <li><code>RESTORE TABLE</code> takes milliseconds — updates Delta transaction log pointer.</li>
+        </ul>
+      </div>
+
+      <!-- Card 5: Common Table Expressions & Set Operations -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔗 Chained CTEs, Window Slicing & Set Operations</span>
+          <span class="card-tag">Core SQL</span>
+        </div>
+        <pre class="code"><span class="kw">WITH</span> raw_txns <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> customer_id, region, amount,
+         <span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span>(<span class="kw">PARTITION BY</span> region <span class="kw">ORDER BY</span> amount <span class="kw">DESC</span>) <span class="kw">AS</span> rk
+  <span class="kw">FROM</span> silver.transactions <span class="kw">WHERE</span> txn_date &gt;= <span class="fn">current_date</span>() - <span class="num">30</span>
+),
+top_spenders <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> customer_id, region, amount <span class="kw">FROM</span> raw_txns <span class="kw">WHERE</span> rk &lt;= <span class="num">10</span>
+)
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> top_spenders
+<span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> customer_id, region, amount <span class="kw">FROM</span> silver.manual_overrides
+<span class="kw">EXCEPT DISTINCT</span>
+<span class="kw">SELECT</span> customer_id, region, amount <span class="kw">FROM</span> silver.fraud_blacklist;</pre>
+        <div class="alert alert-tip">
+          💡 <b>Recursive CTE:</b> Use <code>WITH RECURSIVE</code> to traverse bill-of-materials or organizational hierarchies in a single SQL pass.
+        </div>
+      </div>
+
+      <!-- Card 6: Medallion Pipeline & QUALIFY Deduplication -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🥇 Medallion SQL & QUALIFY Deduplication</span>
+          <span class="card-tag">Architecture</span>
+        </div>
+        <pre class="code"><span class="cm">-- Silver Cleanse: QUALIFY filter eliminates nested subqueries!</span>
+<span class="kw">CREATE OR REPLACE TABLE</span> silver.orders_cleansed <span class="kw">AS</span>
+<span class="kw">SELECT</span>
+  order_id, customer_id, amount,
+  <span class="fn">CAST</span>(order_date <span class="kw">AS DATE</span>) <span class="kw">AS</span> order_date,
+  _metadata.file_modification_time <span class="kw">AS</span> ingested_at
+<span class="kw">FROM</span> bronze.orders_raw
+<span class="kw">WHERE</span> amount &gt; <span class="num">0</span> <span class="kw">AND</span> order_id <span class="kw">IS NOT NULL</span>
+<span class="kw">QUALIFY ROW_NUMBER</span>() <span class="kw">OVER</span>(
+  <span class="kw">PARTITION BY</span> order_id <span class="kw">ORDER BY</span> ingested_at <span class="kw">DESC</span>
+) = <span class="num">1</span>;
+
+<span class="cm">-- Gold Aggregation: Pre-computed dimension metrics</span>
+<span class="kw">CREATE OR REPLACE TABLE</span> gold.customer_metrics <span class="kw">AS</span>
+<span class="kw">SELECT</span> customer_id, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> orders, <span class="fn">SUM</span>(amount) <span class="kw">AS</span> ltv
+<span class="kw">FROM</span> silver.orders_cleansed <span class="kw">GROUP BY</span> customer_id;</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>QUALIFY Clause:</b> Replaces expensive <code>SELECT * FROM (SELECT ..., ROW_NUMBER() ...) WHERE rn=1</code> subqueries cleanly!
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="page-footer-left">
+        <span>Santosh Jammi | Principal Data Architect</span>
+        <span>•</span>
+        <span>Databricks Lakehouse Cheat Sheet Series</span>
+      </div>
+      <div class="page-footer-right">Page 1 of 2 — DDL, DML & Maintenance</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page">
+    <div class="header-bar">
+      <div class="header-left">
+        <div class="header-title-box">
+          <h1>⚡ DATABRICKS SPARK SQL CHEAT SHEET</h1>
+          <p>Analytical SQL, Complex Types, Higher-Order Functions, Pivot & Engine Tuning</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">Advanced SQL</span>
+        <span class="badge badge-secondary">Analytical Functions</span>
+        <span class="badge badge-dark">Row Filters / Masks</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Card 7: Window Functions & Analytical SQL -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📊 Window Functions & Analytical Framing</span>
+          <span class="card-tag">Analytics</span>
+        </div>
+        <pre class="code"><span class="kw">SELECT</span> customer_id, txn_date, amount,
+  <span class="cm">-- Ranking: Row_Number (unique), Dense_Rank (no gaps)</span>
+  <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span>(w_acct <span class="kw">ORDER BY</span> txn_date <span class="kw">DESC</span>) <span class="kw">AS</span> rn,
+  <span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span>(w_acct <span class="kw">ORDER BY</span> amount <span class="kw">DESC</span>) <span class="kw">AS</span> rk,
+  <span class="cm">-- Offsets: Prior & Next transaction amount</span>
+  <span class="fn">LAG</span>(amount, <span class="num">1</span>, <span class="num">0.0</span>) <span class="kw">OVER</span>(w_acct <span class="kw">ORDER BY</span> txn_date) <span class="kw">AS</span> prev_amt,
+  <span class="fn">LEAD</span>(amount, <span class="num">1</span>, <span class="num">0.0</span>) <span class="kw">OVER</span>(w_acct <span class="kw">ORDER BY</span> txn_date) <span class="kw">AS</span> next_amt,
+  <span class="cm">-- Moving 7-Day Rolling Average (Physical rows)</span>
+  <span class="fn">AVG</span>(amount) <span class="kw">OVER</span>(w_acct <span class="kw">ORDER BY</span> txn_date
+    <span class="kw">ROWS BETWEEN</span> <span class="num">6</span> <span class="kw">PRECEDING AND CURRENT ROW</span>) <span class="kw">AS</span> roll_7d_avg,
+  <span class="cm">-- Cumulative Year-to-Date Sum (Range)</span>
+  <span class="fn">SUM</span>(amount) <span class="kw">OVER</span>(w_acct <span class="kw">ORDER BY</span> txn_date
+    <span class="kw">RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>) <span class="kw">AS</span> ytd_sum
+<span class="kw">FROM</span> silver.transactions
+<span class="kw">WINDOW</span> w_acct <span class="kw">AS</span> (<span class="kw">PARTITION BY</span> customer_id);</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>Pro Tip:</b> If source data is clustered/sorted by the window partition key, Catalyst executes windowing without any network shuffle!
+        </div>
+      </div>
+
+      <!-- Card 8: Complex Types & Semi-Structured Data -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🧩 Complex Types: Structs, Arrays & JSON</span>
+          <span class="card-tag">Semi-Structured</span>
+        </div>
+        <pre class="code"><span class="cm">-- Struct navigation, Array slicing, Map lookup</span>
+<span class="kw">SELECT</span>
+  payload.user.id <span class="kw">AS</span> user_id,             <span class="cm">-- struct field</span>
+  payload.tags[<span class="num">0</span>] <span class="kw">AS</span> primary_tag,          <span class="cm">-- array 0-index</span>
+  payload.attributes[<span class="str">'tier'</span>] <span class="kw">AS</span> tier,     <span class="cm">-- map lookup</span>
+  <span class="cm">-- Parse raw JSON string into typed Struct</span>
+  <span class="fn">from_json</span>(raw_payload, <span class="str">'id BIGINT, name STRING, items ARRAY&lt;STRING&gt;'</span>) <span class="kw">AS</span> parsed,
+  <span class="cm">-- Convert Struct into JSON string</span>
+  <span class="fn">to_json</span>(<span class="fn">named_struct</span>(<span class="str">'ts'</span>, <span class="fn">current_timestamp</span>(), <span class="str">'code'</span>, <span class="num">200</span>)) <span class="kw">AS</span> json_str
+<span class="kw">FROM</span> bronze.events;
+
+<span class="cm">-- Explode Array into relational rows</span>
+<span class="kw">SELECT</span> order_id, item.sku, item.qty, item.unit_price
+<span class="kw">FROM</span> silver.orders
+<span class="kw">LATERAL VIEW EXPLODE</span>(line_items) lv <span class="kw">AS</span> item;</pre>
+        <ul class="rules-list">
+          <li><code>LATERAL VIEW OUTER EXPLODE</code> preserves rows with empty/null arrays.</li>
+          <li><code>schema_of_json()</code> dynamically extracts schema from a sample JSON string.</li>
+        </ul>
+      </div>
+
+      <!-- Card 9: Higher-Order Functions (Vectorized) -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚡ Higher-Order Functions (In-Engine Array Ops)</span>
+          <span class="card-tag">Photon Vectorized</span>
+        </div>
+        <pre class="code"><span class="kw">SELECT</span> order_id,
+  <span class="cm">-- TRANSFORM: Map elements without exploding!</span>
+  <span class="fn">TRANSFORM</span>(line_items, x -&gt;
+    <span class="fn">named_struct</span>(<span class="str">'sku'</span>, x.sku, <span class="str">'gross'</span>, <span class="fn">ROUND</span>(x.price * <span class="num">1.20</span>, <span class="num">2</span>))
+  ) <span class="kw">AS</span> taxed_items,
+
+  <span class="cm">-- FILTER: Retain only elements matching condition</span>
+  <span class="fn">FILTER</span>(line_items, x -&gt; x.price &gt; <span class="num">100.0</span>) <span class="kw">AS</span> luxury_items,
+
+  <span class="cm">-- EXISTS: Returns true if any element satisfies predicate</span>
+  <span class="fn">EXISTS</span>(line_items, x -&gt; x.sku <span class="kw">LIKE</span> <span class="str">'PROMO-%'</span>) <span class="kw">AS</span> has_promo,
+
+  <span class="cm">-- AGGREGATE: Reduce array to scalar sum</span>
+  <span class="fn">AGGREGATE</span>(line_items, <span class="num">0.0</span>, (acc, x) -&gt; acc + x.price,
+            acc -&gt; <span class="fn">ROUND</span>(acc, <span class="num">2</span>)) <span class="kw">AS</span> total_order_sum
+<span class="kw">FROM</span> silver.orders;</pre>
+        <div class="alert alert-tip">
+          💡 <b>Architect Rule:</b> Higher-Order functions run entirely in memory inside Tungsten/Photon C++ without row explosion or shuffle overhead.
+        </div>
+      </div>
+
+      <!-- Card 10: Governance - Row Filters & Column Masks -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔒 Unity Catalog Row Filters & Column Masks</span>
+          <span class="card-tag">Security</span>
+        </div>
+        <pre class="code"><span class="cm">-- 1. Column Masking (Mask card PAN unless in finance)</span>
+<span class="kw">CREATE OR REPLACE FUNCTION</span> mask_card_pan(pan <span class="typ">STRING</span>)
+<span class="kw">RETURN IF</span>(<span class="fn">IS_ACCOUNT_GROUP_MEMBER</span>(<span class="str">'pci_auditors'</span>), pan,
+          <span class="fn">CONCAT</span>(<span class="str">'****-****-****-'</span>, <span class="fn">RIGHT</span>(pan, <span class="num">4</span>)));
+
+<span class="kw">ALTER TABLE</span> silver.payments
+<span class="kw">ALTER COLUMN</span> card_pan <span class="kw">SET MASK</span> mask_card_pan;
+
+<span class="cm">-- 2. Row Filtering (Regional multi-tenant isolation)</span>
+<span class="kw">CREATE OR REPLACE FUNCTION</span> filter_by_region(region <span class="typ">STRING</span>)
+<span class="kw">RETURN</span> <span class="fn">IS_ACCOUNT_GROUP_MEMBER</span>(<span class="str">'global_admin'</span>) <span class="kw">OR</span> region = <span class="fn">current_user</span>();
+
+<span class="kw">ALTER TABLE</span> silver.sales
+<span class="kw">SET ROW FILTER</span> filter_by_region <span class="kw">ON</span> (region);</pre>
+        <div class="alert alert-sec">
+          🔒 <b>Fine-Grained Security:</b> Applied transparently at storage read-time for BI, SQL, Python, and R without maintaining separate secure views.
+        </div>
+      </div>
+
+      <!-- Card 11: PIVOT, UNPIVOT & Multi-Dimensional Grouping -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔄 PIVOT, UNPIVOT & Grouping Sets</span>
+          <span class="card-tag">Transformations</span>
+        </div>
+        <pre class="code"><span class="cm">-- PIVOT: Rotate row values into columnar KPIs</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> (
+  <span class="kw">SELECT</span> region, quarter, revenue <span class="kw">FROM</span> silver.sales
+) <span class="kw">PIVOT</span> (
+  <span class="fn">SUM</span>(revenue) <span class="kw">FOR</span> quarter <span class="kw">IN</span> (<span class="str">'Q1'</span>, <span class="str">'Q2'</span>, <span class="str">'Q3'</span>, <span class="str">'Q4'</span>)
+);
+
+<span class="cm">-- UNPIVOT: Rotate columnar metrics into tidy rows</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> silver.quarterly_kpis
+<span class="kw">UNPIVOT</span> (revenue <span class="kw">FOR</span> qtr <span class="kw">IN</span> (q1, q2, q3, q4));
+
+<span class="cm">-- CUBE & ROLLUP: Multi-level executive aggregation</span>
+<span class="kw">SELECT</span> region, product, <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> total
+<span class="kw">FROM</span> silver.sales <span class="kw">GROUP BY ROLLUP</span> (region, product);</pre>
+        <div class="alert alert-tip">
+          💡 <b>ROLLUP vs CUBE:</b> <code>ROLLUP</code> produces hierarchical subtotals (Country &gt; State &gt; City); <code>CUBE</code> computes all 2^N combinations.
+        </div>
+      </div>
+
+      <!-- Card 12: Performance Hints & Spark SQL Engine Knobs -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🚀 Join Strategy Hints & Session Performance Configuration</span>
+          <span class="card-tag">Engine Tuning</span>
+        </div>
+        <pre class="code"><span class="cm">-- Optimizer Join Hints</span>
+<span class="kw">SELECT</span> <span class="cm">/*+ BROADCAST(dim_cat) */</span>
+  f.txn_id, f.amount, dim_cat.category_name
+<span class="kw">FROM</span> silver.fact_sales f
+<span class="kw">JOIN</span> silver.dim_category dim_cat <span class="kw">ON</span> f.category_id = dim_cat.id;
+
+<span class="cm">-- Force Shuffle Hash Join</span>
+<span class="kw">SELECT</span> <span class="cm">/*+ SHUFFLE_HASH(orders) */</span> *
+<span class="kw">FROM</span> orders <span class="kw">JOIN</span> returns <span class="kw">ON</span> orders.id = returns.id;</pre>
+        <table class="mini-table">
+          <tr><th>Knob</th><th>Setting</th><th>Impact</th></tr>
+          <tr><td><code>spark.sql.shuffle.partitions</code></td><td><code>auto</code></td><td>Enables AQE dynamic partition sizing</td></tr>
+          <tr><td><code>spark.sql.adaptive.enabled</code></td><td><code>true</code></td><td>Runtime join re-planning & skew split</td></tr>
+          <tr><td><code>spark.databricks.delta.optimizeWrite.enabled</code></td><td><code>true</code></td><td>Pre-shuffle writes to prevent small files</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="page-footer-left">
+        <span>Santosh Jammi | Principal Data Architect</span>
+        <span>•</span>
+        <span>Databricks Lakehouse Cheat Sheet Series</span>
+      </div>
+      <div class="page-footer-right">Page 2 of 2 — Analytical SQL & Tuning</div>
+    </div>
+  </div>
+
+</body>
+</html>

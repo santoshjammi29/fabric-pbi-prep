@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Databricks PySpark Enterprise Cheat Sheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #080c15;
+  color: #e2e8f0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 7.2px;
+  line-height: 1.25;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  max-height: 297mm;
+  padding: 5mm 6.5mm 4.5mm 6.5mm;
+  background: #080c15;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Page Header */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #E25A1C;
+  padding-bottom: 3.5px;
+  margin-bottom: 4px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.header-title-box h1 {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-title-box p {
+  font-size: 7.2px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+}
+
+.badge {
+  padding: 1.5px 5.5px;
+  border-radius: 3px;
+  font-size: 6.8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-primary { background: #E25A1C; color: #ffffff; }
+.badge-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
+.badge-dark { background: #0f172a; color: #a5b4fc; border: 1px solid #1e293b; }
+.badge-accent { background: #10b981; color: #042f2e; }
+
+/* Grid Layout: 3 Rows of 2 Cards */
+.content-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 4px 5.5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 2px;
+}
+
+.card-title {
+  font-size: 8.2px;
+  font-weight: 700;
+  color: #FB923C;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-tag {
+  font-size: 6.2px;
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Code Blocks */
+pre.code {
+  background: #040711;
+  border: 1px solid #141e33;
+  border-radius: 3px;
+  padding: 3px 4.5px;
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 6.5px;
+  line-height: 1.22;
+  color: #e2e8f0;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Syntax Highlighting */
+.kw { color: #f43f5e; font-weight: 600; }    /* keywords */
+.fn { color: #38bdf8; font-weight: 600; }    /* functions */
+.str { color: #4ade80; }                     /* strings */
+.cm { color: #64748b; font-style: italic; }  /* comments */
+.num { color: #fb923c; }                     /* numbers */
+.cls { color: #fbbf24; font-weight: 600; }   /* classes/types */
+.var { color: #a78bfa; }                     /* variables */
+.typ { color: #facc15; }                     /* SQL types */
+
+/* Callout Alert Boxes */
+.alert {
+  padding: 2px 3.5px;
+  border-radius: 2px;
+  font-size: 6.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 3.5px;
+  line-height: 1.18;
+}
+
+.alert-tip {
+  background: rgba(14, 165, 233, 0.08);
+  border-left: 2px solid #0ea5e9;
+  color: #bae6fd;
+}
+
+.alert-perf {
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 2px solid #10b981;
+  color: #a7f3d0;
+}
+
+.alert-warn {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 2px solid #f59e0b;
+  color: #fde68a;
+}
+
+.alert-sec {
+  background: rgba(168, 85, 247, 0.08);
+  border-left: 2px solid #a855f7;
+  color: #e9d5ff;
+}
+
+/* Mini Tables */
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 6.5px;
+  margin: 1px 0;
+}
+
+.mini-table th {
+  text-align: left;
+  background: #141e33;
+  color: #94a3b8;
+  padding: 1.5px 3px;
+  font-weight: 600;
+  border-bottom: 1px solid #1e293b;
+}
+
+.mini-table td {
+  padding: 1.2px 3px;
+  border-bottom: 1px solid #141e33;
+  color: #cbd5e1;
+}
+
+.mini-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mini-table code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  font-size: 6.2px;
+}
+
+/* Bullet list */
+ul.rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2px;
+}
+
+ul.rules-list li {
+  font-size: 6.5px;
+  position: relative;
+  padding-left: 6.5px;
+  color: #cbd5e1;
+  line-height: 1.18;
+}
+
+ul.rules-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #E25A1C;
+  font-weight: bold;
+}
+
+/* Footer */
+.page-footer {
+  border-top: 1px solid #1e293b;
+  padding-top: 2.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 6.5px;
+  color: #64748b;
+}
+
+.page-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-footer-right {
+  font-weight: 600;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+    <div class="header-bar">
+      <div class="header-left">
+        <div class="header-title-box">
+          <h1>🔥 DATABRICKS PYSPARK CHEAT SHEET</h1>
+          <p>Production Reference: SparkSession, DataFrame API, Schemas, Joins, Windowing & Aggregations</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">PySpark</span>
+        <span class="badge badge-secondary">DataFrame API</span>
+        <span class="badge badge-dark">Delta Lake 3.x</span>
+        <span class="badge badge-accent">Auto Loader</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Card 1: SparkSession & Imports -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🚀 SparkSession & Standard Imports</span>
+          <span class="card-tag">Setup</span>
+        </div>
+        <pre class="code"><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession, Window <span class="kw">as</span> <span class="cls">W</span>
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> <span class="cls">F</span>, types <span class="kw">as</span> <span class="cls">T</span>
+<span class="kw">from</span> delta.tables <span class="kw">import</span> <span class="cls">DeltaTable</span>
+
+<span class="cm"># Pre-initialized in Databricks as 'spark'; Configured for Medallion</span>
+<span class="var">spark</span>.conf.set(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"auto"</span>)
+<span class="var">spark</span>.conf.set(<span class="str">"spark.sql.adaptive.enabled"</span>, <span class="str">"true"</span>)
+<span class="var">spark</span>.conf.set(<span class="str">"spark.sql.adaptive.coalescePartitions.enabled"</span>, <span class="str">"true"</span>)
+<span class="var">spark</span>.conf.set(<span class="str">"spark.databricks.delta.optimizeWrite.enabled"</span>, <span class="str">"true"</span>)
+<span class="var">spark</span>.conf.set(<span class="str">"spark.databricks.delta.autoCompact.enabled"</span>, <span class="str">"true"</span>)</pre>
+        <ul class="rules-list">
+          <li><code>optimizeWrite</code> performs an exchange before writing to ensure 128MB-1GB files.</li>
+          <li><code>autoCompact</code> automatically checks and compacts files after individual write stages.</li>
+        </ul>
+      </div>
+
+      <!-- Card 2: Essential DataFrame Transformations -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚡ DataFrame Projections & Filtering</span>
+          <span class="card-tag">Core API</span>
+        </div>
+        <pre class="code"><span class="cm"># Projections, Expressions & Casts</span>
+<span class="var">df_clean</span> = (<span class="var">df</span>
+    .select(
+        <span class="str">"customer_id"</span>,
+        <span class="cls">F</span>.col(<span class="str">"amount"</span>).cast(<span class="cls">T</span>.DecimalType(<span class="num">18</span>, <span class="num">2</span>)).alias(<span class="str">"amount_eur"</span>),
+        <span class="cls">F</span>.to_date(<span class="cls">F</span>.col(<span class="str">"created_at"</span>)).alias(<span class="str">"txn_date"</span>)
+    )
+    .withColumn(<span class="str">"tier"</span>,
+        <span class="cls">F</span>.when(<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>) &gt; <span class="num">5000</span>, <span class="str">"PLATINUM"</span>)
+         .when(<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>) &gt; <span class="num">1000</span>, <span class="str">"GOLD"</span>)
+         .otherwise(<span class="str">"STANDARD"</span>)
+    )
+    .filter((<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>) &gt; <span class="num">0</span>) &amp; <span class="cls">F</span>.col(<span class="str">"customer_id"</span>).isNotNull())
+    .dropDuplicates([<span class="str">"customer_id"</span>, <span class="str">"txn_date"</span>])
+    .orderBy(<span class="cls">F</span>.col(<span class="str">"amount_eur"</span>).desc_nulls_last())
+)</pre>
+        <div class="alert alert-tip">
+          💡 <b>withColumns():</b> In Spark 3.3+, pass a dictionary to <code>df.withColumns(...)</code> to add multiple columns in a single projection pass!
+        </div>
+      </div>
+
+      <!-- Card 3: Strict Schema Definition -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📐 Schema Definition (StructType & StructField)</span>
+          <span class="card-tag">Data Quality</span>
+        </div>
+        <pre class="code"><span class="cm"># Explicit schema avoids expensive inferSchema full-scans</span>
+<span class="var">txn_schema</span> = <span class="cls">T</span>.StructType([
+    <span class="cls">T</span>.StructField(<span class="str">"txn_id"</span>, <span class="cls">T</span>.LongType(), nullable=<span class="kw">False</span>),
+    <span class="cls">T</span>.StructField(<span class="str">"cust_id"</span>, <span class="cls">T</span>.StringType(), nullable=<span class="kw">False</span>),
+    <span class="cls">T</span>.StructField(<span class="str">"amount"</span>, <span class="cls">T</span>.DecimalType(<span class="num">18</span>, <span class="num">2</span>), nullable=<span class="kw">False</span>),
+    <span class="cls">T</span>.StructField(<span class="str">"attributes"</span>, <span class="cls">T</span>.MapType(<span class="cls">T</span>.StringType(), <span class="cls">T</span>.StringType())),
+    <span class="cls">T</span>.StructField(<span class="str">"items"</span>, <span class="cls">T</span>.ArrayType(<span class="cls">T</span>.StringType())),
+    <span class="cls">T</span>.StructField(<span class="str">"event_time"</span>, <span class="cls">T</span>.TimestampType())
+])
+
+<span class="cm"># Read with enforced schema and corrupt record safety</span>
+<span class="var">df</span> = (<span class="var">spark</span>.read
+      .schema(<span class="var">txn_schema</span>)
+      .option(<span class="str">"mode"</span>, <span class="str">"PERMISSIVE"</span>)
+      .option(<span class="str">"columnNameOfCorruptRecord"</span>, <span class="str">"_corrupt"</span>)
+      .json(<span class="str">"abfss://landing@adls.dfs.core.windows.net/txns/"</span>))</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>FinOps Sizing:</b> Enforcing schemas on read eliminates a 2-pass scan over multi-terabyte JSON/CSV landing zones.
+        </div>
+      </div>
+
+      <!-- Card 4: Standard Functions (F) Quick Reference -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🧰 pyspark.sql.functions (F) Master Reference</span>
+          <span class="card-tag">Functions</span>
+        </div>
+        <table class="mini-table">
+          <tr><th>Category</th><th>Top Functions</th></tr>
+          <tr><td><b>String</b></td><td><code>F.concat_ws('_', c1, c2)</code>, <code>F.regexp_replace()</code>, <code>F.split()</code>, <code>F.trim()</code></td></tr>
+          <tr><td><b>Date/Time</b></td><td><code>F.to_date()</code>, <code>F.date_add(c, 30)</code>, <code>F.datediff(c1, c2)</code>, <code>F.date_trunc('MM')</code></td></tr>
+          <tr><td><b>Nulls</b></td><td><code>F.coalesce(c1, c2, F.lit('N/A'))</code>, <code>df.na.fill(0)</code>, <code>df.na.drop()</code></td></tr>
+          <tr><td><b>Array</b></td><td><code>F.explode()</code>, <code>F.array_contains()</code>, <code>F.size()</code>, <code>F.array_distinct()</code></td></tr>
+          <tr><td><b>JSON</b></td><td><code>F.from_json(col, schema)</code>, <code>F.to_json(struct)</code>, <code>F.get_json_object()</code></td></tr>
+        </table>
+        <div class="alert alert-perf">
+          ⚡ <b>Vectorization:</b> Built-in <code>pyspark.sql.functions</code> execute natively in JVM/C++ Photon without Python serialization penalties!
+        </div>
+      </div>
+
+      <!-- Card 5: Joins, Broadcast & Skew Salting -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔀 Joins, Broadcast Hints & Skew Salting</span>
+          <span class="card-tag">Optimization</span>
+        </div>
+        <pre class="code"><span class="cm"># Broadcast Join: Eliminates shuffle for lookup tables (&lt;100MB)</span>
+<span class="var">df_joined</span> = <span class="var">df_fact</span>.join(<span class="cls">F</span>.broadcast(<span class="var">df_dim</span>), on=<span class="str">"cat_id"</span>, how=<span class="str">"left"</span>)
+
+<span class="cm"># Semi & Anti Joins (Replaces expensive IN / NOT IN subqueries)</span>
+<span class="var">df_active</span> = <span class="var">df_users</span>.join(<span class="var">df_purchases</span>, on=<span class="str">"user_id"</span>, how=<span class="str">"left_semi"</span>)
+<span class="var">df_churned</span> = <span class="var">df_users</span>.join(<span class="var">df_purchases</span>, on=<span class="str">"user_id"</span>, how=<span class="str">"left_anti"</span>)
+
+<span class="cm"># Manual 2-Stage Skew Salting (When AQE cannot balance 100M+ key)</span>
+<span class="var">df_skewed</span> = <span class="var">df_fact</span>.withColumn(<span class="str">"salt"</span>, (<span class="cls">F</span>.rand() * <span class="num">10</span>).cast(<span class="str">"int"</span>))
+<span class="var">df_dim_exploded</span> = (<span class="var">df_dim</span>
+    .withColumn(<span class="str">"salt_arr"</span>, <span class="cls">F</span>.array([<span class="cls">F</span>.lit(i) <span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">10</span>)]))
+    .withColumn(<span class="str">"salt"</span>, <span class="cls">F</span>.explode(<span class="str">"salt_arr"</span>)))
+<span class="var">df_salted_join</span> = <span class="var">df_skewed</span>.join(<span class="var">df_dim_exploded</span>, on=[<span class="str">"key"</span>, <span class="str">"salt"</span>])</pre>
+      </div>
+
+      <!-- Card 6: Window Functions in PySpark -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🪟 Analytical Window Specifications (pyspark.sql.Window)</span>
+          <span class="card-tag">Analytics</span>
+        </div>
+        <pre class="code"><span class="cm"># Define Window Specifications</span>
+<span class="var">w_dept</span> = <span class="cls">W</span>.partitionBy(<span class="str">"dept_id"</span>).orderBy(<span class="cls">F</span>.col(<span class="str">"salary"</span>).desc())
+<span class="var">w_roll_7d</span> = (<span class="cls">W</span>.partitionBy(<span class="str">"account_id"</span>)
+             .orderBy(<span class="cls">F</span>.col(<span class="str">"txn_date"</span>).cast(<span class="str">"timestamp"</span>).cast(<span class="str">"long"</span>))
+             .rangeBetween(-<span class="num">7</span> * <span class="num">86400</span>, <span class="num">0</span>)) <span class="cm"># 7 days in seconds</span>
+
+<span class="var">df_analyzed</span> = (<span class="var">df</span>
+    .withColumn(<span class="str">"dense_rank"</span>, <span class="cls">F</span>.dense_rank().over(<span class="var">w_dept</span>))
+    .withColumn(<span class="str">"prev_salary"</span>, <span class="cls">F</span>.lag(<span class="str">"salary"</span>, <span class="num">1</span>, <span class="num">0</span>).over(<span class="var">w_dept</span>))
+    .withColumn(<span class="str">"salary_diff"</span>, <span class="cls">F</span>.col(<span class="str">"salary"</span>) - <span class="cls">F</span>.col(<span class="str">"prev_salary"</span>))
+    .withColumn(<span class="str">"rolling_7d_total"</span>, <span class="cls">F</span>.sum(<span class="str">"amount"</span>).over(<span class="var">w_roll_7d</span>))
+)</pre>
+        <div class="alert alert-tip">
+          💡 <b>RangeBetween vs RowsBetween:</b> <code>rangeBetween</code> handles calendar days and gaps; <code>rowsBetween</code> operates strictly on physical row indices.
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="page-footer-left">
+        <span>Santosh Jammi | Principal Data Architect</span>
+        <span>•</span>
+        <span>Databricks Lakehouse Cheat Sheet Series</span>
+      </div>
+      <div class="page-footer-right">Page 1 of 2 — DataFrame API & Windows</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page">
+    <div class="header-bar">
+      <div class="header-left">
+        <div class="header-title-box">
+          <h1>🔥 DATABRICKS PYSPARK CHEAT SHEET</h1>
+          <p>DeltaTable API, Auto Loader Streaming, Vectorized UDFs & Performance Tuning</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">Lakehouse API</span>
+        <span class="badge badge-secondary">PyArrow Vectorized</span>
+        <span class="badge badge-dark">Streaming</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Card 7: DeltaTable Python API -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📦 DeltaTable Python API & Upserts</span>
+          <span class="card-tag">Lakehouse</span>
+        </div>
+        <pre class="code"><span class="kw">from</span> delta.tables <span class="kw">import</span> <span class="cls">DeltaTable</span>
+
+<span class="var">dt</span> = <span class="cls">DeltaTable</span>.forName(<span class="var">spark</span>, <span class="str">"prod_catalog.silver.customers"</span>)
+
+<span class="cm"># Pythonic ACID Merge / Upsert</span>
+(<span class="var">dt</span>.alias(<span class="str">"t"</span>)
+   .merge(<span class="var">source_df</span>.alias(<span class="str">"s"</span>), <span class="str">"t.cust_id = s.cust_id"</span>)
+   .whenMatchedUpdate(
+       condition=<span class="str">"s.op = 'U'"</span>,
+       set={"name": "s.name", "updated_at": "current_timestamp()"}
+   )
+   .whenMatchedDelete(condition=<span class="str">"s.op = 'D'"</span>)
+   .whenNotMatchedInsert(
+       values={"cust_id": "s.cust_id", "name": "s.name",
+               "created_at": "current_timestamp()"}
+   )
+   .execute())
+
+<span class="cm"># Maintenance & Time Travel</span>
+<span class="var">dt</span>.optimize().executeCompaction()
+<span class="var">dt</span>.vacuum(<span class="num">168</span>)  <span class="cm"># 7 days</span>
+<span class="var">hist_df</span> = <span class="var">dt</span>.history()</pre>
+      </div>
+
+      <!-- Card 8: Structured Streaming & Auto Loader -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🌊 Auto Loader & Structured Streaming</span>
+          <span class="card-tag">Streaming</span>
+        </div>
+        <pre class="code"><span class="cm"># Ingestion with Databricks Auto Loader (cloudFiles)</span>
+<span class="var">stream_df</span> = (<span class="var">spark</span>.readStream
+    .format(<span class="str">"cloudFiles"</span>)
+    .option(<span class="str">"cloudFiles.format"</span>, <span class="str">"json"</span>)
+    .option(<span class="str">"cloudFiles.schemaLocation"</span>, <span class="str">"/checkpoints/schema"</span>)
+    .option(<span class="str">"cloudFiles.inferColumnTypes"</span>, <span class="str">"true"</span>)
+    .option(<span class="str">"cloudFiles.schemaEvolutionMode"</span>, <span class="str">"addNewColumns"</span>)
+    .load(<span class="str">"abfss://raw@adls.dfs.core.windows.net/events/"</span>))
+
+<span class="cm"># Watermarked Sink write with AvailableNow trigger</span>
+<span class="var">query</span> = (<span class="var">stream_df</span>
+    .withWatermark(<span class="str">"event_time"</span>, <span class="str">"10 minutes"</span>)
+    .writeStream
+    .format(<span class="str">"delta"</span>)
+    .outputMode(<span class="str">"append"</span>)
+    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/checkpoints/bronze_events"</span>)
+    .trigger(availableNow=<span class="kw">True</span>) <span class="cm"># Incremental batch</span>
+    .toTable(<span class="str">"bronze.events"</span>))</pre>
+        <div class="alert alert-tip">
+          💡 <b>Trigger(availableNow=True):</b> Replaces legacy <code>once=True</code>. Processes all pending data in rate-limited micro-batches then stops, slashing cluster costs!
+        </div>
+      </div>
+
+      <!-- Card 9: Vectorized Pandas UDFs vs Standard UDFs -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚡ PyArrow Vectorized Pandas UDFs</span>
+          <span class="card-tag">Performance</span>
+        </div>
+        <pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> pandas_udf
+
+<span class="cm"># Vectorized Series-to-Series UDF (Uses Apache Arrow)</span>
+<span class="kw">@pandas_udf</span>(<span class="cls">T</span>.DoubleType())
+<span class="kw">def</span> calculate_vat(price: pd.Series, rate: pd.Series) -&gt; pd.Series:
+    <span class="kw">return</span> price * (<span class="num">1.0</span> + rate)
+
+<span class="var">df_taxed</span> = <span class="var">df</span>.withColumn(<span class="str">"gross"</span>, calculate_vat(<span class="cls">F</span>.col(<span class="str">"net"</span>), <span class="cls">F</span>.col(<span class="str">"rate"</span>)))
+
+<span class="cm"># Grouped Map Vectorized UDF (applyInPandas)</span>
+<span class="kw">def</span> normalize_group(pdf: pd.DataFrame) -&gt; pd.DataFrame:
+    pdf[<span class="str">"z_score"</span>] = (pdf[<span class="str">"val"</span>] - pdf[<span class="str">"val"</span>].mean()) / pdf[<span class="str">"val"</span>].std()
+    <span class="kw">return</span> pdf
+
+<span class="var">df_norm</span> = <span class="var">df</span>.groupby(<span class="str">"device_id"</span>).applyInPandas(
+    normalize_group, schema=<span class="var">output_schema</span>
+)</pre>
+        <div class="alert alert-warn">
+          ⚠️ <b>Avoid Standard @udf:</b> Regular Python UDFs force row-by-row Py4J socket serialization. Pandas UDFs process columnar Arrow batches up to 100x faster!
+        </div>
+      </div>
+
+      <!-- Card 10: Partitioning & Memory Control -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚖️ Partition Management: Repartition vs Coalesce</span>
+          <span class="card-tag">FinOps / Sizing</span>
+        </div>
+        <pre class="code"><span class="cm"># Inspect current partitions</span>
+<span class="var">num_parts</span> = <span class="var">df</span>.rdd.getNumPartitions()
+
+<span class="cm"># Repartition: FULL SHUFFLE across cluster (Increase/Balance)</span>
+<span class="var">df_balanced</span> = <span class="var">df</span>.repartition(<span class="num">200</span>)
+<span class="var">df_hash</span> = <span class="var">df</span>.repartition(<span class="num">100</span>, <span class="str">"region"</span>)
+
+<span class="cm"># Coalesce: ZERO SHUFFLE (Shrinks local partition blocks)</span>
+<span class="var">df_shrunk</span> = <span class="var">df</span>.coalesce(<span class="num">10</span>) <span class="cm"># Use right before file write!</span></pre>
+        <table class="mini-table">
+          <tr><th>Operation</th><th>Network Shuffle</th><th>Partition Target</th></tr>
+          <tr><td><code>repartition(N)</code></td><td>Yes (Exchange)</td><td>Increase or redistribute evenly</td></tr>
+          <tr><td><code>coalesce(N)</code></td><td>No (Local merge)</td><td>Shrink only; avoids small files</td></tr>
+        </table>
+        <div class="alert alert-perf">
+          ⚡ <b>Rule of Thumb:</b> Target <b>100MB - 200MB</b> uncompressed data per partition.
+        </div>
+      </div>
+
+      <!-- Card 11: Caching, Persistence & Cleanup -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💾 Caching, Persistence Levels & Cleanup</span>
+          <span class="card-tag">Memory Management</span>
+        </div>
+        <pre class="code"><span class="kw">from</span> pyspark <span class="kw">import</span> <span class="cls">StorageLevel</span>
+
+<span class="cm"># Cache: MEMORY_AND_DISK_DESER (Default)</span>
+<span class="var">df_cached</span> = <span class="var">df</span>.cache()
+
+<span class="cm"># Persist with Serialized Kryo (Saves up to 3x RAM)</span>
+<span class="var">df_persisted</span> = <span class="var">df</span>.persist(<span class="cls">StorageLevel</span>.MEMORY_ONLY_SER)
+
+<span class="cm"># MANDATORY: Evict from RAM when actions complete!</span>
+<span class="var">df_cached</span>.unpersist()</pre>
+        <ul class="rules-list">
+          <li><b>When to Cache:</b> Cache ONLY when a DataFrame is reused across 2+ separate downstream actions.</li>
+          <li><b>Over-caching Antipattern:</b> Starves Unified Execution Memory, forcing shuffle spills to disk!</li>
+        </ul>
+      </div>
+
+      <!-- Card 12: Streaming ForeachBatch Sink & Microbatch Processing -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔁 Streaming foreachBatch Microbatch Processing</span>
+          <span class="card-tag">Streaming Sink</span>
+        </div>
+        <pre class="code"><span class="kw">def</span> process_micro_batch(micro_df, batch_id):
+    <span class="cm"># Cache microbatch if referenced in multiple merges</span>
+    <span class="var">micro_df</span>.persist()
+    
+    <span class="cm"># ACID Merge microbatch directly into Delta Silver</span>
+    (<span class="cls">DeltaTable</span>.forName(<span class="var">spark</span>, <span class="str">"silver.txns"</span>).alias(<span class="str">"t"</span>)
+     .merge(<span class="var">micro_df</span>.alias(<span class="str">"s"</span>), <span class="str">"t.id = s.id"</span>)
+     .whenMatchedUpdateAll()
+     .whenNotMatchedInsertAll()
+     .execute())
+    
+    <span class="var">micro_df</span>.unpersist()
+
+<span class="var">query</span> = (<span class="var">stream_df</span>.writeStream
+    .foreachBatch(process_micro_batch)
+    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/chk/silver"</span>)
+    .start())</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>foreachBatch Superpower:</b> Allows writing a streaming pipeline into non-streaming sinks, running multi-table merges, and executing deduplications per microbatch.
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="page-footer-left">
+        <span>Santosh Jammi | Principal Data Architect</span>
+        <span>•</span>
+        <span>Databricks Lakehouse Cheat Sheet Series</span>
+      </div>
+      <div class="page-footer-right">Page 2 of 2 — DeltaTable, Streaming & Optimization</div>
+    </div>
+  </div>
+
+</body>
+</html>

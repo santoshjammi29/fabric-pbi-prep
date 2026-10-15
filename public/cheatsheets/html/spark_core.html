@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Apache Spark Core & Architecture Cheat Sheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #080c15;
+  color: #e2e8f0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 7.2px;
+  line-height: 1.25;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  max-height: 297mm;
+  padding: 5mm 6.5mm 4.5mm 6.5mm;
+  background: #080c15;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Page Header */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #8B5CF6;
+  padding-bottom: 3.5px;
+  margin-bottom: 4px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.header-title-box h1 {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-title-box p {
+  font-size: 7.2px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+}
+
+.badge {
+  padding: 1.5px 5.5px;
+  border-radius: 3px;
+  font-size: 6.8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-primary { background: #8B5CF6; color: #ffffff; }
+.badge-secondary { background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
+.badge-dark { background: #0f172a; color: #a5b4fc; border: 1px solid #1e293b; }
+.badge-accent { background: #10b981; color: #042f2e; }
+
+/* Grid Layout: 3 Rows of 2 Cards */
+.content-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 4px 5.5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 2px;
+}
+
+.card-title {
+  font-size: 8.2px;
+  font-weight: 700;
+  color: #A78BFA;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-tag {
+  font-size: 6.2px;
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Code Blocks */
+pre.code {
+  background: #040711;
+  border: 1px solid #141e33;
+  border-radius: 3px;
+  padding: 3px 4.5px;
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 6.5px;
+  line-height: 1.22;
+  color: #e2e8f0;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Syntax Highlighting */
+.kw { color: #f43f5e; font-weight: 600; }    /* keywords */
+.fn { color: #38bdf8; font-weight: 600; }    /* functions */
+.str { color: #4ade80; }                     /* strings */
+.cm { color: #64748b; font-style: italic; }  /* comments */
+.num { color: #fb923c; }                     /* numbers */
+.cls { color: #fbbf24; font-weight: 600; }   /* classes/types */
+.var { color: #a78bfa; }                     /* variables */
+.typ { color: #facc15; }                     /* SQL types */
+
+/* Callout Alert Boxes */
+.alert {
+  padding: 2px 3.5px;
+  border-radius: 2px;
+  font-size: 6.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 3.5px;
+  line-height: 1.18;
+}
+
+.alert-tip {
+  background: rgba(14, 165, 233, 0.08);
+  border-left: 2px solid #0ea5e9;
+  color: #bae6fd;
+}
+
+.alert-perf {
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 2px solid #10b981;
+  color: #a7f3d0;
+}
+
+.alert-warn {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 2px solid #f59e0b;
+  color: #fde68a;
+}
+
+.alert-sec {
+  background: rgba(168, 85, 247, 0.08);
+  border-left: 2px solid #a855f7;
+  color: #e9d5ff;
+}
+
+/* Mini Tables */
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 6.5px;
+  margin: 1px 0;
+}
+
+.mini-table th {
+  text-align: left;
+  background: #141e33;
+  color: #94a3b8;
+  padding: 1.5px 3px;
+  font-weight: 600;
+  border-bottom: 1px solid #1e293b;
+}
+
+.mini-table td {
+  padding: 1.2px 3px;
+  border-bottom: 1px solid #141e33;
+  color: #cbd5e1;
+}
+
+.mini-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mini-table code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  font-size: 6.2px;
+}
+
+/* Bullet list */
+ul.rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2px;
+}
+
+ul.rules-list li {
+  font-size: 6.5px;
+  position: relative;
+  padding-left: 6.5px;
+  color: #cbd5e1;
+  line-height: 1.18;
+}
+
+ul.rules-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #8B5CF6;
+  font-weight: bold;
+}
+
+/* Footer */
+.page-footer {
+  border-top: 1px solid #1e293b;
+  padding-top: 2.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 6.5px;
+  color: #64748b;
+}
+
+.page-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-footer-right {
+  font-weight: 600;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+    <div class="header-bar">
+      <div class="header-left">
+        <div class="header-title-box">
+          <h1>⚙️ SPARK ARCHITECTURE & ENGINE INTERNALS</h1>
+          <p>Cluster Topology, JVM Memory Allocation, Shuffling, Catalyst & Resource Sizing</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">Spark Core</span>
+        <span class="badge badge-secondary">Tungsten & Photon</span>
+        <span class="badge badge-dark">Memory Model</span>
+        <span class="badge badge-accent">Catalyst Optimizer</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Card 1: Cluster Hierarchy & Execution Topography -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🏢 Cluster Topology & Execution Hierarchy</span>
+          <span class="card-tag">Architecture</span>
+        </div>
+        <table class="mini-table">
+          <tr><th>Component</th><th>Role & Responsibilities</th></tr>
+          <tr><td><b>Driver</b></td><td>Hosts <code>SparkSession</code>, DAGScheduler, TaskScheduler, Web UI (4040). Translates code to physical stages.</td></tr>
+          <tr><td><b>Cluster Mgr</b></td><td>Allocates physical compute resources (Databricks CM / YARN / K8s).</td></tr>
+          <tr><td><b>Worker Node</b></td><td>Physical VM hosting Executor JVM instances and NVMe shuffle disks.</td></tr>
+          <tr><td><b>Executor</b></td><td>JVM process running tasks in thread slots; holds execution/storage RAM.</td></tr>
+          <tr><td><b>Core / Slot</b></td><td>Thread processing slot. Optimal: <b>4-5 cores per executor</b>.</td></tr>
+        </table>
+        <div class="alert alert-tip">
+          💡 <b>Execution Cascade:</b> <b>Action</b> (collect/write) → <b>Job</b> → <b>Stages</b> (split by wide shuffles) → <b>Tasks</b> (1 task per partition per core).
+        </div>
+      </div>
+
+      <!-- Card 2: JVM Memory Management Model -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🧠 Executor JVM Unified Memory Model</span>
+          <span class="card-tag">Memory</span>
+        </div>
+        <table class="mini-table">
+          <tr><th>Segment</th><th>Size / Share</th><th>Purpose</th></tr>
+          <tr><td><b>Reserved</b></td><td>300 MB</td><td>Hardcoded for Spark internal engine structures</td></tr>
+          <tr><td><b>User Memory</b></td><td>40% (Heap - 300MB)</td><td>Custom data structures, UDF allocations, metadata</td></tr>
+          <tr><td><b>Unified Memory</b></td><td>60% (Heap - 300MB)</td><td>Dynamically shared between Execution & Storage</td></tr>
+          <tr><td>└ <i>Execution</i></td><td>Dynamic pool</td><td>Shuffles, joins, sorts, aggregations (Can evict storage!)</td></tr>
+          <tr><td>└ <i>Storage</i></td><td>Dynamic pool</td><td>Cached data (<code>df.cache()</code>); cannot evict execution!</td></tr>
+          <tr><td><b>Overhead</b></td><td>max(384MB, 10%)</td><td>Off-heap VM overhead, Py4J IPC, thread stacks</td></tr>
+        </table>
+        <div class="alert alert-perf">
+          ⚡ <b>Off-Heap (Tungsten):</b> <code>spark.memory.offHeap.enabled = true</code> allocates memory directly outside JVM, completely bypassing Garbage Collection pauses!
+        </div>
+      </div>
+
+      <!-- Card 3: Narrow vs Wide Dependencies -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔀 Transformations: Narrow vs Wide Dependencies</span>
+          <span class="card-tag">DAG Scheduler</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+          <div>
+            <b style="color: #34d399;">Narrow (Pipelined)</b>
+            <ul class="rules-list" style="margin-top:2px;">
+              <li><code>map</code>, <code>filter</code>, <code>withColumn</code>, <code>union</code></li>
+              <li>Each parent partition used by at most 1 child partition.</li>
+              <li>Zero network shuffle! Pipelined in memory within the <b>same stage</b>.</li>
+            </ul>
+          </div>
+          <div>
+            <b style="color: #f43f5e;">Wide (Shuffle Boundary)</b>
+            <ul class="rules-list" style="margin-top:2px;">
+              <li><code>groupBy</code>, <code>join</code>, <code>distinct</code>, <code>repartition</code></li>
+              <li>Multiple child partitions depend on parent partitions.</li>
+              <li>Forces network exchange; terminates stage and starts new stage!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Shuffle Internals & Spill -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🌪️ The Shuffle Engine: Write, Read & Spill</span>
+          <span class="card-tag">Shuffle</span>
+        </div>
+        <ul class="rules-list">
+          <li><b>Shuffle Write:</b> Mappers write records to memory buffer; sorted and written to a single <code>.data</code> file with <code>.index</code> offset file on local NVMe disk.</li>
+          <li><b>Shuffle Read:</b> Reducers fetch their required blocks over Netty RPC from all mappers across the network into local memory buffers.</li>
+          <li><b>Spill (Memory) vs Spill (Disk):</b> Occurs when shuffle memory exceeds executor threshold. Data is serialized and flushed to disk (huge latency penalty!).</li>
+        </ul>
+        <div class="alert alert-warn">
+          ⚠️ <b>Triage Spills:</b> If Spark UI shows Spill (Memory) / Spill (Disk), immediately increase executor RAM, enable AQE, or increase shuffle partitions!
+        </div>
+      </div>
+
+      <!-- Card 5: Catalyst Optimizer & Whole-Stage CodeGen -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚡ Catalyst Optimizer & Tungsten Engine</span>
+          <span class="card-tag">Query Engine</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+          <div style="background: #141e33; padding: 3px; border-radius: 3px;">
+            <b style="color: #38bdf8;">1. Analysis</b>
+            <p style="font-size: 6.2px; color: #cbd5e1; margin-top: 1px;">Resolves names against Unity Catalog.</p>
+            <b style="color: #38bdf8; margin-top:2px; display:inline-block;">2. Logical Opt</b>
+            <p style="font-size: 6.2px; color: #cbd5e1; margin-top: 1px;">Predicate pushdown, column pruning.</p>
+          </div>
+          <div style="background: #141e33; padding: 3px; border-radius: 3px;">
+            <b style="color: #38bdf8;">3. Physical Plan</b>
+            <p style="font-size: 6.2px; color: #cbd5e1; margin-top: 1px;">CBO picks optimal join (BHJ vs SMJ).</p>
+            <b style="color: #38bdf8; margin-top:2px; display:inline-block;">4. Tungsten CodeGen</b>
+            <p style="font-size: 6.2px; color: #cbd5e1; margin-top: 1px;">Compiles loops into CPU L1/L2 registers.</p>
+          </div>
+        </div>
+        <div class="alert alert-tip">
+          💡 <b>UnsafeRow:</b> Tungsten stores records in raw off-heap binary format without Java object wrapper overhead.
+        </div>
+      </div>
+
+      <!-- Card 6: Cluster Sizing & Sizing Math -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📐 Cluster Sizing & Resource Allocation Math</span>
+          <span class="card-tag">Infrastructure</span>
+        </div>
+        <pre class="code"><span class="cm"># Production Cluster Allocation Formula</span>
+<span class="cm"># Example: 10 Nodes, 16 Cores & 64GB RAM each</span>
+1. Cores per Node = 16 - 1 (OS/YARN) = 15 Cores
+2. Cores per Executor = 5 (Sweet spot for HDFS/ADLS IO throughput)
+3. Executors per Node = 15 / 5 = 3 Executors
+4. Total Executors = (10 Nodes * 3) - 1 (Driver) = 29 Executors
+5. RAM per Node = 64GB - 1GB (OS) = 63GB
+6. RAM per Executor = 63GB / 3 = 21GB
+7. Memory Overhead = max(384MB, 0.10 * 21GB) = ~2.1GB
+8. Executor Heap = 21GB - 2.1GB = ~18.9GB (Set: --executor-memory 19g)</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>Parallelism Rule:</b> <code>spark.default.parallelism = total_executor_cores * 2 to 3</code> (For 145 cores = ~300-450 partitions).
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="page-footer-left">
+        <span>Santosh Jammi | Principal Data Architect</span>
+        <span>•</span>
+        <span>Databricks Lakehouse Cheat Sheet Series</span>
+      </div>
+      <div class="page-footer-right">Page 1 of 2 — Cluster, Memory, Shuffle & Catalyst</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page">
+    <div class="header-bar">
+      <div class="header-left">
+        <div class="header-title-box">
+          <h1>⚙️ SPARK ARCHITECTURE & ENGINE INTERNALS</h1>
+          <p>Photon Native Engine, AQE Dynamic Optimization, Spark UI Triage & Skew Mastery</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-primary">AQE & Skew</span>
+        <span class="badge badge-secondary">Spark UI Debugging</span>
+        <span class="badge badge-dark">Photon C++</span>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Card 7: Databricks Photon Engine -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🚀 Databricks Photon Native Vectorized Engine</span>
+          <span class="card-tag">Photon</span>
+        </div>
+        <ul class="rules-list">
+          <li><b>C++ Native Execution:</b> Replaces Tungsten Java bytecode execution path entirely with hand-optimized native C++.</li>
+          <li><b>SIMD Vectorization:</b> Processes batches of column values in CPU SIMD registers simultaneously (Single Instruction, Multiple Data).</li>
+          <li><b>Zero JVM Overhead:</b> Eliminates Java object allocation, GC pauses, and JIT deoptimizations for high-concurrency SQL and aggregations.</li>
+        </ul>
+        <div class="alert alert-perf">
+          ⚡ <b>Accelerated Operations:</b> Delta Parquet scanning, complex hash joins, high-cardinality aggregations, and string/regex operations execute up to <b>5x faster</b> on Photon.
+        </div>
+      </div>
+
+      <!-- Card 8: Adaptive Query Execution (AQE) -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🧠 Adaptive Query Execution (AQE) 3 Superpowers</span>
+          <span class="card-tag">Adaptive Tuning</span>
+        </div>
+        <table class="mini-table">
+          <tr><th>Feature</th><th>Runtime Action</th><th>Config Knob</th></tr>
+          <tr><td><b>Dynamic Partition Coalescing</b></td><td>Merges tiny post-shuffle partitions to eliminate small-task scheduling overhead</td><td><code>spark.sql.adaptive.coalescePartitions.enabled = true</code></td></tr>
+          <tr><td><b>Dynamic Join Switching</b></td><td>Converts SortMergeJoin to BroadcastHashJoin if runtime stage output &lt; 10MB</td><td><code>spark.sql.adaptive.autoBroadcastJoinThreshold</code></td></tr>
+          <tr><td><b>Dynamic Skew Join</b></td><td>Detects skewed partitions (&gt;5x median & &gt;256MB) and automatically splits them</td><td><code>spark.sql.adaptive.skewJoin.enabled = true</code></td></tr>
+        </table>
+      </div>
+
+      <!-- Card 9: Spark UI Diagnostic Playbook -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔍 Spark UI Diagnostic & Triage Playbook</span>
+          <span class="card-tag">Diagnostics</span>
+        </div>
+        <table class="mini-table">
+          <tr><th>Spark UI Tab</th><th>Metric / Symptom</th><th>Diagnosis & Fix</th></tr>
+          <tr><td><b>Stages Tab</b></td><td>Max task time &gt;&gt; 75th percentile</td><td><b>Data Skew:</b> Single straggler task holding stage. Enable AQE skew join or salt keys.</td></tr>
+          <tr><td><b>Stages Tab</b></td><td>Spill (Memory) & Spill (Disk) &gt; 0</td><td><b>Memory Deficit:</b> Increase executor memory or raise <code>spark.sql.shuffle.partitions</code>.</td></tr>
+          <tr><td><b>Executors Tab</b></td><td>GC Time &gt; 10% of Task Time</td><td><b>Heap Exhaustion:</b> Large object allocations or oversized partitions. Enable Off-Heap memory.</td></tr>
+          <tr><td><b>SQL / Plan</b></td><td>SortMergeJoin instead of Broadcast</td><td>Check table statistics with <code>ANALYZE TABLE</code> or supply <code>/*+ BROADCAST */</code> hint.</td></tr>
+        </table>
+      </div>
+
+      <!-- Card 10: Data Skew Troubleshooting Playbook -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚠️ Data Skew Root Causes & Solutions</span>
+          <span class="card-tag">Skew Remediation</span>
+        </div>
+        <ul class="rules-list">
+          <li><b>Root Causes:</b> High frequency keys (e.g. <code>NULL</code> customer IDs, default dummy values, power-law Pareto distributions).</li>
+          <li><b>Strategy 1 (AQE):</b> Ensure <code>spark.sql.adaptive.skewJoin.enabled = true</code> (Databricks default).</li>
+          <li><b>Strategy 2 (Null Separation):</b> Filter null keys into a separate stream; join only non-nulls; <code>UNION ALL</code> nulls back.</li>
+          <li><b>Strategy 3 (Broadcast):</b> If one table fits in RAM (&lt;8GB on large clusters), broadcast it to eliminate shuffle completely!</li>
+        </ul>
+      </div>
+
+      <!-- Card 11: Storage Levels & Persistence Matrix -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💾 Storage Levels & Checkpoint Decision Matrix</span>
+          <span class="card-tag">Persistence</span>
+        </div>
+        <table class="mini-table">
+          <tr><th>Storage Level</th><th>Space</th><th>CPU</th><th>RAM</th><th>Disk</th></tr>
+          <tr><td><code>MEMORY_ONLY</code></td><td>High</td><td>Lowest</td><td>Yes (Deser)</td><td>No</td></tr>
+          <tr><td><code>MEMORY_ONLY_SER</code></td><td>Low (3x less)</td><td>Low</td><td>Yes (Kryo)</td><td>No</td></tr>
+          <tr><td><code>MEMORY_AND_DISK</code></td><td>Medium</td><td>Med</td><td>Spills to Disk</td><td>Yes</td></tr>
+          <tr><td><code>OFF_HEAP</code></td><td>Low</td><td>Lowest</td><td>Tungsten RAM</td><td>No GC!</td></tr>
+        </table>
+        <div class="alert alert-tip">
+          💡 <b>df.persist() vs df.checkpoint():</b>
+          <code>persist()</code> keeps lineage for node recovery; <code>checkpoint()</code> writes to ADLS and <b>TRUNCATES lineage</b> graph (mandatory for iterative ML/Streaming).
+        </div>
+      </div>
+
+      <!-- Card 12: JVM GC Tuning & Shuffle Math -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚙️ JVM Garbage Collection (G1GC) & Shuffle Math</span>
+          <span class="card-tag">Tuning Knobs</span>
+        </div>
+        <pre class="code"><span class="cm"># Production G1GC Flags for Databricks / Spark</span>
+-XX:+UseG1GC
+-XX:InitiatingHeapOccupancyPercent=35
+-XX:G1ReservePercent=15
+-XX:MaxGCPauseMillis=200
+
+<span class="cm"># Optimal Shuffle Partitions Calculation</span>
+<span class="cm"># Rule: Target 100MB - 200MB per shuffle partition</span>
+Total Shuffle Input Data = 64 GB (= 65,536 MB)
+Optimal Partitions = 65,536 MB / 128 MB = 512 Partitions
+Set: spark.conf.set("spark.sql.shuffle.partitions", 512)</pre>
+        <div class="alert alert-perf">
+          ⚡ <b>AQE Advisory Size:</b> Set <code>spark.sql.adaptive.advisoryPartitionSizeInBytes = 134217728</code> (128MB) for automatic post-shuffle partition sizing.
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="page-footer-left">
+        <span>Santosh Jammi | Principal Data Architect</span>
+        <span>•</span>
+        <span>Databricks Lakehouse Cheat Sheet Series</span>
+      </div>
+      <div class="page-footer-right">Page 2 of 2 — Photon, AQE, Spark UI & Diagnostics</div>
+    </div>
+  </div>
+
+</body>
+</html>

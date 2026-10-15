@@ -17,6 +17,7 @@ import {
   RefreshCw,
   ShieldAlert,
   FileCode2,
+  Download,
 } from "lucide-react";
 import type { CheatCode, CheatCodeCategory } from "@/types/data";
 import { CheatCard } from "@/components/cheatsheet/cheat-card";
@@ -316,6 +317,45 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
         <section aria-labelledby="optimization-flow-heading">
           <OptimizationFlow onSelectCheatCode={handleJumpToCode} />
         </section>
+
+        {/* Databricks Architecture & Coding Cheat Sheets Banner */}
+        <div className="p-3 sm:p-4 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-500/10 via-orange-500/5 to-blue-500/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-lg bg-red-500/15 text-red-500 dark:text-red-400 flex items-center justify-center shrink-0">
+              <Flame size={18} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Databricks Architecture &amp; Coding Cheat Sheets</h4>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-500 dark:text-red-400 border border-red-500/30">
+                  NEW • DBR 15.4/16.0 LTS
+                </span>
+              </div>
+              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 md:line-clamp-1 mt-0.5">
+                Download print-ready vector PDFs and 250 DPI panoramic posters for Spark SQL, PySpark, Spark Core Internals, and Python in Databricks.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 flex-wrap w-full md:w-auto">
+            <a
+              href="/cheatsheets/html/index.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-lg bg-[#FF3621] hover:bg-[#e0301d] text-white text-xs font-semibold transition-colors shadow-xs flex items-center gap-1.5"
+            >
+              <span>Interactive Hub</span>
+              <ArrowRight size={13} />
+            </a>
+            <a
+              href="/cheatsheets/pdf/databricks_master_cheatsheet.pdf"
+              download
+              className="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors flex items-center gap-1.5"
+            >
+              <Download size={13} className="text-red-400" />
+              <span>Master PDF (8 Pages)</span>
+            </a>
+          </div>
+        </div>
 
         {/* Whiteboard Blueprints Reference Banner */}
         <div className="p-2.5 sm:p-3 rounded-xl border border-blue-500/30 bg-blue-500/5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
