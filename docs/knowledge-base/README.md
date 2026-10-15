@@ -1,15 +1,15 @@
 # Enterprise Data Architecture Knowledge Base
 
-> **Authoritative Reference & Architectural Walkthrough Guide**  
-> Covering Azure Synapse Analytics, Microsoft Fabric, Modern NoSQL & Vector Databases, Modern ETL/ELT Applications, Big Data FinOps, and Production Practice Scenarios.
+> **Authoritative Reference, Architectural Walkthrough Guide & Production Blueprints**  
+> Covering Azure Synapse Analytics, Microsoft Fabric, Modern NoSQL & Vector Databases, Modern ETL/ELT Applications, Big Data FinOps, Open Format Storage Types, and Production Practice Scenarios.
 
 ---
 
 ## 📚 Knowledge Base Structure & Contents
 
-This repository contains an export-ready, production-grade knowledge base designed for data architects, principal data engineers, and engineering leaders. It is structured into deep-dive technical modules that can be exported directly or converted into an interactive walkthrough website using static site generators (Next.js, Astro Starlight, Docusaurus, VitePress, or MkDocs).
+This repository contains an export-ready, production-grade knowledge base designed for Principal Data Architects, Staff Data Engineers, and Engineering Leaders. It is structured into deep-dive technical modules that can be exported directly or converted into an interactive walkthrough website using static site generators (Next.js, Astro Starlight, Docusaurus, VitePress, or MkDocs).
 
-| Module | Title | Primary Focus Areas | File |
+| Module | Title | Primary Focus Areas | File / Reference |
 | :--- | :--- | :--- | :--- |
 | **01** | **Azure Synapse Architecture Deep-Dive** | Dedicated SQL Pools (MPP), Serverless SQL, Spark Pools, Synapse Link HTAP, Managed VNet, WLM, skews, enterprise success stories. | [`01_azure_synapse_architecture.md`](./01_azure_synapse_architecture.md) |
 | **02** | **Microsoft Fabric Architecture Mastery** | SaaS vs PaaS, OneLake Shortcuts, Lakehouse vs Warehouse, Direct Lake Power BI, Eventhouse/KQL, F-SKU Capacity, Smoothing/Bursting, Migration. | [`02_microsoft_fabric_mastery.md`](./02_microsoft_fabric_mastery.md) |
@@ -17,6 +17,8 @@ This repository contains an export-ready, production-grade knowledge base design
 | **04** | **Modern ETL/ELT & Stream Processing** | Spark 3.5+ vs Flink vs DuckDB + Polars in-process, Delta Lake UniForm vs Iceberg vs Hudi, Kafka vs Event Hubs, Airflow vs Dagster, dbt Core/Cloud. | [`04_modern_etl_elt_applications.md`](./04_modern_etl_elt_applications.md) |
 | **05** | **Revenue-Generating & Cost-Effective FinOps** | TCO frameworks, Serverless vs Provisioned break-even curves, Storage tiering, High-revenue monetization patterns, Cost-optimized architectures. | [`05_revenue_generating_vs_cost_effective_finops.md`](./05_revenue_generating_vs_cost_effective_finops.md) |
 | **06** | **Architectural Practice & Walkthroughs** | 6 End-to-End Enterprise Blueprints with Mermaid diagrams, failure modes, trade-off matrices, anti-patterns, and debugging playbooks. | [`06_architectural_practice_walkthroughs.md`](./06_architectural_practice_walkthroughs.md) |
+| **07** | **Open Format Storage Types Reference** | Deep-dive blueprints comparing Open Table Formats (Delta Lake, Iceberg, Hudi, Paimon) and Open File Formats (Parquet, ORC, Avro). | [`../open_format_storage_types_guide.md`](../open_format_storage_types_guide.md) |
+| **08** | **6 Delta Lake Optimization Levers** | Benchmarking 6 Delta Lake optimization levers (Partitioning, Z-Order, OPTIMIZE Compaction, Auto Optimize, Liquid Clustering, VACUUM). | [Databricks Storage Optimization](/code-practice) |
 | **Data** | **Unified Machine-Readable JSON Export** | Full structured JSON dataset with metadata, schema tags, questions, and code snippets for automated website build and vector indexing. | [`knowledge_base_export.json`](./knowledge_base_export.json) |
 
 ---
@@ -66,6 +68,7 @@ This repository contains an export-ready, production-grade knowledge base design
      - Modern ETL/ELT: 04_modern_etl_elt_applications.md
      - Big Data FinOps: 05_revenue_generating_vs_cost_effective_finops.md
      - Architectural Walkthroughs: 06_architectural_practice_walkthroughs.md
+     - Open Storage Formats: ../open_format_storage_types_guide.md
    ```
 3. Serve locally: `mkdocs serve` or build: `mkdocs build`.
 
@@ -73,8 +76,8 @@ This repository contains an export-ready, production-grade knowledge base design
 The companion file `knowledge_base_export.json` contains:
 - `modules`: Array of 6 deep-dive architectural modules with summary, target personas, and key takeaways.
 - `blueprints`: Detailed architectural blueprints with problem statement, system components, trade-offs, and failure recovery.
-- `concepts`: Key architectural concepts indexed by category, difficulty level, and keywords.
-- `scenarios`: Interactive walkthrough questions with solutions and decision criteria.
+- `concepts`: Key architectural concepts indexed by category, difficulty level, and keywords (622 concepts across 10 categories).
+- `scenarios`: Interactive walkthrough questions with solutions and decision criteria (3,200 scenarios).
 
 You can import this JSON directly into:
 - **Algolia / Meilisearch / Elasticsearch** for full-text search.
@@ -88,3 +91,4 @@ You can import this JSON directly into:
 - **Microsoft Azure Well-Architected Framework (WAF)** for Reliability, Security, Cost Optimization, Operational Excellence, and Performance Efficiency.
 - **Fabric Customer Advisory Team (CAT)** production blueprints, Direct Lake sizing, and capacity smoothing guidelines.
 - **Data Mesh & Medallion Lakehouse Standards** established across Netflix, Uber, Airbnb, and Microsoft engineering publications.
+- **Delta Lake & Apache Iceberg Specifications** for ACID transactions, hidden partitioning, metadata catalogs, and compaction protocols.

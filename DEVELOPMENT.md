@@ -1,86 +1,124 @@
-# Development, Testing, & Operations Guide
+# Development, Testing, & Operations Guide: `fabric-pbi-prep`
 
-Welcome to the Microsoft Fabric & Power BI Interview Prep portal development guide. This document details the architectural decisions, foolproof mechanisms, testing workflows, and best practices that make this website stable, robust, and friendly to millions of concurrent users.
+Welcome to the **fabric-pbi-prep** developer and contributor guide. This document details the modern Next.js 16 App Router architecture, Server-Side Data Access Layer (DAL), automated Vitest test suite, and release workflows.
 
 ---
 
 ## 1. Project Architecture
 
-This application is built as a premium, Apple-inspired Single Page Application (SPA) utilizing vanilla HTML5, modern client-side JavaScript, and CSS variables. It requires zero compilation or backend server resources, meaning it can scale to millions of concurrent users with 100% availability via a static file host (like Vercel or GitHub Pages).
+The platform is built as an enterprise-grade cloud educational portal leveraging Next.js 16 App Router, React 19 Server Components, and Tailwind CSS. It enforces a strict **Zero-Bundle Data Mandate** to ensure blazing client-side performance even with over 10,700 learning records.
 
-### Architecture Map
-```mermaid
-graph TD
-    A[index.html] --> B[styles.css]
-    A --> C[app.js]
-    A --> D[questions.js]
-    A --> E[data_concepts.js]
-    C --> F[localStorage Caching]
-    C --> G[DOM Interactions]
+```
+/Users/santosh/Documents/antigravity/adventurous-raman/
+├── src/
+│   ├── app/                         # Next.js 16 App Router routes
+│   │   ├── page.tsx                 # Landing page & Whiteboard Showcase
+│   │   ├── guided-learning/         # Cross-section progressive topic journeys
+│   │   ├── concepts/                # Key concepts (622 concepts & Databricks 100)
+│   │   ├── qa-prep/                 # Q&A practice (3,207 core + 3,597 DE questions)
+│   │   ├── architecture/            # Architecture scenarios (3,200 scenarios) & 32 blueprints
+│   │   ├── code-practice/           # PySpark / Spark SQL / Python code benchmarks
+│   │   ├── cheat-sheet/             # Vector PDFs, posters, and code cards
+│   │   ├── data-engineering-mindmap/# DE.UNIVERSE HTML5 Canvas GPU mindmap
+│   │   ├── spark-engine/            # Spark memory, shuffle, Catalyst & Photon
+│   │   ├── company-research/        # 156 Hyderabad & Bangalore GCC profiles
+│   │   ├── learning-paths/          # Certification paths (DP-600, DP-203, PL-300, Databricks)
+│   │   └── api/search/route.ts      # Edge SWR multi-word fuzzy search handler
+│   ├── components/                  # Reusable UI primitives and layout components
+│   ├── data/
+│   │   ├── json/                    # Canonical JSON datasets (10,700+ records)
+│   │   ├── diagrams.ts              # 32 Whiteboard Architecture Blueprints catalog
+│   │   ├── guided-learning-topics.ts# Topic configurations for /guided-learning
+│   │   └── index.ts                 # Standardized exports & domain mapping
+│   ├── lib/
+│   │   ├── dal.ts                   # React 19 cache() Server Data Access Layer
+│   │   ├── search-engine.ts         # Universal multi-word fuzzy search engine
+│   │   └── guided-learning.ts       # Cross-section aggregation engine
+│   ├── workers/                     # Web Workers for SIMD vector compute
+│   └── __tests__/                   # 32 Vitest test suites (298 tests)
+├── public/
+│   └── diagrams/                    # Lossless WebP, AVIF, and JPG whiteboard blueprints
+└── docs/                            # Deep-dive guides & Knowledge Base
 ```
 
-- **`index.html`**: Defines the main application structure, semantic layout grids, and horizontal filter stacks (`.qa-hfilter-stack`).
-- **`styles.css`**: Features responsive, apple-inspired layout grids, dark/light theme support, glassmorphism card variables, and horizontal/vertical scroll wrappers.
-- **`app.js`**: Core controller containing routing lifecycle, state management, event listeners, dynamic filters, rendering loops, and stats mapping.
-- **`questions.js`**: Automatically compiled JSON question records (~1.2MB).
-- **`data_concepts.js`**: Interactive data defining architectural terms and definitions sorted by difficulty.
+---
+
+## 2. Data File Inventory & Schemas
+
+All canonical datasets reside in `src/data/json/`:
+
+| File | Primary Type | Item Count | Key Fields |
+| :--- | :--- | :--- | :--- |
+| `data_concepts.json` | `Concept[]` | **622** | `id`, `term`, `category`, `difficulty`, `definition`, `explanation`, `keyPoints[]` |
+| `databricks_100.json` | `Databricks100Item[]` | **100** | `num`, `day`, `concept`, `category`, `difficulty`, `whatYouShouldKnow`, `code`, `cert`, `keyPoints[]` |
+| `data_architecture.json` | `ArchitectureQuestion[]` | **3,200** | `id`, `source`, `category`, `niche`, `difficulty`, `question`, `answer` |
+| `data_de.json` | `Question[]` | **3,597** | `id`, `source`, `category`, `niche`, `difficulty`, `question`, `answer`, `domain` |
+| `questions.json` | `Question[]` | **3,207** | `id`, `source`, `category`, `niche`, `difficulty`, `question`, `answer` |
+| `company_profiles.json` | `CompanyProfile[]` | **156** | `id`, `name`, `industry`, `tier`, `techStack[]`, `salaryRange`, `interviewFocus` |
+| `databricks_cheatsheets.json`| `CheatSheetSuite[]` | **6 (48 cards)** | `suiteId`, `title`, `sections[]`, `codeBlocks[]`, `pdfUrl`, `posterUrl` |
+| `data_pyspark.json` | `CodeSheetItem[]` | **43** | `id`, `title`, `level`, `category`, `description`, `code` |
+| `data_sparksql.json` | `CodeSheetItem[]` | **44** | `id`, `title`, `level`, `category`, `description`, `code` |
+
+### Difficulty Enum:
+`'EASY' | 'MEDIUM' | 'HARD' | 'ARCHITECT'`
+
+### Standardized Domain Categories (`getStandardizedDomain`):
+- `Compute & Orchestration`: Databricks, Apache Spark, Apache Airflow
+- `Data Pipelines & Ingestion`: Azure Data Factory (ADF), dbt, Kafka, CDC
+- `Storage Engine & Lakehouse`: OneLake, Delta Lake, Apache Iceberg, Storage
+- `Semantic & BI`: Power BI, DAX, Fabric Semantic Models
+- `Governance & Quality`: Microsoft Purview, Unity Catalog, Data Quality
 
 ---
 
-## 2. Multi-User Friendliness & Local Cache Insulation
+## 3. High-Performance Engineering Patterns
 
-Because the website is 100% client-side, it is inherently **multi-user friendly** out of the box. No user sessions interfere with others, and user data is never leaked or stored in a shared database.
+### 3.1 Zero-Bundle Server Components
+Direct client imports of `src/data/json` are prohibited. Instead, page components use Server Components or route handlers via `src/lib/dal.ts` with React 19 `cache()` request deduplication.
 
-### Progress Tracking & Theme Preferences
-- **Insulated State**: Questions marked as *Unseen*, *Reviewing*, or *Mastered* are saved securely in the user's browser via `localStorage`.
-- **System Theme Matching**: Theme switching stores preference (`dark`/`light`) in the client's browser local cache, ensuring zero page flickering on load.
-- **Robust LocalStorage Safe-Guards**: State reads are wrapped in `try/catch` blocks to prevent crashes if a user blocks local storage or runs in strict privacy mode (incognito).
+### 3.2 TanStack Virtual List Rendering
+Lists containing hundreds or thousands of cards (`/qa-prep`, `/concepts`, `/architecture`) consume `@tanstack/react-virtual` with fixed or dynamic row heights, guaranteeing smooth 60 FPS scrolling and minimal DOM nodes.
+
+### 3.3 HTML5 Canvas 60 FPS Mindmap Engine
+The interactive mindmap (`/data-engineering-mindmap`) avoids heavy DOM trees by rendering all 250+ nodes and flowing bezier particle streams directly to an HTML5 `<canvas>` via GPU hardware acceleration.
+
+### 3.4 Web Worker Offloading
+Heavy compute tasks (1536-dimensional vector distance calculations for RAG simulations) run in background threads (`src/workers/compute.worker.ts`), preventing main thread freezing.
 
 ---
 
-## 3. Foolproof Data Compilation & Schema Validation
+## 4. Automated Testing Suite (Vitest)
 
-To prevent database syntax mistakes or formatting errors from taking down the live website, we enforce a compilation and validation pipeline.
+Our automated verification suite enforces 100% test passing across 32 test files before any pull request or deployment:
 
-### Database Compilation (`data/*.toon` & JSON)
-All source databases are compiled down to optimized Javascript variables using compilation tooling:
 ```bash
-python3 scripts/compile_db.py
-```
+# Run all 32 test suites in single-run mode
+npm test -- --run
 
-### Automatic Verification Checks
-Before pushing to production, developer scripts validate:
-1. **Uniqueness**: No duplicate question IDs.
-2. **Required Fields**: Every entry must contain an `id`, `category`, `niche`, `question`, and `answer`.
-3. **Category Constraints**: Ensures balanced questions across topics.
-
----
-
-## 4. Advanced Testing & Verification Suite
-
-Our testing framework consists of multiple layers of automated testing, combining JSDOM and Puppeteer.
-
-### Test Categories
-1. **Portal Data Integrity (`tests/test_portal.js`)**: Structural checking of JSON schema, duplicate checks, and distribution rules.
-2. **Concept Explainer (`tests/test_explainer.js`)**: Interactive search, debounces, and accordion toggle validation.
-3. **DE Cheat Sheet (`tests/test_cheatsheet.js`)**: Lang switches, tab active highlights, comparison tables.
-4. **Key Concepts Glossary (`tests/test_concepts.js`)**: Validates sorting logic (`EASY` -> `MEDIUM` -> `HARD`), category filters, search filters.
-5. **Hyderabad GCC Directory (`tests/test_gcc.js`)**: Checks search matching, risk tier filtering, and table rows display.
-6. **E2E Puppeteer (`tests/test_ui.js`)**: Visual layout transitions, clicking interactions, and viewport responsiveness.
-
-### Running the Test Suite
-Ensure the local development server is running in the background:
-```bash
-# Run all automated JSDOM and Puppeteer tests
+# Run in watch mode during feature development
 npm test
 ```
 
+### Verified Test Categories:
+1. **Data Integrity (`src/__tests__/data.integrity.test.ts`)**: Schema compliance, unique ID validation, non-empty fields, and difficulty rating integrity.
+2. **Domain Helpers (`src/__tests__/data.helpers.test.ts`)**: `getStandardizedDomain`, topic counters, and category mappings.
+3. **Route Handlers (`src/__tests__/data.routes.test.ts`)**: Server-side data routes and search API edge responses.
+4. **Universal Search (`src/__tests__/features.universal-search.test.ts`)**: Multi-word tokenization, ranking algorithms, and fuzzy search accuracy.
+5. **Guided Learning (`src/__tests__/guided-learning.test.ts`)**: Topic item aggregation across questions, concepts, and blueprints.
+6. **Responsive Uniformity (`src/__tests__/features.responsive-uniformity.test.ts`)**: Mobile, tablet, desktop breakpoint audits.
+7. **Component Primitives**: Smooth accordion, breadcrumbs, focus traps, and beginner rail tests.
+
 ---
 
-## 5. Operations & Release Guidelines
+## 5. Build & Deployment Lifecycle
 
-To publish a new version of the website safely:
-1. Update database records inside the `data/` directory or update components in `index.html`.
-2. Regenerate database script: `python3 scripts/compile_db.py`.
-3. Run the validation checks: `npm test`.
-4. Deploy the production build: `npm run deploy` (or `npx vercel --prod`).
+```bash
+# 1. Type checking and production Next.js build
+npm run build
+
+# 2. Automated test run
+npm test -- --run
+
+# 3. Deploy to Vercel production
+npx vercel --prod --yes
+```

@@ -1,7 +1,9 @@
 # DE.UNIVERSE — Editorial Knowledge Graph Documentation
 
-## 1. Design Rationale
+## 1. Design Rationale & Rendering Engine
 `DE.UNIVERSE` (`/data-engineering-mindmap`) is built with an editorial, data-dense, quiet aesthetic inspired by Linear, Stripe Docs, Vercel, and Apple Newsroom. The interface avoids visual clutter, cartoonish colors, bouncy animations, background particle stars, and emojis. Every element uses a strict 12-column grid, 8px vertical rhythm, hairline 1px borders (`#15171C`), and a single desaturated accent (`#7C9CFF`).
+
+The rendering pipeline is powered by a hardware-accelerated **HTML5 Canvas 60 FPS Engine** (`src/components/mindmap/mindmap-canvas-engine.tsx`) that renders nodes, connectors, and fluid particle flow streams directly on the GPU using `requestAnimationFrame`, sustaining locked 60 FPS performance without DOM memory pressure. Full accessibility is preserved via an accessible keyboard-navigable surface (`L` shortcut) and unified with the global **Universal Multi-Word Fuzzy Search Engine** (`⌘K` / `Ctrl+K`).
 
 ---
 

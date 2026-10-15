@@ -4,7 +4,7 @@
 
 This report documents the end-to-end design system overhaul for [`https://fabric-pbi-prep.vercel.app`](https://fabric-pbi-prep.vercel.app). Every view, tab, card, header, input, button, and badge has been refactored to consume a single, unified Design Token System (`tokens.ts` & `globals.css`) and modular Component Primitives (`/src/components/ui/`).
 
-All 19 automated test suites (`npm test`) pass with a **100% success rate** (40.8s runtime), visual regression screenshots across 6 breakpoints (42 images total) have been captured and verified, and WCAG 2.1 AA accessibility contrast guidelines are strictly satisfied.
+All 32 automated test suites (`npm test -- --run`) pass with a **100% success rate** (298 tests passing in ~6.1s), visual regression screenshots across 6 breakpoints (42 images total) have been captured and verified, and WCAG 2.1 AA accessibility contrast guidelines are strictly satisfied.
 
 ---
 
