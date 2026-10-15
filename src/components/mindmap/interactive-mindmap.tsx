@@ -33,8 +33,8 @@ import {
   LayoutGrid,
   Route,
   GitBranch,
+  Type,
   Eye,
-  SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -44,8 +44,8 @@ import {
   MindmapSubtopic,
 } from "@/data/mindmap-data";
 
-/* ─── Icon Mapper ────────────────────────────────────────────────────── */
-function getDomainIcon(name: string, size = 18) {
+/* ─── High-Contrast Icon Mapper ───────────────────────────────────────── */
+function getDomainIcon(name: string, size = 20) {
   switch (name) {
     case "Radio":
       return <Radio size={size} />;
@@ -68,29 +68,35 @@ function getDomainIcon(name: string, size = 18) {
 
 /* ─── Architectural Flow Order (Sequential Lifecycle) ───────────────── */
 const FLOW_SEQUENCE = [
-  { id: "ingestion", step: "01", stage: "Ingestion & Streaming", flowRole: "Real-Time Capture" },
-  { id: "storage", step: "02", stage: "Storage & Lakehouse", flowRole: "Open ACID Lake" },
-  { id: "compute", step: "03", stage: "Unified Compute", flowRole: "Distributed Spark Engine" },
-  { id: "orchestration", step: "04", stage: "DataOps & CI/CD", flowRole: "DAG Orchestration" },
-  { id: "serving", step: "05", stage: "Analytical Serving", flowRole: "Zero-Copy Direct Lake" },
-  { id: "governance", step: "06", stage: "Enterprise Governance", flowRole: "Unified Catalog & Lineage" },
-  { id: "ai", step: "07", stage: "AI & Vector Retrieval", flowRole: "GenAI RAG Grounding" },
+  { id: "ingestion", step: "01", stage: "Ingestion & Streaming", flowRole: "Real-Time Event & CDC Capture" },
+  { id: "storage", step: "02", stage: "Storage & Lakehouse", flowRole: "ACID Transactional Open Lake" },
+  { id: "compute", step: "03", stage: "Unified Compute", flowRole: "Distributed In-Memory Spark Engine" },
+  { id: "orchestration", step: "04", stage: "DataOps & CI/CD", flowRole: "Declarative DAG Orchestration" },
+  { id: "serving", step: "05", stage: "Analytical Serving", flowRole: "Zero-Copy Direct Lake Semantic Layer" },
+  { id: "governance", step: "06", stage: "Enterprise Governance", flowRole: "Unified Catalog, Security & Lineage" },
+  { id: "ai", step: "07", stage: "AI & Vector Retrieval", flowRole: "GenAI RAG & Vector Embeddings Grounding" },
 ];
 
-/* ─── Balanced Canvas Geometry Dimensions (Legible & Compact) ─────────── */
-const CANVAS_WIDTH = 2500;
-const CANVAS_HEIGHT = 1650;
-const ROOT_X = 1250;
-const ROOT_Y = 825;
+/* ─── Canvas Geometry Base Dimensions (High Legibility & Contrast) ────── */
+const CANVAS_WIDTH = 2600;
+const CANVAS_HEIGHT = 1750;
+const ROOT_X = 1300;
+const ROOT_Y = 875;
 
 export function InteractiveMindmap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // View Modes: "canvas" (interactive graph) | "matrix" (7-pillar matrix) | "journey" (lifecycle pipeline)
-  const [viewMode, setViewMode] = useState<"canvas" | "matrix" | "journey">("canvas");
+  // View Modes:
+  // "canvas"  = Interactive 2D graph with pan & zoom (Default for testing & spatial exploration)
+  // "roadmap" = Simple, large, high-readability linear roadmap (Optimal for seniors / eye sight)
+  // "matrix"  = 7-Pillars comparison board
+  const [viewMode, setViewMode] = useState<"canvas" | "roadmap" | "matrix">("canvas");
+
+  // Accessibility: Text Size Scale ("normal" | "large" | "xl")
+  const [textSize, setTextSize] = useState<"normal" | "large" | "xl">("large");
 
   // Transform state: pan & zoom
-  const [zoom, setZoom] = useState(0.65);
+  const [zoom, setZoom] = useState(0.72);
   const [pan, setPan] = useState({ x: -350, y: -250 });
   const [isPanning, setIsPanning] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
@@ -106,7 +112,6 @@ export function InteractiveMindmap() {
   const [drawerTab, setDrawerTab] = useState<"rubric" | "concept">("rubric");
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
   const [isFlowMode, setIsFlowMode] = useState(true);
-  const [activeJourneyStep, setActiveJourneyStep] = useState<number>(0);
   const [linkedConcept, setLinkedConcept] = useState<{
     id: string;
     term: string;
@@ -175,16 +180,13 @@ export function InteractiveMindmap() {
     if (!container) return;
 
     const handleWheelNative = (e: WheelEvent) => {
-      // Prevent browser window from scrolling
       e.preventDefault();
       e.stopPropagation();
 
       if (e.ctrlKey || e.metaKey) {
-        // Pinch-to-zoom / trackpad pinch
         const zoomDelta = -e.deltaY * 0.003;
-        setZoom((prev) => Math.min(1.8, Math.max(0.4, Number((prev + zoomDelta).toFixed(3)))));
+        setZoom((prev) => Math.min(1.8, Math.max(0.45, Number((prev + zoomDelta).toFixed(3)))));
       } else {
-        // Smooth canvas panning
         setPan((prev) => ({
           x: prev.x - e.deltaX,
           y: prev.y - e.deltaY,
@@ -318,7 +320,7 @@ export function InteractiveMindmap() {
         (clientWidth - 80) / CANVAS_WIDTH,
         (clientHeight - 80) / CANVAS_HEIGHT
       );
-      const clampedZoom = Math.max(0.42, Math.min(1.0, Number(targetZoom.toFixed(2))));
+      const clampedZoom = Math.max(0.48, Math.min(1.0, Number(targetZoom.toFixed(2))));
       setZoom(clampedZoom);
       setPan({
         x: (clientWidth - CANVAS_WIDTH * clampedZoom) / 2,
@@ -347,7 +349,7 @@ export function InteractiveMindmap() {
   };
 
   const handleZoom = useCallback((delta: number) => {
-    setZoom((prev) => Math.min(1.8, Math.max(0.4, Number((prev + delta).toFixed(2)))));
+    setZoom((prev) => Math.min(1.8, Math.max(0.45, Number((prev + delta).toFixed(2)))));
   }, []);
 
   /* ─── Fullscreen Toggle ────────────────────────────────────────────── */
@@ -423,9 +425,7 @@ export function InteractiveMindmap() {
     return matched;
   }, [searchQuery]);
 
-  /* ─── Collision-Free Base Positions Math ─────────────────────────────── */
-  // Left: Ingestion (top), Storage (mid), Compute (bottom)
-  // Right: Orchestration (top), Serving (mid-top), Governance (mid-bottom), AI (bottom)
+  /* ─── Base Positions Math for Canvas ───────────────────────────────── */
   const baseLayout = useMemo(() => {
     const positions: Record<
       string,
@@ -437,19 +437,19 @@ export function InteractiveMindmap() {
     > = {};
 
     // LEFT DOMAINS
-    const leftBranchX = 780;
-    const leftSubtopicX = 330;
+    const leftBranchX = 820;
+    const leftSubtopicX = 350;
     const leftDomainYConfigs = [
-      { id: "ingestion", centerY: 350 },
-      { id: "storage", centerY: 825 },
-      { id: "compute", centerY: 1300 },
+      { id: "ingestion", centerY: 360 },
+      { id: "storage", centerY: 875 },
+      { id: "compute", centerY: 1390 },
     ];
 
     leftDomainYConfigs.forEach((cfg) => {
       const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
       if (!domain) return;
       const count = domain.subtopics.length;
-      const pitch = 115;
+      const pitch = 125;
       const startY = cfg.centerY - ((count - 1) * pitch) / 2;
 
       positions[domain.id] = {
@@ -464,20 +464,20 @@ export function InteractiveMindmap() {
     });
 
     // RIGHT DOMAINS
-    const rightBranchX = 1720;
-    const rightSubtopicX = 2170;
+    const rightBranchX = 1780;
+    const rightSubtopicX = 2250;
     const rightDomainYConfigs = [
-      { id: "orchestration", centerY: 260 },
-      { id: "serving", centerY: 635 },
-      { id: "governance", centerY: 1010 },
-      { id: "ai", centerY: 1385 },
+      { id: "orchestration", centerY: 280 },
+      { id: "serving", centerY: 675 },
+      { id: "governance", centerY: 1075 },
+      { id: "ai", centerY: 1475 },
     ];
 
     rightDomainYConfigs.forEach((cfg) => {
       const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
       if (!domain) return;
       const count = domain.subtopics.length;
-      const pitch = 115;
+      const pitch = 125;
       const startY = cfg.centerY - ((count - 1) * pitch) / 2;
 
       positions[domain.id] = {
@@ -524,11 +524,9 @@ export function InteractiveMindmap() {
     return computed;
   }, [baseLayout, nodeOffsets]);
 
-  // Root node position with offset
   const rootActualX = ROOT_X + (nodeOffsets["root"]?.x || 0);
   const rootActualY = ROOT_Y + (nodeOffsets["root"]?.y || 0);
 
-  // Copy code helper
   const copySnippet = (code: string) => {
     navigator.clipboard.writeText(code);
     setHasCopied(true);
@@ -536,7 +534,7 @@ export function InteractiveMindmap() {
     setTimeout(() => setHasCopied(false), 2000);
   };
 
-  /* ─── Flow Sequence Path Coordinates ────────────────────────────────── */
+  /* ─── Flow Path Data for Visual Canvas ──────────────────────────────── */
   const flowPathData = useMemo(() => {
     if (!isFlowMode) return "";
     const points: Array<{ x: number; y: number }> = [];
@@ -560,90 +558,216 @@ export function InteractiveMindmap() {
     return d;
   }, [layoutNodes, isFlowMode]);
 
+  /* ─── Dynamic Font Scale Classes based on textSize ──────────────────── */
+  const fontClasses = useMemo(() => {
+    if (textSize === "xl") {
+      return {
+        heading: "text-2xl sm:text-3xl font-black",
+        subheading: "text-xl font-bold",
+        title: "text-lg font-bold",
+        body: "text-base font-normal leading-relaxed",
+        subtext: "text-sm font-medium",
+        badge: "text-xs font-bold px-3 py-1",
+        btn: "text-sm font-bold px-4 py-2.5",
+      };
+    }
+    if (textSize === "large") {
+      return {
+        heading: "text-xl sm:text-2xl font-extrabold",
+        subheading: "text-lg font-bold",
+        title: "text-base font-bold",
+        body: "text-sm sm:text-base font-normal leading-relaxed",
+        subtext: "text-xs sm:text-sm font-medium",
+        badge: "text-xs font-bold px-2.5 py-1",
+        btn: "text-xs sm:text-sm font-bold px-3.5 py-2",
+      };
+    }
+    return {
+      heading: "text-lg sm:text-xl font-bold",
+      subheading: "text-base font-bold",
+      title: "text-sm font-bold",
+      body: "text-xs sm:text-sm font-normal leading-relaxed",
+      subtext: "text-xs font-normal",
+      badge: "text-[11px] font-semibold px-2 py-0.5",
+      btn: "text-xs font-semibold px-3 py-1.5",
+    };
+  }, [textSize]);
+
   return (
-    <div className="space-y-4">
-      {/* ─── TOP PRIMARY CONTROLS & PERSPECTIVE SWITCHER ───────────────── */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-md">
-        {/* Left: View Mode Pills */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shrink-0">
+    <div className="space-y-5">
+      {/* ─── ACCESSIBILITY & VIEW CONTROL BAR ───────────────────────────── */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-4 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-md">
+        {/* Left: View Mode Selectors */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setViewMode("canvas")}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
               viewMode === "canvas"
-                ? "bg-purple-600 text-white shadow-sm"
-                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
+                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
+              fontClasses.subtext
             )}
           >
-            <GitBranch size={14} />
-            <span>Interactive Map</span>
+            <GitBranch size={16} />
+            <span>1. Visual Topography Map</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode("roadmap")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
+              viewMode === "roadmap"
+                ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
+                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
+              fontClasses.subtext
+            )}
+          >
+            <Route size={16} />
+            <span>2. Large Linear Roadmap (Senior Friendly)</span>
           </button>
 
           <button
             onClick={() => setViewMode("matrix")}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
               viewMode === "matrix"
-                ? "bg-purple-600 text-white shadow-sm"
-                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
+                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
+              fontClasses.subtext
             )}
           >
-            <LayoutGrid size={14} />
-            <span>7 Pillars Matrix</span>
-            <span className="hidden sm:inline text-[10px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-200">
-              Scannable
-            </span>
-          </button>
-
-          <button
-            onClick={() => setViewMode("journey")}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
-              viewMode === "journey"
-                ? "bg-purple-600 text-white shadow-sm"
-                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-            )}
-          >
-            <Route size={14} />
-            <span>Lifecycle Pipeline</span>
+            <LayoutGrid size={16} />
+            <span>3. 7 Pillars Board</span>
           </button>
         </div>
 
         {/* Center: Live Keyword Search */}
         <div className="relative flex-1 max-w-md">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] pointer-events-none" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search concepts, Kafka, Iceberg, dbt, Spark, CDC..."
-            className="w-full pl-8 pr-8 py-1.5 rounded-xl bg-[var(--surface-2)] text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] border border-[var(--border)] focus:outline-none focus:border-purple-500 transition-colors"
+            placeholder="search concepts (e.g. Kafka, Iceberg, Spark, CDC)..."
+            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[var(--surface-2)] text-sm font-medium text-[var(--foreground)] placeholder-[var(--muted-foreground)] border-2 border-[var(--border)] focus:outline-none focus:border-purple-500 transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer p-1"
               aria-label="Clear search"
             >
-              <X size={13} />
+              <X size={15} />
             </button>
           )}
         </div>
 
-        {/* Right: Quick Action Indicators & Counters */}
-        <div className="flex items-center justify-end gap-2 shrink-0">
+        {/* Right: Senior Accessibility & Text-Size Scale Controls */}
+        <div className="flex items-center gap-2 shrink-0 self-end lg:self-auto">
           {searchMatches.size > 0 && (
-            <span className="text-xs text-cyan-400 font-bold bg-cyan-500/10 px-2.5 py-1 rounded-xl border border-cyan-500/25">
-              {searchMatches.size} matches found
+            <span className="text-xs font-bold text-cyan-600 dark:text-cyan-300 bg-cyan-500/15 px-3 py-1 rounded-xl border border-cyan-500/30">
+              {searchMatches.size} matches
             </span>
           )}
-          <span className="text-xs text-[var(--muted-foreground)] hidden lg:inline">
-            7 Domains · 28 Architecture Protocols
-          </span>
+
+          {/* Text Size Scale Toggle */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+            <span className="text-xs font-bold text-[var(--muted-foreground)] px-2 flex items-center gap-1">
+              <Type size={14} />
+              <span className="hidden sm:inline">Text Size:</span>
+            </span>
+            <button
+              onClick={() => setTextSize("normal")}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
+                textSize === "normal"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              )}
+              title="Standard text size"
+            >
+              A
+            </button>
+            <button
+              onClick={() => setTextSize("large")}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
+                textSize === "large"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              )}
+              title="Large text size (Senior friendly)"
+            >
+              A+
+            </button>
+            <button
+              onClick={() => setTextSize("xl")}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
+                textSize === "xl"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              )}
+              title="Extra-large high visibility text"
+            >
+              A++
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ─── VIEW MODE 1: INTERACTIVE VISUAL CANVAS ───────────────────── */}
+      {/* ─── PRIMARY HEADER BADGE: "Modern Data Architecture" ─────────── */}
+      <div className="p-5 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shrink-0">
+            <Compass size={26} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                End-to-End Enterprise Stack
+              </span>
+              <span className="text-[var(--muted-foreground)]">•</span>
+              <span className="text-xs font-medium text-[var(--muted-foreground)]">7 Domains · 28 Core Concepts</span>
+            </div>
+            <h2 className={cn("font-black text-[var(--foreground)] tracking-tight", fontClasses.heading)}>
+              Enterprise Platform Architecture
+            </h2>
+          </div>
+        </div>
+
+        {/* Quick Domain Filter Selector Pills */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            onClick={() => setActiveFilter("all")}
+            className={cn(
+              "px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs",
+              activeFilter === "all"
+                ? "bg-purple-600 text-white shadow-sm"
+                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]"
+            )}
+          >
+            All 7 Domains
+          </button>
+          {MINDMAP_DOMAINS.map((domain) => (
+            <button
+              key={domain.id}
+              onClick={() => setActiveFilter(domain.id === activeFilter ? "all" : domain.id)}
+              className={cn(
+                "px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer text-xs flex items-center gap-1",
+                activeFilter === domain.id
+                  ? `${domain.color.badge} font-bold ring-2 ring-purple-400 shadow-sm`
+                  : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]"
+              )}
+            >
+              <span>{domain.shortTitle}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── VIEW MODE 1: INTERACTIVE VISUAL CANVAS (SELECT-NONE BORDER) ─ */}
       {viewMode === "canvas" && (
         <div
           ref={containerRef}
@@ -660,146 +784,85 @@ export function InteractiveMindmap() {
             height: isFullscreen ? undefined : "clamp(640px, calc(100svh - 180px), 1000px)",
           }}
         >
-          {/* Subtle Ambient Background Grid */}
+          {/* Background Grid */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-25 dark:opacity-15"
+            className="absolute inset-0 pointer-events-none opacity-20"
             style={{
-              backgroundImage: "radial-gradient(circle, var(--muted-foreground) 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
+              backgroundImage: "radial-gradient(circle, var(--muted-foreground) 1.2px, transparent 1.2px)",
+              backgroundSize: "32px 32px",
             }}
           />
 
-          {/* Ambient Glow Accents */}
-          <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* ─── CANVAS TOOLBAR (Top Floating Bar) ───────────────────────── */}
-          <div className="absolute top-3 left-3 right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-            {/* Domain Quick-Pills */}
-            <div className="flex flex-wrap items-center gap-1 bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] p-1 rounded-xl shadow-lg">
-              <button
-                onClick={() => setActiveFilter("all")}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
-                  activeFilter === "all"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-              >
-                All 7 Pillars
-              </button>
-              {MINDMAP_DOMAINS.map((domain) => (
-                <button
-                  key={domain.id}
-                  onClick={() => {
-                    const next = domain.id === activeFilter ? "all" : domain.id;
-                    setActiveFilter(next);
-                    if (next !== "all") {
-                      setSelectedDomain(domain);
-                      const pos = baseLayout[domain.id];
-                      if (pos && containerRef.current) {
-                        const cw = containerRef.current.clientWidth;
-                        const ch = containerRef.current.clientHeight;
-                        setPan({
-                          x: cw / 2 - pos.x * zoom,
-                          y: ch / 2 - pos.y * zoom,
-                        });
-                      }
-                    }
-                  }}
-                  className={cn(
-                    "px-2 py-1 rounded-lg text-[11px] font-medium transition-all flex items-center gap-1 cursor-pointer",
-                    activeFilter === domain.id
-                      ? `${domain.color.badge} font-bold shadow-xs`
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  <span>{domain.shortTitle}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Canvas Actions: Flow Mode, Tidy Up, Zoom, Fullscreen */}
-            <div className="flex items-center gap-1 bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] p-1 rounded-xl shadow-lg">
-              {/* Flow Mode Toggle */}
+          {/* ─── CANVAS TOOLBAR (Top Bar) ─────────────────────────────── */}
+          <div className="absolute top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
+            <div className="flex items-center gap-2 bg-[var(--surface-1)] border-2 border-[var(--border)] p-1.5 rounded-2xl shadow-xl">
+              <span className="text-xs font-bold text-[var(--foreground)] px-2">Topography Canvas</span>
               <button
                 onClick={() => setIsFlowMode(!isFlowMode)}
                 className={cn(
-                  "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
                   isFlowMode
-                    ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
                     : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                 )}
                 title="toggle animated architectural data flow"
               >
-                <Activity size={13} className={cn(isFlowMode && "text-cyan-400 animate-pulse")} />
-                <span className="hidden sm:inline">Data Flow</span>
+                <Activity size={14} className={cn(isFlowMode && "text-cyan-400 animate-pulse")} />
+                <span>{isFlowMode ? "FLOW #01 Active" : "Data Flow Off"}</span>
               </button>
 
-              {/* Tidy Up Auto Align */}
               <button
                 onClick={tidyLayout}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[var(--foreground)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] transition-all cursor-pointer"
                 title="auto-organize movable nodes"
               >
-                <Sparkles size={13} className="text-purple-400" />
-                <span className="hidden sm:inline">Tidy Up</span>
+                <Sparkles size={14} className="text-purple-400" />
+                <span>Tidy Up</span>
               </button>
+            </div>
 
-              <div className="h-3.5 w-px bg-[var(--border)] mx-0.5" />
-
-              {/* Zoom Controls */}
+            <div className="flex items-center gap-2 bg-[var(--surface-1)] border-2 border-[var(--border)] p-1.5 rounded-2xl shadow-xl">
               <button
-                onClick={() => handleZoom(0.12)}
-                className="p-1 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+                onClick={() => handleZoom(0.15)}
+                className="p-2 rounded-xl text-[var(--foreground)] hover:bg-[var(--surface-2)] font-bold cursor-pointer"
                 title="Zoom In"
                 aria-label="Zoom in"
               >
-                <ZoomIn size={14} />
+                <ZoomIn size={16} />
               </button>
               <button
-                onClick={() => handleZoom(-0.12)}
-                className="p-1 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+                onClick={() => handleZoom(-0.15)}
+                className="p-2 rounded-xl text-[var(--foreground)] hover:bg-[var(--surface-2)] font-bold cursor-pointer"
                 title="Zoom Out"
                 aria-label="Zoom out"
               >
-                <ZoomOut size={14} />
+                <ZoomOut size={16} />
               </button>
-
-              <span className="text-[11px] font-mono text-[var(--muted-foreground)] px-1 min-w-[2.5rem] text-center">
+              <span className="text-xs font-mono font-bold text-[var(--foreground)] px-1 min-w-[3rem] text-center">
                 {Math.round(zoom * 100)}%
               </span>
 
               <button
                 onClick={resetView}
-                className="p-1 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+                className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
                 title="Fit to Screen"
                 aria-label="Reset view"
               >
-                <RotateCcw size={13} />
-              </button>
-
-              <div className="h-3.5 w-px bg-[var(--border)] mx-0.5" />
-
-              <button
-                onClick={collapsedDomains.size > 0 ? expandAll : collapseAll}
-                className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-              >
-                {collapsedDomains.size > 0 ? "Expand" : "Collapse"}
+                Fit Screen
               </button>
 
               <button
                 onClick={toggleFullscreen}
-                className="p-1 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+                className="p-2 rounded-xl text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
                 title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Mindmap"}
                 aria-label="Toggle fullscreen"
               >
-                {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </button>
             </div>
           </div>
 
-          {/* ─── VIRTUAL CANVAS (Translated & Scaled Plane) ─────────────── */}
+          {/* ─── VIRTUAL CANVAS PLANE ──────────────────────────────────── */}
           <div
             className="absolute origin-top-left transition-transform duration-75 ease-out"
             style={{
@@ -808,7 +871,7 @@ export function InteractiveMindmap() {
               transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
             }}
           >
-            {/* ─── HIGH-PRECISION SVG CONNECTOR LAYER ───────────────────── */}
+            {/* SVG Connectors */}
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
               xmlns="http://www.w3.org/2000/svg"
@@ -822,51 +885,22 @@ export function InteractiveMindmap() {
                     animation: flowStreamMove 1.4s linear infinite;
                   }
                 `}</style>
-
-                {/* Per-domain color gradients */}
-                {MINDMAP_DOMAINS.map((domain) => (
-                  <linearGradient
-                    key={`grad-${domain.id}`}
-                    id={`grad-${domain.id}`}
-                    x1={domain.side === "left" ? "100%" : "0%"}
-                    y1="50%"
-                    x2={domain.side === "left" ? "0%" : "100%"}
-                    y2="50%"
-                  >
-                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor={domain.color.hex} stopOpacity="0.9" />
-                  </linearGradient>
-                ))}
-
-                {/* Flow Sequence Rainbow Stream Gradient */}
                 <linearGradient id="flowSeqGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#06b6d4" />
-                  <stop offset="30%" stopColor="#10b981" />
-                  <stop offset="60%" stopColor="#f59e0b" />
-                  <stop offset="85%" stopColor="#8b5cf6" />
+                  <stop offset="50%" stopColor="#f59e0b" />
                   <stop offset="100%" stopColor="#ec4899" />
                 </linearGradient>
               </defs>
 
-              {/* 1. ANIMATED ARCHITECTURAL FLOW PIPELINE */}
+              {/* Data Flow Pulse Line */}
               {isFlowMode && flowPathData && (
-                <g className="flow-pipeline-layer">
-                  {/* Glow outline */}
+                <g className="flow-layer">
                   <path
                     d={flowPathData}
                     fill="none"
                     stroke="url(#flowSeqGrad)"
-                    strokeWidth={8}
-                    strokeOpacity={0.16}
-                    strokeLinecap="round"
-                  />
-                  {/* Animated Dash */}
-                  <path
-                    d={flowPathData}
-                    fill="none"
-                    stroke="url(#flowSeqGrad)"
-                    strokeWidth={3}
-                    strokeDasharray="8 8"
+                    strokeWidth={5}
+                    strokeDasharray="10 8"
                     strokeLinecap="round"
                     className="flow-stream-animated"
                     strokeOpacity={0.9}
@@ -874,117 +908,94 @@ export function InteractiveMindmap() {
                 </g>
               )}
 
-              {/* 2. ROOT HUB TO DOMAIN CONNECTIONS */}
+              {/* Connectors: Root to Domains */}
               {filteredDomains.map((domain) => {
                 const pos = layoutNodes[domain.id];
                 if (!pos) return null;
 
                 const isLeft = domain.side === "left";
-                const rootAnchorX = isLeft ? rootActualX - 160 : rootActualX + 160;
+                const rootAnchorX = isLeft ? rootActualX - 170 : rootActualX + 170;
                 const rootAnchorY = rootActualY;
 
-                const branchAnchorX = isLeft ? pos.x + 150 : pos.x - 150;
+                const branchAnchorX = isLeft ? pos.x + 160 : pos.x - 160;
                 const branchAnchorY = pos.y;
 
                 const dx = Math.abs(branchAnchorX - rootAnchorX) * 0.55;
                 const cx1 = isLeft ? rootAnchorX - dx : rootAnchorX + dx;
                 const cx2 = isLeft ? branchAnchorX + dx : branchAnchorX - dx;
 
-                const isSelected = selectedDomain?.id === domain.id;
-                const isMatched = searchMatches.has(domain.id);
-
                 return (
-                  <g key={`root-conn-${domain.id}`}>
-                    <path
-                      d={`M ${rootAnchorX} ${rootAnchorY} C ${cx1} ${rootAnchorY}, ${cx2} ${branchAnchorY}, ${branchAnchorX} ${branchAnchorY}`}
-                      fill="none"
-                      stroke={domain.color.hex}
-                      strokeWidth={isSelected || isMatched ? 4.5 : 2.5}
-                      strokeOpacity={isSelected || isMatched ? 0.75 : 0.3}
-                      strokeLinecap="round"
-                    />
-                  </g>
+                  <path
+                    key={`root-conn-${domain.id}`}
+                    d={`M ${rootAnchorX} ${rootAnchorY} C ${cx1} ${rootAnchorY}, ${cx2} ${branchAnchorY}, ${branchAnchorX} ${branchAnchorY}`}
+                    fill="none"
+                    stroke={domain.color.hex}
+                    strokeWidth={4}
+                    strokeOpacity={0.5}
+                    strokeLinecap="round"
+                  />
                 );
               })}
 
-              {/* 3. DOMAIN BRANCH TO SUBTOPIC CONNECTIONS */}
+              {/* Connectors: Domain to Subtopics */}
               {filteredDomains.map((domain) => {
                 if (collapsedDomains.has(domain.id)) return null;
                 const pos = layoutNodes[domain.id];
                 if (!pos) return null;
 
                 const isLeft = domain.side === "left";
-                const branchAnchorX = isLeft ? pos.x - 150 : pos.x + 150;
+                const branchAnchorX = isLeft ? pos.x - 160 : pos.x + 160;
                 const branchAnchorY = pos.y;
 
                 return pos.subtopics.map((subPos) => {
-                  const subAnchorX = isLeft ? subPos.x + 140 : subPos.x - 140;
+                  const subAnchorX = isLeft ? subPos.x + 150 : subPos.x - 150;
                   const subAnchorY = subPos.y;
 
                   const dx = Math.abs(subAnchorX - branchAnchorX) * 0.5;
                   const cx1 = isLeft ? branchAnchorX - dx : branchAnchorX + dx;
                   const cx2 = isLeft ? subAnchorX + dx : subAnchorX - dx;
 
-                  const isSubSelected = selectedSubtopic?.id === subPos.id;
-                  const isSubMatched = searchMatches.has(subPos.id);
-
                   return (
-                    <g key={`sub-conn-${subPos.id}`}>
-                      <path
-                        d={`M ${branchAnchorX} ${branchAnchorY} C ${cx1} ${branchAnchorY}, ${cx2} ${subAnchorY}, ${subAnchorX} ${subAnchorY}`}
-                        fill="none"
-                        stroke={domain.color.hex}
-                        strokeWidth={isSubSelected || isSubMatched ? 3 : 1.6}
-                        strokeOpacity={isSubSelected || isSubMatched ? 0.85 : 0.32}
-                        strokeLinecap="round"
-                      />
-                    </g>
+                    <path
+                      key={`sub-conn-${subPos.id}`}
+                      d={`M ${branchAnchorX} ${branchAnchorY} C ${cx1} ${branchAnchorY}, ${cx2} ${subAnchorY}, ${subAnchorX} ${subAnchorY}`}
+                      fill="none"
+                      stroke={domain.color.hex}
+                      strokeWidth={2.5}
+                      strokeOpacity={0.45}
+                      strokeLinecap="round"
+                    />
                   );
                 });
               })}
             </svg>
 
-            {/* ─── CENTRAL ROOT NODE (MOVABLE) ─────────────────────────── */}
+            {/* Central Root Hub Node */}
             <div
               data-node="true"
               className="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-grab active:cursor-grabbing"
               style={{ left: `${rootActualX}px`, top: `${rootActualY}px` }}
               onMouseDown={(e) => startNodeDrag("root", e)}
             >
-              <div className="relative group p-[2px] rounded-3xl bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 shadow-2xl">
-                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-purple-600 to-cyan-600 opacity-30 blur-lg group-hover:opacity-50 transition-opacity" />
-                <div className="relative w-80 p-5 rounded-3xl bg-[var(--surface-0)] border border-[var(--border)] flex flex-col items-center text-center space-y-2">
-                  <div className="flex items-center gap-1 text-[9px] font-mono text-[var(--muted-foreground)]">
-                    <Move size={10} />
-                    <span>Movable Central Hub</span>
+              <div className="relative group p-1 rounded-3xl bg-gradient-to-r from-purple-600 to-cyan-500 shadow-2xl">
+                <div className="relative w-84 p-6 rounded-3xl bg-[var(--surface-0)] border-2 border-[var(--border)] flex flex-col items-center text-center space-y-2">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white shadow-lg">
+                    <Sparkles size={24} />
                   </div>
-
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center text-white shadow-md">
-                    <Sparkles size={20} />
-                  </div>
-
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
-                      Enterprise Data Stack
-                    </span>
-                    <h2 className="text-lg font-extrabold text-[var(--foreground)] tracking-tight">
-                      Modern Data Architecture
-                    </h2>
-                    <p className="text-[11px] text-[var(--muted-foreground)] leading-tight">
-                      7 Core Pillars · 28 Protocols · Lakehouse Engine
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 pt-1">
-                    <span className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/25 text-[10px] font-semibold text-purple-300">
-                      Click any node to inspect
-                    </span>
-                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
+                    Enterprise Data Stack
+                  </span>
+                  <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+                    Modern Data Architecture
+                  </h2>
+                  <p className="text-xs text-[var(--muted-foreground)] font-medium">
+                    7 Core Pillars · 28 Protocols · Lakehouse Engine
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* ─── LEVEL 1: DOMAIN BRANCH NODES (MOVABLE) ───────────────── */}
+            {/* Level 1 Domain Nodes */}
             {filteredDomains.map((domain) => {
               const pos = layoutNodes[domain.id];
               if (!pos) return null;
@@ -992,17 +1003,13 @@ export function InteractiveMindmap() {
               const isCollapsed = collapsedDomains.has(domain.id);
               const isSelected = selectedDomain?.id === domain.id;
               const isMatched = searchMatches.has(domain.id);
-              const isDragging = activeDragId === domain.id;
               const flowInfo = FLOW_SEQUENCE.find((f) => f.id === domain.id);
 
               return (
                 <div
                   key={domain.id}
                   data-node="true"
-                  className={cn(
-                    "absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-grab active:cursor-grabbing transition-transform duration-75",
-                    isDragging && "scale-105 z-30"
-                  )}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-grab active:cursor-grabbing"
                   style={{ left: `${pos.x}px`, top: `${pos.y}px` }}
                   onMouseDown={(e) => startNodeDrag(domain.id, e)}
                 >
@@ -1013,70 +1020,44 @@ export function InteractiveMindmap() {
                       setSelectedSubtopic(domain.subtopics[0]);
                     }}
                     className={cn(
-                      "w-76 p-3.5 rounded-2xl border transition-all duration-200 shadow-lg group backdrop-blur-xl",
+                      "w-80 p-4 rounded-2xl border-2 transition-all shadow-xl bg-[var(--surface-1)]",
                       isSelected
-                        ? `bg-[var(--surface-1)] ${domain.color.border} ring-2 ring-purple-500 shadow-2xl`
+                        ? "border-purple-500 ring-4 ring-purple-500/40"
                         : isMatched
-                        ? `bg-[var(--surface-1)] ${domain.color.border} ring-2 ring-cyan-400 shadow-xl`
-                        : "bg-[var(--surface-1)]/95 border-[var(--border)] hover:border-[var(--border-hover)] hover:scale-102"
+                        ? "border-cyan-400 ring-4 ring-cyan-400/50"
+                        : "border-[var(--border)] hover:border-purple-400"
                     )}
-                    style={{
-                      boxShadow: isSelected ? `0 0 25px ${domain.color.glow}` : undefined,
-                    }}
                   >
-                    {/* Top Flow Step Indicator */}
                     {isFlowMode && flowInfo && (
-                      <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-[var(--border)]/60 text-[10px] font-mono">
-                        <span className="font-bold text-cyan-400 flex items-center gap-1">
-                          <Activity size={10} className="animate-pulse" />
+                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--border)] text-xs font-mono font-bold">
+                        <span className="text-cyan-400 flex items-center gap-1">
+                          <Activity size={12} className="animate-pulse" />
                           FLOW #{flowInfo.step}
                         </span>
-                        <span className="text-[var(--muted-foreground)] text-[9px] truncate max-w-[150px]">
-                          {flowInfo.flowRole}
-                        </span>
+                        <span className="text-[var(--muted-foreground)] text-[10px]">{flowInfo.flowRole}</span>
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between gap-2.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <GripVertical
-                          size={14}
-                          className="text-[var(--muted-foreground)] opacity-40 group-hover:opacity-100 transition-opacity shrink-0"
-                        />
-                        <div
-                          className={cn(
-                            "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border",
-                            domain.color.bg,
-                            domain.color.border,
-                            domain.color.text
-                          )}
-                        >
-                          {getDomainIcon(domain.icon, 16)}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={cn("p-2 rounded-xl border-2 shrink-0", domain.color.bg, domain.color.border, domain.color.text)}>
+                          {getDomainIcon(domain.icon, 18)}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-xs font-bold text-[var(--foreground)] truncate leading-tight">
+                          <h3 className="text-sm font-extrabold text-[var(--foreground)] truncate">
                             {domain.title}
                           </h3>
-                          <span className="text-[10px] text-[var(--muted-foreground)] font-medium">
+                          <span className="text-xs text-[var(--muted-foreground)] font-medium">
                             {domain.subtopics.length} Protocols
                           </span>
                         </div>
                       </div>
 
-                      {/* Expand / Collapse Pill */}
                       <button
                         onClick={(e) => toggleDomainCollapse(domain.id, e)}
-                        className="p-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors shrink-0 cursor-pointer"
-                        title={isCollapsed ? "Expand Subtopics" : "Collapse Subtopics"}
-                        aria-label={isCollapsed ? `Expand ${domain.title}` : `Collapse ${domain.title}`}
+                        className="p-1.5 rounded-lg bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] font-bold text-xs"
                       >
-                        {isCollapsed ? (
-                          domain.side === "left" ? <ChevronLeft size={13} /> : <ChevronRight size={13} />
-                        ) : (
-                          <span className="text-[9px] font-mono font-bold px-1 text-purple-400">
-                            {domain.subtopics.length}
-                          </span>
-                        )}
+                        {isCollapsed ? "Expand" : domain.subtopics.length}
                       </button>
                     </div>
                   </div>
@@ -1084,7 +1065,7 @@ export function InteractiveMindmap() {
               );
             })}
 
-            {/* ─── LEVEL 2: SUBTOPIC NODES (MOVABLE) ─────────────────────── */}
+            {/* Level 2 Subtopic Nodes */}
             {filteredDomains.map((domain) => {
               if (collapsedDomains.has(domain.id)) return null;
               const pos = layoutNodes[domain.id];
@@ -1096,16 +1077,12 @@ export function InteractiveMindmap() {
 
                 const isSelected = selectedSubtopic?.id === sub.id;
                 const isMatched = searchMatches.has(sub.id);
-                const isDragging = activeDragId === sub.id;
 
                 return (
                   <div
                     key={sub.id}
                     data-node="true"
-                    className={cn(
-                      "absolute -translate-x-1/2 -translate-y-1/2 z-10 cursor-grab active:cursor-grabbing transition-transform duration-75",
-                      isDragging && "scale-105 z-30"
-                    )}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 z-10 cursor-grab active:cursor-grabbing"
                     style={{ left: `${subPos.x}px`, top: `${subPos.y}px` }}
                     onMouseDown={(e) => startNodeDrag(sub.id, e)}
                   >
@@ -1116,56 +1093,34 @@ export function InteractiveMindmap() {
                         setSelectedSubtopic(sub);
                       }}
                       className={cn(
-                        "w-72 p-2.5 rounded-xl border transition-all duration-200 shadow-md group backdrop-blur-md space-y-1.5",
+                        "w-76 p-3 rounded-2xl border-2 transition-all shadow-md bg-[var(--surface-1)] space-y-1.5",
                         isSelected
-                          ? `bg-[var(--surface-1)] ${domain.color.border} ring-2 ring-purple-500 shadow-lg scale-102`
-                          : highlightedNodeId === sub.id
-                          ? "bg-[var(--surface-1)] border-cyan-400 ring-4 ring-cyan-400/80 shadow-2xl animate-pulse scale-102"
+                          ? "border-purple-500 ring-4 ring-purple-500/40"
                           : isMatched
-                          ? "bg-[var(--surface-1)] border-cyan-400 ring-2 ring-cyan-400/60"
-                          : "bg-[var(--surface-1)]/95 border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                          ? "border-cyan-400 ring-4 ring-cyan-400/50"
+                          : "border-[var(--border)] hover:border-purple-400"
                       )}
-                      style={{
-                        boxShadow: isSelected ? `0 0 20px ${domain.color.glow}` : undefined,
-                      }}
                     >
-                      <div className="flex items-center justify-between gap-1.5">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <GripVertical
-                            size={12}
-                            className="text-[var(--muted-foreground)] opacity-40 group-hover:opacity-100 transition-opacity shrink-0"
-                          />
-                          <h4 className="text-xs font-bold text-[var(--foreground)] truncate leading-snug">
-                            {sub.name}
-                          </h4>
-                        </div>
-                        <ChevronRight
-                          size={12}
-                          className={cn(
-                            "shrink-0 transition-transform",
-                            isSelected ? "text-purple-400 translate-x-0.5" : "text-[var(--muted-foreground)]"
-                          )}
-                        />
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="text-xs font-bold text-[var(--foreground)] truncate">
+                          {sub.name}
+                        </h4>
+                        <ChevronRight size={14} className="text-purple-400 shrink-0" />
                       </div>
 
-                      <p className="text-[10px] text-[var(--muted-foreground)] leading-tight line-clamp-2">
+                      <p className="text-[11px] text-[var(--foreground)] opacity-90 line-clamp-2 leading-tight">
                         {sub.desc}
                       </p>
 
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {sub.protocols.slice(0, 3).map((protocol) => (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {sub.protocols.slice(0, 3).map((p) => (
                           <span
-                            key={protocol}
-                            className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
+                            key={p}
+                            className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
                           >
-                            {protocol}
+                            {p}
                           </span>
                         ))}
-                        {sub.protocols.length > 3 && (
-                          <span className="text-[8px] font-mono px-1 py-0.2 rounded bg-[var(--surface-2)] text-[var(--muted-foreground)] border border-[var(--border)]">
-                            +{sub.protocols.length - 3}
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -1173,201 +1128,136 @@ export function InteractiveMindmap() {
               });
             })}
           </div>
-
-          {/* ─── BOTTOM-LEFT STATUS BAR ───────────────────────────────── */}
-          <div className="absolute bottom-3 left-3 z-30 pointer-events-auto bg-[var(--surface-1)]/90 backdrop-blur-xl border border-[var(--border)] px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2.5 text-xs">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-            </span>
-            <span className="font-semibold text-[var(--foreground)] text-[11px]">Interactive Topography</span>
-            <span className="text-[var(--muted-foreground)]">•</span>
-            <span className="hidden sm:inline text-[var(--muted-foreground)] text-[11px]">
-              Drag Nodes · Mouse Wheel Pan · Pinch Zoom
-            </span>
-          </div>
-
-          {/* ─── BOTTOM-RIGHT RADAR MINIMAP ───────────────────────────── */}
-          <div className="absolute bottom-3 right-3 z-30 pointer-events-auto hidden sm:block">
-            <div
-              className="w-40 h-28 rounded-xl bg-[var(--surface-1)]/95 backdrop-blur-xl border border-[var(--border)] shadow-xl relative overflow-hidden cursor-crosshair group"
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickY = e.clientY - rect.top;
-                const targetCanvasX = (clickX / 160) * CANVAS_WIDTH;
-                const targetCanvasY = (clickY / 112) * CANVAS_HEIGHT;
-                setPan({
-                  x: containerSize.width / 2 - targetCanvasX * zoom,
-                  y: containerSize.height / 2 - targetCanvasY * zoom,
-                });
-              }}
-              title="Radar Minimap — Click to pan canvas"
-            >
-              {/* Radar Grid */}
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle,rgba(255,255,255,0.4)_1px,transparent_1px)] [background-size:6px_6px]" />
-
-              {/* Central Hub Dot */}
-              <div
-                className="absolute w-2 h-2 rounded-full bg-purple-500 -translate-x-1/2 -translate-y-1/2 shadow-xs"
-                style={{
-                  left: `${(rootActualX / CANVAS_WIDTH) * 160}px`,
-                  top: `${(rootActualY / CANVAS_HEIGHT) * 112}px`,
-                }}
-              />
-
-              {/* Domain Dots */}
-              {MINDMAP_DOMAINS.map((domain) => {
-                const pos = layoutNodes[domain.id];
-                if (!pos) return null;
-                return (
-                  <div
-                    key={`mm-${domain.id}`}
-                    className="absolute w-1.5 h-1.5 rounded-full -translate-x-1/2 -translate-y-1/2"
-                    style={{
-                      left: `${(pos.x / CANVAS_WIDTH) * 160}px`,
-                      top: `${(pos.y / CANVAS_HEIGHT) * 112}px`,
-                      backgroundColor: domain.color.hex,
-                    }}
-                  />
-                );
-              })}
-
-              {/* Viewport Bounds Rectangle */}
-              {(() => {
-                const scaleX = 160 / CANVAS_WIDTH;
-                const scaleY = 112 / CANVAS_HEIGHT;
-                const vpWidth = (containerSize.width / zoom) * scaleX;
-                const vpHeight = (containerSize.height / zoom) * scaleY;
-                const vpLeft = (-pan.x / zoom) * scaleX;
-                const vpTop = (-pan.y / zoom) * scaleY;
-
-                return (
-                  <div
-                    className="absolute border border-purple-400 bg-purple-500/15 rounded pointer-events-none transition-all duration-75"
-                    style={{
-                      left: `${Math.max(0, vpLeft)}px`,
-                      top: `${Math.max(0, vpTop)}px`,
-                      width: `${Math.min(160, vpWidth)}px`,
-                      height: `${Math.min(112, vpHeight)}px`,
-                    }}
-                  />
-                );
-              })()}
-
-              <span className="absolute bottom-1 right-1.5 text-[8px] font-mono text-[var(--muted-foreground)] opacity-70">
-                Radar
-              </span>
-            </div>
-          </div>
         </div>
       )}
 
-      {/* ─── VIEW MODE 2: 7 PILLARS ARCHITECTURE MATRIX (SCANNABLE) ────── */}
-      {viewMode === "matrix" && (
-        <div className="space-y-4 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-            <span>
-              Showing all <strong>7 Enterprise Domains</strong> and <strong>28 Architecture Concepts</strong> side-by-side
+      {/* ─── VIEW MODE 2: SIMPLE HIGH-READABILITY LINEAR ROADMAP ────────── */}
+      {viewMode === "roadmap" && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-between text-sm text-[var(--foreground)]">
+            <span className="font-semibold flex items-center gap-2">
+              <Eye size={18} className="text-purple-400" />
+              <span><strong>Senior High-Readability Mode:</strong> Large text, clear high-contrast cards, and natural vertical scrolling.</span>
             </span>
-            <span className="text-purple-400 font-medium">Click any card to inspect rubric &amp; code</span>
+            <span className="text-xs text-[var(--muted-foreground)] hidden md:inline">Click any card to inspect trade-offs and practice questions</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="space-y-8">
             {filteredDomains.map((domain, dIdx) => {
               const flowInfo = FLOW_SEQUENCE.find((f) => f.id === domain.id);
 
               return (
                 <div
                   key={domain.id}
-                  className={cn(
-                    "rounded-2xl border bg-[var(--surface-1)] p-4 shadow-sm flex flex-col justify-between transition-all",
-                    selectedDomain?.id === domain.id
-                      ? "border-purple-500/50 ring-2 ring-purple-500/30 shadow-md"
-                      : "border-[var(--border)] hover:border-[var(--border-hover)]"
-                  )}
+                  className="rounded-3xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-6 sm:p-8 shadow-lg space-y-6 transition-all"
                 >
-                  <div className="space-y-3">
-                    {/* Domain Header Card */}
-                    <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-[var(--border)]">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div
-                          className={cn(
-                            "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border",
-                            domain.color.bg,
-                            domain.color.border,
-                            domain.color.text
-                          )}
-                        >
-                          {getDomainIcon(domain.icon, 16)}
+                  {/* Stage Header Banner */}
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-5 border-b-2 border-[var(--border)]">
+                    <div className="flex items-center gap-4">
+                      {/* Big High-Contrast Number Badge */}
+                      <div className="w-14 h-14 rounded-2xl bg-purple-600 text-white font-black text-2xl flex items-center justify-center shrink-0 shadow-md">
+                        {flowInfo?.step || `0${dIdx + 1}`}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">
+                          <span>PIPELINE STAGE {flowInfo?.step || `0${dIdx + 1}`} OF 07</span>
+                          <span>•</span>
+                          <span>{flowInfo?.flowRole}</span>
                         </div>
-                        <div className="min-w-0">
-                          <span className="text-[10px] font-mono font-bold text-cyan-400 block">
-                            STAGE #{flowInfo?.step || `0${dIdx + 1}`}
-                          </span>
-                          <h3 className="text-sm font-bold text-[var(--foreground)] truncate leading-tight">
-                            {domain.title}
-                          </h3>
-                        </div>
+                        <h3 className={cn("font-black text-[var(--foreground)] tracking-tight", fontClasses.subheading)}>
+                          {domain.title}
+                        </h3>
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
-                      {domain.summary}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className={cn("rounded-xl border font-bold", domain.color.badge, fontClasses.badge)}>
+                        {domain.subtopics.length} Architecture Protocols
+                      </span>
+                    </div>
+                  </div>
 
-                    {/* Subtopics List */}
-                    <div className="space-y-2 pt-1">
-                      {domain.subtopics.map((sub) => {
-                        const isSubSelected = selectedSubtopic?.id === sub.id;
-                        const isSubMatched = searchMatches.has(sub.id);
+                  {/* Domain Summary (Large, Readable Body) */}
+                  <p className={cn("text-[var(--foreground)] font-medium leading-relaxed max-w-4xl", fontClasses.body)}>
+                    {domain.summary}
+                  </p>
 
-                        return (
-                          <div
-                            key={sub.id}
-                            onClick={() => {
-                              setSelectedDomain(domain);
-                              setSelectedSubtopic(sub);
-                            }}
-                            className={cn(
-                              "p-3 rounded-xl border transition-all cursor-pointer space-y-1.5",
-                              isSubSelected
-                                ? "bg-[var(--surface-2)] border-purple-500 ring-2 ring-purple-500/30"
-                                : isSubMatched
-                                ? "bg-[var(--surface-2)] border-cyan-400 ring-2 ring-cyan-400/50"
-                                : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-purple-500/40 hover:bg-[var(--surface-2)]"
-                            )}
-                          >
-                            <div className="flex items-center justify-between gap-1.5">
-                              <h4 className="text-xs font-bold text-[var(--foreground)] truncate leading-snug">
+                  {/* 4 Subtopic Cards in Generous Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                    {domain.subtopics.map((sub) => {
+                      const isSubSelected = selectedSubtopic?.id === sub.id;
+                      const isSubMatched = searchMatches.has(sub.id);
+
+                      return (
+                        <div
+                          key={sub.id}
+                          onClick={() => {
+                            setSelectedDomain(domain);
+                            setSelectedSubtopic(sub);
+                          }}
+                          className={cn(
+                            "rounded-2xl border-2 p-5 transition-all cursor-pointer flex flex-col justify-between space-y-4 shadow-sm",
+                            isSubSelected
+                              ? "bg-[var(--surface-2)] border-purple-500 ring-4 ring-purple-500/30"
+                              : isSubMatched
+                              ? "bg-[var(--surface-2)] border-cyan-400 ring-4 ring-cyan-400/50"
+                              : "bg-[var(--surface-2)]/90 border-[var(--border)] hover:border-purple-400 hover:bg-[var(--surface-2)]"
+                          )}
+                        >
+                          <div className="space-y-2.5">
+                            <div className="flex items-start justify-between gap-3">
+                              <h4 className={cn("text-[var(--foreground)] font-extrabold leading-snug", fontClasses.title)}>
                                 {sub.name}
                               </h4>
-                              <ChevronRight size={13} className="text-[var(--muted-foreground)] shrink-0" />
+                              <span className="p-1 rounded-lg bg-[var(--surface-3)] text-purple-400 shrink-0">
+                                <ChevronRight size={16} />
+                              </span>
                             </div>
 
-                            <p className="text-[10px] text-[var(--muted-foreground)] leading-snug line-clamp-2">
+                            <p className={cn("text-[var(--foreground)] opacity-90", fontClasses.body)}>
                               {sub.desc}
                             </p>
 
-                            <div className="flex flex-wrap gap-1 pt-0.5">
-                              {sub.protocols.slice(0, 3).map((p) => (
+                            {/* Production Trade-off Callout */}
+                            <div className="p-3.5 rounded-xl bg-[var(--surface-0)] border border-amber-500/35 space-y-1">
+                              <span className="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1.5">
+                                <Sparkles size={13} />
+                                Architectural Trade-Off
+                              </span>
+                              <p className={cn("text-[var(--foreground)] font-medium leading-relaxed", fontClasses.subtext)}>
+                                {sub.tradeOffs}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3 pt-2 border-t border-[var(--border)]">
+                            {/* Standard Protocols Badges */}
+                            <div className="flex flex-wrap gap-1.5">
+                              {sub.protocols.map((p) => (
                                 <span
                                   key={p}
-                                  className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[var(--surface-0)] border border-[var(--border)] text-[var(--foreground)]"
+                                  className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
                                 >
                                   {p}
                                 </span>
                               ))}
-                              {sub.protocols.length > 3 && (
-                                <span className="text-[9px] font-mono text-[var(--muted-foreground)]">
-                                  +{sub.protocols.length - 3}
-                                </span>
-                              )}
+                            </div>
+
+                            {/* Practice Action Link */}
+                            <div className="flex items-center justify-between pt-1">
+                              <button
+                                type="button"
+                                className="inline-flex items-center gap-1.5 font-bold text-purple-600 dark:text-purple-400 hover:text-purple-300 text-sm"
+                              >
+                                <span>Inspect Full Rubric &amp; Blueprint</span>
+                                <ArrowRight size={15} />
+                              </button>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -1376,270 +1266,160 @@ export function InteractiveMindmap() {
         </div>
       )}
 
-      {/* ─── VIEW MODE 3: LIFECYCLE PIPELINE STEPPER ─────────────────── */}
-      {viewMode === "journey" && (
+      {/* ─── VIEW MODE 3: 7 PILLARS COMPARISON BOARD ──────────────────── */}
+      {viewMode === "matrix" && (
         <div className="space-y-4 animate-in fade-in duration-200">
-          {/* Stepper Navigation Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-            {FLOW_SEQUENCE.map((seq, idx) => {
-              const dom = MINDMAP_DOMAINS.find((d) => d.id === seq.id);
-              const isActive = activeJourneyStep === idx;
-
-              return (
-                <button
-                  key={seq.id}
-                  onClick={() => {
-                    setActiveJourneyStep(idx);
-                    if (dom) {
-                      setSelectedDomain(dom);
-                      setSelectedSubtopic(dom.subtopics[0]);
-                    }
-                  }}
-                  className={cn(
-                    "p-3 rounded-2xl border text-left transition-all cursor-pointer space-y-1 relative overflow-hidden",
-                    isActive
-                      ? "bg-purple-600/15 border-purple-500 ring-2 ring-purple-500/30"
-                      : "bg-[var(--surface-1)] border-[var(--border)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
-                  )}
-                >
-                  <div className="flex items-center justify-between text-[10px] font-mono">
-                    <span className={cn("font-bold", isActive ? "text-purple-400" : "text-[var(--muted-foreground)]")}>
-                      #{seq.step}
-                    </span>
-                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping" />}
-                  </div>
-                  <h4 className="text-xs font-bold text-[var(--foreground)] truncate leading-tight">
-                    {dom?.shortTitle || seq.stage}
-                  </h4>
-                  <p className="text-[10px] text-[var(--muted-foreground)] truncate">
-                    {seq.flowRole}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Active Lifecycle Stage Feature Card */}
-          {(() => {
-            const currentSeq = FLOW_SEQUENCE[activeJourneyStep];
-            const currentDomain = MINDMAP_DOMAINS.find((d) => d.id === currentSeq?.id) || MINDMAP_DOMAINS[0];
-
-            return (
-              <div className="p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xl space-y-6">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border shadow-md",
-                        currentDomain.color.bg,
-                        currentDomain.color.border,
-                        currentDomain.color.text
-                      )}
-                    >
-                      {getDomainIcon(currentDomain.icon, 24)}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredDomains.map((domain, dIdx) => (
+              <div
+                key={domain.id}
+                className="rounded-2xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-4 shadow-sm flex flex-col justify-between space-y-4"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2.5 pb-2 border-b border-[var(--border)]">
+                    <div className={cn("p-2 rounded-xl border shrink-0", domain.color.bg, domain.color.text)}>
+                      {getDomainIcon(domain.icon, 16)}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono font-bold text-cyan-400">
-                          PIPELINE STEP #{currentSeq.step} OF 07
-                        </span>
-                        <span className="text-[var(--muted-foreground)]">•</span>
-                        <span className="text-xs text-[var(--muted-foreground)]">{currentSeq.flowRole}</span>
-                      </div>
-                      <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
-                        {currentDomain.title}
-                      </h3>
+                      <span className="text-[10px] font-mono font-bold text-cyan-500 block">STAGE 0{dIdx + 1}</span>
+                      <h4 className="text-sm font-bold text-[var(--foreground)]">{domain.title}</h4>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      disabled={activeJourneyStep === 0}
-                      onClick={() => setActiveJourneyStep((prev) => Math.max(0, prev - 1))}
-                      className="px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs font-semibold text-[var(--foreground)] disabled:opacity-40 cursor-pointer"
-                    >
-                      Previous Step
-                    </button>
-                    <button
-                      disabled={activeJourneyStep === FLOW_SEQUENCE.length - 1}
-                      onClick={() => setActiveJourneyStep((prev) => Math.min(FLOW_SEQUENCE.length - 1, prev + 1))}
-                      className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold disabled:opacity-40 cursor-pointer shadow-md"
-                    >
-                      Next Step
-                    </button>
-                  </div>
-                </div>
+                  <p className="text-xs text-[var(--foreground)] opacity-90 leading-relaxed">
+                    {domain.summary}
+                  </p>
 
-                <p className="text-sm text-[var(--foreground)] leading-relaxed max-w-3xl">
-                  {currentDomain.summary}
-                </p>
-
-                {/* Subtopic Architecture Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {currentDomain.subtopics.map((sub) => (
-                    <div
-                      key={sub.id}
-                      onClick={() => {
-                        setSelectedDomain(currentDomain);
-                        setSelectedSubtopic(sub);
-                      }}
-                      className="p-4 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)]/80 hover:border-purple-500/50 hover:bg-[var(--surface-2)] transition-all cursor-pointer space-y-3"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-sm font-bold text-[var(--foreground)]">
-                          {sub.name}
-                        </h4>
-                        <span className="text-[10px] font-semibold text-purple-400">Inspect Rubric →</span>
-                      </div>
-
-                      <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-                        {sub.desc}
-                      </p>
-
-                      <div className="p-2.5 rounded-xl bg-[var(--surface-0)] border border-[var(--border)] text-xs text-[var(--foreground)] space-y-1">
-                        <span className="text-[10px] font-bold text-amber-400 block uppercase tracking-wider">
-                          Trade-Off Rationale
-                        </span>
-                        <p className="text-[11px] text-[var(--muted-foreground)] leading-snug">
-                          {sub.tradeOffs}
+                  <div className="space-y-2 pt-1">
+                    {domain.subtopics.map((sub) => (
+                      <div
+                        key={sub.id}
+                        onClick={() => {
+                          setSelectedDomain(domain);
+                          setSelectedSubtopic(sub);
+                        }}
+                        className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-400 transition-all cursor-pointer space-y-1"
+                      >
+                        <div className="flex items-center justify-between text-xs font-bold text-[var(--foreground)]">
+                          <span>{sub.name}</span>
+                          <ChevronRight size={13} className="text-purple-400" />
+                        </div>
+                        <p className="text-[11px] text-[var(--foreground)] opacity-80 leading-snug line-clamp-2">
+                          {sub.desc}
                         </p>
                       </div>
-
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {sub.protocols.map((p) => (
-                          <span
-                            key={p}
-                            className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
-                          >
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            );
-          })()}
+            ))}
+          </div>
         </div>
       )}
 
-      {/* ─── RIGHT SLIDE-OUT INSPECTOR DRAWER ────────────────────────── */}
+      {/* ─── SLIDE-OUT INSPECTOR DRAWER (LARGE & READABLE) ─────────────── */}
       <AnimatePresence>
         {selectedSubtopic && selectedDomain && (
           <m.div
-            initial={{ opacity: 0, x: 380 }}
+            initial={{ opacity: 0, x: 420 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 380 }}
+            exit={{ opacity: 0, x: 420 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[460px] bg-[var(--surface-1)] border-l border-[var(--border)] shadow-2xl p-6 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
+            className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[500px] bg-[var(--surface-1)] border-l-2 border-[var(--border)] shadow-2xl p-6 sm:p-8 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
           >
             <div className="space-y-6">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border",
-                      selectedDomain.color.badge
-                    )}
-                  >
-                    {selectedDomain.shortTitle}
-                  </span>
-                </div>
+              {/* Header */}
+              <div className="flex items-center justify-between pb-4 border-b-2 border-[var(--border)]">
+                <span className={cn("rounded-xl border font-bold text-xs px-3 py-1", selectedDomain.color.badge)}>
+                  {selectedDomain.shortTitle}
+                </span>
                 <button
                   onClick={() => setSelectedSubtopic(null)}
-                  className="p-1.5 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
                   aria-label="Close details"
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
 
-              {/* Mode Tab Switcher: Architect Rubric vs Concept Card */}
-              <div className="flex items-center p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold">
+              {/* Mode Switcher */}
+              <div className="flex items-center p-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-bold">
                 <button
                   onClick={() => setDrawerTab("rubric")}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg transition-all cursor-pointer",
-                    drawerTab === "rubric"
-                      ? "bg-purple-600 text-white shadow-sm"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                    "flex-1 py-2 px-3 rounded-lg transition-all cursor-pointer text-center",
+                    drawerTab === "rubric" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)]"
                   )}
                 >
-                  <Sparkles size={13} />
-                  <span>Architect Rubric</span>
+                  Architect Rubric
                 </button>
                 <button
                   onClick={() => setDrawerTab("concept")}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg transition-all cursor-pointer",
-                    drawerTab === "concept"
-                      ? "bg-purple-600 text-white shadow-sm"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                    "flex-1 py-2 px-3 rounded-lg transition-all cursor-pointer text-center",
+                    drawerTab === "concept" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)]"
                   )}
                 >
-                  <BookOpen size={13} />
-                  <span>Concept Card</span>
+                  Concept Card
                 </button>
               </div>
 
-              {/* VIEW 1: ARCHITECT RUBRIC */}
+              {/* View 1: Architect Rubric */}
               {drawerTab === "rubric" && (
-                <div className="space-y-5 animate-in fade-in duration-200">
+                <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="space-y-2">
-                    <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
+                    <h3 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
                       {selectedSubtopic.name}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+                    <p className="text-base text-[var(--foreground)] leading-relaxed">
                       {selectedSubtopic.desc}
                     </p>
                   </div>
 
                   {/* Architectural Trade-offs Callout */}
-                  <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-amber-500/30 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
-                      <Sparkles size={14} />
+                  <div className="p-5 rounded-2xl bg-[var(--surface-2)] border-2 border-amber-500/40 space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-bold text-amber-500">
+                      <Sparkles size={16} />
                       <span>Architectural Trade-Off &amp; Production Rubric</span>
                     </div>
-                    <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                    <p className="text-sm font-medium text-[var(--foreground)] leading-relaxed">
                       {selectedSubtopic.tradeOffs}
                     </p>
                   </div>
 
-                  {/* Ecosystem & Protocols Badges */}
+                  {/* Protocols */}
                   <div className="space-y-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      Ecosystem Protocols &amp; Standard Tooling
+                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                      Standard Protocols &amp; Tooling
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedSubtopic.protocols.map((protocol) => (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedSubtopic.protocols.map((p) => (
                         <span
-                          key={protocol}
-                          className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
+                          key={p}
+                          className="px-3 py-1 rounded-xl text-xs font-mono font-bold bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
                         >
-                          {protocol}
+                          {p}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Production Blueprint Snippet */}
+                  {/* Code Snippet */}
                   {selectedSubtopic.codeSnippet && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                           Production Blueprint Snippet
                         </span>
                         <button
                           onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
-                          className="inline-flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-400 hover:text-purple-300 cursor-pointer"
                         >
-                          {hasCopied ? <Check size={12} /> : <Copy size={12} />}
+                          {hasCopied ? <Check size={14} /> : <Copy size={14} />}
                           <span>{hasCopied ? "Copied" : "Copy"}</span>
                         </button>
                       </div>
-                      <pre className="p-3.5 rounded-xl bg-black/80 border border-[var(--border)] text-[11px] font-mono text-cyan-300 whitespace-pre-wrap break-words leading-relaxed overflow-x-auto">
+                      <pre className="p-4 rounded-xl bg-black/90 border border-[var(--border)] text-xs font-mono text-cyan-300 whitespace-pre-wrap leading-relaxed overflow-x-auto">
                         <code>{selectedSubtopic.codeSnippet}</code>
                       </pre>
                     </div>
@@ -1647,50 +1427,47 @@ export function InteractiveMindmap() {
                 </div>
               )}
 
-              {/* VIEW 2: CONCEPT CARD OVERLAY */}
+              {/* View 2: Concept Card */}
               {drawerTab === "concept" && (
-                <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
                       {linkedConcept?.category || selectedDomain.shortTitle} · Core Concept
                     </span>
-                    <h3 className="text-xl font-extrabold text-[var(--foreground)] tracking-tight">
+                    <h3 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
                       {linkedConcept?.term || selectedSubtopic.name}
                     </h3>
                   </div>
 
-                  {/* Plain-English Definition */}
-                  <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-cyan-500/30 space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">
+                  <div className="p-5 rounded-2xl bg-[var(--surface-2)] border-2 border-cyan-500/40 space-y-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
                       Plain-English Definition
                     </span>
-                    <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                    <p className="text-sm font-medium text-[var(--foreground)] leading-relaxed">
                       {linkedConcept?.definition || selectedSubtopic.desc}
                     </p>
                   </div>
 
-                  {/* Architectural Deep-Dive */}
-                  <div className="space-y-1.5">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-1.5">
-                      <Sparkles size={13} className="text-purple-700 dark:text-purple-400" />
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-2">
+                      <Sparkles size={15} className="text-purple-400" />
                       Architectural Deep-Dive
                     </h4>
-                    <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                    <p className="text-sm text-[var(--foreground)] leading-relaxed">
                       {linkedConcept?.explanation || selectedSubtopic.tradeOffs}
                     </p>
                   </div>
 
-                  {/* Key Takeaways */}
-                  {linkedConcept?.keyPoints && linkedConcept.keyPoints.length > 0 && (
-                    <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                  {linkedConcept?.keyPoints && (
+                    <div className="space-y-2 pt-3 border-t border-[var(--border)]">
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--foreground)]">
                         Core Takeaways:
                       </h4>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {linkedConcept.keyPoints.map((point, ki) => (
-                          <li key={ki} className="flex items-start gap-2 text-xs text-[var(--muted-foreground)]">
-                            <CheckCircle2 size={13} className="text-emerald-700 dark:text-green-400 mt-0.5 shrink-0" />
-                            <span className="leading-snug">{point}</span>
+                          <li key={ki} className="flex items-start gap-2 text-sm text-[var(--foreground)]">
+                            <CheckCircle2 size={16} className="text-green-400 mt-0.5 shrink-0" />
+                            <span>{point}</span>
                           </li>
                         ))}
                       </ul>
@@ -1699,32 +1476,29 @@ export function InteractiveMindmap() {
                 </div>
               )}
 
-              {/* Drawer Footer Actions */}
-              <div className="pt-6 mt-6 border-t border-[var(--border)] space-y-2">
+              {/* Footer Actions */}
+              <div className="pt-6 border-t-2 border-[var(--border)] space-y-3">
                 <Link
                   href={
                     selectedSubtopic.conceptId
                       ? `/qa-prep?conceptId=${selectedSubtopic.conceptId}&term=${encodeURIComponent(selectedSubtopic.name)}`
                       : selectedSubtopic.practiceLink
                   }
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-98 text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-600/30 transition-all"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold shadow-lg transition-all"
                 >
-                  <Zap size={15} />
+                  <Zap size={16} />
                   <span>Practice Interview Q&amp;As for this Topic</span>
-                  <ArrowRight size={15} />
+                  <ArrowRight size={16} />
                 </Link>
                 {linkedConcept && (
                   <Link
                     href={`/concepts?card=${linkedConcept.id}`}
-                    className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 text-xs font-semibold transition-colors border border-[var(--border)]"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 text-sm font-semibold border border-[var(--border)] transition-colors"
                   >
-                    <BookOpen size={13} />
+                    <BookOpen size={15} />
                     <span>Open in Concepts Library</span>
                   </Link>
                 )}
-                <p className="text-[11px] text-center text-[var(--muted-foreground)]">
-                  Filters verified interview questions for this specific architecture node
-                </p>
               </div>
             </div>
           </m.div>
