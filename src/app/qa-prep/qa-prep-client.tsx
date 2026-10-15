@@ -24,6 +24,9 @@ import {
   Compass,
   ArrowRight,
   Filter,
+  Code2,
+  X,
+  SlidersHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -31,7 +34,18 @@ import { HubSubnav } from "@/components/layout/hub-subnav";
 import { UnifiedQuestion, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { ArchitectureDiagramItem } from "@/data/diagrams";
 import dynamic from "next/dynamic";
-import { recordLastTopic } from "@/lib/user-progress";
+import {
+  TECH_ECOSYSTEMS,
+  SCENARIO_ARCHETYPES,
+  TechEcosystemId,
+  ScenarioArchetypeId,
+  matchTechEcosystem,
+  matchScenarioArchetype,
+  matchDomain,
+  questionHasCode,
+  computeFilterCounts,
+  getQuestionSearchCorpus,
+} from "@/lib/qa-filters";
 
 const AnswerRenderer = dynamic(
   () => import("@/components/ui/answer-renderer").then((mod) => mod.AnswerRenderer),
@@ -145,11 +159,20 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") || searchParams.get("search") || "";
   const initialDomain = searchParams.get("domain") || searchParams.get("category") || "ALL";
+  const initialTech = (searchParams.get("tech") || searchParams.get("ecosystem") || "ALL").toUpperCase() as TechEcosystemId;
+  const initialArchetype = (searchParams.get("archetype") || searchParams.get("scenario") || "ALL").toUpperCase() as ScenarioArchetypeId;
 
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [selectedDomain, setSelectedDomain] = useState<string>(initialDomain);
+  const [selectedTech, setSelectedTech] = useState<TechEcosystemId>(
+    TECH_ECOSYSTEMS.some((e) => e.id === initialTech) ? initialTech : "ALL"
+  );
+  const [selectedArchetype, setSelectedArchetype] = useState<ScenarioArchetypeId>(
+    SCENARIO_ARCHETYPES.some((a) => a.id === initialArchetype) ? initialArchetype : "ALL"
+  );
+
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
@@ -164,7 +187,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Sync bookmarks
+  // Sync bookmarks from localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -173,10 +196,17 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     } catch {}
   }, []);
 
-  // Reactively synchronize URL search parameters (q, search, domain, category, difficulty, card, id)
+  // Pre-calculate filter counts for real-time badges
+  const { techCounts, archetypeCounts } = useMemo(() => {
+    return computeFilterCounts(initialQuestions, bookmarks);
+  }, [initialQuestions, bookmarks]);
+
+  // Synchronize URL search parameters
   useEffect(() => {
     const qParam = searchParams.get("q") || searchParams.get("search");
     const domainParam = searchParams.get("domain") || searchParams.get("category");
+    const techParam = (searchParams.get("tech") || searchParams.get("ecosystem") || "").toUpperCase() as TechEcosystemId;
+    const archetypeParam = (searchParams.get("archetype") || searchParams.get("scenario") || "").toUpperCase() as ScenarioArchetypeId;
     const diffParam = searchParams.get("difficulty");
     const cardParam = searchParams.get("card") || searchParams.get("id");
 
@@ -186,6 +216,14 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
 
     if (domainParam) {
       setSelectedDomain(domainParam);
+    }
+
+    if (techParam && TECH_ECOSYSTEMS.some((e) => e.id === techParam)) {
+      setSelectedTech(techParam);
+    }
+
+    if (archetypeParam && SCENARIO_ARCHETYPES.some((a) => a.id === archetypeParam)) {
+      setSelectedArchetype(archetypeParam);
     }
 
     if (diffParam && ["EASY", "MEDIUM", "HARD", "ARCHITECT", "ALL"].includes(diffParam.toUpperCase())) {
@@ -218,35 +256,55 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     toast.info("Reset to default order");
   }, []);
 
-  // Filter questions
+  const handleResetAllFilters = useCallback(() => {
+    setSelectedTech("ALL");
+    setSelectedArchetype("ALL");
+    setSelectedDomain("ALL");
+    setSelectedDifficulty("ALL");
+    setSearchQuery("");
+    toast.info("Cleared all filters");
+  }, []);
+
+  // Multi-dimensional filtering logic
   const filteredQuestions = useMemo(() => {
     let result = initialQuestions;
 
+    // 1. Tech Ecosystem Filter
+    if (selectedTech !== "ALL") {
+      result = result.filter((item) => matchTechEcosystem(item, selectedTech));
+    }
+
+    // 2. Scenario Archetype / Hotspot Filter
+    if (selectedArchetype !== "ALL") {
+      result = result.filter((item) =>
+        matchScenarioArchetype(item, selectedArchetype, undefined, bookmarks)
+      );
+    }
+
+    // 3. Standardized Domain Filter
+    if (selectedDomain !== "ALL") {
+      result = result.filter((item) => matchDomain(item, selectedDomain));
+    }
+
+    // 4. Difficulty Filter
     if (selectedDifficulty !== "ALL") {
       result = result.filter((item) => item.difficulty === selectedDifficulty);
     }
 
-    if (selectedDomain !== "ALL") {
-      const target = selectedDomain.toUpperCase();
+    // 5. Full-text search
+    if (deferredSearch.trim()) {
+      const q = deferredSearch.toLowerCase().trim();
       result = result.filter((item) => {
-        const cat = (item.category || "").toUpperCase();
-        const niche = (item.niche || "").toUpperCase();
-        const dom = (item.domain || "").toUpperCase();
-        return cat.includes(target) || niche.includes(target) || dom.includes(target);
+        const text = getQuestionSearchCorpus(item);
+        return (
+          text.includes(q) ||
+          (item.answer && item.answer.toLowerCase().includes(q)) ||
+          (item.code && item.code.toLowerCase().includes(q))
+        );
       });
     }
 
-    if (deferredSearch.trim()) {
-      const q = deferredSearch.toLowerCase().trim();
-      result = result.filter(
-        (item) =>
-          item.question.toLowerCase().includes(q) ||
-          item.answer.toLowerCase().includes(q) ||
-          (item.category && item.category.toLowerCase().includes(q)) ||
-          (item.niche && item.niche.toLowerCase().includes(q))
-      );
-    }
-
+    // 6. Shuffled Order
     if (isShuffled) {
       result = [...result].sort((a, b) => {
         const hashA = (a.id.length * 37 + shuffleSeed) % 100;
@@ -256,7 +314,24 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     }
 
     return result;
-  }, [initialQuestions, selectedDifficulty, selectedDomain, deferredSearch, isShuffled, shuffleSeed]);
+  }, [
+    initialQuestions,
+    selectedTech,
+    selectedArchetype,
+    selectedDomain,
+    selectedDifficulty,
+    deferredSearch,
+    isShuffled,
+    shuffleSeed,
+    bookmarks,
+  ]);
+
+  // Adjust studyIndex if bounds change
+  useEffect(() => {
+    if (studyIndex >= filteredQuestions.length && filteredQuestions.length > 0) {
+      setStudyIndex(0);
+    }
+  }, [filteredQuestions.length, studyIndex]);
 
   // Window Virtualization for Questions List
   const virtualizer = useWindowVirtualizer({
@@ -310,6 +385,16 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
 
   const currentStudyCard = filteredQuestions[studyIndex];
 
+  const hasActiveFilters =
+    selectedTech !== "ALL" ||
+    selectedArchetype !== "ALL" ||
+    selectedDomain !== "ALL" ||
+    selectedDifficulty !== "ALL" ||
+    searchQuery.trim().length > 0;
+
+  const currentTechObj = TECH_ECOSYSTEMS.find((e) => e.id === selectedTech);
+  const currentArchetypeObj = SCENARIO_ARCHETYPES.find((a) => a.id === selectedArchetype);
+
   return (
     <div className="space-y-4 pb-16">
       <HubSubnav
@@ -323,41 +408,67 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
 
       {/* ─── DOUBLE-LINE SLICERS & FILTERS (ALWAYS VISIBLE AT TOP OF WEBPAGE) ─── */}
       <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-        {/* LINE 1: DOMAIN SLICERS */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-            <Filter size={11} /> Domains:
-          </span>
-          <button
-            onClick={() => setSelectedDomain("ALL")}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-              selectedDomain === "ALL"
-                ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-            )}
-          >
-            All Domains ({initialQuestions.length})
-          </button>
-          {STANDARDIZED_DOMAINS.map((dom) => (
-            <button
-              key={dom}
-              onClick={() => setSelectedDomain(dom)}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-                selectedDomain === dom
-                  ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
+        {/* LINE 1: TECHNOLOGY ECOSYSTEM SLICERS + DOMAIN SELECTOR */}
+        <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none pb-0.5">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 flex items-center gap-1">
+              <Zap size={11} className="text-amber-500" /> Tech:
+            </span>
+
+            {TECH_ECOSYSTEMS.map((eco) => {
+              const count = eco.id === "ALL" ? initialQuestions.length : techCounts[eco.id] || 0;
+              const isSelected = selectedTech === eco.id;
+              return (
+                <button
+                  key={eco.id}
+                  onClick={() => setSelectedTech(eco.id)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
+                    isSelected
+                      ? "bg-blue-600 border-blue-500 text-white shadow-xs"
+                      : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  )}
+                  title={eco.description}
+                >
+                  <span>{eco.label}</span>
+                  <span
+                    className={cn(
+                      "text-[10px] px-1 py-0.2 rounded-full font-mono",
+                      isSelected ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+                    )}
+                  >
+                    {count.toLocaleString()}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Canonical Domain Dropdown */}
+          <div className="flex items-center gap-1 shrink-0 pl-2 border-l border-[var(--border)]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] whitespace-nowrap hidden lg:inline">
+              Domain:
+            </span>
+            <select
+              value={selectedDomain}
+              onChange={(e) => setSelectedDomain(e.target.value)}
+              className="text-xs font-semibold py-1 px-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] cursor-pointer focus:outline-none focus:border-blue-500 max-w-[130px] sm:max-w-none"
+              title="Filter by standardized high-level domain"
             >
-              {dom}
-            </button>
-          ))}
+              <option value="ALL">🌐 All Domains</option>
+              {STANDARDIZED_DOMAINS.map((dom) => (
+                <option key={dom} value={dom}>
+                  {dom}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* LINE 2: SEARCH FILTER + DIFFICULTY SLICERS + STUDY MODE */}
+        {/* LINE 2: SEARCH FILTER + SCENARIO ARCHETYPE DROPDOWN + DIFFICULTY SLICERS + STUDY MODE */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
-          <div className="relative flex-1">
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-[200px]">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
             <input
               type="text"
@@ -377,6 +488,35 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
+            {/* Scenario Archetype Hotspot Selector */}
+            <div className="flex items-center gap-1 shrink-0">
+              <select
+                value={selectedArchetype}
+                onChange={(e) => setSelectedArchetype(e.target.value as ScenarioArchetypeId)}
+                className={cn(
+                  "h-8 px-2.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer focus:outline-none focus:border-blue-500 shrink-0",
+                  selectedArchetype !== "ALL"
+                    ? "bg-purple-600/10 border-purple-500/40 text-purple-400 font-bold"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)]"
+                )}
+                title="Filter by architectural scenario archetype or failure mode"
+              >
+                {SCENARIO_ARCHETYPES.map((arc) => {
+                  const count =
+                    arc.id === "ALL"
+                      ? initialQuestions.length
+                      : arc.id === "BOOKMARKED"
+                      ? bookmarks.length
+                      : archetypeCounts[arc.id] || 0;
+                  return (
+                    <option key={arc.id} value={arc.id}>
+                      {arc.emoji} {arc.label} ({count.toLocaleString()})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
             {/* Difficulty Selector */}
             <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
               {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
@@ -384,18 +524,18 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                   key={diff}
                   onClick={() => setSelectedDifficulty(diff)}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                    "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                     selectedDifficulty === diff
                       ? "bg-blue-600 text-white shadow-xs"
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >
-                  {diff}
+                  {diff === "ARCHITECT" ? "ARCH" : diff}
                 </button>
               ))}
             </div>
 
-            {/* Study Mode Flashcard Button */}
+            {/* Flashcard Study Mode Button */}
             <button
               onClick={() => setIsStudyMode(!isStudyMode)}
               className={cn(
@@ -409,11 +549,89 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               <span>{isStudyMode ? "Exit Study" : "Study Mode"}</span>
             </button>
 
-            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+            {/* Clear All Filters Button (Shown when filters active) */}
+            {hasActiveFilters && (
+              <button
+                onClick={handleResetAllFilters}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer whitespace-nowrap"
+                title="Reset all active filters"
+              >
+                <X size={12} />
+                <span>Reset</span>
+              </button>
+            )}
+
+            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden xl:inline">
               <strong className="text-[var(--foreground)]">{filteredQuestions.length.toLocaleString()}</strong> Qs
             </span>
           </div>
         </div>
+
+        {/* ACTIVE FILTER BADGES ROW (Only shown if at least one filter is active) */}
+        {hasActiveFilters && (
+          <div className="flex items-center gap-1.5 flex-wrap pt-1.5 border-t border-[var(--border)]/60 text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1">
+              <SlidersHorizontal size={10} /> Active:
+            </span>
+
+            {selectedTech !== "ALL" && currentTechObj && (
+              <button
+                onClick={() => setSelectedTech("ALL")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[11px] hover:bg-blue-500/20 cursor-pointer"
+              >
+                <span>Tech: {currentTechObj.label}</span>
+                <X size={11} />
+              </button>
+            )}
+
+            {selectedArchetype !== "ALL" && currentArchetypeObj && (
+              <button
+                onClick={() => setSelectedArchetype("ALL")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-400 text-[11px] hover:bg-purple-500/20 cursor-pointer"
+              >
+                <span>Scenario: {currentArchetypeObj.label}</span>
+                <X size={11} />
+              </button>
+            )}
+
+            {selectedDomain !== "ALL" && (
+              <button
+                onClick={() => setSelectedDomain("ALL")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[11px] hover:bg-cyan-500/20 cursor-pointer"
+              >
+                <span>Domain: {selectedDomain}</span>
+                <X size={11} />
+              </button>
+            )}
+
+            {selectedDifficulty !== "ALL" && (
+              <button
+                onClick={() => setSelectedDifficulty("ALL")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] hover:bg-amber-500/20 cursor-pointer"
+              >
+                <span>Difficulty: {selectedDifficulty}</span>
+                <X size={11} />
+              </button>
+            )}
+
+            {searchQuery.trim().length > 0 && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] hover:bg-emerald-500/20 cursor-pointer"
+              >
+                <span>Search: &quot;{searchQuery}&quot;</span>
+                <X size={11} />
+              </button>
+            )}
+
+            <button
+              onClick={handleResetAllFilters}
+              className="text-[10px] text-[var(--muted-foreground)] hover:text-red-400 underline cursor-pointer ml-1"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Header Hub Banner Summary */}
@@ -424,7 +642,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               6,500+ Production Interview Scenarios &amp; Architect Q&amp;A
             </h1>
             <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
-              Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, and Lakehouse architectures.
+              Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, Delta Lake, Airflow, dbt, and Lakehouse architectures.
             </p>
           </div>
           <div className="text-xs text-[var(--muted-foreground)] shrink-0">
@@ -515,10 +733,19 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
           </div>
 
           {filteredQuestions.length === 0 ? (
-            <div className="py-16 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8">
-              <Layers size={36} className="mx-auto text-[var(--muted-foreground)] mb-3 opacity-40" />
+            <div className="py-16 text-center rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] p-8 space-y-3">
+              <Layers size={36} className="mx-auto text-[var(--muted-foreground)] opacity-40" />
               <h3 className="text-sm font-semibold text-[var(--foreground)]">No matching questions</h3>
-              <p className="text-xs text-[var(--muted-foreground)] mt-1">Try another keyword or filter criteria.</p>
+              <p className="text-xs text-[var(--muted-foreground)]">Try adjusting your filters or clearing search criteria.</p>
+              {hasActiveFilters && (
+                <button
+                  onClick={handleResetAllFilters}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 transition-all cursor-pointer shadow-xs"
+                >
+                  <RotateCw size={12} />
+                  <span>Reset All Filters</span>
+                </button>
+              )}
             </div>
           ) : (
             <div
@@ -536,6 +763,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                 const isExpanded = expandedIds.has(q.id);
                 const isBookmarked = bookmarks.includes(q.id);
                 const diffStyle = difficultyColors[q.difficulty] || difficultyColors.MEDIUM;
+                const hasCode = questionHasCode(q);
 
                 return (
                   <div
@@ -576,6 +804,11 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                               <span className={cn("text-[9px] font-semibold px-1.5 py-0.5 rounded border", diffStyle.bg, diffStyle.text, diffStyle.border)}>
                                 {q.difficulty}
                               </span>
+                              {hasCode && (
+                                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  <Code2 size={10} /> Code
+                                </span>
+                              )}
                             </div>
                             <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] leading-snug">
                               {q.question}
