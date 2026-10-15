@@ -16,6 +16,7 @@ import {
   pythonData,
   learningPathsDb,
   cheatsheetData,
+  databricksCheatsheetData,
   modernStackDb,
   modernBlueprintsDb,
   modernCodeMatrix,
@@ -150,6 +151,11 @@ export const serverlessDb = {
       if (data && data.length > 0) return data;
     }
     return cheatsheetData;
+  },
+
+  // Databricks Architecture & Coding Cheat Sheets
+  async getDatabricksCheatsheetData() {
+    return databricksCheatsheetData;
   },
 
   // Learning Paths

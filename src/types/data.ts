@@ -343,6 +343,73 @@ export interface CheatCode {
 }
 
 // ==========================================
+// 12b. Databricks Architecture & Coding Cheat Sheets
+// ==========================================
+
+export type DatabricksDomainId = 'sparksql' | 'pyspark' | 'spark_core' | 'python';
+
+export interface DatabricksExplainItem {
+  text: string;
+  html: string;
+}
+
+export interface DatabricksAlert {
+  type: 'tip' | 'perf' | 'warn' | 'sec';
+  html: string;
+  text: string;
+}
+
+export interface DatabricksCheatCard {
+  id: string;
+  domain: DatabricksDomainId;
+  domainTitle: string;
+  shortTitle: string;
+  domainColor: string;
+  page: number;
+  cardNumber: number;
+  title: string;
+  tag: string;
+  code: string;
+  codeHtml: string;
+  language: 'sql' | 'python';
+  explain: DatabricksExplainItem[];
+  alert: DatabricksAlert | null;
+}
+
+export interface DatabricksDomainMeta {
+  id: DatabricksDomainId;
+  title: string;
+  shortTitle: string;
+  subtitle: string;
+  badge: string;
+  accentColor: string;
+  pdf: string;
+  pdfSize: string;
+  poster: string;
+  posterDimensions: string;
+  pageImages: string[];
+  html: string;
+  cardCount: number;
+}
+
+export interface DatabricksSuiteData {
+  suiteTitle: string;
+  suiteSubtitle: string;
+  masterPdf: {
+    title: string;
+    url: string;
+    size: string;
+    pages: number;
+  };
+  interactiveHub: {
+    url: string;
+    title: string;
+  };
+  domains: DatabricksDomainMeta[];
+  cards: DatabricksCheatCard[];
+}
+
+// ==========================================
 // 13. Company Intelligence Profiles
 // ==========================================
 

@@ -8,6 +8,7 @@ import {
   UnifiedQuestion,
   Difficulty,
   DataOpsDataset,
+  DatabricksSuiteData,
 } from "@/types/data";
 
 /**
@@ -105,6 +106,10 @@ export const getLearningPathsDAL = cache(async (): Promise<LearningPath[]> => {
 
 export const getCheatsheetDataDAL = cache(async (): Promise<CheatCode[]> => {
   return await serverlessDb.getCheatsheetData();
+});
+
+export const getDatabricksCheatsheetDataDAL = cache(async (): Promise<DatabricksSuiteData> => {
+  return await serverlessDb.getDatabricksCheatsheetData();
 });
 
 // --- 6. MODERN STACK & BLUEPRINTS ---

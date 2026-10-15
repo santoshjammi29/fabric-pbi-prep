@@ -90,6 +90,7 @@ const navGroups: NavGroup[] = [
         matches: ["/code-practice", "/cheat-sheet"],
         subItems: [
           { label: "Production Cheat Sheet", href: "/cheat-sheet" },
+          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks" },
           { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
           { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
           { label: "T-SQL Drills", href: "/code-practice?db=mssql" },

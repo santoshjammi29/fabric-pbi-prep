@@ -2,10 +2,12 @@ import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
-import { cheatsheetData } from "@/data";
+import { cheatsheetData, databricksCheatsheetData } from "@/data";
 import { OptimizationFlow } from "@/components/cheatsheet/optimization-flow";
 import { CheatCard } from "@/components/cheatsheet/cheat-card";
 import { QuickJumpTOC } from "@/components/cheatsheet/quick-jump-toc";
+import { DatabricksCard } from "@/components/cheatsheet/databricks-card";
+import { DatabricksCheatsheetView } from "@/components/cheatsheet/databricks-cheatsheet-view";
 
 describe("Production Cheat Sheet Data Integrity", () => {
   it("cheatsheetData is defined and non-empty", () => {
@@ -111,3 +113,64 @@ describe("Cheat Sheet Components", () => {
     unmount();
   });
 });
+
+describe("Databricks Architecture & Coding Cheat Sheet Suite", () => {
+  it("databricksCheatsheetData contains 48 cards and 4 domains", () => {
+    expect(databricksCheatsheetData).toBeDefined();
+    expect(databricksCheatsheetData.cards.length).toBe(48);
+    expect(databricksCheatsheetData.domains.length).toBe(4);
+    expect(databricksCheatsheetData.masterPdf.url).toBe("/cheatsheets/pdf/databricks_master_cheatsheet.pdf");
+  });
+
+  it("each domain has 12 cards, valid pdf, and poster assets", () => {
+    const validDomainIds = ["sparksql", "pyspark", "spark_core", "python"];
+    databricksCheatsheetData.domains.forEach((dom) => {
+      expect(validDomainIds).toContain(dom.id);
+      expect(dom.cardCount).toBe(12);
+      expect(dom.pdf.endsWith(".pdf")).toBe(true);
+      expect(dom.poster.endsWith(".png")).toBe(true);
+      expect(dom.pageImages.length).toBe(2);
+
+      const domainCards = databricksCheatsheetData.cards.filter((c) => c.domain === dom.id);
+      expect(domainCards.length).toBe(12);
+    });
+  });
+
+  it("each card has required fields, code, and explanation breakdown", () => {
+    databricksCheatsheetData.cards.forEach((card) => {
+      expect(card.id).toBeTruthy();
+      expect(card.title).toBeTruthy();
+      expect(card.tag).toBeTruthy();
+      expect(card.code).toBeTruthy();
+      expect([1, 2]).toContain(card.page);
+      expect(card.cardNumber).toBeGreaterThanOrEqual(1);
+      expect(card.cardNumber).toBeLessThanOrEqual(12);
+      expect(Array.isArray(card.explain)).toBe(true);
+      expect(card.explain.length).toBeGreaterThan(0);
+      card.explain.forEach((exp) => {
+        expect(exp.text).toBeTruthy();
+        expect(exp.html).toBeTruthy();
+      });
+    });
+  });
+
+  it("renders DatabricksCard with code, tag, and explanation points", () => {
+    const sample = databricksCheatsheetData.cards[0];
+    render(<DatabricksCard card={sample} />);
+    expect(screen.getByText(sample.title)).toBeDefined();
+    expect(screen.getByText(sample.tag)).toBeDefined();
+    expect(screen.getByText(/Code Breakdown & Engine Mechanics/i)).toBeDefined();
+  });
+
+  it("renders DatabricksCheatsheetView with domain tabs and master download link", () => {
+    render(<DatabricksCheatsheetView data={databricksCheatsheetData} />);
+    expect(screen.getByText(/Databricks Architecture &/i)).toBeDefined();
+    expect(screen.getByText(/Download Master PDF/i)).toBeDefined();
+    expect(screen.getByText("All 48 Cards")).toBeDefined();
+    expect(screen.getAllByText("Spark SQL").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("PySpark").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Spark Core").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Python & SDK").length).toBeGreaterThanOrEqual(1);
+  });
+});
+

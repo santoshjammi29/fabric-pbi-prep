@@ -20,6 +20,7 @@ import {
   ZoomOut,
   RotateCcw,
   Download,
+  Flame,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -340,6 +341,44 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Curriculum Levels</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Databricks & Spark Core Cheat Sheet Cross-Link */}
+      <div className="p-3 sm:p-3.5 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-500/10 via-amber-500/5 to-purple-500/5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-red-500/15 text-red-500 dark:text-red-400 flex items-center justify-center shrink-0">
+            <Flame size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">
+                Databricks &amp; Spark Core Architecture Cheat Sheets
+              </h4>
+              <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">
+                48 Cards &amp; Wall Posters
+              </span>
+            </div>
+            <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-1 mt-0.5">
+              Vector PDFs and 250-DPI posters covering Spark Core &amp; Architecture Internals, PySpark, Spark SQL, and JVM Memory Formulas.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+          <Link
+            href="/cheat-sheet?tab=databricks&domain=spark_core"
+            className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold shadow-xs transition-colors"
+          >
+            Spark Core Cheat Sheet &rarr;
+          </Link>
+          <a
+            href="/cheatsheets/pdf/databricks_spark_core_cheatsheet.pdf"
+            download
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors"
+          >
+            <Download size={13} className="text-red-400" />
+            <span>PDF (2p)</span>
+          </a>
         </div>
       </div>
 

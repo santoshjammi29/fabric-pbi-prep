@@ -1,23 +1,40 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { getCheatsheetDataDAL } from "@/lib/dal";
+import { getCheatsheetDataDAL, getDatabricksCheatsheetDataDAL } from "@/lib/dal";
 import { CheatSheetClient } from "./cheat-sheet-client";
 import { generatePageMetadata, generateHowToSchema } from "@/lib/seo";
 
 export const revalidate = 3600; // 1-hour ISR cache on edge
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getCheatsheetDataDAL();
+  const [data, databricksData] = await Promise.all([
+    getCheatsheetDataDAL(),
+    getDatabricksCheatsheetDataDAL(),
+  ]);
+  const totalItems = data.length + databricksData.cards.length;
+
   return generatePageMetadata({
-    title: `Production Cheat Sheet (${data.length} Engine Recipes) | Spark, Delta & Fabric`,
-    description: `Enterprise architect reference guide with ${data.length} battle-tested recipes for Apache Spark 4.0, PySpark memory optimization, OOM recovery, and Delta Lake maintenance.`,
+    title: `Production & Databricks Cheat Sheets (${totalItems} Recipes & Cards) | Spark, Delta & Fabric`,
+    description: `Enterprise architect reference guide: 67 incident runbooks + 48 Databricks coding language cards (Spark SQL, PySpark, Spark Core, Python SDK) with 5 print-ready vector PDFs and 250-DPI posters.`,
     path: "/cheat-sheet",
-    keywords: ["Spark Cheat Sheet", "PySpark OOM", "Delta Lake Optimization", "AQE", "Data Engineering Recipes"],
+    keywords: [
+      "Databricks Cheat Sheet",
+      "Spark SQL Cheat Sheet",
+      "PySpark Cheat Sheet",
+      "Spark Core Memory Architecture",
+      "Delta Lake Optimization",
+      "AQE",
+      "Liquid Clustering",
+      "Data Engineering Runbooks",
+    ],
   });
 }
 
 export default async function CheatSheetPage() {
-  const data = await getCheatsheetDataDAL();
+  const [data, databricksData] = await Promise.all([
+    getCheatsheetDataDAL(),
+    getDatabricksCheatsheetDataDAL(),
+  ]);
 
   const howToSchema = generateHowToSchema(
     "How to Fix Apache Spark OOM and Driver Errors in Production",
@@ -45,7 +62,7 @@ export default async function CheatSheetPage() {
           </div>
         }
       >
-        <CheatSheetClient initialData={data} />
+        <CheatSheetClient initialData={data} databricksData={databricksData} />
       </Suspense>
     </>
   );
