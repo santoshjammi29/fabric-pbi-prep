@@ -153,3 +153,8 @@ npx tsx scripts/migrate_to_serverless_db.ts --provider=supabase
    - TanStack Virtual DOM renders only visible items in viewport.
    - HTML5 `<canvas>` GPU engine renders interactive mindmap connectors and particle streams at a locked 60 FPS.
    - Background Web Workers execute SIMD cosine similarity and Spark execution graphs off the UI thread.
+
+---
+
+[← Back to Audits Directory](./README.md) • [Documentation Hub](../README.md)
+

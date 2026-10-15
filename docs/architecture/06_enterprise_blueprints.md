@@ -218,3 +218,7 @@ flowchart TD
 1. **Synapse Query Hangs at 99%**: Run `DBCC PDW_SHOWSPACEUSED`. Look for rows concentrated in 1 or 2 of the 60 distributions. Re-hash the table on a high-cardinality synthetic key.
 2. **Fabric Direct Lake Falls Back to DirectQuery**: Check Power BI capacity metrics. Ensure RLS is handled in the Semantic Model or Warehouse, calculated columns are pre-computed in Spark, and total column count does not exceed model limits.
 3. **Cosmos DB HTTP 429 Surge**: Inspect the partition key cardinality. Verify that read queries specify the partition key in the `WHERE` clause to avoid cross-partition query fan-out.
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

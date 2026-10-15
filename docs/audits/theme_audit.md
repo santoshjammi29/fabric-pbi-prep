@@ -65,3 +65,8 @@ To eliminate any possibility of vanishing elements under theme switching, all SV
 - **Label Text on Label Background**: `14.2:1` (Dark), `18.0:1` (Light) — **PASS**
 - **Node Circle on Background**: `9.8:1` (Dark), `8.4:1` (Light) — **PASS**
 - **Selected Edge Highlight on Background**: `4.8:1` (Dark), `4.6:1` (Light) — **PASS**
+
+---
+
+[← Back to Audits Directory](./README.md) • [Documentation Hub](../README.md)
+

@@ -175,3 +175,7 @@ When moving DDL from Synapse Dedicated SQL Pools to Fabric Warehouse:
 1. **Remove Distribution Clauses**: Fabric handles distributed storage automatically. Remove `WITH (DISTRIBUTION = HASH(...), CLUSTERED COLUMNSTORE INDEX)`.
 2. **Remove Partitioning Constraints on Small Tables**: In Fabric, Delta Lake micro-partitioning handles indexing via V-Order. Manual partition schemes are only recommended for tables $>1\text{TB}$.
 3. **Refactor Unsupported Syntax**: Convert `IDENTITY` columns to surrogate key generation via Spark `monotonically_increasing_id()` or Window functions if strict sequential integrity is not required.
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

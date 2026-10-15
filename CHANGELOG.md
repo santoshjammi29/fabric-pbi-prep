@@ -48,14 +48,14 @@
 ## v0.7 — Enterprise Data Architecture Knowledge Base (2026-10-08)
 
 ### 📚 Production Knowledge Base & Multi-SSG Export
-- **6 Deep-Dive Architectural Modules (`docs/knowledge-base/`)**:
-  - `01_azure_synapse_architecture.md`: Dedicated SQL Pools (MPP), Serverless SQL, Spark Pools, HTAP Synapse Link.
-  - `02_microsoft_fabric_mastery.md`: OneLake, Shortcuts, Direct Lake, F-SKU Capacity smoothing & bursting.
-  - `03_modern_nosql_and_vector_databases.md`: Cosmos DB RU/s tuning, MongoDB, ScyllaDB, pgvector & Qdrant for RAG.
-  - `04_modern_etl_elt_applications.md`: Spark vs Flink vs DuckDB/Polars, Delta UniForm vs Iceberg, Airflow vs Dagster.
-  - `05_revenue_generating_vs_cost_effective_finops.md`: Cloud Lakehouse FinOps, TCO frameworks, storage tiering.
-  - `06_architectural_practice_walkthroughs.md`: 6 production blueprints with Mermaid sequence flows and failure modes.
-- **Unified JSON Export (`docs/knowledge-base/knowledge_base_export.json`)**: Machine-readable JSON export for static site generators (Nextra, Astro Starlight, MkDocs).
+- **6 Deep-Dive Architectural Modules (`docs/architecture/`)**:
+  - `01_azure_synapse.md`: Dedicated SQL Pools (MPP), Serverless SQL, Spark Pools, HTAP Synapse Link.
+  - `02_microsoft_fabric.md`: OneLake, Shortcuts, Direct Lake, F-SKU Capacity smoothing & bursting.
+  - `03_nosql_vector_db.md`: Cosmos DB RU/s tuning, MongoDB, ScyllaDB, pgvector & Qdrant for RAG.
+  - `04_etl_stream_proc.md`: Spark vs Flink vs DuckDB/Polars, Delta UniForm vs Iceberg, Airflow vs Dagster.
+  - `05_lakehouse_finops.md`: Cloud Lakehouse FinOps, TCO frameworks, storage tiering.
+  - `06_enterprise_blueprints.md`: 6 production blueprints with Mermaid sequence flows and failure modes.
+- **Unified JSON Export (`docs/architecture/knowledge_base_export.json`)**: Machine-readable JSON export for static site generators (Nextra, Astro Starlight, MkDocs).
 
 ---
 

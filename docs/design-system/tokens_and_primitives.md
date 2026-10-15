@@ -108,3 +108,8 @@ Functional emojis are replaced with standardized Lucide SVG icons across UI comp
 - `375px` & `414px` (Mobile): Single-column stacked cards, full-width inputs, horizontal scroll tabs, 2-col stat tiles.
 - `768px` (Tablet): 2-col card grids, stacked mobile GCC tables, 3-col stat tiles.
 - `1024px`, `1440px`, `1920px` (Desktop): Multi-column grids (3–5 columns), sticky headers, full data tables, persistent sidebar navigation.
+
+---
+
+[← Back to Design System Directory](./README.md) • [Documentation Hub](../README.md)
+

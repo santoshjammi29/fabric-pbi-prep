@@ -164,3 +164,7 @@ In high-compliance enterprise sectors (banking, healthcare, defense), Synapse mu
 | **Row Count Skew** | One distribution holds 20M rows while others hold 100K rows; query execution hangs at 98%. | Low cardinality or skewed distribution key (e.g. `CountryCode` where 95% is 'US'). | Run `DBCC PDW_SHOWSPACEUSED('dbo.FactSales');`. Re-hash on a high-cardinality synthetic key (e.g., `HashKey = CustomerId + OrderId`). |
 | **Micro-Batch Delta Spills** | Huge query degradation over weeks; high disk IO. | Running small INSERT/COPY commands every 5 minutes creating millions of uncompressed delta stores. | Aggregate micro-batches into temporary staging tables; load into final tables in chunks $>1.05\text{M}$ rows, or schedule nightly `ALTER INDEX REBUILD`. |
 | **Serverless Wildcard CSV Scanning** | Multi-thousand dollar unexpected cloud bill. | Querying `BULK '*.csv'` without file pruning or column projection. | Convert raw files to Parquet with Snappy/ZSTD compression; partition folders by `/year=YYYY/month=MM/` and filter with `filepath()`. |
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

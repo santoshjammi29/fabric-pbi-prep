@@ -148,3 +148,7 @@ Architectural decision guide:
 | **High-Scale IoT Telemetry & Sensor Ingestion** | ScyllaDB / Apache Cassandra | LSM tree architecture, 100K+ writes/sec per node. | Tombstone accumulation; improper compaction strategy. |
 | **High-Speed Session State & Feature Caching** | Redis / Dragonfly / Aerospike | In-memory key-value storage, sub-millisecond retrieval. | RAM cost exhaustion; persistence snapshot latency spikes. |
 | **Enterprise RAG & Semantic Document Search** | Qdrant / pgvector / Milvus | HNSW graph vector indexing, cosine similarity distance. | High RAM consumption for HNSW graphs; metadata filter overhead. |
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

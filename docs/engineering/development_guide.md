@@ -122,3 +122,8 @@ npm test -- --run
 # 3. Deploy to Vercel production
 npx vercel --prod --yes
 ```
+
+---
+
+[← Back to Engineering Directory](./README.md) • [Documentation Hub](../README.md)
+

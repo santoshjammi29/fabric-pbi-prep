@@ -106,3 +106,7 @@ How a high-growth data organization can run a massive 10TB/day data platform on 
 | **Ad-Hoc Querying** | Always-on Dedicated SQL Pool | Synapse Serverless SQL + DuckDB memory caching | \$400 |
 | **Orchestration** | Managed Enterprise Orchestrator | Self-hosted Dagster / Airflow on lightweight Kubernetes | \$180 |
 | **Total Estimated Spend**| **\$22,000 – \$35,000/month** | **Target Architecture** | **$\approx \$2,280$/month** |
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

@@ -143,3 +143,7 @@ In large organizations, monolithic dbt repositories become unmanageable (1,500+ 
 - Each business domain (Marketing, Finance, Supply Chain) maintains its own independent dbt project.
 - Upstream projects declare **Public Models** protected by **Model Contracts** (strict schema enforcement).
 - Downstream projects query upstream models using cross-project references (`{{ ref('finance_project', 'dim_customers') }}`) without having access to internal staging logic.
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

@@ -292,3 +292,7 @@ flowchart TD
    * Choose **Apache Iceberg** when operating across multiple query engines (Spark, Trino, Snowflake, DuckDB) where catalog abstraction and partition evolution are paramount.
    * Choose **Delta Lake** when Databricks or Microsoft Fabric forms the central compute core, leveraging **UniForm** to expose Iceberg endpoints without storage duplication.
    * Choose **Apache Hudi** when workloads involve high-volume CDC micro-batches requiring record-level bloom/bucket indexing and incremental consumption.
+
+---
+
+[← Back to Architecture Library](./README.md) • [Documentation Hub](../README.md)

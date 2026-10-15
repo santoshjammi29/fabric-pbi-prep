@@ -145,17 +145,16 @@ Our automated verification suite enforces zero regressions across data integrity
 
 ---
 
-## 📜 Technical Guides & Knowledge Base
+## 📜 Central Documentation Directory
 
-- [Open Format Storage Types: Architecture Blueprints & Deep-Dive Reference](docs/open_format_storage_types_guide.md)
-- [Enterprise Data Architecture Knowledge Base](docs/knowledge-base/README.md)
-  - [Module 01: Azure Synapse Architecture](docs/knowledge-base/01_azure_synapse_architecture.md)
-  - [Module 02: Microsoft Fabric Mastery](docs/knowledge-base/02_microsoft_fabric_mastery.md)
-  - [Module 03: Modern NoSQL & Vector Databases](docs/knowledge-base/03_modern_nosql_and_vector_databases.md)
-  - [Module 04: Modern ETL/ELT & Stream Processing](docs/knowledge-base/04_modern_etl_elt_applications.md)
-  - [Module 05: Revenue-Generating vs Cost-Effective FinOps](docs/knowledge-base/05_revenue_generating_vs_cost_effective_finops.md)
-  - [Module 06: Architectural Practice Walkthroughs](docs/knowledge-base/06_architectural_practice_walkthroughs.md)
-- [Mindmap Editorial Specification](MINDMAP_README.md)
-- [Development, Testing & Operations Guide](DEVELOPMENT.md)
-- [Production Audit Report](PRODUCTION_AUDIT.md)
-- [Design System & UI Tokens Specification](DESIGN_SYSTEM.md)
+The complete documentation library is organized under [`docs/`](docs/README.md) into four specialized pillars:
+
+| Pillar | Focus | Key Documents |
+| :--- | :--- | :--- |
+| **[Architecture & Blueprints](docs/architecture/README.md)** | Lakehouse systems, storage engines, and production blueprints | [`01_azure_synapse.md`](docs/architecture/01_azure_synapse.md) • [`02_microsoft_fabric.md`](docs/architecture/02_microsoft_fabric.md) • [`03_nosql_vector_db.md`](docs/architecture/03_nosql_vector_db.md) • [`04_etl_stream_proc.md`](docs/architecture/04_etl_stream_proc.md) • [`05_lakehouse_finops.md`](docs/architecture/05_lakehouse_finops.md) • [`06_enterprise_blueprints.md`](docs/architecture/06_enterprise_blueprints.md) • [`07_open_storage_formats.md`](docs/architecture/07_open_storage_formats.md) • [`08_delta_optimization.md`](docs/architecture/08_delta_optimization.md) • [`knowledge_base_export.json`](docs/architecture/knowledge_base_export.json) |
+| **[Production Audits](docs/audits/README.md)** | Performance benchmarks & accessibility verifications | [`production_audit.md`](docs/audits/production_audit.md) (Edge Web Vitals & 298 Tests) • [`theme_audit.md`](docs/audits/theme_audit.md) (Theme Contrast Matrix) • [`design_system_audit.md`](docs/audits/design_system_audit.md) (Fluid Typography & Breakpoints) |
+| **[Design System](docs/design-system/README.md)** | Visual design, fluid tokens & GPU motion specs | [`tokens_and_primitives.md`](docs/design-system/tokens_and_primitives.md) (Surfaces & Clamp Typography) • [`mindmap_editorial.md`](docs/design-system/mindmap_editorial.md) (HTML5 Canvas 60 FPS Engine) |
+| **[Engineering & Operations](docs/engineering/README.md)** | Developer onboarding, testing & roadmap | [`development_guide.md`](docs/engineering/development_guide.md) (App Router DAL & Vitest Runbook) • [`roadmap.md`](docs/engineering/roadmap.md) (Platform & Mindmap Roadmap) |
+
+👉 **[Browse Full Documentation Hub (`docs/README.md`)](docs/README.md)**
+

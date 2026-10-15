@@ -85,5 +85,9 @@ The rendering pipeline is powered by a hardware-accelerated **HTML5 Canvas 60 FP
 | `In conclusion` | Conversational filler; remove. |
 | `delve into` | Repetitive AI essay trope; replace with `examine` or `analyze`. |
 | `scalable solution` | Generic buzzword; replace with `scalable system` or `distributed architecture`. |
-| `empower` | Promotional fluff; replace with `enable` or `allow`. |
 | `unlock the power` | Cliché marketing phrase; replace with `utilize capabilities`. |
+
+---
+
+[← Back to Design System Directory](./README.md) • [Documentation Hub](../README.md)
+

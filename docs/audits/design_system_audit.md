@@ -121,5 +121,9 @@ All 42 screenshots across 6 breakpoints (375px, 414px, 768px, 1024px, 1440px, 19
 | `styles.css` | Global CSS with Design System Primitives | 10,834 lines |
 | `index.html` | SPA Structure & Component Markup | 4,787 lines |
 | `/audit/components.csv` | Component Inventory CSV | 36 rows |
-| `/audit/tokens.csv` | Token Inventory CSV | 26 rows |
-| `/DESIGN_SYSTEM.md` | Full Design System Specification | 115 lines |
+| `/docs/design-system/tokens_and_primitives.md` | Full Design System Specification | 115 lines |
+
+---
+
+[← Back to Audits Directory](./README.md) • [Documentation Hub](../README.md)
+
