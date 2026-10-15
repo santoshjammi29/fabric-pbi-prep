@@ -27272,7 +27272,7 @@
   {
     "id": "arch-spark-deep-001",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Spark Distributed Core Architecture",
     "difficulty": "EASY",
     "question": "What is the internal distributed architecture of Apache Spark, and how do Driver, Cluster Manager, Executors, and Tasks coordinate during job execution?",
@@ -27281,7 +27281,7 @@
   {
     "id": "arch-spark-deep-002",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Catalyst Optimizer 4-Phase Compilation",
     "difficulty": "MEDIUM",
     "question": "Walk through the 4 internal phases of the Spark Catalyst Optimizer: from Unresolved Logical Plan to Whole-Stage Code Generation.",
@@ -27290,7 +27290,7 @@
   {
     "id": "arch-spark-deep-003",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Whole-Stage Code Generation & Tungsten Execution Engine",
     "difficulty": "HARD",
     "question": "How do Project Tungsten and Whole-Stage Code Generation bypass JVM object overhead, garbage collection pauses, and CPU register stalls?",
@@ -27299,7 +27299,7 @@
   {
     "id": "arch-spark-deep-004",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Spark Connect Architecture: gRPC Client-Server Decoupling",
     "difficulty": "ARCHITECT",
     "question": "What is the architectural design of Spark Connect in Spark 3.4+ / Databricks Runtime 13+, and how does it decouple IDE client drivers from remote server clusters?",
@@ -27362,7 +27362,7 @@
   {
     "id": "arch-spark-deep-005",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "PySpark Narrow vs Wide Transformations",
     "difficulty": "EASY",
     "question": "What is the mechanical difference between Narrow and Wide transformations in Spark, and how do they govern Stage boundaries and network shuffles?",
@@ -27371,7 +27371,7 @@
   {
     "id": "arch-spark-deep-006",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "PySpark Vectorized UDFs (pandas_udf) with Apache Arrow",
     "difficulty": "MEDIUM",
     "question": "Why are standard Python UDFs an extreme performance bottleneck in PySpark, and how do Vectorized `pandas_udf` with Apache Arrow deliver 10x-100x speedups?",
@@ -27380,7 +27380,7 @@
   {
     "id": "arch-spark-deep-007",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Spark SQL Window Function Framing Optimization",
     "difficulty": "MEDIUM",
     "question": "How do Window Function frame specifications (`RANGE BETWEEN` vs `ROWS BETWEEN`) affect performance in Spark SQL, and how do you prevent single-partition OOMs?",
@@ -27389,7 +27389,7 @@
   {
     "id": "arch-spark-deep-008",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Spark SQL Join Strategies: BHJ vs SHJ vs SMJ vs Cartesian",
     "difficulty": "HARD",
     "question": "Dissect the 4 physical join strategies in Spark SQL: Broadcast Hash Join, Shuffle Hash Join, Sort Merge Join, and Cartesian Product. How does Catalyst select between them?",
@@ -27398,7 +27398,7 @@
   {
     "id": "arch-spark-deep-009",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Data Skew Diagnosis & Salting Remediation",
     "difficulty": "HARD",
     "question": "How do you detect Data Skew in the Spark UI, and how do you implement two-phase Salting and AQE Skew Join Optimization to eliminate straggler tasks?",
@@ -27407,7 +27407,7 @@
   {
     "id": "arch-spark-deep-010",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Driver OutOfMemory (OOM) Root Cause Elimination",
     "difficulty": "HARD",
     "question": "What are the four primary root causes of Spark Driver OutOfMemory (OOM) crashes in production, and how do you architect code patterns to prevent them?",
@@ -27416,7 +27416,7 @@
   {
     "id": "arch-spark-deep-011",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Executor OOM & Container Killed by Exit Code 137",
     "difficulty": "HARD",
     "question": "Dissect the differences between `java.lang.OutOfMemoryError: Java heap space` and `Container killed by YARN/K8s for exceeding memory limits (Exit Code 137)`. How do you tune memory overhead?",
@@ -27425,7 +27425,7 @@
   {
     "id": "arch-spark-deep-012",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Shuffle FetchFailedException & Network Timeout Resolution",
     "difficulty": "HARD",
     "question": "What causes `org.apache.spark.shuffle.FetchFailedException`, and how do you tune network timeouts, shuffle buffer sizes, and retry counts to stabilize wide joins?",
@@ -27434,7 +27434,7 @@
   {
     "id": "arch-spark-deep-013",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Memory Spill and Disk Spill Optimization",
     "difficulty": "HARD",
     "question": "What is the difference between `Spill (Memory)` and `Spill (Disk)` in the Spark UI, and why does in-memory data expand 5x-10x when spilled to disk?",
@@ -27443,7 +27443,7 @@
   {
     "id": "arch-spark-deep-014",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "JVM Garbage Collection Tuning (G1GC) in High-Memory Clusters",
     "difficulty": "ARCHITECT",
     "question": "How do you diagnose JVM Garbage Collection thrashing in high-memory executor nodes (>64GB RAM), and how do you configure the G1GC garbage collector for sub-second pause times?",
@@ -27452,7 +27452,7 @@
   {
     "id": "arch-spark-deep-015",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "The Small File Problem & Automated Delta Compaction",
     "difficulty": "ARCHITECT",
     "question": "What is the Small File Problem in Cloud Data Lakes, how does it degrade S3/ADLS metadata throughput, and how do Auto-Optimize, OPTIMIZE, and Bin-Packing resolve it?",
@@ -27461,7 +27461,7 @@
   {
     "id": "arch-spark-deep-016",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Adaptive Query Execution (AQE) Dynamic Runtime Optimization",
     "difficulty": "MEDIUM",
     "question": "How does Adaptive Query Execution (AQE) optimize physical plans at runtime in Spark 3+, and what are its three primary optimization pillars?",
@@ -27470,7 +27470,7 @@
   {
     "id": "arch-spark-deep-017",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "spark.sql.shuffle.partitions vs spark.default.parallelism",
     "difficulty": "MEDIUM",
     "question": "What is the critical architectural difference between `spark.sql.shuffle.partitions` and `spark.default.parallelism`? When does each setting apply?",
@@ -27479,7 +27479,7 @@
   {
     "id": "arch-spark-deep-018",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Broadcast Join Thresholds & Timeout Tuning",
     "difficulty": "HARD",
     "question": "How do you size `spark.sql.autoBroadcastJoinThreshold` safely, and how do you resolve broadcast timeout exceptions in high-volume pipelines?",
@@ -27488,7 +27488,7 @@
   {
     "id": "arch-spark-deep-019",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Cache vs Persist Storage Levels Deepdive",
     "difficulty": "HARD",
     "question": "Compare `df.cache()` with `df.persist()`. What are the trade-offs of `MEMORY_ONLY`, `MEMORY_AND_DISK`, and `OFF_HEAP` storage levels?",
@@ -27497,7 +27497,7 @@
   {
     "id": "arch-spark-deep-020",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Delta Lake Liquid Clustering vs Partitioning & Z-Order",
     "difficulty": "ARCHITECT",
     "question": "How does Delta Lake Liquid Clustering (`CLUSTER BY`) obsolete legacy Hive partitioning and static Z-Ordering? What is the underlying space-filling curve mechanics?",
@@ -27506,7 +27506,7 @@
   {
     "id": "arch-spark-deep-021",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Databricks Photon Vectorized Native Engine",
     "difficulty": "ARCHITECT",
     "question": "What is the internal architecture of Databricks Photon? How does its native C++ vectorized execution engine accelerate Spark SQL and eliminate JVM bottlenecks?",
@@ -27515,7 +27515,7 @@
   {
     "id": "arch-spark-deep-022",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Dynamic Partition Pruning (DPP) in Star-Schema Joins",
     "difficulty": "ARCHITECT",
     "question": "How does Dynamic Partition Pruning (DPP) work in Spark 3+, and how does it dynamically eliminate fact table partition scans in dimensional star-schemas?",
@@ -27524,7 +27524,7 @@
   {
     "id": "arch-spark-deep-023",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Spark Unified Memory Manager Internal Allocation",
     "difficulty": "HARD",
     "question": "What is the exact internal memory breakdown of a Spark Executor JVM under the Unified Memory Manager? How do Execution Memory and Storage Memory borrow from each other?",
@@ -27533,7 +27533,7 @@
   {
     "id": "arch-spark-deep-024",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Optimal Executor Sizing: The 5-Core Golden Rule",
     "difficulty": "ARCHITECT",
     "question": "Why is 4-5 cores per executor considered the golden rule in Spark architecture? How do you calculate executor memory, core allocation, and instance counts for a 16-node cluster?",
@@ -27542,7 +27542,7 @@
   {
     "id": "arch-spark-deep-025",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Off-Heap Memory Configuration & Tuning",
     "difficulty": "ARCHITECT",
     "question": "When should an enterprise architect enable `spark.memory.offHeap.enabled`? How does off-heap allocation reduce GC pressure in petabyte-scale workloads?",
@@ -27551,7 +27551,7 @@
   {
     "id": "arch-spark-deep-026",
     "source": "Architecture Hub",
-    "category": "Databricks Lakehouse Architecture",
+    "category": "Advanced PySpark & Spark Core Optimization",
     "niche": "Local NVMe SSDs & Cloud Storage I/O Optimization",
     "difficulty": "ARCHITECT",
     "question": "How do local NVMe SSDs transform Spark shuffle and spill performance compared to network-attached block storage? How do you configure cloud VM storage tiering?",

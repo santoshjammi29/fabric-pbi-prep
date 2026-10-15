@@ -533,19 +533,6 @@ new_entries = [
             "Both clones are differential — a second `CREATE OR REPLACE ... DEEP CLONE` only copies new/changed files since the last clone."
         ]
     },
-    {
-        "id": "spark-delta-live-tables",
-        "term": "Delta Live Tables (DLT)",
-        "category": "SPARK & DATABRICKS",
-        "difficulty": "HARD",
-        "definition": "A Databricks framework for declaratively defining and orchestrating Delta Lake data pipelines using Python or SQL, with built-in data quality expectations, lineage, and automatic retry logic.",
-        "explanation": "DLT pipelines are defined using Python decorators (`@dlt.table`, `@dlt.view`) or SQL `CREATE LIVE TABLE` statements. The DLT runtime handles dependency resolution (building a DAG of tables), compute management, incremental updates, and checkpoint management automatically. Data quality is enforced via `@dlt.expect` constraints that can warn, drop invalid records, or fail the pipeline. DLT operates in two modes: Triggered (batch) and Continuous (streaming).",
-        "keyPoints": [
-            "Define with `@dlt.table` decorator and return a Spark DataFrame; DLT resolves dependencies between tables automatically.",
-            "Expectations: `@dlt.expect('no_nulls', 'id IS NOT NULL')` — use `expect_or_drop` to quarantine bad rows rather than fail the pipeline.",
-            "DLT tables are always Delta tables managed by the pipeline — you cannot write to them from outside the pipeline context."
-        ]
-    },
     # ── DATABRICKS PLATFORM ────────────────────────────────────────────────
     {
         "id": "spark-photon-engine",
@@ -584,19 +571,6 @@ new_entries = [
             "Zero cold start — compute starts in seconds, not minutes; ideal for interactive notebooks and ad-hoc SQL queries.",
             "No cluster config required — Databricks manages VM type, Spark version, and scaling automatically.",
             "Per-second billing: cost scales linearly with execution time — preferable over all-purpose clusters for sporadic workloads."
-        ]
-    },
-    {
-        "id": "spark-databricks-asset-bundles",
-        "term": "Databricks Asset Bundles (DABs)",
-        "category": "SPARK & DATABRICKS",
-        "difficulty": "HARD",
-        "definition": "A Databricks CI/CD framework that defines jobs, pipelines, clusters, and permissions as YAML configuration files (bundle.yml), enabling version-controlled, environment-aware deployment of Databricks resources.",
-        "explanation": "DABs use a `databricks.yml` bundle manifest to declare all workspace resources: Jobs, DLT Pipelines, Model Serving endpoints, clusters, and permissions. Resources reference Python/notebook files in the same repo. The Databricks CLI (`databricks bundle deploy`) syncs the bundle to a target environment (dev/staging/prod), resolving environment-specific variable substitutions from `targets:` blocks. This enables GitOps workflows where every resource change goes through a PR, CI validation, and promotion pipeline.",
-        "keyPoints": [
-            "Define jobs, DLT pipelines, and clusters in `databricks.yml`; use `targets: dev/staging/prod` blocks for environment overrides.",
-            "Deploy with `databricks bundle deploy --target prod` — idempotent, creates or updates resources based on bundle diff.",
-            "Supports variable interpolation: `${var.my_env}` — inject environment-specific values via CI/CD secrets, not hardcoded in YAML."
         ]
     },
     {
@@ -741,19 +715,6 @@ new_entries = [
             "Requires External Shuffle Service — without it, executor removal loses shuffle data and causes stage re-runs.",
             "On Databricks, autoscaling is the UI-level configuration; internally it uses Dynamic Resource Allocation + Databricks-managed scaling heuristics.",
             "Tune `spark.dynamicAllocation.schedulerBacklogTimeout` to delay scale-up for burst avoidance on short-lived task queues."
-        ]
-    },
-    {
-        "id": "spark-adaptive-query-execution",
-        "term": "Adaptive Query Execution (AQE)",
-        "category": "SPARK & DATABRICKS",
-        "difficulty": "HARD",
-        "definition": "A Spark 3.x framework that re-optimises query plans at runtime after each shuffle stage completes, using actual data statistics rather than pre-query estimates to make better physical plan decisions.",
-        "explanation": "Static Catalyst planning relies on estimated row counts and data sizes, which can be highly inaccurate for complex queries. AQE inserts re-optimisation checkpoints after each shuffle materialisation point. At each checkpoint, it uses actual shuffle partition sizes to: (1) coalesce small partitions, (2) detect and split skewed partitions, (3) switch join strategies (e.g., from SMJ to BHJ if one side turns out to be smaller than expected). This makes AQE one of the most impactful single configurations in modern Spark.",
-        "keyPoints": [
-            "Enable: `spark.sql.adaptive.enabled=true` (default in Spark 3.2+); includes coalescing, skew join, and dynamic join strategy switching.",
-            "AQE can convert a planned SortMergeJoin to a BroadcastHashJoin at runtime if actual shuffle size is below the broadcast threshold.",
-            "AQE decisions are visible in Spark UI physical plan as `AQEShuffleRead` and `BroadcastHashJoin (AQE)` nodes."
         ]
     },
     {
@@ -938,28 +899,23 @@ new_entries = [
             "Confluent integration: `from_avro(col, schemaRegistryUrl)` deserialises Kafka Avro messages inline in PySpark streaming pipelines."
         ]
     },
-    {
-        "id": "spark-spark-connect",
-        "term": "Spark Connect",
-        "category": "SPARK & DATABRICKS",
-        "difficulty": "HARD",
-        "definition": "A Spark 3.4+ architecture that decouples the Spark client from the server using a gRPC-based protocol, allowing thin Python, Scala, or R clients to connect to a remote Spark cluster without a local JVM.",
-        "explanation": "Traditional PySpark requires the client machine to run a full JVM (Py4J gateway) alongside the Python process. Spark Connect replaces Py4J with a gRPC stub that serialises DataFrame operations as protocol buffer messages and sends them to a remote Spark Connect server. The server executes the plan and streams results back. This enables: (1) Truly remote clients (notebooks, IDEs) without local cluster setup; (2) Independent client/server versioning; (3) Python-native DataFrame API with no JVM dependency. Databricks Connect v2 is built on Spark Connect.",
-        "keyPoints": [
-            "Client sends plan proto-buf over gRPC; server executes and returns Arrow-format results — no Py4J, no local JVM required.",
-            "Databricks Connect v2 (for DBR 13.0+) is built on Spark Connect — enables local IDE development against a remote Databricks cluster.",
-            "Limitation: some Spark APIs that require direct driver-side state management are not yet available via Spark Connect."
-        ]
-    },
 ]
 
+existing_terms = {item['term'].lower().strip() for item in data}
+
+added = 0
+skipped = 0
 for e in new_entries:
-    if e['id'] in existing_ids:
-        print(f"SKIP (duplicate): {e['id']}")
+    term_key = e['term'].lower().strip()
+    if e['id'] in existing_ids or term_key in existing_terms:
+        print(f"SKIP (duplicate id/term): {e['id']} / {e['term']}")
+        skipped += 1
     else:
         existing_ids.add(e['id'])
+        existing_terms.add(term_key)
         data.append(e)
+        added += 1
 
 with open(FILE, 'w') as f:
     json.dump(data, f, indent=2, ensure_ascii=False)
-print(f"After: {len(data)}")
+print(f"After: {len(data)} (Added: {added}, Skipped: {skipped})")

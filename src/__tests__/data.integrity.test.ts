@@ -57,6 +57,11 @@ describe('Data Integrity — conceptsDb', () => {
       })
     })
   })
+  it('every entry has a valid difficulty level', () => {
+    const validLevels = new Set(['EASY', 'MEDIUM', 'HARD', 'ARCHITECT'])
+    const bad = conceptsDb.filter(c => !validLevels.has(c.difficulty))
+    expect(bad.length).toBe(0)
+  })
 })
 
 describe('Data Integrity — questionsDb (Fabric & PBI)', () => {
@@ -86,6 +91,16 @@ describe('Data Integrity — questionsDeDb (General DE)', () => {
     const bad = questionsDeDb.filter(q => !hasString(q.question) || !hasString(q.answer))
     expect(bad.length).toBe(0)
   })
+  it('every entry has a unique id', () => {
+    const ids = questionsDeDb.map(q => q.id).filter(Boolean)
+    const unique = new Set(ids)
+    expect(unique.size).toBe(ids.length)
+  })
+  it('every entry has a valid difficulty level', () => {
+    const validLevels = new Set(['EASY', 'MEDIUM', 'HARD', 'ARCHITECT'])
+    const bad = questionsDeDb.filter(q => !validLevels.has(q.difficulty))
+    expect(bad.length).toBe(0)
+  })
 })
 
 describe('Data Integrity — architectureData', () => {
@@ -94,6 +109,16 @@ describe('Data Integrity — architectureData', () => {
   })
   it('every entry has a question field', () => {
     const bad = architectureData.filter(a => !hasString(a.question))
+    expect(bad.length).toBe(0)
+  })
+  it('every entry has a unique id', () => {
+    const ids = architectureData.map(a => a.id).filter(Boolean)
+    const unique = new Set(ids)
+    expect(unique.size).toBe(ids.length)
+  })
+  it('every entry has a valid difficulty level', () => {
+    const validLevels = new Set(['EASY', 'MEDIUM', 'HARD', 'ARCHITECT'])
+    const bad = architectureData.filter(a => !validLevels.has(a.difficulty))
     expect(bad.length).toBe(0)
   })
 })

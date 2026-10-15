@@ -47,6 +47,20 @@ describe('guided-learning data', () => {
     expect(items.length).toBeGreaterThan(100);
   });
 
+  it('getTopicItems returns items for spark with zero Databricks governance leak', () => {
+    const items = getTopicItems('spark');
+    expect(items.length).toBeGreaterThan(50);
+    expect(items.some((i) => i.type === 'concept')).toBe(true);
+    expect(items.some((i) => i.type === 'qa')).toBe(true);
+    expect(items.some((i) => i.type === 'architecture')).toBe(true);
+
+    // Verify zero Databricks Lakehouse Architecture questions leak into spark track
+    const databricksLakehouseItems = items.filter(
+      (i) => i.category === 'Databricks Lakehouse Architecture'
+    );
+    expect(databricksLakehouseItems.length).toBe(0);
+  });
+
   it('getTopicItems returns items for new tracks: streaming, modeling, governance', () => {
     const streamingItems = getTopicItems('streaming');
     expect(streamingItems.length).toBeGreaterThan(30);

@@ -20,7 +20,7 @@ SPARK_ITEMS = [
     {
         "de_id": "de-new-arch-spark-deep-027",
         "arch_id": "arch-spark-deep-027",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Spark SQL Bucketing & Bucket Join Mechanics",
         "difficulty": "HARD",
@@ -94,7 +94,7 @@ df_joined.explain(mode="formatted")
     {
         "de_id": "de-new-arch-spark-deep-028",
         "arch_id": "arch-spark-deep-028",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Dynamic Partition Overwrite & Batch Idempotency",
         "difficulty": "MEDIUM",
@@ -159,7 +159,7 @@ WHERE event_date BETWEEN '2026-10-14' AND '2026-10-15';
     {
         "de_id": "de-new-arch-spark-deep-029",
         "arch_id": "arch-spark-deep-029",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Vectorized Pandas UDFs & PySpark Pandas API",
         "difficulty": "HARD",
@@ -234,7 +234,7 @@ df_forecasts = df_sales.groupBy("store_id").applyInPandas(
     {
         "de_id": "de-new-arch-spark-deep-030",
         "arch_id": "arch-spark-deep-030",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Py4J IPC Communication & Python-JVM Interoperability",
         "difficulty": "HARD",
@@ -292,7 +292,7 @@ df = df.select(*new_cols)
     {
         "de_id": "de-new-arch-spark-deep-031",
         "arch_id": "arch-spark-deep-031",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Spark SQL Windowing, Frames & Pivot Operations",
         "difficulty": "HARD",
@@ -360,7 +360,7 @@ df_unpivoted = df_pivoted.selectExpr(
     {
         "de_id": "de-new-arch-spark-deep-032",
         "arch_id": "arch-spark-deep-032",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Semi & Anti Joins Execution & NULL Safety",
         "difficulty": "MEDIUM",
@@ -424,7 +424,7 @@ LEFT ANTI JOIN prod_lakehouse.core.orders o
     {
         "de_id": "de-new-arch-spark-deep-033",
         "arch_id": "arch-spark-deep-033",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "PySpark Memory Leak Diagnostics & Lifecycle Management",
         "difficulty": "HARD",
@@ -509,7 +509,7 @@ finally:
     {
         "de_id": "de-new-arch-spark-deep-034",
         "arch_id": "arch-spark-deep-034",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Spark Heartbeat Timeouts & Node Liveness Tuning",
         "difficulty": "HARD",
@@ -567,7 +567,7 @@ print(f"Total active executors connected to driver: {len(active_executor_ids)}")
     {
         "de_id": "de-new-arch-spark-deep-035",
         "arch_id": "arch-spark-deep-035",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Straggler Task Diagnostics & Spark UI Timeline Analysis",
         "difficulty": "HARD",
@@ -638,7 +638,7 @@ df_balanced = df_skewed_salted.join(df_dim_exploded, on="salted_join_key")
     {
         "de_id": "de-new-arch-spark-deep-036",
         "arch_id": "arch-spark-deep-036",
-        "category_de": "Databricks Lakehouse Architecture",
+        "category_de": "SPARK_PYSPARK",
         "category_arch": "Advanced PySpark & Spark Core Optimization",
         "niche": "Spark UI DAG, Stage Metrics & Ganglia Profiling",
         "difficulty": "ARCHITECT",

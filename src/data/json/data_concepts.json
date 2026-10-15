@@ -3979,7 +3979,7 @@
     "id": "py-concept-pydantic-v2",
     "term": "Pydantic V2 Rust Core Data Validation & Serialization",
     "category": "GENERAL DE",
-    "difficulty": "ADVANCED",
+    "difficulty": "HARD",
     "definition": "A data validation and parsing library rewritten in Rust (pydantic-core) that enforces strict type contracts, schema evolution, and deserialization speed for Python ETL and streaming pipelines.",
     "explanation": "In modern lakehouses, data quality at the Bronze ingestion boundary requires rapid schema validation. Pydantic V2 compiles model validators into native machine code via Rust, achieving 5x to 50x higher throughput over V1. It natively integrates with Python 3.10+ type annotations, handles JSON streaming serialization directly in C-allocated buffers, and enables declarative contract enforcement for schema evolution in Kafka and REST ingestion pipelines.",
     "keyPoints": [
@@ -3993,7 +3993,7 @@
     "id": "py-concept-asyncio-etl",
     "term": "AsyncIO & Event Loops in High-Throughput REST Data Ingestion",
     "category": "GENERAL DE",
-    "difficulty": "ADVANCED",
+    "difficulty": "HARD",
     "definition": "Single-threaded cooperative multitasking utilizing non-blocking I/O multiplexers (epoll/kqueue) to ingest thousands of API endpoints concurrently with minimal OS thread memory overhead.",
     "explanation": "Traditional thread pools (e.g., 100 threads in ThreadPoolExecutor) consume 8MB+ stack memory per thread and incur significant OS context switching costs when polling slow third-party SaaS APIs. Python's asyncio module with aiohttp or httpx utilizes an event loop to handle 10,000+ simultaneous TCP sockets on a single thread. Coupled with token bucket rate limiters and exponential backoff semaphore patterns, asyncio provides maximum throughput while honoring upstream API rate limits.",
     "keyPoints": [
@@ -4021,7 +4021,7 @@
     "id": "py-concept-simd-vectorization",
     "term": "Vectorized Numerical & Array Operations via NumPy & Arrow",
     "category": "GENERAL DE",
-    "difficulty": "ADVANCED",
+    "difficulty": "HARD",
     "definition": "The technique of replacing scalar Python for-loops with contiguous C/Rust memory array operations evaluated via CPU SIMD (Single Instruction, Multiple Data) instructions.",
     "explanation": "Iterating over a Python list of numbers with a for loop involves dynamic type checking, boxing, and unboxing for every element (O(N) interpreter overhead). Vectorized operations organize data as contiguous C-ordered memory buffers of primitive data types (e.g. float64). Modern x86_64 and ARM processors (AVX-512, NEON) execute mathematical transformations across 4 to 16 data values simultaneously per clock cycle, yielding 50x-100x speedups for financial calculations and feature engineering.",
     "keyPoints": [
@@ -4077,7 +4077,7 @@
     "id": "py-concept-abcs-protocols",
     "term": "Python Protocols (PEP 544) & Structural Subtyping in ETL Frameworks",
     "category": "GENERAL DE",
-    "difficulty": "ADVANCED",
+    "difficulty": "HARD",
     "definition": "Static duck typing mechanism in Python allowing data pipeline interfaces to enforce structural contracts at compile time without requiring rigid class inheritance hierarchies.",
     "explanation": "Enterprise data pipelines often need modular components (Extractors, Transformers, Loaders) that can be swapped across cloud storage, databases, and APIs. Nominal subtyping (inheriting from abstract classes via abc.ABC) couples source code to base class definitions. Protocols (typing.Protocol) define required method signatures and attributes structurally. MyPy and Pyright statically verify that pipeline stages adhere to the contract without runtime subclassing overhead.",
     "keyPoints": [

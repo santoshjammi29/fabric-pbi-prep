@@ -43,7 +43,7 @@ export const GUIDED_TOPICS: GuidedTopic[] = [
     conceptCategories: ['SPARK & DATABRICKS'],
     questionCategories: ['SPARK & DATABRICKS', 'SPARK_PYSPARK'],
     archKeywords: ['PYSPARK', 'SPARK'],
-    deKeywords: ['BIG DATA', 'SPARK', 'DATABRICKS'],
+    deKeywords: ['BIG DATA', 'SPARK'],
     stages: {
       foundations: 'RDD vs DataFrame APIs, lazy evaluation, transformations vs actions, and basic cluster topology.',
       core: 'Catalyst logical/physical optimization plans, broadcast joins, partition sizing, and PySpark UDF pitfalls.',
