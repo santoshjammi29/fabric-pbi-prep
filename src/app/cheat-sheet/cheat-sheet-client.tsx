@@ -325,14 +325,14 @@ function CheatSheetContent({ initialData }: { initialData: CheatCode[] }) {
             </div>
             <div className="min-w-0">
               <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">Looking for visual system design blueprints?</h4>
-              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-1">Pair your code optimization with 21 high-resolution whiteboard architecture diagrams detailing Spark memory shuffles, Catalyst query plans, Delta Lake ACID commits, and Airflow distributed workers.</p>
+              <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-1">Pair your code optimization with 28 high-resolution whiteboard architecture diagrams detailing Spark memory shuffles, Catalyst query plans, Delta Lake ACID commits, and Airflow distributed workers.</p>
             </div>
           </div>
           <Link
             href="/architecture?tab=diagrams"
             className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-xs"
           >
-            Explore 21 Blueprints &rarr;
+            Explore 28 Blueprints &rarr;
           </Link>
         </div>
 

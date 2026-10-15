@@ -129,7 +129,9 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
     const ids = [
       "spark-catalyst-photon-engine",
       "spark-shuffle-memory-execution",
+      "spark-data-skew-aqe-optimization",
       "delta-lake-under-the-hood",
+      "databricks-dabs-devops-pipeline",
       "databricks-platform-master",
     ];
     return ids
@@ -513,7 +515,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                   href="/architecture?tab=diagrams"
                   className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-xs shrink-0"
                 >
-                  <span>All 21 Blueprints</span>
+                  <span>All {architectureDiagrams.length} Blueprints</span>
                   <ChevronDown size={13} className="-rotate-90" />
                 </Link>
               </div>
