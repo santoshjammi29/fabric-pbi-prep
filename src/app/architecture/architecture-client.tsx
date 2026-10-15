@@ -840,117 +840,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
         ]}
       />
 
-      {/* 1. HERO BANNER */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 -mb-12 w-64 h-64 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 space-y-2 max-w-4xl">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-            <Sparkles size={13} />
-            <span>Unified Architecture &amp; Python Systems Hub</span>
-          </div>
-
-          <h1 className="text-xl sm:text-2xl font-bold text-[var(--foreground)] tracking-tight">
-            Enterprise Architecture &amp; Python Platform Hub
-          </h1>
-
-          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-            End-to-end distributed system blueprints, Lakehouse medallion topologies, high-performance Python runbooks, and cross-engine polyglot translation matrices engineered for high-concurrency production platforms.
-          </p>
-
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1">
-            <button
-              onClick={() => handleTabChange("scenarios")}
-              className={cn(
-                "p-2.5 rounded-xl border text-left transition-all",
-                activeTab === "scenarios"
-                  ? "bg-purple-500/15 border-purple-500/40 shadow-xs"
-                  : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-purple-500/30"
-              )}
-            >
-              <div className="text-base sm:text-lg font-bold text-purple-400 leading-none">
-                {architectureData.length}
-              </div>
-              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
-                <Layers size={12} className="text-purple-400" /> System Blueprints
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange("diagrams")}
-              className={cn(
-                "p-2.5 rounded-xl border text-left transition-all",
-                activeTab === "diagrams"
-                  ? "bg-purple-500/15 border-purple-500/40 shadow-xs"
-                  : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-purple-500/30"
-              )}
-            >
-              <div className="text-base sm:text-lg font-bold text-purple-400 leading-none">
-                {architectureDiagrams.length}
-              </div>
-              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
-                <Sparkles size={12} className="text-purple-400" /> Whiteboard Diagrams
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange("python")}
-              className={cn(
-                "p-2.5 rounded-xl border text-left transition-all",
-                activeTab === "python"
-                  ? "bg-emerald-500/15 border-emerald-500/40 shadow-xs"
-                  : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-emerald-500/30"
-              )}
-            >
-              <div className="text-base sm:text-lg font-bold text-emerald-400 leading-none">
-                {pythonData.length}
-              </div>
-              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
-                <TopicIcon topic="python" size={12} /> Python Runbooks
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange("polyglot")}
-              className={cn(
-                "p-2.5 rounded-xl border text-left transition-all",
-                activeTab === "polyglot"
-                  ? "bg-amber-500/15 border-amber-500/40 shadow-xs"
-                  : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-amber-500/30"
-              )}
-            >
-              <div className="text-base sm:text-lg font-bold text-amber-400 leading-none">
-                {modernCodeMatrix.length} Engines
-              </div>
-              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
-                <Code2 size={12} className="text-amber-400" /> Polyglot Matrix
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange("distributed")}
-              className={cn(
-                "p-2.5 rounded-xl border text-left transition-all col-span-2 sm:col-span-1",
-                activeTab === "distributed"
-                  ? "bg-blue-500/15 border-blue-500/40 shadow-xs"
-                  : "bg-[var(--surface-2)]/60 border-[var(--border)] hover:border-blue-500/30"
-              )}
-            >
-              <div className="text-base sm:text-lg font-bold text-blue-400 leading-none">
-                {modernStackWithPy.length}
-              </div>
-              <div className="text-[10px] font-medium text-[var(--muted-foreground)] flex items-center gap-1 mt-1">
-                <Terminal size={12} className="text-blue-400" /> Distributed Scenarios
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. UNIFIED HUB VIEW TABS */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+      {/* 1. TOP MODULE NAVIGATION TABS */}
+      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
         {[
           { id: "scenarios", label: "System Blueprints", count: architectureData.length, iconComponent: Layers, iconColor: "text-purple-400" },
           { id: "diagrams", label: "Whiteboard Diagrams", count: architectureDiagrams.length, iconComponent: Sparkles, iconColor: "text-purple-400" },
@@ -964,7 +855,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as ArchHubTab)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0",
+                "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer",
                 activeTab === tab.id
                   ? "bg-purple-600 text-white shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -989,42 +880,79 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
         })}
       </div>
 
-      {/* 3. SYSTEM SCENARIOS VIEW */}
+      {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK (ACTIVE PER TAB) */}
       {activeTab === "scenarios" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Controls Deck */}
-          <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row gap-2.5">
-              <div className="relative flex-1">
-                <Search
-                  size={15}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-                />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
+        <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
+          {/* LINE 1: SPEC / CATEGORY SLICERS */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
+              <Filter size={11} /> Specs:
+            </span>
+            <button
+              onClick={() => {
+                setSelectedCategory("ALL");
+                setVisibleCount(initialBatch);
+                updateUrlParam("category", "ALL");
+              }}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+                selectedCategory === "ALL"
+                  ? "bg-purple-600 border-purple-500 text-white shadow-xs"
+                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              )}
+            >
+              ⚡ All {categories.length - 1} Specs ({architectureData.length})
+            </button>
+            {categories.filter((cat) => cat !== "ALL").map((cat) => (
+              <button
+                key={cat}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setVisibleCount(initialBatch);
+                  updateUrlParam("category", cat);
+                }}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+                  selectedCategory === cat
+                    ? "bg-purple-600 border-purple-500 text-white shadow-xs"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* LINE 2: SEARCH FILTER + DIFFICULTY SLICERS + SHUFFLE + EXPAND/COLLAPSE */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
+            <div className="relative flex-1">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setVisibleCount(initialBatch);
+                }}
+                placeholder="Search 3,080+ architecture blueprints (e.g., Vitess, Spanner TrueTime, Little's Law)..."
+                className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
                     setVisibleCount(initialBatch);
                   }}
-                  placeholder="Search 3,080+ architecture blueprints (e.g., Vitess sharding, Spanner TrueTime, gh-ost, CoW branching, Little's Law)..."
-                  className="w-full pl-9 pr-4 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      setVisibleCount(initialBatch);
-                    }}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)]"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
 
-              {/* Difficulty chips */}
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+            <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
+              {/* Difficulty Selector */}
+              <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
                 {["ALL", "ARCHITECT", "HARD", "MEDIUM", "EASY"].map((diff) => (
                   <button
                     key={diff}
@@ -1034,43 +962,216 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       updateUrlParam("difficulty", diff);
                     }}
                     className={cn(
-                      "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer",
+                      "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                       selectedDifficulty === diff
-                        ? "bg-blue-600 text-white shadow-xs font-semibold"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                        ? "bg-purple-600 text-white shadow-xs"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                     )}
                   >
-                    {diff === "ALL" ? "All Levels" : diff}
+                    {diff === "ALL" ? "ALL" : diff}
                   </button>
                 ))}
               </div>
-            </div>
 
-            {/* Spec / Category horizontal chip scroll */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-                <Filter size={11} /> Spec:
-              </span>
-              {categories.map((cat) => (
+              {/* Shuffle Button */}
+              <button
+                onClick={handleShuffle}
+                className={cn(
+                  "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  isShuffled
+                    ? "bg-purple-600 border-purple-500 text-white"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                )}
+                title="Shuffle or randomize architecture scenarios"
+              >
+                <Shuffle size={12} className={cn(isShuffled && "rotate-180 transition-transform")} />
+                <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+              </button>
+
+              {/* Expand / Collapse All */}
+              <div className="flex items-center gap-1">
                 <button
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    setVisibleCount(initialBatch);
-                    updateUrlParam("category", cat);
-                  }}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer",
-                    selectedCategory === cat
-                      ? "bg-blue-600 text-white shadow-xs font-semibold"
-                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] hover:bg-[var(--surface-2)]"
-                  )}
+                  onClick={() => setExpandedIds(new Set(paginatedItems.map((i) => i.id)))}
+                  className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
                 >
-                  {cat === "ALL" ? `⚡ All ${categories.length - 1} Specs` : cat}
+                  Expand All
                 </button>
-              ))}
+                <button
+                  onClick={() => setExpandedIds(new Set())}
+                  className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
+                >
+                  Collapse All
+                </button>
+              </div>
+
+              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+                <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> scenarios
+              </span>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === "python" && (
+        <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
+          {/* LINE 1: FRAMEWORK & DOMAIN SLICERS */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
+              <Terminal size={11} /> Engines:
+            </span>
+            {FRAMEWORKS.map((fw) => (
+              <button
+                key={fw.id}
+                onClick={() => {
+                  setSelectedPyFramework(fw.id);
+                  setPyPage(1);
+                }}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
+                  selectedPyFramework === fw.id
+                    ? "bg-cyan-600 border-cyan-500 text-white shadow-xs"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                {fw.topicKey ? (
+                  <TopicIcon topic={fw.topicKey} size={12} />
+                ) : (
+                  <Sparkles size={11} className="text-cyan-400" />
+                )}
+                <span>{fw.label}</span>
+              </button>
+            ))}
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mx-1 flex items-center gap-1">
+              <Filter size={11} /> Domain:
+            </span>
+            {pyDomains.map((dom) => (
+              <button
+                key={dom}
+                onClick={() => {
+                  setSelectedPyDomain(dom);
+                  setPyPage(1);
+                }}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+                  selectedPyDomain === dom
+                    ? "bg-purple-600 border-purple-500 text-white shadow-xs"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                {dom === "all" ? "⚡ All Domains" : dom}
+              </button>
+            ))}
+          </div>
+
+          {/* LINE 2: SEARCH FILTER + LEVEL SLICERS + BOOKMARKS TOGGLE */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
+            <div className="relative flex-1">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+              <input
+                type="text"
+                value={pySearch}
+                onChange={(e) => {
+                  setPySearch(e.target.value);
+                  setPyPage(1);
+                }}
+                placeholder="Search Python runbooks (e.g., streaming, deltalake, asyncio, tracemalloc)..."
+                className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+              />
+              {pySearch && (
+                <button
+                  onClick={() => {
+                    setPySearch("");
+                    setPyPage(1);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
+              {/* Level Selector */}
+              <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                {PYTHON_LEVELS.map((lvl) => (
+                  <button
+                    key={lvl.id}
+                    onClick={() => {
+                      setSelectedPyLevel(lvl.id);
+                      setPyPage(1);
+                      updateUrlParam("level", lvl.id);
+                    }}
+                    className={cn(
+                      "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap capitalize",
+                      selectedPyLevel === lvl.id
+                        ? "bg-cyan-600 text-white shadow-xs"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                    )}
+                  >
+                    {lvl.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Bookmarks Toggle */}
+              <button
+                onClick={() => {
+                  setShowPyBookmarksOnly(!showPyBookmarksOnly);
+                  setPyPage(1);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  showPyBookmarksOnly
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                )}
+              >
+                {showPyBookmarksOnly ? <BookmarkCheck size={13} /> : <Bookmark size={13} />}
+                <span>Saved ({pyBookmarks.length})</span>
+              </button>
+
+              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+                <strong className="text-[var(--foreground)]">{filteredRunbooks.length}</strong> runbooks
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header Hub Banner Summary */}
+      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="space-y-0.5">
+            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
+              Enterprise Architecture &amp; Systems Engineering Hub
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
+              End-to-end distributed system blueprints, Lakehouse medallion topologies, high-performance Python runbooks, and cross-engine polyglot translation matrices engineered for high-concurrency production platforms.
+            </p>
+          </div>
+          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
+            {activeTab === "scenarios" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{paginatedItems.length}</strong> of {filteredItems.length} scenarios ({architectureData.length} total)</span>
+            )}
+            {activeTab === "diagrams" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{architectureDiagrams.length}</strong> production blueprints</span>
+            )}
+            {activeTab === "python" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{filteredRunbooks.length}</strong> of {pythonData.length} runbooks</span>
+            )}
+            {activeTab === "polyglot" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{modernCodeMatrix.length}</strong> cross-engine translation matrices</span>
+            )}
+            {activeTab === "distributed" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{modernStackWithPy.length}</strong> distributed solution architectures</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. SYSTEM SCENARIOS VIEW */}
+      {activeTab === "scenarios" && (
+        <div className="space-y-6 animate-in fade-in duration-300">
 
           {/* Results Meta */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
@@ -1265,142 +1366,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       {/* 4. PYTHON RUNBOOKS VIEW */}
       {activeTab === "python" && (
         <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Slicers Deck */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 shadow-sm">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search
-                  size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-                />
-                <input
-                  type="text"
-                  value={pySearch}
-                  onChange={(e) => {
-                    setPySearch(e.target.value);
-                    setPyPage(1);
-                  }}
-                  placeholder="Search Python runbooks (e.g., streaming, deltalake, asyncio, tracemalloc, pycapsule)..."
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--surface-2)]/60 border border-[var(--border)] text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-emerald-500/50 transition-all"
-                />
-                {pySearch && (
-                  <button
-                    onClick={() => {
-                      setPySearch("");
-                      setPyPage(1);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-md bg-[var(--surface-3)]"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
 
-              {/* Bookmarks toggle button */}
-              <button
-                onClick={() => {
-                  setShowPyBookmarksOnly(!showPyBookmarksOnly);
-                  setPyPage(1);
-                }}
-                className={cn(
-                  "px-4 py-3 rounded-2xl text-xs font-semibold border flex items-center justify-center gap-2 transition-all shrink-0",
-                  showPyBookmarksOnly
-                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm"
-                    : "bg-[var(--surface-2)]/60 text-[var(--muted-foreground)] hover:text-[var(--foreground)] border-[var(--border)]"
-                )}
-              >
-                {showPyBookmarksOnly ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-                <span>Bookmarks ({pyBookmarks.length})</span>
-              </button>
-            </div>
-
-            {/* Level Slicer */}
-            <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider flex items-center gap-1.5">
-                <SlidersHorizontal size={12} />
-                <span>Execution Level:</span>
-              </div>
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
-                {PYTHON_LEVELS.map((lvl) => (
-                  <button
-                    key={lvl.id}
-                    onClick={() => {
-                      setSelectedPyLevel(lvl.id);
-                      setPyPage(1);
-                      updateUrlParam("level", lvl.id);
-                    }}
-                    className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 capitalize",
-                      selectedPyLevel === lvl.id
-                        ? "bg-emerald-600 text-white shadow-sm font-semibold"
-                        : "bg-[var(--surface-2)]/60 text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                    )}
-                  >
-                    {lvl.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Framework / Stack Slicer */}
-            <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider flex items-center gap-1.5">
-                <Terminal size={12} />
-                <span>Compute Stack &amp; Engine:</span>
-              </div>
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
-                {FRAMEWORKS.map((fw) => (
-                  <button
-                    key={fw.id}
-                    onClick={() => {
-                      setSelectedPyFramework(fw.id);
-                      setPyPage(1);
-                    }}
-                    className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 flex items-center gap-1.5",
-                      selectedPyFramework === fw.id
-                        ? "bg-cyan-600 text-white shadow-sm font-semibold"
-                        : "bg-[var(--surface-2)]/60 text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                    )}
-                  >
-                    {fw.topicKey ? (
-                      <TopicIcon topic={fw.topicKey} size={13} />
-                    ) : (
-                      <Sparkles size={12} className="text-purple-400" />
-                    )}
-                    <span>{fw.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Domain Slicer */}
-            <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider flex items-center gap-1.5">
-                <Filter size={12} />
-                <span>Domain Focus:</span>
-              </div>
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
-                {pyDomains.map((dom) => (
-                  <button
-                    key={dom}
-                    onClick={() => {
-                      setSelectedPyDomain(dom);
-                      setPyPage(1);
-                    }}
-                    className={cn(
-                      "px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 whitespace-nowrap",
-                      selectedPyDomain === dom
-                        ? "bg-purple-600 text-white shadow-sm font-semibold"
-                        : "bg-[var(--surface-2)]/60 text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                    )}
-                  >
-                    {dom === "all" ? "⚡ All Domains" : dom}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* Results Meta */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">

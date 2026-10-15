@@ -176,97 +176,167 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
         </div>
       </div>
 
-      {/* Primary Tab Navigation */}
-      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none mb-3">
-        <button
-          onClick={() => setTab("connectivity")}
-          className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 shrink-0 whitespace-nowrap",
-            currentTab === "connectivity"
-              ? "bg-blue-600 text-white shadow-xs"
-              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-          )}
-        >
-          <Network size={14} />
-          <span>1. Tool Connectivity & Secrets</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20 text-white">
-            {initialData.connectivity.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setTab("cicd")}
-          className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 shrink-0 whitespace-nowrap",
-            currentTab === "cicd"
-              ? "bg-blue-600 text-white shadow-xs"
-              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-          )}
-        >
-          <GitBranch size={14} />
-          <span>2. CI/CD Alternatives & Pipelines</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20 text-white">
-            {initialData.cicdAlternatives.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setTab("lifecycle")}
-          className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 shrink-0 whitespace-nowrap",
-            currentTab === "lifecycle"
-              ? "bg-blue-600 text-white shadow-xs"
-              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-          )}
-        >
-          <Workflow size={14} />
-          <span>3. End-to-End Project Lifecycle</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20 text-white">
-            {initialData.lifecycleStages.length} Stages
-          </span>
-        </button>
-
-        <button
-          onClick={() => setTab("diagram")}
-          className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 shrink-0 whitespace-nowrap",
-            currentTab === "diagram"
-              ? "bg-blue-600 text-white shadow-xs"
-              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-          )}
-        >
-          <Layers size={14} />
-          <span>4. Interactive Architecture Diagram</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            Whiteboard
-          </span>
-        </button>
-      </div>
-
-      {/* Global Search Bar (Common to all tabs) */}
-      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] mb-4">
-        <Search size={14} className="text-[var(--muted-foreground)] shrink-0" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={
-            currentTab === "connectivity"
-              ? "Search connectivity (e.g. Managed Identity, OAuth M2M, Key Vault, Linked Service, profiles.yml)..."
-              : currentTab === "cicd"
-              ? "Search CI/CD patterns (e.g. Databricks Asset Bundles, Git-Sync, Slim CI, ARM template)..."
-              : "Search lifecycle stages, deliverables, failure modes, or interview scripts..."
-          }
-          className="w-full bg-transparent text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-hidden"
-        />
-        {searchQuery && (
+      {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK */}
+      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs mb-4">
+        {/* LINE 1: PRIMARY TAB NAVIGATION */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
           <button
-            onClick={() => setSearchQuery("")}
-            className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-0.5 rounded bg-[var(--surface-3)]"
+            onClick={() => setTab("connectivity")}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              currentTab === "connectivity"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            )}
           >
-            Clear
+            <Network size={14} />
+            <span>1. Tool Connectivity & Secrets</span>
+            <span className={cn(
+              "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
+              currentTab === "connectivity" ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+            )}>
+              {initialData.connectivity.length}
+            </span>
           </button>
-        )}
+
+          <button
+            onClick={() => setTab("cicd")}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              currentTab === "cicd"
+                ? "bg-purple-600 text-white shadow-xs"
+                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            )}
+          >
+            <GitBranch size={14} />
+            <span>2. CI/CD Alternatives & Pipelines</span>
+            <span className={cn(
+              "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
+              currentTab === "cicd" ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+            )}>
+              {initialData.cicdAlternatives.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setTab("lifecycle")}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              currentTab === "lifecycle"
+                ? "bg-emerald-600 text-white shadow-xs"
+                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            )}
+          >
+            <Workflow size={14} />
+            <span>3. End-to-End Project Lifecycle</span>
+            <span className={cn(
+              "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
+              currentTab === "lifecycle" ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+            )}>
+              {initialData.lifecycleStages.length} Stages
+            </span>
+          </button>
+
+          <button
+            onClick={() => setTab("diagram")}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              currentTab === "diagram"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            )}
+          >
+            <Layers size={14} />
+            <span>4. Interactive Architecture Diagram</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Whiteboard
+            </span>
+          </button>
+        </div>
+
+        {/* LINE 2: SEARCH INPUT + TAB-SPECIFIC FILTER CHIPS + RESULT COUNTER */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={
+                currentTab === "connectivity"
+                  ? "Search connectivity (e.g. Managed Identity, OAuth M2M, Key Vault, profiles.yml)..."
+                  : currentTab === "cicd"
+                  ? "Search CI/CD patterns (e.g. Databricks Asset Bundles, Git-Sync, Slim CI)..."
+                  : "Search lifecycle stages, deliverables, failure modes, or interview scripts..."
+              }
+              className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
+            {currentTab === "connectivity" && (
+              <>
+                <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                  {["ALL", "ADF", "Databricks", "Airflow", "dbt", "Synapse", "OIDC"].map((tool) => (
+                    <button
+                      key={tool}
+                      onClick={() => setSelectedToolFilter(tool)}
+                      className={cn(
+                        "px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                        selectedToolFilter === tool
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                      )}
+                    >
+                      {tool}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+                  <strong className="text-[var(--foreground)]">{filteredConnectivity.length}</strong> configs
+                </span>
+              </>
+            )}
+
+            {currentTab === "cicd" && (
+              <>
+                <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                  {["ALL", "Databricks", "Airflow", "dbt", "ADF", "Database / Lakehouse"].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCicdCategory(cat)}
+                      className={cn(
+                        "px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                        selectedCicdCategory === cat
+                          ? "bg-purple-600 text-white shadow-xs"
+                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                      )}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+                  <strong className="text-[var(--foreground)]">{filteredCicd.length}</strong> patterns
+                </span>
+              </>
+            )}
+
+            {currentTab === "lifecycle" && (
+              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1">
+                Stage <strong className="text-[var(--foreground)]">{activeStageNumber}</strong> of {initialData.lifecycleStages.length}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ========================================================================= */}
@@ -274,26 +344,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
       {/* ========================================================================= */}
       {currentTab === "connectivity" && (
         <div className="space-y-3">
-          {/* Sub-filters by Tool */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 text-xs">
-            <span className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase mr-1">
-              Filter:
-            </span>
-            {["ALL", "ADF", "Databricks", "Airflow", "dbt", "Synapse", "OIDC"].map((tool) => (
-              <button
-                key={tool}
-                onClick={() => setSelectedToolFilter(tool)}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
-                  selectedToolFilter === tool
-                    ? "bg-blue-600 text-white font-semibold"
-                    : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                )}
-              >
-                {tool}
-              </button>
-            ))}
-          </div>
+
 
           {/* Cards Grid */}
           <div className="grid grid-cols-1 gap-3">
@@ -464,26 +515,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
       {/* ========================================================================= */}
       {currentTab === "cicd" && (
         <div className="space-y-3">
-          {/* Sub-filters by CI/CD Category */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 text-xs">
-            <span className="text-[11px] font-bold text-[var(--muted-foreground)] uppercase mr-1">
-              Category:
-            </span>
-            {["ALL", "Databricks", "Airflow", "dbt", "ADF", "Database / Lakehouse"].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCicdCategory(cat)}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
-                  selectedCicdCategory === cat
-                    ? "bg-purple-600 text-white font-semibold"
-                    : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)]"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+
 
           {/* Alternatives Cards */}
           <div className="grid grid-cols-1 gap-3.5">

@@ -23,6 +23,7 @@ import {
   Building2,
   Compass,
   ArrowRight,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -320,108 +321,115 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
         ]}
       />
 
-      {/* Header Hub Banner */}
-      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 overflow-hidden shadow-xs">
-        <div className="relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-            <MessageSquare size={12} />
-            <span>Interview Practice &amp; Architect Q&amp;A Hub</span>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-lg sm:text-xl font-bold text-[var(--foreground)] tracking-tight">
-              6,500+ Production Interview Scenarios
-            </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
-              Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, and Lakehouse architectures.
-            </p>
+      {/* ─── DOUBLE-LINE SLICERS & FILTERS (ALWAYS VISIBLE AT TOP OF WEBPAGE) ─── */}
+      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
+        {/* LINE 1: DOMAIN SLICERS */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
+            <Filter size={11} /> Domains:
+          </span>
+          <button
+            onClick={() => setSelectedDomain("ALL")}
+            className={cn(
+              "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+              selectedDomain === "ALL"
+                ? "bg-blue-600 border-blue-500 text-white shadow-xs"
+                : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            )}
+          >
+            All Domains ({initialQuestions.length})
+          </button>
+          {STANDARDIZED_DOMAINS.map((dom) => (
+            <button
+              key={dom}
+              onClick={() => setSelectedDomain(dom)}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+                selectedDomain === dom
+                  ? "bg-blue-600 border-blue-500 text-white shadow-xs"
+                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              )}
+            >
+              {dom}
+            </button>
+          ))}
+        </div>
+
+        {/* LINE 2: SEARCH FILTER + DIFFICULTY SLICERS + STUDY MODE */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search 6,500+ questions by keyword, mechanism, syntax..."
+              className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
+            {/* Difficulty Selector */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setSelectedDifficulty(diff)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                    selectedDifficulty === diff
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  )}
+                >
+                  {diff}
+                </button>
+              ))}
+            </div>
+
+            {/* Study Mode Flashcard Button */}
             <button
               onClick={() => setIsStudyMode(!isStudyMode)}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer shadow-xs",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
                 isStudyMode
-                  ? "bg-blue-600 border-blue-500 text-white"
+                  ? "bg-purple-600 border-purple-500 text-white"
                   : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
               )}
             >
               <Zap size={13} />
-              <span>{isStudyMode ? "Exit Study Mode" : "Interactive Study Mode (Flashcards)"}</span>
+              <span>{isStudyMode ? "Exit Study" : "Study Mode"}</span>
             </button>
-            <span className="text-[11px] text-[var(--muted-foreground)]">
-              Showing {filteredQuestions.length.toLocaleString()} of {initialQuestions.length.toLocaleString()} questions
+
+            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+              <strong className="text-[var(--foreground)]">{filteredQuestions.length.toLocaleString()}</strong> Qs
             </span>
           </div>
         </div>
       </div>
 
-      {/* Standardized Domain Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
-        <button
-          onClick={() => setSelectedDomain("ALL")}
-          className={cn(
-            "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-            selectedDomain === "ALL"
-              ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-              : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-          )}
-        >
-          All Domains
-        </button>
-        {STANDARDIZED_DOMAINS.map((dom) => (
-          <button
-            key={dom}
-            onClick={() => setSelectedDomain(dom)}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-              selectedDomain === dom
-                ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            {dom}
-          </button>
-        ))}
-      </div>
-
-      {/* Search & Difficulty Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-2.5">
-        <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search questions by topic, failure modes, code syntax..."
-            className="w-full pl-9 pr-12 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        {/* Difficulty Selector */}
-        <div className="flex items-center gap-1 p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0 overflow-x-auto scrollbar-none">
-          {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
-            <button
-              key={diff}
-              onClick={() => setSelectedDifficulty(diff)}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
-                selectedDifficulty === diff
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-            >
-              {diff}
-            </button>
-          ))}
+      {/* Header Hub Banner Summary */}
+      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="space-y-0.5">
+            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
+              6,500+ Production Interview Scenarios &amp; Architect Q&amp;A
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
+              Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, and Lakehouse architectures.
+            </p>
+          </div>
+          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
+            Showing <strong className="text-[var(--foreground)]">{filteredQuestions.length.toLocaleString()}</strong> of {initialQuestions.length.toLocaleString()} questions
+          </div>
         </div>
       </div>
 

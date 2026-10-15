@@ -316,8 +316,25 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
           initialCardId={searchParams.get("card") || undefined}
         />
       ) : (
-        /* --- PRODUCTION INCIDENT RUNBOOKS VIEW --- */
         <div className="space-y-4">
+          {/* Top Double-Line Slicers & Filters Deck */}
+          <section aria-labelledby="filters-heading">
+            <CategoryBar
+              categories={ALL_CATEGORIES}
+              categoryCounts={categoryCounts}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              selectedImpact={selectedImpact}
+              onSelectImpact={setSelectedImpact}
+              selectedScenario={selectedScenario}
+              onSelectScenario={setSelectedScenario}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              totalFiltered={filteredCodes.length}
+              totalCount={cheatsheetData.length}
+            />
+          </section>
+
           {/* Hero / Header Section */}
           <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
             <div className="space-y-2">
@@ -445,23 +462,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
               </Link>
             </div>
 
-            {/* Search, Filter Pills & Impact Select */}
-            <section aria-labelledby="filters-heading">
-              <CategoryBar
-                categories={ALL_CATEGORIES}
-                categoryCounts={categoryCounts}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                selectedImpact={selectedImpact}
-                onSelectImpact={setSelectedImpact}
-                selectedScenario={selectedScenario}
-                onSelectScenario={setSelectedScenario}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                totalFiltered={filteredCodes.length}
-                totalCount={cheatsheetData.length}
-              />
-            </section>
 
             {/* Grid Layout + Sticky TOC Sidebar */}
             <div className="flex items-start gap-4 sm:gap-6">

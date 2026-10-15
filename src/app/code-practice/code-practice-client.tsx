@@ -298,69 +298,135 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
         ]}
       />
 
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
-              <FileCode2 size={13} />
-              <span>Step 2 · Polyglot Engineering</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
-              Hands-On Code Practice &amp; Syntaxes
-            </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Production-grade code patterns across 4 core languages. Optimized for window functions,
-              incremental merges, vector operations, and low-latency analytics.
-            </p>
+      {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK */}
+      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
+        {/* LINE 1: LANGUAGE / ENGINE SLICERS */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
+            <Terminal size={11} /> Engines:
+          </span>
+          {(Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
+            const cfg = languageConfigs[key];
+            const isSelected = activeLang === key;
+            return (
+              <button
+                key={key}
+                onClick={() => handleLangChange(key)}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
+                  isSelected
+                    ? "bg-blue-600 border-blue-500 text-white shadow-xs"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                <TopicIcon topic={cfg.topicKey} size={13} />
+                <span>{cfg.name}</span>
+                <span
+                  className={cn(
+                    "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
+                    isSelected ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+                  )}
+                >
+                  {cfg.data.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* LINE 2: SEARCH FILTER + LEVEL SLICERS + SHUFFLE + EXPAND/COLLAPSE */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
+              className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 shrink-0 text-center">
-            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-xl font-bold text-blue-400">128+</div>
-              <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">Templates</div>
+          <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
+            {/* Level Selector */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              {["ALL", "beginner", "intermediate", "advanced", "architect"].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setSelectedLevel(level)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer whitespace-nowrap",
+                    selectedLevel === level
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  )}
+                >
+                  {level}
+                </button>
+              ))}
             </div>
-            <div className="px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-xl font-bold text-purple-400">4</div>
-              <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">Languages</div>
+
+            {/* Shuffle Button */}
+            <button
+              onClick={handleShuffle}
+              className={cn(
+                "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                isShuffled
+                  ? "bg-blue-600 border-blue-500 text-white"
+                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+              title="Shuffle templates"
+            >
+              <Shuffle size={12} className={cn(isShuffled && "rotate-180 transition-transform")} />
+              <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
+            </button>
+
+            {/* Expand / Collapse All */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setExpandedIds(new Set(displayedItems.map((i) => i.id)))}
+                className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
+              >
+                Expand All
+              </button>
+              <button
+                onClick={() => setExpandedIds(new Set())}
+                className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
+              >
+                Collapse All
+              </button>
             </div>
+
+            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
+              <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> drills
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Language Selector Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {(Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
-          const cfg = languageConfigs[key];
-          const isSelected = activeLang === key;
-          return (
-            <button
-              key={key}
-              onClick={() => handleLangChange(key)}
-              className={cn(
-                "flex items-center gap-2 p-2 sm:p-2.5 rounded-lg border transition-all text-left group cursor-pointer",
-                isSelected
-                  ? "bg-blue-600/15 border-blue-500/50 shadow-xs"
-                  : "bg-[var(--surface-1)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)]"
-              )}
-            >
-              <TopicIcon topic={cfg.topicKey} size={18} className="group-hover:scale-105 transition-transform shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div
-                  className={cn(
-                    "text-xs sm:text-[13px] font-bold truncate leading-tight",
-                    isSelected ? "text-blue-600 dark:text-blue-300" : "text-[var(--foreground)]"
-                  )}
-                >
-                  {cfg.name}
-                </div>
-                <div className="text-[10px] text-[var(--muted-foreground)]">
-                  {cfg.data.length} Templates
-                </div>
-              </div>
-            </button>
-          );
-        })}
+      {/* Header Hub Banner Summary */}
+      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="space-y-0.5">
+            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
+              Hands-On Code Practice &amp; Polyglot Syntaxes
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
+              Production-grade code patterns across 4 core languages. Optimized for window functions, incremental merges, vector operations, and low-latency analytics.
+            </p>
+          </div>
+          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
+            Showing <strong className="text-[var(--foreground)]">{displayedItems.length}</strong> of {currentDataset.length} templates ({languageConfigs[activeLang].name})
+          </div>
+        </div>
       </div>
 
       {/* 4-Layer Integrated Domain Navigation */}
@@ -421,94 +487,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             </div>
           </div>
         </Link>
-      </div>
-
-      {/* Search & Level Filters */}
-      <div className="flex flex-col sm:flex-row gap-2">
-        <div className="relative flex-1">
-          <Search
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
-            className="w-full pl-9 pr-4 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)]"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        {/* Level Filters */}
-        <div className="flex items-center gap-1 p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0 overflow-x-auto scrollbar-none">
-          {["ALL", "beginner", "intermediate", "advanced", "architect"].map((level) => (
-            <button
-              key={level}
-              onClick={() => setSelectedLevel(level)}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer",
-                selectedLevel === level
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-            >
-              {level}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Count summary & Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
-        <div className="flex items-center gap-3">
-          <span>
-            Showing <strong className="text-[var(--foreground)]">{displayedItems.length}</strong> coding templates
-          </span>
-          <button
-            onClick={handleShuffle}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all shrink-0",
-              isShuffled
-                ? "bg-blue-600 text-white border-blue-500 shadow-xs"
-                : "bg-[var(--surface-1)] border-[var(--border)] text-[var(--foreground)] hover:border-blue-500/40 hover:bg-[var(--surface-2)]"
-            )}
-            title="Shuffle or randomize coding templates"
-          >
-            <Shuffle size={13} className={cn(isShuffled && "rotate-180 transition-transform")} />
-            <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
-          </button>
-          {isShuffled && (
-            <button
-              onClick={handleResetOrder}
-              className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-1.5 py-1 underline underline-offset-2"
-            >
-              Reset Order
-            </button>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setExpandedIds(new Set(displayedItems.map((i) => i.id)))}
-            className="hover:text-[var(--foreground)] font-medium transition-colors"
-          >
-            Expand All
-          </button>
-          <span>•</span>
-          <button
-            onClick={() => setExpandedIds(new Set())}
-            className="hover:text-[var(--foreground)] font-medium transition-colors"
-          >
-            Collapse All
-          </button>
-        </div>
       </div>
 
       {/* Code Templates Stream */}
