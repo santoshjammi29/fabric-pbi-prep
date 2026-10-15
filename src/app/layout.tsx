@@ -5,6 +5,8 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { AllPagesNav } from "@/components/layout/all-pages-nav";
+import { AllPagesFooter } from "@/components/layout/all-pages-footer";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ScrollProgressBar } from "@/components/layout/scroll-progress-bar";
 import { ScrollBackToTop } from "@/components/layout/scroll-back-to-top";
@@ -130,10 +132,13 @@ export default function RootLayout({
               {/* Top Announcement Bar (SitePoint/Noupe style) */}
               <AnnouncementBar />
 
+              {/* Always-Visible Navigation Bar for All Pages & Subpages */}
+              <AllPagesNav />
+
               {/* Page content */}
               <main
                 id="main-content"
-                className="flex-1 px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:pt-8 lg:pb-10"
+                className="flex-1 px-4 pt-4 pb-20 sm:px-6 lg:px-8 lg:pt-6 lg:pb-10"
                 tabIndex={-1}
               >
                 <div className="mx-auto w-full max-w-7xl 2xl:max-w-[1600px]">
@@ -141,6 +146,9 @@ export default function RootLayout({
                   {children}
                 </div>
               </main>
+
+              {/* Comprehensive All Pages & Subpages Site Footer */}
+              <AllPagesFooter />
 
               {/* Mobile bottom nav */}
               <MobileNav />

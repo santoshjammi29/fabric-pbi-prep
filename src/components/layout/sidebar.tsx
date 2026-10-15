@@ -6,130 +6,8 @@ import { useState, useEffect, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { TextSizeController } from "@/components/ui/text-size-controller";
-import {
-  Home,
-  BookOpen,
-  FileCode2,
-  Layers,
-  MessageSquare,
-  Compass,
-  User,
-  ChevronLeft,
-  Workflow,
-} from "lucide-react";
-
-interface SubNavItem {
-  label: string;
-  href: string;
-}
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ElementType;
-  pill?: { text: string; variant: "easy" | "medium" | "hard" | "architect" | "new" | "info" };
-  matches?: string[];
-  subItems?: SubNavItem[];
-}
-
-interface NavGroup {
-  title: string;
-  items: NavItem[];
-}
-
-const navGroups: NavGroup[] = [
-  {
-    title: "Portal",
-    items: [
-      { label: "Home Dashboard", href: "/", icon: Home },
-    ],
-  },
-  {
-    title: "Academy Pillars",
-    items: [
-      {
-        label: "Learning Journey",
-        href: "/guided-learning",
-        icon: Compass,
-        pill: { text: "The Roadmap", variant: "info" },
-        matches: ["/guided-learning", "/learning-paths"],
-        subItems: [
-          { label: "Guided Topic Tracks", href: "/guided-learning" },
-          { label: "Career Curricula", href: "/learning-paths" },
-        ],
-      },
-      {
-        label: "Concepts & Engines",
-        href: "/concepts",
-        icon: BookOpen,
-        pill: { text: "Foundations", variant: "easy" },
-        matches: ["/concepts", "/spark-engine", "/modern-stack"],
-        subItems: [
-          { label: "Concepts Glossary", href: "/concepts" },
-          { label: "Spark Engine Lab", href: "/spark-engine" },
-          { label: "Modern Stack & FinOps", href: "/modern-stack" },
-        ],
-      },
-      {
-        label: "Architecture Hub",
-        href: "/architecture",
-        icon: Layers,
-        pill: { text: "Principal", variant: "architect" },
-        matches: ["/architecture", "/mindmap"],
-        subItems: [
-          { label: "System Scenarios", href: "/architecture?tab=scenarios" },
-          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams" },
-          { label: "Interactive Mindmap", href: "/mindmap" },
-        ],
-      },
-      {
-        label: "Code & Runbooks",
-        href: "/code-practice",
-        icon: FileCode2,
-        pill: { text: "Prod Ready", variant: "medium" },
-        matches: ["/code-practice", "/cheat-sheet"],
-        subItems: [
-          { label: "Production Cheat Sheet", href: "/cheat-sheet" },
-          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks" },
-          { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
-          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
-          { label: "T-SQL Drills", href: "/code-practice?db=mssql" },
-          { label: "Python & Polars", href: "/code-practice?db=python" },
-        ],
-      },
-      {
-        label: "DataOps & Lifecycle",
-        href: "/dataops",
-        icon: Workflow,
-        pill: { text: "CI/CD & E2E", variant: "architect" },
-        matches: ["/dataops"],
-        subItems: [
-          { label: "Tool Connectivity & Secrets", href: "/dataops?tab=connectivity" },
-          { label: "CI/CD Alternatives & Pipelines", href: "/dataops?tab=cicd" },
-          { label: "End-to-End Lifecycle Playbook", href: "/dataops?tab=lifecycle" },
-          { label: "Whiteboard Architecture Flow", href: "/dataops?tab=diagram" },
-        ],
-      },
-      {
-        label: "Interview Drill Hub",
-        href: "/qa-prep",
-        icon: MessageSquare,
-        pill: { text: "6.5k+ Qs", variant: "hard" },
-        matches: ["/qa-prep", "/company-research"],
-        subItems: [
-          { label: "Question Drill Bank", href: "/qa-prep" },
-          { label: "Target Company Intel", href: "/company-research" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Workspace",
-    items: [
-      { label: "My Studio", href: "/studio", icon: User, pill: { text: "Personal", variant: "info" } },
-    ],
-  },
-];
+import { ChevronLeft } from "lucide-react";
+import { NAV_GROUPS, isSubHrefActive, NavItem } from "@/data/navigation-data";
 
 const pillVariants: Record<string, string> = {
   easy: "bg-green-500/10 text-green-400 border-green-500/20",
@@ -165,34 +43,7 @@ function SidebarInner() {
   };
 
   const isSubActive = (subHref: string) => {
-    if (!pathname) return false;
-    const [subPath, subQuery] = subHref.split("?");
-    if (pathname !== subPath) return false;
-
-    if (!subQuery) {
-      if (!searchParams) return true;
-      const currentTab = searchParams.get("tab");
-      const currentDb = searchParams.get("db");
-      if (!currentTab && !currentDb) return true;
-      return false;
-    }
-
-    if (!searchParams) return false;
-    const subParams = new URLSearchParams(subQuery);
-    for (const [key, val] of subParams.entries()) {
-      const currentVal = searchParams.get(key);
-      if (pathname === "/architecture" && key === "tab" && val === "scenarios" && !currentVal) {
-        return true;
-      }
-      if (pathname === "/code-practice" && key === "db" && val === "pyspark" && !currentVal) {
-        return true;
-      }
-      if (pathname === "/dataops" && key === "tab" && val === "connectivity" && !currentVal) {
-        return true;
-      }
-      if (currentVal !== val) return false;
-    }
-    return true;
+    return isSubHrefActive(pathname, searchParams, subHref);
   };
 
   return (
@@ -200,7 +51,7 @@ function SidebarInner() {
       className={cn(
         "hidden lg:flex flex-col h-dvh sticky top-0 border-r transition-all duration-300 ease-in-out",
         "bg-[var(--surface-1)] border-[var(--border)]",
-        collapsed ? "w-[72px]" : "w-[260px]"
+        collapsed ? "w-[72px]" : "w-[275px]"
       )}
     >
       {/* Brand */}
@@ -212,7 +63,7 @@ function SidebarInner() {
       >
         {!collapsed && (
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-xs">
               DP
             </div>
             <div className="min-w-0">
@@ -228,7 +79,7 @@ function SidebarInner() {
         <button
           onClick={toggleCollapsed}
           className={cn(
-            "p-1.5 rounded-lg hover:bg-[var(--surface-3)] transition-colors",
+            "p-1.5 rounded-lg hover:bg-[var(--surface-3)] transition-colors cursor-pointer",
             "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
           )}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -244,9 +95,9 @@ function SidebarInner() {
         </button>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation Tree — Always Visible on All Layouts */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 scrollbar-none">
-        {navGroups.map((group, gi) => (
+        {NAV_GROUPS.map((group, gi) => (
           <div key={gi} className={cn(gi > 0 && "mt-3.5")}>
             {group.title && !collapsed && (
               <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted-foreground)]">
@@ -292,9 +143,9 @@ function SidebarInner() {
                       )}
                     </Link>
 
-                    {/* Clean sub-navigation reveals when item is active in expanded mode */}
-                    {active && !collapsed && item.subItems && (
-                      <ul className="ml-7 my-1 space-y-0.5 border-l border-[var(--border)] pl-2.5 animate-in fade-in duration-150">
+                    {/* All sub-navigation items ALWAYS visible in expanded mode */}
+                    {!collapsed && item.subItems && (
+                      <ul className="ml-5 my-1 space-y-0.5 border-l-2 border-[var(--border)] pl-3">
                         {item.subItems.map((sub) => {
                           const subActive = isSubActive(sub.href);
                           return (
@@ -302,13 +153,33 @@ function SidebarInner() {
                               <Link
                                 href={sub.href}
                                 className={cn(
-                                  "block px-2 py-1 text-xs rounded-lg transition-colors truncate",
+                                  "flex items-center gap-2 px-2 py-1.5 text-xs rounded-lg transition-all truncate",
                                   subActive
-                                    ? "text-purple-400 bg-purple-500/10 font-semibold"
+                                    ? "text-blue-600 dark:text-blue-400 bg-blue-500/10 font-bold shadow-xs"
                                     : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                                 )}
                               >
-                                {sub.label}
+                                <span
+                                  className={cn(
+                                    "w-1.5 h-1.5 rounded-full shrink-0 transition-all",
+                                    subActive
+                                      ? "bg-blue-500 scale-125 shadow-[0_0_6px_rgba(59,130,246,0.8)]"
+                                      : "bg-[var(--muted-foreground)]/30"
+                                  )}
+                                />
+                                <span className="truncate flex-1">{sub.label}</span>
+                                {sub.badge && (
+                                  <span
+                                    className={cn(
+                                      "text-[9px] px-1.5 py-0.2 rounded font-medium",
+                                      subActive
+                                        ? "bg-blue-600/20 text-blue-600 dark:text-blue-300"
+                                        : "bg-[var(--surface-2)] text-[var(--muted-foreground)]"
+                                    )}
+                                  >
+                                    {sub.badge}
+                                  </span>
+                                )}
                               </Link>
                             </li>
                           );
@@ -337,7 +208,7 @@ export function Sidebar() {
     <Suspense
       fallback={
         <aside
-          className="hidden lg:flex flex-col h-dvh sticky top-0 border-r w-[260px] bg-[var(--surface-1)] border-[var(--border)]"
+          className="hidden lg:flex flex-col h-dvh sticky top-0 border-r w-[275px] bg-[var(--surface-1)] border-[var(--border)]"
           aria-hidden="true"
         />
       }

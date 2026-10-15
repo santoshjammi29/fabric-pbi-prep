@@ -7,135 +7,18 @@ import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { ThemeCycleButton, ThemeSegmentedPills } from "@/components/ui/theme-switcher";
 import { TextSizeQuickToggle, TextSizeSegmentedPills } from "@/components/ui/text-size-controller";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
-import {
-  Search,
-  Menu,
-  X,
-  Home,
-  BookOpen,
-  FileCode2,
-  Layers,
-  MessageSquare,
-  Compass,
-  User,
-  Workflow,
-} from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NAV_GROUPS, isSubHrefActive } from "@/data/navigation-data";
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ElementType;
-  badge?: string;
-  badgeColor?: string;
-  matches?: string[];
-  subItems?: { label: string; href: string }[];
-}
-
-interface NavGroup {
-  title: string;
-  items: NavItem[];
-}
-
-const navGroups: NavGroup[] = [
-  {
-    title: "Portal",
-    items: [
-      { label: "Home Dashboard", href: "/", icon: Home },
-    ],
-  },
-  {
-    title: "Academy Pillars",
-    items: [
-      {
-        label: "Learning Journey",
-        href: "/guided-learning",
-        icon: Compass,
-        badge: "The Roadmap",
-        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        matches: ["/guided-learning", "/learning-paths"],
-        subItems: [
-          { label: "Guided Topic Tracks", href: "/guided-learning" },
-          { label: "Career Curricula", href: "/learning-paths" },
-        ],
-      },
-      {
-        label: "Concepts & Engines",
-        href: "/concepts",
-        icon: BookOpen,
-        badge: "Foundations",
-        badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
-        matches: ["/concepts", "/spark-engine", "/modern-stack"],
-        subItems: [
-          { label: "Concepts Glossary", href: "/concepts" },
-          { label: "Spark Engine Lab", href: "/spark-engine" },
-          { label: "Modern Stack & FinOps", href: "/modern-stack" },
-        ],
-      },
-      {
-        label: "Architecture Hub",
-        href: "/architecture",
-        icon: Layers,
-        badge: "Principal",
-        badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-        matches: ["/architecture", "/mindmap"],
-        subItems: [
-          { label: "System Scenarios", href: "/architecture?tab=scenarios" },
-          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams" },
-          { label: "Interactive Mindmap", href: "/mindmap" },
-        ],
-      },
-      {
-        label: "Code & Runbooks",
-        href: "/code-practice",
-        icon: FileCode2,
-        badge: "Prod Ready",
-        badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-        matches: ["/code-practice", "/cheat-sheet"],
-        subItems: [
-          { label: "Production Cheat Sheet", href: "/cheat-sheet" },
-          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks" },
-          { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
-          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql" },
-          { label: "T-SQL Drills", href: "/code-practice?db=mssql" },
-          { label: "Python & Polars", href: "/code-practice?db=python" },
-        ],
-      },
-      {
-        label: "DataOps & Lifecycle",
-        href: "/dataops",
-        icon: Workflow,
-        badge: "CI/CD & E2E",
-        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-        matches: ["/dataops"],
-        subItems: [
-          { label: "Tool Connectivity & Secrets", href: "/dataops?tab=connectivity" },
-          { label: "CI/CD Alternatives & Pipelines", href: "/dataops?tab=cicd" },
-          { label: "End-to-End Lifecycle Playbook", href: "/dataops?tab=lifecycle" },
-          { label: "Whiteboard Architecture Flow", href: "/dataops?tab=diagram" },
-        ],
-      },
-      {
-        label: "Interview Drill Hub",
-        href: "/qa-prep",
-        icon: MessageSquare,
-        badge: "6.5k+ Qs",
-        badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-        matches: ["/qa-prep", "/company-research"],
-        subItems: [
-          { label: "Question Drill Bank", href: "/qa-prep" },
-          { label: "Target Company Intel", href: "/company-research" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Workspace",
-    items: [
-      { label: "My Studio", href: "/studio", icon: User, badge: "Personal", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-    ],
-  },
-];
+const badgeVariants: Record<string, string> = {
+  easy: "bg-green-500/10 text-green-400 border-green-500/20",
+  medium: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  hard: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  architect: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  new: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+};
 
 function MobileHeaderInner() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -145,7 +28,7 @@ function MobileHeaderInner() {
 
   useFocusTrap(drawerRef, drawerOpen, () => setDrawerOpen(false));
 
-  // Close drawer on navigation (both pathname and searchParams)
+  // Close drawer on navigation
   useEffect(() => {
     setDrawerOpen(false);
   }, [pathname, searchParams]);
@@ -174,34 +57,7 @@ function MobileHeaderInner() {
   };
 
   const isSubActive = (subHref: string) => {
-    if (!pathname) return false;
-    const [subPath, subQuery] = subHref.split("?");
-    if (pathname !== subPath) return false;
-
-    if (!subQuery) {
-      if (!searchParams) return true;
-      const currentTab = searchParams.get("tab");
-      const currentDb = searchParams.get("db");
-      if (!currentTab && !currentDb) return true;
-      return false;
-    }
-
-    if (!searchParams) return false;
-    const subParams = new URLSearchParams(subQuery);
-    for (const [key, val] of subParams.entries()) {
-      const currentVal = searchParams.get(key);
-      if (pathname === "/architecture" && key === "tab" && val === "scenarios" && !currentVal) {
-        return true;
-      }
-      if (pathname === "/code-practice" && key === "db" && val === "pyspark" && !currentVal) {
-        return true;
-      }
-      if (pathname === "/dataops" && key === "tab" && val === "connectivity" && !currentVal) {
-        return true;
-      }
-      if (currentVal !== val) return false;
-    }
-    return true;
+    return isSubHrefActive(pathname, searchParams, subHref);
   };
 
   return (
@@ -215,14 +71,14 @@ function MobileHeaderInner() {
         <div className="flex items-center gap-2.5 min-w-0">
           <button
             onClick={() => setDrawerOpen(!drawerOpen)}
-            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors shrink-0"
+            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors shrink-0 cursor-pointer"
             aria-label={drawerOpen ? "Close navigation menu" : "Open navigation menu"}
           >
             {drawerOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
           <Link href="/" className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-xs">
               DP
             </div>
             <div className="min-w-0">
@@ -239,7 +95,7 @@ function MobileHeaderInner() {
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={openSearch}
-            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+            className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
             aria-label="Search all content and concepts"
             title="Search"
           >
@@ -252,7 +108,7 @@ function MobileHeaderInner() {
         </div>
       </header>
 
-      {/* Slide-over Mobile Navigation Drawer */}
+      {/* Slide-over Mobile Navigation Drawer — All Pages & Subpages Always Visible */}
       {drawerOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex animate-in fade-in duration-200">
           {/* Backdrop */}
@@ -273,17 +129,17 @@ function MobileHeaderInner() {
             {/* Drawer Header */}
             <div className="flex items-center justify-between h-14 px-4 border-b border-[var(--border)]">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-xs">
                   DP
                 </div>
                 <div>
                   <div className="text-xs font-bold text-[var(--foreground)]">Navigation Menu</div>
-                  <div className="text-[10px] text-[var(--muted-foreground)]">Explore learning hubs</div>
+                  <div className="text-[10px] text-[var(--muted-foreground)]">All Hubs &amp; Subpages</div>
                 </div>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
                 aria-label="Close menu"
               >
                 <X size={18} />
@@ -297,7 +153,7 @@ function MobileHeaderInner() {
                   setDrawerOpen(false);
                   openSearch();
                 }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <Search size={14} />
@@ -307,9 +163,9 @@ function MobileHeaderInner() {
               </button>
             </div>
 
-            {/* Nav Groups List */}
+            {/* Nav Groups List — All Pages and Subpages Permanently Visible */}
             <nav className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-none">
-              {navGroups.map((group) => (
+              {NAV_GROUPS.map((group) => (
                 <div key={group.title} className="space-y-1">
                   <div className="px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                     {group.title}
@@ -333,24 +189,25 @@ function MobileHeaderInner() {
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                             )}
                           >
-                            <div className="flex items-center gap-3">
-                              <Icon size={16} className={cn(active ? "text-white" : "text-blue-500 dark:text-blue-400")} />
-                              <span>{item.label}</span>
+                            <div className="flex items-center gap-3 min-w-0">
+                              <Icon size={16} className={cn(active ? "text-white" : "text-blue-500 dark:text-blue-400 shrink-0")} />
+                              <span className="truncate">{item.label}</span>
                             </div>
-                            {item.badge && (
+                            {item.pill && (
                               <span
                                 className={cn(
-                                  "text-[10px] font-semibold px-2 py-0.5 rounded-full border",
-                                  active ? "bg-white/20 text-white border-white/30" : item.badgeColor
+                                  "text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0",
+                                  active ? "bg-white/20 text-white border-white/30" : badgeVariants[item.pill.variant]
                                 )}
                               >
-                                {item.badge}
+                                {item.pill.text}
                               </span>
                             )}
                           </Link>
 
-                          {active && item.subItems && (
-                            <div className="ml-6 my-1 space-y-0.5 border-l border-[var(--border)] pl-2.5">
+                          {/* All sub-navigation items ALWAYS visible in mobile drawer */}
+                          {item.subItems && (
+                            <div className="ml-5 my-1 space-y-0.5 border-l-2 border-[var(--border)] pl-3">
                               {item.subItems.map((sub) => {
                                 const subActive = isSubActive(sub.href);
                                 return (
@@ -359,13 +216,33 @@ function MobileHeaderInner() {
                                     href={sub.href}
                                     onClick={() => setDrawerOpen(false)}
                                     className={cn(
-                                      "block px-2 py-1 text-xs rounded-lg transition-colors truncate",
+                                      "flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-lg transition-colors truncate",
                                       subActive
-                                        ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-500/10"
+                                        ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-500/10"
                                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                                     )}
                                   >
-                                    {sub.label}
+                                    <span
+                                      className={cn(
+                                        "w-1.5 h-1.5 rounded-full shrink-0",
+                                        subActive
+                                          ? "bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.8)]"
+                                          : "bg-[var(--muted-foreground)]/40"
+                                      )}
+                                    />
+                                    <span className="truncate flex-1">{sub.label}</span>
+                                    {sub.badge && (
+                                      <span
+                                        className={cn(
+                                          "text-[9px] px-1.5 py-0.2 rounded font-medium",
+                                          subActive
+                                            ? "bg-blue-600/20 text-blue-600 dark:text-blue-300"
+                                            : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+                                        )}
+                                      >
+                                        {sub.badge}
+                                      </span>
+                                    )}
                                   </Link>
                                 );
                               })}
