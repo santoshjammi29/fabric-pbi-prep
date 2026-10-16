@@ -84,6 +84,7 @@ export const NAV_GROUPS: NavGroup[] = [
         matches: ["/concepts", "/spark-engine", "/modern-stack"],
         subItems: [
           { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "Glossary" },
+          { label: "Concepts Mind Map", href: "/concepts?view=mindmap", icon: GitBranch, badge: "Mind Map" },
           { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
           { label: "Modern Stack & FinOps", href: "/modern-stack", icon: Zap, badge: "FinOps" },
         ],

@@ -24,6 +24,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
+  GitBranch,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ import { recordLastTopic } from "@/lib/user-progress";
 import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
+import { ConceptsMindmapView } from "@/components/concepts/concepts-mindmap-view";
 
 const SmoothAccordion = dynamic(
   () => import("@/components/ui/smooth-accordion").then((mod) => mod.SmoothAccordion),
@@ -187,8 +189,14 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
+  // View Mode: 'list' | 'mindmap' | 'study'
+  const initialViewParam = searchParams.get("view");
+  const [activeView, setActiveView] = useState<"list" | "mindmap" | "study">(
+    initialViewParam === "mindmap" ? "mindmap" : initialViewParam === "study" ? "study" : "list"
+  );
+
   // Study Mode State
-  const [isStudyMode, setIsStudyMode] = useState(false);
+  const [isStudyMode, setIsStudyMode] = useState(initialViewParam === "study");
   const [studyIndex, setStudyIndex] = useState(0);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
 
@@ -215,12 +223,24 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     } catch {}
   }, []);
 
-  // Reactively synchronize URL search parameters (term, q, search, category, difficulty, card, id)
+  // Reactively synchronize URL search parameters (term, q, search, category, difficulty, card, id, view)
   useEffect(() => {
     const termParam = searchParams.get("term") || searchParams.get("q") || searchParams.get("search");
     const catParam = searchParams.get("category");
     const diffParam = searchParams.get("difficulty");
     const cardParam = searchParams.get("card") || searchParams.get("id");
+    const viewParam = searchParams.get("view");
+
+    if (viewParam === "mindmap") {
+      setActiveView("mindmap");
+      setIsStudyMode(false);
+    } else if (viewParam === "study") {
+      setActiveView("study");
+      setIsStudyMode(true);
+    } else if (viewParam === "list") {
+      setActiveView("list");
+      setIsStudyMode(false);
+    }
 
     if (termParam !== null) {
       setSearchQuery(termParam);
@@ -413,43 +433,63 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
         hubTitle="Foundations & Concepts"
         items={[
           { label: "Concepts Library", href: "/concepts", icon: BookOpen },
+          { label: "Concepts Mind Map", href: "/concepts?view=mindmap", icon: GitBranch, badge: "Multi-Level" },
           { label: "Spark Engine", href: "/spark-engine", icon: Zap },
           { label: "Modern Stack", href: "/modern-stack", icon: Layers },
         ]}
       />
 
       {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
-      <UnifiedSearchFilterBox
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Search 660+ concepts by term, keyword, or mechanism... (Press / to search)"
-        matchCount={filteredConcepts.length}
-        totalCount={initialConcepts.length}
-        countUnit="concepts"
-        themeAccent="blue"
-        hasActiveFilters={hasActiveFilters}
-        onResetAll={handleResetAllFilters}
-        actions={{
-          readAll: {
-            isActive: isReadAllMode,
-            onToggle: toggleReadAllMode,
-            shortcut: "⇧E",
-            count: filteredConcepts.length,
-          },
-          studyMode: {
-            isActive: isStudyMode,
-            onToggle: () => setIsStudyMode(!isStudyMode),
-            label: isStudyMode ? "Exit Flashcards" : "Flashcards",
-          },
-          shuffle: {
-            isShuffled,
-            onShuffle: handleShuffle,
-          },
-          expandCollapse: {
-            onExpandAll: handleExpandAll,
-            onCollapseAll: handleCollapseAll,
-          },
-        }}
+      {activeView !== "mindmap" && (
+        <UnifiedSearchFilterBox
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search 660+ concepts by term, keyword, or mechanism... (Press / to search)"
+          matchCount={filteredConcepts.length}
+          totalCount={initialConcepts.length}
+          countUnit="concepts"
+          themeAccent="blue"
+          hasActiveFilters={hasActiveFilters}
+          onResetAll={handleResetAllFilters}
+          actions={{
+            readAll: {
+              isActive: isReadAllMode,
+              onToggle: toggleReadAllMode,
+              shortcut: "⇧E",
+              count: filteredConcepts.length,
+            },
+            studyMode: {
+              isActive: isStudyMode,
+              onToggle: () => {
+                const next = !isStudyMode;
+                setIsStudyMode(next);
+                if (next) setActiveView("study");
+                else setActiveView("list");
+              },
+              label: isStudyMode ? "Exit Flashcards" : "Flashcards",
+            },
+            shuffle: {
+              isShuffled,
+              onShuffle: handleShuffle,
+            },
+            expandCollapse: {
+              onExpandAll: handleExpandAll,
+              onCollapseAll: handleCollapseAll,
+            },
+            customActions: (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveView("mindmap");
+                  setIsStudyMode(false);
+                }}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              >
+                <GitBranch size={13} className="text-blue-400" />
+                <span>Mind Map</span>
+              </button>
+            ),
+          }}
         levels={[
           {
             id: "categories",
@@ -533,10 +573,11 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             : []),
         ]}
       />
+    )}
 
-      {/* Hero Header Summary */}
+    {/* Hero Header Summary & View Mode Switcher */}
       <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-0.5">
             <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
               Enterprise Data Platform Concepts Library
@@ -545,19 +586,78 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
               Master the foundational and architectural definitions across Microsoft Fabric, Azure Databricks, Apache Airflow, Delta Lake, and Modern Data Stack.
             </p>
           </div>
-          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
-            Showing <strong className="text-[var(--foreground)]">{filteredConcepts.length}</strong> of {initialConcepts.length} concepts
+
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shrink-0 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("list");
+                setIsStudyMode(false);
+              }}
+              className={cn(
+                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                activeView === "list" && !isStudyMode
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+            >
+              <BookOpen size={13} />
+              <span>Glossary List</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("mindmap");
+                setIsStudyMode(false);
+              }}
+              className={cn(
+                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                activeView === "mindmap"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+            >
+              <GitBranch size={13} />
+              <span>Multi-Level Mind Map</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("study");
+                setIsStudyMode(true);
+              }}
+              className={cn(
+                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                isStudyMode
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+            >
+              <Sparkles size={13} />
+              <span>Flashcards</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Study Flashcard Mode */}
-      {isStudyMode && currentStudyCard && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-blue-500/30 shadow-md space-y-3.5">
-          <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
-            <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider text-[11px]">
-              Flashcard {studyIndex + 1} of {filteredConcepts.length}
-            </span>
+      {/* VIEW BRANCHING */}
+      {activeView === "mindmap" ? (
+        <ConceptsMindmapView
+          concepts={initialConcepts}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
+      ) : (
+        <>
+          {/* Study Flashcard Mode */}
+          {isStudyMode && currentStudyCard && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-blue-500/30 shadow-md space-y-3.5">
+              <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+                <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider text-[11px]">
+                  Flashcard {studyIndex + 1} of {filteredConcepts.length}
+                </span>
             <span className="font-mono text-[10px]">{currentStudyCard.category}</span>
           </div>
 
@@ -798,6 +898,8 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
           )}
         </div>
       )}
-    </div>
+    </>
+  )}
+</div>
   );
 }
