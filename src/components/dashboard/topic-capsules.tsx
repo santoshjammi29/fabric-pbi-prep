@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Sparkles, Globe } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TopicIcon } from "@/components/ui/topic-icon";
 
@@ -21,7 +21,7 @@ const topics: Topic[] = [
   { id: "fabric", label: "Fabric & OneLake", topicKey: "fabric", href: "/concepts?term=Fabric" },
   { id: "synapse-fabric", label: "Synapse & Fabric Masterclass", topicKey: "azure", href: "/modern-stack#blueprints" },
   { id: "spark", label: "Spark 4.0 Internals", topicKey: "spark", href: "/spark-engine" },
-  { id: "mindmap", label: "DE Mindmap", icon: Globe, href: "/mindmap" },
+  { id: "blueprints", label: "Whiteboard Blueprints", icon: Sparkles, href: "/architecture?tab=diagrams" },
   { id: "lakehouse", label: "Delta & Iceberg", topicKey: "datalake", href: "/modern-stack" },
   { id: "code", label: "Polyglot Practice", topicKey: "sql", href: "/code-practice" },
   { id: "ai", label: "AI & Vector RAG", topicKey: "ai", href: "/modern-stack#ai" },

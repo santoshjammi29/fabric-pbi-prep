@@ -24,7 +24,6 @@ const VALID_ROUTES = new Set([
   '/company-research',
   '/python',
   '/guided-learning',
-  '/mindmap',
   '/studio',
   '/cheat-sheet',
 ])

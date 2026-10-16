@@ -17,8 +17,8 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Always-Visible Navigation Across All Layouts", () => {
-  it("defines all 22 pages and subpages in the centralized navigation catalog", () => {
-    expect(ALL_FLAT_PAGES_AND_SUBPAGES.length).toBeGreaterThanOrEqual(21);
+  it("defines all 21 pages and subpages in the centralized navigation catalog", () => {
+    expect(ALL_FLAT_PAGES_AND_SUBPAGES.length).toBeGreaterThanOrEqual(20);
     const hrefs = ALL_FLAT_PAGES_AND_SUBPAGES.map((p) => p.href);
 
     // Verify key core subpages exist
@@ -29,7 +29,6 @@ describe("Always-Visible Navigation Across All Layouts", () => {
     expect(hrefs).toContain("/modern-stack");
     expect(hrefs).toContain("/architecture?tab=scenarios");
     expect(hrefs).toContain("/architecture?tab=diagrams");
-    expect(hrefs).toContain("/mindmap");
     expect(hrefs).toContain("/cheat-sheet");
     expect(hrefs).toContain("/code-practice?db=pyspark");
     expect(hrefs).toContain("/dataops?tab=connectivity");
@@ -48,7 +47,6 @@ describe("Always-Visible Navigation Across All Layouts", () => {
     expect(screen.getByText("Concepts Glossary")).toBeDefined();
     expect(screen.getByText("Spark Engine Lab")).toBeDefined();
     expect(screen.getByText("System Scenarios")).toBeDefined();
-    expect(screen.getByText("Interactive Mindmap")).toBeDefined();
     expect(screen.getByText("Production Cheat Sheet")).toBeDefined();
     expect(screen.getByText("PySpark Drills")).toBeDefined();
     expect(screen.getByText("Tool Connectivity & Secrets")).toBeDefined();
@@ -69,7 +67,6 @@ describe("Always-Visible Navigation Across All Layouts", () => {
     // Check subpage chips
     expect(screen.getByText("Topic Tracks")).toBeDefined();
     expect(screen.getByText("Scenarios")).toBeDefined();
-    expect(screen.getByText("Mindmap")).toBeDefined();
     expect(screen.getByText("PySpark")).toBeDefined();
     expect(screen.getByText("CI/CD Pipelines")).toBeDefined();
   });
@@ -83,7 +80,7 @@ describe("Always-Visible Navigation Across All Layouts", () => {
 
   it("correctly identifies active subpage hrefs including default parameters", () => {
     // Exact match
-    expect(isSubHrefActive("/mindmap", new URLSearchParams(), "/mindmap")).toBe(true);
+    expect(isSubHrefActive("/guided-learning", new URLSearchParams(), "/guided-learning")).toBe(true);
 
     // Query param match
     expect(isSubHrefActive("/architecture", new URLSearchParams("tab=diagrams"), "/architecture?tab=diagrams")).toBe(true);

@@ -30,9 +30,6 @@ src/
 │   ├── guided-learning/
 │   │   ├── page.tsx
 │   │   └── guided-learning-client.tsx
-│   ├── mindmap/
-│   │   ├── page.tsx
-│   │   └── mindmap-client.tsx
 │   └── studio/
 │       ├── page.tsx
 │       └── studio-client.tsx

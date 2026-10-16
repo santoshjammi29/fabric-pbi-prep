@@ -10,7 +10,7 @@
 | Document | Primary Scope | Operational Focus | Link |
 | :--- | :--- | :--- | :--- |
 | **Development & Operations Guide** | Project architecture, Server Data Layer, Vitest suite, Vercel | App Router folder layout, Zero-Bundle Data Mandate, 32 Vitest suites (298 tests), deployment lifecycle. | [`development_guide.md`](./development_guide.md) |
-| **Platform & Mindmap Roadmap** | Completed milestones & future architectural expansions | Databricks 100, 6 Delta Lake optimization levers, high-throughput in-process compute (Arrow Flight, DuckDB). | [`roadmap.md`](./roadmap.md) |
+| **Platform Engineering Roadmap** | Completed milestones & future architectural expansions | Databricks 100, 6 Delta Lake optimization levers, high-throughput in-process compute (Arrow Flight, DuckDB). | [`roadmap.md`](./roadmap.md) |
 
 ---
 

@@ -52,7 +52,7 @@ const HUB_METADATA: Record<string, HubMetadata> = {
     badge: "Principal",
     badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
     count: "3,124+ Scenarios · 32 Visuals",
-    summary: "Real-world system design scenarios, failure recovery trade-offs, whiteboard blueprints, and mindmaps.",
+    summary: "Real-world system design scenarios, failure recovery trade-offs, and whiteboard blueprints.",
     icon: Layers,
   },
   "/code-practice": {

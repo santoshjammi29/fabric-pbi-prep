@@ -42,7 +42,6 @@ The `fabric-pbi-prep` platform has undergone a total senior staff-engineer archi
 - **Above-The-Fold `priority`**: Enforced `priority={true}` and strict responsive `sizes` on all hero graphics and blueprint modals, locking **Cumulative Layout Shift (CLS) at 0.000**.
 
 ### 1.3 Fluidity: UI Engine (DOM $\rightarrow$ GPU)
-- **HTML5 Canvas 60 FPS Engine (`src/components/mindmap/mindmap-canvas-engine.tsx`)**: Replaced heavy DOM-based mindmap cards with a hardware-accelerated HTML5 `<canvas>` rendering engine. Connectors, animated bezier flow streams, and glowing particles run on the GPU via `requestAnimationFrame`.
 - **Windowed List Virtualization**: Implemented `@tanstack/react-virtual` in `/qa-prep` and `/concepts`, sustaining 60 FPS scrolling through 10,700+ items without DOM bloat.
 - **Web Worker Compute Offloading (`src/workers/compute.worker.ts`)**: Moved SIMD 4-way loop unrolled Float32Array cosine distance (1536-dim) and Spark execution simulations off the main thread into dedicated background workers.
 
@@ -70,7 +69,7 @@ Tested from global edge vantage points simulating broadband and mobile networks:
 | | **CLS** | 0.158 | **0.000** | `-100.0%` | Zero asynchronous layout shifting |
 | **Singapore (sin1)** | **TTFB** | 890 ms | **56 ms** | `-93.7%` | Geo-IP edge node termination |
 | | **LCP** | 3.75 s | **0.95 s** | `-74.7%` | 74.8% asset reduction + WebP/AVIF streaming |
-| | **FID / INP** | 104 ms | **< 16 ms** | `-84.6%` | Pure GPU Canvas rendering in InteractiveMindmap |
+| | **FID / INP** | 104 ms | **< 16 ms** | `-84.6%` | Zero-bundle client rendering with virtual DOM |
 | | **CLS** | 0.165 | **0.000** | `-100.0%` | Fixed size layout containers |
 
 ---
@@ -151,7 +150,6 @@ npx tsx scripts/migrate_to_serverless_db.ts --provider=supabase
 4. **Client-Side GPU & Worker Engine**:
    - Zero raw JSON payload bundled into client JavaScript.
    - TanStack Virtual DOM renders only visible items in viewport.
-   - HTML5 `<canvas>` GPU engine renders interactive mindmap connectors and particle streams at a locked 60 FPS.
    - Background Web Workers execute SIMD cosine similarity and Spark execution graphs off the UI thread.
 
 ---

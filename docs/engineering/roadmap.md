@@ -1,6 +1,6 @@
-# Data Engineering Mindmap & Platform — v2 Roadmap
+# Data Platform Architect — v2 Roadmap
 
-This roadmap outlines achieved milestones and future planned expansions for **Version 2.0+** of the Data Engineering Universe Mindmap and Microsoft Data Platform Architect Prep platform.
+This roadmap outlines achieved milestones and future planned expansions for **Version 2.0+** of the Data Platform Architect Prep platform.
 
 ---
 
@@ -10,14 +10,13 @@ This roadmap outlines achieved milestones and future planned expansions for **Ve
 - [x] **6 Delta Lake Optimization Levers**: Under-the-hood blueprint and 50M-row hands-on benchmarking (Partitioning, Z-Order, OPTIMIZE, Auto Optimize, Liquid Clustering, VACUUM).
 - [x] **Open Format Storage Types**: Whiteboard blueprints and technical deep-dive guide comparing Delta Lake, Apache Iceberg, Apache Hudi, Parquet, ORC, and Avro.
 - [x] **Zero-Bundle Data Architecture**: React 19 `cache()` Server Data Access Layer (DAL) with Edge SWR caching.
-- [x] **HTML5 Canvas 60 FPS Mindmap Engine**: GPU hardware-accelerated canvas rendering with fluid motion.
 - [x] **Universal Multi-Word Fuzzy Search Engine**: Sub-5ms cross-page discovery with keyboard command palette (`⌘K` / `Ctrl+K`).
 - [x] **Databricks Cheat Sheet Suite**: 48 cards with vector PDFs, printable posters, and line-by-line code breakdowns.
 - [x] **Enterprise Knowledge Base**: 6 comprehensive modules covering Synapse, Fabric, NoSQL/Vector, ETL/Streaming, FinOps, and Architectural Practice.
 
 ---
 
-## 🚀 Domain Expansions in Mindmap v2.0
+## 🚀 Domain Expansions in Platform v2.0
 
 ### 1. AI & MLOps Engineering (Primary Domain 11)
 - [x] **LLMOps & Vector Databases**: Pinecone, Qdrant, Milvus, Weaviate, pgvector

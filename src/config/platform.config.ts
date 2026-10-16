@@ -67,12 +67,6 @@ export const PLATFORM_CONFIG = {
       badge: "4-Stage Mastery",
       description: "Structured progressive learning paths from foundational concepts to principal architect level.",
     },
-    mindmap: {
-      title: "Interactive Topography Mindmap",
-      path: "/mindmap",
-      badge: "Global View",
-      description: "Infinite zoomable canvas of the complete modern data engineering ecosystem.",
-    },
     sparkEngine: {
       title: "Apache Spark Engine Lab",
       path: "/spark-engine",

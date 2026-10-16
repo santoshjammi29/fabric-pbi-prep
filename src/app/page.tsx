@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function DashboardPage() {
   const courseSchema = generateCourseSchema(
     "Enterprise Microsoft Fabric & Lakehouse Architecture Masterclass",
-    "Comprehensive preparation curriculum featuring 6,570+ technical scenarios, Spark 4.0 execution simulator, interactive architectural mindmap, and high-resolution whiteboard blueprints."
+    "Comprehensive preparation curriculum featuring 6,570+ technical scenarios, Spark 4.0 execution simulator, and high-resolution whiteboard blueprints."
   );
 
   return (

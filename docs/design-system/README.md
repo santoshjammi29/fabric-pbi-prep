@@ -10,7 +10,6 @@
 | Specification | Primary Scope | Key Standards & Implementations | Link |
 | :--- | :--- | :--- | :--- |
 | **Design Tokens & UI Primitives** | Color palette, fluid typography, 4px grid, component API | Surfaces (`base`, `raised`, `overlay`, `sunken`), `clamp()` fluid type scale, Heading/Card/Button/Badge primitives. | [`tokens_and_primitives.md`](./tokens_and_primitives.md) |
-| **Mindmap Editorial & Motion Spec** | HTML5 Canvas GPU engine, motion vocabulary, banned words | Feathers Drifting on Water motion model, locked 60 FPS requestAnimationFrame rendering, banned corporate buzzwords. | [`mindmap_editorial.md`](./mindmap_editorial.md) |
 
 ---
 

@@ -19,7 +19,6 @@ The platform is built as an enterprise-grade cloud educational portal leveraging
 │   │   ├── architecture/            # Architecture scenarios (3,200 scenarios) & 32 blueprints
 │   │   ├── code-practice/           # PySpark / Spark SQL / Python code benchmarks
 │   │   ├── cheat-sheet/             # Vector PDFs, posters, and code cards
-│   │   ├── data-engineering-mindmap/# DE.UNIVERSE HTML5 Canvas GPU mindmap
 │   │   ├── spark-engine/            # Spark memory, shuffle, Catalyst & Photon
 │   │   ├── company-research/        # 156 Hyderabad & Bangalore GCC profiles
 │   │   ├── learning-paths/          # Certification paths (DP-600, DP-203, PL-300, Databricks)
@@ -79,10 +78,7 @@ Direct client imports of `src/data/json` are prohibited. Instead, page component
 ### 3.2 TanStack Virtual List Rendering
 Lists containing hundreds or thousands of cards (`/qa-prep`, `/concepts`, `/architecture`) consume `@tanstack/react-virtual` with fixed or dynamic row heights, guaranteeing smooth 60 FPS scrolling and minimal DOM nodes.
 
-### 3.3 HTML5 Canvas 60 FPS Mindmap Engine
-The interactive mindmap (`/data-engineering-mindmap`) avoids heavy DOM trees by rendering all 250+ nodes and flowing bezier particle streams directly to an HTML5 `<canvas>` via GPU hardware acceleration.
-
-### 3.4 Web Worker Offloading
+### 3.3 Web Worker Offloading
 Heavy compute tasks (1536-dimensional vector distance calculations for RAG simulations) run in background threads (`src/workers/compute.worker.ts`), preventing main thread freezing.
 
 ---

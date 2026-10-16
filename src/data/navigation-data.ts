@@ -15,7 +15,6 @@ import {
   GitBranch,
   ShieldCheck,
   Cpu,
-  Globe,
   Route,
   Activity,
   Code2,
@@ -94,11 +93,10 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/architecture",
         icon: Layers,
         pill: { text: "Principal", variant: "architect" },
-        matches: ["/architecture", "/mindmap"],
+        matches: ["/architecture"],
         subItems: [
           { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
           { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "Visuals" },
-          { label: "Interactive Mindmap", href: "/mindmap", icon: Globe, badge: "Map" },
         ],
       },
       {
@@ -165,7 +163,6 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   // Architecture Hub
   { id: "arch-scenarios", label: "System Scenarios", shortLabel: "Scenarios", href: "/architecture?tab=scenarios", category: "Architecture", categoryColor: "purple", icon: Layers, badge: "3.1k+" },
   { id: "arch-diagrams", label: "Whiteboard Blueprints", shortLabel: "Blueprints", href: "/architecture?tab=diagrams", category: "Architecture", categoryColor: "purple", icon: Sparkles, badge: "Visuals" },
-  { id: "mindmap", label: "Interactive Mindmap", shortLabel: "Mindmap", href: "/mindmap", category: "Architecture", categoryColor: "purple", icon: Globe, badge: "Topography" },
   
   // Code & Runbooks
   { id: "cheat-sheet", label: "Production Cheat Sheet", shortLabel: "Cheat Sheet", href: "/cheat-sheet", category: "Code", categoryColor: "cyan", icon: FileCode2, badge: "Runbooks" },

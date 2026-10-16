@@ -21,7 +21,6 @@ import {
   Shuffle,
   BookOpen,
   Building2,
-  Compass,
   ArrowRight,
   Filter,
   Code2,
@@ -447,7 +446,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
         items={[
           { label: "Q&A Scenarios", href: "/qa-prep", icon: MessageSquare },
           { label: "System Design", href: "/architecture", icon: Building2 },
-          { label: "Mindmap", href: "/mindmap", icon: Compass },
         ]}
       />
 

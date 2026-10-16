@@ -25,7 +25,6 @@ import {
   ArrowRight,
   ExternalLink,
   Shuffle,
-  Globe,
   Target,
   Database,
 } from "lucide-react";
@@ -908,7 +907,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
         items={[
           { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: `${architectureData.length.toLocaleString()} Scenarios` },
           { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: `${architectureDiagrams.length}+ Visuals` },
-          { label: "Interactive Mindmap", href: "/mindmap", icon: Globe, badge: "Topography" },
         ]}
       />
 

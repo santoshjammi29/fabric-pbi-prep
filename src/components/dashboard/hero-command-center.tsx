@@ -93,17 +93,17 @@ const PILLARS: PillarItem[] = [
     borderColor: "border-purple-500/20",
     hoverBorder: "hover:border-purple-500/50",
     description:
-      "Real-world enterprise system design problems, failure recovery trade-offs, whiteboard blueprints, and infinite mindmap.",
+      "Real-world enterprise system design problems, failure recovery trade-offs, and whiteboard blueprints.",
     features: [
       "System Design Scenarios",
       "Whiteboard Blueprints Gallery",
-      "Interactive DE Mindmap",
+      "Polyglot Translation Matrix",
       "Zero-Downtime Partition Swaps",
     ],
     primaryLink: { label: "View Architecture Hub", href: "/architecture" },
     secondaryLinks: [
       { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams" },
-      { label: "Interactive Mindmap", href: "/mindmap" },
+      { label: "System Scenarios", href: "/architecture?tab=scenarios" },
     ],
   },
   {

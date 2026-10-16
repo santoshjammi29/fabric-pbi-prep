@@ -60,7 +60,6 @@ UI components, mathematical fluid typography, and hardware-accelerated canvas mo
 | Document | Primary Focus | Key Specifications | Link |
 | :--- | :--- | :--- | :--- |
 | **Design Tokens & UI Primitives** | Design Token System 2.0 (`color`, `font`, `space`) | Surface elevation, fluid type scale, Heading/Card/Button API | [`design-system/tokens_and_primitives.md`](./design-system/tokens_and_primitives.md) |
-| **Mindmap Editorial & Motion** | HTML5 Canvas GPU engine, motion models, tone | 60 FPS requestAnimationFrame canvas, banned hype words | [`design-system/mindmap_editorial.md`](./design-system/mindmap_editorial.md) |
 
 👉 **[Explore Design System Specifications](./design-system/README.md)**
 
@@ -73,7 +72,7 @@ Developer onboarding, architecture rules, testing runbooks, and strategic planni
 | Document | Primary Focus | Operational Guide | Link |
 | :--- | :--- | :--- | :--- |
 | **Development & Operations Guide** | Next.js 16 App Router, DAL, Vitest suite, Vercel | Local setup, Zero-Bundle rule, 32 Vitest suites runbook | [`engineering/development_guide.md`](./engineering/development_guide.md) |
-| **Platform & Mindmap Roadmap** | Completed milestones & v2.0+ planned expansions | Databricks 100, 6 Optimization Levers, Arrow Flight SQL | [`engineering/roadmap.md`](./engineering/roadmap.md) |
+| **Platform Engineering Roadmap** | Completed milestones & v2.0+ planned expansions | Databricks 100, 6 Optimization Levers, Arrow Flight SQL | [`engineering/roadmap.md`](./engineering/roadmap.md) |
 
 👉 **[Explore Engineering Runbooks](./engineering/README.md)**
 

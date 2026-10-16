@@ -30,7 +30,6 @@ describe("HubSubnav & E-Ink Accessibility Suite", () => {
     const archItems = [
       { label: "System Scenarios", href: "/architecture?tab=scenarios", badge: "3,124 Scenarios" },
       { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", badge: "25+ Visuals" },
-      { label: "Interactive Mindmap", href: "/mindmap", badge: "Topography" },
     ];
 
     it("activates System Scenarios by default when on /architecture without query parameters", () => {
@@ -41,11 +40,9 @@ describe("HubSubnav & E-Ink Accessibility Suite", () => {
 
       const scenariosLink = screen.getByRole("link", { name: /System Scenarios/i });
       const diagramsLink = screen.getByRole("link", { name: /Whiteboard Blueprints/i });
-      const mindmapLink = screen.getByRole("link", { name: /Interactive Mindmap/i });
 
       expect(scenariosLink.className).toContain("hub-subnav-item-active");
       expect(diagramsLink.className).toContain("hub-subnav-item-idle");
-      expect(mindmapLink.className).toContain("hub-subnav-item-idle");
     });
 
     it("activates Whiteboard Blueprints when ?tab=diagrams", () => {
@@ -58,19 +55,6 @@ describe("HubSubnav & E-Ink Accessibility Suite", () => {
       const diagramsLink = screen.getByRole("link", { name: /Whiteboard Blueprints/i });
 
       expect(diagramsLink.className).toContain("hub-subnav-item-active");
-      expect(scenariosLink.className).toContain("hub-subnav-item-idle");
-    });
-
-    it("activates Interactive Mindmap when on /mindmap path", () => {
-      mockPathname = "/mindmap";
-      mockSearchParams = new URLSearchParams();
-
-      render(<HubSubnav hubTitle="Architecture Hub" items={archItems} />);
-
-      const mindmapLink = screen.getByRole("link", { name: /Interactive Mindmap/i });
-      const scenariosLink = screen.getByRole("link", { name: /System Scenarios/i });
-
-      expect(mindmapLink.className).toContain("hub-subnav-item-active");
       expect(scenariosLink.className).toContain("hub-subnav-item-idle");
     });
 

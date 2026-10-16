@@ -100,7 +100,6 @@ All whiteboard architecture blueprints are available in high-resolution lossless
 
 - **Universal Multi-Word Fuzzy Search (`⌘K` / `Ctrl+K`)**: Cross-route discovery engine indexing all concepts, questions, blueprints, and cheat sheets simultaneously with instant keyboard navigation.
 - **Guided Learning Journeys (`/guided-learning`)**: Topic-based cross-section paths (ADF, Databricks, Fabric, Spark, Airflow, dbt, SQL Server) that aggregate concepts, code, blueprints, and questions into a single progressive roadmap.
-- **DE.UNIVERSE Mindmap (`/data-engineering-mindmap`)**: 10 primary domains, 250+ concepts, rendered via an editorial HTML5 `<canvas>` GPU engine running at a smooth 60 FPS with gentle fluid motion.
 - **Databricks 100 Day Challenge (`/concepts`)**: Structured 100-day curriculum with daily progress tracking, certification mapping, and code implementations.
 - **Architectural Blueprints Gallery (`/architecture`)**: Interactive whiteboard blueprint viewer with modal zoom, key takeaways, and direct documentation links.
 - **Code Practice Hub (`/code-practice`)**: Side-by-side PySpark, Spark SQL, and Python code benchmarks with live copyable snippets.
@@ -153,8 +152,8 @@ The complete documentation library is organized under [`docs/`](docs/README.md) 
 | :--- | :--- | :--- |
 | **[Architecture & Blueprints](docs/architecture/README.md)** | Lakehouse systems, storage engines, and production blueprints | [`01_azure_synapse.md`](docs/architecture/01_azure_synapse.md) • [`02_microsoft_fabric.md`](docs/architecture/02_microsoft_fabric.md) • [`03_nosql_vector_db.md`](docs/architecture/03_nosql_vector_db.md) • [`04_etl_stream_proc.md`](docs/architecture/04_etl_stream_proc.md) • [`05_lakehouse_finops.md`](docs/architecture/05_lakehouse_finops.md) • [`06_enterprise_blueprints.md`](docs/architecture/06_enterprise_blueprints.md) • [`07_open_storage_formats.md`](docs/architecture/07_open_storage_formats.md) • [`08_delta_optimization.md`](docs/architecture/08_delta_optimization.md) • [`knowledge_base_export.json`](docs/architecture/knowledge_base_export.json) |
 | **[Production Audits](docs/audits/README.md)** | Performance benchmarks & accessibility verifications | [`production_audit.md`](docs/audits/production_audit.md) (Edge Web Vitals & 298 Tests) • [`theme_audit.md`](docs/audits/theme_audit.md) (Theme Contrast Matrix) • [`design_system_audit.md`](docs/audits/design_system_audit.md) (Fluid Typography & Breakpoints) |
-| **[Design System](docs/design-system/README.md)** | Visual design, fluid tokens & GPU motion specs | [`tokens_and_primitives.md`](docs/design-system/tokens_and_primitives.md) (Surfaces & Clamp Typography) • [`mindmap_editorial.md`](docs/design-system/mindmap_editorial.md) (HTML5 Canvas 60 FPS Engine) |
-| **[Engineering & Operations](docs/engineering/README.md)** | Developer onboarding, testing & roadmap | [`development_guide.md`](docs/engineering/development_guide.md) (App Router DAL & Vitest Runbook) • [`roadmap.md`](docs/engineering/roadmap.md) (Platform & Mindmap Roadmap) |
+| **[Design System](docs/design-system/README.md)** | Visual design, fluid tokens & GPU motion specs | [`tokens_and_primitives.md`](docs/design-system/tokens_and_primitives.md) (Surfaces & Clamp Typography) • [`design_system_audit.md`](docs/audits/design_system_audit.md) |
+| **[Engineering & Operations](docs/engineering/README.md)** | Developer onboarding, testing & roadmap | [`development_guide.md`](docs/engineering/development_guide.md) (App Router DAL & Vitest Runbook) • [`roadmap.md`](docs/engineering/roadmap.md) (Platform Roadmap) |
 
 👉 **[Browse Full Documentation Hub (`docs/README.md`)](docs/README.md)**
 

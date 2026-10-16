@@ -1,6 +1,4 @@
-# THEME AUDIT — Fabric PBI Prep Site Theme Analysis
-
-This audit extracts the exact design tokens and computed properties from the deployed platform at `https://fabric-pbi-prep.vercel.app`. Every visual decision in the `/data-engineering-mindmap` rebuild derives directly from this contract.
+This audit extracts the exact design tokens and computed properties from the deployed platform at `https://fabric-pbi-prep.vercel.app`. Every visual component derives directly from this contract.
 
 ---
 

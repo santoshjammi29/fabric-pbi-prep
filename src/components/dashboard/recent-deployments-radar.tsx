@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   Sparkles,
   Compass,
-  Globe,
   Workflow,
   Layers,
   Cpu,
@@ -52,25 +51,6 @@ const DEPLOYMENT_HIGHLIGHTS: DeploymentHighlight[] = [
     ctaHref: "/concepts",
     icon: Compass,
     iconBg: "bg-blue-600",
-  },
-  {
-    id: "senior-mindmap",
-    badge: "Accessibility & Readability",
-    badgeColor: "bg-purple-500/10 text-purple-500 dark:text-purple-400 border-purple-500/25",
-    title: "Senior-Friendly High-Contrast Mindmap",
-    subtitle: "Large linear roadmap, text scaling, and 7 architectural pillars",
-    description:
-      "Overhauled the interactive mindmap with a natural vertical-scrolling linear roadmap mode, dynamic text size scaler (A, A+, A++), large 56px numbered stage badges (01-07), thick color-coded vectors, and solid high-contrast card backgrounds for effortless readability.",
-    keyUpdates: [
-      "Natural-scrolling linear roadmap alternative",
-      "On-demand font scaler (Normal → Large → XL)",
-      "High-contrast solid cards with thick borders",
-      "Direct interview Q&A question linking",
-    ],
-    ctaLabel: "Explore Mindmap & Roadmap",
-    ctaHref: "/mindmap",
-    icon: Globe,
-    iconBg: "bg-purple-600",
   },
   {
     id: "dataops-lifecycle",

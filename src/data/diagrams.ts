@@ -415,7 +415,7 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     category: "Platform Landscape",
     image: "/diagrams/enterprise_edge_architecture.webp",
     tags: ["Edge Computing", "Next.js", "Redis Cache", "Web Workers", "Server-Side DAL", "ISR", "Client Performance"],
-    description: "High-concurrency data platform edge architecture illustrating end-to-end data delivery across three tiers: Data Layer & Persistence (Raw Lakehouse JSONs, Server-Side DAL with React cache(), Upstash Global Redis Cache), Edge Optimization & Compute (Vercel Edge Node Proxy, SWR Edge Cache, Next.js Server Components SSG/ISR, Dynamic Semantic SEO Engine), and Client Runtime & UI (GPU-Accelerated Canvas Mindmaps, TanStack Virtual 60fps windowing, Background Web Workers for SIMD Cosine Distance & Spark Simulation).",
+    description: "High-concurrency data platform edge architecture illustrating end-to-end data delivery across three tiers: Data Layer & Persistence (Raw Lakehouse JSONs, Server-Side DAL with React cache(), Upstash Global Redis Cache), Edge Optimization & Compute (Vercel Edge Node Proxy, SWR Edge Cache, Next.js Server Components SSG/ISR, Dynamic Semantic SEO Engine), and Client Runtime & UI (TanStack Virtual 60fps windowing, Background Web Workers for SIMD Cosine Distance & Spark Simulation).",
     keyPoints: [
       "Fabric Eventstream IoT Ingestion: Eventstream Input connects to Azure Event Hubs (or Kafka) to ingest high-velocity real-time GPS telemetry from 50,000+ distributed IoT devices.",
       "Eventstream Processor In-Flight Cleansing: Performs real-time filtering, coordinate format normalization, bounding-box geo-enrichment, and invalid entry removal before landing.",

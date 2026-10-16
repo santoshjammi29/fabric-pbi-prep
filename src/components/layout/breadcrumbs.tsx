@@ -22,8 +22,6 @@ const ROUTE_LABELS: Record<string, string> = {
   "/code-practice": "Code Practice",
   "/python": "Python Data Hub",
   "/qa-prep": "Q&A Prep",
-  "/mindmap": "Interactive Mindmap",
-  "/de-mindmap": "Data Engineering Mindmap",
   "/company-research": "Company Research",
   "/studio": "My Learning Studio",
   "/guided-learning": "Guided Learning",

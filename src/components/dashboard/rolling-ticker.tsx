@@ -163,7 +163,6 @@ export function buildTickerItems(seed?: number): TickerItem[] {
   // 9. Spotlights
   const spotlights: Omit<TickerItem, "color">[] = [
     { label: "Spark Engine Simulator",       href: "/spark-engine" },
-    { label: "Data Engineering Mindmap",     href: "/mindmap" },
     { label: "Company Research Hub",         href: "/company-research" },
     { label: "Career Learning Paths",        href: "/learning-paths" },
     { label: "Medallion Architecture",       href: "/concepts?term=Medallion%20Architecture&id=lakehouse-medallion-architecture" },
