@@ -25,7 +25,7 @@ export function buildPageMetadata({
   type = "website",
 }: PageMetadataOptions): Metadata {
   const canonicalUrl = `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const fullTitle = `${title} | Microsoft Data Platform Architect Prep`;
+  const fullTitle = `${title} | DataPlatform Architect`;
 
   return {
     title: fullTitle,
@@ -48,7 +48,7 @@ export function buildPageMetadata({
       title: fullTitle,
       description,
       url: canonicalUrl,
-      siteName: "Microsoft Data Platform Architect Prep",
+      siteName: "DataPlatform Architect",
       images: [
         {
           url: ogImage,
@@ -114,7 +114,7 @@ export function generateCourseSchema(
     description: course.description,
     provider: {
       "@type": "Organization",
-      name: "Microsoft Data Platform Architect Academy",
+      name: "DataPlatform Architect",
       sameAs: SITE_URL,
     },
     url: `${SITE_URL}${course.url.startsWith("/") ? course.url : `/${course.url}`}`,

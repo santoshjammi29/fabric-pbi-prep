@@ -34,13 +34,13 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Microsoft Data Platform Architect Prep",
-    template: "%s | MS Data Platform Prep",
+    default: "DataPlatform Architect | Enterprise Fabric, Databricks & Lakehouse Prep",
+    template: "%s | DataPlatform Architect",
   },
   description:
-    "Technical interview preparation portal for Microsoft Fabric, Power BI, Databricks, and Modern Data Engineering. Study structured concepts and practice with challenging Q&As.",
+    "Enterprise interview preparation and system design portal for Microsoft Fabric, Databricks, Delta Lake, PySpark, and Modern Data Engineering. Master structured concepts, architecture blueprints, and 6,500+ architect drills.",
   openGraph: {
-    title: "Microsoft Data Platform Architect Prep",
+    title: "DataPlatform Architect | Enterprise Fabric, Databricks & Lakehouse Prep",
     description:
       "6,500+ architect-level Q&As across Fabric, Power BI, Databricks, Delta Lake, PySpark and System Design. Master the concepts that matter.",
     type: "website",
@@ -52,14 +52,19 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: "/favicon.svg",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Fabric Prep",
+    title: "DataPlatform",
   },
   formatDetection: {
     telephone: false,

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { TextSizeController } from "@/components/ui/text-size-controller";
 import { ChevronLeft } from "lucide-react";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { NAV_GROUPS, isSubHrefActive, NavItem } from "@/data/navigation-data";
 
 const pillVariants: Record<string, string> = {
@@ -58,29 +59,35 @@ function SidebarInner() {
       <div
         className={cn(
           "flex items-center h-16 px-4 border-b border-[var(--border)] shrink-0",
-          collapsed ? "justify-center" : "justify-between"
+          collapsed ? "flex-col justify-center gap-1 py-2 h-auto" : "justify-between"
         )}
       >
-        {!collapsed && (
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-xs">
-              DP
-            </div>
+        <Link
+          href="/"
+          className="flex items-center gap-3 min-w-0 group"
+          title="DataPlatform Architect - Home"
+        >
+          <BrandLogo
+            size={collapsed ? 28 : 32}
+            className="transition-transform duration-200 group-hover:scale-105"
+          />
+          {!collapsed && (
             <div className="min-w-0">
-              <h1 className="text-sm font-semibold text-[var(--foreground)] truncate">
-                MS Data Platform
+              <h1 className="text-sm font-bold text-[var(--foreground)] tracking-tight truncate group-hover:text-blue-400 transition-colors">
+                DataPlatform
               </h1>
-              <span className="text-[10px] font-medium text-[var(--muted-foreground)]">
+              <span className="text-[10px] font-medium text-[var(--muted-foreground)] block -mt-0.5">
                 Architect Prep
               </span>
             </div>
-          </div>
-        )}
+          )}
+        </Link>
         <button
           onClick={toggleCollapsed}
           className={cn(
             "p-1.5 rounded-lg hover:bg-[var(--surface-3)] transition-colors cursor-pointer",
-            "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
+            collapsed && "mt-1"
           )}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}

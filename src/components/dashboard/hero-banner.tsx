@@ -16,11 +16,11 @@ export function HeroBanner() {
         </span>
 
         <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-          <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            Microsoft Data Platform
+          <span className="bg-gradient-to-r from-sky-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+            DataPlatform Architect
           </span>
           <br />
-          Architect Preparation
+          Enterprise Fabric, Databricks &amp; Lakehouse Prep
         </h1>
 
         <p className="text-sm sm:text-base text-slate-400 max-w-2xl leading-relaxed">

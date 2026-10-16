@@ -77,7 +77,7 @@ describe("Always-Visible Navigation Across All Layouts", () => {
   it("renders AllPagesFooter with comprehensive links to all pillars and subpages", () => {
     render(<AllPagesFooter />);
 
-    expect(screen.getAllByText(/Microsoft Data Platform Architect Prep/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/DataPlatform Architect/i).length).toBeGreaterThan(0);
     expect(screen.getByText("Search Concepts & Drills")).toBeDefined();
   });
 

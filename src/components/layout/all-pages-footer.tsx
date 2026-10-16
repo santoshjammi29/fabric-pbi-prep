@@ -8,6 +8,7 @@ import { NAV_GROUPS, isSubHrefActive } from "@/data/navigation-data";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { TextSizeController } from "@/components/ui/text-size-controller";
 import { Sparkles, Terminal, ArrowUp, Search, Compass, BookOpen, Layers, FileCode2, Workflow, MessageSquare } from "lucide-react";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 function AllPagesFooterInner() {
   const pathname = usePathname();
@@ -32,15 +33,13 @@ function AllPagesFooterInner() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-10 border-b border-[var(--border)]">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                DP
-              </div>
+              <BrandLogo size={36} className="rounded-xl shadow-md" />
               <div>
                 <h3 className="font-extrabold text-base tracking-tight text-[var(--foreground)]">
-                  Microsoft Data Platform Architect Prep
+                  DataPlatform Architect
                 </h3>
                 <p className="text-xs text-[var(--muted-foreground)]">
-                  Enterprise Mastery for Microsoft Fabric, Databricks, Spark 4.0, Delta Lake &amp; DataOps
+                  Enterprise Fabric, Databricks &amp; Lakehouse Prep · 6,500+ Architecture Drills
                 </p>
               </div>
             </div>
@@ -127,7 +126,7 @@ function AllPagesFooterInner() {
         {/* Bottom Accessibility & Theme Controller Strip */}
         <div className="pt-8 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--muted-foreground)]">
           <div className="flex flex-wrap items-center gap-4">
-            <span>© 2026 Microsoft Data Platform Architect Prep</span>
+            <span>© 2026 DataPlatform Architect</span>
             <span>•</span>
             <Link href="/" className="hover:text-[var(--foreground)]">Home</Link>
             <Link href="/concepts" className="hover:text-[var(--foreground)]">Concepts</Link>

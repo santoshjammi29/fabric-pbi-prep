@@ -8,6 +8,7 @@ import { ThemeCycleButton, ThemeSegmentedPills } from "@/components/ui/theme-swi
 import { TextSizeQuickToggle, TextSizeSegmentedPills } from "@/components/ui/text-size-controller";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { Search, Menu, X } from "lucide-react";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { cn } from "@/lib/utils";
 import { NAV_GROUPS, isSubHrefActive } from "@/data/navigation-data";
 
@@ -77,13 +78,11 @@ function MobileHeaderInner() {
             {drawerOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <Link href="/" className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-xs">
-              DP
-            </div>
+          <Link href="/" className="flex items-center gap-2.5 min-w-0" title="DataPlatform Architect">
+            <BrandLogo size={28} className="rounded-lg shadow-xs" />
             <div className="min-w-0">
-              <h2 className="text-xs sm:text-sm font-semibold text-[var(--foreground)] leading-tight truncate">
-                MS Data Platform
+              <h2 className="text-xs sm:text-sm font-bold text-[var(--foreground)] leading-tight truncate">
+                DataPlatform
               </h2>
               <span className="text-[9px] sm:text-[10px] font-medium text-[var(--muted-foreground)] block -mt-0.5">
                 Architect Prep
@@ -129,12 +128,10 @@ function MobileHeaderInner() {
             {/* Drawer Header */}
             <div className="flex items-center justify-between h-14 px-4 border-b border-[var(--border)]">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-xs">
-                  DP
-                </div>
+                <BrandLogo size={28} className="rounded-lg shadow-xs" />
                 <div>
-                  <div className="text-xs font-bold text-[var(--foreground)]">Navigation Menu</div>
-                  <div className="text-[10px] text-[var(--muted-foreground)]">All Hubs &amp; Subpages</div>
+                  <div className="text-xs font-bold text-[var(--foreground)]">DataPlatform Architect</div>
+                  <div className="text-[10px] text-[var(--muted-foreground)]">Enterprise Learning System</div>
                 </div>
               </div>
               <button
