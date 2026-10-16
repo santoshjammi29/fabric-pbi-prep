@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
+import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import { architectureDiagrams } from "@/data/diagrams";
 import { ArchitectureDiagramsGallery } from "@/components/architecture/diagrams-gallery";
 import {
@@ -900,6 +901,47 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     toast.success("Direct link to runbook copied!");
   };
 
+  const archCategoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const item of architectureData) {
+      counts[item.category] = (counts[item.category] || 0) + 1;
+    }
+    return counts;
+  }, []);
+
+  const hasActiveScenarioFilters =
+    selectedCategory !== "ALL" ||
+    selectedDifficulty !== "ALL" ||
+    searchQuery.trim().length > 0;
+
+  const handleResetScenarioFilters = useCallback(() => {
+    setSelectedCategory("ALL");
+    setSelectedDifficulty("ALL");
+    setSearchQuery("");
+    setIsShuffled(false);
+    setVisibleCount(initialBatch);
+    updateUrlParam("category", "ALL");
+    updateUrlParam("difficulty", "ALL");
+    toast.info("Reset all scenario filters");
+  }, [initialBatch, updateUrlParam]);
+
+  const hasActivePyFilters =
+    selectedPyFramework !== "all" ||
+    selectedPyDomain !== "all" ||
+    selectedPyLevel !== "all" ||
+    showPyBookmarksOnly ||
+    pySearch.trim().length > 0;
+
+  const handleResetPyFilters = useCallback(() => {
+    setSelectedPyFramework("all");
+    setSelectedPyDomain("all");
+    setSelectedPyLevel("all");
+    setShowPyBookmarksOnly(false);
+    setPySearch("");
+    setPyPage(1);
+    toast.info("Reset all runbook filters");
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-4 pb-16 animate-in fade-in duration-300">
       <HubSubnav
@@ -950,267 +992,167 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
         })}
       </div>
 
-      {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK (ACTIVE PER TAB) */}
+      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX (ACTIVE PER TAB) ─── */}
       {activeTab === "scenarios" && (
-        <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-          {/* LINE 1: SPEC / CATEGORY SLICERS */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-              <Filter size={11} /> Specs:
-            </span>
-            <button
-              onClick={() => {
-                setSelectedCategory("ALL");
+        <UnifiedSearchFilterBox
+          searchQuery={searchQuery}
+          onSearchChange={(val) => {
+            setSearchQuery(val);
+            setVisibleCount(initialBatch);
+          }}
+          searchPlaceholder="Search 3,080+ architecture blueprints (e.g., Vitess, Spanner TrueTime, Little's Law)... (Press / to search)"
+          matchCount={filteredItems.length}
+          totalCount={architectureData.length}
+          countUnit="scenarios"
+          themeAccent="purple"
+          hasActiveFilters={hasActiveScenarioFilters}
+          onResetAll={handleResetScenarioFilters}
+          actions={{
+            readAll: {
+              isActive: isReadAllMode,
+              onToggle: toggleReadAllScenarios,
+              shortcut: "⇧E",
+              count: filteredItems.length,
+            },
+            shuffle: {
+              isShuffled,
+              onShuffle: handleShuffle,
+            },
+            expandCollapse: {
+              onExpandAll: handleExpandAllScenarios,
+              onCollapseAll: handleCollapseAllScenarios,
+            },
+          }}
+          levels={[
+            {
+              id: "specs",
+              title: "Level 1: Blueprint Specifications",
+              shortTitle: "Specs",
+              icon: <Filter size={13} className="text-purple-400" />,
+              layout: "chips",
+              accentColor: "purple",
+              selectedId: selectedCategory,
+              onSelect: (cat) => {
+                setSelectedCategory(cat);
                 setVisibleCount(initialBatch);
-                updateUrlParam("category", "ALL");
-              }}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-                selectedCategory === "ALL"
-                  ? "bg-purple-600 border-purple-500 text-white shadow-xs"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-            >
-              ⚡ All {categories.length - 1} Specs ({architectureData.length})
-            </button>
-            {categories.filter((cat) => cat !== "ALL").map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setSelectedCategory(cat);
-                  setVisibleCount(initialBatch);
-                  updateUrlParam("category", cat);
-                }}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-                  selectedCategory === cat
-                    ? "bg-purple-600 border-purple-500 text-white shadow-xs"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* LINE 2: SEARCH FILTER + DIFFICULTY SLICERS + SHUFFLE + EXPAND/COLLAPSE */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
-            <div className="relative flex-1">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setVisibleCount(initialBatch);
-                }}
-                placeholder="Search 3,080+ architecture blueprints (e.g., Vitess, Spanner TrueTime, Little's Law)..."
-                className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setVisibleCount(initialBatch);
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
-              {/* Difficulty Selector */}
-              <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                {["ALL", "ARCHITECT", "HARD", "MEDIUM", "EASY"].map((diff) => (
-                  <button
-                    key={diff}
-                    onClick={() => {
-                      setSelectedDifficulty(diff);
+                updateUrlParam("category", cat);
+              },
+              options: [
+                {
+                  id: "ALL",
+                  label: `⚡ All ${categories.length - 1} Specs`,
+                  count: architectureData.length,
+                },
+                ...categories
+                  .filter((cat) => cat !== "ALL")
+                  .map((cat) => ({
+                    id: cat,
+                    label: cat,
+                    count: archCategoryCounts[cat] || 0,
+                  })),
+              ],
+            },
+            {
+              id: "difficulty",
+              title: "Level 2: Difficulty Calibration",
+              shortTitle: "Difficulty",
+              icon: <Sparkles size={13} className="text-amber-400" />,
+              layout: "segmented",
+              selectedId: selectedDifficulty,
+              onSelect: (diff) => {
+                setSelectedDifficulty(diff);
+                setVisibleCount(initialBatch);
+                updateUrlParam("difficulty", diff);
+              },
+              options: [
+                { id: "ALL", label: "ALL" },
+                { id: "ARCHITECT", label: "ARCH" },
+                { id: "HARD", label: "HARD" },
+                { id: "MEDIUM", label: "MEDIUM" },
+                { id: "EASY", label: "EASY" },
+              ],
+            },
+          ]}
+          activeFilters={[
+            ...(isReadAllMode
+              ? [
+                  {
+                    id: "readall",
+                    label: `Read All Mode Active (${filteredItems.length.toLocaleString()} Scenarios)`,
+                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
+                    onRemove: handleCollapseAllScenarios,
+                  },
+                ]
+              : []),
+            ...(selectedCategory !== "ALL"
+              ? [
+                  {
+                    id: "category",
+                    label: `Spec: ${selectedCategory}`,
+                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                    onRemove: () => {
+                      setSelectedCategory("ALL");
                       setVisibleCount(initialBatch);
-                      updateUrlParam("difficulty", diff);
-                    }}
-                    className={cn(
-                      "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
-                      selectedDifficulty === diff
-                        ? "bg-purple-600 text-white shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                    )}
-                  >
-                    {diff === "ALL" ? "ALL" : diff}
-                  </button>
-                ))}
-              </div>
-
-              {/* Shuffle Button */}
-              <button
-                onClick={handleShuffle}
-                className={cn(
-                  "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                  isShuffled
-                    ? "bg-purple-600 border-purple-500 text-white"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                )}
-                title="Shuffle or randomize architecture scenarios"
-              >
-                <Shuffle size={12} className={cn(isShuffled && "rotate-180 transition-transform")} />
-                <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
-              </button>
-
-              {/* Read All / Continuous Reading Mode Toggle */}
-              <button
-                onClick={toggleReadAllScenarios}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                  isReadAllMode
-                    ? "bg-emerald-600 hover:bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20 shadow-md ring-2 ring-emerald-500/30"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                )}
-                title="Toggle continuous reading mode for all scenarios (Shift + E)"
-              >
-                <BookOpen size={13} className={cn(isReadAllMode && "animate-pulse")} />
-                <span>{isReadAllMode ? "Exit Read All" : "Read All"}</span>
-                <kbd className="hidden md:inline-block text-[10px] px-1 py-0.5 rounded bg-black/20 text-current border border-white/20 font-mono">
-                  ⇧E
-                </kbd>
-              </button>
-
-              {/* Expand / Collapse All */}
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={handleExpandAllScenarios}
-                  className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
-                  title="Expand all scenario cards"
-                >
-                  Expand All
-                </button>
-                <button
-                  onClick={handleCollapseAllScenarios}
-                  className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
-                  title="Collapse all scenario cards"
-                >
-                  Collapse All
-                </button>
-              </div>
-
-              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
-                <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> scenarios
-              </span>
-            </div>
-          </div>
-        </div>
+                      updateUrlParam("category", "ALL");
+                    },
+                  },
+                ]
+              : []),
+            ...(selectedDifficulty !== "ALL"
+              ? [
+                  {
+                    id: "difficulty",
+                    label: `Difficulty: ${selectedDifficulty}`,
+                    color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                    onRemove: () => {
+                      setSelectedDifficulty("ALL");
+                      setVisibleCount(initialBatch);
+                      updateUrlParam("difficulty", "ALL");
+                    },
+                  },
+                ]
+              : []),
+            ...(searchQuery.trim().length > 0
+              ? [
+                  {
+                    id: "search",
+                    label: `Search: "${searchQuery}"`,
+                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                    onRemove: () => {
+                      setSearchQuery("");
+                      setVisibleCount(initialBatch);
+                    },
+                  },
+                ]
+              : []),
+          ]}
+        />
       )}
 
       {activeTab === "python" && (
-        <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-          {/* LINE 1: FRAMEWORK & DOMAIN SLICERS */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-              <Terminal size={11} /> Engines:
-            </span>
-            {FRAMEWORKS.map((fw) => (
+        <UnifiedSearchFilterBox
+          searchQuery={pySearch}
+          onSearchChange={(val) => {
+            setPySearch(val);
+            setPyPage(1);
+          }}
+          searchPlaceholder="Search Python runbooks (e.g., streaming, deltalake, asyncio, tracemalloc)... (Press / to search)"
+          matchCount={filteredRunbooks.length}
+          totalCount={pythonData.length}
+          countUnit="runbooks"
+          themeAccent="cyan"
+          hasActiveFilters={hasActivePyFilters}
+          onResetAll={handleResetPyFilters}
+          actions={{
+            customActions: (
               <button
-                key={fw.id}
-                onClick={() => {
-                  setSelectedPyFramework(fw.id);
-                  setPyPage(1);
-                }}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
-                  selectedPyFramework === fw.id
-                    ? "bg-cyan-600 border-cyan-500 text-white shadow-xs"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-              >
-                {fw.topicKey ? (
-                  <TopicIcon topic={fw.topicKey} size={12} />
-                ) : (
-                  <Sparkles size={11} className="text-cyan-400" />
-                )}
-                <span>{fw.label}</span>
-              </button>
-            ))}
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mx-1 flex items-center gap-1">
-              <Filter size={11} /> Domain:
-            </span>
-            {pyDomains.map((dom) => (
-              <button
-                key={dom}
-                onClick={() => {
-                  setSelectedPyDomain(dom);
-                  setPyPage(1);
-                }}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-                  selectedPyDomain === dom
-                    ? "bg-purple-600 border-purple-500 text-white shadow-xs"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-              >
-                {dom === "all" ? "⚡ All Domains" : dom}
-              </button>
-            ))}
-          </div>
-
-          {/* LINE 2: SEARCH FILTER + LEVEL SLICERS + BOOKMARKS TOGGLE */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
-            <div className="relative flex-1">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
-              <input
-                type="text"
-                value={pySearch}
-                onChange={(e) => {
-                  setPySearch(e.target.value);
-                  setPyPage(1);
-                }}
-                placeholder="Search Python runbooks (e.g., streaming, deltalake, asyncio, tracemalloc)..."
-                className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
-              />
-              {pySearch && (
-                <button
-                  onClick={() => {
-                    setPySearch("");
-                    setPyPage(1);
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
-              {/* Level Selector */}
-              <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                {PYTHON_LEVELS.map((lvl) => (
-                  <button
-                    key={lvl.id}
-                    onClick={() => {
-                      setSelectedPyLevel(lvl.id);
-                      setPyPage(1);
-                      updateUrlParam("level", lvl.id);
-                    }}
-                    className={cn(
-                      "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap capitalize",
-                      selectedPyLevel === lvl.id
-                        ? "bg-cyan-600 text-white shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                    )}
-                  >
-                    {lvl.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Bookmarks Toggle */}
-              <button
+                type="button"
                 onClick={() => {
                   setShowPyBookmarksOnly(!showPyBookmarksOnly);
                   setPyPage(1);
                 }}
                 className={cn(
-                  "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
                   showPyBookmarksOnly
                     ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                     : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
@@ -1219,13 +1161,135 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                 {showPyBookmarksOnly ? <BookmarkCheck size={13} /> : <Bookmark size={13} />}
                 <span>Saved ({pyBookmarks.length})</span>
               </button>
-
-              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
-                <strong className="text-[var(--foreground)]">{filteredRunbooks.length}</strong> runbooks
-              </span>
-            </div>
-          </div>
-        </div>
+            ),
+          }}
+          levels={[
+            {
+              id: "engines",
+              title: "Level 1: Execution Engines & Frameworks",
+              shortTitle: "Engines",
+              icon: <Terminal size={13} className="text-cyan-400" />,
+              layout: "chips",
+              accentColor: "cyan",
+              selectedId: selectedPyFramework,
+              onSelect: (id) => {
+                setSelectedPyFramework(id as FrameworkKey);
+                setPyPage(1);
+              },
+              options: FRAMEWORKS.map((fw) => ({
+                id: fw.id,
+                label: fw.label,
+                icon: fw.topicKey ? (
+                  <TopicIcon topic={fw.topicKey} size={12} />
+                ) : (
+                  <Sparkles size={11} className="text-cyan-400" />
+                ),
+              })),
+            },
+            {
+              id: "domains",
+              title: "Level 2: Problem Domains & Architectures",
+              shortTitle: "Domains",
+              icon: <Filter size={13} className="text-purple-400" />,
+              layout: "chips",
+              accentColor: "purple",
+              selectedId: selectedPyDomain,
+              onSelect: (dom) => {
+                setSelectedPyDomain(dom);
+                setPyPage(1);
+              },
+              options: pyDomains.map((dom) => ({
+                id: dom,
+                label: dom === "all" ? "⚡ All Domains" : dom,
+              })),
+            },
+            {
+              id: "level",
+              title: "Level 3: Experience Level",
+              shortTitle: "Level",
+              icon: <Sparkles size={13} className="text-amber-400" />,
+              layout: "segmented",
+              selectedId: selectedPyLevel,
+              onSelect: (lvl) => {
+                setSelectedPyLevel(lvl as CodeLevel | "all");
+                setPyPage(1);
+                updateUrlParam("level", lvl);
+              },
+              options: PYTHON_LEVELS.map((lvl) => ({
+                id: lvl.id,
+                label: lvl.label,
+              })),
+            },
+          ]}
+          activeFilters={[
+            ...(selectedPyFramework !== "all"
+              ? [
+                  {
+                    id: "framework",
+                    label: `Engine: ${FRAMEWORKS.find((f) => f.id === selectedPyFramework)?.label || selectedPyFramework}`,
+                    color: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
+                    onRemove: () => {
+                      setSelectedPyFramework("all");
+                      setPyPage(1);
+                    },
+                  },
+                ]
+              : []),
+            ...(selectedPyDomain !== "all"
+              ? [
+                  {
+                    id: "domain",
+                    label: `Domain: ${selectedPyDomain}`,
+                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                    onRemove: () => {
+                      setSelectedPyDomain("all");
+                      setPyPage(1);
+                    },
+                  },
+                ]
+              : []),
+            ...(selectedPyLevel !== "all"
+              ? [
+                  {
+                    id: "level",
+                    label: `Level: ${selectedPyLevel}`,
+                    color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                    onRemove: () => {
+                      setSelectedPyLevel("all");
+                      setPyPage(1);
+                      updateUrlParam("level", "all");
+                    },
+                  },
+                ]
+              : []),
+            ...(showPyBookmarksOnly
+              ? [
+                  {
+                    id: "bookmarks",
+                    label: `Bookmarks Only (${pyBookmarks.length})`,
+                    color: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+                    onRemove: () => {
+                      setShowPyBookmarksOnly(false);
+                      setPyPage(1);
+                    },
+                  },
+                ]
+              : []),
+            ...(pySearch.trim().length > 0
+              ? [
+                  {
+                    id: "search",
+                    label: `Search: "${pySearch}"`,
+                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                    onRemove: () => {
+                      setPySearch("");
+                      setPyPage(1);
+                    },
+                  },
+                ]
+              : []),
+          ]}
+        />
       )}
 
       {/* Header Hub Banner Summary */}

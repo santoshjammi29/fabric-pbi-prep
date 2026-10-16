@@ -33,6 +33,7 @@ import dynamic from "next/dynamic";
 import { recordLastTopic } from "@/lib/user-progress";
 import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
+import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 
 const SmoothAccordion = dynamic(
   () => import("@/components/ui/smooth-accordion").then((mod) => mod.SmoothAccordion),
@@ -385,6 +386,27 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
   const currentStudyCard = filteredConcepts[studyIndex];
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of initialConcepts) {
+      counts[c.category] = (counts[c.category] || 0) + 1;
+    }
+    return counts;
+  }, [initialConcepts]);
+
+  const hasActiveFilters =
+    selectedCategory !== "ALL" ||
+    selectedDifficulty !== "ALL" ||
+    searchQuery.trim().length > 0;
+
+  const handleResetAllFilters = useCallback(() => {
+    setSelectedCategory("ALL");
+    setSelectedDifficulty("ALL");
+    setSearchQuery("");
+    setIsShuffled(false);
+    toast.info("Reset all filters");
+  }, []);
+
   return (
     <div className="space-y-4 pb-16">
       <HubSubnav
@@ -396,142 +418,121 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
         ]}
       />
 
-      {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK */}
-      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-        {/* LINE 1: CATEGORY SLICERS */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-            <Filter size={11} /> Categories:
-          </span>
-          <button
-            onClick={() => setSelectedCategory("ALL")}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-              selectedCategory === "ALL"
-                ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-            )}
-          >
-            All Domains ({initialConcepts.length})
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
-                selectedCategory === cat
-                  ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* LINE 2: SEARCH FILTER + DIFFICULTY SLICERS + FLASHCARDS BUTTON */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
-          <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search concepts by term, keyword, or mechanism..."
-              className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
-            {/* Difficulty Selector */}
-            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
-                <button
-                  key={diff}
-                  onClick={() => setSelectedDifficulty(diff)}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
-                    selectedDifficulty === diff
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  {diff}
-                </button>
-              ))}
-            </div>
-
-            {/* Read All / Continuous Reading Mode Controls */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={toggleReadAllMode}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                  isReadAllMode
-                    ? "bg-emerald-600 border-emerald-500 text-white shadow-emerald-500/20"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                )}
-                title="Toggle Read All mode: view all definitions and architectural key points continuously (Shortcut: Shift + E)"
-              >
-                <BookOpen size={13} />
-                <span>{isReadAllMode ? "Reading All" : "Read All"}</span>
-                {isReadAllMode && (
-                  <span className="ml-0.5 px-1.5 py-0.2 bg-emerald-700/80 rounded-full text-[10px] font-bold">
-                    ON
-                  </span>
-                )}
-              </button>
-
-              <div className="hidden sm:flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <button
-                  type="button"
-                  onClick={handleExpandAll}
-                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
-                  title="Expand all concepts"
-                >
-                  Expand All
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCollapseAll}
-                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
-                  title="Collapse all concepts"
-                >
-                  Collapse All
-                </button>
-              </div>
-            </div>
-
-            {/* Study Mode Flashcard Button */}
-            <button
-              onClick={() => setIsStudyMode(!isStudyMode)}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                isStudyMode
-                  ? "bg-purple-600 border-purple-500 text-white"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <Zap size={13} />
-              <span>{isStudyMode ? "Exit Flashcards" : "Flashcards"}</span>
-            </button>
-
-            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
-              <strong className="text-[var(--foreground)]">{filteredConcepts.length}</strong> concepts
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
+      <UnifiedSearchFilterBox
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search 660+ concepts by term, keyword, or mechanism... (Press / to search)"
+        matchCount={filteredConcepts.length}
+        totalCount={initialConcepts.length}
+        countUnit="concepts"
+        themeAccent="blue"
+        hasActiveFilters={hasActiveFilters}
+        onResetAll={handleResetAllFilters}
+        actions={{
+          readAll: {
+            isActive: isReadAllMode,
+            onToggle: toggleReadAllMode,
+            shortcut: "⇧E",
+            count: filteredConcepts.length,
+          },
+          studyMode: {
+            isActive: isStudyMode,
+            onToggle: () => setIsStudyMode(!isStudyMode),
+            label: isStudyMode ? "Exit Flashcards" : "Flashcards",
+          },
+          shuffle: {
+            isShuffled,
+            onShuffle: handleShuffle,
+          },
+          expandCollapse: {
+            onExpandAll: handleExpandAll,
+            onCollapseAll: handleCollapseAll,
+          },
+        }}
+        levels={[
+          {
+            id: "categories",
+            title: "Level 1: Concept Categories & Domains",
+            shortTitle: "Categories",
+            icon: <Filter size={13} className="text-blue-500" />,
+            layout: "chips",
+            accentColor: "blue",
+            selectedId: selectedCategory,
+            onSelect: (id) => setSelectedCategory(id),
+            options: [
+              {
+                id: "ALL",
+                label: "All Domains",
+                count: initialConcepts.length,
+              },
+              ...categories.map((cat) => ({
+                id: cat,
+                label: cat,
+                count: categoryCounts[cat] || 0,
+              })),
+            ],
+          },
+          {
+            id: "difficulty",
+            title: "Level 2: Difficulty Calibration",
+            shortTitle: "Difficulty",
+            icon: <Sparkles size={13} className="text-amber-400" />,
+            layout: "segmented",
+            selectedId: selectedDifficulty,
+            onSelect: (id) => setSelectedDifficulty(id),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "EASY", label: "EASY" },
+              { id: "MEDIUM", label: "MEDIUM" },
+              { id: "HARD", label: "HARD" },
+              { id: "ARCHITECT", label: "ARCH" },
+            ],
+          },
+        ]}
+        activeFilters={[
+          ...(isReadAllMode
+            ? [
+                {
+                  id: "readall",
+                  label: `Read All Mode Active (${filteredConcepts.length} Concepts)`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
+                  onRemove: handleCollapseAll,
+                },
+              ]
+            : []),
+          ...(selectedCategory !== "ALL"
+            ? [
+                {
+                  id: "category",
+                  label: `Category: ${selectedCategory}`,
+                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+                  onRemove: () => setSelectedCategory("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedDifficulty !== "ALL"
+            ? [
+                {
+                  id: "difficulty",
+                  label: `Difficulty: ${selectedDifficulty}`,
+                  color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                  onRemove: () => setSelectedDifficulty("ALL"),
+                },
+              ]
+            : []),
+          ...(searchQuery.trim().length > 0
+            ? [
+                {
+                  id: "search",
+                  label: `Search: "${searchQuery}"`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                  onRemove: () => setSearchQuery(""),
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {/* Hero Header Summary */}
       <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">

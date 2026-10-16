@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
+import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import type { CompanyProfile, CompanyTier } from "@/types/data";
 
 const POPULAR_TECHS = [
@@ -269,163 +270,147 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
         </div>
       </div>
 
-      {/* Search & Tier Filters */}
-      <div className="space-y-2.5">
-        {/* Row 1: Search Input & Tier Tabs */}
-        <div className="flex flex-col md:flex-row gap-2.5">
-          <div className="relative flex-1">
-            <Search
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setVisibleCount(ITEMS_PER_PAGE);
-              }}
-              placeholder="Search by company, tech (e.g. Databricks, Flink, Iceberg), hub, or interview topic..."
-              className="w-full pl-9 pr-8 py-1.5 sm:py-2 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                aria-label="Clear search"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          {/* Tier Switcher */}
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-0.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shrink-0">
-            {[
-              { key: "ALL", label: "All Companies", count: tierCounts.ALL },
+      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
+      <UnifiedSearchFilterBox
+        searchQuery={searchQuery}
+        onSearchChange={(val) => {
+          setSearchQuery(val);
+          setVisibleCount(ITEMS_PER_PAGE);
+        }}
+        searchPlaceholder="Search 156+ companies by name, tech (e.g. Databricks, Flink, Iceberg), hub, or interview topic... (Press / to search)"
+        matchCount={filteredCompanies.length}
+        totalCount={initialProfiles.length}
+        countUnit="companies"
+        themeAccent="blue"
+        hasActiveFilters={
+          selectedTier !== "ALL" ||
+          selectedTech !== "All" ||
+          selectedHub !== "All Hubs" ||
+          searchQuery.trim().length > 0
+        }
+        onResetAll={handleResetFilters}
+        levels={[
+          {
+            id: "tier",
+            title: "Level 1: Enterprise Company Tier",
+            shortTitle: "Tier",
+            icon: <TrendingUp size={13} className="text-blue-500" />,
+            layout: "chips",
+            accentColor: "blue",
+            selectedId: selectedTier,
+            onSelect: (key) => {
+              setSelectedTier(key);
+              setVisibleCount(ITEMS_PER_PAGE);
+            },
+            options: [
+              { id: "ALL", label: "All Companies", count: tierCounts.ALL },
               {
-                key: "Tier 1 FAANG / BigTech",
+                id: "Tier 1 FAANG / BigTech",
                 label: "Tier 1 BigTech",
                 count: tierCounts["Tier 1 FAANG / BigTech"],
               },
               {
-                key: "Tier 1 Global FinTech",
+                id: "Tier 1 Global FinTech",
                 label: "Tier 1 FinTech",
                 count: tierCounts["Tier 1 Global FinTech"],
               },
               {
-                key: "Global Capability Center (GCC)",
+                id: "Global Capability Center (GCC)",
                 label: "Enterprise GCCs",
                 count: tierCounts["Global Capability Center (GCC)"],
               },
-            ].map((t) => (
-              <button
-                key={t.key}
-                onClick={() => {
-                  setSelectedTier(t.key);
-                  setVisibleCount(ITEMS_PER_PAGE);
-                }}
-                className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 whitespace-nowrap cursor-pointer",
-                  selectedTier === t.key
-                    ? "bg-blue-600 text-white shadow-xs font-semibold"
-                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                )}
-              >
-                <span>{t.label}</span>
-                <span
-                  className={cn(
-                    "text-[10px] px-1.5 py-0.2 rounded-full font-mono",
-                    selectedTier === t.key
-                      ? "bg-white/20 text-white"
-                      : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
-                  )}
-                >
-                  {t.count}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Row 2: Secondary Quick Filters (Tech Stack & Hiring Hubs) */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-0.5 text-xs">
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full sm:w-auto py-0.5">
-            <span className="text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-              <SlidersHorizontal size={11} /> Tech:
-            </span>
-            {POPULAR_TECHS.map((tech) => (
-              <button
-                key={tech}
-                onClick={() => {
-                  setSelectedTech(tech);
-                  setVisibleCount(ITEMS_PER_PAGE);
-                }}
-                className={cn(
-                  "px-2 py-0.5 rounded-md text-[11px] font-medium transition-all shrink-0 whitespace-nowrap border cursor-pointer",
-                  selectedTech === tech
-                    ? "bg-blue-600 text-white border-blue-500 shadow-xs font-semibold"
-                    : "bg-[var(--surface-1)] text-[var(--muted-foreground)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
-                )}
-              >
-                {tech}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full sm:w-auto shrink-0 py-0.5">
-            <span className="text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
-              <MapPin size={11} /> Hub:
-            </span>
-            {TOP_HUBS.map((hub) => (
-              <button
-                key={hub}
-                onClick={() => {
-                  setSelectedHub(hub);
-                  setVisibleCount(ITEMS_PER_PAGE);
-                }}
-                className={cn(
-                  "px-2 py-0.5 rounded-md text-[11px] font-medium transition-all shrink-0 whitespace-nowrap border cursor-pointer",
-                  selectedHub === hub
-                    ? "bg-cyan-600 text-white border-cyan-500 shadow-xs font-semibold"
-                    : "bg-[var(--surface-1)] text-[var(--muted-foreground)] border-[var(--border)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
-                )}
-              >
-                {hub}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Results summary & Active filter reset */}
-        <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] px-1">
-          <div>
-            Showing <strong className="text-[var(--foreground)]">{displayedCompanies.length}</strong> of{" "}
-            <strong className="text-[var(--foreground)]">{filteredCompanies.length}</strong> companies
-            {selectedTier !== "ALL" && (
-              <span> in <span className="text-blue-500 dark:text-blue-400 font-medium">{selectedTier}</span></span>
-            )}
-            {selectedTech !== "All" && (
-              <span> with <span className="text-blue-500 dark:text-blue-400 font-medium">{selectedTech}</span></span>
-            )}
-            {selectedHub !== "All Hubs" && (
-              <span> in <span className="text-cyan-500 dark:text-cyan-400 font-medium">{selectedHub}</span></span>
-            )}
-          </div>
-
-          {(selectedTier !== "ALL" ||
-            selectedTech !== "All" ||
-            selectedHub !== "All Hubs" ||
-            searchQuery) && (
-            <button
-              onClick={handleResetFilters}
-              className="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 underline font-medium cursor-pointer"
-            >
-              Reset all filters
-            </button>
-          )}
-        </div>
-      </div>
+            ],
+          },
+          {
+            id: "tech",
+            title: "Level 2: Target Technology Stacks",
+            shortTitle: "Tech Stack",
+            icon: <SlidersHorizontal size={13} className="text-purple-400" />,
+            layout: "chips",
+            accentColor: "purple",
+            selectedId: selectedTech,
+            onSelect: (tech) => {
+              setSelectedTech(tech);
+              setVisibleCount(ITEMS_PER_PAGE);
+            },
+            options: POPULAR_TECHS.map((tech) => ({
+              id: tech,
+              label: tech === "All" ? "All Tech Stacks" : tech,
+            })),
+          },
+          {
+            id: "hub",
+            title: "Level 3: Global Capability Hub Locations",
+            shortTitle: "Hubs",
+            icon: <MapPin size={13} className="text-cyan-400" />,
+            layout: "chips",
+            accentColor: "cyan",
+            selectedId: selectedHub,
+            onSelect: (hub) => {
+              setSelectedHub(hub);
+              setVisibleCount(ITEMS_PER_PAGE);
+            },
+            options: TOP_HUBS.map((hub) => ({
+              id: hub,
+              label: hub,
+            })),
+          },
+        ]}
+        activeFilters={[
+          ...(selectedTier !== "ALL"
+            ? [
+                {
+                  id: "tier",
+                  label: `Tier: ${selectedTier}`,
+                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+                  onRemove: () => {
+                    setSelectedTier("ALL");
+                    setVisibleCount(ITEMS_PER_PAGE);
+                  },
+                },
+              ]
+            : []),
+          ...(selectedTech !== "All"
+            ? [
+                {
+                  id: "tech",
+                  label: `Tech: ${selectedTech}`,
+                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  onRemove: () => {
+                    setSelectedTech("All");
+                    setVisibleCount(ITEMS_PER_PAGE);
+                  },
+                },
+              ]
+            : []),
+          ...(selectedHub !== "All Hubs"
+            ? [
+                {
+                  id: "hub",
+                  label: `Hub: ${selectedHub}`,
+                  color: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
+                  onRemove: () => {
+                    setSelectedHub("All Hubs");
+                    setVisibleCount(ITEMS_PER_PAGE);
+                  },
+                },
+              ]
+            : []),
+          ...(searchQuery.trim().length > 0
+            ? [
+                {
+                  id: "search",
+                  label: `Search: "${searchQuery}"`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                  onRemove: () => {
+                    setSearchQuery("");
+                    setVisibleCount(ITEMS_PER_PAGE);
+                  },
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {/* Empty State */}
       {filteredCompanies.length === 0 && (

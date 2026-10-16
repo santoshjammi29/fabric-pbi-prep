@@ -26,10 +26,12 @@ import {
   Code2,
   X,
   SlidersHorizontal,
+  Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
+import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import { UnifiedQuestion, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { ArchitectureDiagramItem } from "@/data/diagrams";
 import dynamic from "next/dynamic";
@@ -449,288 +451,175 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
         ]}
       />
 
-      {/* ─── DOUBLE-LINE SLICERS & FILTERS (ALWAYS VISIBLE AT TOP OF WEBPAGE) ─── */}
-      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-        {/* LINE 1: TECHNOLOGY ECOSYSTEM SLICERS + DOMAIN SELECTOR */}
-        <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none pb-0.5">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 flex items-center gap-1">
-              <Zap size={11} className="text-amber-500" /> Tech:
-            </span>
-
-            {TECH_ECOSYSTEMS.map((eco) => {
-              const count = eco.id === "ALL" ? initialQuestions.length : techCounts[eco.id] || 0;
-              const isSelected = selectedTech === eco.id;
-              return (
-                <button
-                  key={eco.id}
-                  onClick={() => setSelectedTech(eco.id)}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
-                    isSelected
-                      ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                      : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                  title={eco.description}
-                >
-                  <span>{eco.label}</span>
-                  <span
-                    className={cn(
-                      "text-[10px] px-1 py-0.2 rounded-full font-mono",
-                      isSelected ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
-                    )}
-                  >
-                    {count.toLocaleString()}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Canonical Domain Dropdown */}
-          <div className="flex items-center gap-1 shrink-0 pl-2 border-l border-[var(--border)]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] whitespace-nowrap hidden lg:inline">
-              Domain:
-            </span>
-            <select
-              value={selectedDomain}
-              onChange={(e) => setSelectedDomain(e.target.value)}
-              className="text-xs font-semibold py-1 px-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] cursor-pointer focus:outline-none focus:border-blue-500 max-w-[130px] sm:max-w-none"
-              title="Filter by standardized high-level domain"
-            >
-              <option value="ALL">🌐 All Domains</option>
-              {STANDARDIZED_DOMAINS.map((dom) => (
-                <option key={dom} value={dom}>
-                  {dom}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* LINE 2: SEARCH FILTER + SCENARIO ARCHETYPE DROPDOWN + DIFFICULTY SLICERS + STUDY MODE */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search 6,500+ questions by keyword, mechanism, syntax..."
-              className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
-            {/* Scenario Archetype Hotspot Selector */}
-            <div className="flex items-center gap-1 shrink-0">
-              <select
-                value={selectedArchetype}
-                onChange={(e) => setSelectedArchetype(e.target.value as ScenarioArchetypeId)}
-                className={cn(
-                  "h-8 px-2.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer focus:outline-none focus:border-blue-500 shrink-0",
-                  selectedArchetype !== "ALL"
-                    ? "bg-purple-600/10 border-purple-500/40 text-purple-400 font-bold"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)]"
-                )}
-                title="Filter by architectural scenario archetype or failure mode"
-              >
-                {SCENARIO_ARCHETYPES.map((arc) => {
-                  const count =
-                    arc.id === "ALL"
-                      ? initialQuestions.length
-                      : arc.id === "BOOKMARKED"
-                      ? bookmarks.length
-                      : archetypeCounts[arc.id] || 0;
-                  return (
-                    <option key={arc.id} value={arc.id}>
-                      {arc.emoji} {arc.label} ({count.toLocaleString()})
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
-            {/* Difficulty Selector */}
-            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
-                <button
-                  key={diff}
-                  onClick={() => setSelectedDifficulty(diff)}
-                  className={cn(
-                    "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
-                    selectedDifficulty === diff
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  {diff === "ARCHITECT" ? "ARCH" : diff}
-                </button>
-              ))}
-            </div>
-
-            {/* Read All / Continuous Reading Mode Controls */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={toggleReadAllMode}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                  isReadAllMode
-                    ? "bg-emerald-600 border-emerald-500 text-white shadow-emerald-500/20"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                )}
-                title="Toggle Read All mode: reads all cards with full answers continuously (Shortcut: Shift + E)"
-              >
-                <BookOpen size={13} />
-                <span>{isReadAllMode ? "Reading All" : "Read All"}</span>
-                {isReadAllMode && (
-                  <span className="ml-0.5 px-1.5 py-0.2 bg-emerald-700/80 rounded-full text-[10px] font-bold">
-                    ON
-                  </span>
-                )}
-              </button>
-
-              <div className="hidden sm:flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <button
-                  type="button"
-                  onClick={handleExpandAll}
-                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
-                  title="Expand all matching questions"
-                >
-                  Expand All
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCollapseAll}
-                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
-                  title="Collapse all matching questions"
-                >
-                  Collapse All
-                </button>
-              </div>
-            </div>
-
-            {/* Flashcard Study Mode Button */}
-            <button
-              onClick={() => setIsStudyMode(!isStudyMode)}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                isStudyMode
-                  ? "bg-purple-600 border-purple-500 text-white"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <Zap size={13} />
-              <span>{isStudyMode ? "Exit Study" : "Study Mode"}</span>
-            </button>
-
-            {/* Clear All Filters Button (Shown when filters active) */}
-            {hasActiveFilters && (
-              <button
-                onClick={handleResetAllFilters}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer whitespace-nowrap"
-                title="Reset all active filters"
-              >
-                <X size={12} />
-                <span>Reset</span>
-              </button>
-            )}
-
-            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden xl:inline">
-              <strong className="text-[var(--foreground)]">{filteredQuestions.length.toLocaleString()}</strong> Qs
-            </span>
-          </div>
-        </div>
-
-        {/* ACTIVE FILTER & READING MODE BADGES ROW */}
-        {(hasActiveFilters || isReadAllMode) && (
-          <div className="flex items-center gap-1.5 flex-wrap pt-1.5 border-t border-[var(--border)]/60 text-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1">
-              <SlidersHorizontal size={10} /> Active:
-            </span>
-
-            {isReadAllMode && (
-              <button
-                type="button"
-                onClick={handleCollapseAll}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] hover:bg-emerald-500/20 cursor-pointer font-medium"
-                title="Click to exit Read All mode and collapse cards"
-              >
-                <BookOpen size={11} />
-                <span>Read All Mode Active ({filteredQuestions.length.toLocaleString()} Cards)</span>
-                <X size={11} />
-              </button>
-            )}
-
-            {selectedTech !== "ALL" && currentTechObj && (
-              <button
-                onClick={() => setSelectedTech("ALL")}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[11px] hover:bg-blue-500/20 cursor-pointer"
-              >
-                <span>Tech: {currentTechObj.label}</span>
-                <X size={11} />
-              </button>
-            )}
-
-            {selectedArchetype !== "ALL" && currentArchetypeObj && (
-              <button
-                onClick={() => setSelectedArchetype("ALL")}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-400 text-[11px] hover:bg-purple-500/20 cursor-pointer"
-              >
-                <span>Scenario: {currentArchetypeObj.label}</span>
-                <X size={11} />
-              </button>
-            )}
-
-            {selectedDomain !== "ALL" && (
-              <button
-                onClick={() => setSelectedDomain("ALL")}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[11px] hover:bg-cyan-500/20 cursor-pointer"
-              >
-                <span>Domain: {selectedDomain}</span>
-                <X size={11} />
-              </button>
-            )}
-
-            {selectedDifficulty !== "ALL" && (
-              <button
-                onClick={() => setSelectedDifficulty("ALL")}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] hover:bg-amber-500/20 cursor-pointer"
-              >
-                <span>Difficulty: {selectedDifficulty}</span>
-                <X size={11} />
-              </button>
-            )}
-
-            {searchQuery.trim().length > 0 && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] hover:bg-emerald-500/20 cursor-pointer"
-              >
-                <span>Search: &quot;{searchQuery}&quot;</span>
-                <X size={11} />
-              </button>
-            )}
-
-            <button
-              onClick={handleResetAllFilters}
-              className="text-[10px] text-[var(--muted-foreground)] hover:text-red-400 underline cursor-pointer ml-1"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
-      </div>
+      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
+      <UnifiedSearchFilterBox
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search 6,500+ questions by keyword, mechanism, syntax... (Press / to search)"
+        matchCount={filteredQuestions.length}
+        totalCount={initialQuestions.length}
+        countUnit="Qs"
+        themeAccent="blue"
+        hasActiveFilters={hasActiveFilters}
+        onResetAll={handleResetAllFilters}
+        actions={{
+          readAll: {
+            isActive: isReadAllMode,
+            onToggle: toggleReadAllMode,
+            shortcut: "⇧E",
+            count: filteredQuestions.length,
+          },
+          studyMode: {
+            isActive: isStudyMode,
+            onToggle: () => setIsStudyMode(!isStudyMode),
+          },
+          expandCollapse: {
+            onExpandAll: handleExpandAll,
+            onCollapseAll: handleCollapseAll,
+          },
+        }}
+        levels={[
+          {
+            id: "tech",
+            title: "Level 1: Technology Ecosystem",
+            shortTitle: "Tech",
+            icon: <Zap size={13} className="text-amber-500" />,
+            layout: "chips",
+            accentColor: "blue",
+            selectedId: selectedTech,
+            onSelect: (id) => setSelectedTech(id as TechEcosystemId),
+            options: TECH_ECOSYSTEMS.map((eco) => ({
+              id: eco.id,
+              label: eco.label,
+              shortLabel: eco.shortLabel,
+              description: eco.description,
+              count: eco.id === "ALL" ? initialQuestions.length : techCounts[eco.id] || 0,
+            })),
+          },
+          {
+            id: "archetype",
+            title: "Level 2: Scenario Archetypes & Problem Patterns",
+            shortTitle: "Archetypes",
+            icon: <Target size={13} className="text-purple-400" />,
+            layout: "grid",
+            columns: 5,
+            accentColor: "purple",
+            selectedId: selectedArchetype,
+            onSelect: (id) => setSelectedArchetype(id as ScenarioArchetypeId),
+            options: SCENARIO_ARCHETYPES.map((arc) => {
+              const count =
+                arc.id === "ALL"
+                  ? initialQuestions.length
+                  : arc.id === "BOOKMARKED"
+                  ? bookmarks.length
+                  : archetypeCounts[arc.id] || 0;
+              return {
+                id: arc.id,
+                label: arc.label,
+                shortLabel: arc.shortLabel,
+                emoji: arc.emoji,
+                description: arc.description,
+                count,
+              };
+            }),
+          },
+          {
+            id: "domain",
+            title: "Level 3: Standardized High-Level Domains",
+            shortTitle: "Domains",
+            icon: <Layers size={13} className="text-cyan-400" />,
+            layout: "chips",
+            accentColor: "cyan",
+            selectedId: selectedDomain,
+            onSelect: (id) => setSelectedDomain(id),
+            options: [
+              { id: "ALL", label: "All Domains", emoji: "🌐" },
+              ...STANDARDIZED_DOMAINS.map((dom) => ({
+                id: dom,
+                label: dom,
+              })),
+            ],
+          },
+          {
+            id: "difficulty",
+            title: "Level 4: Difficulty Calibration",
+            shortTitle: "Difficulty",
+            icon: <Sparkles size={13} className="text-amber-400" />,
+            layout: "segmented",
+            selectedId: selectedDifficulty,
+            onSelect: (id) => setSelectedDifficulty(id),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "EASY", label: "EASY" },
+              { id: "MEDIUM", label: "MEDIUM" },
+              { id: "HARD", label: "HARD" },
+              { id: "ARCHITECT", label: "ARCH" },
+            ],
+          },
+        ]}
+        activeFilters={[
+          ...(isReadAllMode
+            ? [
+                {
+                  id: "readall",
+                  label: `Read All Mode Active (${filteredQuestions.length.toLocaleString()} Cards)`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
+                  onRemove: handleCollapseAll,
+                },
+              ]
+            : []),
+          ...(selectedTech !== "ALL" && currentTechObj
+            ? [
+                {
+                  id: "tech",
+                  label: `Tech: ${currentTechObj.label}`,
+                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+                  onRemove: () => setSelectedTech("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedArchetype !== "ALL" && currentArchetypeObj
+            ? [
+                {
+                  id: "archetype",
+                  label: `Scenario: ${currentArchetypeObj.label}`,
+                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  onRemove: () => setSelectedArchetype("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedDomain !== "ALL"
+            ? [
+                {
+                  id: "domain",
+                  label: `Domain: ${selectedDomain}`,
+                  color: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
+                  onRemove: () => setSelectedDomain("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedDifficulty !== "ALL"
+            ? [
+                {
+                  id: "difficulty",
+                  label: `Difficulty: ${selectedDifficulty}`,
+                  color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                  onRemove: () => setSelectedDifficulty("ALL"),
+                },
+              ]
+            : []),
+          ...(searchQuery.trim().length > 0
+            ? [
+                {
+                  id: "search",
+                  label: `Search: "${searchQuery}"`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                  onRemove: () => setSearchQuery(""),
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {/* Header Hub Banner Summary */}
       <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">

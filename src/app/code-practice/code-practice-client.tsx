@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { m, AnimatePresence } from "framer-motion";
@@ -20,6 +20,7 @@ import {
   Shuffle,
   Terminal,
   Zap,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { recordLastTopic } from "@/lib/user-progress";
 import { TopicIcon } from "@/components/ui/topic-icon";
+import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 
 type LanguageKey = "pyspark" | "sparksql" | "mssql" | "python";
 
@@ -285,6 +287,17 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
     return arr;
   }, [filteredItems, isShuffled, shuffleSeed]);
 
+  const hasActiveCodeFilters =
+    selectedLevel !== "ALL" ||
+    searchQuery.trim().length > 0;
+
+  const handleResetCodeFilters = useCallback(() => {
+    setSelectedLevel("ALL");
+    setSearchQuery("");
+    setIsShuffled(false);
+    toast.info("Reset code filters");
+  }, []);
+
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
@@ -298,119 +311,87 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
         ]}
       />
 
-      {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK */}
-      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-        {/* LINE 1: LANGUAGE / ENGINE SLICERS */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-            <Terminal size={11} /> Engines:
-          </span>
-          {(Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
-            const cfg = languageConfigs[key];
-            const isSelected = activeLang === key;
-            return (
-              <button
-                key={key}
-                onClick={() => handleLangChange(key)}
-                className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
-                  isSelected
-                    ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-              >
-                <TopicIcon topic={cfg.topicKey} size={13} />
-                <span>{cfg.name}</span>
-                <span
-                  className={cn(
-                    "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
-                    isSelected ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
-                  )}
-                >
-                  {cfg.data.length}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* LINE 2: SEARCH FILTER + LEVEL SLICERS + SHUFFLE + EXPAND/COLLAPSE */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
-          <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases...`}
-              className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
-            {/* Level Selector */}
-            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              {["ALL", "beginner", "intermediate", "advanced", "architect"].map((level) => (
-                <button
-                  key={level}
-                  onClick={() => setSelectedLevel(level)}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer whitespace-nowrap",
-                    selectedLevel === level
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
-
-            {/* Shuffle Button */}
-            <button
-              onClick={handleShuffle}
-              className={cn(
-                "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
-                isShuffled
-                  ? "bg-blue-600 border-blue-500 text-white"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-              title="Shuffle templates"
-            >
-              <Shuffle size={12} className={cn(isShuffled && "rotate-180 transition-transform")} />
-              <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
-            </button>
-
-            {/* Expand / Collapse All */}
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setExpandedIds(new Set(displayedItems.map((i) => i.id)))}
-                className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
-              >
-                Expand All
-              </button>
-              <button
-                onClick={() => setExpandedIds(new Set())}
-                className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
-              >
-                Collapse All
-              </button>
-            </div>
-
-            <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
-              <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> drills
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
+      <UnifiedSearchFilterBox
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={`Search ${languageConfigs[activeLang].name} syntax, functions, or use cases... (Press / to search)`}
+        matchCount={filteredItems.length}
+        totalCount={currentDataset.length}
+        countUnit="drills"
+        themeAccent="blue"
+        hasActiveFilters={hasActiveCodeFilters}
+        onResetAll={handleResetCodeFilters}
+        actions={{
+          shuffle: {
+            isShuffled,
+            onShuffle: handleShuffle,
+          },
+          expandCollapse: {
+            onExpandAll: () => setExpandedIds(new Set(displayedItems.map((i) => i.id))),
+            onCollapseAll: () => setExpandedIds(new Set()),
+          },
+        }}
+        levels={[
+          {
+            id: "engines",
+            title: "Level 1: Language & Execution Engine",
+            shortTitle: "Engines",
+            icon: <Terminal size={13} className="text-blue-500" />,
+            layout: "chips",
+            accentColor: "blue",
+            selectedId: activeLang,
+            onSelect: (id) => handleLangChange(id as LanguageKey),
+            options: (Object.keys(languageConfigs) as LanguageKey[]).map((key) => {
+              const cfg = languageConfigs[key];
+              return {
+                id: key,
+                label: cfg.name,
+                icon: <TopicIcon topic={cfg.topicKey} size={13} />,
+                count: cfg.data.length,
+              };
+            }),
+          },
+          {
+            id: "level",
+            title: "Level 2: Difficulty & Complexity",
+            shortTitle: "Level",
+            icon: <Sparkles size={13} className="text-amber-400" />,
+            layout: "segmented",
+            selectedId: selectedLevel,
+            onSelect: (lvl) => setSelectedLevel(lvl),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "beginner", label: "Beginner" },
+              { id: "intermediate", label: "Intermediate" },
+              { id: "advanced", label: "Advanced" },
+              { id: "architect", label: "Architect" },
+            ],
+          },
+        ]}
+        activeFilters={[
+          ...(selectedLevel !== "ALL"
+            ? [
+                {
+                  id: "level",
+                  label: `Level: ${selectedLevel}`,
+                  color: "bg-amber-500/10 border-amber-500/30 text-amber-400 capitalize",
+                  onRemove: () => setSelectedLevel("ALL"),
+                },
+              ]
+            : []),
+          ...(searchQuery.trim().length > 0
+            ? [
+                {
+                  id: "search",
+                  label: `Search: "${searchQuery}"`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                  onRemove: () => setSearchQuery(""),
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {/* Header Hub Banner Summary */}
       <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
