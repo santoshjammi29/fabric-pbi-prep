@@ -433,7 +433,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
         hubTitle="Foundations & Concepts"
         items={[
           { label: "Concepts Library", href: "/concepts", icon: BookOpen },
-          { label: "Concepts Mind Map", href: "/concepts?view=mindmap", icon: GitBranch, badge: "Multi-Level" },
+          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Multi-Level" },
           { label: "Spark Engine", href: "/spark-engine", icon: Zap },
           { label: "Modern Stack", href: "/modern-stack", icon: Layers },
         ]}

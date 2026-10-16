@@ -81,10 +81,10 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/concepts",
         icon: BookOpen,
         pill: { text: "Foundations", variant: "easy" },
-        matches: ["/concepts", "/spark-engine", "/modern-stack"],
+        matches: ["/concepts", "/mindmap", "/spark-engine", "/modern-stack"],
         subItems: [
           { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "Glossary" },
-          { label: "Concepts Mind Map", href: "/concepts?view=mindmap", icon: GitBranch, badge: "Mind Map" },
+          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Mind Map" },
           { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
           { label: "Modern Stack & FinOps", href: "/modern-stack", icon: Zap, badge: "FinOps" },
         ],
@@ -158,6 +158,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   
   // Concepts & Engines
   { id: "concepts", label: "Concepts Glossary", shortLabel: "Glossary", href: "/concepts", category: "Concepts", categoryColor: "emerald", icon: BookOpen, badge: "Concepts" },
+  { id: "mindmap", label: "Concepts Mind Map", shortLabel: "Mind Map", href: "/mindmap", category: "Concepts", categoryColor: "emerald", icon: GitBranch, badge: "Mind Map" },
   { id: "spark-engine", label: "Spark Engine Lab", shortLabel: "Spark Lab", href: "/spark-engine", category: "Concepts", categoryColor: "emerald", icon: Cpu, badge: "Lab" },
   { id: "modern-stack", label: "Modern Stack & FinOps", shortLabel: "Modern Stack", href: "/modern-stack", category: "Concepts", categoryColor: "emerald", icon: Zap, badge: "FinOps" },
   

@@ -19,6 +19,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/spark-engine": "Spark Engine Hub",
   "/modern-stack": "Modern Data Stack",
   "/concepts": "Key Concepts",
+  "/mindmap": "Concepts Mind Map",
   "/code-practice": "Code Practice",
   "/python": "Python Data Hub",
   "/qa-prep": "Q&A Prep",

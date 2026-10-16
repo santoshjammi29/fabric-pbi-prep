@@ -63,18 +63,13 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: "/mindmap",
-        destination: "/architecture",
-        permanent: false,
-      },
-      {
         source: "/data-engineering-mindmap",
-        destination: "/architecture",
+        destination: "/mindmap",
         permanent: false,
       },
       {
         source: "/de-mindmap",
-        destination: "/architecture",
+        destination: "/mindmap",
         permanent: false,
       },
       {
