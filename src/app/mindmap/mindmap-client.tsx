@@ -27,9 +27,9 @@ export function MindmapClient() {
             <Globe size={14} />
             <span>Interactive Navigation</span>
           </div>
-          <h3 className="text-xs sm:text-sm font-semibold text-[var(--foreground)]">Infinite Canvas Navigation</h3>
+          <h3 className="text-xs sm:text-sm font-semibold text-[var(--foreground)]">Hierarchical Tree Navigation</h3>
           <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-            Click and drag to pan across the topography. Use mouse wheel or the toolbar (+/-) to zoom into specific protocol trees.
+            Expand and collapse architectural branches across the 7 core pillars. Toggle between Tree View and Pillars Matrix with live search filtering.
           </p>
         </div>
 

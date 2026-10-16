@@ -62,21 +62,136 @@ export interface SearchResponse {
 }
 
 export const TOPIC_SYNONYMS: Record<string, string[]> = {
-  spark: ["spark", "pyspark", "catalyst", "aqe", "tungsten", "photon", "rdd", "shuffle", "broadcast", "skew"],
-  databricks: ["databricks", "delta", "unity catalog", "dlt", "delta live tables", "auto loader", "liquid clustering", "zorder", "z-order", "dbfs", "vacuum", "dabs", "databricks 100", "genie", "lakeflow"],
-  fabric: ["fabric", "onelake", "direct lake", "directlake", "v-order", "synapse dw", "capacity", "shortcuts", "mirrored"],
-  airflow: ["airflow", "dag", "taskflow", "operator", "sensor", "triggerer", "xcom", "celery", "astronomer", "mwaa"],
-  dbt: ["dbt", "jinja", "ref", "snapshot", "semantic layer", "macro", "materialization", "dbt mesh", "scd type 2"],
-  adf: ["adf", "data factory", "azure data factory", "shir", "integration runtime", "tumbling window", "copy activity"],
-  datalake: ["datalake", "data lake", "lakehouse", "medallion", "bronze", "silver", "gold", "iceberg", "hudi", "delta lake", "open table", "parquet", "orc", "avro"],
-  modeling: ["modeling", "modelling", "kimball", "star schema", "snowflake schema", "fact table", "dimension", "scd", "slowly changing dimension", "data vault", "surrogate key"],
-  sql: ["sql", "tsql", "t-sql", "mssql", "execution plan", "index seek", "index scan", "btree", "window function", "cte", "mvcc", "relational"],
-  streaming: ["streaming", "kafka", "flink", "structured streaming", "event-time", "watermark", "consumer group", "offset", "cdc", "debezium", "outbox"],
-  governance: ["governance", "purview", "catalog", "lineage", "contracts", "data contracts", "rls", "cls", "masking", "security", "great expectations", "data quality"],
-  powerbi: ["powerbi", "power bi", "dax", "vertipaq", "semantic model", "calculate", "measure", "calculated column"],
-  python: ["python", "polars", "pandas", "arrow", "apache arrow", "pydantic", "gil", "asyncio", "multiprocessing", "pytest"],
-  "system-design": ["system design", "distributed systems", "cap theorem", "saga", "sharding", "consistent hashing", "cache-aside", "redis", "rate limiting"],
+  spark: [
+    "spark", "pyspark", "catalyst", "catalyst optimizer", "aqe", "adaptive query execution",
+    "tungsten", "photon", "rdd", "shuffle", "broadcast", "skew", "data skew", "spill",
+    "broadcast hash join", "sort merge join", "shuffle hash join", "whole stage code generation",
+    "g1gc", "garbage collection", "memory overhead", "executor memory", "driver memory",
+    "dynamic allocation", "partitioning", "coalesce", "repartition", "collect_list", "collect_set",
+    "dataframe", "spark sql", "spark streaming", "structured streaming", "watermark", "checkpointing",
+    "state store", "rocksdb", "spark-submit", "accumulator", "broadcast variable", "spark ui"
+  ],
+  databricks: [
+    "databricks", "delta", "delta lake", "unity catalog", "three-level namespace", "three level namespace",
+    "dlt", "delta live tables", "auto loader", "cloud files", "liquid clustering", "zorder", "z-order",
+    "dbfs", "vacuum", "optimize", "compaction", "bin-packing", "dabs", "databricks asset bundles",
+    "databricks 100", "genie", "lakeflow", "change data feed", "cdf", "delta sharing", "serverless",
+    "photon engine", "workspace", "metastore", "managed tables", "external tables", "cluster policies"
+  ],
+  fabric: [
+    "fabric", "onelake", "direct lake", "directlake", "v-order", "synapse dw", "data warehouse",
+    "lakehouse", "capacity", "sku", "f-sku", "shortcuts", "mirrored", "mirroring", "eventstream",
+    "data activator", "reflex", "purview fabric", "semantic model", "fabric notebook", "dataflows gen2",
+    "kql database", "real-time intelligence", "copilot", "git integration", "deployment pipelines"
+  ],
+  airflow: [
+    "airflow", "dag", "dags", "taskflow", "taskflow api", "operator", "operators", "sensor", "sensors",
+    "triggerer", "xcom", "celery", "celery executor", "kubernetes executor", "astronomer", "mwaa",
+    "cloud composer", "backfill", "catchup", "sla", "pools", "dynamic dags", "deferrable operator",
+    "taskgroup", "airflow 2", "airflow 3", "connection", "variable", "lineage"
+  ],
+  dbt: [
+    "dbt", "jinja", "ref", "source", "snapshot", "semantic layer", "macro", "materialization",
+    "ephemeral", "incremental", "is_incremental", "dbt mesh", "scd type 2", "singular test",
+    "generic test", "dbt test", "dbt build", "dbt docs", "dbt cloud", "dbt core", "exposures",
+    "metrics", "contracts", "model contracts", "semantic models"
+  ],
+  adf: [
+    "adf", "data factory", "azure data factory", "shir", "self-hosted integration runtime",
+    "integration runtime", "azure ir", "tumbling window", "tumbling window trigger", "copy activity",
+    "mapping data flow", "lookup", "foreach", "pipeline parameters", "linked service", "dataset",
+    "web activity", "execute pipeline", "event trigger", "schedule trigger"
+  ],
+  datalake: [
+    "datalake", "data lake", "lakehouse", "medallion", "medallion architecture", "bronze", "silver",
+    "gold", "iceberg", "apache iceberg", "hudi", "apache hudi", "delta lake", "open table",
+    "open table formats", "parquet", "orc", "avro", "manifest list", "metadata tree", "snapshot tree",
+    "time travel", "merge on read", "mor", "copy on write", "cow", "acid lake", "schema evolution"
+  ],
+  modeling: [
+    "modeling", "modelling", "kimball", "ralph kimball", "star schema", "snowflake schema",
+    "fact table", "dimension table", "dimension", "scd", "slowly changing dimension", "scd type 1",
+    "scd type 2", "scd type 3", "scd type 4", "scd type 6", "data vault", "data vault 2.0",
+    "hubs", "links", "satellites", "surrogate key", "business key", "junk dimension",
+    "degenerate dimension", "conformed dimension", "role-playing dimension", "bridge table",
+    "additive", "semi-additive", "non-additive", "grain", "granularity", "factless fact table"
+  ],
+  sql: [
+    "sql", "tsql", "t-sql", "mssql", "sql server", "execution plan", "index seek", "index scan",
+    "b-tree", "btree", "clustered index", "nonclustered index", "covering index", "page split",
+    "buffer pool", "window function", "cte", "recursive cte", "mvcc", "acid", "isolation level",
+    "read committed", "snapshot isolation", "serializable", "row_number", "rank", "dense_rank",
+    "lead", "lag", "partition by", "order by", "stored procedure", "tempdb"
+  ],
+  streaming: [
+    "streaming", "kafka", "apache kafka", "kraft", "zookeeper", "flink", "apache flink",
+    "structured streaming", "event-time", "processing-time", "watermark", "watermarking",
+    "consumer group", "offset", "cdc", "change data capture", "debezium", "outbox",
+    "outbox pattern", "event sourcing", "exactly once", "at least once", "backpressure",
+    "event hubs", "kinesis", "kafka connect", "log compaction"
+  ],
+  governance: [
+    "governance", "purview", "microsoft purview", "unity catalog", "catalog", "lineage",
+    "data lineage", "contracts", "data contracts", "schema registry", "rls", "row level security",
+    "cls", "column level security", "masking", "dynamic data masking", "security", "great expectations",
+    "data quality", "data observability", "soda", "audit logging", "gdpr", "pii", "sensitivity labels"
+  ],
+  powerbi: [
+    "powerbi", "power bi", "dax", "vertipaq", "vertipaq engine", "semantic model", "calculate",
+    "filter context", "row context", "context transition", "all", "allexcept", "values",
+    "summarize", "measure", "calculated column", "calculated table", "direct lake", "directquery",
+    "import mode", "composite model", "tabular model", "rls in power bi"
+  ],
+  python: [
+    "python", "polars", "pandas", "arrow", "apache arrow", "duckdb", "pydantic", "gil",
+    "global interpreter lock", "asyncio", "multiprocessing", "threading", "pytest", "typing",
+    "dataclass", "generator", "yield", "memoryview", "cython", "vectorized"
+  ],
+  "system-design": [
+    "system design", "distributed systems", "cap theorem", "pacelc", "saga", "saga pattern",
+    "sharding", "consistent hashing", "cache-aside", "write-through", "redis", "memcached",
+    "rate limiting", "circuit breaker", "bulkhead", "eventual consistency", "two-phase commit",
+    "2pc", "raft", "paxos", "bloom filter", "backpressure", "load balancer"
+  ],
+  blueprints: [
+    "blueprints", "architecture diagrams", "whiteboard", "architecture", "system architecture",
+    "fabric onelake architecture", "powerbi direct lake vertipaq", "powerbi dax engine context",
+    "apache airflow architecture", "dbt analytics engineering dag", "adf hybrid architecture",
+    "kafka event streaming pipeline", "cdc debezium lakehouse pipeline", "databricks medallion architecture",
+    "databricks dlt pipeline", "databricks ecosystem landscape", "rag vector search data pipeline",
+    "unity catalog architecture", "purview governance catalog", "delta lake mechanism",
+    "apache iceberg open table format", "open table formats lakehouse architecture",
+    "open file formats storage architecture", "databricks optimization techniques architecture",
+    "catalyst photon engine", "spark shuffle memory execution", "sql server query engine optimization",
+    "kimball dimensional star schema", "data vault enterprise architecture", "enterprise edge architecture",
+    "distributed systems resilience architecture", "python arrow polars architecture",
+    "data mesh enterprise architecture", "spark data skew aqe optimization", "lakehouse finops cost optimization",
+    "databricks dabs devops pipeline", "databricks master architecture"
+  ],
 };
+
+export const SUGGESTED_SEARCH_KEYWORDS = [
+  "Catalyst Optimizer",
+  "Delta Lake ACID",
+  "Fabric OneLake",
+  "Direct Lake VertiPaq",
+  "Apache Airflow DAGs",
+  "dbt Semantic Layer",
+  "Liquid Clustering",
+  "Unity Catalog",
+  "Kafka CDC Debezium",
+  "Kimball Star Schema",
+  "Data Vault 2.0",
+  "Adaptive Query Execution (AQE)",
+  "Photon Engine",
+  "Vector Search RAG",
+  "Microsoft Purview",
+  "Spark Shuffle Memory",
+  "ADF Self-Hosted IR",
+  "Apache Iceberg",
+  "Medallion Architecture",
+  "Lakehouse FinOps",
+];
 
 const STOP_WORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "for", "from",

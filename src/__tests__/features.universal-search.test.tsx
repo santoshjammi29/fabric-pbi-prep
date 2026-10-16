@@ -112,4 +112,36 @@ describe("Universal Search Engine & Cross-Page Topic Discovery", () => {
     expect(screen.getByText("Architecture")).toBeDefined();
     expect(screen.getByText("Q&A Prep")).toBeDefined();
   });
+
+  it("opens CommandPalette using the forward slash '/' key shortcut", () => {
+    render(<CommandPalette />);
+
+    // Press '/' key
+    fireEvent.keyDown(window, { key: "/" });
+
+    const input = screen.getByPlaceholderText(/Search concepts, questions, architecture, topics/i);
+    expect(input).toBeDefined();
+  });
+
+  it("renders suggested popular architecture keywords when search query is empty", () => {
+    render(<CommandPalette />);
+
+    // Open via Ctrl+K
+    fireEvent.keyDown(window, { key: "k", ctrlKey: true });
+
+    // Expect popular keywords bar
+    expect(screen.getByText(/Popular Architecture & Concept Keywords/i)).toBeDefined();
+    expect(screen.getByText("Catalyst Optimizer")).toBeDefined();
+    expect(screen.getByText("Delta Lake ACID")).toBeDefined();
+    expect(screen.getByText("Direct Lake VertiPaq")).toBeDefined();
+  });
+
+  it("finds whiteboard architecture blueprints like 'Catalyst Photon Engine' or 'Medallion'", () => {
+    const res = executePortalSearch("Photon Engine");
+    expect(res.total).toBeGreaterThan(0);
+    const hasBlueprint = res.items.some(
+      (item) => item.category === "Blueprints" || item.title.toLowerCase().includes("photon")
+    );
+    expect(hasBlueprint).toBe(true);
+  });
 });

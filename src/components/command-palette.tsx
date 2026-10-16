@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 import { useTextSize, TEXT_SIZE_OPTIONS } from "@/components/providers/text-size-provider";
-import { executePortalSearch, TopicIdentification, SearchResultItem } from "@/lib/search-engine";
+import { executePortalSearch, TopicIdentification, SearchResultItem, SUGGESTED_SEARCH_KEYWORDS } from "@/lib/search-engine";
 
 export type CommandCategory =
   | "Navigation"
@@ -356,6 +356,17 @@ export function CommandPalette() {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsOpen((prev) => !prev);
+      } else if (
+        e.key === "/" &&
+        !isOpen &&
+        !(
+          e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement ||
+          (e.target as HTMLElement)?.isContentEditable
+        )
+      ) {
+        e.preventDefault();
+        setIsOpen(true);
       } else if (e.key === "Escape" && isOpen) {
         e.preventDefault();
         setIsOpen(false);
@@ -458,6 +469,28 @@ export function CommandPalette() {
             ESC
           </span>
         </div>
+
+        {/* Suggested Quick Keywords when Query is Empty */}
+        {!query && (
+          <div className="px-4 py-2 bg-[var(--surface-2)]/60 border-b border-[var(--border)] space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+              <Sparkles size={11} className="text-blue-400" />
+              <span>Popular Architecture &amp; Concept Keywords:</span>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {SUGGESTED_SEARCH_KEYWORDS.map((kw) => (
+                <button
+                  key={kw}
+                  type="button"
+                  onClick={() => setQuery(kw)}
+                  className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[var(--surface-1)] hover:bg-blue-600/15 hover:text-blue-400 text-[var(--foreground)] border border-[var(--border)] hover:border-blue-500/30 transition-colors cursor-pointer"
+                >
+                  {kw}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Topic Identification Spotlight Card */}
         {identifiedTopics.length > 0 && (

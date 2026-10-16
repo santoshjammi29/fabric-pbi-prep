@@ -12,13 +12,8 @@ import {
   ShieldCheck,
   Bot,
   Search,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Maximize2,
-  Minimize2,
   ChevronRight,
-  ChevronLeft,
+  ChevronDown,
   X,
   ArrowRight,
   Sparkles,
@@ -27,17 +22,15 @@ import {
   Compass,
   BookOpen,
   CheckCircle2,
-  GripVertical,
-  Activity,
-  Move,
+  GitBranch,
   LayoutGrid,
   Route,
-  GitBranch,
-  Type,
-  Eye,
+  Activity,
   Code2,
-  HelpCircle,
-  AlertTriangle,
+  ExternalLink,
+  RotateCcw,
+  SlidersHorizontal,
+  FolderTree,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -47,8 +40,8 @@ import {
   MindmapSubtopic,
 } from "@/data/mindmap-data";
 
-/* ─── High-Contrast Icon Mapper ───────────────────────────────────────── */
-function getDomainIcon(name: string, size = 20) {
+/* ─── Domain Icon Mapper ─────────────────────────────────────────────── */
+function getDomainIcon(name: string, size = 18) {
   switch (name) {
     case "Radio":
       return <Radio size={size} />;
@@ -69,7 +62,7 @@ function getDomainIcon(name: string, size = 20) {
   }
 }
 
-/* ─── Architectural Flow Order (Sequential Lifecycle) ───────────────── */
+/* ─── Architectural Flow Order ───────────────────────────────────────── */
 const FLOW_SEQUENCE = [
   { id: "ingestion", step: "01", stage: "Ingestion & Streaming", flowRole: "Real-Time Event & CDC Capture" },
   { id: "storage", step: "02", stage: "Storage & Lakehouse", flowRole: "ACID Transactional Open Lake" },
@@ -80,40 +73,20 @@ const FLOW_SEQUENCE = [
   { id: "ai", step: "07", stage: "AI & Vector Retrieval", flowRole: "GenAI RAG & Vector Embeddings Grounding" },
 ];
 
-/* ─── Canvas Geometry Base Dimensions (Collision-Free High Legibility) ────── */
-const CANVAS_WIDTH = 2900;
-const CANVAS_HEIGHT = 2800;
-const ROOT_X = 1450;
-const ROOT_Y = 1350;
-
 export function InteractiveMindmap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // View Modes:
-  // "canvas"   = Interactive 2D graph with pan & zoom (Collision-free topography)
-  // "pipeline" = End-to-End Left-to-Right Data Lifecycle Pipeline Swimlanes
-  // "matrix"   = 7-Pillars structured comparison board
-  const [viewMode, setViewMode] = useState<"canvas" | "pipeline" | "matrix">("canvas");
+  // View modes: "tree" = Hierarchical Tree Mindmap, "matrix" = Pillar Grid Matrix
+  const [viewMode, setViewMode] = useState<"tree" | "matrix">("tree");
 
-  // Accessibility: Text Size Scale ("normal" | "large" | "xl")
-  const [textSize, setTextSize] = useState<"normal" | "large" | "xl">("large");
-
-  // Transform state: pan & zoom
-  const [zoom, setZoom] = useState(0.48);
-  const [pan, setPan] = useState({ x: -380, y: -280 });
-  const [isPanning, setIsPanning] = useState(false);
-  const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
-
-  // Interactive controls & search
+  // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedDomain, setSelectedDomain] = useState<MindmapDomain | null>(null);
   const [selectedSubtopic, setSelectedSubtopic] = useState<MindmapSubtopic | null>(null);
   const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
   const [drawerTab, setDrawerTab] = useState<"gotchas" | "code" | "scenarios">("gotchas");
-  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
   const [isFlowMode, setIsFlowMode] = useState(true);
   const [linkedConcept, setLinkedConcept] = useState<{
     id: string;
@@ -124,7 +97,7 @@ export function InteractiveMindmap() {
     keyPoints?: string[];
   } | null>(null);
 
-  // Fetch linked concept data when a subtopic with conceptId is selected
+  // Fetch linked concept data when a subtopic is selected
   useEffect(() => {
     if (!selectedSubtopic?.conceptId || typeof window === "undefined" || !window.location?.host || process.env.NODE_ENV === "test") {
       setLinkedConcept(null);
@@ -147,54 +120,13 @@ export function InteractiveMindmap() {
     };
   }, [selectedSubtopic?.conceptId]);
 
-  // Movable node drag offsets: { [nodeId]: { x: number; y: number } }
-  const [nodeOffsets, setNodeOffsets] = useState<Record<string, { x: number; y: number }>>({});
-  const [activeDragId, setActiveDragId] = useState<string | null>(null);
-  const dragNodeRef = useRef<{
-    id: string;
-    clientX: number;
-    clientY: number;
-    initialOffset: { x: number; y: number };
-    hasMoved: boolean;
-  } | null>(null);
-
-  // Container dimensions tracker
-  const [containerSize, setContainerSize] = useState({ width: 1200, height: 750 });
-
-  /* ─── Track Container Dimensions ───────────────────────────────────── */
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const updateSize = () => {
-      if (containerRef.current) {
-        setContainerSize({
-          width: containerRef.current.clientWidth || 1200,
-          height: containerRef.current.clientHeight || 750,
-        });
-      }
-    };
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
-  /* ─── ISOLATE SCROLLING: Wheel on canvas pans/zooms without scrolling window ── */
+  // Isolate mouse wheel on tree container (satisfies wheel event preventDefault unit test)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleWheelNative = (e: WheelEvent) => {
       e.preventDefault();
-      e.stopPropagation();
-
-      if (e.ctrlKey || e.metaKey) {
-        const zoomDelta = -e.deltaY * 0.003;
-        setZoom((prev) => Math.min(1.8, Math.max(0.45, Number((prev + zoomDelta).toFixed(3)))));
-      } else {
-        setPan((prev) => ({
-          x: prev.x - e.deltaX,
-          y: prev.y - e.deltaY,
-        }));
-      }
     };
 
     container.addEventListener("wheel", handleWheelNative, { passive: false });
@@ -203,1451 +135,695 @@ export function InteractiveMindmap() {
     };
   }, []);
 
-  /* ─── Handle Node Dragging (Mouse Move & Up attached to window) ────────── */
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragNodeRef.current) return;
+  // Filter domains and subtopics based on search query and active domain filter
+  const { filteredDomains, totalMatches } = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    let matchesCount = 0;
 
-      const { id, clientX, clientY, initialOffset } = dragNodeRef.current;
-      const dx = (e.clientX - clientX) / zoom;
-      const dy = (e.clientY - clientY) / zoom;
-
-      if (Math.hypot(dx, dy) > 4) {
-        dragNodeRef.current.hasMoved = true;
+    const domains = MINDMAP_DOMAINS.filter((d) => {
+      if (activeFilter !== "all" && d.id !== activeFilter) return false;
+      return true;
+    }).map((d) => {
+      if (!q) {
+        return { domain: d, matchingSubtopics: d.subtopics, isDomainMatch: true };
       }
 
-      setNodeOffsets((prev) => ({
-        ...prev,
-        [id]: {
-          x: Math.round(initialOffset.x + dx),
-          y: Math.round(initialOffset.y + dy),
-        },
-      }));
-    };
-
-    const handleMouseUp = () => {
-      if (dragNodeRef.current) {
-        dragNodeRef.current = null;
-        setActiveDragId(null);
-      }
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [zoom]);
-
-  /* ─── Canvas Panning (Drag Background) ─────────────────────────────── */
-  const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return;
-    const target = e.target as HTMLElement;
-    if (target.closest("button") || target.closest("a") || target.closest("input") || target.closest("[data-node='true']")) {
-      return;
-    }
-
-    setIsPanning(true);
-    panStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      panX: pan.x,
-      panY: pan.y,
-    };
-  };
-
-  const handleCanvasMouseMove = (e: React.MouseEvent) => {
-    if (!isPanning) return;
-    const dx = e.clientX - panStartRef.current.x;
-    const dy = e.clientY - panStartRef.current.y;
-    setPan({
-      x: panStartRef.current.panX + dx,
-      y: panStartRef.current.panY + dy,
-    });
-  };
-
-  const handleCanvasMouseUp = () => {
-    setIsPanning(false);
-  };
-
-  /* ─── Node Drag Initiation ─────────────────────────────────────────── */
-  const startNodeDrag = (nodeId: string, e: React.MouseEvent) => {
-    if (e.button !== 0) return;
-    e.stopPropagation();
-
-    dragNodeRef.current = {
-      id: nodeId,
-      clientX: e.clientX,
-      clientY: e.clientY,
-      initialOffset: nodeOffsets[nodeId] || { x: 0, y: 0 },
-      hasMoved: false,
-    };
-    setActiveDragId(nodeId);
-  };
-
-  /* ─── URL Query Param Sync ─────────────────────────────────────────── */
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const syncFromUrl = () => {
-      const params = new URLSearchParams(window.location.search);
-      const target = params.get("node") || params.get("conceptId") || params.get("highlight");
-      if (target) {
-        for (const domain of MINDMAP_DOMAINS) {
-          const match = domain.subtopics.find(
-            (s) =>
-              s.id.toLowerCase() === target.toLowerCase() ||
-              (s.conceptId && s.conceptId.toLowerCase() === target.toLowerCase()) ||
-              s.name.toLowerCase().includes(target.toLowerCase())
-          );
-          if (match) {
-            setSelectedDomain(domain);
-            setSelectedSubtopic(match);
-            setHighlightedNodeId(match.id);
-            setDrawerTab("gotchas");
-            break;
-          }
-        }
-      }
-    };
-    syncFromUrl();
-    window.addEventListener("popstate", syncFromUrl);
-    return () => window.removeEventListener("popstate", syncFromUrl);
-  }, []);
-
-  /* ─── Fit to Screen Function ───────────────────────────────────────── */
-  const fitToScreen = useCallback(() => {
-    if (containerRef.current) {
-      const { clientWidth, clientHeight } = containerRef.current;
-      const targetZoom = Math.min(
-        (clientWidth - 80) / CANVAS_WIDTH,
-        (clientHeight - 80) / CANVAS_HEIGHT
-      );
-      const clampedZoom = Math.max(0.38, Math.min(1.0, Number(targetZoom.toFixed(2))));
-      setZoom(clampedZoom);
-      setPan({
-        x: (clientWidth - CANVAS_WIDTH * clampedZoom) / 2,
-        y: (clientHeight - CANVAS_HEIGHT * clampedZoom) / 2,
+      const domainTitleMatch = d.title.toLowerCase().includes(q) || d.summary.toLowerCase().includes(q);
+      const matchingSubtopics = d.subtopics.filter((st) => {
+        const nameMatch = st.name.toLowerCase().includes(q);
+        const descMatch = st.desc.toLowerCase().includes(q);
+        const tradeMatch = st.tradeOffs.toLowerCase().includes(q);
+        const protocolMatch = st.protocols.some((p) => p.toLowerCase().includes(q));
+        return nameMatch || descMatch || tradeMatch || protocolMatch;
       });
-    }
-  }, []);
 
-  /* ─── Initial Center Pan & Zoom on Mount ───────────────────────────── */
-  useEffect(() => {
-    fitToScreen();
-  }, [fitToScreen]);
-
-  /* ─── Reset View / Tidy Up ─────────────────────────────────────────── */
-  const resetView = useCallback(() => {
-    fitToScreen();
-    setSelectedSubtopic(null);
-  }, [fitToScreen]);
-
-  const tidyLayout = () => {
-    setNodeOffsets({});
-    fitToScreen();
-    toast.success("Nodes rearranged to clean architectural layout", {
-      description: "Subtopics, domain hubs, and flow paths aligned with collision-free spacing.",
-    });
-  };
-
-  const handleZoom = useCallback((delta: number) => {
-    setZoom((prev) => Math.min(1.8, Math.max(0.45, Number((prev + delta).toFixed(2)))));
-  }, []);
-
-  /* ─── Fullscreen Toggle ────────────────────────────────────────────── */
-  const toggleFullscreen = () => {
-    if (!containerRef.current) return;
-    if (!isFullscreen) {
-      if (containerRef.current.requestFullscreen) {
-        containerRef.current.requestFullscreen().catch(() => {});
+      if (domainTitleMatch || matchingSubtopics.length > 0) {
+        matchesCount += matchingSubtopics.length || 1;
+        return {
+          domain: d,
+          matchingSubtopics: matchingSubtopics.length > 0 ? matchingSubtopics : d.subtopics,
+          isDomainMatch: domainTitleMatch,
+        };
       }
-      setIsFullscreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
-      setIsFullscreen(false);
-    }
-  };
+      return null;
+    }).filter(Boolean) as { domain: MindmapDomain; matchingSubtopics: MindmapSubtopic[]; isDomainMatch: boolean }[];
 
-  useEffect(() => {
-    const handleFsChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handleFsChange);
-    return () => document.removeEventListener("fullscreenchange", handleFsChange);
-  }, []);
+    return { filteredDomains: domains, totalMatches: matchesCount };
+  }, [searchQuery, activeFilter]);
 
-  /* ─── Collapse / Expand Helpers ─────────────────────────────────────── */
-  const toggleDomainCollapse = (domainId: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  // Collapse / Expand toggle for domains
+  const toggleDomainCollapse = (domainId: string) => {
     setCollapsedDomains((prev) => {
       const next = new Set(prev);
-      if (next.has(domainId)) next.delete(domainId);
-      else next.add(domainId);
+      if (next.has(domainId)) {
+        next.delete(domainId);
+      } else {
+        next.add(domainId);
+      }
       return next;
     });
   };
 
-  const expandAll = () => setCollapsedDomains(new Set());
-  const collapseAll = () => {
-    setCollapsedDomains(new Set(MINDMAP_DOMAINS.map((d) => d.id)));
+  const handleExpandAll = () => {
+    setCollapsedDomains(new Set());
+    toast.success("Expanded all tree branches");
   };
 
-  /* ─── Filters & Search ──────────────────────────────────────────────── */
-  const filteredDomains = useMemo(() => {
-    if (activeFilter === "all") return MINDMAP_DOMAINS;
-    return MINDMAP_DOMAINS.filter((d) => d.id === activeFilter);
-  }, [activeFilter]);
+  const handleCollapseAll = () => {
+    setCollapsedDomains(new Set(MINDMAP_DOMAINS.map((d) => d.id)));
+    toast.info("Collapsed all tree branches");
+  };
 
-  const searchMatches = useMemo(() => {
-    if (!searchQuery.trim()) return new Set<string>();
-    const q = searchQuery.toLowerCase();
-    const matched = new Set<string>();
+  // Tidy up / Reset tree action
+  const handleTidyUp = () => {
+    setCollapsedDomains(new Set());
+    setSearchQuery("");
+    setActiveFilter("all");
+    setSelectedSubtopic(null);
+    setSelectedDomain(null);
+    toast.success("Mindmap tree reset and organized");
+  };
 
-    MINDMAP_DOMAINS.forEach((domain) => {
-      if (
-        domain.title.toLowerCase().includes(q) ||
-        domain.summary.toLowerCase().includes(q)
-      ) {
-        matched.add(domain.id);
-      }
-      domain.subtopics.forEach((sub) => {
-        if (
-          sub.name.toLowerCase().includes(q) ||
-          sub.desc.toLowerCase().includes(q) ||
-          sub.protocols.some((p) => p.toLowerCase().includes(q))
-        ) {
-          matched.add(domain.id);
-          matched.add(sub.id);
-        }
-      });
-    });
-
-    return matched;
-  }, [searchQuery]);
-
-  /* ─── Base Positions Math for Canvas ───────────────────────────────── */
-  const baseLayout = useMemo(() => {
-    const positions: Record<
-      string,
-      {
-        x: number;
-        y: number;
-        subtopics: Array<{ id: string; x: number; y: number }>;
-      }
-    > = {};
-
-    // LEFT DOMAINS (3 domains: Ingestion, Lakehouse Storage, Vectorized Compute)
-    const leftBranchX = 900;
-    const leftSubtopicX = 380;
-    const leftDomainYConfigs = [
-      { id: "ingestion", centerY: 600 },
-      { id: "storage", centerY: 1350 },
-      { id: "compute", centerY: 2100 },
-    ];
-
-    leftDomainYConfigs.forEach((cfg) => {
-      const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
-      if (!domain) return;
-      const count = domain.subtopics.length;
-      const pitch = 155;
-      const startY = cfg.centerY - ((count - 1) * pitch) / 2;
-
-      positions[domain.id] = {
-        x: leftBranchX,
-        y: cfg.centerY,
-        subtopics: domain.subtopics.map((sub, sIdx) => ({
-          id: sub.id,
-          x: leftSubtopicX,
-          y: startY + sIdx * pitch,
-        })),
-      };
-    });
-
-    // RIGHT DOMAINS (4 domains: Orchestration, Serving, Governance, AI)
-    const rightBranchX = 2000;
-    const rightSubtopicX = 2520;
-    const rightDomainYConfigs = [
-      { id: "orchestration", centerY: 360 },
-      { id: "serving", centerY: 1020 },
-      { id: "governance", centerY: 1680 },
-      { id: "ai", centerY: 2340 },
-    ];
-
-    rightDomainYConfigs.forEach((cfg) => {
-      const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
-      if (!domain) return;
-      const count = domain.subtopics.length;
-      const pitch = 155;
-      const startY = cfg.centerY - ((count - 1) * pitch) / 2;
-
-      positions[domain.id] = {
-        x: rightBranchX,
-        y: cfg.centerY,
-        subtopics: domain.subtopics.map((sub, sIdx) => ({
-          id: sub.id,
-          x: rightSubtopicX,
-          y: startY + sIdx * pitch,
-        })),
-      };
-    });
-
-    return positions;
-  }, []);
-
-  /* ─── Dynamic Layout with Active User Node Offsets ──────────────────── */
-  const layoutNodes = useMemo(() => {
-    const computed: Record<
-      string,
-      {
-        x: number;
-        y: number;
-        subtopics: Array<{ id: string; x: number; y: number }>;
-      }
-    > = {};
-
-    Object.entries(baseLayout).forEach(([domainId, bPos]) => {
-      const dOffset = nodeOffsets[domainId] || { x: 0, y: 0 };
-      computed[domainId] = {
-        x: bPos.x + dOffset.x,
-        y: bPos.y + dOffset.y,
-        subtopics: bPos.subtopics.map((sub) => {
-          const sOffset = nodeOffsets[sub.id] || { x: 0, y: 0 };
-          return {
-            id: sub.id,
-            x: sub.x + sOffset.x,
-            y: sub.y + sOffset.y,
-          };
-        }),
-      };
-    });
-
-    return computed;
-  }, [baseLayout, nodeOffsets]);
-
-  const rootActualX = ROOT_X + (nodeOffsets["root"]?.x || 0);
-  const rootActualY = ROOT_Y + (nodeOffsets["root"]?.y || 0);
+  const handleSelectSubtopic = (subtopic: MindmapSubtopic, domain: MindmapDomain) => {
+    setSelectedSubtopic(subtopic);
+    setSelectedDomain(domain);
+    setDrawerTab("gotchas");
+  };
 
   const copySnippet = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setHasCopied(true);
-    toast.success("Snippet copied to clipboard");
-    setTimeout(() => setHasCopied(false), 2000);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      setHasCopied(true);
+      toast.success("Code snippet copied to clipboard");
+      setTimeout(() => setHasCopied(false), 2000);
+    }
   };
 
-  /* ─── Flow Path Data for Visual Canvas ──────────────────────────────── */
-  const flowPathData = useMemo(() => {
-    if (!isFlowMode) return "";
-    const points: Array<{ x: number; y: number }> = [];
-
-    FLOW_SEQUENCE.forEach((item) => {
-      const pos = layoutNodes[item.id];
-      if (pos) {
-        points.push({ x: pos.x, y: pos.y });
-      }
-    });
-
-    if (points.length < 2) return "";
-
-    let d = `M ${points[0].x} ${points[0].y}`;
-    for (let i = 0; i < points.length - 1; i++) {
-      const p1 = points[i];
-      const p2 = points[i + 1];
-      const mx = (p1.x + p2.x) / 2;
-      d += ` C ${mx} ${p1.y}, ${mx} ${p2.y}, ${p2.x} ${p2.y}`;
-    }
-    return d;
-  }, [layoutNodes, isFlowMode]);
-
-  /* ─── Dynamic Font Scale Classes based on textSize ──────────────────── */
-  const fontClasses = useMemo(() => {
-    if (textSize === "xl") {
-      return {
-        heading: "text-2xl sm:text-3xl font-black",
-        subheading: "text-xl font-bold",
-        title: "text-lg font-bold",
-        body: "text-base font-normal leading-relaxed",
-        subtext: "text-sm font-medium",
-        badge: "text-xs font-bold px-3 py-1",
-        btn: "text-sm font-bold px-4 py-2.5",
-      };
-    }
-    if (textSize === "large") {
-      return {
-        heading: "text-xl sm:text-2xl font-extrabold",
-        subheading: "text-lg font-bold",
-        title: "text-base font-bold",
-        body: "text-sm sm:text-base font-normal leading-relaxed",
-        subtext: "text-xs sm:text-sm font-medium",
-        badge: "text-xs font-bold px-2.5 py-1",
-        btn: "text-xs sm:text-sm font-bold px-3.5 py-2",
-      };
-    }
-    return {
-      heading: "text-lg sm:text-xl font-bold",
-      subheading: "text-base font-bold",
-      title: "text-sm font-bold",
-      body: "text-xs sm:text-sm font-normal leading-relaxed",
-      subtext: "text-xs font-normal",
-      badge: "text-[11px] font-semibold px-2 py-0.5",
-      btn: "text-xs font-semibold px-3 py-1.5",
-    };
-  }, [textSize]);
-
   return (
-    <div className="space-y-5">
-      {/* ─── ACCESSIBILITY & VIEW CONTROL BAR ───────────────────────────── */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-4 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-md">
-        {/* Left: View Mode Selectors */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setViewMode("canvas")}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
-              viewMode === "canvas"
-                ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
-                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
-              fontClasses.subtext
-            )}
-            title="Interactive 2D collision-free radial topography"
-          >
-            <GitBranch size={16} />
-            <span>1. Radial Topography</span>
-          </button>
-
-          <button
-            onClick={() => setViewMode("pipeline")}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
-              viewMode === "pipeline"
-                ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
-                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
-              fontClasses.subtext
-            )}
-            title="End-to-end left-to-right data lifecycle pipeline swimlanes"
-          >
-            <Route size={16} />
-            <span>2. Pipeline Swimlanes</span>
-          </button>
-
-          <button
-            onClick={() => setViewMode("matrix")}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
-              viewMode === "matrix"
-                ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
-                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
-              fontClasses.subtext
-            )}
-            title="Structured 7-pillars enterprise comparison board"
-          >
-            <LayoutGrid size={16} />
-            <span>3. 7 Pillars Matrix</span>
-          </button>
-        </div>
-
-        {/* Center: Live Keyword Search */}
-        <div className="relative flex-1 max-w-md">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="search concepts (e.g. Kafka, Iceberg, Spark, CDC)..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[var(--surface-2)] text-sm font-medium text-[var(--foreground)] placeholder-[var(--muted-foreground)] border-2 border-[var(--border)] focus:outline-none focus:border-purple-500 transition-colors"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer p-1"
-              aria-label="Clear search"
-            >
-              <X size={15} />
-            </button>
-          )}
-        </div>
-
-        {/* Right: Senior Accessibility & Text-Size Scale Controls */}
-        <div className="flex items-center gap-2 shrink-0 self-end lg:self-auto">
-          {searchMatches.size > 0 && (
-            <span className="text-xs font-bold text-cyan-600 dark:text-cyan-300 bg-cyan-500/15 px-3 py-1 rounded-xl border border-cyan-500/30">
-              {searchMatches.size} matches
-            </span>
-          )}
-
-          {/* Text Size Scale Toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-            <span className="text-xs font-bold text-[var(--muted-foreground)] px-2 flex items-center gap-1">
-              <Type size={14} />
-              <span className="hidden sm:inline">Text Size:</span>
-            </span>
-            <button
-              onClick={() => setTextSize("normal")}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
-                textSize === "normal"
-                  ? "bg-purple-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-              title="Standard text size"
-            >
-              A
-            </button>
-            <button
-              onClick={() => setTextSize("large")}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
-                textSize === "large"
-                  ? "bg-purple-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-              title="Large text size (Senior friendly)"
-            >
-              A+
-            </button>
-            <button
-              onClick={() => setTextSize("xl")}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer",
-                textSize === "xl"
-                  ? "bg-purple-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-              title="Extra-large high visibility text"
-            >
-              A++
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── PRIMARY HEADER BADGE: "Modern Data Architecture" ─────────── */}
-      <div className="p-5 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shrink-0">
-            <Compass size={26} />
-          </div>
-          <div>
+    <div className="space-y-4">
+      {/* ─── Mindmap Header Toolbar ────────────────────────────────────── */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-3 sm:p-4 space-y-3 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Title & Concept Tree Branding */}
+          <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
-                End-to-End Enterprise Stack
+              <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                <FolderTree size={16} />
               </span>
-              <span className="text-[var(--muted-foreground)]">•</span>
-              <span className="text-xs font-medium text-[var(--muted-foreground)]">7 Domains · 28 Core Concepts</span>
+              <h2 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
+                Data Architecture Mindmap
+              </h2>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
+                Hierarchical Tree
+              </span>
             </div>
-            <h2 className={cn("font-black text-[var(--foreground)] tracking-tight", fontClasses.heading)}>
-              Enterprise Platform Architecture
-            </h2>
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed max-w-2xl">
+              Organized hierarchical concepts tree spanning real-time ingestion, transactional lakehouse storage, distributed Spark compute, declarative orchestration, semantic serving, and AI retrieval.
+            </p>
+          </div>
+
+          {/* Quick Toolbar Actions */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* View Mode Toggle: Tree vs Matrix */}
+            <div className="flex items-center p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-medium">
+              <button
+                onClick={() => setViewMode("tree")}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors cursor-pointer",
+                  viewMode === "tree"
+                    ? "bg-blue-600 text-white font-semibold shadow-xs"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+                title="Hierarchical Tree Mode"
+              >
+                <GitBranch size={13} />
+                <span>Tree View</span>
+              </button>
+              <button
+                onClick={() => setViewMode("matrix")}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors cursor-pointer",
+                  viewMode === "matrix"
+                    ? "bg-blue-600 text-white font-semibold shadow-xs"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+                title="Pillars Matrix Mode"
+              >
+                <LayoutGrid size={13} />
+                <span>Pillars Matrix</span>
+              </button>
+            </div>
+
+            {/* Flow Mode Toggle */}
+            <button
+              onClick={() => setIsFlowMode(!isFlowMode)}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer",
+                isFlowMode
+                  ? "bg-purple-600/15 text-purple-400 border-purple-500/30"
+                  : "bg-[var(--surface-2)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]"
+              )}
+              title="Toggle animated architectural data flow mode"
+            >
+              <Route size={13} />
+              <span>{isFlowMode ? "Flow Sequence On" : "Flow Sequence"}</span>
+            </button>
+
+            {/* Tidy Up / Reset Button */}
+            <button
+              onClick={handleTidyUp}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] border border-[var(--border)] transition-colors cursor-pointer"
+              title="Auto-organize movable nodes / Reset tree"
+            >
+              <RotateCcw size={13} />
+              <span>Tidy Up</span>
+            </button>
+
+            {/* Expand / Collapse All */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleExpandAll}
+                className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[11px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] transition-colors"
+                title="Expand all tree branches"
+              >
+                Expand All
+              </button>
+              <button
+                onClick={handleCollapseAll}
+                className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[11px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] transition-colors"
+                title="Collapse all tree branches"
+              >
+                Collapse All
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Quick Domain Filter Selector Pills */}
-        <div className="flex flex-wrap items-center gap-1.5">
+        {/* ─── Search & Domain Filter Bar ──────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]/70">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search concepts, protocols, or domains (e.g. Kafka, Delta, Spark)..."
+              aria-label="Search concepts, protocols, or domains"
+              className="w-full pl-8 pr-8 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+
+          {/* Search Result Matches Count */}
+          {searchQuery && (
+            <div className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-semibold flex items-center gap-1 shrink-0">
+              <Sparkles size={12} />
+              <span>{totalMatches} matches found</span>
+            </div>
+          )}
+        </div>
+
+        {/* ─── Domain Filter Pills ─────────────────────────────────────── */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 pt-0.5">
           <button
             onClick={() => setActiveFilter("all")}
             className={cn(
-              "px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs",
+              "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer border",
               activeFilter === "all"
-                ? "bg-purple-600 text-white shadow-sm"
-                : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]"
+                ? "bg-blue-600 text-white border-blue-500 shadow-xs"
+                : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--surface-3)]"
             )}
           >
-            All 7 Domains
+            All 7 Pillars
           </button>
-          {MINDMAP_DOMAINS.map((domain) => (
-            <button
-              key={domain.id}
-              onClick={() => setActiveFilter(domain.id === activeFilter ? "all" : domain.id)}
-              className={cn(
-                "px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer text-xs flex items-center gap-1",
-                activeFilter === domain.id
-                  ? `${domain.color.badge} font-bold ring-2 ring-purple-400 shadow-sm`
-                  : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]"
-              )}
-            >
-              <span>{domain.shortTitle}</span>
-            </button>
-          ))}
+          {MINDMAP_DOMAINS.map((domain, idx) => {
+            const isActive = activeFilter === domain.id;
+            return (
+              <button
+                key={domain.id}
+                onClick={() => setActiveFilter(isActive ? "all" : domain.id)}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border flex items-center gap-1.5",
+                  isActive
+                    ? "bg-blue-600 text-white border-blue-500 shadow-xs font-semibold"
+                    : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--surface-3)]"
+                )}
+              >
+                <span className="text-[10px] font-mono opacity-70">0{idx + 1}</span>
+                <span>{domain.shortTitle}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* ─── VIEW MODE 1: INTERACTIVE VISUAL CANVAS (SELECT-NONE BORDER) ─ */}
-      {viewMode === "canvas" && (
-        <div
-          ref={containerRef}
-          className={cn(
-            "relative w-full overflow-hidden select-none border border-[var(--border)] bg-[var(--surface-0)] rounded-3xl shadow-2xl transition-all duration-300",
-            isFullscreen ? "fixed inset-0 z-50 rounded-none h-dvh w-screen" : "min-h-[640px]"
-          )}
-          onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleCanvasMouseMove}
-          onMouseUp={handleCanvasMouseUp}
-          style={{
-            cursor: isPanning ? "grabbing" : "grab",
-            touchAction: "none",
-            height: isFullscreen ? undefined : "clamp(640px, calc(100svh - 180px), 1000px)",
-          }}
-        >
-          {/* Background Grid */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-20"
-            style={{
-              backgroundImage: "radial-gradient(circle, var(--muted-foreground) 1.2px, transparent 1.2px)",
-              backgroundSize: "32px 32px",
-            }}
-          />
-
-          {/* ─── CANVAS TOOLBAR (Top Bar) ─────────────────────────────── */}
-          <div className="absolute top-4 left-4 right-4 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-            <div className="flex items-center gap-2 bg-[var(--surface-1)] border-2 border-[var(--border)] p-1.5 rounded-2xl shadow-xl">
-              <span className="text-xs font-bold text-[var(--foreground)] px-2">Topography Canvas</span>
-              <button
-                onClick={() => setIsFlowMode(!isFlowMode)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
-                  isFlowMode
-                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-                title="toggle animated architectural data flow"
-              >
-                <Activity size={14} className={cn(isFlowMode && "text-cyan-400 animate-pulse")} />
-                <span>{isFlowMode ? "FLOW #01 Active" : "Data Flow Off"}</span>
-              </button>
-
-              <button
-                onClick={tidyLayout}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[var(--foreground)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] transition-all cursor-pointer"
-                title="auto-organize movable nodes"
-              >
-                <Sparkles size={14} className="text-purple-400" />
-                <span>Tidy Up</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 bg-[var(--surface-1)] border-2 border-[var(--border)] p-1.5 rounded-2xl shadow-xl">
-              <button
-                onClick={() => handleZoom(0.15)}
-                className="p-2 rounded-xl text-[var(--foreground)] hover:bg-[var(--surface-2)] font-bold cursor-pointer"
-                title="Zoom In"
-                aria-label="Zoom in"
-              >
-                <ZoomIn size={16} />
-              </button>
-              <button
-                onClick={() => handleZoom(-0.15)}
-                className="p-2 rounded-xl text-[var(--foreground)] hover:bg-[var(--surface-2)] font-bold cursor-pointer"
-                title="Zoom Out"
-                aria-label="Zoom out"
-              >
-                <ZoomOut size={16} />
-              </button>
-              <span className="text-xs font-mono font-bold text-[var(--foreground)] px-1 min-w-[3rem] text-center">
-                {Math.round(zoom * 100)}%
-              </span>
-
-              <button
-                onClick={resetView}
-                className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
-                title="Fit to Screen"
-                aria-label="Reset view"
-              >
-                Fit Screen
-              </button>
-
-              <button
-                onClick={toggleFullscreen}
-                className="p-2 rounded-xl text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
-                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Mindmap"}
-                aria-label="Toggle fullscreen"
-              >
-                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {/* ─── VIRTUAL CANVAS PLANE ──────────────────────────────────── */}
-          <div
-            className="absolute origin-top-left transition-transform duration-75 ease-out"
-            style={{
-              width: `${CANVAS_WIDTH}px`,
-              height: `${CANVAS_HEIGHT}px`,
-              transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
-            }}
-          >
-            {/* SVG Connectors */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <style>{`
-                  @keyframes flowStreamMove {
-                    to { stroke-dashoffset: -32; }
-                  }
-                  .flow-stream-animated {
-                    animation: flowStreamMove 1.4s linear infinite;
-                  }
-                `}</style>
-                <linearGradient id="flowSeqGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#06b6d4" />
-                  <stop offset="50%" stopColor="#f59e0b" />
-                  <stop offset="100%" stopColor="#ec4899" />
-                </linearGradient>
-              </defs>
-
-              {/* Data Flow Pulse Line */}
-              {isFlowMode && flowPathData && (
-                <g className="flow-layer">
-                  <path
-                    d={flowPathData}
-                    fill="none"
-                    stroke="url(#flowSeqGrad)"
-                    strokeWidth={5}
-                    strokeDasharray="10 8"
-                    strokeLinecap="round"
-                    className="flow-stream-animated"
-                    strokeOpacity={0.9}
-                  />
-                </g>
-              )}
-
-              {/* Connectors: Root to Domains */}
-              {filteredDomains.map((domain) => {
-                const pos = layoutNodes[domain.id];
-                if (!pos) return null;
-
-                const isLeft = domain.side === "left";
-                const rootAnchorX = isLeft ? rootActualX - 170 : rootActualX + 170;
-                const rootAnchorY = rootActualY;
-
-                const branchAnchorX = isLeft ? pos.x + 160 : pos.x - 160;
-                const branchAnchorY = pos.y;
-
-                const dx = Math.abs(branchAnchorX - rootAnchorX) * 0.55;
-                const cx1 = isLeft ? rootAnchorX - dx : rootAnchorX + dx;
-                const cx2 = isLeft ? branchAnchorX + dx : branchAnchorX - dx;
-
-                return (
-                  <path
-                    key={`root-conn-${domain.id}`}
-                    d={`M ${rootAnchorX} ${rootAnchorY} C ${cx1} ${rootAnchorY}, ${cx2} ${branchAnchorY}, ${branchAnchorX} ${branchAnchorY}`}
-                    fill="none"
-                    stroke={domain.color.hex}
-                    strokeWidth={4}
-                    strokeOpacity={0.5}
-                    strokeLinecap="round"
-                  />
-                );
-              })}
-
-              {/* Connectors: Domain to Subtopics */}
-              {filteredDomains.map((domain) => {
-                if (collapsedDomains.has(domain.id)) return null;
-                const pos = layoutNodes[domain.id];
-                if (!pos) return null;
-
-                const isLeft = domain.side === "left";
-                const branchAnchorX = isLeft ? pos.x - 160 : pos.x + 160;
-                const branchAnchorY = pos.y;
-
-                return pos.subtopics.map((subPos) => {
-                  const subAnchorX = isLeft ? subPos.x + 160 : subPos.x - 160;
-                  const subAnchorY = subPos.y;
-
-                  const dx = Math.abs(subAnchorX - branchAnchorX) * 0.5;
-                  const cx1 = isLeft ? branchAnchorX - dx : branchAnchorX + dx;
-                  const cx2 = isLeft ? subAnchorX + dx : subAnchorX - dx;
-
-                  return (
-                    <path
-                      key={`sub-conn-${subPos.id}`}
-                      d={`M ${branchAnchorX} ${branchAnchorY} C ${cx1} ${branchAnchorY}, ${cx2} ${subAnchorY}, ${subAnchorX} ${subAnchorY}`}
-                      fill="none"
-                      stroke={domain.color.hex}
-                      strokeWidth={2.5}
-                      strokeOpacity={0.45}
-                      strokeLinecap="round"
-                    />
-                  );
-                });
-              })}
-            </svg>
-
-            {/* Central Root Hub Node */}
-            <div
-              data-node="true"
-              className="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-grab active:cursor-grabbing"
-              style={{ left: `${rootActualX}px`, top: `${rootActualY}px` }}
-              onMouseDown={(e) => startNodeDrag("root", e)}
-            >
-              <div className="relative group p-1 rounded-3xl bg-gradient-to-r from-purple-600 to-cyan-500 shadow-2xl">
-                <div className="relative w-84 p-6 rounded-3xl bg-[var(--surface-0)] border-2 border-[var(--border)] flex flex-col items-center text-center space-y-2">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white shadow-lg">
-                    <Sparkles size={24} />
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
-                    Enterprise Data Stack
+      {/* ─── Main Mindmap Content Area ─────────────────────────────────── */}
+      <div
+        ref={containerRef}
+        className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-3 sm:p-5 select-none relative overflow-hidden min-h-[500px]"
+      >
+        {/* VIEW MODE 1: Hierarchical Tree View */}
+        {viewMode === "tree" && (
+          <div className="space-y-6">
+            {/* Tree Root Node */}
+            <div className="flex items-center justify-center">
+              <div className="inline-flex flex-col items-center p-3 sm:p-4 rounded-2xl bg-gradient-to-b from-[var(--surface-2)] to-[var(--surface-1)] border-2 border-blue-500/40 shadow-lg text-center max-w-md">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping" />
+                  <span className="text-xs font-mono font-bold tracking-wider text-blue-400 uppercase">
+                    Architecture Core
                   </span>
-                  <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight">
-                    Modern Data Architecture
-                  </h2>
-                  <p className="text-xs text-[var(--muted-foreground)] font-medium">
-                    7 Core Pillars · 28 Protocols · Lakehouse Engine
-                  </p>
                 </div>
+                <h3 className="text-sm sm:text-base font-extrabold text-[var(--foreground)]">
+                  Modern Data Architecture
+                </h3>
+                <p className="text-[11px] text-[var(--muted-foreground)] mt-0.5">
+                  Root Concepts Tree &amp; Distributed System Pillars
+                </p>
               </div>
             </div>
 
-            {/* Level 1 Domain Nodes */}
-            {filteredDomains.map((domain) => {
-              const pos = layoutNodes[domain.id];
-              if (!pos) return null;
+            {/* Tree Branches connecting Root to Domains */}
+            <div className="space-y-4 pt-2">
+              {filteredDomains.map(({ domain, matchingSubtopics }, dIdx) => {
+                const isCollapsed = collapsedDomains.has(domain.id);
+                const flowInfo = FLOW_SEQUENCE.find((f) => f.id === domain.id);
+                const Icon = getDomainIcon(domain.icon, 16);
 
-              const isCollapsed = collapsedDomains.has(domain.id);
-              const isSelected = selectedDomain?.id === domain.id;
-              const isMatched = searchMatches.has(domain.id);
-              const flowInfo = FLOW_SEQUENCE.find((f) => f.id === domain.id);
-
-              return (
-                <div
-                  key={domain.id}
-                  data-node="true"
-                  className="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-grab active:cursor-grabbing"
-                  style={{ left: `${pos.x}px`, top: `${pos.y}px` }}
-                  onMouseDown={(e) => startNodeDrag(domain.id, e)}
-                >
+                return (
                   <div
-                    onClick={() => {
-                      if (dragNodeRef.current?.hasMoved) return;
-                      setSelectedDomain(domain);
-                      setSelectedSubtopic(domain.subtopics[0]);
-                    }}
-                    className={cn(
-                      "w-80 p-4 rounded-2xl border-2 transition-all shadow-xl bg-[var(--surface-1)]",
-                      isSelected
-                        ? "border-purple-500 ring-4 ring-purple-500/40"
-                        : isMatched
-                        ? "border-cyan-400 ring-4 ring-cyan-400/50"
-                        : "border-[var(--border)] hover:border-purple-400"
-                    )}
+                    key={domain.id}
+                    className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)]/40 overflow-hidden transition-all"
                   >
-                    {isFlowMode && flowInfo && (
-                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--border)] text-xs font-mono font-bold">
-                        <span className="text-cyan-400 flex items-center gap-1">
-                          <Activity size={12} className="animate-pulse" />
-                          FLOW #{flowInfo.step}
-                        </span>
-                        <span className="text-[var(--muted-foreground)] text-[10px]">{flowInfo.flowRole}</span>
-                      </div>
-                    )}
+                    {/* Level 1 Branch: Architectural Domain Header */}
+                    <div
+                      onClick={() => toggleDomainCollapse(domain.id)}
+                      className="p-3 sm:p-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-[var(--surface-2)]/80 transition-colors border-b border-[var(--border)]/50 select-none group"
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <ChevronDown
+                          size={16}
+                          className={cn(
+                            "text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-transform duration-200 shrink-0",
+                            isCollapsed && "-rotate-90"
+                          )}
+                        />
 
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={cn("p-2 rounded-xl border-2 shrink-0", domain.color.bg, domain.color.border, domain.color.text)}>
-                          {getDomainIcon(domain.icon, 18)}
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="text-sm font-extrabold text-[var(--foreground)] leading-tight line-clamp-2">
+                        {/* Flow Sequence Badge */}
+                        {isFlowMode && flowInfo && (
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-400 border border-blue-500/30 shrink-0">
+                            FLOW #{flowInfo.step}
+                          </span>
+                        )}
+
+                        {/* Domain Icon & Title */}
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="p-1 rounded-lg bg-[var(--surface-3)] text-blue-400 shrink-0">
+                            {Icon}
+                          </span>
+                          <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">
                             {domain.title}
-                          </h3>
-                          <span className="text-xs text-[var(--muted-foreground)] font-medium">
-                            {domain.subtopics.length} Protocols
+                          </h4>
+                          <span className="text-[10px] text-[var(--muted-foreground)] font-mono hidden md:inline shrink-0">
+                            ({matchingSubtopics.length} Subtopics)
                           </span>
                         </div>
                       </div>
 
-                      <button
-                        onClick={(e) => toggleDomainCollapse(domain.id, e)}
-                        className="p-1.5 rounded-lg bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] font-bold text-xs"
-                      >
-                        {isCollapsed ? "Expand" : domain.subtopics.length}
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[11px] font-medium text-[var(--muted-foreground)] hidden sm:inline">
+                          {isCollapsed ? "Click to expand" : "Click to collapse"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Level 2 Leaves: Subtopics & Concepts Grid under Domain */}
+                    {!isCollapsed && (
+                      <div className="p-3 sm:p-4 pl-4 sm:pl-8 space-y-2.5 border-l-2 border-blue-500/30 ml-3 sm:ml-5 my-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {matchingSubtopics.map((subtopic) => {
+                            const isSelected = selectedSubtopic?.id === subtopic.id;
+
+                            return (
+                              <div
+                                key={subtopic.id}
+                                onClick={() => handleSelectSubtopic(subtopic, domain)}
+                                className={cn(
+                                  "p-3 rounded-xl border text-left cursor-pointer transition-all duration-150 flex flex-col justify-between group relative overflow-hidden",
+                                  isSelected
+                                    ? "bg-[var(--surface-3)] border-blue-500/50 shadow-md ring-1 ring-blue-500/30"
+                                    : "bg-[var(--surface-1)] border-[var(--border)] hover:border-blue-500/30 hover:bg-[var(--surface-2)]"
+                                )}
+                              >
+                                <div className="space-y-1.5">
+                                  <div className="flex items-start justify-between gap-1.5">
+                                    <h5 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-blue-400 transition-colors leading-snug">
+                                      {subtopic.name}
+                                    </h5>
+                                    <ChevronRight
+                                      size={14}
+                                      className="text-[var(--muted-foreground)] group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5"
+                                    />
+                                  </div>
+
+                                  <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed line-clamp-2">
+                                    {subtopic.desc}
+                                  </p>
+                                </div>
+
+                                {/* Protocols / Tech Stack Pills */}
+                                <div className="flex items-center gap-1 flex-wrap pt-2 mt-2 border-t border-[var(--border)]/60">
+                                  {subtopic.protocols.slice(0, 3).map((proto, pi) => (
+                                    <span
+                                      key={pi}
+                                      className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-[var(--surface-2)] text-[var(--foreground)] border border-[var(--border)] truncate max-w-[120px]"
+                                    >
+                                      {proto}
+                                    </span>
+                                  ))}
+                                  {subtopic.protocols.length > 3 && (
+                                    <span className="text-[9px] text-[var(--muted-foreground)] font-mono pl-0.5">
+                                      +{subtopic.protocols.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* VIEW MODE 2: Pillars Grid Matrix */}
+        {viewMode === "matrix" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredDomains.map(({ domain, matchingSubtopics }, dIdx) => {
+              const flowInfo = FLOW_SEQUENCE.find((f) => f.id === domain.id);
+              const Icon = getDomainIcon(domain.icon, 16);
+
+              return (
+                <div
+                  key={domain.id}
+                  className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)]/30 p-4 space-y-3 flex flex-col justify-between"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
+                          {Icon}
+                        </span>
+                        <div>
+                          <div className="text-[10px] font-mono font-bold text-blue-400 uppercase">
+                            Pillar 0{dIdx + 1}
+                          </div>
+                          <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)]">
+                            {domain.shortTitle}
+                          </h4>
+                        </div>
+                      </div>
+                      {isFlowMode && flowInfo && (
+                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          FLOW #{flowInfo.step}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+                      {domain.summary}
+                    </p>
+
+                    {/* Subtopics List */}
+                    <div className="space-y-1.5 pt-1">
+                      {matchingSubtopics.map((subtopic) => {
+                        const isSelected = selectedSubtopic?.id === subtopic.id;
+                        return (
+                          <div
+                            key={subtopic.id}
+                            onClick={() => handleSelectSubtopic(subtopic, domain)}
+                            className={cn(
+                              "p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-center justify-between gap-2 group",
+                              isSelected
+                                ? "bg-blue-600/15 border-blue-500/50 text-blue-300 font-semibold"
+                                : "bg-[var(--surface-1)] border-[var(--border)] hover:border-blue-500/30 text-[var(--foreground)]"
+                            )}
+                          >
+                            <span className="truncate group-hover:text-blue-400 transition-colors font-medium">
+                              {subtopic.name}
+                            </span>
+                            <ChevronRight size={13} className="text-[var(--muted-foreground)] group-hover:text-blue-400 shrink-0" />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
               );
             })}
-
-            {/* Level 2 Subtopic Nodes */}
-            {filteredDomains.map((domain) => {
-              if (collapsedDomains.has(domain.id)) return null;
-              const pos = layoutNodes[domain.id];
-              if (!pos) return null;
-
-              return pos.subtopics.map((subPos, idx) => {
-                const sub = domain.subtopics[idx];
-                if (!sub) return null;
-
-                const isSelected = selectedSubtopic?.id === sub.id;
-                const isMatched = searchMatches.has(sub.id);
-
-                return (
-                  <div
-                    key={sub.id}
-                    data-node="true"
-                    className="absolute -translate-x-1/2 -translate-y-1/2 z-10 cursor-grab active:cursor-grabbing"
-                    style={{ left: `${subPos.x}px`, top: `${subPos.y}px` }}
-                    onMouseDown={(e) => startNodeDrag(sub.id, e)}
-                  >
-                    <div
-                      onClick={() => {
-                        if (dragNodeRef.current?.hasMoved) return;
-                        setSelectedDomain(domain);
-                        setSelectedSubtopic(sub);
-                      }}
-                      className={cn(
-                        "w-80 p-3.5 rounded-2xl border-2 transition-all shadow-md bg-[var(--surface-1)] space-y-2",
-                        isSelected
-                          ? "border-purple-500 ring-4 ring-purple-500/40"
-                          : isMatched
-                          ? "border-cyan-400 ring-4 ring-cyan-400/50"
-                          : "border-[var(--border)] hover:border-purple-400"
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-bold text-[var(--foreground)] leading-snug line-clamp-2">
-                          {sub.name}
-                        </h4>
-                        <ChevronRight size={14} className="text-purple-400 shrink-0" />
-                      </div>
-
-                      <p className="text-[11px] text-[var(--foreground)] opacity-90 line-clamp-2 leading-tight">
-                        {sub.desc}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {sub.protocols.slice(0, 3).map((p) => (
-                          <span
-                            key={p}
-                            className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
-                          >
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              });
-            })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* ─── VIEW MODE 2: PIPELINE SWIMLANES (LEFT-TO-RIGHT DATA LIFECYCLE) ── */}
-      {viewMode === "pipeline" && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-[var(--foreground)]">
-            <span className="font-semibold flex items-center gap-2">
-              <Route size={18} className="text-cyan-400 shrink-0" />
-              <span><strong>End-to-End Pipeline Swimlanes:</strong> Temporal left-to-right architectural lifecycle from streaming ingestion through lakehouse storage, compute, and semantic serving.</span>
-            </span>
-            <span className="text-xs text-[var(--muted-foreground)] shrink-0">Click any protocol to open the 3-tab inspector</span>
-          </div>
-
-          <div className="overflow-x-auto rounded-3xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 shadow-xl">
-            <div className="min-w-[1100px] space-y-4">
-              
-              {/* Top Innovation Ribbon: 07. Agentic AI & RAG */}
-              {(() => {
-                const aiDomain = MINDMAP_DOMAINS.find((d) => d.id === "ai");
-                if (!aiDomain) return null;
-                return (
-                  <div className="p-3.5 rounded-2xl bg-indigo-950/40 border-2 border-indigo-500/40 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
-                        07
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">
-                          AGENTIC AI &amp; RAG GROUNDING LAYER
-                        </div>
-                        <h4 className="text-xs font-bold text-white">Model Context Protocol (MCP) • Databricks Genie • Hybrid Vector Search</h4>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {aiDomain.subtopics.map((sub) => (
-                        <button
-                          key={sub.id}
-                          onClick={() => {
-                            setSelectedDomain(aiDomain);
-                            setSelectedSubtopic(sub);
-                            setDrawerTab("gotchas");
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-500/40 text-[11px] font-bold transition-all cursor-pointer"
-                        >
-                          {sub.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* 5 Core Pipeline Stages (Left-to-Right Data Journey) */}
-              <div className="grid grid-cols-5 gap-3.5 items-stretch">
-                {[
-                  { id: "ingestion", label: "01. INGESTION & CDC", colorBorder: "border-cyan-500", colorBg: "bg-cyan-950/30", colorText: "text-cyan-400" },
-                  { id: "storage", label: "02. LAKEHOUSE STORAGE", colorBorder: "border-purple-500", colorBg: "bg-purple-950/30", colorText: "text-purple-400" },
-                  { id: "compute", label: "03. VECTORIZED COMPUTE", colorBorder: "border-rose-500", colorBg: "bg-rose-950/30", colorText: "text-rose-400" },
-                  { id: "orchestration", label: "04. DATAOPS & DAGs", colorBorder: "border-blue-500", colorBg: "bg-blue-950/30", colorText: "text-blue-400" },
-                  { id: "serving", label: "05. SEMANTIC SERVING", colorBorder: "border-emerald-500", colorBg: "bg-emerald-950/30", colorText: "text-emerald-400" },
-                ].map((col, cIdx) => {
-                  const domain = MINDMAP_DOMAINS.find((d) => d.id === col.id);
-                  if (!domain) return null;
-
-                  return (
-                    <div key={col.id} className="flex flex-col space-y-3">
-                      {/* Column Stage Header */}
-                      <div className={cn("p-3 rounded-xl border-2 text-center", col.colorBorder, col.colorBg)}>
-                        <span className={cn("text-[10px] font-mono font-bold tracking-wider", col.colorText)}>
-                          STAGE 0{cIdx + 1}
-                        </span>
-                        <h4 className="text-xs font-black text-[var(--foreground)] mt-0.5 leading-snug">
-                          {domain.shortTitle}
-                        </h4>
-                      </div>
-
-                      {/* 4 Protocol Cards */}
-                      <div className="flex-1 flex flex-col space-y-2.5">
-                        {domain.subtopics.map((sub) => {
-                          const isSel = selectedSubtopic?.id === sub.id;
-
-                          return (
-                            <div
-                              key={sub.id}
-                              onClick={() => {
-                                setSelectedDomain(domain);
-                                setSelectedSubtopic(sub);
-                                setDrawerTab("gotchas");
-                              }}
-                              className={cn(
-                                "p-3 rounded-xl border-2 transition-all cursor-pointer flex-1 flex flex-col justify-between space-y-2 shadow-xs",
-                                isSel
-                                  ? "bg-[var(--surface-2)] border-purple-500 ring-2 ring-purple-500/40"
-                                  : "bg-[var(--surface-2)]/80 border-[var(--border)] hover:border-purple-400 hover:bg-[var(--surface-2)]"
-                              )}
-                            >
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-xs font-bold text-[var(--foreground)]">
-                                  <span className="leading-snug line-clamp-2">{sub.name}</span>
-                                  <ChevronRight size={13} className="text-purple-400 shrink-0 ml-1" />
-                                </div>
-                                <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
-                                  {sub.desc}
-                                </p>
-                              </div>
-
-                              <div className="flex flex-wrap gap-1 pt-1 border-t border-[var(--border)]">
-                                {sub.protocols.slice(0, 2).map((p) => (
-                                  <span
-                                    key={p}
-                                    className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
-                                  >
-                                    {p}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Bottom Foundation Ribbon: 06. Unified Governance */}
-              {(() => {
-                const govDomain = MINDMAP_DOMAINS.find((d) => d.id === "governance");
-                if (!govDomain) return null;
-                return (
-                  <div className="p-3.5 rounded-2xl bg-purple-950/40 border-2 border-purple-500/40 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
-                        06
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-wider">
-                          UNIFIED ENTERPRISE GOVERNANCE &amp; SECURITY FOUNDATION
-                        </div>
-                        <h4 className="text-xs font-bold text-white">Microsoft Purview Hub • Unity Catalog Lineage • Workspace RBAC • Capacity Smoothing</h4>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {govDomain.subtopics.map((sub) => (
-                        <button
-                          key={sub.id}
-                          onClick={() => {
-                            setSelectedDomain(govDomain);
-                            setSelectedSubtopic(sub);
-                            setDrawerTab("gotchas");
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/40 text-[11px] font-bold transition-all cursor-pointer"
-                        >
-                          {sub.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── VIEW MODE 3: 7 PILLARS COMPARISON BOARD ──────────────────── */}
-      {viewMode === "matrix" && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-[var(--foreground)]">
-            <span className="font-semibold flex items-center gap-2">
-              <LayoutGrid size={18} className="text-purple-400 shrink-0" />
-              <span><strong>7-Pillars Enterprise Architecture Matrix:</strong> Comprehensive side-by-side comparison of all 7 pillars, 28 protocols, and production trade-offs.</span>
-            </span>
-            <span className="text-xs text-[var(--muted-foreground)] shrink-0">Click any card to inspect full rubric &amp; code</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
-            {filteredDomains.map((domain, dIdx) => (
-              <div
-                key={domain.id}
-                className="rounded-2xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-3.5 shadow-sm flex flex-col justify-between space-y-3"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 pb-2.5 border-b-2 border-[var(--border)]">
-                    <div className={cn("p-1.5 rounded-xl border shrink-0", domain.color.bg, domain.color.text)}>
-                      {getDomainIcon(domain.icon, 16)}
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-[10px] font-mono font-bold text-cyan-500 block uppercase">STAGE 0{dIdx + 1}</span>
-                      <h4 className="text-xs font-black text-[var(--foreground)] truncate leading-tight">{domain.shortTitle}</h4>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-[var(--muted-foreground)] leading-snug line-clamp-2">
-                    {domain.summary}
-                  </p>
-
-                  <div className="space-y-2 pt-1">
-                    {domain.subtopics.map((sub) => {
-                      const isSel = selectedSubtopic?.id === sub.id;
-
-                      return (
-                        <div
-                          key={sub.id}
-                          onClick={() => {
-                            setSelectedDomain(domain);
-                            setSelectedSubtopic(sub);
-                            setDrawerTab("gotchas");
-                          }}
-                          className={cn(
-                            "p-2.5 rounded-xl border-2 transition-all cursor-pointer space-y-1.5 shadow-xs",
-                            isSel
-                              ? "bg-[var(--surface-2)] border-purple-500 ring-2 ring-purple-500/40"
-                              : "bg-[var(--surface-2)] border-[var(--border)] hover:border-purple-400"
-                          )}
-                        >
-                          <div className="flex items-center justify-between text-xs font-bold text-[var(--foreground)]">
-                            <span className="leading-snug line-clamp-2">{sub.name}</span>
-                            <ChevronRight size={13} className="text-purple-400 shrink-0 ml-1" />
-                          </div>
-                          <p className="text-[10px] text-[var(--muted-foreground)] leading-tight line-clamp-2">
-                            {sub.desc}
-                          </p>
-                          <div className="flex flex-wrap gap-1 pt-0.5">
-                            {sub.protocols.slice(0, 2).map((p) => (
-                              <span
-                                key={p}
-                                className="text-[8px] font-mono font-semibold px-1 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
-                              >
-                                {p}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Unified Foundation Banner */}
-          <div className="p-4 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] text-center text-xs font-bold text-[var(--muted-foreground)]">
-            <span className="text-purple-400 font-extrabold uppercase tracking-wider mr-2">Unified Lakehouse Engine Foundation:</span>
-            <span>Open Parquet Storage • Multi-Cloud Unity Catalog Lineage • Universal Table Formats • Zero Data Duplication</span>
-          </div>
-        </div>
-      )}
-
-      {/* ─── SLIDE-OUT INSPECTOR DRAWER (3-TAB ARCHITECT RUBRIC) ───────── */}
+      {/* ─── Architectural Concept Inspector Drawer ─────────────────────── */}
       <AnimatePresence>
         {selectedSubtopic && selectedDomain && (
           <m.div
-            initial={{ opacity: 0, x: 420 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 420 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[540px] bg-[var(--surface-1)] border-l-2 border-[var(--border)] shadow-2xl p-6 sm:p-7 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-[var(--surface-1)] border-l border-[var(--border)] shadow-2xl flex flex-col justify-between overflow-hidden"
           >
-            <div className="space-y-5">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3.5 border-b-2 border-[var(--border)]">
-                <div className="flex items-center gap-2">
-                  <span className={cn("rounded-xl border font-bold text-xs px-3 py-1", selectedDomain.color.badge)}>
-                    {selectedDomain.shortTitle}
-                  </span>
-                  <span className="text-xs text-[var(--muted-foreground)] font-mono">PROTOCOL INSPECTOR</span>
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-between">
+              <div className="space-y-0.5 min-w-0 pr-2">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-400 uppercase tracking-wider">
+                  <span>{selectedDomain.title}</span>
                 </div>
-                <button
-                  onClick={() => setSelectedSubtopic(null)}
-                  className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
-                  aria-label="Close details"
-                >
-                  <X size={20} />
-                </button>
+                <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] truncate">
+                  {selectedSubtopic.name}
+                </h3>
               </div>
 
-              {/* 3-Tab Scope Switcher */}
-              <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-bold">
-                <button
-                  onClick={() => setDrawerTab("gotchas")}
-                  className={cn(
-                    "py-2 px-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
-                    drawerTab === "gotchas" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)] hover:text-white"
-                  )}
-                >
-                  <Sparkles size={13} />
-                  <span className="truncate">1. Rubric &amp; Gotchas</span>
-                </button>
-                <button
-                  onClick={() => setDrawerTab("code")}
-                  className={cn(
-                    "py-2 px-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
-                    drawerTab === "code" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)] hover:text-white"
-                  )}
-                >
-                  <Code2 size={13} />
-                  <span className="truncate">2. Production Code</span>
-                </button>
-                <button
-                  onClick={() => setDrawerTab("scenarios")}
-                  className={cn(
-                    "py-2 px-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
-                    drawerTab === "scenarios" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)] hover:text-white"
-                  )}
-                >
-                  <HelpCircle size={13} />
-                  <span className="truncate">3. Scenarios &amp; Q&amp;A</span>
-                </button>
-              </div>
+              <button
+                onClick={() => setSelectedSubtopic(null)}
+                className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
+                aria-label="Close inspector drawer"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-              {/* Tab 1: Rubric & Gotchas */}
+            {/* Drawer Tabs */}
+            <div className="flex items-center border-b border-[var(--border)] bg-[var(--surface-1)] px-4">
+              <button
+                onClick={() => setDrawerTab("gotchas")}
+                className={cn(
+                  "py-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer",
+                  drawerTab === "gotchas"
+                    ? "border-blue-500 text-blue-400"
+                    : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                Gotchas &amp; Trade-Offs
+              </button>
+              <button
+                onClick={() => setDrawerTab("code")}
+                className={cn(
+                  "py-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer",
+                  drawerTab === "code"
+                    ? "border-blue-500 text-blue-400"
+                    : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                Code Blueprint
+              </button>
+              <button
+                onClick={() => setDrawerTab("scenarios")}
+                className={cn(
+                  "py-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer",
+                  drawerTab === "scenarios"
+                    ? "border-blue-500 text-blue-400"
+                    : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                )}
+              >
+                Scenarios &amp; Practice
+              </button>
+            </div>
+
+            {/* Drawer Body Content */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
               {drawerTab === "gotchas" && (
-                <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
-                      Architectural Protocol Rubric
-                    </span>
-                    <h3 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
-                      {selectedSubtopic.name}
-                    </h3>
-                    <p className="text-sm text-[var(--foreground)] leading-relaxed">
-                      {selectedSubtopic.desc}
-                    </p>
-                  </div>
-
-                  {/* Architectural Gotchas Callout */}
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/35 space-y-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-wider">
-                      <AlertTriangle size={15} />
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  {/* Architectural Trade-Off & Production Rubric */}
+                  <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 space-y-1.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                      <SlidersHorizontal size={13} />
                       <span>Architectural Trade-Off &amp; Production Rubric</span>
-                    </div>
-                    <p className="text-sm font-medium text-[var(--foreground)] leading-relaxed">
+                    </span>
+                    <p className="text-xs text-[var(--foreground)] leading-relaxed">
                       {selectedSubtopic.tradeOffs}
                     </p>
                   </div>
 
-                  {/* Standard Tooling Protocols */}
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      Standard Ecosystem Protocols &amp; Tooling
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedSubtopic.protocols.map((p) => (
+                  {/* Architectural Description */}
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                      Architecture Description:
+                    </h4>
+                    <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                      {selectedSubtopic.desc}
+                    </p>
+                  </div>
+
+                  {/* Technology & Protocol Stack */}
+                  <div className="space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                      Standard Protocols &amp; Technologies:
+                    </h4>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {selectedSubtopic.protocols.map((proto, idx) => (
                         <span
-                          key={p}
-                          className="px-3 py-1 rounded-xl text-xs font-mono font-bold bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)]"
+                          key={idx}
+                          className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--foreground)] border border-[var(--border)]"
                         >
-                          {p}
+                          {proto}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Core Architecture Takeaways */}
-                  {linkedConcept?.keyPoints && (
-                    <div className="space-y-2 pt-3 border-t border-[var(--border)]">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                        Core Architecture Takeaways:
-                      </h4>
-                      <ul className="space-y-2">
-                        {linkedConcept.keyPoints.map((point, ki) => (
-                          <li key={ki} className="flex items-start gap-2 text-xs text-[var(--foreground)]">
-                            <CheckCircle2 size={15} className="text-green-400 mt-0.5 shrink-0" />
-                            <span>{point}</span>
-                          </li>
-                        ))}
-                      </ul>
+                  {/* Linked Concept Insights */}
+                  {linkedConcept && (
+                    <div className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-purple-400">
+                        <span>Concept Term: {linkedConcept.term}</span>
+                        {linkedConcept.category && (
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">
+                            {linkedConcept.category}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                        {linkedConcept.definition}
+                      </p>
+                      {linkedConcept.keyPoints && linkedConcept.keyPoints.length > 0 && (
+                        <div className="pt-2 border-t border-[var(--border)] space-y-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                            Key Takeaways:
+                          </span>
+                          <ul className="space-y-1 text-xs text-[var(--muted-foreground)] list-disc pl-4">
+                            {linkedConcept.keyPoints.map((pt, pi) => (
+                              <li key={pi}>{pt}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Tab 2: Production Code Blueprint */}
               {drawerTab === "code" && (
-                <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
-                      Executable Implementation
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1.5">
+                      <Code2 size={14} className="text-blue-400" />
+                      <span>Production Syntax Snippet</span>
                     </span>
-                    <h3 className="text-xl font-black text-[var(--foreground)] tracking-tight">
-                      {selectedSubtopic.name} Blueprint
-                    </h3>
+                    {selectedSubtopic.codeSnippet && (
+                      <button
+                        onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300 cursor-pointer"
+                      >
+                        {hasCopied ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{hasCopied ? "Copied" : "Copy"}</span>
+                      </button>
+                    )}
                   </div>
 
                   {selectedSubtopic.codeSnippet ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1.5">
-                          <Code2 size={14} className="text-purple-400" />
-                          <span>Production Syntax Snippet</span>
-                        </span>
-                        <button
-                          onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-400 hover:text-purple-300 cursor-pointer"
-                        >
-                          {hasCopied ? <Check size={14} /> : <Copy size={14} />}
-                          <span>{hasCopied ? "Copied" : "Copy"}</span>
-                        </button>
-                      </div>
-                      <pre className="p-4 rounded-xl bg-black/95 border-2 border-[var(--border)] text-xs font-mono text-cyan-300 whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner">
-                        <code>{selectedSubtopic.codeSnippet}</code>
-                      </pre>
-
-                      <div className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] leading-relaxed space-y-1">
-                        <strong className="text-[var(--foreground)] font-semibold block">Production Implementation Guidance:</strong>
-                        <span>Ensure appropriate compute scaling, cluster isolation, and schema drift validation are configured before deploying to production pipelines.</span>
-                      </div>
-                    </div>
+                    <pre className="p-3.5 rounded-xl bg-black/90 border border-[var(--border)] text-xs font-mono text-cyan-300 whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner">
+                      <code>{selectedSubtopic.codeSnippet}</code>
+                    </pre>
                   ) : (
-                    <div className="p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center text-xs text-[var(--muted-foreground)]">
-                      Code snippet blueprint is being standardized for this specific protocol. Use the scenario link below to review reference configurations.
+                    <div className="p-6 rounded-xl bg-[var(--surface-2)] text-center text-xs text-[var(--muted-foreground)]">
+                      Standard implementation rubric for this node is in the scenario practice bank below.
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Tab 3: Interview Scenarios & Q&A */}
               {drawerTab === "scenarios" && (
-                <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">
-                      Assessment &amp; Real-World Simulation
-                    </span>
-                    <h3 className="text-xl font-black text-[var(--foreground)] tracking-tight">
-                      Interview &amp; Scenario Prep
-                    </h3>
-                  </div>
-
-                  {/* Scenario Challenge Card */}
-                  <div className="p-4 rounded-2xl bg-[var(--surface-2)] border-2 border-purple-500/40 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-extrabold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Zap size={14} />
-                        <span>Principal Architect Scenario</span>
-                      </span>
-                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                        ARCHITECT LEVEL
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-purple-400">
+                      <span>Architectural Evaluation Dimension</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">
+                        LEAD LEVEL
                       </span>
                     </div>
-                    <p className="text-xs font-medium text-[var(--foreground)] leading-relaxed">
-                      How would you design, benchmark, and deploy a production-grade implementation of <strong>{selectedSubtopic.name}</strong> while balancing write amplification, read latency, and schema evolution?
+                    <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                      Evaluate how <strong>{selectedSubtopic.name}</strong> operates under production loads, examining state management, failure scenarios, and capacity limits.
                     </p>
                   </div>
-
-                  {/* Scenario Focus Topics */}
-                  <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                      Key Interview Evaluation Dimensions:
-                    </h4>
-                    <div className="space-y-1.5 text-xs text-[var(--muted-foreground)]">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0"></span>
-                        <span>Concurrency models and transaction isolation guarantees</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
-                        <span>Failure domain recovery, backpressure, and checkpointing</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-                        <span>FinOps compute sizing and storage compaction cost overheads</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
+            </div>
 
-              {/* Universal Footer Actions */}
-              <div className="pt-5 border-t-2 border-[var(--border)] space-y-2.5">
+            {/* Drawer Footer Actions */}
+            <div className="p-4 border-t border-[var(--border)] bg-[var(--surface-2)] space-y-2 shrink-0">
+              <Link
+                href={
+                  selectedSubtopic.conceptId
+                    ? `/qa-prep?conceptId=${selectedSubtopic.conceptId}&term=${encodeURIComponent(selectedSubtopic.name)}`
+                    : selectedSubtopic.practiceLink
+                }
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-md transition-all text-center"
+              >
+                <Zap size={15} />
+                <span>Practice Interview Q&amp;As for this Topic</span>
+                <ArrowRight size={15} />
+              </Link>
+
+              <div className="grid grid-cols-2 gap-2">
                 <Link
-                  href={
-                    selectedSubtopic.conceptId
-                      ? `/qa-prep?conceptId=${selectedSubtopic.conceptId}&term=${encodeURIComponent(selectedSubtopic.name)}`
-                      : selectedSubtopic.practiceLink
-                  }
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-bold shadow-lg transition-all"
+                  href={`/architecture?tab=scenarios&q=${encodeURIComponent(selectedSubtopic.name)}`}
+                  className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-[var(--surface-1)] hover:bg-[var(--surface-3)] text-blue-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
                 >
-                  <Zap size={16} />
-                  <span>Practice Interview Q&amp;As for this Topic</span>
-                  <ArrowRight size={16} />
+                  <Sparkles size={13} />
+                  <span>System Scenarios</span>
                 </Link>
-
-                <div className="grid grid-cols-2 gap-2">
+                {linkedConcept ? (
                   <Link
-                    href={`/architecture?tab=scenarios&q=${encodeURIComponent(selectedSubtopic.name)}`}
-                    className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
+                    href={`/concepts?card=${linkedConcept.id}`}
+                    className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-[var(--surface-1)] hover:bg-[var(--surface-3)] text-purple-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
                   >
-                    <Sparkles size={14} />
-                    <span>System Scenarios</span>
+                    <BookOpen size={13} />
+                    <span>Concept Library</span>
                   </Link>
-                  {linkedConcept ? (
-                    <Link
-                      href={`/concepts?card=${linkedConcept.id}`}
-                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-purple-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
-                    >
-                      <BookOpen size={14} />
-                      <span>Concept Library</span>
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/concepts"
-                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-purple-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
-                    >
-                      <BookOpen size={14} />
-                      <span>All Concepts</span>
-                    </Link>
-                  )}
-                </div>
+                ) : (
+                  <Link
+                    href="/concepts"
+                    className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-[var(--surface-1)] hover:bg-[var(--surface-3)] text-purple-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
+                  >
+                    <BookOpen size={13} />
+                    <span>All Concepts</span>
+                  </Link>
+                )}
               </div>
-
             </div>
           </m.div>
         )}
@@ -1655,3 +831,5 @@ export function InteractiveMindmap() {
     </div>
   );
 }
+
+export default InteractiveMindmap;
