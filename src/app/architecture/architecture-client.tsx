@@ -473,6 +473,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [isReadAllMode, setIsReadAllMode] = useState(false);
+  const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const initialBatch = 25;
@@ -677,8 +679,9 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   }, [filteredItems, isShuffled, shuffleSeed]);
 
   const paginatedItems = useMemo(() => {
+    if (isReadAllMode) return displayedFilteredItems;
     return displayedFilteredItems.slice(0, visibleCount);
-  }, [displayedFilteredItems, visibleCount]);
+  }, [displayedFilteredItems, visibleCount, isReadAllMode]);
 
   // Filtered Python Runbooks
   const filteredRunbooks = useMemo(() => {
@@ -730,26 +733,95 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     return modernStackDb.filter((q) => Boolean(q.py_code));
   }, []);
 
-  // Handlers for System Scenarios
+  // Handlers for System Scenarios & Read All Mode
+  const handleExpandAllScenarios = useCallback(() => {
+    setIsReadAllMode(true);
+    setCollapsedInReadMode(new Set());
+    setVisibleCount(filteredItems.length);
+    setExpandedIds(new Set(filteredItems.map((i) => i.id)));
+    toast.success(`Read All Mode: All ${filteredItems.length.toLocaleString()} architecture scenarios expanded`);
+  }, [filteredItems]);
+
+  const handleCollapseAllScenarios = useCallback(() => {
+    setIsReadAllMode(false);
+    setExpandedIds(new Set());
+    setCollapsedInReadMode(new Set());
+    toast.info("Collapsed all architecture scenarios");
+  }, []);
+
+  const toggleReadAllScenarios = useCallback(() => {
+    if (!isReadAllMode) {
+      handleExpandAllScenarios();
+    } else {
+      handleCollapseAllScenarios();
+    }
+  }, [isReadAllMode, handleExpandAllScenarios, handleCollapseAllScenarios]);
+
+  const handleExpandAllRunbooks = useCallback(() => {
+    setPyExpandedIds(new Set(filteredRunbooks.map((r) => r.id)));
+    toast.success(`Expanded all ${filteredRunbooks.length.toLocaleString()} Python runbooks`);
+  }, [filteredRunbooks]);
+
+  const handleCollapseAllRunbooks = useCallback(() => {
+    setPyExpandedIds(new Set());
+    toast.info("Collapsed all Python runbooks");
+  }, []);
+
   const toggleExpand = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-        const item = architectureData.find((a) => a.id === id);
-        if (item) {
-          recordLastTopic({
-            title: item.question.slice(0, 60),
-            href: `/architecture?card=${id}`,
-            category: item.category || "Architecture",
-          });
+    if (isReadAllMode) {
+      setCollapsedInReadMode((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } else {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+          const item = architectureData.find((a) => a.id === id);
+          if (item) {
+            recordLastTopic({
+              title: item.question.slice(0, 60),
+              href: `/architecture?card=${id}`,
+              category: item.category || "Architecture",
+            });
+          }
+        }
+        return next;
+      });
+    }
+  };
+
+  // Global keyboard shortcut: Shift + E to toggle Read All mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      if (e.shiftKey && (e.key === "E" || e.key === "e")) {
+        e.preventDefault();
+        if (activeTab === "scenarios") {
+          toggleReadAllScenarios();
+        } else if (activeTab === "python") {
+          if (pyExpandedIds.size > 0) {
+            handleCollapseAllRunbooks();
+          } else {
+            handleExpandAllRunbooks();
+          }
         }
       }
-      return next;
-    });
-  };
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeTab, toggleReadAllScenarios, pyExpandedIds, handleCollapseAllRunbooks, handleExpandAllRunbooks]);
 
   const toggleBookmark = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -988,17 +1060,37 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                 <span>{isShuffled ? "Reshuffle" : "Shuffle"}</span>
               </button>
 
+              {/* Read All / Continuous Reading Mode Toggle */}
+              <button
+                onClick={toggleReadAllScenarios}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  isReadAllMode
+                    ? "bg-emerald-600 hover:bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20 shadow-md ring-2 ring-emerald-500/30"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                )}
+                title="Toggle continuous reading mode for all scenarios (Shift + E)"
+              >
+                <BookOpen size={13} className={cn(isReadAllMode && "animate-pulse")} />
+                <span>{isReadAllMode ? "Exit Read All" : "Read All"}</span>
+                <kbd className="hidden md:inline-block text-[10px] px-1 py-0.5 rounded bg-black/20 text-current border border-white/20 font-mono">
+                  ⇧E
+                </kbd>
+              </button>
+
               {/* Expand / Collapse All */}
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => setExpandedIds(new Set(paginatedItems.map((i) => i.id)))}
+                  onClick={handleExpandAllScenarios}
                   className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
+                  title="Expand all scenario cards"
                 >
                   Expand All
                 </button>
                 <button
-                  onClick={() => setExpandedIds(new Set())}
+                  onClick={handleCollapseAllScenarios}
                   className="px-2 py-1 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-all cursor-pointer whitespace-nowrap"
+                  title="Collapse all scenario cards"
                 >
                   Collapse All
                 </button>
@@ -1204,15 +1296,27 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setExpandedIds(new Set(paginatedItems.map((i) => i.id)))}
-                className="hover:text-[var(--foreground)] font-medium transition-colors"
+                onClick={toggleReadAllScenarios}
+                className={cn(
+                  "inline-flex items-center gap-1 font-semibold transition-colors cursor-pointer",
+                  isReadAllMode ? "text-emerald-500 dark:text-emerald-400 font-bold" : "hover:text-[var(--foreground)]"
+                )}
+                title="Toggle continuous read-all mode (Shift + E)"
+              >
+                <BookOpen size={13} className={cn(isReadAllMode && "text-emerald-500 dark:text-emerald-400")} />
+                <span>{isReadAllMode ? "Exit Read All" : "Read All"}</span>
+              </button>
+              <span>•</span>
+              <button
+                onClick={handleExpandAllScenarios}
+                className="hover:text-[var(--foreground)] font-medium transition-colors cursor-pointer"
               >
                 Expand All
               </button>
               <span>•</span>
               <button
-                onClick={() => setExpandedIds(new Set())}
-                className="hover:text-[var(--foreground)] font-medium transition-colors"
+                onClick={handleCollapseAllScenarios}
+                className="hover:text-[var(--foreground)] font-medium transition-colors cursor-pointer"
               >
                 Collapse All
               </button>
@@ -1241,7 +1345,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
           ) : (
             <div className="space-y-4">
               {paginatedItems.map((item) => {
-                const isExpanded = expandedIds.has(item.id);
+                const isExpanded = isReadAllMode ? !collapsedInReadMode.has(item.id) : expandedIds.has(item.id);
                 const isBookmarked = bookmarks.includes(item.id);
                 const diffStyle = difficultyColors[item.difficulty] || difficultyColors.ARCHITECT;
 
@@ -1399,15 +1503,15 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setPyExpandedIds(new Set(paginatedRunbooks.map((r) => r.id)))}
-                className="hover:text-[var(--foreground)] font-medium transition-colors"
+                onClick={handleExpandAllRunbooks}
+                className="hover:text-[var(--foreground)] font-medium transition-colors cursor-pointer"
               >
                 Expand All
               </button>
               <span>•</span>
               <button
-                onClick={() => setPyExpandedIds(new Set())}
-                className="hover:text-[var(--foreground)] font-medium transition-colors"
+                onClick={handleCollapseAllRunbooks}
+                className="hover:text-[var(--foreground)] font-medium transition-colors cursor-pointer"
               >
                 Collapse All
               </button>

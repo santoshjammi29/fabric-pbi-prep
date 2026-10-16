@@ -158,6 +158,8 @@ function GuidedLearningContent() {
   const [stageFilter, setStageFilter] = useState<string>("ALL");
   const [collapsedStages, setCollapsedStages] = useState<Record<string, boolean>>({});
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [isReadAllMode, setIsReadAllMode] = useState(false);
+  const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [pages, setPages] = useState<Record<string, number>>({});
   const [isShuffled, setIsShuffled] = useState(false);
@@ -201,6 +203,8 @@ function GuidedLearningContent() {
       setSelectedStatus("ALL");
       setStageFilter("ALL");
       setExpandedIds(new Set());
+      setIsReadAllMode(false);
+      setCollapsedInReadMode(new Set());
       setIsShuffled(false);
       setCollapsedStages({});
     } else if (typeof window !== "undefined") {
@@ -329,14 +333,64 @@ function GuidedLearningContent() {
     [selectedTopic]
   );
 
-  const toggleExpand = useCallback((id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const handleExpandAll = useCallback(() => {
+    setIsReadAllMode(true);
+    setCollapsedInReadMode(new Set());
+    setExpandedIds(new Set(filteredItems.map((i) => i.id)));
+    toast.success(`Read All Mode: All ${filteredItems.length} milestone cards expanded`);
+  }, [filteredItems]);
+
+  const handleCollapseAll = useCallback(() => {
+    setIsReadAllMode(false);
+    setExpandedIds(new Set());
+    setCollapsedInReadMode(new Set());
+    toast.info("Collapsed all milestone cards");
   }, []);
+
+  const toggleReadAllMode = useCallback(() => {
+    if (!isReadAllMode) {
+      handleExpandAll();
+    } else {
+      handleCollapseAll();
+    }
+  }, [isReadAllMode, handleExpandAll, handleCollapseAll]);
+
+  // Global keyboard shortcut: Shift + E to toggle Read All mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      if (e.shiftKey && (e.key === "E" || e.key === "e")) {
+        e.preventDefault();
+        toggleReadAllMode();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggleReadAllMode]);
+
+  const toggleExpand = useCallback((id: string) => {
+    if (isReadAllMode) {
+      setCollapsedInReadMode((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } else {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
+  }, [isReadAllMode]);
 
   const markStageAllDone = useCallback(
     (stageKey: string) => {
@@ -1016,6 +1070,45 @@ function GuidedLearningContent() {
 
               <div className="w-px h-3.5 bg-[var(--border)] mx-1 shrink-0" />
 
+              {/* Read All Mode Toggle */}
+              <button
+                onClick={toggleReadAllMode}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  isReadAllMode
+                    ? "bg-emerald-600 hover:bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20 shadow-md ring-2 ring-emerald-500/30"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                )}
+                title="Toggle continuous reading mode for all curriculum cards (Shift + E)"
+              >
+                <BookOpen size={12} className={cn(isReadAllMode && "animate-pulse")} />
+                <span>{isReadAllMode ? "Exit Read All" : "Read All"}</span>
+                <kbd className="hidden sm:inline-block text-[9px] px-1 py-0.2 rounded bg-black/20 text-current border border-white/20 font-mono">
+                  ⇧E
+                </kbd>
+              </button>
+
+              {/* Expand / Collapse All */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handleExpandAll}
+                  className="px-2 py-1 rounded text-[11px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer border border-transparent hover:border-[var(--border)]"
+                  title="Expand all cards"
+                >
+                  Expand All
+                </button>
+                <span className="text-[var(--muted-foreground)]">•</span>
+                <button
+                  onClick={handleCollapseAll}
+                  className="px-2 py-1 rounded text-[11px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer border border-transparent hover:border-[var(--border)]"
+                  title="Collapse all cards"
+                >
+                  Collapse All
+                </button>
+              </div>
+
+              <div className="w-px h-3.5 bg-[var(--border)] mx-1 shrink-0" />
+
               {/* Drill / Shuffle Mode */}
               <div className="flex items-center gap-1 shrink-0 ml-auto">
                 <button
@@ -1059,7 +1152,7 @@ function GuidedLearningContent() {
 
                 const isCollapsed = collapsedStages[stage.id];
                 const pageNum = pages[stage.id] || 1;
-                const visibleItems = items.slice(0, pageNum * pageSize);
+                const visibleItems = isReadAllMode ? items : items.slice(0, pageNum * pageSize);
                 const stageDoneCount = items.filter((i) => completedIds.has(i.id)).length;
                 const isStageComplete = stageDoneCount === items.length && items.length > 0;
 
@@ -1111,7 +1204,7 @@ function GuidedLearningContent() {
                       <div className="space-y-1">
                         {visibleItems.map((item) => {
                           const isCompleted = completedIds.has(item.id);
-                          const isExpanded = expandedIds.has(item.id);
+                          const isExpanded = isReadAllMode ? !collapsedInReadMode.has(item.id) : expandedIds.has(item.id);
                           const diffStyle = difficultyColors[item.difficulty] || difficultyColors.MEDIUM;
                           const tStyle = typeColors[item.type] || typeColors.concept;
                           const IconComp = tStyle.icon;
@@ -1268,7 +1361,7 @@ function GuidedLearningContent() {
                     )}
 
                     {/* Pagination Controls per stage */}
-                    {!isCollapsed && visibleItems.length < items.length && (
+                    {!isCollapsed && !isReadAllMode && visibleItems.length < items.length && (
                       <div className="flex items-center justify-center gap-2 pt-2 border-t border-[var(--border)]">
                         <button
                           onClick={() => setPages((p) => ({ ...p, [stage.id]: (p[stage.id] || 1) * 2 }))}

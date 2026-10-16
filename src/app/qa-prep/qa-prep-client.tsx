@@ -174,6 +174,8 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   );
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [isReadAllMode, setIsReadAllMode] = useState(false);
+  const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
@@ -374,14 +376,57 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const toggleExpand = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const handleExpandAll = useCallback(() => {
+    setIsReadAllMode(true);
+    setCollapsedInReadMode(new Set());
+    toast.success(`Read All Mode: All ${filteredQuestions.length.toLocaleString()} cards expanded`);
+  }, [filteredQuestions.length]);
+
+  const handleCollapseAll = useCallback(() => {
+    setIsReadAllMode(false);
+    setExpandedIds(new Set());
+    setCollapsedInReadMode(new Set());
+    toast.info("Collapsed all cards");
+  }, []);
+
+  const toggleReadAllMode = useCallback(() => {
+    if (!isReadAllMode) {
+      handleExpandAll();
+    } else {
+      handleCollapseAll();
+    }
+  }, [isReadAllMode, handleExpandAll, handleCollapseAll]);
+
+  const toggleExpand = useCallback((id: string) => {
+    if (isReadAllMode) {
+      setCollapsedInReadMode((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } else {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
+  }, [isReadAllMode]);
+
+  // Global Keyboard Shortcut: Shift + E to toggle Read All Mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "E" && e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        toggleReadAllMode();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggleReadAllMode]);
 
   const currentStudyCard = filteredQuestions[studyIndex];
 
@@ -535,6 +580,48 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               ))}
             </div>
 
+            {/* Read All / Continuous Reading Mode Controls */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={toggleReadAllMode}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  isReadAllMode
+                    ? "bg-emerald-600 border-emerald-500 text-white shadow-emerald-500/20"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                )}
+                title="Toggle Read All mode: reads all cards with full answers continuously (Shortcut: Shift + E)"
+              >
+                <BookOpen size={13} />
+                <span>{isReadAllMode ? "Reading All" : "Read All"}</span>
+                {isReadAllMode && (
+                  <span className="ml-0.5 px-1.5 py-0.2 bg-emerald-700/80 rounded-full text-[10px] font-bold">
+                    ON
+                  </span>
+                )}
+              </button>
+
+              <div className="hidden sm:flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={handleExpandAll}
+                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
+                  title="Expand all matching questions"
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCollapseAll}
+                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
+                  title="Collapse all matching questions"
+                >
+                  Collapse All
+                </button>
+              </div>
+            </div>
+
             {/* Flashcard Study Mode Button */}
             <button
               onClick={() => setIsStudyMode(!isStudyMode)}
@@ -567,12 +654,25 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
           </div>
         </div>
 
-        {/* ACTIVE FILTER BADGES ROW (Only shown if at least one filter is active) */}
-        {hasActiveFilters && (
+        {/* ACTIVE FILTER & READING MODE BADGES ROW */}
+        {(hasActiveFilters || isReadAllMode) && (
           <div className="flex items-center gap-1.5 flex-wrap pt-1.5 border-t border-[var(--border)]/60 text-xs">
             <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1">
               <SlidersHorizontal size={10} /> Active:
             </span>
+
+            {isReadAllMode && (
+              <button
+                type="button"
+                onClick={handleCollapseAll}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] hover:bg-emerald-500/20 cursor-pointer font-medium"
+                title="Click to exit Read All mode and collapse cards"
+              >
+                <BookOpen size={11} />
+                <span>Read All Mode Active ({filteredQuestions.length.toLocaleString()} Cards)</span>
+                <X size={11} />
+              </button>
+            )}
 
             {selectedTech !== "ALL" && currentTechObj && (
               <button
@@ -760,7 +860,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               {virtualizer.getVirtualItems().map((virtualRow) => {
                 const q = filteredQuestions[virtualRow.index];
                 if (!q) return null;
-                const isExpanded = expandedIds.has(q.id);
+                const isExpanded = isReadAllMode ? !collapsedInReadMode.has(q.id) : expandedIds.has(q.id);
                 const isBookmarked = bookmarks.includes(q.id);
                 const diffStyle = difficultyColors[q.difficulty] || difficultyColors.MEDIUM;
                 const hasCode = questionHasCode(q);

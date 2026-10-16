@@ -135,11 +135,12 @@ export function MindmapCanvasEngine({
 
       // Connectors: Domain -> Subtopics
       if (!collapsedDomains.has(domain.id)) {
+        const subBranchAnchorX = isLeft ? pos.x - 160 : pos.x + 160;
         pos.subtopics.forEach((subPos) => {
-          const subAnchorX = isLeft ? subPos.x + 145 : subPos.x - 145;
+          const subAnchorX = isLeft ? subPos.x + 155 : subPos.x - 155;
           const subAnchorY = subPos.y;
-          const sdx = Math.abs(subAnchorX - branchAnchorX) * 0.5;
-          const scx1 = isLeft ? branchAnchorX - sdx : branchAnchorX + sdx;
+          const sdx = Math.abs(subAnchorX - subBranchAnchorX) * 0.5;
+          const scx1 = isLeft ? subBranchAnchorX - sdx : subBranchAnchorX + sdx;
           const scx2 = isLeft ? subAnchorX + sdx : subAnchorX - sdx;
 
           const isSubSel = selectedSubtopic?.id === subPos.id;
@@ -147,7 +148,7 @@ export function MindmapCanvasEngine({
 
           ctx.save();
           ctx.beginPath();
-          ctx.moveTo(branchAnchorX, branchAnchorY);
+          ctx.moveTo(subBranchAnchorX, branchAnchorY);
           ctx.bezierCurveTo(scx1, branchAnchorY, scx2, subAnchorY, subAnchorX, subAnchorY);
           ctx.lineWidth = isSubSel || isSubMat ? 3.5 : 1.5;
           ctx.strokeStyle = isSubSel || isSubMat ? domain.color.hex : `${domain.color.hex}44`;

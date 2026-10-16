@@ -179,6 +179,8 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [isReadAllMode, setIsReadAllMode] = useState(false);
+  const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isShuffled, setIsShuffled] = useState(false);
@@ -329,14 +331,57 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     copyTimerRef.current = setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const toggleExpand = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const handleExpandAll = useCallback(() => {
+    setIsReadAllMode(true);
+    setCollapsedInReadMode(new Set());
+    toast.success(`Read All Mode: All ${filteredConcepts.length.toLocaleString()} concepts expanded`);
+  }, [filteredConcepts.length]);
+
+  const handleCollapseAll = useCallback(() => {
+    setIsReadAllMode(false);
+    setExpandedIds(new Set());
+    setCollapsedInReadMode(new Set());
+    toast.info("Collapsed all concepts");
+  }, []);
+
+  const toggleReadAllMode = useCallback(() => {
+    if (!isReadAllMode) {
+      handleExpandAll();
+    } else {
+      handleCollapseAll();
+    }
+  }, [isReadAllMode, handleExpandAll, handleCollapseAll]);
+
+  const toggleExpand = useCallback((id: string) => {
+    if (isReadAllMode) {
+      setCollapsedInReadMode((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } else {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
+  }, [isReadAllMode]);
+
+  // Global Keyboard Shortcut: Shift + E to toggle Read All Mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "E" && e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        toggleReadAllMode();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggleReadAllMode]);
 
   const currentStudyCard = filteredConcepts[studyIndex];
 
@@ -423,6 +468,48 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                   {diff}
                 </button>
               ))}
+            </div>
+
+            {/* Read All / Continuous Reading Mode Controls */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={toggleReadAllMode}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap",
+                  isReadAllMode
+                    ? "bg-emerald-600 border-emerald-500 text-white shadow-emerald-500/20"
+                    : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                )}
+                title="Toggle Read All mode: view all definitions and architectural key points continuously (Shortcut: Shift + E)"
+              >
+                <BookOpen size={13} />
+                <span>{isReadAllMode ? "Reading All" : "Read All"}</span>
+                {isReadAllMode && (
+                  <span className="ml-0.5 px-1.5 py-0.2 bg-emerald-700/80 rounded-full text-[10px] font-bold">
+                    ON
+                  </span>
+                )}
+              </button>
+
+              <div className="hidden sm:flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={handleExpandAll}
+                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
+                  title="Expand all concepts"
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCollapseAll}
+                  className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-all cursor-pointer whitespace-nowrap"
+                  title="Collapse all concepts"
+                >
+                  Collapse All
+                </button>
+              </div>
             </div>
 
             {/* Study Mode Flashcard Button */}
@@ -568,7 +655,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
               {virtualizer.getVirtualItems().map((virtualRow) => {
                 const concept = filteredConcepts[virtualRow.index];
                 if (!concept) return null;
-                const isExpanded = expandedIds.has(concept.id);
+                const isExpanded = isReadAllMode ? !collapsedInReadMode.has(concept.id) : expandedIds.has(concept.id);
                 const isBookmarked = bookmarks.includes(concept.id);
                 const diffStyle = difficultyColors[concept.difficulty] || difficultyColors.MEDIUM;
 

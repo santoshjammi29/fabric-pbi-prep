@@ -35,6 +35,9 @@ import {
   GitBranch,
   Type,
   Eye,
+  Code2,
+  HelpCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -77,27 +80,27 @@ const FLOW_SEQUENCE = [
   { id: "ai", step: "07", stage: "AI & Vector Retrieval", flowRole: "GenAI RAG & Vector Embeddings Grounding" },
 ];
 
-/* ─── Canvas Geometry Base Dimensions (High Legibility & Contrast) ────── */
-const CANVAS_WIDTH = 2600;
-const CANVAS_HEIGHT = 1750;
-const ROOT_X = 1300;
-const ROOT_Y = 875;
+/* ─── Canvas Geometry Base Dimensions (Collision-Free High Legibility) ────── */
+const CANVAS_WIDTH = 2900;
+const CANVAS_HEIGHT = 2800;
+const ROOT_X = 1450;
+const ROOT_Y = 1350;
 
 export function InteractiveMindmap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // View Modes:
-  // "canvas"  = Interactive 2D graph with pan & zoom (Default for testing & spatial exploration)
-  // "roadmap" = Simple, large, high-readability linear roadmap (Optimal for seniors / eye sight)
-  // "matrix"  = 7-Pillars comparison board
-  const [viewMode, setViewMode] = useState<"canvas" | "roadmap" | "matrix">("canvas");
+  // "canvas"   = Interactive 2D graph with pan & zoom (Collision-free topography)
+  // "pipeline" = End-to-End Left-to-Right Data Lifecycle Pipeline Swimlanes
+  // "matrix"   = 7-Pillars structured comparison board
+  const [viewMode, setViewMode] = useState<"canvas" | "pipeline" | "matrix">("canvas");
 
   // Accessibility: Text Size Scale ("normal" | "large" | "xl")
   const [textSize, setTextSize] = useState<"normal" | "large" | "xl">("large");
 
   // Transform state: pan & zoom
-  const [zoom, setZoom] = useState(0.72);
-  const [pan, setPan] = useState({ x: -350, y: -250 });
+  const [zoom, setZoom] = useState(0.48);
+  const [pan, setPan] = useState({ x: -380, y: -280 });
   const [isPanning, setIsPanning] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
@@ -109,7 +112,7 @@ export function InteractiveMindmap() {
   const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
-  const [drawerTab, setDrawerTab] = useState<"rubric" | "concept">("rubric");
+  const [drawerTab, setDrawerTab] = useState<"gotchas" | "code" | "scenarios">("gotchas");
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
   const [isFlowMode, setIsFlowMode] = useState(true);
   const [linkedConcept, setLinkedConcept] = useState<{
@@ -301,7 +304,7 @@ export function InteractiveMindmap() {
             setSelectedDomain(domain);
             setSelectedSubtopic(match);
             setHighlightedNodeId(match.id);
-            setDrawerTab("concept");
+            setDrawerTab("gotchas");
             break;
           }
         }
@@ -320,7 +323,7 @@ export function InteractiveMindmap() {
         (clientWidth - 80) / CANVAS_WIDTH,
         (clientHeight - 80) / CANVAS_HEIGHT
       );
-      const clampedZoom = Math.max(0.48, Math.min(1.0, Number(targetZoom.toFixed(2))));
+      const clampedZoom = Math.max(0.38, Math.min(1.0, Number(targetZoom.toFixed(2))));
       setZoom(clampedZoom);
       setPan({
         x: (clientWidth - CANVAS_WIDTH * clampedZoom) / 2,
@@ -436,20 +439,20 @@ export function InteractiveMindmap() {
       }
     > = {};
 
-    // LEFT DOMAINS
-    const leftBranchX = 820;
-    const leftSubtopicX = 350;
+    // LEFT DOMAINS (3 domains: Ingestion, Lakehouse Storage, Vectorized Compute)
+    const leftBranchX = 900;
+    const leftSubtopicX = 380;
     const leftDomainYConfigs = [
-      { id: "ingestion", centerY: 360 },
-      { id: "storage", centerY: 875 },
-      { id: "compute", centerY: 1390 },
+      { id: "ingestion", centerY: 600 },
+      { id: "storage", centerY: 1350 },
+      { id: "compute", centerY: 2100 },
     ];
 
     leftDomainYConfigs.forEach((cfg) => {
       const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
       if (!domain) return;
       const count = domain.subtopics.length;
-      const pitch = 125;
+      const pitch = 155;
       const startY = cfg.centerY - ((count - 1) * pitch) / 2;
 
       positions[domain.id] = {
@@ -463,21 +466,21 @@ export function InteractiveMindmap() {
       };
     });
 
-    // RIGHT DOMAINS
-    const rightBranchX = 1780;
-    const rightSubtopicX = 2250;
+    // RIGHT DOMAINS (4 domains: Orchestration, Serving, Governance, AI)
+    const rightBranchX = 2000;
+    const rightSubtopicX = 2520;
     const rightDomainYConfigs = [
-      { id: "orchestration", centerY: 280 },
-      { id: "serving", centerY: 675 },
-      { id: "governance", centerY: 1075 },
-      { id: "ai", centerY: 1475 },
+      { id: "orchestration", centerY: 360 },
+      { id: "serving", centerY: 1020 },
+      { id: "governance", centerY: 1680 },
+      { id: "ai", centerY: 2340 },
     ];
 
     rightDomainYConfigs.forEach((cfg) => {
       const domain = MINDMAP_DOMAINS.find((d) => d.id === cfg.id);
       if (!domain) return;
       const count = domain.subtopics.length;
-      const pitch = 125;
+      const pitch = 155;
       const startY = cfg.centerY - ((count - 1) * pitch) / 2;
 
       positions[domain.id] = {
@@ -602,43 +605,46 @@ export function InteractiveMindmap() {
           <button
             onClick={() => setViewMode("canvas")}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
+              "flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
               viewMode === "canvas"
                 ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
                 : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
               fontClasses.subtext
             )}
+            title="Interactive 2D collision-free radial topography"
           >
             <GitBranch size={16} />
-            <span>1. Visual Topography Map</span>
+            <span>1. Radial Topography</span>
           </button>
 
           <button
-            onClick={() => setViewMode("roadmap")}
+            onClick={() => setViewMode("pipeline")}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
-              viewMode === "roadmap"
+              "flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
+              viewMode === "pipeline"
                 ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
                 : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
               fontClasses.subtext
             )}
+            title="End-to-end left-to-right data lifecycle pipeline swimlanes"
           >
             <Route size={16} />
-            <span>2. Large Linear Roadmap (Senior Friendly)</span>
+            <span>2. Pipeline Swimlanes</span>
           </button>
 
           <button
             onClick={() => setViewMode("matrix")}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
+              "flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer",
               viewMode === "matrix"
                 ? "bg-purple-600 text-white shadow-md ring-2 ring-purple-400/50"
                 : "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]",
               fontClasses.subtext
             )}
+            title="Structured 7-pillars enterprise comparison board"
           >
             <LayoutGrid size={16} />
-            <span>3. 7 Pillars Board</span>
+            <span>3. 7 Pillars Matrix</span>
           </button>
         </div>
 
@@ -948,7 +954,7 @@ export function InteractiveMindmap() {
                 const branchAnchorY = pos.y;
 
                 return pos.subtopics.map((subPos) => {
-                  const subAnchorX = isLeft ? subPos.x + 150 : subPos.x - 150;
+                  const subAnchorX = isLeft ? subPos.x + 160 : subPos.x - 160;
                   const subAnchorY = subPos.y;
 
                   const dx = Math.abs(subAnchorX - branchAnchorX) * 0.5;
@@ -1044,7 +1050,7 @@ export function InteractiveMindmap() {
                           {getDomainIcon(domain.icon, 18)}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-sm font-extrabold text-[var(--foreground)] truncate">
+                          <h3 className="text-sm font-extrabold text-[var(--foreground)] leading-tight line-clamp-2">
                             {domain.title}
                           </h3>
                           <span className="text-xs text-[var(--muted-foreground)] font-medium">
@@ -1093,7 +1099,7 @@ export function InteractiveMindmap() {
                         setSelectedSubtopic(sub);
                       }}
                       className={cn(
-                        "w-76 p-3 rounded-2xl border-2 transition-all shadow-md bg-[var(--surface-1)] space-y-1.5",
+                        "w-80 p-3.5 rounded-2xl border-2 transition-all shadow-md bg-[var(--surface-1)] space-y-2",
                         isSelected
                           ? "border-purple-500 ring-4 ring-purple-500/40"
                           : isMatched
@@ -1102,7 +1108,7 @@ export function InteractiveMindmap() {
                       )}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-bold text-[var(--foreground)] truncate">
+                        <h4 className="text-xs font-bold text-[var(--foreground)] leading-snug line-clamp-2">
                           {sub.name}
                         </h4>
                         <ChevronRight size={14} className="text-purple-400 shrink-0" />
@@ -1131,63 +1137,205 @@ export function InteractiveMindmap() {
         </div>
       )}
 
-      {/* ─── VIEW MODE 2: SIMPLE HIGH-READABILITY LINEAR ROADMAP ────────── */}
-      {viewMode === "roadmap" && (
+      {/* ─── VIEW MODE 2: PIPELINE SWIMLANES (LEFT-TO-RIGHT DATA LIFECYCLE) ── */}
+      {viewMode === "pipeline" && (
         <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-between text-sm text-[var(--foreground)]">
+          <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-[var(--foreground)]">
             <span className="font-semibold flex items-center gap-2">
-              <Eye size={18} className="text-purple-400" />
-              <span><strong>Senior High-Readability Mode:</strong> Large text, clear high-contrast cards, and natural vertical scrolling.</span>
+              <Route size={18} className="text-cyan-400 shrink-0" />
+              <span><strong>End-to-End Pipeline Swimlanes:</strong> Temporal left-to-right architectural lifecycle from streaming ingestion through lakehouse storage, compute, and semantic serving.</span>
             </span>
-            <span className="text-xs text-[var(--muted-foreground)] hidden md:inline">Click any card to inspect trade-offs and practice questions</span>
+            <span className="text-xs text-[var(--muted-foreground)] shrink-0">Click any protocol to open the 3-tab inspector</span>
           </div>
 
-          <div className="space-y-8">
-            {filteredDomains.map((domain, dIdx) => {
-              const flowInfo = FLOW_SEQUENCE.find((f) => f.id === domain.id);
-
-              return (
-                <div
-                  key={domain.id}
-                  className="rounded-3xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-6 sm:p-8 shadow-lg space-y-6 transition-all"
-                >
-                  {/* Stage Header Banner */}
-                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-5 border-b-2 border-[var(--border)]">
-                    <div className="flex items-center gap-4">
-                      {/* Big High-Contrast Number Badge */}
-                      <div className="w-14 h-14 rounded-2xl bg-purple-600 text-white font-black text-2xl flex items-center justify-center shrink-0 shadow-md">
-                        {flowInfo?.step || `0${dIdx + 1}`}
+          <div className="overflow-x-auto rounded-3xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 shadow-xl">
+            <div className="min-w-[1100px] space-y-4">
+              
+              {/* Top Innovation Ribbon: 07. Agentic AI & RAG */}
+              {(() => {
+                const aiDomain = MINDMAP_DOMAINS.find((d) => d.id === "ai");
+                if (!aiDomain) return null;
+                return (
+                  <div className="p-3.5 rounded-2xl bg-indigo-950/40 border-2 border-indigo-500/40 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                        07
                       </div>
-
                       <div>
-                        <div className="flex items-center gap-2 text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">
-                          <span>PIPELINE STAGE {flowInfo?.step || `0${dIdx + 1}`} OF 07</span>
-                          <span>•</span>
-                          <span>{flowInfo?.flowRole}</span>
+                        <div className="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">
+                          AGENTIC AI &amp; RAG GROUNDING LAYER
                         </div>
-                        <h3 className={cn("font-black text-[var(--foreground)] tracking-tight", fontClasses.subheading)}>
-                          {domain.title}
-                        </h3>
+                        <h4 className="text-xs font-bold text-white">Model Context Protocol (MCP) • Databricks Genie • Hybrid Vector Search</h4>
                       </div>
                     </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {aiDomain.subtopics.map((sub) => (
+                        <button
+                          key={sub.id}
+                          onClick={() => {
+                            setSelectedDomain(aiDomain);
+                            setSelectedSubtopic(sub);
+                            setDrawerTab("gotchas");
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-500/40 text-[11px] font-bold transition-all cursor-pointer"
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
-                    <div className="flex items-center gap-2">
-                      <span className={cn("rounded-xl border font-bold", domain.color.badge, fontClasses.badge)}>
-                        {domain.subtopics.length} Architecture Protocols
-                      </span>
+              {/* 5 Core Pipeline Stages (Left-to-Right Data Journey) */}
+              <div className="grid grid-cols-5 gap-3.5 items-stretch">
+                {[
+                  { id: "ingestion", label: "01. INGESTION & CDC", colorBorder: "border-cyan-500", colorBg: "bg-cyan-950/30", colorText: "text-cyan-400" },
+                  { id: "storage", label: "02. LAKEHOUSE STORAGE", colorBorder: "border-purple-500", colorBg: "bg-purple-950/30", colorText: "text-purple-400" },
+                  { id: "compute", label: "03. VECTORIZED COMPUTE", colorBorder: "border-rose-500", colorBg: "bg-rose-950/30", colorText: "text-rose-400" },
+                  { id: "orchestration", label: "04. DATAOPS & DAGs", colorBorder: "border-blue-500", colorBg: "bg-blue-950/30", colorText: "text-blue-400" },
+                  { id: "serving", label: "05. SEMANTIC SERVING", colorBorder: "border-emerald-500", colorBg: "bg-emerald-950/30", colorText: "text-emerald-400" },
+                ].map((col, cIdx) => {
+                  const domain = MINDMAP_DOMAINS.find((d) => d.id === col.id);
+                  if (!domain) return null;
+
+                  return (
+                    <div key={col.id} className="flex flex-col space-y-3">
+                      {/* Column Stage Header */}
+                      <div className={cn("p-3 rounded-xl border-2 text-center", col.colorBorder, col.colorBg)}>
+                        <span className={cn("text-[10px] font-mono font-bold tracking-wider", col.colorText)}>
+                          STAGE 0{cIdx + 1}
+                        </span>
+                        <h4 className="text-xs font-black text-[var(--foreground)] mt-0.5 leading-snug">
+                          {domain.shortTitle}
+                        </h4>
+                      </div>
+
+                      {/* 4 Protocol Cards */}
+                      <div className="flex-1 flex flex-col space-y-2.5">
+                        {domain.subtopics.map((sub) => {
+                          const isSel = selectedSubtopic?.id === sub.id;
+
+                          return (
+                            <div
+                              key={sub.id}
+                              onClick={() => {
+                                setSelectedDomain(domain);
+                                setSelectedSubtopic(sub);
+                                setDrawerTab("gotchas");
+                              }}
+                              className={cn(
+                                "p-3 rounded-xl border-2 transition-all cursor-pointer flex-1 flex flex-col justify-between space-y-2 shadow-xs",
+                                isSel
+                                  ? "bg-[var(--surface-2)] border-purple-500 ring-2 ring-purple-500/40"
+                                  : "bg-[var(--surface-2)]/80 border-[var(--border)] hover:border-purple-400 hover:bg-[var(--surface-2)]"
+                              )}
+                            >
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-xs font-bold text-[var(--foreground)]">
+                                  <span className="leading-snug line-clamp-2">{sub.name}</span>
+                                  <ChevronRight size={13} className="text-purple-400 shrink-0 ml-1" />
+                                </div>
+                                <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
+                                  {sub.desc}
+                                </p>
+                              </div>
+
+                              <div className="flex flex-wrap gap-1 pt-1 border-t border-[var(--border)]">
+                                {sub.protocols.slice(0, 2).map((p) => (
+                                  <span
+                                    key={p}
+                                    className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
+                                  >
+                                    {p}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bottom Foundation Ribbon: 06. Unified Governance */}
+              {(() => {
+                const govDomain = MINDMAP_DOMAINS.find((d) => d.id === "governance");
+                if (!govDomain) return null;
+                return (
+                  <div className="p-3.5 rounded-2xl bg-purple-950/40 border-2 border-purple-500/40 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
+                        06
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-wider">
+                          UNIFIED ENTERPRISE GOVERNANCE &amp; SECURITY FOUNDATION
+                        </div>
+                        <h4 className="text-xs font-bold text-white">Microsoft Purview Hub • Unity Catalog Lineage • Workspace RBAC • Capacity Smoothing</h4>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {govDomain.subtopics.map((sub) => (
+                        <button
+                          key={sub.id}
+                          onClick={() => {
+                            setSelectedDomain(govDomain);
+                            setSelectedSubtopic(sub);
+                            setDrawerTab("gotchas");
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/40 text-[11px] font-bold transition-all cursor-pointer"
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── VIEW MODE 3: 7 PILLARS COMPARISON BOARD ──────────────────── */}
+      {viewMode === "matrix" && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-[var(--foreground)]">
+            <span className="font-semibold flex items-center gap-2">
+              <LayoutGrid size={18} className="text-purple-400 shrink-0" />
+              <span><strong>7-Pillars Enterprise Architecture Matrix:</strong> Comprehensive side-by-side comparison of all 7 pillars, 28 protocols, and production trade-offs.</span>
+            </span>
+            <span className="text-xs text-[var(--muted-foreground)] shrink-0">Click any card to inspect full rubric &amp; code</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+            {filteredDomains.map((domain, dIdx) => (
+              <div
+                key={domain.id}
+                className="rounded-2xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-3.5 shadow-sm flex flex-col justify-between space-y-3"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 pb-2.5 border-b-2 border-[var(--border)]">
+                    <div className={cn("p-1.5 rounded-xl border shrink-0", domain.color.bg, domain.color.text)}>
+                      {getDomainIcon(domain.icon, 16)}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-mono font-bold text-cyan-500 block uppercase">STAGE 0{dIdx + 1}</span>
+                      <h4 className="text-xs font-black text-[var(--foreground)] truncate leading-tight">{domain.shortTitle}</h4>
                     </div>
                   </div>
 
-                  {/* Domain Summary (Large, Readable Body) */}
-                  <p className={cn("text-[var(--foreground)] font-medium leading-relaxed max-w-4xl", fontClasses.body)}>
+                  <p className="text-[11px] text-[var(--muted-foreground)] leading-snug line-clamp-2">
                     {domain.summary}
                   </p>
 
-                  {/* 4 Subtopic Cards in Generous Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                  <div className="space-y-2 pt-1">
                     {domain.subtopics.map((sub) => {
-                      const isSubSelected = selectedSubtopic?.id === sub.id;
-                      const isSubMatched = searchMatches.has(sub.id);
+                      const isSel = selectedSubtopic?.id === sub.id;
 
                       return (
                         <div
@@ -1195,129 +1343,50 @@ export function InteractiveMindmap() {
                           onClick={() => {
                             setSelectedDomain(domain);
                             setSelectedSubtopic(sub);
+                            setDrawerTab("gotchas");
                           }}
                           className={cn(
-                            "rounded-2xl border-2 p-5 transition-all cursor-pointer flex flex-col justify-between space-y-4 shadow-sm",
-                            isSubSelected
-                              ? "bg-[var(--surface-2)] border-purple-500 ring-4 ring-purple-500/30"
-                              : isSubMatched
-                              ? "bg-[var(--surface-2)] border-cyan-400 ring-4 ring-cyan-400/50"
-                              : "bg-[var(--surface-2)]/90 border-[var(--border)] hover:border-purple-400 hover:bg-[var(--surface-2)]"
+                            "p-2.5 rounded-xl border-2 transition-all cursor-pointer space-y-1.5 shadow-xs",
+                            isSel
+                              ? "bg-[var(--surface-2)] border-purple-500 ring-2 ring-purple-500/40"
+                              : "bg-[var(--surface-2)] border-[var(--border)] hover:border-purple-400"
                           )}
                         >
-                          <div className="space-y-2.5">
-                            <div className="flex items-start justify-between gap-3">
-                              <h4 className={cn("text-[var(--foreground)] font-extrabold leading-snug", fontClasses.title)}>
-                                {sub.name}
-                              </h4>
-                              <span className="p-1 rounded-lg bg-[var(--surface-3)] text-purple-400 shrink-0">
-                                <ChevronRight size={16} />
-                              </span>
-                            </div>
-
-                            <p className={cn("text-[var(--foreground)] opacity-90", fontClasses.body)}>
-                              {sub.desc}
-                            </p>
-
-                            {/* Production Trade-off Callout */}
-                            <div className="p-3.5 rounded-xl bg-[var(--surface-0)] border border-amber-500/35 space-y-1">
-                              <span className="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1.5">
-                                <Sparkles size={13} />
-                                Architectural Trade-Off
-                              </span>
-                              <p className={cn("text-[var(--foreground)] font-medium leading-relaxed", fontClasses.subtext)}>
-                                {sub.tradeOffs}
-                              </p>
-                            </div>
+                          <div className="flex items-center justify-between text-xs font-bold text-[var(--foreground)]">
+                            <span className="leading-snug line-clamp-2">{sub.name}</span>
+                            <ChevronRight size={13} className="text-purple-400 shrink-0 ml-1" />
                           </div>
-
-                          <div className="space-y-3 pt-2 border-t border-[var(--border)]">
-                            {/* Standard Protocols Badges */}
-                            <div className="flex flex-wrap gap-1.5">
-                              {sub.protocols.map((p) => (
-                                <span
-                                  key={p}
-                                  className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
-                                >
-                                  {p}
-                                </span>
-                              ))}
-                            </div>
-
-                            {/* Practice Action Link */}
-                            <div className="flex items-center justify-between pt-1">
-                              <button
-                                type="button"
-                                className="inline-flex items-center gap-1.5 font-bold text-purple-600 dark:text-purple-400 hover:text-purple-300 text-sm"
+                          <p className="text-[10px] text-[var(--muted-foreground)] leading-tight line-clamp-2">
+                            {sub.desc}
+                          </p>
+                          <div className="flex flex-wrap gap-1 pt-0.5">
+                            {sub.protocols.slice(0, 2).map((p) => (
+                              <span
+                                key={p}
+                                className="text-[8px] font-mono font-semibold px-1 py-0.5 rounded bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)]"
                               >
-                                <span>Inspect Full Rubric &amp; Blueprint</span>
-                                <ArrowRight size={15} />
-                              </button>
-                            </div>
+                                {p}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ─── VIEW MODE 3: 7 PILLARS COMPARISON BOARD ──────────────────── */}
-      {viewMode === "matrix" && (
-        <div className="space-y-4 animate-in fade-in duration-200">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredDomains.map((domain, dIdx) => (
-              <div
-                key={domain.id}
-                className="rounded-2xl border-2 border-[var(--border)] bg-[var(--surface-1)] p-4 shadow-sm flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2.5 pb-2 border-b border-[var(--border)]">
-                    <div className={cn("p-2 rounded-xl border shrink-0", domain.color.bg, domain.color.text)}>
-                      {getDomainIcon(domain.icon, 16)}
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-mono font-bold text-cyan-500 block">STAGE 0{dIdx + 1}</span>
-                      <h4 className="text-sm font-bold text-[var(--foreground)]">{domain.title}</h4>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-[var(--foreground)] opacity-90 leading-relaxed">
-                    {domain.summary}
-                  </p>
-
-                  <div className="space-y-2 pt-1">
-                    {domain.subtopics.map((sub) => (
-                      <div
-                        key={sub.id}
-                        onClick={() => {
-                          setSelectedDomain(domain);
-                          setSelectedSubtopic(sub);
-                        }}
-                        className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] hover:border-purple-400 transition-all cursor-pointer space-y-1"
-                      >
-                        <div className="flex items-center justify-between text-xs font-bold text-[var(--foreground)]">
-                          <span>{sub.name}</span>
-                          <ChevronRight size={13} className="text-purple-400" />
-                        </div>
-                        <p className="text-[11px] text-[var(--foreground)] opacity-80 leading-snug line-clamp-2">
-                          {sub.desc}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             ))}
           </div>
+
+          {/* Unified Foundation Banner */}
+          <div className="p-4 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] text-center text-xs font-bold text-[var(--muted-foreground)]">
+            <span className="text-purple-400 font-extrabold uppercase tracking-wider mr-2">Unified Lakehouse Engine Foundation:</span>
+            <span>Open Parquet Storage • Multi-Cloud Unity Catalog Lineage • Universal Table Formats • Zero Data Duplication</span>
+          </div>
         </div>
       )}
 
-      {/* ─── SLIDE-OUT INSPECTOR DRAWER (LARGE & READABLE) ─────────────── */}
+      {/* ─── SLIDE-OUT INSPECTOR DRAWER (3-TAB ARCHITECT RUBRIC) ───────── */}
       <AnimatePresence>
         {selectedSubtopic && selectedDomain && (
           <m.div
@@ -1325,14 +1394,17 @@ export function InteractiveMindmap() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 420 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[500px] bg-[var(--surface-1)] border-l-2 border-[var(--border)] shadow-2xl p-6 sm:p-8 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
+            className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[540px] bg-[var(--surface-1)] border-l-2 border-[var(--border)] shadow-2xl p-6 sm:p-7 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-2xl"
           >
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b-2 border-[var(--border)]">
-                <span className={cn("rounded-xl border font-bold text-xs px-3 py-1", selectedDomain.color.badge)}>
-                  {selectedDomain.shortTitle}
-                </span>
+              <div className="flex items-center justify-between pb-3.5 border-b-2 border-[var(--border)]">
+                <div className="flex items-center gap-2">
+                  <span className={cn("rounded-xl border font-bold text-xs px-3 py-1", selectedDomain.color.badge)}>
+                    {selectedDomain.shortTitle}
+                  </span>
+                  <span className="text-xs text-[var(--muted-foreground)] font-mono">PROTOCOL INSPECTOR</span>
+                </div>
                 <button
                   onClick={() => setSelectedSubtopic(null)}
                   className="p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] cursor-pointer"
@@ -1342,44 +1414,59 @@ export function InteractiveMindmap() {
                 </button>
               </div>
 
-              {/* Mode Switcher */}
-              <div className="flex items-center p-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-bold">
+              {/* 3-Tab Scope Switcher */}
+              <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-bold">
                 <button
-                  onClick={() => setDrawerTab("rubric")}
+                  onClick={() => setDrawerTab("gotchas")}
                   className={cn(
-                    "flex-1 py-2 px-3 rounded-lg transition-all cursor-pointer text-center",
-                    drawerTab === "rubric" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)]"
+                    "py-2 px-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
+                    drawerTab === "gotchas" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)] hover:text-white"
                   )}
                 >
-                  Architect Rubric
+                  <Sparkles size={13} />
+                  <span className="truncate">1. Rubric &amp; Gotchas</span>
                 </button>
                 <button
-                  onClick={() => setDrawerTab("concept")}
+                  onClick={() => setDrawerTab("code")}
                   className={cn(
-                    "flex-1 py-2 px-3 rounded-lg transition-all cursor-pointer text-center",
-                    drawerTab === "concept" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)]"
+                    "py-2 px-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
+                    drawerTab === "code" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)] hover:text-white"
                   )}
                 >
-                  Concept Card
+                  <Code2 size={13} />
+                  <span className="truncate">2. Production Code</span>
+                </button>
+                <button
+                  onClick={() => setDrawerTab("scenarios")}
+                  className={cn(
+                    "py-2 px-2 rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
+                    drawerTab === "scenarios" ? "bg-purple-600 text-white shadow-sm" : "text-[var(--foreground)] hover:text-white"
+                  )}
+                >
+                  <HelpCircle size={13} />
+                  <span className="truncate">3. Scenarios &amp; Q&amp;A</span>
                 </button>
               </div>
 
-              {/* View 1: Architect Rubric */}
-              {drawerTab === "rubric" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="space-y-2">
+              {/* Tab 1: Rubric & Gotchas */}
+              {drawerTab === "gotchas" && (
+                <div className="space-y-5 animate-in fade-in duration-200">
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
+                      Architectural Protocol Rubric
+                    </span>
                     <h3 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
                       {selectedSubtopic.name}
                     </h3>
-                    <p className="text-base text-[var(--foreground)] leading-relaxed">
+                    <p className="text-sm text-[var(--foreground)] leading-relaxed">
                       {selectedSubtopic.desc}
                     </p>
                   </div>
 
-                  {/* Architectural Trade-offs Callout */}
-                  <div className="p-5 rounded-2xl bg-[var(--surface-2)] border-2 border-amber-500/40 space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-bold text-amber-500">
-                      <Sparkles size={16} />
+                  {/* Architectural Gotchas Callout */}
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/35 space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-500 uppercase tracking-wider">
+                      <AlertTriangle size={15} />
                       <span>Architectural Trade-Off &amp; Production Rubric</span>
                     </div>
                     <p className="text-sm font-medium text-[var(--foreground)] leading-relaxed">
@@ -1387,12 +1474,12 @@ export function InteractiveMindmap() {
                     </p>
                   </div>
 
-                  {/* Protocols */}
+                  {/* Standard Tooling Protocols */}
                   <div className="space-y-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      Standard Protocols &amp; Tooling
+                      Standard Ecosystem Protocols &amp; Tooling
                     </span>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {selectedSubtopic.protocols.map((p) => (
                         <span
                           key={p}
@@ -1404,69 +1491,16 @@ export function InteractiveMindmap() {
                     </div>
                   </div>
 
-                  {/* Code Snippet */}
-                  {selectedSubtopic.codeSnippet && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                          Production Blueprint Snippet
-                        </span>
-                        <button
-                          onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-400 hover:text-purple-300 cursor-pointer"
-                        >
-                          {hasCopied ? <Check size={14} /> : <Copy size={14} />}
-                          <span>{hasCopied ? "Copied" : "Copy"}</span>
-                        </button>
-                      </div>
-                      <pre className="p-4 rounded-xl bg-black/90 border border-[var(--border)] text-xs font-mono text-cyan-300 whitespace-pre-wrap leading-relaxed overflow-x-auto">
-                        <code>{selectedSubtopic.codeSnippet}</code>
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* View 2: Concept Card */}
-              {drawerTab === "concept" && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
-                      {linkedConcept?.category || selectedDomain.shortTitle} · Core Concept
-                    </span>
-                    <h3 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
-                      {linkedConcept?.term || selectedSubtopic.name}
-                    </h3>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-[var(--surface-2)] border-2 border-cyan-500/40 space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
-                      Plain-English Definition
-                    </span>
-                    <p className="text-sm font-medium text-[var(--foreground)] leading-relaxed">
-                      {linkedConcept?.definition || selectedSubtopic.desc}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--foreground)] flex items-center gap-2">
-                      <Sparkles size={15} className="text-purple-400" />
-                      Architectural Deep-Dive
-                    </h4>
-                    <p className="text-sm text-[var(--foreground)] leading-relaxed">
-                      {linkedConcept?.explanation || selectedSubtopic.tradeOffs}
-                    </p>
-                  </div>
-
+                  {/* Core Architecture Takeaways */}
                   {linkedConcept?.keyPoints && (
                     <div className="space-y-2 pt-3 border-t border-[var(--border)]">
-                      <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--foreground)]">
-                        Core Takeaways:
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                        Core Architecture Takeaways:
                       </h4>
                       <ul className="space-y-2">
                         {linkedConcept.keyPoints.map((point, ki) => (
-                          <li key={ki} className="flex items-start gap-2 text-sm text-[var(--foreground)]">
-                            <CheckCircle2 size={16} className="text-green-400 mt-0.5 shrink-0" />
+                          <li key={ki} className="flex items-start gap-2 text-xs text-[var(--foreground)]">
+                            <CheckCircle2 size={15} className="text-green-400 mt-0.5 shrink-0" />
                             <span>{point}</span>
                           </li>
                         ))}
@@ -1476,30 +1510,144 @@ export function InteractiveMindmap() {
                 </div>
               )}
 
-              {/* Footer Actions */}
-              <div className="pt-6 border-t-2 border-[var(--border)] space-y-3">
+              {/* Tab 2: Production Code Blueprint */}
+              {drawerTab === "code" && (
+                <div className="space-y-5 animate-in fade-in duration-200">
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
+                      Executable Implementation
+                    </span>
+                    <h3 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+                      {selectedSubtopic.name} Blueprint
+                    </h3>
+                  </div>
+
+                  {selectedSubtopic.codeSnippet ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1.5">
+                          <Code2 size={14} className="text-purple-400" />
+                          <span>Production Syntax Snippet</span>
+                        </span>
+                        <button
+                          onClick={() => copySnippet(selectedSubtopic.codeSnippet!)}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-400 hover:text-purple-300 cursor-pointer"
+                        >
+                          {hasCopied ? <Check size={14} /> : <Copy size={14} />}
+                          <span>{hasCopied ? "Copied" : "Copy"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-4 rounded-xl bg-black/95 border-2 border-[var(--border)] text-xs font-mono text-cyan-300 whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner">
+                        <code>{selectedSubtopic.codeSnippet}</code>
+                      </pre>
+
+                      <div className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] leading-relaxed space-y-1">
+                        <strong className="text-[var(--foreground)] font-semibold block">Production Implementation Guidance:</strong>
+                        <span>Ensure appropriate compute scaling, cluster isolation, and schema drift validation are configured before deploying to production pipelines.</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] text-center text-xs text-[var(--muted-foreground)]">
+                      Code snippet blueprint is being standardized for this specific protocol. Use the scenario link below to review reference configurations.
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab 3: Interview Scenarios & Q&A */}
+              {drawerTab === "scenarios" && (
+                <div className="space-y-5 animate-in fade-in duration-200">
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">
+                      Assessment &amp; Real-World Simulation
+                    </span>
+                    <h3 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+                      Interview &amp; Scenario Prep
+                    </h3>
+                  </div>
+
+                  {/* Scenario Challenge Card */}
+                  <div className="p-4 rounded-2xl bg-[var(--surface-2)] border-2 border-purple-500/40 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Zap size={14} />
+                        <span>Principal Architect Scenario</span>
+                      </span>
+                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                        ARCHITECT LEVEL
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium text-[var(--foreground)] leading-relaxed">
+                      How would you design, benchmark, and deploy a production-grade implementation of <strong>{selectedSubtopic.name}</strong> while balancing write amplification, read latency, and schema evolution?
+                    </p>
+                  </div>
+
+                  {/* Scenario Focus Topics */}
+                  <div className="p-4 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                      Key Interview Evaluation Dimensions:
+                    </h4>
+                    <div className="space-y-1.5 text-xs text-[var(--muted-foreground)]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0"></span>
+                        <span>Concurrency models and transaction isolation guarantees</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                        <span>Failure domain recovery, backpressure, and checkpointing</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                        <span>FinOps compute sizing and storage compaction cost overheads</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Universal Footer Actions */}
+              <div className="pt-5 border-t-2 border-[var(--border)] space-y-2.5">
                 <Link
                   href={
                     selectedSubtopic.conceptId
                       ? `/qa-prep?conceptId=${selectedSubtopic.conceptId}&term=${encodeURIComponent(selectedSubtopic.name)}`
                       : selectedSubtopic.practiceLink
                   }
-                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold shadow-lg transition-all"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-bold shadow-lg transition-all"
                 >
                   <Zap size={16} />
                   <span>Practice Interview Q&amp;As for this Topic</span>
                   <ArrowRight size={16} />
                 </Link>
-                {linkedConcept && (
+
+                <div className="grid grid-cols-2 gap-2">
                   <Link
-                    href={`/concepts?card=${linkedConcept.id}`}
-                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 text-sm font-semibold border border-[var(--border)] transition-colors"
+                    href={`/architecture?tab=scenarios&q=${encodeURIComponent(selectedSubtopic.name)}`}
+                    className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-cyan-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
                   >
-                    <BookOpen size={15} />
-                    <span>Open in Concepts Library</span>
+                    <Sparkles size={14} />
+                    <span>System Scenarios</span>
                   </Link>
-                )}
+                  {linkedConcept ? (
+                    <Link
+                      href={`/concepts?card=${linkedConcept.id}`}
+                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-purple-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
+                    >
+                      <BookOpen size={14} />
+                      <span>Concept Library</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/concepts"
+                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-purple-400 text-xs font-semibold border border-[var(--border)] transition-colors text-center"
+                    >
+                      <BookOpen size={14} />
+                      <span>All Concepts</span>
+                    </Link>
+                  )}
+                </div>
               </div>
+
             </div>
           </m.div>
         )}
