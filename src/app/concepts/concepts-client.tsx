@@ -121,7 +121,7 @@ function getConceptMatchingDiagram(concept: Concept, diagrams: ArchitectureDiagr
   if (text.includes("open table format") || text.includes("delta vs iceberg") || (text.includes("iceberg") && text.includes("delta") && text.includes("hudi"))) {
     return diagrams.find((d) => d.id === "open-table-formats-lakehouse");
   }
-  if (text.includes("open file format") || text.includes("parquet vs orc") || text.includes("avro") || text.includes("orc")) {
+  if (text.includes("open file format") || text.includes("parquet vs orc") || text.includes("avro") || text.includes("orc") || text.includes("columnstore") || text.includes("dictionary encoding") || text.includes("bit-packing") || text.includes("run-length") || text.includes("page compression") || text.includes("segment elimination") || text.includes("batch mode")) {
     return diagrams.find((d) => d.id === "open-file-formats-storage");
   }
   if (text.includes("delta lake") || text.includes("_delta_log") || text.includes("acid") || text.includes("automerge")) {

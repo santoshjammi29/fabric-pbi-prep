@@ -226,6 +226,12 @@ export const TECH_ECOSYSTEMS: readonly TechEcosystem[] = [
       t.includes("indexing") ||
       t.includes("execution plan") ||
       t.includes("columnstore") ||
+      t.includes("rowstore") ||
+      t.includes("dictionary encoding") ||
+      t.includes("bit-packing") ||
+      t.includes("segment elimination") ||
+      t.includes("page compression") ||
+      t.includes("batch mode") ||
       t.includes("stored procedure") ||
       t.includes("window function") ||
       t.includes("postgres") ||

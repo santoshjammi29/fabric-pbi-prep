@@ -1524,5 +1524,54 @@
       "COPY INTO",
       "Vectorized"
     ]
+  },
+  {
+    "id": "columnstore-compression-vectorization-cheatsheet",
+    "title": "Columnstore Storage: Compression Encodings & Batch Mode Vectorization",
+    "category": "SQL & Storage",
+    "categorySlug": "sql-storage",
+    "impact": "Critical",
+    "effort": "Low Effort",
+    "problem": "Analytical aggregate queries scanning millions of rows in traditional rowstore tables suffer severe I/O bottlenecks and high CPU cycles due to row-by-row Volcano iteration and lack of columnar compression.",
+    "solution": "Deploy Clustered Columnstore Indexes with Dictionary Encoding, Bit-Packing, and RLE. Sort data by low-cardinality columns to maximize Run-Length runs and enable Segment Elimination. Leverage Batch Mode processing (~900 rows per vector) for 10x compression and 100x query acceleration.",
+    "codeSnippet": "-- 1. Create Clustered Columnstore Index for OLAP aggregation workloads\nCREATE CLUSTERED COLUMNSTORE INDEX cci_fact_sales \nON dbo.FactSales;\n\n-- 2. Sort/cluster data during load to maximize RLE runs and Segment Elimination\n-- Low cardinality columns (like ProductCategory) compress 20x+ via Dictionary Encoding & RLE\nINSERT INTO dbo.FactSales WITH (TABLOCK)\nSELECT * FROM dbo.StagingSales\nORDER BY ProductCategory, OrderDateKey;\n\n-- 3. Verify Batch Mode execution and Segment Elimination in Query Plan\nSELECT ProductCategory, SUM(SalesAmount) AS TotalSales\nFROM dbo.FactSales\nWHERE OrderDateKey >= 20260101\nGROUP BY ProductCategory;\n-- Plan confirms: ExecutionMode = \"Batch\", Segment Elimination skips irrelevant rowgroups",
+    "language": "sql",
+    "whyItMatters": "Columnstore organizes data by columns rather than rows, while Batch Mode processes multiple rows simultaneously in CPU cache. Combining Dictionary Encoding, Bit-Packing, and RLE on low-cardinality attributes slashes storage by 90% and enables instant predicate evaluation.",
+    "metrics": "10x storage compression, 5x-10x CPU reduction via batch mode, 90%+ I/O eliminated",
+    "antiPattern": "Applying Columnstore indexes on high-cardinality transaction keys in OLTP workloads with frequent single-row updates, or using row-mode execution when batch mode is available.",
+    "tags": [
+      "Columnstore",
+      "Compression",
+      "Dictionary Encoding",
+      "RLE",
+      "Bit-Packing",
+      "Batch Mode",
+      "Segment Elimination",
+      "SQL Server"
+    ]
+  },
+  {
+    "id": "fabric-purview-governance-tenets-cheatsheet",
+    "title": "Microsoft Fabric & Purview: Native Governance Architecture Rules",
+    "category": "Production Best Practices",
+    "categorySlug": "production-best-practices",
+    "impact": "High Impact",
+    "effort": "Low Effort",
+    "problem": "Enterprises attempt to build fragile custom metadata synchronization scripts across cross-tenant environments or assume Fabric workspace permissions control Purview governance assets, resulting in technical debt and compliance gaps.",
+    "solution": "Co-locate Fabric and Purview in the same Azure tenant for zero-copy native integration. Treat Purview as the non-destructive governance control plane (metadata enrichment in Purview does not modify source Fabric objects). Configure workspace permissions for automated lineage, implement separate compute engines for data quality rule execution, and enforce independent Purview RBAC.",
+    "codeSnippet": "// Native Purview & Fabric Integration Architectural Rules:\n{\n  \"tenantRequirement\": \"Same Azure Active Directory (Microsoft Entra ID) Tenant\",\n  \"integrationPattern\": \"Native Purview Hub Connector (Avoid custom metadata sync)\",\n  \"catalogStandard\": \"Microsoft Purview (Azure Data Catalog is deprecated)\",\n  \"storageObjectSafety\": \"Metadata enrichment in Purview does not modify source Fabric objects\",\n  \"lineageCapture\": \"Workspace Contributor/Admin + Tenant Admin Switch Enabled\",\n  \"rbacModel\": \"Purview RBAC (Data Curator/Reader) is completely decoupled from Fabric Workspace roles\",\n  \"dataQualityPattern\": \"Purview defines rules; execution is delegated to Fabric Spark or ADF\",\n  \"glossaryCacheNotice\": \"Business glossary updates refresh asynchronously in search index\"\n}",
+    "language": "json",
+    "whyItMatters": "Custom metadata solutions create technical debt and maintenance burden. Native Purview integration provides automated lineage, sensitivity classification, and cataloging without risking physical data mutations or security boundary bypasses.",
+    "metrics": "0 custom sync code required, 100% automated lineage capture, zero-risk non-destructive cataloging",
+    "antiPattern": "Building homegrown scripts to synchronize table metadata between Fabric and external catalogs, relying on deprecated Azure Data Catalog, or assuming Fabric Workspace Admin automatically grants Purview governance rights.",
+    "tags": [
+      "Fabric",
+      "Purview",
+      "Governance",
+      "Lineage",
+      "RBAC",
+      "Metadata",
+      "Data Quality"
+    ]
   }
 ]
