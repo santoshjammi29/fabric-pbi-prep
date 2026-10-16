@@ -70,16 +70,16 @@ function getConceptMatchingDiagram(concept: Concept, diagrams: ArchitectureDiagr
   if (text.includes("skew") || text.includes("salting") || text.includes("skewjoin")) {
     return diagrams.find((d) => d.id === "spark-data-skew-aqe-optimization");
   }
-  if (text.includes("finops") || text.includes("cost") || text.includes("spot instance") || text.includes("billing.usage")) {
+  if (text.includes("finops") || text.includes("cost") || text.includes("spot instance") || text.includes("billing.usage") || text.includes("smoothing") || text.includes("f64") || text.includes("bursting")) {
     return diagrams.find((d) => d.id === "lakehouse-finops-cost-optimization");
   }
   if (text.includes("bundle") || text.includes("dab") || (text.includes("databricks") && text.includes("ci/cd"))) {
     return diagrams.find((d) => d.id === "databricks-dabs-devops-pipeline");
   }
-  if (text.includes("onelake") || text.includes("shortcut") || (concept.category.includes("FABRIC") && text.includes("lakehouse"))) {
+  if (text.includes("onelake") || text.includes("shortcut") || (concept.category.includes("FABRIC") && text.includes("lakehouse")) || text.includes("workspace role") || text.includes("member role")) {
     return diagrams.find((d) => d.id === "fabric-onelake-architecture");
   }
-  if (text.includes("direct lake") || text.includes("vertipaq") || text.includes("directquery")) {
+  if (text.includes("direct lake") || text.includes("vertipaq") || text.includes("directquery") || text.includes("framing")) {
     return diagrams.find((d) => d.id === "powerbi-direct-lake-vertipaq");
   }
   if (text.includes("dax") || text.includes("calculate") || text.includes("context transition")) {
@@ -93,6 +93,9 @@ function getConceptMatchingDiagram(concept: Concept, diagrams: ArchitectureDiagr
   }
   if (text.includes("adf") || text.includes("integration runtime") || text.includes("shir")) {
     return diagrams.find((d) => d.id === "adf-hybrid-integration-runtime");
+  }
+  if (text.includes("eventstream") || text.includes("iot") || text.includes("gps")) {
+    return diagrams.find((d) => d.id === "enterprise-edge-client-architecture") || diagrams.find((d) => d.id === "kafka-event-streaming-pipeline");
   }
   if (text.includes("kafka") || text.includes("streaming") || text.includes("watermark")) {
     return diagrams.find((d) => d.id === "kafka-event-streaming-pipeline");
@@ -109,10 +112,19 @@ function getConceptMatchingDiagram(concept: Concept, diagrams: ArchitectureDiagr
   if (text.includes("unity catalog") || text.includes("3-level namespace") || text.includes("delta sharing")) {
     return diagrams.find((d) => d.id === "unity-catalog-governance");
   }
-  if (text.includes("purview") || text.includes("governance") || text.includes("lineage")) {
+  if (text.includes("purview") || text.includes("governance") || text.includes("lineage") || text.includes("gdpr") || text.includes("sensitivity label")) {
     return diagrams.find((d) => d.id === "purview-governance-catalog");
   }
-  if (text.includes("delta lake") || text.includes("_delta_log") || text.includes("acid")) {
+  if (text.includes("small file") || text.includes("z-order") || text.includes("zorder") || text.includes("liquid clustering") || text.includes("auto optimize") || text.includes("compaction")) {
+    return diagrams.find((d) => d.id === "databricks-optimization-techniques-architecture");
+  }
+  if (text.includes("open table format") || text.includes("delta vs iceberg") || (text.includes("iceberg") && text.includes("delta") && text.includes("hudi"))) {
+    return diagrams.find((d) => d.id === "open-table-formats-lakehouse");
+  }
+  if (text.includes("open file format") || text.includes("parquet vs orc") || text.includes("avro") || text.includes("orc")) {
+    return diagrams.find((d) => d.id === "open-file-formats-storage");
+  }
+  if (text.includes("delta lake") || text.includes("_delta_log") || text.includes("acid") || text.includes("automerge")) {
     return diagrams.find((d) => d.id === "delta-lake-under-the-hood");
   }
   if (text.includes("iceberg") || text.includes("manifest")) {

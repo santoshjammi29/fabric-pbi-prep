@@ -93,7 +93,14 @@ export const TECH_ECOSYSTEMS: readonly TechEcosystem[] = [
       t.includes("vertipaq") ||
       t.includes("v-order") ||
       t.includes("power query") ||
-      t.includes("dataflow gen2"),
+      t.includes("dataflow gen2") ||
+      t.includes("eventstream") ||
+      t.includes("eventhouse") ||
+      t.includes("purview") ||
+      t.includes("capacity") ||
+      t.includes("smoothing") ||
+      t.includes("copy into") ||
+      t.includes("framing"),
   },
   {
     id: "DATABRICKS",
@@ -144,7 +151,12 @@ export const TECH_ECOSYSTEMS: readonly TechEcosystem[] = [
       t.includes("z-order") ||
       t.includes("hudi") ||
       t.includes("liquid clustering") ||
-      t.includes("parquet"),
+      t.includes("parquet") ||
+      t.includes("automerge") ||
+      t.includes("auto schema merge") ||
+      t.includes("schema evolution") ||
+      t.includes("merge into") ||
+      t.includes("two-stage"),
   },
   {
     id: "AIRFLOW_ADF",
@@ -196,7 +208,11 @@ export const TECH_ECOSYSTEMS: readonly TechEcosystem[] = [
       t.includes("event streaming") ||
       t.includes("structured streaming") ||
       t.includes("watermark") ||
-      t.includes("backpressure"),
+      t.includes("backpressure") ||
+      t.includes("eventstream") ||
+      t.includes("event hub") ||
+      t.includes("late arrival") ||
+      t.includes("out-of-order"),
   },
   {
     id: "SQL_DATABASES",
@@ -215,7 +231,11 @@ export const TECH_ECOSYSTEMS: readonly TechEcosystem[] = [
       t.includes("postgres") ||
       t.includes("cte") ||
       t.includes("mssql") ||
-      t.includes("database"),
+      t.includes("database") ||
+      t.includes("sys.dm_exec_sessions") ||
+      t.includes("sys.dm_exec_requests") ||
+      t.includes("queryinsights") ||
+      t.includes("copy into"),
   },
   {
     id: "GOVERNANCE",
@@ -233,7 +253,13 @@ export const TECH_ECOSYSTEMS: readonly TechEcosystem[] = [
       t.includes("data mesh") ||
       t.includes("rls") ||
       t.includes("ols") ||
-      t.includes("data masking"),
+      t.includes("data masking") ||
+      t.includes("gdpr") ||
+      t.includes("sensitivity label") ||
+      t.includes("pii") ||
+      t.includes("workspace role") ||
+      t.includes("member role") ||
+      t.includes("capacity admin"),
   },
   {
     id: "AI_RAG",
@@ -283,7 +309,9 @@ export const SCENARIO_ARCHETYPES: readonly ScenarioArchetype[] = [
       t.includes("garbage collection") ||
       t.includes("gc pause") ||
       t.includes("driver oom") ||
-      t.includes("executor oom"),
+      t.includes("executor oom") ||
+      t.includes("collect()") ||
+      t.includes("driver out of memory"),
   },
   {
     id: "SKEW_JOINS",
@@ -317,7 +345,9 @@ export const SCENARIO_ARCHETYPES: readonly ScenarioArchetype[] = [
       t.includes("concurrency") ||
       t.includes("write conflict") ||
       t.includes("isolation level") ||
-      t.includes("optimistic concurrency"),
+      t.includes("optimistic concurrency") ||
+      t.includes("two-stage") ||
+      t.includes("framing"),
   },
   {
     id: "CDC_STREAMING",
@@ -334,7 +364,9 @@ export const SCENARIO_ARCHETYPES: readonly ScenarioArchetype[] = [
       t.includes("at-least-once") ||
       t.includes("backpressure") ||
       t.includes("consumer lag") ||
-      t.includes("streaming"),
+      t.includes("streaming") ||
+      t.includes("eventstream") ||
+      t.includes("late arrival"),
   },
   {
     id: "FINOPS_COST",
@@ -351,7 +383,11 @@ export const SCENARIO_ARCHETYPES: readonly ScenarioArchetype[] = [
       t.includes("cluster auto-scaling") ||
       t.includes("idle") ||
       t.includes("billing") ||
-      t.includes("right-sizing"),
+      t.includes("right-sizing") ||
+      t.includes("capacity smoothing") ||
+      t.includes("smoothing") ||
+      t.includes("bursting") ||
+      t.includes("f64"),
   },
   {
     id: "SYSTEM_DESIGN",
@@ -384,7 +420,12 @@ export const SCENARIO_ARCHETYPES: readonly ScenarioArchetype[] = [
       t.includes("data vault") ||
       t.includes("surrogate key") ||
       t.includes("fact table") ||
-      t.includes("dimension table"),
+      t.includes("dimension table") ||
+      t.includes("scd type 2") ||
+      t.includes("sha2") ||
+      t.includes("iscurrent") ||
+      t.includes("schema-on-write") ||
+      t.includes("schema-on-read"),
   },
   {
     id: "CODE_ONLY",

@@ -32,10 +32,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Microsoft Fabric", "OneLake", "Delta Lake", "Direct Lake", "Shortcuts", "Synapse Data Warehouse", "Fabric Spark", "Purview"],
     description: "End-to-end Microsoft Fabric architecture showing the single SaaS data lake (OneLake), universal Delta Parquet storage format with V-Order optimization, zero-copy shortcuts linking AWS S3 and GCP, and multi-engine compute integration (Spark, Synapse DW, Power BI Direct Lake, KQL, and Data Factory).",
     keyPoints: [
-      "OneLake acts as the 'OneDrive for Data' providing a single logical data lake across the entire organization without fragmented silos.",
-      "OneLake Shortcuts allow instant virtualization of external data in Amazon S3, Google Cloud Storage, and ADLS Gen2 with zero data copying or egress fees.",
-      "Multi-Engine Compute: Fabric Spark, Synapse Data Warehouse (T-SQL), and Real-Time Intelligence all read and write to the same open Delta Parquet files.",
-      "Unified governance via Microsoft Purview provides centralized access control, workspace domains, automated sensitivity labels, and full data lineage."
+      "One Tenant = One OneLake: single unified hierarchical namespace automatically provisioned per tenant. Workspaces serve as logical containers and RBAC boundaries, not physical storage accounts. Capacities provide compute resources, not storage silos.",
+      "OneLake Shortcuts virtualize internal workspace folders and external clouds (Amazon S3, Google Cloud Storage, ADLS Gen2) with zero data copying. Best practice limits chaining to 2 levels maximum to avoid latency and metadata degradation.",
+      "Eventhouse OneLake Availability: Enabling OneLake availability does NOT retroactively duplicate historical KQL telemetry; only newly ingested data arriving after activation is synchronized to OneLake as Delta Parquet.",
+      "Unified Governance via Purview Hub: Automated PII discovery, classification, and sensitivity labeling across Lakehouses and Warehouses for GDPR compliance."
     ],
     docLink: "https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview"
   },
@@ -48,10 +48,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Power BI", "Direct Lake", "VertiPaq", "DAX", "Fabric Semantic Model", "Delta Parquet", "Import vs DirectQuery"],
     description: "Architectural comparison of Power BI Direct Lake mode against legacy Import and DirectQuery. Illustrates how the VertiPaq in-memory analytics engine directly memory-maps Delta Parquet column chunks from OneLake storage into RAM on-demand, achieving sub-second DAX query response times with real-time data freshness and zero data duplication.",
     keyPoints: [
-      "Bypasses scheduled data refresh entirely by loading Delta Parquet column chunks straight into VertiPaq memory on demand.",
-      "Eliminates data duplication and 1GB/10GB model size limits inherent to traditional Power BI Import mode.",
-      "Provides sub-second DAX analytical query speeds without generating high query loads or concurrency bottlenecks on underlying relational databases.",
-      "Automatic Fallback mechanism gracefully falls back to DirectQuery if semantic model features or security constraints exceed Direct Lake thresholds."
+      "Framing Operation Efficiency: In Direct Lake mode, data is not imported or copied. Refreshes execute a metadata 'Framing' operation that synchronizes table schemas and file pointers in memory—consuming 90-95% fewer CUs and running 10-100x faster than Import full refreshes.",
+      "VertiPaq In-Memory Mapping: Memory-maps OneLake V-Order Delta Parquet columns directly into RAM on-demand, achieving sub-second DAX analytics with zero data duplication.",
+      "Decoupled FinOps: OneLake storage costs remain constant (pay-as-you-go per GB), decoupled from query-time compute Capacity Units (CUs).",
+      "Automatic Fallback Guardrail: Gracefully switches to DirectQuery mode if model memory limits or complex RLS rules exceed Direct Lake thresholds."
     ],
     docLink: "https://learn.microsoft.com/en-us/power-bi/enterprise/directlake-overview"
   },
@@ -240,10 +240,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Microsoft Purview", "Governance", "Data Catalog", "Lineage", "Sensitivity Labels", "ABAC", "Data Map"],
     description: "Enterprise data governance, discovery, and compliance framework using Microsoft Purview. Explains how the unified Data Map automatically scans multi-cloud and on-premise data estates, extracts column-level lineage from pipelines, classifies sensitive data (PII/PCI), and enforces attribute-based access control.",
     keyPoints: [
-      "Purview Data Map creates an automated knowledge graph mapping data assets across Azure, AWS S3, Google Cloud, and on-premises databases.",
-      "Automated Scanning Engine inspects data samples using 200+ built-in classification rules (credit cards, tax IDs, passport numbers).",
-      "End-to-End Lineage Engine automatically traces column-level and dataset transformations across ADF, Databricks, Fabric, and Power BI.",
-      "Centralized Access Policies (ABAC) enforce least-privilege credential-less access and dynamic data masking across distributed lakehouses."
+      "Microsoft Purview Hub in Fabric delivers unified data governance, offering automated data discovery, end-to-end data lineage, and metadata management across all OneLake workspaces.",
+      "GDPR Compliance & PII Tracking: Automated classification detects sensitive Personally Identifiable Information (PII), tracking where sensitive data resides across Lakehouses and Warehouses.",
+      "Fabric Sensitivity Labels: Applies persistent sensitivity labels for data protection, encryption, and export restrictions that cascade seamlessly from OneLake Delta tables into Power BI Direct Lake reports.",
+      "Cross-Workspace Lineage & Auditability: Fulfills GDPR Article 30 audit requirements and right-to-be-forgotten discovery across the enterprise data estate."
     ],
     docLink: "https://learn.microsoft.com/en-us/purview/purview"
   },
@@ -256,10 +256,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Delta Lake", "ACID", "_delta_log", "Liquid Clustering", "OCC", "Time Travel", "CDF"],
     description: "3-panel under-the-hood mechanism contrasting raw Parquet file limitations with Delta Lake's ACID transaction log protocol, Optimistic Concurrency Control, and dynamic Liquid Clustering.",
     keyPoints: [
-      "Atomic commits and ACID guarantees managed via the _delta_log/ JSON commit log and Parquet checkpoints every 10 commits.",
-      "Optimistic Concurrency Control (OCC) and Multi-Version Concurrency Control (MVCC) eliminate blind overwrite race conditions.",
-      "Liquid Clustering (CLUSTER BY) uses Hilbert space-filling curves to replace rigid Hive partitions and manual Z-Ordering.",
-      "Unlocks enterprise capabilities: Time Travel rollback, Schema Enforcement & Evolution, and Change Data Feed (CDF)."
+      "Universal Lakehouse Standard: Delta Lake provides ACID transactions, schema evolution, and open cross-engine interoperability (Spark, Synapse DW, KQL, Power BI Direct Lake) on top of Parquet storage.",
+      "Declarative MERGE INTO & Auto Schema Merge: Executes atomic UPSERT operations; setting spark.databricks.delta.schema.autoMerge.enabled=true allows automatic assimilation of schema changes without write failures.",
+      "Non-Blocking Schema Evolution: Partitions maintain independent schema metadata in the _delta_log; query engines reconcile schemas at read time and automatically populate missing columns with NULLs without data rewrites.",
+      "OCC & Change Data Feed (CDF): Optimistic Concurrency Control eliminates race conditions while CDF exposes row-level change feeds for incremental downstream ETL."
     ],
     docLink: "https://docs.delta.io/latest/delta-intro.html"
   },
@@ -320,12 +320,11 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Delta Lake", "Liquid Clustering", "Z-Ordering", "OPTIMIZE", "Auto Optimize", "VACUUM", "Partitioning", "Databricks", "Storage Hygiene", "Performance Tuning"],
     description: "Under-the-hood architectural blueprint and decision framework detailing the 6 core Delta Lake optimization techniques. Covers physical directory partitioning, multi-dimensional Z-Ordering space-filling curves, bin-packing file compaction via OPTIMIZE, write-time Auto Optimize (optimizeWrites & autoCompact), next-generation Liquid Clustering (CLUSTER BY) Hilbert curves, and safe storage lifecycle management via VACUUM with 7-day retention safety.",
     keyPoints: [
-      "Physical Partitioning (PARTITIONED BY): Segregates data into rigid Hive directory trees. Best for low-cardinality keys (<10,000 distinct values, >1GB/partition); causes small file sprawl and skew on high cardinality.",
-      "Multi-Dimensional Z-Ordering: Space-filling Z-curves cluster 1–4 high-cardinality columns within files to maximize multi-column min/max data skipping, but incurs high write amplification on incremental updates.",
-      "Bin-Packing Compaction (OPTIMIZE): Coalesces thousands of fragmented 1MB–10MB Parquet files from streaming or frequent writes into optimal ~1GB target files, drastically reducing metastore lookup and read I/O overhead.",
-      "Auto Optimize (Write-Time Sizing): Dynamically tunes partition file sizing during streaming micro-batches and high-frequency writes using optimizeWrites (adaptive write partitions) and autoCompact (automatic 128MB compaction).",
-      "Liquid Clustering (CLUSTER BY ★): Databricks recommended standard. Replaces partitioning and Z-Order using Hilbert space-filling curves. Eliminates directory skew, supports dynamic non-destructive key changes, and clusters incrementally during writes.",
-      "VACUUM Lifecycle Hygiene: Permanently deletes unreferenced, tombstoned Parquet files past the safety retention window (default 168 hours / 7 days), preventing storage bloat while guaranteeing snapshot isolation for concurrent readers."
+      "Two-Stage File Compaction Process: Solves the small file problem by decoupling high-speed ingestion (staging) from asynchronous OPTIMIZE compaction, consolidating microscopic files into optimal ~1GB Parquet blocks. Note: Data Factory copy activities do not auto-compact files.",
+      "Multi-Dimensional Z-Ordering: Uses a space-filling Z-curve to co-locate data physically across 2 to 4 frequently filtered/joined columns, enabling Delta Lake's query engine to skip 90-95% of irrelevant files using column min/max metadata statistics.",
+      "Liquid Clustering (CLUSTER BY): Replaces rigid physical partitioning with dynamic Hilbert curve clustering, eliminating partition skew and small file proliferation.",
+      "Partitioning Anti-Pattern: Partitioning tables by arrival timestamps or high-cardinality keys fractures data into microscopic files and severely worsens metadata overhead.",
+      "VACUUM Lifecycle Hygiene: Purges unreferenced Parquet files older than safety retention (default 168 hours / 7 days) to control storage costs without violating ACID time travel."
     ],
     docLink: "/concepts?category=DATABRICKS"
   },
@@ -338,9 +337,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Catalyst Optimizer", "AQE", "Photon", "SIMD", "Vectorized Engine", "Tungsten Engine"],
     description: "4-phase Catalyst query compilation pipeline, runtime re-planning via Adaptive Query Execution (AQE), and execution branching between JVM Tungsten and native C++ Photon.",
     keyPoints: [
-      "Catalyst 4 Phases: Analysis (catalog resolution), Logical Optimization (predicate pushdown), Physical Planning (join cost model), Code Generation.",
-      "Adaptive Query Execution (AQE) dynamically coalesces shuffle partitions, switches to broadcast joins, and splits skewed partitions at runtime.",
-      "Photon vectorized engine written in C++ operates directly on CPU SIMD vector registers, bypassing JVM garbage collection pauses for 3x–10x speedups."
+      "PySpark Actions vs Transformations: Transformations (filter, select, withColumn) build an unresolved/resolved execution DAG lazily; Actions (collect, count) force computation and trigger cluster job execution.",
+      "Action Safety Guardrails: Actions are NOT for performance optimization; executing collect() on large datasets crashes the single Driver JVM with an Out-of-Memory (OOM) error. Caching (cache, persist) is a transformation, not an action.",
+      "Catalyst & Tungsten Acceleration: DataFrame API outperforms RDDs through automated rule/cost-based plan optimization and Project Tungsten whole-stage bytecode generation over off-heap memory.",
+      "Photon Native C++ Engine: Bypasses JVM overhead entirely, executing compiled columnar query plans with SIMD CPU vectorization."
     ],
     docLink: "https://docs.databricks.com/en/optimizations/index.html"
   },
@@ -369,10 +369,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["SQL Server", "T-SQL", "Query Optimizer", "Cardinality Estimation", "Columnstore", "Batch Mode", "Memory Grants"],
     description: "Relational database internals and execution mechanics for SQL Server and Azure SQL. Explains query parsing and algebrization, the cost-based optimizer searching trivial/quick/full plans, physical join operators (Nested Loops, Hash Match, Merge Join), memory workspace grants, and Clustered Columnstore batch mode execution.",
     keyPoints: [
-      "Cost-Based Optimizer (CBO) utilizes column distribution statistics and histograms to calculate cardinalities and determine the lowest-cost physical plan.",
-      "Physical Join Selection: Nested Loops for indexed point lookups; Merge Join for pre-sorted streams; Hash Match for unsorted large sets requiring hash tables.",
-      "Memory Workspace Grants: Complex sort and hash operators require dedicated workspace grants; inadequate grants cause costly TempDB disk spills.",
-      "Clustered Columnstore Indexing stores rows in compressed columnar row groups (up to 1M rows), leveraging CPU SIMD registers for Batch Mode query execution."
+      "DMV Session & Request Monitoring: Joining sys.dm_exec_sessions with sys.dm_exec_requests on session_id identifies the active username, connection status, login time, and exact executing SQL text via sys.dm_exec_sql_text(r.sql_handle).",
+      "Microsoft Fabric queryinsights Schema: Provides built-in system views logging username attribution, query duration, CU consumption, and exact query text for diagnosing high-latency queries.",
+      "Parallel T-SQL COPY INTO: Outperforms INSERT...VALUES and BULK INSERT by executing distributed, parallel bulk file ingestion from ADLS Gen2 directly into Fabric Warehouse tables.",
+      "Storage Engine & Buffer Pool: Coordinates 8KB page caching, write-ahead logging (WAL), and lock escalation to guarantee ACID transactional consistency."
     ],
     docLink: "https://learn.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide"
   },
@@ -385,10 +385,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Kimball", "Dimensional Modeling", "Star Schema", "Fact Tables", "Conformed Dimensions", "SCD Type 2", "Bus Matrix"],
     description: "Enterprise dimensional modeling master blueprint based on Kimball methodology. Details atomic fact table grain declaration, foreign key relationship links to conformed dimensions, Slowly Changing Dimensions (SCD Type 1 overwrite vs SCD Type 2 history tracking), role-playing dimensions, and the Enterprise Data Bus Matrix.",
     keyPoints: [
-      "Atomic Grain Declaration: Designing fact tables at the most atomic level (e.g. 1 row per transaction line item) ensures maximum dimensional drill-down flexibility.",
-      "Conformed Dimensions: Standardized dimensions (Dim_Customer, Dim_Date, Dim_Product) shared across business process marts eliminate inconsistent enterprise metrics.",
-      "SCD Type 2: Preserves historical truth by tracking changes with surrogate keys, Valid_From, Valid_To, and Is_Current flags instead of destructive overwrites.",
-      "Enterprise Data Bus Matrix maps business processes (rows) to conformed dimensions (columns), enabling phased enterprise data mart integration."
+      "Enterprise SCD Type 2 Implementation in Fabric: Maintained using Delta Lake MERGE operations, surrogate keys, business natural keys, Effective/Expiration dates, and IsCurrent flags.",
+      "SHA2 Hash-Based Change Detection: Generates a computed SHA2 hash over all tracked dimensional attributes in source and target, detecting delta modifications instantly without multi-column string comparisons.",
+      "Batch Processing & Late-Arriving Data: Executes MERGE in batches by natural key ranges to manage memory; handles late-arriving records by backdating EffectiveDate and adjusting predecessor expiration timestamps.",
+      "Soft Deletes & Materialized Current View: Deletions set IsDeleted=1 and expire dimension rows rather than physical removal; a materialized view filtering IsCurrent=1 provides simplified BI reporting."
     ],
     docLink: "https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/"
   },
@@ -417,10 +417,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["Edge Computing", "Next.js", "Redis Cache", "Web Workers", "Server-Side DAL", "ISR", "Client Performance"],
     description: "High-concurrency data platform edge architecture illustrating end-to-end data delivery across three tiers: Data Layer & Persistence (Raw Lakehouse JSONs, Server-Side DAL with React cache(), Upstash Global Redis Cache), Edge Optimization & Compute (Vercel Edge Node Proxy, SWR Edge Cache, Next.js Server Components SSG/ISR, Dynamic Semantic SEO Engine), and Client Runtime & UI (GPU-Accelerated Canvas Mindmaps, TanStack Virtual 60fps windowing, Background Web Workers for SIMD Cosine Distance & Spark Simulation).",
     keyPoints: [
-      "Server-Side Data Access Layer (DAL) leverages React cache() and zero-bundle server memory for sub-millisecond retrieval without client overhead.",
-      "Global Upstash Redis Cache delivers sub-100ms TTL state synchronization across multi-region Vercel Edge nodes.",
-      "Incremental Static Regeneration (ISR) and stale-while-revalidate edge caching minimize database pressure while maintaining real-time freshness.",
-      "Client Web Workers offload heavy computational algorithms (vector cosine similarity, Spark execution simulations) to background threads, guaranteeing 60fps main thread responsiveness."
+      "Fabric Eventstream IoT Ingestion: Eventstream Input connects to Azure Event Hubs (or Kafka) to ingest high-velocity real-time GPS telemetry from 50,000+ distributed IoT devices.",
+      "Eventstream Processor In-Flight Cleansing: Performs real-time filtering, coordinate format normalization, bounding-box geo-enrichment, and invalid entry removal before landing.",
+      "Eventstream Output to Lakehouse Delta: Persists streaming outputs directly into Lakehouse Delta tables, supporting both real-time operational alerting and downstream Spark/SQL batch analytics.",
+      "Stream Analytics Watermark Policies: Configures late arrival tolerance (up to 20 days) and out-of-order tolerance (up to 59s) with windowing functions to handle delayed streaming events accurately."
     ],
     docLink: "https://vercel.com/docs/edge-network/overview"
   },
@@ -497,10 +497,10 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
     tags: ["FinOps", "Cost Optimization", "Databricks", "Azure", "Serverless SQL", "Spot Instances", "Liquid Clustering", "VACUUM", "Storage Tiering"],
     description: "Strategic FinOps framework and operational cost governance architecture for enterprise cloud lakehouses. Spans cost allocation tagging and telemetry (Databricks System Tables system.billing.usage, Azure Cost Management API), compute right-sizing (aggressive 10-15 min auto-termination, Spot worker nodes with on-demand driver fallback, Serverless SQL auto-scaling), and storage cost reduction via Delta Lake OPTIMIZE, Liquid Clustering read pruning, and automated lifecycle archiving.",
     keyPoints: [
-      "FinOps Tagging & System Tables: Enforces strict metadata tags (CostCenter, Environment, Owner) to track granular DBU burning velocity and trigger automated anomaly budget alerts.",
-      "Spot Worker Compute Arbitrage: Leveraging Spot instances for ephemeral worker nodes cuts cluster compute expenses by 60%–80%, with On-Demand driver nodes safeguarding against cluster termination.",
-      "Serverless SQL Warehouse Auto-Scaling: 5-second rapid cold-starts and intelligent query queuing automatically scale clusters to zero during query lulls, eliminating idle compute waste.",
-      "Storage Lifecycle & VACUUM: Delta VACUUM purges obsolete historical snapshots beyond retention windows, while cloud lifecycle policies migrate cold raw Bronze files to cost-effective archive tiers."
+      "Fabric Capacity Smoothing Algorithm: Calculates usage over rolling time windows (e.g. 5-10 min interactive, multi-hour background), allowing temporary bursts past 100% (peaks of 140%-200%+) without throttling. Throttling is determined strictly by smoothed consumption.",
+      "Manual Scaling Requirement: Microsoft Fabric capacities (F SKUs) do NOT autoscale automatically; capacity admins must manually change SKU sizes in the Azure Portal.",
+      "Global Overlap Sizing (F64 Unified Architecture): Sizing calculation proves a single unified F64 capacity (64 CUs) accommodates multi-region peak overlap (e.g., EMEA and Americas East 38 CU demand) with maximum burst pooling, outperforming fragmented F16/F32 capacities.",
+      "Automated VACUUM & Storage Lifecycle: Complements compute optimization by permanently purging unreferenced Parquet files past retention thresholds."
     ],
     docLink: "https://docs.databricks.com/en/admin/account-settings/system-tables/index.html"
   },

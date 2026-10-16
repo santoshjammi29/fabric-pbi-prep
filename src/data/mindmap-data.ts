@@ -83,27 +83,38 @@ kafka-consumer-groups.sh --bootstrap-server kafka:9092 \\
       {
         id: "ingestion-processing",
         conceptId: "spark-streaming-checkpointing",
-        name: "Stream Processing Engines",
-        desc: "Stateful streaming transformations with event-time watermarking, sessionization, and exactly-once checkpointing.",
-        tradeOffs: "Sub-second analytical aggregates vs RocksDB state store memory pressure and checkpoint storage I/O.",
-        protocols: ["Apache Flink", "Spark Structured Streaming", "Azure Stream Analytics", "Faust"],
-        practiceLink: "/qa-prep?q=Structured%20Streaming",
-        codeSnippet: `// Spark Structured Streaming with Watermark
-val streamDf = spark.readStream
-  .format("kafka")
-  .load()
-  .withWatermark("eventTime", "10 minutes")
-  .groupBy(window($"eventTime", "5 minutes"), $"customerId")
-  .count()`,
+        name: "Stream Processing & Fabric Eventstream",
+        desc: "Stateful streaming with event-time watermarks, late arrival tolerance (up to 20 days), out-of-order policies (59s), and Fabric Eventstreams routing IoT GPS telemetry from Event Hubs through in-flight processors into Lakehouse Delta tables.",
+        tradeOffs: "Sub-second analytical aggregates and no-code Eventstream routing vs RocksDB state store memory pressure and watermark lag management.",
+        protocols: ["Fabric Eventstream", "Azure Event Hubs", "Azure Stream Analytics", "Spark Structured Streaming", "Apache Flink"],
+        practiceLink: "/qa-prep?q=Eventstream",
+        codeSnippet: `// Fabric Eventstream GPS IoT Ingestion Architecture
+// 1. Eventstream Input: Binds to Azure Event Hubs (GPS Telemetry)
+// 2. Eventstream Processor: Filters invalid coordinates & normalizes UTC
+// 3. Eventstream Output: Persists streaming records to Lakehouse Delta
+// Stream Analytics Watermarking Query:
+SELECT 
+    vehicle_id,
+    System.Timestamp() AS window_end,
+    AVG(speed_mph) AS avg_speed
+FROM [EventHubInput] TIMESTAMP BY event_time
+GROUP BY TumblingWindow(minute, 5), vehicle_id`,
       },
       {
         id: "ingestion-batch",
         conceptId: "databricks-auto-loader-file-discovery",
-        name: "Auto Loader & Polyglot Batch Connectors",
-        desc: "Managed event-driven file discovery (cloudFiles), Lakeflow Connect for SaaS/DB sources, REST webhooks, and scalable staging queues.",
-        tradeOffs: "Idempotent exactly-once ingestion with schema evolution vs queue subscription setup and notification latency.",
-        protocols: ["Auto Loader (cloudFiles)", "Lakeflow Connect", "ADF Copy Activity", "Airbyte", "Fivetran"],
-        practiceLink: "/qa-prep?q=Auto%20Loader",
+        name: "Metadata-Driven Pipelines & Parallel COPY INTO",
+        desc: "Managed event-driven file discovery (cloudFiles), Data Factory metadata-driven Lookup/ForEach orchestration with GetMetadata structural inspection, and high-performance parallel T-SQL COPY INTO loading from external ADLS Gen2 into Fabric Warehouse.",
+        tradeOffs: "Distributed parallel bulk ingestion (fastest T-SQL load) and dynamic parameterization vs control repository maintenance.",
+        protocols: ["Auto Loader (cloudFiles)", "Fabric Warehouse COPY INTO", "Data Factory GetMetadata", "ForEach Loop", "ADLS Gen2"],
+        practiceLink: "/qa-prep?q=COPY%20INTO",
+        codeSnippet: `-- Fabric Warehouse High-Performance Parallel Bulk Load
+COPY INTO dbo.sales_orders
+FROM 'https://datalakeprod.dfs.core.windows.net/raw/sales/*.parquet'
+WITH (
+    FILE_TYPE = 'PARQUET',
+    CREDENTIAL = (IDENTITY = 'Managed Identity')
+);`,
       },
     ],
   },
@@ -127,41 +138,35 @@ val streamDf = spark.readStream
         id: "storage-formats",
         conceptId: "dl-delta-lake",
         name: "ACID Open Table Formats",
-        desc: "Atomic commit logs, snapshot isolation, time travel, and unified streaming + batch writes directly on object storage.",
-        tradeOffs: "Eliminates warehouse vendor lock-in vs metadata management and periodic commit log compaction.",
-        protocols: ["Delta Lake 3.x", "Apache Iceberg", "Apache Hudi", "Parquet Snappy", "Zstandard"],
+        desc: "Universal lakehouse standard providing ACID transactions, declarative MERGE INTO upserts, autoMerge configuration, and non-blocking read-time schema evolution with automatic NULL population for missing partition columns.",
+        tradeOffs: "Cross-engine interoperability (Spark, Synapse DW, KQL, Power BI) without data copying vs transaction log maintenance.",
+        protocols: ["Delta Lake 3.x", "Auto Schema Merge", "Apache Iceberg", "Apache Hudi", "V-Order Parquet"],
         practiceLink: "/concepts?term=Delta%20Lake",
-        codeSnippet: `-- Delta Lake Time Travel & Schema Evolution
-SELECT * FROM gold_sales VERSION AS OF 14;
+        codeSnippet: `-- Delta Lake MERGE INTO with Auto Schema Merge
+SET spark.databricks.delta.schema.autoMerge.enabled = true;
 
-ALTER TABLE gold_sales SET TBLPROPERTIES (
-  'delta.autoOptimize.optimizeWrite' = 'true',
-  'delta.enableChangeDataFeed' = 'true'
-);`,
+MERGE INTO gold_customers AS target
+USING staging_customers AS source
+ON target.customer_id = source.customer_id
+WHEN MATCHED AND target.attr_hash != source.attr_hash THEN
+  UPDATE SET *
+WHEN NOT MATCHED THEN
+  INSERT *;`,
       },
       {
         id: "storage-clustering",
         conceptId: "delta-liquid-clustering",
-        name: "6 Delta Optimization Levers & Liquid Clustering",
-        desc: "Empirical layout engineering comparing Physical Partitioning, multi-dimensional Z-Ordering, Bin-Packing OPTIMIZE, write-time Auto Optimize, Liquid Clustering (Hilbert curves), and VACUUM 7-day retention safety.",
-        tradeOffs: "Eliminates small-file sprawl and partition skew (10x-50x query speedup) vs write shuffle overhead and OCC commit retries.",
-        protocols: ["Liquid Clustering (CLUSTER BY)", "Z-Order", "Bin-Packing OPTIMIZE", "Auto Optimize", "VACUUM RETAIN 168 HOURS"],
-        practiceLink: "/concepts?category=DATABRICKS",
-        codeSnippet: `-- 6 Delta Lake Optimization Levers
--- 1. Liquid Clustering (Recommended Standard)
-CREATE TABLE sales_events USING DELTA CLUSTER BY (sale_date, customer_id);
+        name: "Small Files Compaction & Z-Order Skipping",
+        desc: "Two-stage process decoupling write ingestion from asynchronous OPTIMIZE compaction (~1GB target files) and VACUUM safety retention. Multi-dimensional Z-Ordering across 2-4 columns enabling 90-95% data skipping via file min/max metadata statistics.",
+        tradeOffs: "10x-50x query acceleration and metadata overhead elimination vs periodic compute consumption during OPTIMIZE runs.",
+        protocols: ["Two-Stage OPTIMIZE", "ZORDER BY (2-4 cols)", "Liquid Clustering", "VACUUM RETAIN 168 HOURS"],
+        practiceLink: "/concepts?term=Z-Ordering",
+        codeSnippet: `-- 1. Consolidate small files into ~1GB Parquet blocks with Z-Ordering
+OPTIMIZE delta_lakehouse_table
+ZORDER BY (customer_id, transaction_date);
 
--- 2. Compaction & Incremental Clustering
-OPTIMIZE sales_events;
-
--- 3. Auto Optimize Table Configuration
-ALTER TABLE sales_events SET TBLPROPERTIES (
-  'delta.autoOptimize.optimizeWrite' = 'true',
-  'delta.autoOptimize.autoCompact' = 'true'
-);
-
--- 4. VACUUM Lifecycle Hygiene (7-day safety retention)
-VACUUM sales_events RETAIN 168 HOURS;`,
+-- 2. Clean obsolete commit versions older than 7 days
+VACUUM delta_lakehouse_table RETAIN 168 HOURS;`,
       },
       {
         id: "storage-uniform",
@@ -175,11 +180,11 @@ VACUUM sales_events RETAIN 168 HOURS;`,
       {
         id: "storage-substrate",
         conceptId: "fabric-onelake",
-        name: "Cloud Object Storage Substrate",
-        desc: "Hyperscale distributed blob storage providing 99.999999999% durability, hierarchical namespaces, and private endpoint isolation.",
-        tradeOffs: "Low cost ($0.02/GB) vs eventual metadata listing bottlenecks on flat namespaces.",
-        protocols: ["ADLS Gen2", "AWS S3", "Google Cloud Storage", "OneLake ADLS Gen2 API"],
-        practiceLink: "/concepts?term=ADLS",
+        name: "OneLake Tenant Namespace & Shortcuts",
+        desc: "One Tenant = One OneLake hierarchical namespace. Workspaces provide logical boundaries without storage accounts. Zero-copy shortcuts virtualize ADLS Gen2, AWS S3, and GCS with 2-level chain limits. Eventhouse synchronization syncs only newly ingested data non-retroactively.",
+        tradeOffs: "Zero data replication across business domains vs read-only shortcut constraints and cross-region egress fees.",
+        protocols: ["OneLake Unified Namespace", "Internal Shortcuts", "External S3/GCS Shortcuts", "ADLS Gen2 API"],
+        practiceLink: "/concepts?term=OneLake",
       },
     ],
   },
@@ -203,14 +208,17 @@ VACUUM sales_events RETAIN 168 HOURS;`,
         id: "compute-spark",
         conceptId: "spark-memory-management",
         name: "Apache Spark 4.0 Internals",
-        desc: "Catalyst rule-based query planner, Project Tungsten off-heap memory, Adaptive Query Execution (AQE), and Dynamic Partition Pruning.",
-        tradeOffs: "Handles petabyte scale with fault tolerance vs JVM GC pauses, executor OOM risks, and cluster startup delay.",
-        protocols: ["Spark 4.0", "Catalyst", "Tungsten", "AQE", "PySpark", "Dynamic Allocation"],
+        desc: "PySpark operational boundary: Transformations (filter, select, cache) build a lazy DAG plan; Actions (collect, count) force computation and trigger cluster jobs. Actions are NOT optimizations—collect() on large tables triggers driver OOM. DataFrames excel via Catalyst plan optimization and Tungsten whole-stage codegen.",
+        tradeOffs: "Extreme execution throughput and automatic plan optimization vs Driver JVM memory crashes on misuse of collect().",
+        protocols: ["Catalyst Optimizer", "Project Tungsten", "AQE", "PySpark DataFrame API", "DAG Lineage"],
         practiceLink: "/spark-engine",
-        codeSnippet: `# Spark AQE Join Optimization & Skew Mitigation
-spark.conf.set("spark.sql.adaptive.enabled", "true")
-spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
-spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")`,
+        codeSnippet: `# Transformations: Lazy DAG building
+clean_df = raw_df.filter(col("status") == "ACTIVE").select("user_id", "amount")
+# Caching: Transformation marking storage memory
+cached_df = clean_df.cache()
+# Action: Triggers physical job execution across cluster
+record_count = cached_df.count()
+# CAUTION: collect() brings all data to Driver JVM - avoid on large data!`,
       },
       {
         id: "compute-vectorized",
@@ -273,18 +281,17 @@ df = q.collect()`,
         id: "serving-directlake",
         conceptId: "fabric-direct-lake",
         name: "Fabric Direct Lake & Memory Caching",
-        desc: "Power BI VertiPaq engine directly loads OneLake Delta Parquet columns into RAM on-demand, eliminating scheduled import refreshes.",
-        tradeOffs: "Sub-second dashboards on billions of rows without data copying vs DirectQuery fallback if memory limits are exceeded.",
-        protocols: ["Microsoft Fabric", "Power BI Direct Lake", "VertiPaq", "DAX Query Fusion"],
+        desc: "VertiPaq directly memory-maps OneLake V-Order Delta Parquet into RAM. Framing operation performs metadata-only refreshes (10-100x faster, 90-95% fewer CUs than Import mode). Automatic fallback to DirectQuery occurs on memory limit breach.",
+        tradeOffs: "Sub-second analytical queries with zero data copying and minimal CU refresh cost vs Fallback latency on unsupported features.",
+        protocols: ["Direct Lake", "VertiPaq Framing", "V-Order Parquet", "OneLake Delta", "Fallback DirectQuery"],
         practiceLink: "/concepts?term=Direct%20Lake",
-        codeSnippet: `// Direct Lake DAX Memory Footprint Best Practice
-// Ensure high-cardinality columns are not materialized in reports
+        codeSnippet: `// Direct Lake Framing Operation Architecture
+// - Reads latest _delta_log snapshot in OneLake
+// - Refreshes table schemas and file pointers without loading rows
+// - Consumes minimal CUs compared to full data import
 DEFINE
-  MEASURE 'Sales'[YTD Revenue] =
-    CALCULATE(
-      SUM('Sales'[Amount]),
-      DATESYTD('Date'[Date])
-    )`,
+  MEASURE 'Revenue'[Total Sales] =
+    CALCULATE(SUM('Sales'[Amount]), 'Date'[Year] = 2026)`,
       },
       {
         id: "serving-warehouses",
@@ -307,11 +314,11 @@ DEFINE
       {
         id: "serving-composite",
         conceptId: "pbi-import-mode",
-        name: "Composite Models & Hybrid Partitions",
-        desc: "Combine blazing-fast in-memory cached historical data with real-time DirectQuery partitions for current-day telemetry.",
-        tradeOffs: "Combines petabyte scale with real-time freshness vs complex relationship modeling and query plan debugging.",
-        protocols: ["Power BI Composite Models", "Dual Storage Mode", "Incremental Refresh"],
-        practiceLink: "/qa-prep?q=Composite%20Models",
+        name: "Schema-on-Write & SCD Type 2 Modeling",
+        desc: "Schema-on-write enforces strict structural integrity for curated Gold tables, contrasted with flexible schema-on-read in Bronze. Fabric SCD Type 2 dimensional modeling utilizes Delta MERGE, SHA2 attribute hashing, Effective/Expiration dates, and IsCurrent flags.",
+        tradeOffs: "Guaranteed dimensional integrity for BI reports vs pipeline complexity for tracking out-of-order and late-arriving events.",
+        protocols: ["SCD Type 2", "Schema-on-Write (Gold)", "Schema-on-Read (Bronze)", "SHA2 Hash Change Detection"],
+        practiceLink: "/qa-prep?q=SCD%20Type%202",
       },
     ],
   },
@@ -399,36 +406,34 @@ DEFINE
     subtopics: [
       {
         id: "governance-catalog",
-        conceptId: "databricks-governance-with-unity-catalog---purview",
-        name: "Unified Access Control & Catalogs",
-        desc: "Centralized 3-level namespace (catalog.schema.table) enforcing row-level security, column masking, and tag-based policies.",
-        tradeOffs: "Consistent enterprise security across multiple engines vs cross-account credential federation complexity.",
-        protocols: ["Databricks Unity Catalog", "Microsoft Purview", "AWS Lake Formation", "OpenLineage"],
-        practiceLink: "/architecture?q=Unity%20Catalog",
-        codeSnippet: `-- Unity Catalog Dynamic Column Masking
-CREATE MASK pii_mask ON (val STRING)
-RETURN CASE WHEN IS_ACCOUNT_GROUP_MEMBER('hr_dept') THEN val
-            ELSE '***REDACTED***' END;
-
-ALTER TABLE gold_employees ALTER COLUMN ssn SET MASK pii_mask;`,
+        conceptId: "fabric-purview-gdpr-governance",
+        name: "Purview Hub in Fabric & GDPR Compliance",
+        desc: "Unified governance via Microsoft Purview Hub in Fabric: automated data discovery, PII classification, sensitivity labeling for GDPR compliance, access policies, and cross-workspace data lineage across OneLake artifacts.",
+        tradeOffs: "Automated regulatory auditability and persistent downstream protection vs metadata synchronization overhead.",
+        protocols: ["Microsoft Purview Hub", "Fabric Sensitivity Labels", "GDPR PII Discovery", "Unity Catalog", "OpenLineage"],
+        practiceLink: "/qa-prep?q=Purview",
+        codeSnippet: `-- Purview Sensitivity Labeling in Fabric
+-- Sensitivity labels (e.g. 'Highly Confidential - GDPR PII')
+-- automatically cascade from OneLake Delta tables to Power BI Direct Lake
+-- Enforces encryption, export restrictions, and end-to-end lineage tracking`,
       },
       {
         id: "governance-contracts",
-        conceptId: "de-data-contracts",
-        name: "Data Contracts & Quality Assertion",
-        desc: "Enforceable schema and SLA contracts published by upstream domain producers with automated circuit-breaking quarantine.",
-        tradeOffs: "Stops breaking schema changes before reaching analytical consumers vs friction during rapid source iteration.",
-        protocols: ["Open Data Contract Standard (ODCS)", "Great Expectations", "Soda Core", "Monte Carlo"],
-        practiceLink: "/concepts?term=Data%20Contracts",
+        conceptId: "fabric-workspace-roles-rbac",
+        name: "Fabric Workspace Roles & RBAC Governance",
+        desc: "Separation of duties: Viewer has read-only access; Capacity Admin manages compute resources and scaling; Member creates/edits lakehouse tables, datasets, and reports without access management rights (ideal for data engineers); Admin retains full control.",
+        tradeOffs: "Least privilege security with high developer autonomy vs careful role boundary enforcement.",
+        protocols: ["Fabric RBAC (Member / Admin / Viewer)", "Capacity Admin", "Entra ID", "Data Contracts"],
+        practiceLink: "/qa-prep?q=Workspace%20Roles",
       },
       {
         id: "governance-finops",
-        conceptId: "de-finops-unit-economics",
-        name: "Cloud FinOps & Capacity Optimization",
-        desc: "Capacity Unit (CU) smoothing, burst throttling, auto-termination of idle clusters, and automated orphan file VACUUMing.",
-        tradeOffs: "Reduces cloud data bills by 30%-60% vs potential queue delays during peak concurrent workloads.",
-        protocols: ["Fabric Capacity Metrics", "Spot Fleets", "Snowflake Resource Monitors", "VACUUM"],
-        practiceLink: "/modern-stack#cost",
+        conceptId: "fabric-capacity-smoothing-bursting",
+        name: "Fabric Capacity Smoothing & Bursting FinOps",
+        desc: "Moving-average smoothing algorithm over rolling time windows allows workloads to burst past 100% (peaks of 140%-200%+) without throttling. Throttling is determined strictly by smoothed percentage. Fabric F SKUs require manual scaling (no autoscaling). Sizing justifies unified F64 for multi-region peak overlap (38 CU load).",
+        tradeOffs: "Smooths erratic ETL spikes without immediate throttling vs proactive manual SKU scaling required to prevent sustained queue delays.",
+        protocols: ["Fabric Smoothing Algorithm", "Capacity Metrics App", "F64 Unified Sizing", "Spot Instances"],
+        practiceLink: "/qa-prep?q=Capacity%20Metrics",
       },
       {
         id: "governance-mesh",

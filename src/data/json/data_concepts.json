@@ -8357,5 +8357,314 @@
       "A structured approach to diagnosing slow pipelines: check Spark UI stage breakdown, identify shuffle/spill bottlenecks, examine query plan for full scans or bad joins, verify clustering/statistics, check cluster utilization. Building runbooks for common performance patterns.",
       "Essential architectural pattern for enterprise lakehouse systems."
     ]
+  },
+  {
+    "id": "fabric-purview-gdpr-governance",
+    "term": "Microsoft Purview in Fabric & GDPR Compliance",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The unified data governance integration within Microsoft Fabric (via the Purview Hub) providing automated data discovery, PII classification, sensitivity labeling, and cross-workspace lineage essential for GDPR compliance.",
+    "explanation": "Within the Microsoft data ecosystem, Microsoft Purview serves as the unified data governance control plane, natively integrated with Microsoft Fabric through the embedded Microsoft Purview Hub.\n\nGDPR and global regulatory compliance heavily rely on automated data discovery, classification, and applying sensitivity labels to sensitive information like Personally Identifiable Information (PII). Microsoft Purview provides these capabilities across all Fabric workspaces and OneLake artifacts, enabling enterprise architects to track where sensitive data resides and apply mandatory protection policies.\n\nWithin Fabric, Purview sensitivity labels flow through the data lifecycle\u2014from Lakehouse Delta tables to Power BI Direct Lake semantic models\u2014enforcing encryption, watermarking, and access control. Furthermore, Purview extracts end-to-end data lineage, allowing audit teams to trace PII from external source ingestion down to downstream BI reports and ML models.",
+    "keyPoints": [
+      "Purview Hub in Fabric provides a single pane of glass for cataloging, data health, and governance posture across tenant workspaces.",
+      "Automated PII classification detects sensitive attributes (SSNs, emails, credit cards) across OneLake Delta Parquet files.",
+      "Sensitivity labels provide persistent downstream protection, ensuring export restrictions and encryption persist in Power BI and Office apps.",
+      "Comprehensive data lineage enables GDPR right-to-be-forgotten tracking and regulatory audit defense."
+    ]
+  },
+  {
+    "id": "delta-lake-standard-lakehouse-tables",
+    "term": "Delta Lake Standard for Lakehouse Tables",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "The open-source storage layer built on Apache Parquet that serves as the universal standard for lakehouse tables due to ACID transactions, schema evolution, and cross-engine interoperability.",
+    "explanation": "Delta Lake is the foundational standard for lakehouse tables across Microsoft Fabric and Databricks. It layers an append-only JSON transaction log (_delta_log) on top of columnar Parquet data files to guarantee serializable ACID transactions, preventing partial writes and dirty reads.\n\nDelta Lake natively supports schema evolution, allowing columns to be added or restructured without locking tables or rewriting historical partition files. Crucially, Delta Lake provides open cross-engine interoperability: Fabric Spark, Synapse Data Warehouse T-SQL, Power BI Direct Lake, and KQL Eventhouses can all read and write to the same underlying Delta tables without proprietary lock-in.",
+    "keyPoints": [
+      "ACID Transactions: Guarantees atomicity and isolation for concurrent readers and writers via the _delta_log.",
+      "Schema Evolution: Enables safe, non-blocking additions and modifications to table schemas over time.",
+      "Cross-Engine Interoperability: Directly accessible by Spark, T-SQL, Presto/Trino, and Power BI VertiPaq without data copies.",
+      "Delta Parquet foundation eliminates the dichotomy between high-concurrency relational databases and scalable data lakes."
+    ]
+  },
+  {
+    "id": "fabric-workspace-roles-rbac",
+    "term": "Fabric Workspace Roles: Viewer vs Member vs Admin vs Capacity Admin",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The role-based access control (RBAC) hierarchy governing content authoring, access administration, and capacity resource allocation within Microsoft Fabric workspaces.",
+    "explanation": "Microsoft Fabric enforces a strict security separation of duties across workspace development and capacity administration through four primary roles:\n\n1. Viewer: Grants read-only access to workspace items. Viewers cannot create, edit, or delete lakehouse tables, datasets, or reports, making this role insufficient for data engineers.\n\n2. Capacity Admin: Manages capacity-level compute resources (SKU scaling, pause/resume, and performance monitoring) across the tenant. This role has no workspace-level content creation or table management permissions.\n\n3. Member: The ideal role for data engineers. Members can create and edit content\u2014including Lakehouse tables, Data Factory pipelines, notebooks, and semantic models\u2014and can share items. Crucially, Members CANNOT manage workspace access or modify role assignments (a duty restricted to Admins). This strikes the exact balance between enabling engineering agility and enforcing access governance.\n\n4. Admin: Has full control over the workspace, including deleting the workspace, managing workspace permissions, and assigning roles. Granting Admin to engineers violates the principle of least privilege if access management must remain centralized.",
+    "keyPoints": [
+      "Member role is the recommended enterprise standard for data engineers who need to build and manage data assets without access delegation rights.",
+      "Admin role retains exclusive control over workspace permissions and user role assignment.",
+      "Capacity Admin operates at the compute resource level (CUs, SKUs) independent of workspace item authoring.",
+      "Viewer role provides strictly read-only consumption for business viewers."
+    ]
+  },
+  {
+    "id": "fabric-eventstream-iot-pipeline",
+    "term": "Fabric Eventstream Architecture: Event Hub to Lakehouse",
+    "category": "FABRIC",
+    "difficulty": "HARD",
+    "definition": "Microsoft Fabric's no-code/low-code real-time ingestion service that streams high-throughput IoT telemetry from Azure Event Hubs through real-time processors into Lakehouse Delta tables.",
+    "explanation": "Fabric Eventstream provides an enterprise streaming fabric for ingesting, transforming, and routing real-time telemetry from distributed devices.\n\nAn end-to-end IoT architecture consists of three core components:\n1. Eventstream Input: Connects directly to Azure Event Hubs (or Apache Kafka) to ingest massive parallel GPS streams from IoT devices with managed consumer group offset tracking.\n\n2. Eventstream Processor (optional but recommended): A streaming operator that executes real-time filtering, schema transformations, and data enrichment in flight (e.g., stripping malformed GPS coordinates, normalizing timestamp formats, and computing bounding-box flags) before landing.\n\n3. Eventstream Output: Persists streaming outputs directly into Lakehouse Delta tables. Landing data in Delta format provides long-term retention and allows immediate querying by Spark notebooks, T-SQL via the SQL Analytics endpoint, and Power BI Direct Lake reports with zero data movement.",
+    "keyPoints": [
+      "Eventstream Input connects seamlessly to Azure Event Hubs for real-time IoT and telemetry ingestion.",
+      "Eventstream Processor performs stateless and windowed in-flight cleansing and format normalization.",
+      "Eventstream Output writes Delta Lake Parquet tables directly to OneLake for unified batch and streaming queries.",
+      "Eliminates complex Spark Structured Streaming infrastructure for standard ingestion and routing patterns."
+    ]
+  },
+  {
+    "id": "pyspark-actions-vs-transformations",
+    "term": "PySpark Actions vs Transformations: Lazy Evaluation and Driver OOM",
+    "category": "SPARK & DATABRICKS",
+    "difficulty": "HARD",
+    "definition": "The foundational execution boundary in Apache Spark separating lazily evaluated DAG construction (Transformations) from physical execution triggers (Actions), along with memory safety guardrails.",
+    "explanation": "In Apache Spark and PySpark, operations are strictly classified into Transformations and Actions:\n\n1. Transformations (e.g., filter(), select(), withColumn(), map(), join()): These operations are lazily evaluated. They do not execute computation immediately; instead, they record lineage into an unresolved Directed Acyclic Graph (DAG) of execution.\n\n2. Actions (e.g., collect(), count(), take(), save(), write()): An action is the operation that forces the entire lineage of transformations to be computed, triggering physical execution across the cluster.\n\nCrucial Architectural Nuance: Actions are NOT for performance optimization. While actions trigger the optimized plan built by the Catalyst Optimizer, the action itself can degrade performance. Specifically, calling collect() on a multi-gigabyte or terabyte dataset attempts to serialize all distributed partitions across executors and materialize them onto the single Driver JVM, inevitably triggering a Driver Out-of-Memory (OOM) crash.\n\nFurthermore, caching operations like cache() and persist() are transformations\u2014not actions. They mark a DataFrame/RDD to be saved in storage memory upon subsequent computation, but do not trigger cluster execution on their own.",
+    "keyPoints": [
+      "Transformations are lazily evaluated, merely appending logical operators to the query DAG without moving data.",
+      "Actions (collect, count, write) force DAG evaluation and trigger actual distributed cluster execution.",
+      "Actions are not optimizations; collect() on large datasets crashes the Driver JVM with Out-of-Memory (OOM).",
+      "DataFrame.cache() and persist() are transformations that define storage intent, not actions that trigger jobs."
+    ]
+  },
+  {
+    "id": "fabric-warehouse-copy-into-bulk-loading",
+    "term": "Fabric Warehouse COPY INTO Command",
+    "category": "FABRIC",
+    "difficulty": "MEDIUM",
+    "definition": "A high-throughput, parallelized T-SQL bulk ingestion command in Microsoft Fabric Warehouse and Azure Synapse optimized for loading external Parquet, CSV, or ORC files from ADLS Gen2.",
+    "explanation": "The COPY INTO T-SQL command is specifically engineered for high-performance, parallel data loading from external cloud object storage (Azure Data Lake Storage Gen2) directly into Microsoft Fabric Warehouse and Azure Synapse tables.\n\nThis command fundamentally outperforms traditional relational ingestion methods such as INSERT...VALUES or BULK INSERT. COPY INTO coordinates the distributed compute nodes of the Synapse warehouse engine to read storage files in parallel, bypassing single-threaded bottlenecks and staging tables.\n\nIt features native support for automated file pattern matching, credential delegation (Shared Access Signatures, Managed Identity), robust error routing, and automatic V-Order Delta Parquet creation in OneLake with full transactional consistency.",
+    "keyPoints": [
+      "Distributed parallel execution across compute nodes makes COPY INTO the fastest T-SQL loading mechanism.",
+      "Ingests directly from ADLS Gen2 storage accounts into OneLake Warehouse tables with minimal compute overhead.",
+      "Superior to INSERT...VALUES and single-threaded BULK INSERT for multi-gigabyte to terabyte bulk loads.",
+      "Supports flexible authentication methods including Managed Identity and Shared Access Signatures (SAS)."
+    ]
+  },
+  {
+    "id": "schema-on-write-vs-schema-on-read-medallion",
+    "term": "Schema-on-Write vs Schema-on-Read in Medallion Architecture",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "Architectural principles governing data validation timing: schema-on-read offers flexibility for raw ingestion, whereas schema-on-write enforces strict structural integrity for curated reporting.",
+    "explanation": "A pervasive misconception in data lake design is conflating the purposes of schema-on-write and schema-on-read:\n\n1. Schema-on-Write: Used strictly for structure, integrity, and enterprise consistency\u2014NOT flexibility. It enforces a rigorous schema contract at the moment data is persisted, failing any write containing unexpected types, missing required keys, or illegal schema drift. In the Medallion architecture, schema-on-write is universally mandated for Gold-layer dimensional models and curated tables to guarantee that downstream Power BI reports and executive dashboards never encounter corrupted data.\n\n2. Schema-on-Read: Provides the architectural flexibility needed for ingestion. It defers schema interpretation until the query engine scans the raw payload. This is the cornerstone of the Bronze layer, allowing heterogeneous JSON feeds, webhooks, and IoT logs to land instantly without pipeline failure when upstream systems introduce unexpected fields.",
+    "keyPoints": [
+      "Schema-on-write enforces strict structural integrity and data quality for curated Gold tables, not flexibility.",
+      "Schema-on-read enables maximum ingestion flexibility for raw Bronze landing zones with evolving schemas.",
+      "Gold-layer dimensional models mandate schema-on-write to prevent breaking downstream BI calculations.",
+      "Bronze-layer raw stores leverage schema-on-read to prevent pipeline halting during source payload drift."
+    ]
+  },
+  {
+    "id": "sql-dmv-session-query-monitoring",
+    "term": "SQL Dynamic Management Views: sys.dm_exec_sessions and queryinsights",
+    "category": "SQL SERVER",
+    "difficulty": "HARD",
+    "definition": "Real-time system catalog views and Fabric performance schemas used by DBAs and data architects to isolate active user sessions, running query statements, and resource bottlenecks.",
+    "explanation": "To identify active workloads and diagnose performance bottlenecks in SQL Server, Azure SQL, and Microsoft Fabric Warehouse, database administrators leverage Dynamic Management Views (DMVs):\n\n1. sys.dm_exec_sessions: Provides metadata on all current active user and system sessions, including session_id, login_name, client host name, status, login_time, and transaction isolation level.\n\n2. sys.dm_exec_requests: Details every request currently executing on the database engine. By executing an INNER JOIN between sys.dm_exec_sessions and sys.dm_exec_requests ON s.session_id = r.session_id, an architect immediately exposes who is logged in and what query statement is executing via sys.dm_exec_sql_text(r.sql_handle).\n\n3. Fabric queryinsights Schema: In Microsoft Fabric Warehouse, the native queryinsights schema exposes views (such as exec_requests_history) that log username attribution, query duration, CU consumption, and exact query text, providing historical and real-time observability.",
+    "keyPoints": [
+      "Joining sys.dm_exec_sessions with sys.dm_exec_requests exposes the user and currently running query statement.",
+      "sys.dm_exec_sql_text(sql_handle) decodes the binary plan handle into plain-text SQL statements.",
+      "Microsoft Fabric queryinsights schema provides built-in query text and user attribution for workload tuning.",
+      "Essential for killing rogue queries, identifying blocking chains, and isolating high-CU consumers."
+    ]
+  },
+  {
+    "id": "spark-dataframe-catalyst-tungsten-engine",
+    "term": "Spark DataFrame API: Catalyst Optimizer and Project Tungsten",
+    "category": "SPARK & DATABRICKS",
+    "difficulty": "ARCHITECT",
+    "definition": "The high-level declarative query interface in Apache Spark that achieves superior throughput and memory efficiency over RDDs through automated Catalyst query planning and Tungsten byte-code generation.",
+    "explanation": "For large-scale data engineering pipelines involving cleansing, aggregations, and complex multi-table joins, the Spark DataFrame API is vastly superior to low-level RDDs for three primary reasons:\n\n1. Catalyst Optimizer: Operates as an extensible relational query optimizer. It applies rule-based optimizations (predicate pushdown, constant folding, projection pruning) and Cost-Based Optimizations (CBO) on table statistics to select optimal join algorithms (Broadcast Hash vs. Sort-Merge).\n\n2. Project Tungsten Execution Engine: Optimizes hardware execution by bypassing Java Virtual Machine (JVM) garbage collection overhead. Tungsten manages off-heap binary memory in raw columnar formats and employs whole-stage code generation, compiling complex multi-operator execution plans into concise native JVM bytecode loops.\n\n3. Declarative Expressiveness: Unlike imperative RDD transformations that dictate HOW to navigate records, DataFrames express WHAT data is required, allowing the runtime engine to restructure the execution plan for optimal cluster utilization.",
+    "keyPoints": [
+      "Catalyst Optimizer applies rule-based and cost-based optimizations automatically to logical and physical DAG plans.",
+      "Project Tungsten manages off-heap binary data layout, eliminating JVM object header bloat and GC pauses.",
+      "Tungsten whole-stage code generation compiles expression trees into compact assembly-like bytecode.",
+      "DataFrames provide declarative abstractions far more maintainable and performant than imperative RDD loops."
+    ]
+  },
+  {
+    "id": "delta-lake-merge-into-auto-schema-merge",
+    "term": "Delta Lake MERGE INTO & Auto Schema Merge",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "The declarative UPSERT mechanism in Delta Lake that coordinates atomic inserts, updates, and deletes in a single ACID transaction while automatically assimilating upstream schema drift.",
+    "explanation": "Delta Lake's MERGE INTO statement provides the industry standard for implementing incremental data updates and Change Data Capture (CDC) processing in Lakehouse architectures.\n\nMERGE INTO combines INSERT, UPDATE, and DELETE operations into a single atomic commit, eliminating inconsistent intermediate states during dimensional updates. To handle evolving source schemas, architects enable the configuration:\nspark.databricks.delta.schema.autoMerge.enabled = true\n\nWhen enabled, Delta Lake automatically detects incoming columns during write or merge operations, updates the table schema in the _delta_log transaction log, and seamlessly persists the new attributes without requiring explicit ALTER TABLE DDL or pipeline interruptions.",
+    "keyPoints": [
+      "MERGE INTO is the most efficient and declarative way to execute atomic UPSERT operations in Delta Lake.",
+      "Setting spark.databricks.delta.schema.autoMerge.enabled = true enables automatic schema expansion during MERGE.",
+      "Guarantees ACID transaction atomicity, ensuring concurrent queries never see partial or corrupted updates.",
+      "Integrates with Delta Change Data Feed (CDF) to propagate row-level modifications downstream."
+    ]
+  },
+  {
+    "id": "fabric-eventhouse-onelake-availability",
+    "term": "Eventhouse OneLake Availability Synchronization",
+    "category": "FABRIC",
+    "difficulty": "HARD",
+    "definition": "The streaming synchronization bridge in Microsoft Fabric Real-Time Intelligence that mirrors KQL database tables into OneLake Delta Parquet format without retroactively duplicating historical data.",
+    "explanation": "In Microsoft Fabric Real-Time Intelligence, an Eventhouse (powered by Azure Data Explorer / KQL) can expose its streaming tables directly to OneLake by enabling 'OneLake availability'.\n\nCrucial Operational Mechanic: Enabling OneLake availability does NOT retroactively copy existing historical data stored in the Eventhouse. Instead, only newly ingested data arriving after OneLake availability is activated is synchronized and formatted as Delta Parquet in OneLake.\n\nThis design prevents massive storage doubling and compute spikes when enabling lakehouse integration on multi-terabyte telemetry stores. Historical data remains queryable via KQL, while all ongoing ingestion becomes immediately visible to Fabric Spark, Synapse T-SQL, and Power BI Direct Lake.",
+    "keyPoints": [
+      "Enabling OneLake availability for an Eventhouse does NOT copy historical data retroactively.",
+      "Only newly ingested telemetry following activation is automatically formatted as Delta Parquet in OneLake.",
+      "Eliminates duplicate storage consumption and compute bursts on existing eventhouse tables.",
+      "Enables downstream Spark and Power BI Direct Lake access to ongoing streaming feeds."
+    ]
+  },
+  {
+    "id": "adx-vs-synapse-compute-selection",
+    "term": "Azure Data Explorer (ADX) vs Azure Synapse Analytics Workload Selection",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "Architectural decision criteria for selecting between indexing-optimized real-time telemetry exploration (ADX/KQL) and massively parallel relational data warehousing (Synapse/Fabric Warehouse).",
+    "explanation": "Selecting the optimal compute engine across Azure and Microsoft Fabric depends on the velocity, structure, and query patterns of the workload:\n\n1. Azure Data Explorer (ADX / Fabric KQL Database): Purpose-built for real-time analytics on high-velocity streaming, telemetry, diagnostic logs, and time-series data. ADX automatically indexes all columns (text, numeric, dynamic JSON) upon ingestion, enabling sub-second keyword search, regex parsing, and time-window aggregations across billions of semi-structured records using Kusto Query Language (KQL).\n\n2. Azure Synapse Analytics (Fabric Data Warehouse): Engineered for massive-scale structured relational data warehousing and dimensional modeling. It utilizes distributed query processing across compute nodes, supports full ACID multi-statement T-SQL transactions, enforces schema-on-write integrity, and is optimized for complex multi-table analytical joins and enterprise BI reporting.",
+    "keyPoints": [
+      "ADX (KQL Database) excels at high-velocity streaming, log search, and time-series telemetry exploration.",
+      "ADX automatically creates full-text and inverted indices on all ingested semi-structured JSON fields.",
+      "Synapse Analytics (Fabric Warehouse) is designed for large-scale structured relational modeling and T-SQL queries.",
+      "Fabric unifies both workloads over OneLake, allowing KQL and SQL engines to query shared Delta tables."
+    ]
+  },
+  {
+    "id": "fabric-scd-type-2-delta-merge",
+    "term": "Slowly Changing Dimension (SCD) Type 2 in Microsoft Fabric",
+    "category": "DATABASE ARCHITECTURE",
+    "difficulty": "ARCHITECT",
+    "definition": "The dimensional modeling pattern that maintains a complete history of attribute modifications by creating versioned records with validity timestamps and active flags using Delta Lake MERGE.",
+    "explanation": "Slowly Changing Dimension (SCD) Type 2 preserves historical changes by inserting a new record whenever an attribute changes, keeping prior versions intact. In Microsoft Fabric Lakehouse, SCD Type 2 is implemented using Delta Lake MERGE operations, surrogate keys, and Change Data Feed (CDF).\n\nEnterprise Implementation Standards:\n1. Surrogate & Natural Keys: Natural key identifies the business entity (CustomerID), while an artificial surrogate key uniquely identifies each version.\n2. Validity Timestamps: EffectiveDate (source transaction timestamp, NOT load timestamp) and ExpirationDate (NULL or 9999-12-31 for current).\n3. Current Flag: IsCurrent boolean (1 for active, 0 for historical).\n4. SHA2 Hash Change Detection: Compute a SHA2 hash over all tracked dimensional attributes. Comparing source and target hashes identifies changes instantly without comparing dozens of nullable columns.\n5. Batching by Natural Key: Partition or batch MERGE executions across CustomerID ranges to eliminate memory pressure.\n6. Late-Arriving Data: Insert out-of-order records with backdated EffectiveDate, adjusting the preceding version's ExpirationDate.\n7. Soft Deletes: When source records are deleted, update IsDeleted=1 and set ExpirationDate without physical row removal.\n8. Materialized Current View: Create a Lakehouse view filtering IsCurrent=1 for fast, simplified Power BI reporting.",
+    "keyPoints": [
+      "Preserves full history using surrogate keys, natural keys, Effective/Expiration dates, and IsCurrent flags.",
+      "SHA2 hashing across tracked attributes drastically speeds up delta comparison in MERGE statements.",
+      "EffectiveDate should align to the source business transaction timestamp rather than pipeline execution time.",
+      "Late-arriving records are backdated with historical expiration adjustments, and deletes are tracked as soft deletes."
+    ]
+  },
+  {
+    "id": "data-lake-small-file-problem-compaction",
+    "term": "Data Lake Small File Problem: Two-Stage OPTIMIZE and VACUUM",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "The metadata explosion and query performance degradation caused by millions of sub-optimal files in data lakes, resolved via a two-stage ingest-then-compact operational strategy.",
+    "explanation": "The small file problem arises when micro-batch streaming or fragmented ETL writes accumulate thousands of small files (<100MB) in cloud storage. This introduces massive metadata overhead, exhausts driver memory, causes high HTTP GET request latency, and degrades query speeds by 10x-50x.\n\nIn Microsoft Fabric and Delta Lake, this is resolved via a Two-Stage Process:\n1. Stage 1 (Fast Ingestion): Ingest data rapidly without blocking writes with on-the-fly compaction. Note that Data Factory copy activities do not auto-compact files.\n2. Stage 2 (Asynchronous Compaction): Schedule regular OPTIMIZE commands to consolidate small files into optimal ~1GB Parquet files. OPTIMIZE is idempotent and only touches files that benefit from compaction.\n\nFollowing compaction, old file versions remain for time-travel queries until the VACUUM command is executed to permanently delete unreferenced files past the safety retention threshold (default 7 days), reclaiming storage and reducing cloud costs.\n\nAnti-Pattern: Partitioning by high-cardinality columns or arrival timestamps fractures data into microscopic directories and dramatically worsens the small file problem.",
+    "keyPoints": [
+      "Small files create exponential metadata overhead and degrade analytical query performance by 10x to 50x.",
+      "Two-stage process decouples high-throughput write ingestion from asynchronous file compaction.",
+      "Delta OPTIMIZE consolidates small files into optimal ~1GB Parquet files with zero downtime.",
+      "VACUUM purges obsolete file versions past the retention period to reclaim storage capacity."
+    ]
+  },
+  {
+    "id": "powerbi-direct-lake-framing-cu",
+    "term": "Power BI Direct Lake Framing Operation & Capacity Units",
+    "category": "POWER BI",
+    "difficulty": "ARCHITECT",
+    "definition": "The sub-second, metadata-only refresh mechanism in Power BI Direct Lake mode that synchronizes Delta Lake table schemas and file pointers without loading or copying data, consuming minimal CUs.",
+    "explanation": "Power BI Direct Lake mode revolutionizes enterprise BI by querying OneLake Delta Parquet tables directly through the in-memory VertiPaq engine, combining the sub-second speed of Import mode with the zero-duplication freshness of DirectQuery.\n\nCore Operational Mechanics:\n1. Framing Operation: In Direct Lake mode, scheduled or on-demand 'refreshes' do NOT copy or import data rows. Instead, Power BI executes a 'Framing' operation. Framing reads the latest Delta Lake _delta_log snapshot, updating column schemas, dictionary pointers, and file statistics in memory. This framing operation is 10-100x faster and consumes 90-95% fewer Capacity Units (CUs) than an Import mode full refresh.\n\n2. V-Order Optimization: Direct Lake requires Delta Parquet files to be written with V-Order sorting for optimal VertiPaq columnar memory mapping.\n\n3. Fallback Mode: When a query exceeds capacity memory thresholds, involves unsupported DAX features, or hits complex RLS rules, Direct Lake automatically switches to Fallback mode (DirectQuery), consuming higher CUs and increasing latency.\n\n4. Cost Predictability: OneLake storage is billed on a pay-as-you-go per-GB basis, completely decoupled from query-time compute CUs.",
+    "keyPoints": [
+      "Framing operation is a metadata-only refresh that consumes 90-95% fewer CUs and is 10-100x faster than Import refresh.",
+      "VertiPaq directly memory-maps OneLake Delta Parquet columns into RAM on-demand without data duplication.",
+      "Direct Lake queries automatically fall back to DirectQuery if memory thresholds or feature limits are breached.",
+      "Delta tables must be optimized with V-Order to achieve native sub-second VertiPaq query speeds."
+    ]
+  },
+  {
+    "id": "fabric-capacity-smoothing-bursting",
+    "term": "Fabric Capacity Smoothing Algorithm & Bursting Mechanics",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The computational moving-average mechanism in Microsoft Fabric that calculates Capacity Unit consumption over rolling time windows, enabling workloads to temporarily burst past 100% without throttling.",
+    "explanation": "Microsoft Fabric manages compute capacity through a sophisticated smoothing algorithm designed to absorb variable data engineering and analytical workloads:\n\n1. Smoothing vs Instantaneous Peaks: Rather than measuring instantaneous CPU/memory utilization, Fabric evaluates consumption over rolling time windows (e.g., 5-10 minutes for interactive queries, and multi-hour windows for background operations like Data Factory and Spark jobs).\n\n2. Bursting Beyond 100%: Because capacity is evaluated on a smoothed moving average, workloads can temporarily burst to 140%, 200%, or higher peak utilization without triggering throttling, as long as the smoothed average remains within the capacity limit.\n\n3. Throttling Mechanics: Throttling is determined strictly by the smoothed usage percentage\u2014NOT instantaneous peak spikes. When throttling occurs, Fabric progressively slows background tasks first before impacting interactive user queries.\n\n4. Manual Scaling Requirement: Unlike some serverless cloud services, Microsoft Fabric capacities (F SKUs) do NOT automatically scale up or down based on load. Capacity admins must manually change SKU sizes (F2 through F2048) in the Azure Portal.\n\n5. Global Overlap Sizing Scenario: When designing for overlapping business regions (e.g., EMEA and Americas East overlapping for 2 hours with 38 CU combined demand), a single unified F64 capacity (64 CUs) is superior to fragmented F16/F32 capacities. It accommodates concurrent smoothed demand while providing maximum bursting headroom.",
+    "keyPoints": [
+      "Fabric evaluates capacity consumption over rolling time windows rather than instantaneous usage.",
+      "Workloads can burst above 100% peak utilization without throttling if smoothed consumption is within bounds.",
+      "Throttling decisions are governed by smoothed percentage, not instantaneous peaks.",
+      "Fabric F SKUs require manual resizing; capacities do not autoscale automatically.",
+      "Unified capacities (e.g., F64) pool bursting capabilities across global multi-timezone teams."
+    ]
+  },
+  {
+    "id": "delta-lake-zorder-data-skipping",
+    "term": "Delta Lake Z-Ordering: Space-Filling Curves and Data Skipping",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "HARD",
+    "definition": "A multi-dimensional clustering algorithm that organizes data along a space-filling Z-curve across 2 to 4 frequently queried columns to maximize Delta Lake file-level data skipping.",
+    "explanation": "Z-Ordering (ZORDER) is a multi-dimensional clustering technique that co-locates related data physically in the same set of Parquet files using a space-filling curve algorithm.\n\nHow It Operates:\nWhen executing queries with selective filters or joins, Delta Lake's query engine inspects file metadata containing column min/max statistics. If data is clustered via ZORDER BY (col1, col2), the min/max ranges for these columns across individual files become tightly bounded and non-overlapping. Consequently, the query engine can skip reading 90-95% of irrelevant Parquet files entirely (Data Skipping).\n\nArchitectural Rules & Constraints:\n1. Column Count: Most effective on 2 to 4 columns. Adding more columns leads to the curse of dimensionality and rapidly diminishes pruning benefits.\n2. Column Cardinality: Best suited for medium-to-high cardinality columns frequently used in WHERE clauses and JOIN conditions (e.g., CustomerID, ProductID).\n3. Maintenance: Z-ordering is a batch operation run via OPTIMIZE table ZORDER BY (col1, col2). New data appended to the table is not Z-ordered until the next OPTIMIZE run.\n4. Traditional Indexes vs Z-Order: Traditional B-Tree indexes do not exist in cloud data lakes; Z-Ordering combined with metadata-driven data skipping is the lakehouse equivalent.",
+    "keyPoints": [
+      "Co-locates multi-dimensional data physically along a space-filling Z-curve in Parquet files.",
+      "Enables Delta Lake query engines to skip 90-95% of irrelevant files using column min/max metadata statistics.",
+      "Optimal performance requires selecting 2 to 4 medium-to-high cardinality columns used in WHERE/JOIN clauses.",
+      "Must be periodically maintained via the OPTIMIZE table ZORDER BY command."
+    ]
+  },
+  {
+    "id": "onelake-tenant-scoped-namespace-shortcuts",
+    "term": "OneLake Tenant-Scoped Namespace & Shortcuts Architecture",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The unified SaaS data lake architecture of Microsoft Fabric where a single hierarchical namespace serves the entire enterprise tenant, eliminating data silos via zero-copy shortcuts.",
+    "explanation": "OneLake serves as the centralized 'OneDrive for Data' across Microsoft Fabric, built on Azure Data Lake Storage Gen2. Its architecture is defined by tenant-wide scoping and zero-copy virtualization:\n\n1. Single Namespace per Tenant: One Tenant = One OneLake. Every workspace, lakehouse, warehouse, and KQL database exists within this single tenant-wide namespace. Purchasing additional Fabric capacities creates compute pools, NOT separate OneLake storage accounts.\n\n2. Workspaces as Logical Boundaries: Workspaces function as organizational and access security boundaries, but they do not create physical storage silos.\n\n3. Shortcuts Architecture: Shortcuts are virtual, zero-copy pointers that reference data stored elsewhere within OneLake (internal shortcuts) or in external cloud storage like AWS S3, Google Cloud Storage, and ADLS Gen2 (external shortcuts).\n\n4. Architectural Constraints & Best Practices:\n- Shortcuts are typically read-only references; writes to shortcut folders may not be supported or may write to source.\n- Avoid deep shortcut chains: limit shortcut referencing to a maximum of 2 levels to prevent latency degradation and lineage confusion.\n- External shortcuts across cloud regions incur cross-region latency and cloud provider egress fees.\n- Shortcuts inherit source permissions; if source access changes, dependent shortcuts fail.",
+    "keyPoints": [
+      "One Tenant equals One OneLake: unified hierarchical namespace automatically provisioned per Microsoft 365 tenant.",
+      "Workspaces provide logical organization and RBAC boundaries, not physical storage isolation.",
+      "Capacities provide compute resources only; all capacities share the single underlying OneLake storage layer.",
+      "Shortcuts virtualize internal and external data (S3, GCS) with zero copying, supporting enterprise Data Mesh."
+    ]
+  },
+  {
+    "id": "lakehouse-schema-evolution-null-filling",
+    "term": "Lakehouse Schema Evolution & Read-Time Schema Merging",
+    "category": "DATALAKE ARCHITECTURE",
+    "difficulty": "MEDIUM",
+    "definition": "The non-blocking Delta Lake capability that accommodates structural schema changes across partitions without table locks, reconciling variations at query time with automatic NULL population.",
+    "explanation": "In Microsoft Fabric Lakehouse and Delta Lake architectures, schema evolution allows tables to adapt to upstream changes (such as adding new tracking fields) without requiring full table rewrites or downtime.\n\nHow Schema Evolution Operates:\n1. Partition-Level Metadata: Each partition in a Lakehouse table maintains its own schema metadata in the Delta transaction log (_delta_log).\n2. Non-Blocking Writes: New columns can be appended during write operations without table locks or blocking concurrent queries.\n3. Read-Time Reconciliation: Rather than rewriting historical partition files to include new columns, the Delta query engine reconciles different partition schemas dynamically during read operations.\n4. Automatic NULL Filling: If an older partition file was written before column X was introduced, the query engine automatically returns NULL for column X when scanning that partition, ensuring total backward compatibility.",
+    "keyPoints": [
+      "Schema evolution in Delta Lake is non-blocking and requires zero table locks or downtime.",
+      "Historical partition files are never rewritten when new columns are added, saving massive compute.",
+      "The query engine reconciles partition schemas at read time, automatically populating missing columns with NULL.",
+      "All changes are atomically recorded in the Delta transaction log, preserving ACID integrity."
+    ]
+  },
+  {
+    "id": "metadata-driven-pipeline-orchestration",
+    "term": "Metadata-Driven Pipeline Orchestration: GetMetadata and ForEach",
+    "category": "ADF",
+    "difficulty": "ARCHITECT",
+    "definition": "A scalable Data Factory pipeline design pattern that dynamically controls data ingestion workflows by querying centralized metadata tables using Lookup, ForEach, and GetMetadata activities.",
+    "explanation": "Rather than building static, hardcoded pipelines for every data source, enterprise architects employ Metadata-Driven Pipeline Patterns in Microsoft Fabric Data Factory and Azure Data Factory.\n\nCore Architecture & Pattern:\n1. Metadata Repository: A Lakehouse Delta table stores source connection strings, schema definitions, destination tables, load types (full vs incremental), active flags, and watermark timestamps.\n2. Lookup & ForEach Activities: A master pipeline executes a Lookup activity to query active sources, feeding the collection into a ForEach loop configured for parallel execution.\n3. GetMetadata Activity: Inside the loop, the GetMetadata activity dynamically inspects structural metadata (column names, data types, file properties, existence) from the target source.\n4. Dynamic Copy Activity: Parameterized expressions (e.g., @item().source_name, @item().destination_table) dynamically configure source queries, sink mappings, and error routing.\n5. Production Safeguards: Incorporate circuit-breaker patterns to halt execution after consecutive failures, cache metadata in pipeline variables, and observe the 5,000-iteration limit on ForEach loops.",
+    "keyPoints": [
+      "Enables a single pipeline template to ingest from 100+ heterogeneous sources without code modifications.",
+      "GetMetadata activity dynamically retrieves column structures, types, and file existence properties at runtime.",
+      "Centralized Lakehouse control tables maintain source configurations, load schedules, and watermark timestamps.",
+      "Dynamic expressions (@item().propertyName) eliminate hardcoded dataset paths and promote modular design."
+    ]
+  },
+  {
+    "id": "stream-analytics-watermark-late-events",
+    "term": "Stream Analytics Watermark Policies & Late Event Handling",
+    "category": "GENERAL DE",
+    "difficulty": "HARD",
+    "definition": "The event-time tracking mechanism in stream processing engines that configures late-arrival and out-of-order tolerance windows to ensure accurate window calculation despite network latency.",
+    "explanation": "In real-time stream processing (Azure Stream Analytics, Spark Structured Streaming, Apache Flink), events frequently arrive out of order due to device disconnections, cellular latency, and distributed network hops.\n\nCore Mechanisms:\n1. Watermark: A monotonic timestamp indicating progress through event time, asserting that no further events with a timestamp prior to the watermark will arrive.\n2. Late Arrival Tolerance: The maximum allowed duration between an event's original timestamp and its arrival time (up to 20 days in Azure Stream Analytics). Windows remain open until the tolerance window passes.\n3. Out-of-Order Tolerance: The maximum allowed time difference between events arriving out of sequence (up to 59 seconds in Stream Analytics).\n4. Production Best Practices: Always bind the TIMESTAMP BY clause to an authoritative source event timestamp rather than default ingestion arrival time. Configure secondary outputs to route late-arriving events that exceed the tolerance threshold to a Lakehouse staging table for offline reprocessing and audit.",
+    "keyPoints": [
+      "Watermarks track event-time progression, governing when time-window aggregations deterministically close.",
+      "Late arrival tolerance (up to 20 days) allows streams to wait for delayed telemetry before closing windows.",
+      "Out-of-order tolerance (up to 59 seconds) reorders slightly shuffled events in memory.",
+      "Late events that exceed tolerance windows should be routed to a secondary output for reprocessing."
+    ]
+  },
+  {
+    "id": "fabric-storage-workload-decision-matrix",
+    "term": "Fabric Storage Workload Decision Matrix: Warehouse vs Lakehouse vs KQL",
+    "category": "FABRIC",
+    "difficulty": "ARCHITECT",
+    "definition": "The architectural decision framework evaluating Microsoft Fabric Warehouse, Lakehouse, KQL Database, and OneLake based on transactional consistency, query engines, and data paradigms.",
+    "explanation": "Microsoft Fabric offers purpose-built workloads for distinct analytical patterns, all underpinned by OneLake storage:\n\n1. Fabric Warehouse: Powered by Synapse Data Warehouse technology under the hood. Provides a traditional SQL Server relational experience with full multi-statement ACID transactional consistency, relational schema integrity, and primary/foreign key metadata. Tables are stored in OneLake in optimized Delta Parquet format with V-Order. Best for enterprise relational warehouses, dbt T-SQL transformations, and complex star schemas.\n\n2. Fabric Lakehouse: Built directly on Delta Lake format. Combines data lake flexibility with warehouse performance, exposing both an Apache Spark compute engine and a read-only T-SQL SQL Analytics Endpoint. Best for big data engineering, data science, and multi-language ETL.\n\n3. KQL Database (Eventhouse): Powered by Azure Data Explorer. Purpose-built for high-velocity streaming, log diagnostics, and time-series telemetry with automated full-text and numerical indexing.\n\n4. OneLake: The storage infrastructure and unified namespace for the entire tenant\u2014NOT a compute workload itself.",
+    "keyPoints": [
+      "Fabric Warehouse provides full multi-statement ACID transactional consistency and relational T-SQL experience.",
+      "Fabric Lakehouse pairs Delta Lake format with Apache Spark and a read-only SQL Analytics Endpoint.",
+      "KQL Database (Eventhouse) specializes in real-time log, telemetry, and time-series streaming analytics.",
+      "OneLake is the unified storage substrate for the tenant, not an independent compute workload."
+    ]
   }
 ]
