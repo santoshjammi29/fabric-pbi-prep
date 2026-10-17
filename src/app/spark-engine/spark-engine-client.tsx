@@ -480,8 +480,8 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
         </Link>
       </div>
 
-      {/* Subtab Navigation Chips */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+      {/* Subtab Navigation Chips - Styled after media_1792228927376_5ece2e88.png */}
+      <div className="flex items-center gap-1 overflow-x-auto p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs scrollbar-none">
         {[
           { id: "architecture", label: "Engine Architecture", icon: Cpu },
           { id: "simulator", label: "Live Physical Simulator", icon: Activity },
@@ -496,10 +496,10 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as SparkSubtab)}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
+                "flex items-center gap-1.5 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
                 isSelected
                   ? "bg-blue-600 text-white shadow-xs"
-                  : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               <Icon size={13} />

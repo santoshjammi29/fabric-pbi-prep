@@ -84,11 +84,8 @@ export function CategoryBar({
 }: CategoryBarProps) {
   return (
     <div className="space-y-2 p-2 sm:p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs">
-      {/* LINE 1: DOMAINS (TOPICS) SLICERS */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-          <Filter size={11} /> Topics:
-        </span>
+      {/* LINE 1: DOMAINS (TOPICS) SLICERS - Styled after media_1792228927376_5ece2e88.png */}
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs">
         <button
           type="button"
           onClick={() => {
@@ -96,10 +93,10 @@ export function CategoryBar({
             onSelectScenario("ALL");
           }}
           className={cn(
-            "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+            "px-3 sm:px-4 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer",
             selectedCategory === "ALL" && selectedScenario === "ALL"
-              ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-              : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              ? "bg-blue-600 text-white shadow-xs"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
           )}
         >
           All Topics ({totalCount})
@@ -117,10 +114,10 @@ export function CategoryBar({
                 onSelectScenario("ALL");
               }}
               className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer",
+                "px-3 sm:px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer",
                 isSelected
-                  ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               <span>{cat}</span>
@@ -154,14 +151,14 @@ export function CategoryBar({
 
         <div className="flex items-center gap-2 shrink-0 overflow-x-auto scrollbar-none">
           {/* Difficulty / Impact Selector Pills */}
-          <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+          <div className="flex items-center gap-0.5 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shadow-xs">
             {IMPACT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => onSelectImpact(opt.value)}
                 className={cn(
-                  "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                  "px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                   selectedImpact === opt.value
                     ? "bg-blue-600 text-white shadow-xs"
                     : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
@@ -174,16 +171,16 @@ export function CategoryBar({
 
           {/* Stretch Selector Pills */}
           {onSelectStretch && (
-            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+            <div className="flex items-center gap-0.5 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shadow-xs">
               {STRETCH_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => onSelectStretch(opt.value)}
                   className={cn(
-                    "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                    "px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                     selectedStretch === opt.value
-                      ? "bg-purple-600 text-white shadow-xs"
+                      ? "bg-blue-600 text-white shadow-xs"
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >

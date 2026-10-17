@@ -312,7 +312,7 @@ function PolyglotCard({
           <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">{item.topic}</h3>
         </div>
 
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] self-start sm:self-auto">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] self-start sm:self-auto shadow-xs">
           {[
             { id: "side_by_side", label: "Side-by-Side" },
             { id: "python", label: "Python (Polars)" },
@@ -325,10 +325,10 @@ function PolyglotCard({
               key={tab.id}
               onClick={() => setActiveEngine(tab.id as typeof activeEngine)}
               className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all",
+                "px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
                 activeEngine === tab.id
-                  ? "bg-emerald-600 text-white shadow-sm"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-1)]"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               {tab.label}
@@ -966,8 +966,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-4 pb-16 animate-in fade-in duration-300">
-      {/* 1. TOP MODULE NAVIGATION TABS */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
+      {/* 1. TOP MODULE NAVIGATION TABS - Styled after media_1792228927376_5ece2e88.png */}
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs">
         {[
           { id: "scenarios", label: "System Blueprints", count: architectureData.length, iconComponent: Layers, iconColor: "text-purple-400" },
           { id: "diagrams", label: "Whiteboard Diagrams", count: architectureDiagrams.length, iconComponent: Sparkles, iconColor: "text-purple-400" },
@@ -981,10 +981,10 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as ArchHubTab)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer",
+                "px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer",
                 activeTab === tab.id
-                  ? "bg-purple-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               {tab.topicKey ? (

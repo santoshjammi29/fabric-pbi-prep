@@ -22,11 +22,20 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
   ARCHITECT: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
 };
 
+const FILTER_OPTIONS = [
+  { id: "ALL", label: "ALL" },
+  { id: "EASY", label: "Beginner" },
+  { id: "MEDIUM", label: "Intermediate" },
+  { id: "HARD", label: "Advanced" },
+  { id: "ARCHITECT", label: "Architect" },
+];
+
 export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPath[] }) {
   const learningPathsDb = initialPaths;
   const searchParams = useSearchParams();
   const initialId = searchParams.get("card") || searchParams.get("id") || null;
   const [selectedPathId, setSelectedPathId] = useState<string | null>(initialId || learningPathsDb[0]?.id || null);
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("ALL");
 
   React.useEffect(() => {
     const cardOrId = searchParams.get("card") || searchParams.get("id");
@@ -45,12 +54,17 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
     }
   }, []);
 
+  const filteredPaths = useMemo(() => {
+    if (difficultyFilter === "ALL") return learningPathsDb;
+    return learningPathsDb.filter((p) => p.difficulty === difficultyFilter);
+  }, [learningPathsDb, difficultyFilter]);
+
   const selectedPath: LearningPath | undefined = useMemo(() => {
-    return learningPathsDb.find((p) => p.id === selectedPathId) || learningPathsDb[0];
-  }, [selectedPathId, learningPathsDb]);
+    return filteredPaths.find((p) => p.id === selectedPathId) || filteredPaths[0] || learningPathsDb[0];
+  }, [selectedPathId, filteredPaths, learningPathsDb]);
 
   return (
-    <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
+    <div className="space-y-3 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Header Banner - Compact Reference Style */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -77,10 +91,37 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
         </div>
       </div>
 
-      {/* Path Selector Cards Grid - Compact Design & Full Text Word Wrap */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5">
-        {learningPathsDb.map((path) => {
-          const isSelected = selectedPathId === path.id;
+      {/* Horizontal Difficulty Filter Pills - Styled after user reference image media_1792228927376_5ece2e88.png */}
+      <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-fit shadow-xs">
+        {FILTER_OPTIONS.map((opt) => {
+          const isActive = difficultyFilter === opt.id;
+          return (
+            <button
+              key={opt.id}
+              onClick={() => {
+                setDifficultyFilter(opt.id);
+                const matches = opt.id === "ALL" ? learningPathsDb : learningPathsDb.filter((p) => p.difficulty === opt.id);
+                if (matches.length > 0 && !matches.some((p) => p.id === selectedPathId)) {
+                  handleSelectPath(matches[0].id);
+                }
+              }}
+              className={cn(
+                "px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap",
+                isActive
+                  ? "bg-blue-600 text-white font-semibold shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] font-medium"
+              )}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Path Selector Cards Grid - Compact 5-column Design matching guided learning snip & Full Text Word Wrap */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+        {filteredPaths.map((path) => {
+          const isSelected = selectedPath?.id === path.id;
           const diffStyle = difficultyColors[path.difficulty] || difficultyColors.MEDIUM;
           const cleanKey = path.id.replace("path-", "");
 
@@ -89,15 +130,15 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
               key={path.id}
               onClick={() => handleSelectPath(path.id)}
               className={cn(
-                "p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between group cursor-pointer",
+                "p-2 sm:p-2.5 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between group cursor-pointer",
                 isSelected
-                  ? "bg-[var(--surface-2)] border-purple-500 ring-1 ring-purple-500/40 shadow-xs"
-                  : "bg-[var(--surface-1)] border-[var(--border)] hover:border-purple-500/30 hover:bg-[var(--surface-2)]/80"
+                  ? "bg-[var(--surface-2)] border-blue-500 ring-1 ring-blue-500/40 shadow-xs"
+                  : "bg-[var(--surface-1)] border-[var(--border)] hover:border-blue-500/30 hover:bg-[var(--surface-2)]/80"
               )}
             >
               <div className="space-y-1.5 w-full">
                 <div className="flex items-center justify-between gap-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:border-purple-500/40 transition-colors shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:border-blue-500/40 transition-colors shadow-xs">
                     <TopicIcon topicKey={cleanKey} size={16} />
                   </div>
                   <span
@@ -114,7 +155,7 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
                 <h3
                   className={cn(
                     "text-xs sm:text-[13px] font-bold leading-snug break-words whitespace-normal text-left",
-                    isSelected ? "text-purple-400" : "text-[var(--foreground)] group-hover:text-purple-400 transition-colors"
+                    isSelected ? "text-blue-400" : "text-[var(--foreground)] group-hover:text-blue-400 transition-colors"
                   )}
                 >
                   {path.title}
@@ -126,7 +167,7 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
                   <Calendar size={11} className="shrink-0 text-[var(--muted-foreground)]" />
                   <span>{path.weeks} Weeks</span>
                 </span>
-                <span className="font-semibold text-purple-400 font-mono text-[10px]">
+                <span className="font-semibold text-blue-400 font-mono text-[10px]">
                   {path.examQsCount ? `${path.examQsCount} Q&As` : `${path.phases.length} Phases`}
                 </span>
               </div>
@@ -137,7 +178,7 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
 
       {/* Selected Path Deep Dive View */}
       {selectedPath && (
-        <div className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-200 shadow-xs">
+        <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 animate-in fade-in duration-200 shadow-xs">
           {/* Path Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3.5 border-b border-[var(--border)]">
             <div className="space-y-1.5 max-w-5xl 2xl:max-w-7xl">

@@ -169,19 +169,19 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
 
       {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK */}
       <div className="space-y-2 p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs mb-3">
-        {/* LINE 1: PRIMARY TAB NAVIGATION */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+        {/* LINE 1: PRIMARY TAB NAVIGATION - Styled after media_1792228927376_5ece2e88.png */}
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs pb-0.5">
           <button
             onClick={() => setTab("connectivity")}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              "flex items-center gap-2 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
               currentTab === "connectivity"
                 ? "bg-blue-600 text-white shadow-xs"
-                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             )}
           >
             <Network size={14} />
-            <span>1. Tool Connectivity & Secrets</span>
+            <span>1. Tool Connectivity &amp; Secrets</span>
             <span className={cn(
               "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
               currentTab === "connectivity" ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
@@ -193,14 +193,14 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
           <button
             onClick={() => setTab("cicd")}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              "flex items-center gap-2 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
               currentTab === "cicd"
-                ? "bg-purple-600 text-white shadow-xs"
-                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             )}
           >
             <GitBranch size={14} />
-            <span>2. CI/CD Alternatives & Pipelines</span>
+            <span>2. CI/CD Alternatives &amp; Pipelines</span>
             <span className={cn(
               "text-[10px] px-1.5 py-0.2 rounded-full font-bold",
               currentTab === "cicd" ? "bg-white/20 text-white" : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
@@ -212,10 +212,10 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
           <button
             onClick={() => setTab("lifecycle")}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              "flex items-center gap-2 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
               currentTab === "lifecycle"
-                ? "bg-emerald-600 text-white shadow-xs"
-                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             )}
           >
             <Workflow size={14} />
@@ -231,10 +231,10 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
           <button
             onClick={() => setTab("diagram")}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
+              "flex items-center gap-2 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap cursor-pointer",
               currentTab === "diagram"
                 ? "bg-blue-600 text-white shadow-xs"
-                : "bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             )}
           >
             <Layers size={14} />

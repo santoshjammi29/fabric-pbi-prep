@@ -129,8 +129,6 @@ export function UnifiedSearchFilterBox({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
 
-  // Active level tab selector: 'ALL' shows all levels, or a specific level id to focus
-  const [activeLevelTab, setActiveLevelTab] = useState<string>("ALL");
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
   // Global Keyboard Shortcut: '/' to focus search, 'Escape' to clear/blur
@@ -235,10 +233,7 @@ export function UnifiedSearchFilterBox({
     }
   };
 
-  const displayedLevels =
-    activeLevelTab === "ALL"
-      ? levels
-      : levels.filter((l) => l.id === activeLevelTab);
+  const displayedLevels = levels;
 
   return (
     <section
@@ -421,246 +416,89 @@ export function UnifiedSearchFilterBox({
       {/* Optional Sub-header */}
       {subHeader && <div className="px-3 pb-2 border-b border-[var(--border)]">{subHeader}</div>}
 
-      {/* ─── MULTI-LEVEL FILTER DECK (ACCESSIBLE, NO SINGLE VERTICAL SELECT!) ─── */}
+      {/* ─── COMPACT HORIZONTAL FILTER SLICERS (MATCHING USER PILL STYLE) ─── */}
       {isExpanded && levels.length > 0 && (
-        <div className="border-t border-[var(--border)] p-2.5 sm:p-3 space-y-3 bg-[var(--surface-1)]">
-          {/* Level Switcher Tab Bar (Shown when multiple levels exist) */}
-          {levels.length > 1 && (
-            <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none pb-1">
-              <div className="flex items-center gap-1 shrink-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] mr-1 flex items-center gap-1">
-                  <Filter size={11} className="text-blue-500" /> Levels:
-                </span>
+        <div className="border-t border-[var(--border)] p-2.5 sm:p-3 space-y-2.5 bg-[var(--surface-1)]">
+          {displayedLevels.map((level, levelIdx) => (
+            <div
+              key={level.id}
+              className={cn(
+                "space-y-1.5",
+                levelIdx > 0 && "pt-2 border-t border-[var(--border)]/60"
+              )}
+            >
+              {/* Level Header Label */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
+                  {level.icon}
+                  <span className="tracking-wide">{level.title}</span>
+                  <span className="text-[10px] font-normal text-[var(--muted-foreground)]">
+                    ({level.options.length})
+                  </span>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveLevelTab("ALL")}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1",
-                    activeLevelTab === "ALL"
-                      ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                      : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  <Layers size={11} />
-                  <span>All Levels ({levels.length})</span>
-                </button>
+                {level.selectedId !== "ALL" && level.selectedId !== "" && (
+                  <button
+                    type="button"
+                    onClick={() => level.onSelect("ALL")}
+                    className="text-[11px] text-[var(--muted-foreground)] hover:text-blue-400 underline cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
 
-                {levels.map((lvl, idx) => {
-                  const isSelected = activeLevelTab === lvl.id;
-                  const isFiltered = lvl.selectedId !== "ALL" && lvl.selectedId !== "";
+              {/* Horizontal Pill Track Container (Directly modeled on uploaded user reference) */}
+              <div
+                role="radiogroup"
+                aria-label={level.title}
+                className={cn(
+                  "flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-full shadow-xs",
+                  level.layout === "grid" ? "flex-wrap max-w-full" : "max-w-fit"
+                )}
+              >
+                {level.options.map((opt) => {
+                  const isSelected = level.selectedId === opt.id;
                   return (
                     <button
-                      key={lvl.id}
+                      key={opt.id}
                       type="button"
-                      onClick={() => setActiveLevelTab(lvl.id)}
+                      role="radio"
+                      aria-checked={isSelected}
+                      onClick={() => level.onSelect(opt.id)}
+                      title={opt.description || opt.label}
                       className={cn(
-                        "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5",
+                        "px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0",
                         isSelected
-                          ? "bg-blue-600 border-blue-500 text-white shadow-xs"
-                          : isFiltered
-                          ? "bg-purple-500/10 border-purple-500/30 text-purple-400 font-bold"
-                          : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                          ? "bg-blue-600 text-white shadow-xs font-bold"
+                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]/60 font-medium"
                       )}
                     >
-                      {lvl.icon}
-                      <span>
-                        L{idx + 1}: {lvl.shortTitle || lvl.title}
-                      </span>
-                      {isFiltered && <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />}
+                      {opt.emoji && <span className="shrink-0">{opt.emoji}</span>}
+                      {opt.icon && <span className="shrink-0">{opt.icon}</span>}
+                      <span>{opt.shortLabel || opt.label}</span>
+                      {opt.count !== undefined && (
+                        <span
+                          className={cn(
+                            "text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0 ml-0.5",
+                            isSelected
+                              ? "bg-white/20 text-white font-bold"
+                              : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
+                          )}
+                        >
+                          {opt.count.toLocaleString()}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </div>
-
-              {hasActiveFilters && onResetAll && (
-                <button
-                  type="button"
-                  onClick={onResetAll}
-                  className="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center gap-1 shrink-0 font-medium cursor-pointer"
-                >
-                  <RotateCcw size={11} />
-                  <span>Reset All</span>
-                </button>
-              )}
             </div>
-          )}
-
-          {/* Render Each Displayed Level */}
-          {displayedLevels.map((level, levelIdx) => {
-            const isSegmented = level.layout === "segmented";
-            const isGrid = level.layout === "grid";
-
-            return (
-              <div
-                key={level.id}
-                className={cn(
-                  "space-y-1.5",
-                  levelIdx > 0 && "pt-2.5 border-t border-[var(--border)]/70"
-                )}
-              >
-                {/* Level Header Label */}
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--foreground)]">
-                    {level.icon}
-                    <span className="tracking-wide">{level.title}</span>
-                    <span className="text-[10px] font-normal text-[var(--muted-foreground)]">
-                      ({level.options.length} options)
-                    </span>
-                  </div>
-
-                  {level.selectedId !== "ALL" && level.selectedId !== "" && (
-                    <button
-                      type="button"
-                      onClick={() => level.onSelect("ALL")}
-                      className="text-[11px] text-[var(--muted-foreground)] hover:text-blue-400 underline cursor-pointer"
-                    >
-                      Clear level filter
-                    </button>
-                  )}
-                </div>
-
-                {/* Option Container: Grid Layout (Accessible Multi-Column for Archetypes / Facets) */}
-                {isGrid && (
-                  <div
-                    role="radiogroup"
-                    aria-label={level.title}
-                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5"
-                  >
-                    {level.options.map((opt) => {
-                      const isSelected = level.selectedId === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={isSelected}
-                          onClick={() => level.onSelect(opt.id)}
-                          title={opt.description || opt.label}
-                          className={cn(
-                            "flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all border text-left cursor-pointer group shadow-2xs",
-                            isSelected
-                              ? getOptionActiveStyle(level.accentColor, opt.badgeColor)
-                              : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                          )}
-                        >
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            {opt.emoji && <span className="shrink-0 text-sm">{opt.emoji}</span>}
-                            {opt.icon && <span className="shrink-0">{opt.icon}</span>}
-                            <span className="break-words leading-tight">{opt.shortLabel || opt.label}</span>
-                          </div>
-                          {opt.count !== undefined && (
-                            <span
-                              className={cn(
-                                "text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0",
-                                isSelected
-                                  ? "bg-white/20 text-white font-bold"
-                                  : "bg-[var(--surface-3)] text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]"
-                              )}
-                            >
-                              {opt.count.toLocaleString()}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Option Container: Segmented Layout (Great for Difficulty: ALL / EASY / MED / HARD / ARCH) */}
-                {isSegmented && (
-                  <div
-                    role="radiogroup"
-                    aria-label={level.title}
-                    className="flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none"
-                  >
-                    {level.options.map((opt) => {
-                      const isSelected = level.selectedId === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={isSelected}
-                          onClick={() => level.onSelect(opt.id)}
-                          title={opt.description || opt.label}
-                          className={cn(
-                            "flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-normal break-words transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
-                            getDifficultyColor(opt.id, isSelected)
-                          )}
-                        >
-                          {opt.emoji && <span>{opt.emoji}</span>}
-                          {opt.icon && <span>{opt.icon}</span>}
-                          <span className="break-words">{opt.shortLabel || opt.label}</span>
-                          {opt.count !== undefined && (
-                            <span
-                              className={cn(
-                                "text-[10px] px-1 py-0.2 rounded-full font-mono shrink-0",
-                                isSelected
-                                  ? "bg-white/20 text-white"
-                                  : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
-                              )}
-                            >
-                              {opt.count.toLocaleString()}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Option Container: Wrapping Chips Layout (Great for Categories / Tech Ecosystems) */}
-                {!isGrid && !isSegmented && (
-                  <div
-                    role="radiogroup"
-                    aria-label={level.title}
-                    className="flex flex-wrap items-center gap-1.5"
-                  >
-                    {level.options.map((opt) => {
-                      const isSelected = level.selectedId === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={isSelected}
-                          onClick={() => level.onSelect(opt.id)}
-                          title={opt.description || opt.label}
-                          className={cn(
-                            "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-normal break-words transition-all border shrink-0 cursor-pointer flex items-center gap-1.5 group shadow-2xs",
-                            isSelected
-                              ? getOptionActiveStyle(level.accentColor, opt.badgeColor)
-                              : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                          )}
-                        >
-                          {opt.emoji && <span className="shrink-0">{opt.emoji}</span>}
-                          {opt.icon && <span className="shrink-0">{opt.icon}</span>}
-                          <span className="break-words">{opt.shortLabel || opt.label}</span>
-                          {opt.count !== undefined && (
-                            <span
-                              className={cn(
-                                "text-[10px] px-1.5 py-0.2 rounded-full font-mono",
-                                isSelected
-                                  ? "bg-white/20 text-white font-bold"
-                                  : "bg-[var(--surface-3)] text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]"
-                              )}
-                            >
-                              {opt.count.toLocaleString()}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          ))}
         </div>
       )}
 
-      {/* ─── LEVEL 4: ACTIVE FILTER CHIPS & RESET ROW ─── */}
+      {/* ─── ACTIVE FILTER CHIPS & RESET ROW ─── */}
       {(hasActiveFilters || activeFilters.length > 0) && (
         <div className="flex items-center gap-1.5 flex-wrap px-3 py-2 border-t border-[var(--border)]/70 bg-[var(--surface-2)]/60 text-xs">
           <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] flex items-center gap-1 mr-1">

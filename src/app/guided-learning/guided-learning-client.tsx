@@ -488,17 +488,17 @@ function GuidedLearningContent() {
           </div>
         </div>
 
-        {/* Domain Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none mb-2.5">
+        {/* Domain Filter Pills - Styled after media_1792228927376_5ece2e88.png */}
+        <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-fit shadow-xs mb-2.5">
           {GUIDED_DOMAINS.map((dom) => (
             <button
               key={dom}
               onClick={() => setSelectedDomain(dom)}
               className={cn(
-                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 shrink-0",
+                "px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-150 shrink-0 cursor-pointer whitespace-nowrap",
                 selectedDomain === dom
-                  ? "bg-purple-600 text-white font-semibold shadow-xs"
-                  : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] border border-[var(--border)]"
+                  ? "bg-blue-600 text-white font-semibold shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               {dom}
@@ -996,7 +996,7 @@ function GuidedLearningContent() {
               </div>
 
               {/* Type / Topics Filter */}
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shrink-0 shadow-xs">
                 {[
                   { key: "ALL", label: "All Types" },
                   { key: "concept", label: "Concepts" },
@@ -1007,10 +1007,10 @@ function GuidedLearningContent() {
                     key={item.key}
                     onClick={() => setSelectedType(item.key)}
                     className={cn(
-                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 cursor-pointer",
+                      "px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 cursor-pointer whitespace-nowrap",
                       selectedType === item.key
-                        ? "bg-[var(--surface-3)] text-[var(--foreground)] font-semibold border border-[var(--border)] shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                        ? "bg-blue-600 text-white font-semibold shadow-xs"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                     )}
                   >
                     {item.label}
@@ -1018,42 +1018,44 @@ function GuidedLearningContent() {
                 ))}
               </div>
 
-              <div className="w-px h-3.5 bg-[var(--border)] mx-1 shrink-0" />
-
               {/* Difficulty Filter */}
-              <div className="flex items-center gap-1 shrink-0">
-                {["ALL", "EASY", "MEDIUM", "HARD", "ARCHITECT"].map((diff) => (
+              <div className="flex items-center gap-1 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shrink-0 shadow-xs">
+                {[
+                  { key: "ALL", label: "ALL" },
+                  { key: "EASY", label: "Beginner" },
+                  { key: "MEDIUM", label: "Intermediate" },
+                  { key: "HARD", label: "Advanced" },
+                  { key: "ARCHITECT", label: "Architect" },
+                ].map((diff) => (
                   <button
-                    key={diff}
-                    onClick={() => setSelectedDifficulty(diff)}
+                    key={diff.key}
+                    onClick={() => setSelectedDifficulty(diff.key)}
                     className={cn(
-                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 uppercase cursor-pointer",
-                      selectedDifficulty === diff
-                        ? "bg-purple-600 text-white font-semibold shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                      "px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 cursor-pointer whitespace-nowrap",
+                      selectedDifficulty === diff.key
+                        ? "bg-blue-600 text-white font-semibold shadow-xs"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                     )}
                   >
-                    {diff === "ALL" ? "All Levels" : diff}
+                    {diff.label}
                   </button>
                 ))}
               </div>
 
-              <div className="w-px h-3.5 bg-[var(--border)] mx-1 shrink-0" />
-
               {/* Stretch Filter */}
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shrink-0 shadow-xs">
                 {(["ALL", "STANDARD", "STRETCH"] as const).map((str) => (
                   <button
                     key={str}
                     onClick={() => setSelectedStretch(str)}
                     className={cn(
-                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 cursor-pointer",
+                      "px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 cursor-pointer whitespace-nowrap",
                       selectedStretch === str
-                        ? "bg-purple-600 text-white font-semibold shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
+                        ? "bg-blue-600 text-white font-semibold shadow-xs"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                     )}
                   >
-                    {str}
+                    {str === "ALL" ? "All Tracks" : str === "STANDARD" ? "Core" : "Stretch"}
                   </button>
                 ))}
               </div>

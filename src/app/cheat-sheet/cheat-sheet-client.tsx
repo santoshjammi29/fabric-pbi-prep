@@ -267,13 +267,13 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
 
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      {/* Primary View Switcher Pills */}
-      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] max-w-fit">
+      {/* Primary View Switcher Pills - Styled after media_1792228927376_5ece2e88.png */}
+      <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs">
         <button
           type="button"
           onClick={() => setActiveTab("runbooks")}
           className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap",
             activeTab === "runbooks"
               ? "bg-blue-600 text-white shadow-xs"
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
@@ -290,7 +290,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
           type="button"
           onClick={() => setActiveTab("databricks")}
           className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap",
             activeTab === "databricks"
               ? "bg-red-600 text-white shadow-xs"
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"

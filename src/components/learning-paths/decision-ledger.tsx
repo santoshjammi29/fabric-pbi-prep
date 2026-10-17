@@ -210,13 +210,13 @@ ${selectedOption.cons.map((c) => `- [Trade-off] ${c}`).join("\n")}
         </div>
 
         {/* Decision Point Tabs */}
-        <div className="flex items-center gap-1.5 bg-[var(--surface-2)] p-1 rounded-lg border border-[var(--border)] self-start sm:self-auto shrink-0">
+        <div className="flex items-center gap-1 bg-[var(--surface-2)] p-1 rounded-full border border-[var(--border)] self-start sm:self-auto shrink-0 shadow-xs">
           {DECISION_POINTS.map((dp, idx) => (
             <button
               key={dp.id}
               onClick={() => setActivePointIndex(idx)}
               className={cn(
-                "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                "px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer",
                 activePointIndex === idx
                   ? "bg-blue-600 text-white shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"

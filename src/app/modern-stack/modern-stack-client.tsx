@@ -497,8 +497,8 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
         </div>
       </div>
 
-      {/* Subtab Navigation Chips */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+      {/* Subtab Navigation Chips - Styled after media_1792228927376_5ece2e88.png */}
+      <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-fit shadow-xs">
         {[
           { id: "compatibility", label: "Cloud × Table Matrix", icon: Table },
           { id: "overview", label: "Hub Overview", icon: Sparkles },
@@ -517,10 +517,10 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
               key={tab.id}
               onClick={() => handleTabChange(tab.id as ModernSubtab)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
+                "flex items-center gap-1.5 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
                 isSelected
-                  ? "bg-blue-600 text-white shadow-xs shadow-blue-500/20 font-semibold"
-                  : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] border border-[var(--border)]"
+                  ? "bg-blue-600 text-white shadow-xs font-semibold"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               )}
             >
               <Icon size={13} />

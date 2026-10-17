@@ -35,7 +35,6 @@ import dynamic from "next/dynamic";
 import { recordLastTopic } from "@/lib/user-progress";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
-import { ConceptsMindmapView } from "@/components/concepts/concepts-mindmap-view";
 
 const SmoothAccordion = dynamic(
   () => import("@/components/ui/smooth-accordion").then((mod) => mod.SmoothAccordion),
@@ -190,13 +189,8 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
-  // View Mode: 'list' | 'mindmap' | 'study'
-  const initialViewParam = searchParams.get("view");
-  const [activeView, setActiveView] = useState<"list" | "mindmap" | "study">(
-    initialViewParam === "mindmap" ? "mindmap" : initialViewParam === "study" ? "study" : "list"
-  );
-
   // Study Mode State
+  const initialViewParam = searchParams.get("view");
   const [isStudyMode, setIsStudyMode] = useState(initialViewParam === "study");
   const [studyIndex, setStudyIndex] = useState(0);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
@@ -231,15 +225,9 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     const diffParam = searchParams.get("difficulty");
     const cardParam = searchParams.get("card") || searchParams.get("id");
     const viewParam = searchParams.get("view");
-
-    if (viewParam === "mindmap") {
-      setActiveView("mindmap");
-      setIsStudyMode(false);
-    } else if (viewParam === "study") {
-      setActiveView("study");
+    if (viewParam === "study") {
       setIsStudyMode(true);
     } else if (viewParam === "list") {
-      setActiveView("list");
       setIsStudyMode(false);
     }
 
@@ -454,219 +442,169 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shrink-0 self-start md:self-auto">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView("list");
-                setIsStudyMode(false);
-              }}
-              className={cn(
-                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
-                activeView === "list" && !isStudyMode
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <BookOpen size={13} />
-              <span>Glossary List</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView("mindmap");
-                setIsStudyMode(false);
-              }}
-              className={cn(
-                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
-                activeView === "mindmap"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <GitBranch size={13} />
-              <span>Mind Map</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView("study");
-                setIsStudyMode(true);
-              }}
-              className={cn(
-                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
-                isStudyMode
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <Sparkles size={13} />
-              <span>Flashcards</span>
-            </button>
+          <div className="flex items-center gap-2 shrink-0 self-start md:self-auto">
+            <div className="px-3 py-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-right shadow-2xs">
+              <div className="text-xs sm:text-sm font-bold text-blue-500 font-mono leading-none">
+                {initialConcepts.length}
+              </div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">
+                Definitions
+              </div>
+            </div>
+            <div className="px-3 py-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-right shadow-2xs">
+              <div className="text-xs sm:text-sm font-bold text-purple-400 font-mono leading-none">
+                {categories.length}
+              </div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">
+                Domains
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ─── UNIFIED SEARCH & SIMPLE 3-SLICER FILTER BOX ─── */}
-      {activeView !== "mindmap" && (
-        <UnifiedSearchFilterBox
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search 660+ concepts by term, keyword, or mechanism... (Press / to search)"
-          matchCount={filteredConcepts.length}
-          totalCount={initialConcepts.length}
-          countUnit="concepts"
-          themeAccent="blue"
-          hasActiveFilters={hasActiveFilters}
-          onResetAll={handleResetAllFilters}
-          actions={{
-            readAll: {
-              isActive: isReadAllMode,
-              onToggle: toggleReadAllMode,
-              shortcut: "⇧E",
-              count: filteredConcepts.length,
-            },
-            studyMode: {
-              isActive: isStudyMode,
-              onToggle: () => {
-                const next = !isStudyMode;
-                setIsStudyMode(next);
-                if (next) setActiveView("study");
-                else setActiveView("list");
+      {/* ─── UNIFIED SEARCH & SIMPLE COMPACT FILTER BOX ─── */}
+      <UnifiedSearchFilterBox
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search 660+ concepts by term, keyword, or mechanism... (Press / to search)"
+        matchCount={filteredConcepts.length}
+        totalCount={initialConcepts.length}
+        countUnit="concepts"
+        themeAccent="blue"
+        hasActiveFilters={hasActiveFilters}
+        onResetAll={handleResetAllFilters}
+        actions={{
+          readAll: {
+            isActive: isReadAllMode,
+            onToggle: toggleReadAllMode,
+            shortcut: "⇧E",
+            count: filteredConcepts.length,
+          },
+          studyMode: {
+            isActive: isStudyMode,
+            onToggle: () => setIsStudyMode(!isStudyMode),
+            label: isStudyMode ? "Exit Flashcards" : "Flashcards",
+          },
+          shuffle: {
+            isShuffled,
+            onShuffle: handleShuffle,
+          },
+          expandCollapse: {
+            onExpandAll: handleExpandAll,
+            onCollapseAll: handleCollapseAll,
+          },
+        }}
+        levels={[
+          {
+            id: "topics",
+            title: "Topics & Concept Domains",
+            shortTitle: "Topics",
+            icon: <Filter size={13} className="text-blue-500" />,
+            layout: "chips",
+            accentColor: "blue",
+            selectedId: selectedCategory,
+            onSelect: (id) => setSelectedCategory(id),
+            options: [
+              {
+                id: "ALL",
+                label: "All Domains",
+                count: initialConcepts.length,
               },
-              label: isStudyMode ? "Exit Flashcards" : "Flashcards",
-            },
-            shuffle: {
-              isShuffled,
-              onShuffle: handleShuffle,
-            },
-            expandCollapse: {
-              onExpandAll: handleExpandAll,
-              onCollapseAll: handleCollapseAll,
-            },
-          }}
-          levels={[
-            {
-              id: "topics",
-              title: "Topics & Concept Domains",
-              shortTitle: "Topics",
-              icon: <Filter size={13} className="text-blue-500" />,
-              layout: "chips",
-              accentColor: "blue",
-              selectedId: selectedCategory,
-              onSelect: (id) => setSelectedCategory(id),
-              options: [
+              ...categories.map((cat) => ({
+                id: cat,
+                label: cat,
+                count: categoryCounts[cat] || 0,
+              })),
+            ],
+          },
+          {
+            id: "difficulty",
+            title: "Difficulty Calibration",
+            shortTitle: "Difficulty",
+            icon: <Sparkles size={13} className="text-amber-400" />,
+            layout: "segmented",
+            selectedId: selectedDifficulty,
+            onSelect: (id) => setSelectedDifficulty(id),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "EASY", label: "Beginner" },
+              { id: "MEDIUM", label: "Intermediate" },
+              { id: "HARD", label: "Advanced" },
+              { id: "ARCHITECT", label: "Architect" },
+            ],
+          },
+          {
+            id: "stretch",
+            title: "Stretch & Depth Scope",
+            shortTitle: "Stretch",
+            icon: <Target size={13} className="text-purple-400" />,
+            layout: "segmented",
+            selectedId: selectedStretch,
+            onSelect: (id) => setSelectedStretch(id),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "STANDARD", label: "Standard" },
+              { id: "STRETCH", label: "Stretch" },
+            ],
+          },
+        ]}
+        activeFilters={[
+          ...(isReadAllMode
+            ? [
                 {
-                  id: "ALL",
-                  label: "All Domains",
-                  count: initialConcepts.length,
+                  id: "readall",
+                  label: `Read All Mode Active (${filteredConcepts.length} Concepts)`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
+                  onRemove: handleCollapseAll,
                 },
-                ...categories.map((cat) => ({
-                  id: cat,
-                  label: cat,
-                  count: categoryCounts[cat] || 0,
-                })),
-              ],
-            },
-            {
-              id: "difficulty",
-              title: "Difficulty Calibration",
-              shortTitle: "Difficulty",
-              icon: <Sparkles size={13} className="text-amber-400" />,
-              layout: "segmented",
-              selectedId: selectedDifficulty,
-              onSelect: (id) => setSelectedDifficulty(id),
-              options: [
-                { id: "ALL", label: "ALL" },
-                { id: "EASY", label: "EASY" },
-                { id: "MEDIUM", label: "MEDIUM" },
-                { id: "HARD", label: "HARD" },
-                { id: "ARCHITECT", label: "ARCH" },
-              ],
-            },
-            {
-              id: "stretch",
-              title: "Stretch & Depth Scope",
-              shortTitle: "Stretch",
-              icon: <Target size={13} className="text-purple-400" />,
-              layout: "segmented",
-              selectedId: selectedStretch,
-              onSelect: (id) => setSelectedStretch(id),
-              options: [
-                { id: "ALL", label: "ALL" },
-                { id: "STANDARD", label: "STANDARD" },
-                { id: "STRETCH", label: "STRETCH" },
-              ],
-            },
-          ]}
-          activeFilters={[
-            ...(isReadAllMode
-              ? [
-                  {
-                    id: "readall",
-                    label: `Read All Mode Active (${filteredConcepts.length} Concepts)`,
-                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
-                    onRemove: handleCollapseAll,
-                  },
-                ]
-              : []),
-            ...(selectedCategory !== "ALL"
-              ? [
-                  {
-                    id: "category",
-                    label: `Topic: ${selectedCategory}`,
-                    color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
-                    onRemove: () => setSelectedCategory("ALL"),
-                  },
-                ]
-              : []),
-            ...(selectedDifficulty !== "ALL"
-              ? [
-                  {
-                    id: "difficulty",
-                    label: `Difficulty: ${selectedDifficulty}`,
-                    color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
-                    onRemove: () => setSelectedDifficulty("ALL"),
-                  },
-                ]
-              : []),
-            ...(selectedStretch !== "ALL"
-              ? [
-                  {
-                    id: "stretch",
-                    label: `Scope: ${selectedStretch}`,
-                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                    onRemove: () => setSelectedStretch("ALL"),
-                  },
-                ]
-              : []),
-            ...(searchQuery.trim().length > 0
-              ? [
-                  {
-                    id: "search",
-                    label: `Search: "${searchQuery}"`,
-                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
-                    onRemove: () => setSearchQuery(""),
-                  },
-                ]
-              : []),
-          ]}
-        />
-      )}
+              ]
+            : []),
+          ...(selectedCategory !== "ALL"
+            ? [
+                {
+                  id: "category",
+                  label: `Topic: ${selectedCategory}`,
+                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+                  onRemove: () => setSelectedCategory("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedDifficulty !== "ALL"
+            ? [
+                {
+                  id: "difficulty",
+                  label: `Difficulty: ${selectedDifficulty}`,
+                  color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                  onRemove: () => setSelectedDifficulty("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedStretch !== "ALL"
+            ? [
+                {
+                  id: "stretch",
+                  label: `Scope: ${selectedStretch}`,
+                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  onRemove: () => setSelectedStretch("ALL"),
+                },
+              ]
+            : []),
+          ...(searchQuery.trim().length > 0
+            ? [
+                {
+                  id: "search",
+                  label: `Search: "${searchQuery}"`,
+                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                  onRemove: () => setSearchQuery(""),
+                },
+              ]
+            : []),
+        ]}
+      />
 
-      {/* VIEW BRANCHING */}
-      {activeView === "mindmap" ? (
-        <ConceptsMindmapView
-          concepts={initialConcepts}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
-      ) : (
-        <>
-          {/* Study Flashcard Mode */}
-          {isStudyMode && currentStudyCard && (
+      {/* Study Flashcard Mode */}
+      {isStudyMode && currentStudyCard && (
             <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-blue-500/30 shadow-md space-y-3.5">
               <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
                 <span className="font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider text-[11px]">
@@ -912,8 +850,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
           )}
         </div>
       )}
-    </>
-  )}
-</div>
+    </div>
   );
 }

@@ -68,10 +68,10 @@ describe("ConceptsMindmapView Component", () => {
     render(<ConceptsMindmapView concepts={mockConcepts} />);
 
     expect(screen.getByText("Concepts Multi-Level Mind Map")).toBeDefined();
-    expect(screen.getByText("L1: Topics")).toBeDefined();
-    expect(screen.getByText("L2: Subtopics")).toBeDefined();
-    expect(screen.getByText("L3: Full Tree")).toBeDefined();
-    expect(screen.getByText("L4: Deep")).toBeDefined();
+    expect(screen.getByText("Topics")).toBeDefined();
+    expect(screen.getByText("Subtopics")).toBeDefined();
+    expect(screen.getByText("Full Tree")).toBeDefined();
+    expect(screen.getByText("Deep")).toBeDefined();
 
     // Check that Level 1 topics are rendered
     expect(screen.getByText("Microsoft Fabric")).toBeDefined();
@@ -111,20 +111,20 @@ describe("ConceptsMindmapView Component", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("toggles stretch depth to L1 (Topics Only)", () => {
+  it("toggles stretch depth to Topics Only", () => {
     render(<ConceptsMindmapView concepts={mockConcepts} />);
 
-    const l1Btn = screen.getByText("L1: Topics");
+    const l1Btn = screen.getByText("Topics");
     fireEvent.click(l1Btn);
 
-    // In L1 mode, topic nodes are rendered, but concepts are collapsed
+    // In Topics mode, topic nodes are rendered, but concepts are collapsed
     expect(screen.getByText("Microsoft Fabric")).toBeDefined();
   });
 
-  it("toggles stretch depth to L4 (Deep with inline mechanism)", () => {
+  it("toggles stretch depth to Deep with inline mechanism", () => {
     render(<ConceptsMindmapView concepts={mockConcepts} />);
 
-    const l4Btn = screen.getByText("L4: Deep");
+    const l4Btn = screen.getByText("Deep");
     fireEvent.click(l4Btn);
 
     // Deep mechanism preview should appear

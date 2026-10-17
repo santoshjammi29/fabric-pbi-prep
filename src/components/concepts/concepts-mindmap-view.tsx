@@ -290,23 +290,22 @@ export function ConceptsMindmapView({
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Stretch Depth Switcher */}
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs">
-              <span className="text-[11px] font-semibold text-[var(--muted-foreground)] px-2">Stretch:</span>
+            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] text-xs">
               {[
-                { depth: 1 as const, label: "L1: Topics" },
-                { depth: 2 as const, label: "L2: Subtopics" },
-                { depth: 3 as const, label: "L3: Full Tree" },
-                { depth: 4 as const, label: "L4: Deep" },
+                { depth: 1 as const, label: "Topics" },
+                { depth: 2 as const, label: "Subtopics" },
+                { depth: 3 as const, label: "Full Tree" },
+                { depth: 4 as const, label: "Deep" },
               ].map((d) => (
                 <button
                   key={d.depth}
                   type="button"
                   onClick={() => handleDepthChange(d.depth)}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap",
+                    "px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                     stretchDepth === d.depth
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                      ? "bg-blue-600 text-white shadow-xs font-bold"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]/60 font-medium"
                   )}
                 >
                   {d.label}
