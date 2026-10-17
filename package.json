@@ -18,6 +18,7 @@
     "@tanstack/react-virtual": "^3.14.14",
     "@types/prismjs": "^1.26.6",
     "@upstash/redis": "^1.39.0",
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "framer-motion": "^13.1.1",
     "lucide-react": "^1.37.0",
