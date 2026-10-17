@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { architectureDiagrams, ArchitectureDiagramItem } from "@/data/diagrams";
 import { useDiagramTheme } from "@/lib/diagram-theme";
-import { WhiteboardThemeToggle, WhiteboardFloatingThemeToggle } from "@/components/architecture/whiteboard-theme-toggle";
+import { WhiteboardThemeToggle } from "@/components/architecture/whiteboard-theme-toggle";
 
 // Map diagrams to guided learning topics for deep-linking
 const DIAGRAM_TO_TOPIC: Record<string, { topicKey: string; topicName: string }> = {
@@ -215,35 +215,7 @@ export function HomeWhiteboardsShowcase() {
                 isDark ? "whiteboard-container-dark" : "whiteboard-container-light"
               )}
             >
-              {/* Floating Category Pill (Top-Left) */}
-              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 pointer-events-none">
-                <span className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-xl bg-black/75 backdrop-blur-md text-[10px] sm:text-xs font-bold tracking-wider text-purple-300 uppercase border border-white/15 shadow-lg flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                  {featuredDiagram.category}
-                </span>
-              </div>
-
-              {/* Floating Controls (Top-Right): Dark Mode Toggle + Maximize */}
-              <div
-                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <WhiteboardFloatingThemeToggle />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveModalDiagram(featuredDiagram);
-                    setZoomLevel(1);
-                  }}
-                  className="p-1.5 sm:p-2 rounded-xl bg-black/75 hover:bg-black/90 text-white/90 hover:text-white backdrop-blur-md border border-white/15 transition-all shadow-md cursor-pointer flex items-center gap-1 text-[11px] font-semibold touch-manipulation"
-                  title="Inspect Full Blueprint"
-                >
-                  <Maximize2 size={13} />
-                  <span className="hidden sm:inline">Inspect</span>
-                </button>
-              </div>
-
-              {/* Whiteboard Graphic */}
+              {/* Whiteboard Graphic - Clean View without Obstructive Overlays */}
               <div className="relative w-full h-full flex items-center justify-center p-3 sm:p-5">
                 <Image
                   src={featuredDiagram.image}
@@ -257,13 +229,6 @@ export function HomeWhiteboardsShowcase() {
                     isDark ? "whiteboard-dark" : "whiteboard-light"
                   )}
                 />
-              </div>
-
-              <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/15 transition-colors flex items-center justify-center pointer-events-none">
-                <div className="px-3.5 py-1.5 rounded-xl bg-black/75 text-white text-xs font-semibold backdrop-blur-sm opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center gap-1.5 shadow-lg border border-white/15">
-                  <Maximize2 size={13} />
-                  <span>Click to Inspect Full Blueprint</span>
-                </div>
               </div>
             </div>
 

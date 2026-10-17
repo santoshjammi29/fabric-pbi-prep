@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ArchitectureDiagramItem } from "@/data/diagrams";
 import { useDiagramTheme } from "@/lib/diagram-theme";
-import { WhiteboardFloatingThemeToggle } from "./whiteboard-theme-toggle";
 
 interface WhiteboardCardProps {
   diagram: ArchitectureDiagramItem;
@@ -64,40 +63,13 @@ export function WhiteboardCard({
         className
       )}
     >
-      {/* Visual Canvas Container (Layout Style matching Image 2) */}
+      {/* Visual Canvas Container - Clean, Pristine Whiteboard View without Obstructive Overlays */}
       <div
         className={cn(
           "relative aspect-[16/10] w-full overflow-hidden border-b border-[var(--border)] flex items-center justify-center p-3 sm:p-5 select-none transition-colors duration-300",
           isDark ? "whiteboard-container-dark" : "whiteboard-container-light"
         )}
       >
-        {/* Floating Category Pill (Top-Left) */}
-        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 pointer-events-none">
-          <span className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-black/75 dark:bg-black/85 backdrop-blur-md text-[10px] sm:text-xs font-bold tracking-wider text-blue-300 uppercase border border-white/15 shadow-lg flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            {diagram.category}
-          </span>
-        </div>
-
-        {/* Floating Action Controls (Top-Right): Dark Mode Toggle + Maximize */}
-        <div
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-1.5"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <WhiteboardFloatingThemeToggle />
-
-          <button
-            type="button"
-            onClick={handleCardClick}
-            className="p-1.5 sm:p-2 rounded-xl bg-black/75 hover:bg-black/90 text-white/90 hover:text-white backdrop-blur-md border border-white/15 transition-all shadow-md cursor-pointer flex items-center gap-1 text-[11px] font-semibold touch-manipulation"
-            title="Inspect Full Blueprint"
-            aria-label="Inspect Full Blueprint"
-          >
-            <Maximize2 size={13} />
-            <span className="hidden sm:inline">Inspect</span>
-          </button>
-        </div>
-
         {/* Diagram Image with Hardware-Accelerated Theme Transition */}
         <div className="relative w-full h-full min-h-[220px] flex items-center justify-center">
           <Image
@@ -112,14 +84,6 @@ export function WhiteboardCard({
             priority={priority}
           />
         </div>
-
-        {/* Hover inspection pill */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-          <span className="px-3.5 py-2 rounded-xl bg-black/80 backdrop-blur-md text-white text-xs font-semibold flex items-center gap-2 shadow-xl border border-white/15">
-            <Maximize2 size={14} className="text-blue-300" />
-            <span>Tap to Inspect High-Res</span>
-          </span>
-        </div>
       </div>
 
       {/* Content Details */}
@@ -128,6 +92,11 @@ export function WhiteboardCard({
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-3">
               <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                    {diagram.category}
+                  </span>
+                </div>
                 <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-snug">
                   {diagram.title}
                 </h3>
@@ -140,6 +109,15 @@ export function WhiteboardCard({
                 className="flex items-center gap-1 shrink-0"
                 onClick={(e) => e.stopPropagation()}
               >
+                <button
+                  type="button"
+                  onClick={handleCardClick}
+                  className="p-1.5 sm:p-2 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors touch-manipulation cursor-pointer"
+                  title="Inspect Full Blueprint"
+                  aria-label="Inspect Full Blueprint"
+                >
+                  <Maximize2 size={16} />
+                </button>
                 <button
                   type="button"
                   onClick={handleShare}
