@@ -82,14 +82,14 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/architecture",
         icon: Layers,
         pill: { text: "Principal", variant: "architect" },
-        matches: ["/architecture", "/spark-engine", "/dataops"],
+        matches: ["/architecture", "/spark-engine", "/dataops", "/modern-stack"],
         subItems: [
+          { label: "Cloud × Table Compatibility", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
           { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
           { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
           { label: "End-to-End Lifecycle Playbook", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "E2E" },
           { label: "Tool Connectivity & Secrets", href: "/dataops?tab=connectivity", icon: Network, badge: "Secrets" },
           { label: "CI/CD Alternatives & Pipelines", href: "/dataops?tab=cicd", icon: GitBranch, badge: "CI/CD" },
-          { label: "Cloud × Table Compatibility", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
         ],
       },
       {

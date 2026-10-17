@@ -339,10 +339,10 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
       <HubSubnav
         hubTitle="Architecture & Systems"
         items={[
-          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
-          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
           { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Table, badge: "Matrix" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
+          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
+          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
           { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
         ]}
       />
@@ -993,23 +993,8 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                 From Spark Connect architecture to K8s dynamic allocations and PyDeequ testing.
               </p>
             </div>
-
-            {/* Phase Filters */}
-            <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
-              {["all", 1, 2, 3, 4].map((phase) => (
-                <button
-                  key={phase}
-                  onClick={() => setSelectedPhase(phase as any)}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 capitalize cursor-pointer",
-                    selectedPhase === phase
-                      ? "bg-blue-600 text-white shadow-xs font-semibold"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  {phase === "all" ? "All Phases" : `Phase ${phase}`}
-                </button>
-              ))}
+            <div className="text-xs text-[var(--muted-foreground)]">
+              <span><strong className="text-[var(--foreground)]">{pysparkData.length}</strong> Levels</span>
             </div>
           </div>
 
@@ -1123,23 +1108,6 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                   placeholder="Search terms (e.g. AQE, Tungsten)..."
                   className="pl-8 pr-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--foreground)] outline-none"
                 />
-              </div>
-
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                {["all", "engine", "optimization", "memory", "streaming"].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedLexiconCat(cat)}
-                    className={cn(
-                      "px-2.5 py-1 rounded-lg text-xs font-medium capitalize cursor-pointer",
-                      selectedLexiconCat === cat
-                        ? "bg-blue-600 text-white font-semibold shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                    )}
-                  >
-                    {cat}
-                  </button>
-                ))}
               </div>
             </div>
           </div>

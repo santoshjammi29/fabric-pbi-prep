@@ -2,18 +2,10 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { ArrowUp, Terminal, Layers, Sparkles, BookOpen, Compass } from "lucide-react";
+import { Terminal, Layers, Sparkles, BookOpen, Compass } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
-import { TextSizeController } from "@/components/ui/text-size-controller";
 
 function AllPagesFooterInner() {
-  const scrollToTop = () => {
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   return (
     <footer
       className="mt-16 border-t border-[var(--border)] bg-[var(--surface-1)] text-[var(--foreground)]"
@@ -74,53 +66,7 @@ function AllPagesFooterInner() {
           </div>
         </div>
 
-        {/* Bottom Utility Bar: Shortcuts, Accessibility, and Back-to-Top */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs text-[var(--muted-foreground)]">
-          {/* Keyboard Shortcuts */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <span className="font-semibold text-[var(--foreground)] text-[11px] uppercase tracking-wider">
-              Shortcuts:
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px]">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
-                /
-              </kbd>{" "}
-              Search
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px]">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
-                ⌘K
-              </kbd>{" "}
-              Palette
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px]">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
-                Shift+E
-              </kbd>{" "}
-              Read All
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px]">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
-                Esc
-              </kbd>{" "}
-              Reset
-            </span>
-          </div>
 
-          {/* Quick Controls & Back-to-Top */}
-          <div className="flex items-center gap-3 shrink-0">
-            <TextSizeController collapsed={false} direction="up" align="end" />
-            <ThemeSwitcher collapsed={false} direction="up" align="end" />
-            <button
-              onClick={scrollToTop}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
-              aria-label="Scroll back to top of page"
-            >
-              <ArrowUp size={13} />
-              <span>Top</span>
-            </button>
-          </div>
-        </div>
 
         {/* Minimal Copyright */}
         <div className="pt-2 text-center sm:text-left text-[11px] text-[var(--muted-foreground)] border-t border-[var(--border)]">

@@ -67,22 +67,17 @@ describe("Streamlined Navigation & Meaningful Bottom Page Notes", () => {
   it("renders AllPagesFooter with revamped, simple, and meaningful platform notes and metrics", () => {
     render(<AllPagesFooter />);
 
-    // Platform note title & edition
+    // High-signal platform notes and metrics
     expect(screen.getByText("DataPlatform Architect Notes")).toBeDefined();
     expect(screen.getByText("2026 Edition")).toBeDefined();
-
-    // High-signal metrics
     expect(screen.getByText("10,700+")).toBeDefined();
     expect(screen.getByText("Verified Assets")).toBeDefined();
     expect(screen.getByText("32 Blueprints")).toBeDefined();
     expect(screen.getByText("156 Profiles")).toBeDefined();
     expect(screen.getByText("660 Concepts")).toBeDefined();
 
-    // Keyboard shortcuts
-    expect(screen.getByText("Search")).toBeDefined();
-    expect(screen.getByText("Palette")).toBeDefined();
-    expect(screen.getByText("Read All")).toBeDefined();
-    expect(screen.getAllByText("Reset").length).toBeGreaterThan(0);
+    // Redundant bottom bar controls removed
+    expect(screen.queryByText("Shortcuts:")).toBeNull();
   });
 
   it("correctly identifies active subpage hrefs including default parameters", () => {

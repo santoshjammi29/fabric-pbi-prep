@@ -191,9 +191,9 @@ function MobileHeaderInner() {
                                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                             )}
                           >
-                            <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
                               <Icon size={16} className={cn(active ? "text-white" : "text-blue-500 dark:text-blue-400 shrink-0")} />
-                              <span className="truncate">{item.label}</span>
+                              <span className="break-words whitespace-normal leading-snug">{item.label}</span>
                             </div>
                             {item.pill && (
                               <span
@@ -218,7 +218,7 @@ function MobileHeaderInner() {
                                     href={sub.href}
                                     onClick={() => setDrawerOpen(false)}
                                     className={cn(
-                                      "flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-lg transition-colors truncate",
+                                      "flex items-start gap-2 px-2.5 py-1.5 text-xs rounded-lg transition-colors",
                                       subActive
                                         ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-500/10"
                                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -226,17 +226,17 @@ function MobileHeaderInner() {
                                   >
                                     <span
                                       className={cn(
-                                        "w-1.5 h-1.5 rounded-full shrink-0",
+                                        "w-1.5 h-1.5 rounded-full shrink-0 mt-1",
                                         subActive
                                           ? "bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.8)]"
                                           : "bg-[var(--muted-foreground)]/40"
                                       )}
                                     />
-                                    <span className="truncate flex-1">{sub.label}</span>
+                                    <span className="flex-1 break-words whitespace-normal leading-snug">{sub.label}</span>
                                     {sub.badge && (
                                       <span
                                         className={cn(
-                                          "text-[9px] px-1.5 py-0.2 rounded font-medium",
+                                          "text-[9px] px-1.5 py-0.5 rounded font-medium shrink-0 mt-0.5",
                                           subActive
                                             ? "bg-blue-600/20 text-blue-600 dark:text-blue-300"
                                             : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"

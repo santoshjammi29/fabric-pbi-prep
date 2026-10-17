@@ -30,6 +30,8 @@ import {
   Cpu,
   Workflow,
   Zap,
+  Network,
+  GitBranch,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -968,10 +970,12 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       <HubSubnav
         hubTitle="Architecture & Systems"
         items={[
+          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
           { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: `${architectureData.length.toLocaleString()} Scenarios` },
           { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
           { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
-          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
+          { label: "Tool Secrets", href: "/dataops?tab=connectivity", icon: Network, badge: "Secrets" },
+          { label: "CI/CD Pipelines", href: "/dataops?tab=cicd", icon: GitBranch, badge: "CI/CD" },
           { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: `${architectureDiagrams.length}+ Visuals` },
         ]}
       />
@@ -1087,73 +1091,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               onCollapseAll: handleCollapseAllScenarios,
             },
           }}
-          levels={[
-            {
-              id: "specs",
-              title: "Level 1: Blueprint Specifications",
-              shortTitle: "Specs",
-              icon: <Filter size={13} className="text-purple-400" />,
-              layout: "chips",
-              accentColor: "purple",
-              selectedId: selectedCategory,
-              onSelect: (cat) => {
-                setSelectedCategory(cat);
-                setVisibleCount(initialBatch);
-                updateUrlParam("category", cat);
-              },
-              options: [
-                {
-                  id: "ALL",
-                  label: `⚡ All ${categories.length - 1} Specs`,
-                  count: architectureData.length,
-                },
-                ...categories
-                  .filter((cat) => cat !== "ALL")
-                  .map((cat) => ({
-                    id: cat,
-                    label: cat,
-                    count: archCategoryCounts[cat] || 0,
-                  })),
-              ],
-            },
-            {
-              id: "difficulty",
-              title: "Level 2: Difficulty Calibration",
-              shortTitle: "Difficulty",
-              icon: <Sparkles size={13} className="text-amber-400" />,
-              layout: "segmented",
-              selectedId: selectedDifficulty,
-              onSelect: (diff) => {
-                setSelectedDifficulty(diff);
-                setVisibleCount(initialBatch);
-                updateUrlParam("difficulty", diff);
-              },
-              options: [
-                { id: "ALL", label: "ALL" },
-                { id: "ARCHITECT", label: "ARCH" },
-                { id: "HARD", label: "HARD" },
-                { id: "MEDIUM", label: "MEDIUM" },
-                { id: "EASY", label: "EASY" },
-              ],
-            },
-            {
-              id: "stretch",
-              title: "Level 3: Scope & Stretch",
-              shortTitle: "Stretch",
-              icon: <Sparkles size={13} className="text-purple-400" />,
-              layout: "segmented",
-              selectedId: selectedStretch,
-              onSelect: (stretch) => {
-                setSelectedStretch(stretch as "ALL" | "STANDARD" | "STRETCH");
-                setVisibleCount(initialBatch);
-              },
-              options: [
-                { id: "ALL", label: "ALL" },
-                { id: "STANDARD", label: "STANDARD" },
-                { id: "STRETCH", label: "STRETCH" },
-              ],
-            },
-          ]}
+          levels={[]}
           activeFilters={[
             ...(isReadAllMode
               ? [
@@ -1257,64 +1195,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               </button>
             ),
           }}
-          levels={[
-            {
-              id: "engines",
-              title: "Level 1: Execution Engines & Frameworks",
-              shortTitle: "Engines",
-              icon: <Terminal size={13} className="text-cyan-400" />,
-              layout: "chips",
-              accentColor: "cyan",
-              selectedId: selectedPyFramework,
-              onSelect: (id) => {
-                setSelectedPyFramework(id as FrameworkKey);
-                setPyPage(1);
-              },
-              options: FRAMEWORKS.map((fw) => ({
-                id: fw.id,
-                label: fw.label,
-                icon: fw.topicKey ? (
-                  <TopicIcon topic={fw.topicKey} size={12} />
-                ) : (
-                  <Sparkles size={11} className="text-cyan-400" />
-                ),
-              })),
-            },
-            {
-              id: "level",
-              title: "Level 2: Experience Level",
-              shortTitle: "Level",
-              icon: <Sparkles size={13} className="text-amber-400" />,
-              layout: "segmented",
-              selectedId: selectedPyLevel,
-              onSelect: (lvl) => {
-                setSelectedPyLevel(lvl as CodeLevel | "all");
-                setPyPage(1);
-                updateUrlParam("level", lvl);
-              },
-              options: PYTHON_LEVELS.map((lvl) => ({
-                id: lvl.id,
-                label: lvl.label,
-              })),
-            },
-            {
-              id: "stretch",
-              title: "Level 3: Scope & Stretch",
-              shortTitle: "Stretch",
-              icon: <Sparkles size={13} className="text-purple-400" />,
-              layout: "segmented",
-              selectedId: selectedPyStretch,
-              onSelect: (stretch) => {
-                setSelectedPyStretch(stretch as "ALL" | "STANDARD" | "STRETCH");
-                setPyPage(1);
-              },
-              options: [
-                { id: "ALL", label: "ALL" },
-                { id: "STANDARD", label: "STANDARD" },
-                { id: "STRETCH", label: "STRETCH" },
-              ],
-            },
-          ]}
+          levels={[]}
           activeFilters={[
             ...(selectedPyFramework !== "all"
               ? [

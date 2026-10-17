@@ -35,6 +35,7 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
+  Cpu,
 } from "lucide-react";
 import { HubSubnav } from "@/components/layout/hub-subnav";
 
@@ -137,12 +138,13 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
       <HubSubnav
         hubTitle="Architecture & Systems"
         items={[
+          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
+          { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
           { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
           { label: "Tool Secrets", href: "/dataops?tab=connectivity", icon: Network, badge: "Secrets" },
           { label: "CI/CD Pipelines", href: "/dataops?tab=cicd", icon: GitBranch, badge: "CI/CD" },
           { label: "Architecture Flow", href: "/dataops?tab=diagram", icon: Layers, badge: "Flow" },
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
-          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Spark" },
         ]}
       />
 
@@ -287,51 +289,15 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
 
           <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
             {currentTab === "connectivity" && (
-              <>
-                <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                  {["ALL", "ADF", "Databricks", "Airflow", "dbt", "Synapse", "OIDC"].map((tool) => (
-                    <button
-                      key={tool}
-                      onClick={() => setSelectedToolFilter(tool)}
-                      className={cn(
-                        "px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
-                        selectedToolFilter === tool
-                          ? "bg-blue-600 text-white shadow-xs"
-                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                      )}
-                    >
-                      {tool}
-                    </button>
-                  ))}
-                </div>
-                <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
-                  <strong className="text-[var(--foreground)]">{filteredConnectivity.length}</strong> configs
-                </span>
-              </>
+              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1">
+                <strong className="text-[var(--foreground)]">{filteredConnectivity.length}</strong> of {initialData.connectivity.length} configs
+              </span>
             )}
 
             {currentTab === "cicd" && (
-              <>
-                <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                  {["ALL", "Databricks", "Airflow", "dbt", "ADF", "Database / Lakehouse"].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCicdCategory(cat)}
-                      className={cn(
-                        "px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
-                        selectedCicdCategory === cat
-                          ? "bg-purple-600 text-white shadow-xs"
-                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                      )}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-                <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
-                  <strong className="text-[var(--foreground)]">{filteredCicd.length}</strong> patterns
-                </span>
-              </>
+              <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1">
+                <strong className="text-[var(--foreground)]">{filteredCicd.length}</strong> of {initialData.cicdAlternatives.length} patterns
+              </span>
             )}
 
             {currentTab === "lifecycle" && (
