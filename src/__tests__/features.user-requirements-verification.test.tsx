@@ -24,7 +24,7 @@ describe("User Requirements Verification", () => {
       expect(searchBtn).toBeDefined();
 
       expect(
-        screen.getByText(/Search 6,500\+ Q&As, concepts, architecture blueprints, system design\.\.\./i)
+        screen.getByText(/Search (?:6,500\+|10,700\+) Q&As, concepts, architecture blueprints, system design\.\.\./i)
       ).toBeDefined();
 
       expect(screen.getByText("⌘K")).toBeDefined();

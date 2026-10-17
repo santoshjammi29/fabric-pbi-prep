@@ -2,143 +2,129 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { NAV_GROUPS, isSubHrefActive } from "@/data/navigation-data";
+import { ArrowUp, Terminal, Layers, Sparkles, BookOpen, Compass } from "lucide-react";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { TextSizeController } from "@/components/ui/text-size-controller";
-import { Sparkles, Terminal, ArrowUp, Search, Compass, BookOpen, Layers, FileCode2, Workflow, MessageSquare } from "lucide-react";
-import { BrandLogo } from "@/components/ui/brand-logo";
 
 function AllPagesFooterInner() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const openSearch = () => {
-    window.dispatchEvent(new CustomEvent("open-command-palette"));
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
     <footer
-      className="mt-16 border-t-2 border-[var(--border)] bg-[var(--surface-1)] text-[var(--foreground)]"
+      className="mt-16 border-t border-[var(--border)] bg-[var(--surface-1)] text-[var(--foreground)]"
       role="contentinfo"
-      aria-label="Site Navigation Footer"
+      aria-label="Platform Architecture Notes and Footer"
     >
-      <div className="mx-auto w-full max-w-7xl 2xl:max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
-        {/* Top Header / Portal Branding & Quick Actions */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-10 border-b border-[var(--border)]">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <BrandLogo size={36} className="rounded-xl shadow-md" />
+      <div className="mx-auto w-full max-w-7xl 2xl:max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+        {/* Revamped High-Signal Platform Architecture Note */}
+        <div className="p-4 sm:p-6 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-2xs">
+          <div className="space-y-2 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <BrandLogo size={28} className="rounded-lg shadow-xs" />
+              <h3 className="font-bold text-sm sm:text-base text-[var(--foreground)] tracking-tight">
+                DataPlatform Architect Notes
+              </h3>
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                2026 Edition
+              </span>
+            </div>
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              Curated enterprise reference platform and system design workbench for Principal Architects and Senior Data Engineers. Deep dives across Microsoft Fabric OneLake &amp; Direct Lake, Databricks Unity Catalog &amp; Photon Engine, Open Storage Formats (Delta Lake, Apache Iceberg, Apache Parquet), and high-scale Medallion Lakehouse architectures.
+            </p>
+          </div>
+
+          {/* Meaningful Platform Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2 text-xs font-mono shrink-0">
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex items-center gap-2">
+              <BookOpen size={13} className="text-blue-500 shrink-0" />
               <div>
-                <h3 className="font-extrabold text-base tracking-tight text-[var(--foreground)]">
-                  DataPlatform Architect
-                </h3>
-                <p className="text-xs text-[var(--muted-foreground)]">
-                  Enterprise Fabric, Databricks &amp; Lakehouse Prep · 6,500+ Architecture Drills
-                </p>
+                <span className="block font-bold text-[var(--foreground)]">10,700+</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">Verified Assets</span>
+              </div>
+            </div>
+
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex items-center gap-2">
+              <Layers size={13} className="text-emerald-500 shrink-0" />
+              <div>
+                <span className="block font-bold text-[var(--foreground)]">32 Blueprints</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">Whiteboard Hub</span>
+              </div>
+            </div>
+
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex items-center gap-2">
+              <Compass size={13} className="text-purple-500 shrink-0" />
+              <div>
+                <span className="block font-bold text-[var(--foreground)]">156 Profiles</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">GCC &amp; BigTech</span>
+              </div>
+            </div>
+
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] flex items-center gap-2">
+              <Sparkles size={13} className="text-amber-500 shrink-0" />
+              <div>
+                <span className="block font-bold text-[var(--foreground)]">660 Concepts</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">Architecture Map</span>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={openSearch}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
-            >
-              <Search size={14} />
-              <span>Search Concepts &amp; Drills</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-3)] border border-[var(--border)] text-[10px] font-mono">
+        {/* Bottom Utility Bar: Shortcuts, Accessibility, and Back-to-Top */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs text-[var(--muted-foreground)]">
+          {/* Keyboard Shortcuts */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span className="font-semibold text-[var(--foreground)] text-[11px] uppercase tracking-wider">
+              Shortcuts:
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px]">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
+                /
+              </kbd>{" "}
+              Search
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px]">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
                 ⌘K
-              </kbd>
-            </button>
+              </kbd>{" "}
+              Palette
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px]">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
+                Shift+E
+              </kbd>{" "}
+              Read All
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px]">
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[10px] font-mono">
+                Esc
+              </kbd>{" "}
+              Reset
+            </span>
+          </div>
 
+          {/* Quick Controls & Back-to-Top */}
+          <div className="flex items-center gap-3 shrink-0">
+            <TextSizeController collapsed={false} direction="up" align="end" />
+            <ThemeSwitcher collapsed={false} direction="up" align="end" />
             <button
               onClick={scrollToTop}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+              aria-label="Scroll back to top of page"
             >
-              <ArrowUp size={14} />
+              <ArrowUp size={13} />
               <span>Top</span>
             </button>
           </div>
         </div>
 
-        {/* All Pages & Subpages Grid — Always Visible on All Layouts */}
-        <div className="py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-6">
-          {NAV_GROUPS.flatMap((g) => g.items).filter((item) => item.href !== "/").map((pillar) => {
-            const Icon = pillar.icon;
-            const isPillarActive =
-              (pillar.href === "/" && pathname === "/") ||
-              (pillar.href !== "/" && pathname?.startsWith(pillar.href)) ||
-              Boolean(pillar.matches?.some((m) => pathname?.startsWith(m)));
-
-            return (
-              <div key={pillar.href} className="space-y-3">
-                <Link
-                  href={pillar.href}
-                  className={cn(
-                    "flex items-center gap-2 text-sm font-bold transition-colors group",
-                    isPillarActive
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-[var(--foreground)] hover:text-blue-500"
-                  )}
-                >
-                  <Icon size={16} className={cn(isPillarActive ? "text-blue-500" : "text-[var(--muted-foreground)] group-hover:text-blue-500")} />
-                  <span>{pillar.label}</span>
-                </Link>
-
-                {pillar.subItems && (
-                  <ul className="space-y-1.5 pl-3 border-l border-[var(--border)]">
-                    {pillar.subItems.map((sub) => {
-                      const active = isSubHrefActive(pathname, searchParams, sub.href);
-                      return (
-                        <li key={sub.href}>
-                          <Link
-                            href={sub.href}
-                            className={cn(
-                              "flex items-center justify-between text-xs py-1 px-1.5 rounded-md transition-colors",
-                              active
-                                ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-500/10"
-                                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                            )}
-                          >
-                            <span className="truncate">{sub.label}</span>
-                            {sub.badge && (
-                              <span className="text-[9px] px-1 py-0.2 rounded bg-[var(--surface-2)] text-[var(--muted-foreground)]">
-                                {sub.badge}
-                              </span>
-                            )}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom Accessibility & Theme Controller Strip */}
-        <div className="pt-8 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--muted-foreground)]">
-          <div className="flex flex-wrap items-center gap-4">
-            <span>© 2026 DataPlatform Architect</span>
-            <span>•</span>
-            <Link href="/" className="hover:text-[var(--foreground)]">Home</Link>
-            <Link href="/concepts" className="hover:text-[var(--foreground)]">Concepts</Link>
-            <Link href="/architecture" className="hover:text-[var(--foreground)]">Architecture</Link>
-            <Link href="/qa-prep" className="hover:text-[var(--foreground)]">Interview Hub</Link>
-            <Link href="/studio" className="hover:text-[var(--foreground)]">Studio</Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <TextSizeController collapsed={false} direction="up" align="end" />
-            <ThemeSwitcher collapsed={false} direction="up" align="end" />
-          </div>
+        {/* Minimal Copyright */}
+        <div className="pt-2 text-center sm:text-left text-[11px] text-[var(--muted-foreground)] border-t border-[var(--border)]">
+          <p>© 2026 DataPlatform Architect • All scenario data, diagrams, and curriculum assets engineered for enterprise cloud architecture mastery.</p>
         </div>
       </div>
     </footer>

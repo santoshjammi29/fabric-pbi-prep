@@ -16,7 +16,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-describe("Always-Visible Navigation Across All Layouts", () => {
+describe("Streamlined Navigation & Meaningful Bottom Page Notes", () => {
   it("defines all 21 pages and subpages in the centralized navigation catalog", () => {
     expect(ALL_FLAT_PAGES_AND_SUBPAGES.length).toBeGreaterThanOrEqual(20);
     const hrefs = ALL_FLAT_PAGES_AND_SUBPAGES.map((p) => p.href);
@@ -38,10 +38,10 @@ describe("Always-Visible Navigation Across All Layouts", () => {
     expect(hrefs).toContain("/studio");
   });
 
-  it("renders ALL subpages in the Sidebar even when on root / page without requiring prior activation", () => {
+  it("renders ALL hubs and subpages in the left Sidebar as the primary navigation", () => {
     render(<Sidebar />);
 
-    // Check that subpages across all pillars are immediately rendered and visible
+    // Check that subpages across all pillars are immediately rendered and visible in left sidebar
     expect(screen.getByText("Guided Topic Tracks")).toBeDefined();
     expect(screen.getByText("Career Curricula")).toBeDefined();
     expect(screen.getByText("Concepts Glossary")).toBeDefined();
@@ -55,27 +55,34 @@ describe("Always-Visible Navigation Across All Layouts", () => {
     expect(screen.getByText("Target Company Intel")).toBeDefined();
   });
 
-  it("renders AllPagesNav with all hubs and subpages visible for all screen sizes", () => {
+  it("renders AllPagesNav with only the universal search bar at the top", () => {
     render(<AllPagesNav />);
 
-    // Check hubs strip
-    expect(screen.getByText("All Hubs")).toBeDefined();
-    expect(screen.getByText("Home Dashboard")).toBeDefined();
-    expect(screen.getByText("Learning Journey")).toBeDefined();
-    expect(screen.getByText("Architecture Hub")).toBeDefined();
-
-    // Check subpage chips
-    expect(screen.getByText("Topic Tracks")).toBeDefined();
-    expect(screen.getByText("Scenarios")).toBeDefined();
-    expect(screen.getByText("PySpark")).toBeDefined();
-    expect(screen.getByText("CI/CD Pipelines")).toBeDefined();
+    // Search bar is rendered prominently with ⌘K badge
+    expect(screen.getByRole("search")).toBeDefined();
+    expect(screen.getByText(/Search 10,700\+ Q&As, concepts, architecture blueprints/i)).toBeDefined();
+    expect(screen.getByText("⌘K")).toBeDefined();
   });
 
-  it("renders AllPagesFooter with comprehensive links to all pillars and subpages", () => {
+  it("renders AllPagesFooter with revamped, simple, and meaningful platform notes and metrics", () => {
     render(<AllPagesFooter />);
 
-    expect(screen.getAllByText(/DataPlatform Architect/i).length).toBeGreaterThan(0);
-    expect(screen.getByText("Search Concepts & Drills")).toBeDefined();
+    // Platform note title & edition
+    expect(screen.getByText("DataPlatform Architect Notes")).toBeDefined();
+    expect(screen.getByText("2026 Edition")).toBeDefined();
+
+    // High-signal metrics
+    expect(screen.getByText("10,700+")).toBeDefined();
+    expect(screen.getByText("Verified Assets")).toBeDefined();
+    expect(screen.getByText("32 Blueprints")).toBeDefined();
+    expect(screen.getByText("156 Profiles")).toBeDefined();
+    expect(screen.getByText("660 Concepts")).toBeDefined();
+
+    // Keyboard shortcuts
+    expect(screen.getByText("Search")).toBeDefined();
+    expect(screen.getByText("Palette")).toBeDefined();
+    expect(screen.getByText("Read All")).toBeDefined();
+    expect(screen.getAllByText("Reset").length).toBeGreaterThan(0);
   });
 
   it("correctly identifies active subpage hrefs including default parameters", () => {
