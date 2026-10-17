@@ -20,8 +20,19 @@ interface HubSubnavProps {
 }
 
 function HubSubnavInner({ hubTitle, items, className }: HubSubnavProps) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  let pathname: string | null = null;
+  try {
+    pathname = usePathname();
+  } catch {
+    pathname = null;
+  }
+
+  let searchParams: URLSearchParams | null = null;
+  try {
+    searchParams = useSearchParams();
+  } catch {
+    searchParams = null;
+  }
 
   const isItemActive = (href: string) => {
     const [itemPath, itemQuery] = href.split("?");

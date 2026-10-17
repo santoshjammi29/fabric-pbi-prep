@@ -27,6 +27,9 @@ import {
   Shuffle,
   Target,
   Database,
+  Cpu,
+  Workflow,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -963,9 +966,12 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-4 pb-16 animate-in fade-in duration-300">
       <HubSubnav
-        hubTitle="Architecture Hub"
+        hubTitle="Architecture & Systems"
         items={[
           { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: `${architectureData.length.toLocaleString()} Scenarios` },
+          { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
+          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
+          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
           { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: `${architectureDiagrams.length}+ Visuals` },
         ]}
       />

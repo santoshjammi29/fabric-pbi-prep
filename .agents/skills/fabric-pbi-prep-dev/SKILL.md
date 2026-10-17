@@ -243,14 +243,19 @@ Dynamic multi-level stretching mind map linking concepts across 13 core architec
 
 ---
 
-## 6. Deep-Link URL Patterns
+## 6. Consolidated Academy Hubs & Deep-Link URL Patterns
 
-| Page | URL Pattern |
-| :--- | :--- |
-| **Concepts Hub** | `/concepts?tab=concepts&category=APACHE+AIRFLOW&term=DAG` |
-| **Mind Map** | `/mindmap?topic=databricks&depth=3&mode=tree` |
-| **Q&A Prep** | `/qa-prep?category=AIRFLOW&card=airflow-q-001` |
-| **Architecture Hub** | `/architecture?category=Apache+Airflow+Architecture&card=arch-airflow-001` |
-| **Guided Learning** | `/guided-learning?topic=airflow` |
-| **Company Research** | `/company-research?company=Microsoft` |
-| **Code Practice** | `/code-practice?category=pyspark` |
+All pages and subpages are consolidated into 6 primary cohesive pillars across the navigation catalog, sidebar, and hub subnavs:
+
+| Consolidated Pillar | Scope & Subpages Included | Primary URL & Deep Links |
+| :--- | :--- | :--- |
+| **Concepts & Foundations** | Concepts Glossary, Concepts Mind Map tree, Modern Stack Core Concepts | `/concepts`, `/mindmap`, `/modern-stack?tab=concepts` |
+| **Architecture & Systems** | System Scenarios (3.1k+), Spark Engine Lab, DataOps Lifecycle, Tool Connectivity, CI/CD, Cloud × Table Matrix | `/architecture?tab=scenarios`, `/spark-engine`, `/dataops?tab=lifecycle`, `/modern-stack?tab=compatibility` |
+| **Coding & Runbooks** | Code Practice Drills (PySpark, SQL, T-SQL, Python/Polars), Production Incident Cheat Sheets, Databricks 48 Cards & PDFs, Polyglot Matrix | `/code-practice`, `/code-practice?db=pyspark`, `/cheat-sheet`, `/cheat-sheet?tab=databricks`, `/modern-stack?tab=matrix` |
+| **Visual Blueprints & Diagrams** | 32 Whiteboard Architecture Blueprints Gallery, Interactive DataOps Flow SVG, Modern Stack Blueprints | `/architecture?tab=diagrams`, `/dataops?tab=diagram`, `/modern-stack?tab=blueprints` |
+| **Interview Drill Hub (Q&A)** | Question Drill Bank (6,570+ Qs with SM-2 spaced repetition), Target Company Intel (156 Enterprise profiles) | `/qa-prep`, `/company-research` |
+| **Learning Journey** | Guided Topic Tracks (13 Tracks), Career Curricula (12 Structured paths: Associate to Principal) | `/guided-learning`, `/learning-paths` |
+
+### Cloud Engine × Table Format Compatibility Matrix (First on Page)
+- On `/modern-stack`, the Cloud Engine × Table Format Compatibility Matrix (`compatibility`) is configured as the **first default tab** and renders at the very top of the page.
+- Direct link: `/modern-stack?tab=compatibility` (default fallback when `/modern-stack` is loaded without query parameters).

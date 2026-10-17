@@ -169,10 +169,15 @@ function MobileHeaderInner() {
                   </div>
                   <div className="space-y-0.5">
                     {group.items.map((item) => {
+                      const isSpecialPillarActive = NAV_GROUPS.flatMap((g) => g.items).some((other) => {
+                        if (other.href === item.href) return false;
+                        return other.href.includes("?") && isSubHrefActive(pathname, searchParams, other.href);
+                      });
                       const active =
                         (item.href === "/" && pathname === "/") ||
-                        (item.href !== "/" && pathname?.startsWith(item.href)) ||
-                        Boolean(item.matches?.some((m) => pathname?.startsWith(m)));
+                        (item.href.includes("?")
+                          ? isSubHrefActive(pathname, searchParams, item.href) || Boolean(item.matches?.some((m) => isSubHrefActive(pathname, searchParams, m)))
+                          : !isSpecialPillarActive && (pathname?.startsWith(item.href) || Boolean(item.matches?.some((m) => pathname?.startsWith(m.split("?")[0])))));
                       const Icon = item.icon;
                       return (
                         <div key={item.href}>

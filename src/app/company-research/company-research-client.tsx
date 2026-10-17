@@ -198,7 +198,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     <div className="space-y-3.5 pb-20 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Subnav */}
       <HubSubnav
-        hubTitle="Interview Drill Hub"
+        hubTitle="Q&A & Interview Prep"
         items={[
           {
             label: "Question Drill Bank",
@@ -212,12 +212,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
             icon: Building2,
             badge: "156 Targets",
             badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-          },
-          {
-            label: "Production Cheat Sheet",
-            href: "/cheat-sheet",
-            icon: Sparkles,
-            badge: "Cheat Codes",
           },
         ]}
       />

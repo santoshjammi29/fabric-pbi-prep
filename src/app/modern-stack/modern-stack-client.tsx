@@ -32,6 +32,7 @@ import {
   Share2,
   Workflow,
   Info,
+  GitBranch,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -81,7 +82,7 @@ export function ModernStackClient(props: ModernStackClientProps) {
   } = props.initialModernStack;
   const pythonData = props.initialPython;
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<ModernSubtab>("overview");
+  const [activeTab, setActiveTab] = useState<ModernSubtab>("compatibility");
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleTabChange = useCallback((tabId: ModernSubtab) => {
@@ -102,6 +103,7 @@ export function ModernStackClient(props: ModernStackClientProps) {
       const target = hash || queryTab;
 
       const validTabs: ModernSubtab[] = [
+        "compatibility",
         "overview",
         "concepts",
         "matrix",
@@ -109,7 +111,6 @@ export function ModernStackClient(props: ModernStackClientProps) {
         "blueprints",
         "ai",
         "cost",
-        "compatibility",
         "python",
       ];
 
@@ -117,6 +118,8 @@ export function ModernStackClient(props: ModernStackClientProps) {
         setActiveTab(queryTab as ModernSubtab);
       } else if (hash && validTabs.includes(hash as ModernSubtab)) {
         setActiveTab(hash as ModernSubtab);
+      } else if (!queryTab && !hash) {
+        setActiveTab("compatibility");
       }
 
       if (hash) {
@@ -142,6 +145,7 @@ export function ModernStackClient(props: ModernStackClientProps) {
   useEffect(() => {
     const queryTab = searchParams.get("tab")?.toLowerCase() || searchParams.get("view")?.toLowerCase();
     const validTabs: ModernSubtab[] = [
+      "compatibility",
       "overview",
       "concepts",
       "matrix",
@@ -149,7 +153,6 @@ export function ModernStackClient(props: ModernStackClientProps) {
       "blueprints",
       "ai",
       "cost",
-      "compatibility",
       "python",
     ];
 
@@ -160,6 +163,8 @@ export function ModernStackClient(props: ModernStackClientProps) {
         const el = document.getElementById(queryTab);
         if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }, 150);
+    } else if (!queryTab) {
+      setActiveTab("compatibility");
     }
   }, [searchParams]);
 
@@ -449,11 +454,13 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
-        hubTitle="Concepts & Engines"
+        hubTitle="Architecture & Concepts"
         items={[
-          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "436 Terms" },
+          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Table, badge: "Matrix First" },
+          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
+          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Tree" },
           { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
-          { label: "Modern Stack & FinOps", href: "/modern-stack", icon: Layers, badge: "Playbooks" },
+          { label: "Modern Stack Overview", href: "/modern-stack?tab=overview", icon: Sparkles, badge: "Canvas" },
         ]}
       />
 
@@ -477,6 +484,12 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-blue-400 leading-none">
+                8 Engines
+              </div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Matrix First</div>
+            </div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div className="text-sm sm:text-base font-bold text-cyan-400 leading-none">
                 {modernBlueprintsDb.length}
               </div>
@@ -499,6 +512,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       {/* Subtab Navigation Chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {[
+          { id: "compatibility", label: "Cloud × Table Matrix", icon: Table },
           { id: "overview", label: "Hub Overview", icon: Sparkles },
           { id: "concepts", label: `Core Concepts (${modernConceptsDb.length})`, icon: BookOpen },
           { id: "simulators", label: "6 Live Simulators", icon: Calculator },
@@ -506,7 +520,6 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
           { id: "matrix", label: `Polyglot Matrix (${modernCodeMatrix.length})`, icon: FileCode2 },
           { id: "ai", label: "AI & RAG Stack", icon: Bot },
           { id: "cost", label: `FinOps Playbook (${modernCostPlaybooks.length})`, icon: Flame },
-          { id: "compatibility", label: "Cloud × Table Matrix", icon: Table },
           { id: "python", label: `Python for Modern Stack (${modernStackDb.length})`, icon: Code2 },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -530,7 +543,186 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       </div>
 
       {/* ────────────────────────────────────────────────────────── */}
-      {/* 1. OVERVIEW & CANVAS */}
+      {/* 1. CLOUD TABLE COMPATIBILITY TAB (FIRST OF THE PAGE) */}
+      {/* ────────────────────────────────────────────────────────── */}
+      {activeTab === "compatibility" && (
+        <div
+          id="compatibility"
+          className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 overflow-x-auto animate-in fade-in duration-200"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-[var(--border)]">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400 mb-1">
+                <Table size={11} />
+                <span>2026 Lakehouse Cross-Engine Compatibility Matrix</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] break-words">
+                Cloud Engine × Table Format Compatibility Matrix (2026 Standards)
+              </h3>
+              <p className="text-xs text-[var(--muted-foreground)] break-words">
+                Native write, metadata translation (UniForm / Polaris), and zero-copy cross-engine read support.
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 font-medium">
+                7 Engines Analyzed
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">
+                Zero-Copy Read
+              </span>
+            </div>
+          </div>
+          <table className="w-full text-xs text-left border-collapse min-w-[640px]">
+            <thead>
+              <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                <th className="py-2.5 px-3 font-semibold break-words">Engine / Service</th>
+                <th className="py-2.5 px-3 font-semibold break-words">Delta Lake</th>
+                <th className="py-2.5 px-3 font-semibold break-words">Apache Iceberg</th>
+                <th className="py-2.5 px-3 font-semibold break-words">Apache Hudi</th>
+                <th className="py-2.5 px-3 font-semibold break-words">Metadata Catalog</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">Databricks</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Native (_delta_log)
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> UniForm / Read
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
+                    <AlertTriangle size={13} className="shrink-0" /> Read Support
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">Unity Catalog (OSS)</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">Snowflake</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
+                    <AlertTriangle size={13} className="shrink-0" /> External Stage
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Native Iceberg Table
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-slate-500 font-medium break-words">
+                    <XCircle size={13} className="shrink-0" /> None
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">Apache Polaris / S3</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">Microsoft Fabric</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> OneLake Native
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Iceberg Shortcut
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
+                    <AlertTriangle size={13} className="shrink-0" /> Parquet Shortcut
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">OneLake Metastore</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">Google BigQuery</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> BigLake Delta
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> BigLake Iceberg
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
+                    <AlertTriangle size={13} className="shrink-0" /> Manifest
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">BigLake Metastore</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">DuckDB</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> delta extension
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> iceberg extension
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
+                    <AlertTriangle size={13} className="shrink-0" /> Direct Parquet
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">MotherDuck / In-Memory</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">AWS Athena / EMR</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Athena Delta Connector
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Athena v3 Native
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Native Hudi
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">AWS Glue Data Catalog</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 px-3 font-bold break-words">Trino</td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Native Delta Connector
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Native Iceberg Connector
+                  </span>
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
+                    <CheckCircle2 size={13} className="shrink-0" /> Native Hudi Connector
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">Hive / Glue / Polaris</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────── */}
+      {/* 2. OVERVIEW & CANVAS */}
       {/* ────────────────────────────────────────────────────────── */}
       {activeTab === "overview" && (
         <div id="overview" className="space-y-3 animate-in fade-in duration-200">
@@ -1812,171 +2004,6 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* ────────────────────────────────────────────────────────── */}
-      {/* 8. CLOUD TABLE COMPATIBILITY TAB */}
-      {/* ────────────────────────────────────────────────────────── */}
-      {activeTab === "compatibility" && (
-        <div
-          id="compatibility"
-          className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 overflow-x-auto animate-in fade-in duration-200"
-        >
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
-              Cloud Engine × Table Format Compatibility Matrix (2026 Standards)
-            </h3>
-            <p className="text-xs text-[var(--muted-foreground)]">
-              Native write, metadata translation (UniForm / Polaris), and zero-copy cross-engine read support.
-            </p>
-          </div>
-          <table className="w-full text-xs text-left border-collapse min-w-[640px]">
-            <thead>
-              <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
-                <th className="py-2.5 px-3 font-semibold">Engine / Service</th>
-                <th className="py-2.5 px-3 font-semibold">Delta Lake</th>
-                <th className="py-2.5 px-3 font-semibold">Apache Iceberg</th>
-                <th className="py-2.5 px-3 font-semibold">Apache Hudi</th>
-                <th className="py-2.5 px-3 font-semibold">Metadata Catalog</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
-              <tr>
-                <td className="py-2.5 px-3 font-bold">Databricks</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Native (_delta_log)
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> UniForm / Read
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium">
-                    <AlertTriangle size={13} /> Read Support
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">Unity Catalog (OSS)</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold">Snowflake</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium">
-                    <AlertTriangle size={13} /> External Stage
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Native Iceberg Table
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-slate-500 font-medium">
-                    <XCircle size={13} /> None
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">Apache Polaris / S3</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold">Microsoft Fabric</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> OneLake Native
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Iceberg Shortcut
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium">
-                    <AlertTriangle size={13} /> Parquet Shortcut
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">OneLake Metastore</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold">Google BigQuery</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> BigLake Delta
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> BigLake Iceberg
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium">
-                    <AlertTriangle size={13} /> Manifest
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">BigLake Metastore</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold">DuckDB</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> delta extension
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> iceberg extension
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium">
-                    <AlertTriangle size={13} /> Direct Parquet
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">MotherDuck / In-Memory</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold">AWS Athena / EMR</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Athena Delta Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Athena v3 Native
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Native Hudi
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">AWS Glue Data Catalog</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold">Trino</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Native Delta Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Native Iceberg Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium">
-                    <CheckCircle2 size={13} /> Native Hudi Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)]">Hive / Glue / Polaris</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       )}
 

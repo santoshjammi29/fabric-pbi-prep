@@ -270,7 +270,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Primary Subnav */}
       <HubSubnav
-        hubTitle="Code & Runbooks"
+        hubTitle="Coding & Runbooks"
         items={[
           { label: "Incident Runbooks", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
           { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks", icon: Flame, badge: "48 Cards & PDFs" },
@@ -278,6 +278,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
           { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
           { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
           { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
+          { label: "Polyglot Matrix", href: "/modern-stack?tab=matrix", icon: FileCode2, badge: "Matrix" },
         ]}
       />
 

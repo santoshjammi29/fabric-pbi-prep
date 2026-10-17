@@ -38,8 +38,19 @@ function SidebarInner() {
   const isItemActive = (item: NavItem) => {
     if (!pathname) return false;
     if (item.href === "/") return pathname === "/";
+    if (item.href.includes("?")) {
+      if (isSubHrefActive(pathname, searchParams, item.href)) return true;
+      if (item.matches && item.matches.some((m) => isSubHrefActive(pathname, searchParams, m))) return true;
+      return false;
+    }
+    const isSpecialPillarActive = NAV_GROUPS.flatMap((g) => g.items).some((other) => {
+      if (other.href === item.href) return false;
+      return other.href.includes("?") && isSubHrefActive(pathname, searchParams, other.href);
+    });
+    if (isSpecialPillarActive) return false;
+
     if (pathname.startsWith(item.href)) return true;
-    if (item.matches && item.matches.some((m) => pathname.startsWith(m))) return true;
+    if (item.matches && item.matches.some((m) => pathname.startsWith(m.split("?")[0]))) return true;
     return false;
   };
 

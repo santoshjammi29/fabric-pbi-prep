@@ -453,10 +453,10 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   return (
     <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
-        hubTitle="Interview Prep & Architecture"
+        hubTitle="Q&A & Interview Prep"
         items={[
-          { label: "Q&A Scenarios", href: "/qa-prep", icon: MessageSquare },
-          { label: "System Design", href: "/architecture", icon: Building2 },
+          { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, badge: "6,570+ Qs" },
+          { label: "Target Company Intel", href: "/company-research", icon: Building2, badge: "156 Targets" },
         ]}
       />
 

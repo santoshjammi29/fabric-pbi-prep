@@ -22,6 +22,8 @@ import {
   RotateCcw,
   Download,
   Flame,
+  Workflow,
+  Table,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -335,11 +337,13 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-3.5 pb-16">
       <HubSubnav
-        hubTitle="Concepts & Engines"
+        hubTitle="Architecture & Systems"
         items={[
-          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "436 Terms" },
           { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
-          { label: "Modern Stack & FinOps", href: "/modern-stack", icon: Layers, badge: "Playbooks" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
+          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
+          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Table, badge: "Matrix" },
+          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
         ]}
       />
 

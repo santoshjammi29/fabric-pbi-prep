@@ -7,6 +7,7 @@ import { DataOpsClient } from "@/app/dataops/dataops-client";
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/dataops",
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({
     push: vi.fn(),

@@ -16,12 +16,11 @@ export function MindmapClient({ concepts }: MindmapClientProps) {
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Academy Pillar Subnav */}
       <HubSubnav
-        hubTitle="Foundations & Concepts"
+        hubTitle="Concepts & Foundations"
         items={[
-          { label: "Concepts Library", href: "/concepts", icon: BookOpen },
-          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Multi-Level" },
-          { label: "Spark Engine", href: "/spark-engine", icon: Zap },
-          { label: "Modern Stack", href: "/modern-stack", icon: Layers },
+          { label: "Concepts Library", href: "/concepts", icon: BookOpen, badge: "660+" },
+          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Tree" },
+          { label: "Core Lakehouse Concepts", href: "/modern-stack?tab=concepts", icon: Zap, badge: "FinOps" },
         ]}
       />
 

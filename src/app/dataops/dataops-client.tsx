@@ -36,6 +36,7 @@ import {
   XCircle,
   HelpCircle,
 } from "lucide-react";
+import { HubSubnav } from "@/components/layout/hub-subnav";
 
 interface DataOpsClientProps {
   initialData: DataOpsDataset;
@@ -133,6 +134,18 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-5">
+      <HubSubnav
+        hubTitle="Architecture & Systems"
+        items={[
+          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
+          { label: "Tool Secrets", href: "/dataops?tab=connectivity", icon: Network, badge: "Secrets" },
+          { label: "CI/CD Pipelines", href: "/dataops?tab=cicd", icon: GitBranch, badge: "CI/CD" },
+          { label: "Architecture Flow", href: "/dataops?tab=diagram", icon: Layers, badge: "Flow" },
+          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
+          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Spark" },
+        ]}
+      />
+
       {/* Compact Header Banner */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate mb-3">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
