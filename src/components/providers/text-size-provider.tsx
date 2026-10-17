@@ -3,7 +3,19 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
-export type TextSizeKey = "sm" | "base" | "lg" | "xl" | "2xl";
+export type TextSizeKey =
+  | "3xs"
+  | "2xs"
+  | "xs"
+  | "sm"
+  | "md"
+  | "base"
+  | "lg"
+  | "xl"
+  | "2xl"
+  | "3xl"
+  | "4xl"
+  | "5xl";
 
 export interface TextSizeOption {
   id: TextSizeKey;
@@ -15,11 +27,39 @@ export interface TextSizeOption {
 
 export const TEXT_SIZE_OPTIONS: TextSizeOption[] = [
   {
+    id: "3xs",
+    label: "Micro",
+    tagline: "Ultra-dense layout for split screens & 4K",
+    percent: 75,
+    scaleLabel: "75%",
+  },
+  {
+    id: "2xs",
+    label: "Mini",
+    tagline: "Maximum data density for compact panels",
+    percent: 80,
+    scaleLabel: "80%",
+  },
+  {
+    id: "xs",
+    label: "Extra Small",
+    tagline: "High density for multi-panel workflows",
+    percent: 85,
+    scaleLabel: "85%",
+  },
+  {
     id: "sm",
     label: "Small",
-    tagline: "Compact view for high density",
+    tagline: "Compact view for fast reading & scanning",
     percent: 90,
     scaleLabel: "90%",
+  },
+  {
+    id: "md",
+    label: "Slim",
+    tagline: "Subtle compact scale for clean readability",
+    percent: 95,
+    scaleLabel: "95%",
   },
   {
     id: "base",
@@ -31,7 +71,7 @@ export const TEXT_SIZE_OPTIONS: TextSizeOption[] = [
   {
     id: "lg",
     label: "Medium",
-    tagline: "Enhanced comfort for long reading",
+    tagline: "Enhanced comfort for long reading sessions",
     percent: 110,
     scaleLabel: "110%",
   },
@@ -45,14 +85,48 @@ export const TEXT_SIZE_OPTIONS: TextSizeOption[] = [
   {
     id: "2xl",
     label: "Extra Large",
-    tagline: "Maximum readability and focus",
+    tagline: "Focus mode and reduced eye strain",
     percent: 130,
     scaleLabel: "130%",
+  },
+  {
+    id: "3xl",
+    label: "Super Large",
+    tagline: "Large display and distant reading view",
+    percent: 140,
+    scaleLabel: "140%",
+  },
+  {
+    id: "4xl",
+    label: "Maximum",
+    tagline: "Maximum readability and high zoom",
+    percent: 150,
+    scaleLabel: "150%",
+  },
+  {
+    id: "5xl",
+    label: "Ultra",
+    tagline: "Ultra-high visibility presentation scale",
+    percent: 160,
+    scaleLabel: "160%",
   },
 ];
 
 const STORAGE_KEY = "fabric_text_size";
-const VALID_KEYS: TextSizeKey[] = ["sm", "base", "lg", "xl", "2xl"];
+const VALID_KEYS: TextSizeKey[] = [
+  "3xs",
+  "2xs",
+  "xs",
+  "sm",
+  "md",
+  "base",
+  "lg",
+  "xl",
+  "2xl",
+  "3xl",
+  "4xl",
+  "5xl",
+];
 
 interface TextSizeContextType {
   textSize: TextSizeKey;
@@ -106,7 +180,10 @@ export function TextSizeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const currentOption = useMemo(
-    () => TEXT_SIZE_OPTIONS.find((o) => o.id === textSize) || TEXT_SIZE_OPTIONS[1],
+    () =>
+      TEXT_SIZE_OPTIONS.find((o) => o.id === textSize) ||
+      TEXT_SIZE_OPTIONS.find((o) => o.id === "base") ||
+      TEXT_SIZE_OPTIONS[0],
     [textSize]
   );
 
@@ -147,7 +224,8 @@ export function TextSizeProvider({ children }: { children: React.ReactNode }) {
         const next = TEXT_SIZE_OPTIONS[idx + 1].id;
         setTextSize(next, notify);
       } else if (notify) {
-        toast.info("Maximum text size reached (130%)", { duration: 1500 });
+        const maxOpt = TEXT_SIZE_OPTIONS[TEXT_SIZE_OPTIONS.length - 1];
+        toast.info(`Maximum text size reached (${maxOpt.scaleLabel})`, { duration: 1500 });
       }
     },
     [textSize, setTextSize]
@@ -160,7 +238,8 @@ export function TextSizeProvider({ children }: { children: React.ReactNode }) {
         const prev = TEXT_SIZE_OPTIONS[idx - 1].id;
         setTextSize(prev, notify);
       } else if (notify) {
-        toast.info("Minimum text size reached (90%)", { duration: 1500 });
+        const minOpt = TEXT_SIZE_OPTIONS[0];
+        toast.info(`Minimum text size reached (${minOpt.scaleLabel})`, { duration: 1500 });
       }
     },
     [textSize, setTextSize]
@@ -242,9 +321,12 @@ export function TextSizeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+const defaultOption =
+  TEXT_SIZE_OPTIONS.find((o) => o.id === "base") || TEXT_SIZE_OPTIONS[0];
+
 const defaultContextValue: TextSizeContextType = {
   textSize: "base",
-  currentOption: TEXT_SIZE_OPTIONS[1],
+  currentOption: defaultOption,
   options: TEXT_SIZE_OPTIONS,
   setTextSize: () => {},
   increaseTextSize: () => {},

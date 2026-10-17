@@ -96,7 +96,7 @@ describe("Text Size System", () => {
     expect(localStorage.getItem("fabric_text_size")).toBe("lg");
   });
 
-  it("increases text size sequentially up to maximum (130%)", () => {
+  it("increases text size sequentially up to maximum (160%)", () => {
     render(
       <TextSizeProvider>
         <TestConsumer />
@@ -117,14 +117,26 @@ describe("Text Size System", () => {
     // xl -> 2xl (130%)
     fireEvent.click(screen.getByText("Increase"));
     expect(screen.getByTestId("current-size").textContent).toBe("2xl");
+
+    // 2xl -> 3xl (140%)
+    fireEvent.click(screen.getByText("Increase"));
+    expect(screen.getByTestId("current-size").textContent).toBe("3xl");
+
+    // 3xl -> 4xl (150%)
+    fireEvent.click(screen.getByText("Increase"));
+    expect(screen.getByTestId("current-size").textContent).toBe("4xl");
+
+    // 4xl -> 5xl (160%)
+    fireEvent.click(screen.getByText("Increase"));
+    expect(screen.getByTestId("current-size").textContent).toBe("5xl");
     expect(screen.getByTestId("can-increase").textContent).toBe("false");
 
-    // Attempting to increase past maximum stays at 2xl
+    // Attempting to increase past maximum stays at 5xl
     fireEvent.click(screen.getByText("Increase"));
-    expect(screen.getByTestId("current-size").textContent).toBe("2xl");
+    expect(screen.getByTestId("current-size").textContent).toBe("5xl");
   });
 
-  it("decreases text size sequentially down to minimum (90%)", () => {
+  it("decreases text size sequentially down to minimum (75%)", () => {
     render(
       <TextSizeProvider>
         <TestConsumer />
@@ -134,14 +146,30 @@ describe("Text Size System", () => {
     // Initial: base (100%)
     expect(screen.getByTestId("current-size").textContent).toBe("base");
 
-    // base -> sm (90%)
+    // base -> md (95%)
+    fireEvent.click(screen.getByText("Decrease"));
+    expect(screen.getByTestId("current-size").textContent).toBe("md");
+
+    // md -> sm (90%)
     fireEvent.click(screen.getByText("Decrease"));
     expect(screen.getByTestId("current-size").textContent).toBe("sm");
+
+    // sm -> xs (85%)
+    fireEvent.click(screen.getByText("Decrease"));
+    expect(screen.getByTestId("current-size").textContent).toBe("xs");
+
+    // xs -> 2xs (80%)
+    fireEvent.click(screen.getByText("Decrease"));
+    expect(screen.getByTestId("current-size").textContent).toBe("2xs");
+
+    // 2xs -> 3xs (75%)
+    fireEvent.click(screen.getByText("Decrease"));
+    expect(screen.getByTestId("current-size").textContent).toBe("3xs");
     expect(screen.getByTestId("can-decrease").textContent).toBe("false");
 
-    // Attempting to decrease past minimum stays at sm
+    // Attempting to decrease past minimum stays at 3xs
     fireEvent.click(screen.getByText("Decrease"));
-    expect(screen.getByTestId("current-size").textContent).toBe("sm");
+    expect(screen.getByTestId("current-size").textContent).toBe("3xs");
   });
 
   it("resets text size back to default 100%", () => {
@@ -188,7 +216,7 @@ describe("Text Size System", () => {
         new KeyboardEvent("keydown", { key: "-", altKey: true, bubbles: true })
       );
     });
-    expect(screen.getByTestId("current-size").textContent).toBe("sm");
+    expect(screen.getByTestId("current-size").textContent).toBe("md");
   });
 
   it("renders TextSizeController in expanded mode and handles stepper clicks", () => {
@@ -214,7 +242,7 @@ describe("Text Size System", () => {
     expect(screen.getByText("100%")).toBeDefined();
   });
 
-  it("renders TextSizeSegmentedPills with all 5 scale presets", () => {
+  it("renders TextSizeSegmentedPills with all scale presets", () => {
     render(
       <TextSizeProvider>
         <TextSizeSegmentedPills />

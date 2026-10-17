@@ -258,9 +258,29 @@ html {
   scrollbar-gutter: stable;
 }
 
+html.text-size-3xs {
+  --text-scale: 75%;
+  font-size: 75%;
+}
+
+html.text-size-2xs {
+  --text-scale: 80%;
+  font-size: 80%;
+}
+
+html.text-size-xs {
+  --text-scale: 85%;
+  font-size: 85%;
+}
+
 html.text-size-sm {
   --text-scale: 90%;
   font-size: 90%;
+}
+
+html.text-size-md {
+  --text-scale: 95%;
+  font-size: 95%;
 }
 
 html.text-size-base {
@@ -281,6 +301,21 @@ html.text-size-xl {
 html.text-size-2xl {
   --text-scale: 130%;
   font-size: 130%;
+}
+
+html.text-size-3xl {
+  --text-scale: 140%;
+  font-size: 140%;
+}
+
+html.text-size-4xl {
+  --text-scale: 150%;
+  font-size: 150%;
+}
+
+html.text-size-5xl {
+  --text-scale: 160%;
+  font-size: 160%;
 }
 
 

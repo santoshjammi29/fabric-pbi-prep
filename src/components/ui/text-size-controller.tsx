@@ -164,7 +164,7 @@ export function TextSizeController({
             </div>
 
             {/* Presets List */}
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-72 overflow-y-auto pr-1 scrollbar-thin">
               {options.map((opt) => {
                 const isSelected = textSize === opt.id;
                 return (
@@ -333,7 +333,7 @@ export function TextSizeController({
             </span>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 max-h-72 overflow-y-auto pr-1 scrollbar-thin">
             {options.map((opt) => {
               const isSelected = textSize === opt.id;
               return (
@@ -402,12 +402,12 @@ export function TextSizeSegmentedPills({ className }: { className?: string }) {
   } = useTextSize();
 
   return (
-    <div className={cn("space-y-1.5 select-none", className)}>
-      {/* 5-part pill selector */}
+    <div className={cn("space-y-2 select-none", className)}>
+      {/* Scrollable pill track */}
       <div
         role="radiogroup"
         aria-label="Text size presets"
-        className="grid grid-cols-5 gap-1 p-1 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs"
+        className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs overflow-x-auto scrollbar-none"
       >
         {options.map((opt) => {
           const isSelected = textSize === opt.id;
@@ -419,15 +419,15 @@ export function TextSizeSegmentedPills({ className }: { className?: string }) {
               aria-checked={isSelected}
               onClick={() => setTextSize(opt.id, true)}
               className={cn(
-                "flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-xs font-semibold transition-all cursor-pointer text-center",
+                "flex flex-col items-center justify-center py-1.5 px-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-center shrink-0 min-w-[50px]",
                 isSelected
-                  ? "bg-[var(--surface-3)] text-purple-400 shadow-xs border border-[var(--border-hover)]"
+                  ? "bg-purple-600 text-white shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
               )}
               title={`${opt.label}: ${opt.scaleLabel}`}
             >
               <span className="text-[11px] font-bold">{opt.scaleLabel}</span>
-              <span className="text-[9px] truncate opacity-75">{opt.label}</span>
+              <span className="text-[9px] truncate opacity-85">{opt.label}</span>
             </button>
           );
         })}
@@ -554,7 +554,7 @@ export function TextSizeQuickToggle({
           </div>
 
           {/* Presets List */}
-          <div className="space-y-1">
+          <div className="space-y-1 max-h-64 overflow-y-auto pr-1 scrollbar-thin">
             {options.map((opt) => {
               const isSelected = textSize === opt.id;
               return (
