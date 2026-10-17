@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { CodeSheetItem, CodeLevel } from "@/types/data";
 import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
@@ -309,19 +308,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      <HubSubnav
-        hubTitle="Coding & Runbooks"
-        items={[
-          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
-          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks", icon: Terminal, badge: "DBX" },
-          { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
-          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
-          { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
-          { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
-          { label: "Polyglot Matrix", href: "/modern-stack?tab=matrix", icon: FileCode2, badge: "Matrix" },
-        ]}
-      />
-
       {/* Header Hub Banner Summary */}
       <div className="relative rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

@@ -26,7 +26,6 @@ import { CategoryBar } from "@/components/cheatsheet/category-bar";
 import { QuickJumpTOC } from "@/components/cheatsheet/quick-jump-toc";
 import { DatabricksCheatsheetView } from "@/components/cheatsheet/databricks-cheatsheet-view";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 
 const ALL_CATEGORIES: CheatCodeCategory[] = [
   "Spark Core",
@@ -268,20 +267,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
 
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      {/* Primary Subnav */}
-      <HubSubnav
-        hubTitle="Coding & Runbooks"
-        items={[
-          { label: "Incident Runbooks", href: "/cheat-sheet", icon: Zap, badge: "67 Runbooks" },
-          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks", icon: Flame, badge: "48 Cards & PDFs" },
-          { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: FileCode2, badge: "PySpark" },
-          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Terminal, badge: "Spark SQL" },
-          { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Terminal, badge: "T-SQL" },
-          { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
-          { label: "Polyglot Matrix", href: "/modern-stack?tab=matrix", icon: FileCode2, badge: "Matrix" },
-        ]}
-      />
-
       {/* Primary View Switcher Pills */}
       <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] max-w-fit">
         <button

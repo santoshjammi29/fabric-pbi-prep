@@ -41,18 +41,19 @@ describe("Streamlined Navigation & Meaningful Bottom Page Notes", () => {
   it("renders ALL hubs and subpages in the left Sidebar as the primary navigation", () => {
     render(<Sidebar />);
 
-    // Check that subpages across all pillars are immediately rendered and visible in left sidebar
-    expect(screen.getByText("Guided Topic Tracks")).toBeDefined();
-    expect(screen.getByText("Career Curricula")).toBeDefined();
-    expect(screen.getByText("Concepts Glossary")).toBeDefined();
+    // Check that pages across all groups are cleanly rendered and visible in the left sidebar
+    expect(screen.getByText("Cloud × Table Matrix")).toBeDefined();
+    expect(screen.getByText("Architecture Scenarios")).toBeDefined();
     expect(screen.getByText("Spark Engine Lab")).toBeDefined();
-    expect(screen.getByText("System Scenarios")).toBeDefined();
-    expect(screen.getByText("Production Cheat Sheet")).toBeDefined();
-    expect(screen.getByText("PySpark Drills")).toBeDefined();
-    expect(screen.getByText("Tool Connectivity & Secrets")).toBeDefined();
-    expect(screen.getByText("CI/CD Alternatives & Pipelines")).toBeDefined();
+    expect(screen.getByText("DataOps & CI/CD")).toBeDefined();
+    expect(screen.getByText("Concepts Glossary")).toBeDefined();
+    expect(screen.getByText("Concepts Mind Map")).toBeDefined();
+    expect(screen.getByText("Code Practice")).toBeDefined();
+    expect(screen.getByText("Cheat Sheets")).toBeDefined();
     expect(screen.getByText("Question Drill Bank")).toBeDefined();
     expect(screen.getByText("Target Company Intel")).toBeDefined();
+    expect(screen.getByText("Guided Learning")).toBeDefined();
+    expect(screen.getByText("Career Curricula")).toBeDefined();
   });
 
   it("renders AllPagesNav with only the universal search bar at the top", () => {

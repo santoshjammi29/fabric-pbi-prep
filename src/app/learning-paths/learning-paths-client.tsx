@@ -13,7 +13,6 @@ import {
 import { cn } from "@/lib/utils";
 import { LearningPath, Difficulty } from "@/types/data";
 import { DecisionLedger } from "@/components/learning-paths/decision-ledger";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
 
 const difficultyColors: Record<Difficulty, { bg: string; text: string; border: string }> = {
@@ -52,14 +51,6 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
 
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      <HubSubnav
-        hubTitle="Learning Journey"
-        items={[
-          { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "13 Tracks" },
-          { label: "Career Curricula", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
-        ]}
-      />
-
       {/* Header Banner - Compact Reference Style */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">

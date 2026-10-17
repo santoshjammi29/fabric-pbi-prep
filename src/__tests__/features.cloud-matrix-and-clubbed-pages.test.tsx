@@ -59,24 +59,17 @@ describe("Cloud × Table Matrix First & Consolidated Clubbed Pages Verification"
     });
   });
 
-  describe("2. Coding Pages & Subpages Merged & Clubbed Together", () => {
-    it("clubs all code drills, cheat sheets, Databricks runbooks, and polyglot matrix under Coding & Runbooks", () => {
-      const codingPillar = NAV_GROUPS.flatMap((g) => g.items).find(
-        (item) => item.label === "Coding & Runbooks"
-      );
-      expect(codingPillar).toBeDefined();
+  describe("2. Coding Pages Cleanly Cataloged & Clubbed", () => {
+    it("clubs code practice drills and cheat sheets under Knowledge & Drills", () => {
+      const kdGroup = NAV_GROUPS.find((g) => g.title === "Knowledge & Drills");
+      expect(kdGroup).toBeDefined();
 
-      const subHrefs = codingPillar?.subItems?.map((s) => s.href) || [];
-      expect(subHrefs).toContain("/cheat-sheet");
-      expect(subHrefs).toContain("/cheat-sheet?tab=databricks");
-      expect(subHrefs).toContain("/code-practice?db=pyspark");
-      expect(subHrefs).toContain("/code-practice?db=sparksql");
-      expect(subHrefs).toContain("/code-practice?db=mssql");
-      expect(subHrefs).toContain("/code-practice?db=python");
-      expect(subHrefs).toContain("/modern-stack?tab=matrix");
+      const labels = kdGroup?.items.map((s) => s.label) || [];
+      expect(labels).toContain("Code Practice");
+      expect(labels).toContain("Cheat Sheets");
     });
 
-    it("assigns Category 'Coding' to all flat code subpages", () => {
+    it("assigns Category 'Coding' to all flat code subpages in catalog", () => {
       const codePages = ALL_FLAT_PAGES_AND_SUBPAGES.filter(
         (p) => p.category === "Coding"
       );
@@ -93,20 +86,17 @@ describe("Cloud × Table Matrix First & Consolidated Clubbed Pages Verification"
     });
   });
 
-  describe("3. Concepts Pages & Subpages Merged & Clubbed Together", () => {
-    it("clubs glossary, mind map, and core lakehouse concepts under Concepts & Foundations", () => {
-      const conceptsPillar = NAV_GROUPS.flatMap((g) => g.items).find(
-        (item) => item.label === "Concepts & Foundations"
-      );
-      expect(conceptsPillar).toBeDefined();
+  describe("3. Concepts Pages Cleanly Cataloged & Clubbed", () => {
+    it("clubs glossary and mind map under Knowledge & Drills", () => {
+      const kdGroup = NAV_GROUPS.find((g) => g.title === "Knowledge & Drills");
+      expect(kdGroup).toBeDefined();
 
-      const subHrefs = conceptsPillar?.subItems?.map((s) => s.href) || [];
-      expect(subHrefs).toContain("/concepts");
-      expect(subHrefs).toContain("/mindmap");
-      expect(subHrefs).toContain("/modern-stack?tab=concepts");
+      const labels = kdGroup?.items.map((s) => s.label) || [];
+      expect(labels).toContain("Concepts Glossary");
+      expect(labels).toContain("Concepts Mind Map");
     });
 
-    it("assigns Category 'Concepts' to all flat concepts subpages", () => {
+    it("assigns Category 'Concepts' to all flat concepts subpages in catalog", () => {
       const conceptPages = ALL_FLAT_PAGES_AND_SUBPAGES.filter(
         (p) => p.category === "Concepts"
       );
@@ -119,37 +109,21 @@ describe("Cloud × Table Matrix First & Consolidated Clubbed Pages Verification"
     });
   });
 
-  describe("4. Architecture Pages & Subpages Merged & Clubbed Together", () => {
-    it("clubs system scenarios, Spark engine lab, DataOps lifecycle, and Cloud × Table matrix under Architecture & Systems", () => {
-      const archPillar = NAV_GROUPS.flatMap((g) => g.items).find(
-        (item) => item.label === "Architecture & Systems"
-      );
-      expect(archPillar).toBeDefined();
+  describe("4. Platform & Architecture Pages Cleanly Clubbed Together", () => {
+    it("clubs Cloud × Table matrix, Architecture scenarios, Spark engine lab, and DataOps under Platform", () => {
+      const platformGroup = NAV_GROUPS.find((g) => g.title === "Platform");
+      expect(platformGroup).toBeDefined();
 
-      const subHrefs = archPillar?.subItems?.map((s) => s.href) || [];
-      expect(subHrefs).toContain("/architecture?tab=scenarios");
-      expect(subHrefs).toContain("/spark-engine");
-      expect(subHrefs).toContain("/dataops?tab=lifecycle");
-      expect(subHrefs).toContain("/dataops?tab=connectivity");
-      expect(subHrefs).toContain("/dataops?tab=cicd");
-      expect(subHrefs).toContain("/modern-stack?tab=compatibility");
+      const hrefs = platformGroup?.items.map((s) => s.href) || [];
+      expect(hrefs).toContain("/modern-stack");
+      expect(hrefs).toContain("/architecture");
+      expect(hrefs).toContain("/spark-engine");
+      expect(hrefs).toContain("/dataops");
     });
   });
 
-  describe("5. Visual Blueprints & Diagrams (Images) Merged & Clubbed Together", () => {
-    it("clubs whiteboard blueprints, whiteboard architecture flow, and modern blueprints under Visual Blueprints & Diagrams", () => {
-      const visualsPillar = NAV_GROUPS.flatMap((g) => g.items).find(
-        (item) => item.label === "Visual Blueprints & Diagrams"
-      );
-      expect(visualsPillar).toBeDefined();
-
-      const subHrefs = visualsPillar?.subItems?.map((s) => s.href) || [];
-      expect(subHrefs).toContain("/architecture?tab=diagrams");
-      expect(subHrefs).toContain("/dataops?tab=diagram");
-      expect(subHrefs).toContain("/modern-stack?tab=blueprints");
-    });
-
-    it("assigns Category 'Images & Diagrams' to all visual blueprint pages", () => {
+  describe("5. Visual Blueprints & Diagrams Cataloged in Flat Navigation Catalog", () => {
+    it("assigns Category 'Images & Diagrams' to all visual blueprint pages in catalog", () => {
       const visualPages = ALL_FLAT_PAGES_AND_SUBPAGES.filter(
         (p) => p.category === "Images & Diagrams"
       );
@@ -162,16 +136,16 @@ describe("Cloud × Table Matrix First & Consolidated Clubbed Pages Verification"
     });
   });
 
-  describe("6. Q&A & Interview Prep Merged & Clubbed Together", () => {
-    it("clubs Question Drill Bank and Target Company Intel under Interview Drill Hub", () => {
-      const qaPillar = NAV_GROUPS.flatMap((g) => g.items).find(
-        (item) => item.label === "Interview Drill Hub"
-      );
-      expect(qaPillar).toBeDefined();
+  describe("6. Q&A & Interview Prep Cleanly Clubbed Together", () => {
+    it("clubs Question Drill Bank and Target Company Intel under Interviews & Roadmaps", () => {
+      const interviewGroup = NAV_GROUPS.find((g) => g.title === "Interviews & Roadmaps");
+      expect(interviewGroup).toBeDefined();
 
-      const subHrefs = qaPillar?.subItems?.map((s) => s.href) || [];
-      expect(subHrefs).toContain("/qa-prep");
-      expect(subHrefs).toContain("/company-research");
+      const hrefs = interviewGroup?.items.map((s) => s.href) || [];
+      expect(hrefs).toContain("/qa-prep");
+      expect(hrefs).toContain("/company-research");
+      expect(hrefs).toContain("/guided-learning");
+      expect(hrefs).toContain("/learning-paths");
     });
 
     it("assigns Category 'Q&A' to Question Drill Bank and Target Company Intel", () => {
@@ -186,30 +160,30 @@ describe("Cloud × Table Matrix First & Consolidated Clubbed Pages Verification"
     });
   });
 
-  describe("7. Sidebar Rendering of Clubbed Pillars", () => {
-    it("renders all clubbed pillar titles and subpages in the sidebar", () => {
+  describe("7. Simple Left Side Nav Bar Rendering (Un-nested)", () => {
+    it("renders all simplified navigation groups and flat direct links without nested sub-trees", () => {
       render(<Sidebar />);
 
-      // Pillars
-      expect(screen.getByText("Concepts & Foundations")).toBeDefined();
-      expect(screen.getByText("Architecture & Systems")).toBeDefined();
-      expect(screen.getByText("Coding & Runbooks")).toBeDefined();
-      expect(screen.getByText("Visual Blueprints & Diagrams")).toBeDefined();
-      expect(screen.getByText("Interview Drill Hub")).toBeDefined();
-      expect(screen.getByText("Learning Journey")).toBeDefined();
+      // Groups
+      expect(screen.getByText("Platform")).toBeDefined();
+      expect(screen.getByText("Knowledge & Drills")).toBeDefined();
+      expect(screen.getByText("Interviews & Roadmaps")).toBeDefined();
+      expect(screen.getByText("Workspace")).toBeDefined();
 
-      // Subpages across clubbed groups
+      // Flat direct navigation pages
+      expect(screen.getByText("Cloud × Table Matrix")).toBeDefined();
+      expect(screen.getByText("Architecture Scenarios")).toBeDefined();
+      expect(screen.getByText("Spark Engine Lab")).toBeDefined();
+      expect(screen.getByText("DataOps & CI/CD")).toBeDefined();
       expect(screen.getByText("Concepts Glossary")).toBeDefined();
       expect(screen.getByText("Concepts Mind Map")).toBeDefined();
-      expect(screen.getByText("System Scenarios")).toBeDefined();
-      expect(screen.getByText("Spark Engine Lab")).toBeDefined();
-      expect(screen.getByText("Production Cheat Sheet")).toBeDefined();
-      expect(screen.getByText("PySpark Drills")).toBeDefined();
-      expect(screen.getByText("Whiteboard Blueprints")).toBeDefined();
+      expect(screen.getByText("Code Practice")).toBeDefined();
+      expect(screen.getByText("Cheat Sheets")).toBeDefined();
       expect(screen.getByText("Question Drill Bank")).toBeDefined();
       expect(screen.getByText("Target Company Intel")).toBeDefined();
-      expect(screen.getByText("Guided Topic Tracks")).toBeDefined();
+      expect(screen.getByText("Guided Learning")).toBeDefined();
       expect(screen.getByText("Career Curricula")).toBeDefined();
+      expect(screen.getByText("My Studio")).toBeDefined();
     });
   });
 });

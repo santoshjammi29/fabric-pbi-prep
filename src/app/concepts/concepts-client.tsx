@@ -33,7 +33,6 @@ import { Concept, Difficulty } from "@/types/data";
 import { ArchitectureDiagramItem } from "@/data/diagrams";
 import dynamic from "next/dynamic";
 import { recordLastTopic } from "@/lib/user-progress";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import { ConceptsMindmapView } from "@/components/concepts/concepts-mindmap-view";
@@ -439,15 +438,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
   return (
     <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      <HubSubnav
-        hubTitle="Concepts & Foundations"
-        items={[
-          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
-          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Tree" },
-          { label: "Core Lakehouse Concepts", href: "/modern-stack?tab=concepts", icon: Zap, badge: "FinOps" },
-        ]}
-      />
-
       {/* Header Banner - Compact Reference Standard */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">

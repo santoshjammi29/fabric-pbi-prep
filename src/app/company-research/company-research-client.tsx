@@ -24,7 +24,6 @@ import {
   Flame,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import type { CompanyProfile, CompanyTier } from "@/types/data";
@@ -196,26 +195,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
 
   return (
     <div className="space-y-3.5 pb-20 max-w-7xl mx-auto px-2 sm:px-4">
-      {/* Subnav */}
-      <HubSubnav
-        hubTitle="Q&A & Interview Prep"
-        items={[
-          {
-            label: "Question Drill Bank",
-            href: "/qa-prep",
-            icon: MessageSquare,
-            badge: "6,570+ Qs",
-          },
-          {
-            label: "Target Company Intel",
-            href: "/company-research",
-            icon: Building2,
-            badge: "156 Targets",
-            badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-          },
-        ]}
-      />
-
       {/* Hero Banner */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 isolate shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">

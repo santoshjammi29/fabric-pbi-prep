@@ -37,7 +37,6 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { SmoothAccordion } from "@/components/ui/smooth-accordion";
 import { PrerequisiteBanner } from "@/components/ui/prerequisite-banner";
 import { recordLastTopic } from "@/lib/user-progress";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 
 type SparkSubtab = "architecture" | "simulator" | "memory" | "curriculum" | "lexicon";
 
@@ -336,17 +335,6 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-3.5 pb-16">
-      <HubSubnav
-        hubTitle="Architecture & Systems"
-        items={[
-          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Table, badge: "Matrix" },
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
-          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
-          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
-          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
-        ]}
-      />
-
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">

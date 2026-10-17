@@ -38,7 +38,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { CodeBlock } from "@/components/ui/code-block";
 import dynamic from "next/dynamic";
@@ -453,17 +452,6 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
 
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      <HubSubnav
-        hubTitle="Architecture & Concepts"
-        items={[
-          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Table, badge: "Matrix First" },
-          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
-          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Tree" },
-          { label: "Spark Engine Lab", href: "/spark-engine", icon: Zap, badge: "Simulator" },
-          { label: "Modern Stack Overview", href: "/modern-stack?tab=overview", icon: Sparkles, badge: "Canvas" },
-        ]}
-      />
-
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 isolate shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">

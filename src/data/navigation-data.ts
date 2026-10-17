@@ -57,91 +57,31 @@ export interface FlatNavPage {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    title: "Portal",
+    title: "Platform",
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
+      { label: "Cloud × Table Matrix", href: "/modern-stack", icon: Zap, pill: { text: "Matrix", variant: "easy" } },
+      { label: "Architecture Scenarios", href: "/architecture", icon: Layers, pill: { text: "3.1k+", variant: "architect" } },
+      { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, pill: { text: "Spark", variant: "medium" } },
+      { label: "DataOps & CI/CD", href: "/dataops", icon: Workflow, pill: { text: "E2E", variant: "info" } },
     ],
   },
   {
-    title: "Academy Pillars",
+    title: "Knowledge & Drills",
     items: [
-      {
-        label: "Concepts & Foundations",
-        href: "/concepts",
-        icon: BookOpen,
-        pill: { text: "Foundations", variant: "easy" },
-        matches: ["/concepts", "/mindmap"],
-        subItems: [
-          { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, badge: "660+" },
-          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Tree" },
-          { label: "Core Lakehouse Concepts", href: "/modern-stack?tab=concepts", icon: Zap, badge: "FinOps" },
-        ],
-      },
-      {
-        label: "Architecture & Systems",
-        href: "/architecture",
-        icon: Layers,
-        pill: { text: "Principal", variant: "architect" },
-        matches: ["/architecture", "/spark-engine", "/dataops", "/modern-stack"],
-        subItems: [
-          { label: "Cloud × Table Compatibility", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: "3.1k+" },
-          { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
-          { label: "End-to-End Lifecycle Playbook", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "E2E" },
-          { label: "Tool Connectivity & Secrets", href: "/dataops?tab=connectivity", icon: Network, badge: "Secrets" },
-          { label: "CI/CD Alternatives & Pipelines", href: "/dataops?tab=cicd", icon: GitBranch, badge: "CI/CD" },
-        ],
-      },
-      {
-        label: "Coding & Runbooks",
-        href: "/code-practice",
-        icon: FileCode2,
-        pill: { text: "Prod Ready", variant: "medium" },
-        matches: ["/code-practice", "/cheat-sheet"],
-        subItems: [
-          { label: "Production Cheat Sheet", href: "/cheat-sheet", icon: FileCode2, badge: "Sheet" },
-          { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks", icon: Terminal, badge: "DBX" },
-          { label: "PySpark Drills", href: "/code-practice?db=pyspark", icon: Code2, badge: "PySpark" },
-          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", icon: Database, badge: "SQL" },
-          { label: "T-SQL Drills", href: "/code-practice?db=mssql", icon: Database, badge: "T-SQL" },
-          { label: "Python & Polars", href: "/code-practice?db=python", icon: Code2, badge: "Python" },
-          { label: "Polyglot Code Matrix", href: "/modern-stack?tab=matrix", icon: FileCode2, badge: "Polyglot" },
-        ],
-      },
-      {
-        label: "Visual Blueprints & Diagrams",
-        href: "/architecture?tab=diagrams",
-        icon: Sparkles,
-        pill: { text: "32 Visuals", variant: "new" },
-        matches: ["/architecture?tab=diagrams", "/dataops?tab=diagram"],
-        subItems: [
-          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: "32 Visuals" },
-          { label: "Whiteboard Architecture Flow", href: "/dataops?tab=diagram", icon: Layers, badge: "Flow" },
-          { label: "Modern Stack Blueprints", href: "/modern-stack?tab=blueprints", icon: Cpu, badge: "Blueprints" },
-        ],
-      },
-      {
-        label: "Interview Drill Hub",
-        href: "/qa-prep",
-        icon: MessageSquare,
-        pill: { text: "6.5k+ Qs", variant: "hard" },
-        matches: ["/qa-prep", "/company-research"],
-        subItems: [
-          { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, badge: "6.5k+" },
-          { label: "Target Company Intel", href: "/company-research", icon: Briefcase, badge: "Intel" },
-        ],
-      },
-      {
-        label: "Learning Journey",
-        href: "/guided-learning",
-        icon: Compass,
-        pill: { text: "The Roadmap", variant: "info" },
-        matches: ["/guided-learning", "/learning-paths"],
-        subItems: [
-          { label: "Guided Topic Tracks", href: "/guided-learning", icon: Route, badge: "Topics" },
-          { label: "Career Curricula", href: "/learning-paths", icon: GraduationCap, badge: "Paths" },
-        ],
-      },
+      { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, pill: { text: "660+", variant: "easy" } },
+      { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, pill: { text: "Tree", variant: "info" } },
+      { label: "Code Practice", href: "/code-practice", icon: Code2, pill: { text: "Drills", variant: "medium" } },
+      { label: "Cheat Sheets", href: "/cheat-sheet", icon: FileCode2, pill: { text: "Sheets", variant: "medium" } },
+    ],
+  },
+  {
+    title: "Interviews & Roadmaps",
+    items: [
+      { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, pill: { text: "6.5k+", variant: "hard" } },
+      { label: "Target Company Intel", href: "/company-research", icon: Briefcase, pill: { text: "156+", variant: "new" } },
+      { label: "Guided Learning", href: "/guided-learning", icon: Route, pill: { text: "Tracks", variant: "info" } },
+      { label: "Career Curricula", href: "/learning-paths", icon: GraduationCap, pill: { text: "Roadmap", variant: "info" } },
     ],
   },
   {

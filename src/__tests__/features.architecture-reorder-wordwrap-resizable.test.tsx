@@ -25,28 +25,25 @@ describe("Architecture & Systems Reorder, Word Wrap & Resizable Sidebar Tests", 
     vi.restoreAllMocks();
   });
 
-  it("places Cloud × Table Compatibility as the FIRST subitem under Architecture & Systems", () => {
-    const archPillar = NAV_GROUPS.flatMap((g) => g.items).find(
-      (item) => item.label === "Architecture & Systems"
-    );
-    expect(archPillar).toBeDefined();
-    expect(archPillar?.subItems).toBeDefined();
+  it("places Cloud × Table Matrix as the first platform feature item", () => {
+    const platformGroup = NAV_GROUPS.find((g) => g.title === "Platform");
+    expect(platformGroup).toBeDefined();
 
-    const subItems = archPillar!.subItems!;
-    expect(subItems.length).toBeGreaterThanOrEqual(6);
+    const items = platformGroup!.items;
+    expect(items.length).toBeGreaterThanOrEqual(4);
 
-    // Index 0 must be Cloud × Table Compatibility
-    expect(subItems[0].label).toBe("Cloud × Table Compatibility");
-    expect(subItems[0].href).toBe("/modern-stack?tab=compatibility");
-    expect(subItems[0].badge).toBe("Matrix");
+    // After Home Dashboard, index 1 is Cloud × Table Matrix
+    expect(items[1].label).toBe("Cloud × Table Matrix");
+    expect(items[1].href).toBe("/modern-stack");
+    expect(items[1].pill?.text).toBe("Matrix");
 
-    // Index 1 is System Scenarios
-    expect(subItems[1].label).toBe("System Scenarios");
-    expect(subItems[1].href).toBe("/architecture?tab=scenarios");
+    // Next is Architecture Scenarios
+    expect(items[2].label).toBe("Architecture Scenarios");
+    expect(items[2].href).toBe("/architecture");
 
-    // Index 2 is Spark Engine Lab
-    expect(subItems[2].label).toBe("Spark Engine Lab");
-    expect(subItems[2].href).toBe("/spark-engine");
+    // Next is Spark Engine Lab
+    expect(items[3].label).toBe("Spark Engine Lab");
+    expect(items[3].href).toBe("/spark-engine");
   });
 
   it("renders Sidebar with word-wrap enabled classes and resizer handle", () => {
@@ -62,7 +59,7 @@ describe("Architecture & Systems Reorder, Word Wrap & Resizable Sidebar Tests", 
     expect(resizer.getAttribute("title")).toContain("Drag to resize nav bar width");
 
     // Check word-wrap text styling on navigation items
-    const archLabel = screen.getByText("Architecture & Systems");
+    const archLabel = screen.getByText("Architecture Scenarios");
     expect(archLabel.className).toContain("break-words");
     expect(archLabel.className).toContain("whitespace-normal");
   });

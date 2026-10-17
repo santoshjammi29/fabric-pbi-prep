@@ -10,7 +10,7 @@ import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { Search, Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { cn } from "@/lib/utils";
-import { NAV_GROUPS, isSubHrefActive } from "@/data/navigation-data";
+import { NAV_GROUPS } from "@/data/navigation-data";
 
 const badgeVariants: Record<string, string> = {
   easy: "bg-green-500/10 text-green-400 border-green-500/20",
@@ -57,8 +57,18 @@ function MobileHeaderInner() {
     window.dispatchEvent(new CustomEvent("open-command-palette"));
   };
 
-  const isSubActive = (subHref: string) => {
-    return isSubHrefActive(pathname, searchParams, subHref);
+  const isItemActive = (item: { href: string; matches?: string[] }) => {
+    if (!pathname) return false;
+    if (item.href === "/") return pathname === "/";
+    if (item.href.includes("?")) {
+      const [itemPath, itemQuery] = item.href.split("?");
+      if (pathname !== itemPath) return false;
+      const subParams = new URLSearchParams(itemQuery);
+      return Array.from(subParams.entries()).every(
+        ([k, v]) => searchParams?.get(k) === v
+      );
+    }
+    return pathname === item.href || pathname.startsWith(item.href + "/");
   };
 
   return (
@@ -169,15 +179,7 @@ function MobileHeaderInner() {
                   </div>
                   <div className="space-y-0.5">
                     {group.items.map((item) => {
-                      const isSpecialPillarActive = NAV_GROUPS.flatMap((g) => g.items).some((other) => {
-                        if (other.href === item.href) return false;
-                        return other.href.includes("?") && isSubHrefActive(pathname, searchParams, other.href);
-                      });
-                      const active =
-                        (item.href === "/" && pathname === "/") ||
-                        (item.href.includes("?")
-                          ? isSubHrefActive(pathname, searchParams, item.href) || Boolean(item.matches?.some((m) => isSubHrefActive(pathname, searchParams, m)))
-                          : !isSpecialPillarActive && (pathname?.startsWith(item.href) || Boolean(item.matches?.some((m) => pathname?.startsWith(m.split("?")[0])))));
+                      const active = isItemActive(item);
                       const Icon = item.icon;
                       return (
                         <div key={item.href}>
@@ -206,50 +208,6 @@ function MobileHeaderInner() {
                               </span>
                             )}
                           </Link>
-
-                          {/* All sub-navigation items ALWAYS visible in mobile drawer */}
-                          {item.subItems && (
-                            <div className="ml-5 my-1 space-y-0.5 border-l-2 border-[var(--border)] pl-3">
-                              {item.subItems.map((sub) => {
-                                const subActive = isSubActive(sub.href);
-                                return (
-                                  <Link
-                                    key={sub.href}
-                                    href={sub.href}
-                                    onClick={() => setDrawerOpen(false)}
-                                    className={cn(
-                                      "flex items-start gap-2 px-2.5 py-1.5 text-xs rounded-lg transition-colors",
-                                      subActive
-                                        ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-500/10"
-                                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                                    )}
-                                  >
-                                    <span
-                                      className={cn(
-                                        "w-1.5 h-1.5 rounded-full shrink-0 mt-1",
-                                        subActive
-                                          ? "bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.8)]"
-                                          : "bg-[var(--muted-foreground)]/40"
-                                      )}
-                                    />
-                                    <span className="flex-1 break-words whitespace-normal leading-snug">{sub.label}</span>
-                                    {sub.badge && (
-                                      <span
-                                        className={cn(
-                                          "text-[9px] px-1.5 py-0.5 rounded font-medium shrink-0 mt-0.5",
-                                          subActive
-                                            ? "bg-blue-600/20 text-blue-600 dark:text-blue-300"
-                                            : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
-                                        )}
-                                      >
-                                        {sub.badge}
-                                      </span>
-                                    )}
-                                  </Link>
-                                );
-                              })}
-                            </div>
-                          )}
                         </div>
                       );
                     })}

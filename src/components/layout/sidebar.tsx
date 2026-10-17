@@ -109,27 +109,15 @@ function SidebarInner() {
   const isItemActive = (item: NavItem) => {
     if (!pathname) return false;
     if (item.href === "/") return pathname === "/";
-    if (item.subItems && item.subItems.some((sub) => isSubHrefActive(pathname, searchParams, sub.href))) {
-      return true;
-    }
     if (item.href.includes("?")) {
-      if (isSubHrefActive(pathname, searchParams, item.href)) return true;
-      if (item.matches && item.matches.some((m) => isSubHrefActive(pathname, searchParams, m))) return true;
-      return false;
+      const [itemPath, itemQuery] = item.href.split("?");
+      if (pathname !== itemPath) return false;
+      const subParams = new URLSearchParams(itemQuery);
+      return Array.from(subParams.entries()).every(
+        ([k, v]) => searchParams?.get(k) === v
+      );
     }
-    const isSpecialPillarActive = NAV_GROUPS.flatMap((g) => g.items).some((other) => {
-      if (other.href === item.href) return false;
-      return other.href.includes("?") && isSubHrefActive(pathname, searchParams, other.href);
-    });
-    if (isSpecialPillarActive) return false;
-
-    if (pathname.startsWith(item.href)) return true;
-    if (item.matches && item.matches.some((m) => pathname.startsWith(m.split("?")[0]))) return true;
-    return false;
-  };
-
-  const isSubActive = (subHref: string) => {
-    return isSubHrefActive(pathname, searchParams, subHref);
+    return pathname === item.href || pathname.startsWith(item.href + "/");
   };
 
   return (
@@ -297,52 +285,6 @@ function SidebarInner() {
                         </>
                       )}
                     </Link>
-
-                    {/* All sub-navigation items ALWAYS visible with Full Word Wrap */}
-                    {!collapsed && item.subItems && (
-                      <ul className="ml-5 my-1 space-y-0.5 border-l-2 border-[var(--border)] pl-3">
-                        {item.subItems.map((sub) => {
-                          const subActive = isSubActive(sub.href);
-                          return (
-                            <li key={sub.href}>
-                              <Link
-                                href={sub.href}
-                                className={cn(
-                                  "flex items-start gap-2 px-2 py-1.5 text-xs rounded-lg transition-all",
-                                  subActive
-                                    ? "text-blue-600 dark:text-blue-400 bg-blue-500/10 font-bold shadow-xs"
-                                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-                                )}
-                              >
-                                <span
-                                  className={cn(
-                                    "w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 transition-all",
-                                    subActive
-                                      ? "bg-blue-500 scale-125 shadow-[0_0_6px_rgba(59,130,246,0.8)]"
-                                      : "bg-[var(--muted-foreground)]/30"
-                                  )}
-                                />
-                                <span className="flex-1 break-words whitespace-normal leading-snug text-left">
-                                  {sub.label}
-                                </span>
-                                {sub.badge && (
-                                  <span
-                                    className={cn(
-                                      "text-[9px] px-1.5 py-0.5 rounded font-medium shrink-0 mt-0.5",
-                                      subActive
-                                        ? "bg-blue-600/20 text-blue-600 dark:text-blue-300"
-                                        : "bg-[var(--surface-2)] text-[var(--muted-foreground)]"
-                                    )}
-                                  >
-                                    {sub.badge}
-                                  </span>
-                                )}
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
                   </li>
                 );
               })}

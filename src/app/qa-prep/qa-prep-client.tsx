@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import { UnifiedQuestion, Difficulty, STANDARDIZED_DOMAINS } from "@/types/data";
 import { ArchitectureDiagramItem } from "@/data/diagrams";
@@ -452,14 +451,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
 
   return (
     <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      <HubSubnav
-        hubTitle="Q&A & Interview Prep"
-        items={[
-          { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, badge: "6,570+ Qs" },
-          { label: "Target Company Intel", href: "/company-research", icon: Building2, badge: "156 Targets" },
-        ]}
-      />
-
       {/* Header Banner - Compact Reference Standard */}
       <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">

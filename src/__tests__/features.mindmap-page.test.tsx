@@ -33,9 +33,9 @@ describe("Mindmap Dedicated Page (/mindmap)", () => {
     expect(screen.getByText("Enterprise Data Platform Concepts Mind Map")).toBeDefined();
     expect(screen.getByText(/2 architectural concepts/i)).toBeDefined();
 
-    // Subnav checks
-    expect(screen.getByText("Concepts Library")).toBeDefined();
-    expect(screen.getByText("Concepts Mind Map")).toBeDefined();
+    // Navigation action checks
+    expect(screen.getByText("Glossary List View")).toBeDefined();
+    expect(screen.getByText("Interview Q&A Bank")).toBeDefined();
 
     // Integrated Mind Map component checks
     expect(screen.getByText("Concepts Multi-Level Mind Map")).toBeDefined();

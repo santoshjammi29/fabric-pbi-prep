@@ -35,7 +35,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
 import { architectureDiagrams } from "@/data/diagrams";
@@ -967,19 +966,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-4 pb-16 animate-in fade-in duration-300">
-      <HubSubnav
-        hubTitle="Architecture & Systems"
-        items={[
-          { label: "Cloud × Table Matrix", href: "/modern-stack?tab=compatibility", icon: Zap, badge: "Matrix" },
-          { label: "System Scenarios", href: "/architecture?tab=scenarios", icon: Layers, badge: `${architectureData.length.toLocaleString()} Scenarios` },
-          { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, badge: "Spark" },
-          { label: "DataOps Lifecycle", href: "/dataops?tab=lifecycle", icon: Workflow, badge: "Lifecycle" },
-          { label: "Tool Secrets", href: "/dataops?tab=connectivity", icon: Network, badge: "Secrets" },
-          { label: "CI/CD Pipelines", href: "/dataops?tab=cicd", icon: GitBranch, badge: "CI/CD" },
-          { label: "Whiteboard Blueprints", href: "/architecture?tab=diagrams", icon: Sparkles, badge: `${architectureDiagrams.length}+ Visuals` },
-        ]}
-      />
-
       {/* 1. TOP MODULE NAVIGATION TABS */}
       <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1 rounded-xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
         {[

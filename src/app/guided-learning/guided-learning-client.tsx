@@ -32,7 +32,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import {
   getTopicItems,
   getTopicCounts,
@@ -443,14 +442,6 @@ function GuidedLearningContent() {
 
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      <HubSubnav
-        hubTitle="Learning Journey"
-        items={[
-          { label: "Guided Topic Tracks", href: "/guided-learning", icon: BookMarked, badge: "13 Tracks" },
-          { label: "Career Curricula", href: "/learning-paths", icon: Compass, badge: "12 Tracks" },
-        ]}
-      />
-
       {/* ── TOP BANNER & TRACK MATRIX ─────────────────────────────────── */}
       <section className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="absolute -top-24 -right-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />

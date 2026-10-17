@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { BookOpen, GitBranch, Zap, Layers, HelpCircle, ArrowRight } from "lucide-react";
 import { Concept } from "@/types/data";
-import { HubSubnav } from "@/components/layout/hub-subnav";
 import { ConceptsMindmapView } from "@/components/concepts/concepts-mindmap-view";
 
 interface MindmapClientProps {
@@ -14,15 +13,6 @@ interface MindmapClientProps {
 export function MindmapClient({ concepts }: MindmapClientProps) {
   return (
     <div className="space-y-4 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
-      {/* Academy Pillar Subnav */}
-      <HubSubnav
-        hubTitle="Concepts & Foundations"
-        items={[
-          { label: "Concepts Library", href: "/concepts", icon: BookOpen, badge: "660+" },
-          { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, badge: "Tree" },
-          { label: "Core Lakehouse Concepts", href: "/modern-stack?tab=concepts", icon: Zap, badge: "FinOps" },
-        ]}
-      />
 
       {/* Hero Header */}
       <div className="relative rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs isolate">
