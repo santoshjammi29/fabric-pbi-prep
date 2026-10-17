@@ -471,6 +471,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
+  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isReadAllMode, setIsReadAllMode] = useState(false);
@@ -486,6 +487,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const [pySearch, setPySearch] = useState("");
   const deferredPySearch = useDeferredValue(pySearch);
   const [selectedPyLevel, setSelectedPyLevel] = useState<CodeLevel | "all">("all");
+  const [selectedPyStretch, setSelectedPyStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedPyDomain, setSelectedPyDomain] = useState<string>("all");
   const [selectedPyFramework, setSelectedPyFramework] = useState<FrameworkKey>("all");
   const [showPyBookmarksOnly, setShowPyBookmarksOnly] = useState(false);
@@ -650,6 +652,12 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       if (selectedDifficulty !== "ALL" && item.difficulty !== selectedDifficulty) {
         return false;
       }
+      if (selectedStretch === "STANDARD" && !(item.difficulty === "EASY" || item.difficulty === "MEDIUM")) {
+        return false;
+      }
+      if (selectedStretch === "STRETCH" && !(item.difficulty === "HARD" || item.difficulty === "ARCHITECT")) {
+        return false;
+      }
       if (selectedCategory !== "ALL" && item.category !== selectedCategory) {
         return false;
       }
@@ -663,7 +671,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
       return true;
     });
-  }, [deferredSearch, selectedDifficulty, selectedCategory]);
+  }, [deferredSearch, selectedDifficulty, selectedStretch, selectedCategory]);
 
   const displayedFilteredItems = useMemo(() => {
     if (!isShuffled) return filteredItems;
@@ -687,6 +695,12 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const filteredRunbooks = useMemo(() => {
     return pythonData.filter((item) => {
       if (selectedPyLevel !== "all" && item.level !== selectedPyLevel) return false;
+      if (selectedPyStretch === "STANDARD" && !(item.level === "beginner" || item.level === "intermediate")) {
+        return false;
+      }
+      if (selectedPyStretch === "STRETCH" && !(item.level === "advanced" || item.level === "architect")) {
+        return false;
+      }
       if (selectedPyDomain !== "all" && item.category !== selectedPyDomain) return false;
       if (selectedPyFramework !== "all") {
         const detected = detectFramework(item);
@@ -707,7 +721,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
       return true;
     });
-  }, [deferredPySearch, selectedPyLevel, selectedPyDomain, selectedPyFramework, showPyBookmarksOnly, pyBookmarks]);
+  }, [deferredPySearch, selectedPyLevel, selectedPyStretch, selectedPyDomain, selectedPyFramework, showPyBookmarksOnly, pyBookmarks]);
 
   const displayedFilteredRunbooks = useMemo(() => {
     if (!isShuffled) return filteredRunbooks;
@@ -912,11 +926,13 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const hasActiveScenarioFilters =
     selectedCategory !== "ALL" ||
     selectedDifficulty !== "ALL" ||
+    selectedStretch !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetScenarioFilters = useCallback(() => {
     setSelectedCategory("ALL");
     setSelectedDifficulty("ALL");
+    setSelectedStretch("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     setVisibleCount(initialBatch);
@@ -929,6 +945,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     selectedPyFramework !== "all" ||
     selectedPyDomain !== "all" ||
     selectedPyLevel !== "all" ||
+    selectedPyStretch !== "ALL" ||
     showPyBookmarksOnly ||
     pySearch.trim().length > 0;
 
@@ -936,6 +953,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     setSelectedPyFramework("all");
     setSelectedPyDomain("all");
     setSelectedPyLevel("all");
+    setSelectedPyStretch("ALL");
     setShowPyBookmarksOnly(false);
     setPySearch("");
     setPyPage(1);
@@ -990,6 +1008,46 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
             </button>
           );
         })}
+      </div>
+
+      {/* 2. COMPACT HEADER HUB BANNER */}
+      <div className="relative rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                <Layers size={11} />
+                <span>Architecture Hub</span>
+              </span>
+              <span className="text-[10px] text-[var(--muted-foreground)]">
+                Enterprise Systems Engineering
+              </span>
+            </div>
+            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight break-words">
+              Enterprise Architecture &amp; Systems Engineering Hub
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-relaxed break-words">
+              End-to-end distributed system blueprints, Lakehouse medallion topologies, high-performance Python runbooks, and cross-engine polyglot translation matrices engineered for high-concurrency production platforms.
+            </p>
+          </div>
+          <div className="text-xs text-[var(--muted-foreground)] shrink-0 self-start sm:self-auto">
+            {activeTab === "scenarios" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{paginatedItems.length}</strong> of {filteredItems.length} scenarios</span>
+            )}
+            {activeTab === "diagrams" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{architectureDiagrams.length}</strong> blueprints</span>
+            )}
+            {activeTab === "python" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{filteredRunbooks.length}</strong> of {pythonData.length} runbooks</span>
+            )}
+            {activeTab === "polyglot" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{modernCodeMatrix.length}</strong> matrices</span>
+            )}
+            {activeTab === "distributed" && (
+              <span>Showing <strong className="text-[var(--foreground)]">{modernStackWithPy.length}</strong> architectures</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX (ACTIVE PER TAB) ─── */}
@@ -1072,6 +1130,23 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                 { id: "EASY", label: "EASY" },
               ],
             },
+            {
+              id: "stretch",
+              title: "Level 3: Scope & Stretch",
+              shortTitle: "Stretch",
+              icon: <Sparkles size={13} className="text-purple-400" />,
+              layout: "segmented",
+              selectedId: selectedStretch,
+              onSelect: (stretch) => {
+                setSelectedStretch(stretch as "ALL" | "STANDARD" | "STRETCH");
+                setVisibleCount(initialBatch);
+              },
+              options: [
+                { id: "ALL", label: "ALL" },
+                { id: "STANDARD", label: "STANDARD" },
+                { id: "STRETCH", label: "STRETCH" },
+              ],
+            },
           ]}
           activeFilters={[
             ...(isReadAllMode
@@ -1108,6 +1183,19 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       setSelectedDifficulty("ALL");
                       setVisibleCount(initialBatch);
                       updateUrlParam("difficulty", "ALL");
+                    },
+                  },
+                ]
+              : []),
+            ...(selectedStretch !== "ALL"
+              ? [
+                  {
+                    id: "stretch",
+                    label: `Stretch: ${selectedStretch}`,
+                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                    onRemove: () => {
+                      setSelectedStretch("ALL");
+                      setVisibleCount(initialBatch);
                     },
                   },
                 ]
@@ -1187,25 +1275,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
               })),
             },
             {
-              id: "domains",
-              title: "Level 2: Problem Domains & Architectures",
-              shortTitle: "Domains",
-              icon: <Filter size={13} className="text-purple-400" />,
-              layout: "chips",
-              accentColor: "purple",
-              selectedId: selectedPyDomain,
-              onSelect: (dom) => {
-                setSelectedPyDomain(dom);
-                setPyPage(1);
-              },
-              options: pyDomains.map((dom) => ({
-                id: dom,
-                label: dom === "all" ? "⚡ All Domains" : dom,
-              })),
-            },
-            {
               id: "level",
-              title: "Level 3: Experience Level",
+              title: "Level 2: Experience Level",
               shortTitle: "Level",
               icon: <Sparkles size={13} className="text-amber-400" />,
               layout: "segmented",
@@ -1219,6 +1290,23 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                 id: lvl.id,
                 label: lvl.label,
               })),
+            },
+            {
+              id: "stretch",
+              title: "Level 3: Scope & Stretch",
+              shortTitle: "Stretch",
+              icon: <Sparkles size={13} className="text-purple-400" />,
+              layout: "segmented",
+              selectedId: selectedPyStretch,
+              onSelect: (stretch) => {
+                setSelectedPyStretch(stretch as "ALL" | "STANDARD" | "STRETCH");
+                setPyPage(1);
+              },
+              options: [
+                { id: "ALL", label: "ALL" },
+                { id: "STANDARD", label: "STANDARD" },
+                { id: "STRETCH", label: "STRETCH" },
+              ],
             },
           ]}
           activeFilters={[
@@ -1235,19 +1323,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                   },
                 ]
               : []),
-            ...(selectedPyDomain !== "all"
-              ? [
-                  {
-                    id: "domain",
-                    label: `Domain: ${selectedPyDomain}`,
-                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                    onRemove: () => {
-                      setSelectedPyDomain("all");
-                      setPyPage(1);
-                    },
-                  },
-                ]
-              : []),
             ...(selectedPyLevel !== "all"
               ? [
                   {
@@ -1258,6 +1333,19 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       setSelectedPyLevel("all");
                       setPyPage(1);
                       updateUrlParam("level", "all");
+                    },
+                  },
+                ]
+              : []),
+            ...(selectedPyStretch !== "ALL"
+              ? [
+                  {
+                    id: "stretch",
+                    label: `Stretch: ${selectedPyStretch}`,
+                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                    onRemove: () => {
+                      setSelectedPyStretch("ALL");
+                      setPyPage(1);
                     },
                   },
                 ]
@@ -1291,37 +1379,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
           ]}
         />
       )}
-
-      {/* Header Hub Banner Summary */}
-      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="space-y-0.5">
-            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
-              Enterprise Architecture &amp; Systems Engineering Hub
-            </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
-              End-to-end distributed system blueprints, Lakehouse medallion topologies, high-performance Python runbooks, and cross-engine polyglot translation matrices engineered for high-concurrency production platforms.
-            </p>
-          </div>
-          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
-            {activeTab === "scenarios" && (
-              <span>Showing <strong className="text-[var(--foreground)]">{paginatedItems.length}</strong> of {filteredItems.length} scenarios ({architectureData.length} total)</span>
-            )}
-            {activeTab === "diagrams" && (
-              <span>Showing <strong className="text-[var(--foreground)]">{architectureDiagrams.length}</strong> production blueprints</span>
-            )}
-            {activeTab === "python" && (
-              <span>Showing <strong className="text-[var(--foreground)]">{filteredRunbooks.length}</strong> of {pythonData.length} runbooks</span>
-            )}
-            {activeTab === "polyglot" && (
-              <span>Showing <strong className="text-[var(--foreground)]">{modernCodeMatrix.length}</strong> cross-engine translation matrices</span>
-            )}
-            {activeTab === "distributed" && (
-              <span>Showing <strong className="text-[var(--foreground)]">{modernStackWithPy.length}</strong> distributed solution architectures</span>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* 3. SYSTEM SCENARIOS VIEW */}
       {activeTab === "scenarios" && (

@@ -214,14 +214,20 @@ export function UnifiedSearchFilterBox({
     if (!isSelected) {
       return "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]";
     }
-    switch (id) {
+    const upper = id.toUpperCase();
+    switch (upper) {
       case "EASY":
+      case "BEGINNER":
+      case "STANDARD":
         return "bg-emerald-600 text-white border-emerald-500 shadow-xs font-bold";
       case "MEDIUM":
+      case "INTERMEDIATE":
         return "bg-sky-600 text-white border-sky-500 shadow-xs font-bold";
       case "HARD":
+      case "ADVANCED":
         return "bg-amber-600 text-white border-amber-500 shadow-xs font-bold";
       case "ARCHITECT":
+      case "STRETCH":
         return "bg-purple-600 text-white border-purple-500 shadow-xs font-bold";
       case "ALL":
       default:
@@ -239,13 +245,13 @@ export function UnifiedSearchFilterBox({
       role="search"
       aria-label="Unified Search and Multi-Level Filter Hub"
       className={cn(
-        "rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs transition-all",
+        "rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs transition-all",
         accentStyles.border,
         className
       )}
     >
       {/* ─── LEVEL 0: UNIFIED COMMAND & SEARCH BAR ─── */}
-      <div className="p-2.5 sm:p-3 flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
+      <div className="p-2 sm:p-2.5 flex flex-col md:flex-row items-stretch md:items-center gap-2">
         {/* Search Input Box */}
         <div className="relative flex-1 min-w-[220px]">
           <Search
@@ -538,10 +544,10 @@ export function UnifiedSearchFilterBox({
                               : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
                           )}
                         >
-                          <div className="flex items-center gap-1.5 truncate">
+                          <div className="flex items-center gap-1.5 min-w-0">
                             {opt.emoji && <span className="shrink-0 text-sm">{opt.emoji}</span>}
                             {opt.icon && <span className="shrink-0">{opt.icon}</span>}
-                            <span className="truncate">{opt.shortLabel || opt.label}</span>
+                            <span className="break-words leading-tight">{opt.shortLabel || opt.label}</span>
                           </div>
                           {opt.count !== undefined && (
                             <span
@@ -579,17 +585,17 @@ export function UnifiedSearchFilterBox({
                           onClick={() => level.onSelect(opt.id)}
                           title={opt.description || opt.label}
                           className={cn(
-                            "flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
+                            "flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-normal break-words transition-all cursor-pointer text-center flex items-center justify-center gap-1.5",
                             getDifficultyColor(opt.id, isSelected)
                           )}
                         >
                           {opt.emoji && <span>{opt.emoji}</span>}
                           {opt.icon && <span>{opt.icon}</span>}
-                          <span>{opt.shortLabel || opt.label}</span>
+                          <span className="break-words">{opt.shortLabel || opt.label}</span>
                           {opt.count !== undefined && (
                             <span
                               className={cn(
-                                "text-[10px] px-1 py-0.2 rounded-full font-mono",
+                                "text-[10px] px-1 py-0.2 rounded-full font-mono shrink-0",
                                 isSelected
                                   ? "bg-white/20 text-white"
                                   : "bg-[var(--surface-3)] text-[var(--muted-foreground)]"
@@ -622,7 +628,7 @@ export function UnifiedSearchFilterBox({
                           onClick={() => level.onSelect(opt.id)}
                           title={opt.description || opt.label}
                           className={cn(
-                            "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border shrink-0 cursor-pointer flex items-center gap-1.5 group shadow-2xs",
+                            "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-normal break-words transition-all border shrink-0 cursor-pointer flex items-center gap-1.5 group shadow-2xs",
                             isSelected
                               ? getOptionActiveStyle(level.accentColor, opt.badgeColor)
                               : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
@@ -630,7 +636,7 @@ export function UnifiedSearchFilterBox({
                         >
                           {opt.emoji && <span className="shrink-0">{opt.emoji}</span>}
                           {opt.icon && <span className="shrink-0">{opt.icon}</span>}
-                          <span>{opt.shortLabel || opt.label}</span>
+                          <span className="break-words">{opt.shortLabel || opt.label}</span>
                           {opt.count !== undefined && (
                             <span
                               className={cn(

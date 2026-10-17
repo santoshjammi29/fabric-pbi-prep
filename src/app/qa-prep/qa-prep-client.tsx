@@ -166,6 +166,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
+  const [selectedStretch, setSelectedStretch] = useState<string>("ALL");
   const [selectedDomain, setSelectedDomain] = useState<string>(initialDomain);
   const [selectedTech, setSelectedTech] = useState<TechEcosystemId>(
     TECH_ECOSYSTEMS.some((e) => e.id === initialTech) ? initialTech : "ALL"
@@ -264,6 +265,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     setSelectedArchetype("ALL");
     setSelectedDomain("ALL");
     setSelectedDifficulty("ALL");
+    setSelectedStretch("ALL");
     setSearchQuery("");
     toast.info("Cleared all filters");
   }, []);
@@ -272,26 +274,33 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const filteredQuestions = useMemo(() => {
     let result = initialQuestions;
 
-    // 1. Tech Ecosystem Filter
+    // 1. Tech Ecosystem Filter (Topics)
     if (selectedTech !== "ALL") {
       result = result.filter((item) => matchTechEcosystem(item, selectedTech));
     }
 
-    // 2. Scenario Archetype / Hotspot Filter
+    // 2. Difficulty Filter
+    if (selectedDifficulty !== "ALL") {
+      result = result.filter((item) => item.difficulty === selectedDifficulty);
+    }
+
+    // 3. Stretch & Depth Filter
+    if (selectedStretch === "STANDARD") {
+      result = result.filter((item) => item.difficulty === "EASY" || item.difficulty === "MEDIUM");
+    } else if (selectedStretch === "STRETCH") {
+      result = result.filter((item) => item.difficulty === "HARD" || item.difficulty === "ARCHITECT");
+    }
+
+    // 4. Scenario Archetype / Hotspot Filter (if passed via URL/bookmark)
     if (selectedArchetype !== "ALL") {
       result = result.filter((item) =>
         matchScenarioArchetype(item, selectedArchetype, undefined, bookmarks)
       );
     }
 
-    // 3. Standardized Domain Filter
+    // 5. Standardized Domain Filter (if passed via URL)
     if (selectedDomain !== "ALL") {
       result = result.filter((item) => matchDomain(item, selectedDomain));
-    }
-
-    // 4. Difficulty Filter
-    if (selectedDifficulty !== "ALL") {
-      result = result.filter((item) => item.difficulty === selectedDifficulty);
     }
 
     // 5. Full-text search
@@ -442,7 +451,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const currentArchetypeObj = SCENARIO_ARCHETYPES.find((a) => a.id === selectedArchetype);
 
   return (
-    <div className="space-y-4 pb-16">
+    <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
         hubTitle="Interview Prep & Architecture"
         items={[
@@ -451,7 +460,35 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
         ]}
       />
 
-      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
+      {/* Header Banner - Compact Reference Standard */}
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
+              <MessageSquare size={12} />
+              <span>Production Interview Scenarios</span>
+            </div>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
+              6,500+ Senior Data Engineering &amp; Architect Q&amp;A
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
+              Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, Delta Lake, Airflow, dbt, and Lakehouse architectures.
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto">
+            <div className="px-3 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-blue-400 font-mono">
+                {filteredQuestions.length.toLocaleString()}
+              </div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-mono leading-none">
+                Matching Q&amp;As
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── UNIFIED SEARCH & SIMPLE 3-SLICER FILTER BOX ─── */}
       <UnifiedSearchFilterBox
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -480,9 +517,9 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
         }}
         levels={[
           {
-            id: "tech",
-            title: "Level 1: Technology Ecosystem",
-            shortTitle: "Tech",
+            id: "topics",
+            title: "Topics & Technology Ecosystem",
+            shortTitle: "Topics",
             icon: <Zap size={13} className="text-amber-500" />,
             layout: "chips",
             accentColor: "blue",
@@ -497,52 +534,8 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
             })),
           },
           {
-            id: "archetype",
-            title: "Level 2: Scenario Archetypes & Problem Patterns",
-            shortTitle: "Archetypes",
-            icon: <Target size={13} className="text-purple-400" />,
-            layout: "grid",
-            columns: 5,
-            accentColor: "purple",
-            selectedId: selectedArchetype,
-            onSelect: (id) => setSelectedArchetype(id as ScenarioArchetypeId),
-            options: SCENARIO_ARCHETYPES.map((arc) => {
-              const count =
-                arc.id === "ALL"
-                  ? initialQuestions.length
-                  : arc.id === "BOOKMARKED"
-                  ? bookmarks.length
-                  : archetypeCounts[arc.id] || 0;
-              return {
-                id: arc.id,
-                label: arc.label,
-                shortLabel: arc.shortLabel,
-                emoji: arc.emoji,
-                description: arc.description,
-                count,
-              };
-            }),
-          },
-          {
-            id: "domain",
-            title: "Level 3: Standardized High-Level Domains",
-            shortTitle: "Domains",
-            icon: <Layers size={13} className="text-cyan-400" />,
-            layout: "chips",
-            accentColor: "cyan",
-            selectedId: selectedDomain,
-            onSelect: (id) => setSelectedDomain(id),
-            options: [
-              { id: "ALL", label: "All Domains", emoji: "🌐" },
-              ...STANDARDIZED_DOMAINS.map((dom) => ({
-                id: dom,
-                label: dom,
-              })),
-            ],
-          },
-          {
             id: "difficulty",
-            title: "Level 4: Difficulty Calibration",
+            title: "Difficulty Calibration",
             shortTitle: "Difficulty",
             icon: <Sparkles size={13} className="text-amber-400" />,
             layout: "segmented",
@@ -554,6 +547,20 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               { id: "MEDIUM", label: "MEDIUM" },
               { id: "HARD", label: "HARD" },
               { id: "ARCHITECT", label: "ARCH" },
+            ],
+          },
+          {
+            id: "stretch",
+            title: "Stretch & Depth Scope",
+            shortTitle: "Stretch",
+            icon: <Target size={13} className="text-purple-400" />,
+            layout: "segmented",
+            selectedId: selectedStretch,
+            onSelect: (id) => setSelectedStretch(id),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "STANDARD", label: "STANDARD" },
+              { id: "STRETCH", label: "STRETCH" },
             ],
           },
         ]}
@@ -572,29 +579,9 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
             ? [
                 {
                   id: "tech",
-                  label: `Tech: ${currentTechObj.label}`,
+                  label: `Topic: ${currentTechObj.label}`,
                   color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
                   onRemove: () => setSelectedTech("ALL"),
-                },
-              ]
-            : []),
-          ...(selectedArchetype !== "ALL" && currentArchetypeObj
-            ? [
-                {
-                  id: "archetype",
-                  label: `Scenario: ${currentArchetypeObj.label}`,
-                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                  onRemove: () => setSelectedArchetype("ALL"),
-                },
-              ]
-            : []),
-          ...(selectedDomain !== "ALL"
-            ? [
-                {
-                  id: "domain",
-                  label: `Domain: ${selectedDomain}`,
-                  color: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
-                  onRemove: () => setSelectedDomain("ALL"),
                 },
               ]
             : []),
@@ -605,6 +592,16 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                   label: `Difficulty: ${selectedDifficulty}`,
                   color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
                   onRemove: () => setSelectedDifficulty("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedStretch !== "ALL"
+            ? [
+                {
+                  id: "stretch",
+                  label: `Scope: ${selectedStretch}`,
+                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  onRemove: () => setSelectedStretch("ALL"),
                 },
               ]
             : []),
@@ -620,23 +617,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
             : []),
         ]}
       />
-
-      {/* Header Hub Banner Summary */}
-      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="space-y-0.5">
-            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
-              6,500+ Production Interview Scenarios &amp; Architect Q&amp;A
-            </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
-              Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, Delta Lake, Airflow, dbt, and Lakehouse architectures.
-            </p>
-          </div>
-          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
-            Showing <strong className="text-[var(--foreground)]">{filteredQuestions.length.toLocaleString()}</strong> of {initialQuestions.length.toLocaleString()} questions
-          </div>
-        </div>
-      </div>
 
       {/* Study Flashcard Mode */}
       {isStudyMode && currentStudyCard && (
@@ -797,7 +777,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                                 </span>
                               )}
                             </div>
-                            <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] leading-snug">
+                            <h3 className="text-sm sm:text-[15px] font-bold text-[var(--foreground)] leading-snug break-words whitespace-normal">
                               {q.question}
                             </h3>
                           </div>
@@ -834,7 +814,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                       {/* Expanded Answer */}
                       {isExpanded && (
                         <div className="px-3.5 pb-3.5 sm:px-4 sm:pb-4 pt-1 border-t border-[var(--border)]/60 bg-[var(--surface-2)]/30 space-y-2">
-                          <div className="pt-1 text-xs sm:text-[13px] text-[var(--foreground)] leading-relaxed">
+                          <div className="pt-1 text-xs sm:text-[13px] text-[var(--foreground)] leading-relaxed break-words whitespace-normal">
                             <AnswerRenderer text={q.answer} />
                           </div>
 

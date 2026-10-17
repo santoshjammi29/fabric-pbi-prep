@@ -53,6 +53,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedImpact, setSelectedImpact] = useState<string>("ALL");
+  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedScenario, setSelectedScenario] = useState<string>("ALL");
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
@@ -220,9 +221,17 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
         }
       }
 
+      // Stretch filter
+      if (selectedStretch === "STANDARD" && !(code.impact === "Quick Win" || code.impact === "High Impact")) {
+        return false;
+      }
+      if (selectedStretch === "STRETCH" && !(code.impact === "Critical" || code.impact === "Architect Level")) {
+        return false;
+      }
+
       return true;
     });
-  }, [cheatsheetData, searchQuery, selectedCategory, selectedImpact, selectedScenario]);
+  }, [cheatsheetData, searchQuery, selectedCategory, selectedImpact, selectedStretch, selectedScenario]);
 
   // Jump handler for the optimization flow diagram
   const handleJumpToCode = (targetId: string) => {
@@ -231,6 +240,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
     setSelectedCategory("ALL");
     setSelectedScenario("ALL");
     setSelectedImpact("ALL");
+    setSelectedStretch("ALL");
     setSearchQuery("");
     setTimeout(() => {
       const el = document.getElementById(targetId);
@@ -244,6 +254,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
     setSearchQuery("");
     setSelectedCategory("ALL");
     setSelectedImpact("ALL");
+    setSelectedStretch("ALL");
     setSelectedScenario("ALL");
     setHighlightedId(null);
   };
@@ -316,7 +327,33 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
           initialCardId={searchParams.get("card") || undefined}
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-3.5">
+          {/* Compact Header Hub Banner */}
+          <div className="relative rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <Terminal size={11} />
+                    <span>Architectural Runbooks</span>
+                  </span>
+                  <span className="text-[10px] text-[var(--muted-foreground)]">
+                    Production Incident Playbooks
+                  </span>
+                </div>
+                <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
+                  Data Engineering Production Incident Runbooks
+                </h1>
+                <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-relaxed break-words">
+                  Battle-tested emergency runbooks, triage procedures, and performance knobs for Apache Spark, dbt, Airflow, and Lakehouse platforms. Structured as Problem Scenario &rarr; Root Cause Triage &rarr; Hardened Solution.
+                </p>
+              </div>
+              <div className="text-xs text-[var(--muted-foreground)] shrink-0 self-start sm:self-auto">
+                Showing <strong className="text-[var(--foreground)]">{filteredCodes.length}</strong> of {cheatsheetData.length} runbooks
+              </div>
+            </div>
+          </div>
+
           {/* Top Double-Line Slicers & Filters Deck */}
           <section aria-labelledby="filters-heading">
             <CategoryBar
@@ -326,6 +363,8 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
               onSelectCategory={setSelectedCategory}
               selectedImpact={selectedImpact}
               onSelectImpact={setSelectedImpact}
+              selectedStretch={selectedStretch}
+              onSelectStretch={setSelectedStretch}
               selectedScenario={selectedScenario}
               onSelectScenario={setSelectedScenario}
               searchQuery={searchQuery}
@@ -334,67 +373,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
               totalCount={cheatsheetData.length}
             />
           </section>
-
-          {/* Hero / Header Section */}
-          <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
-            <div className="space-y-2">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                <Terminal size={13} />
-                <span>Architectural Production Reference &amp; Incident Runbooks</span>
-              </div>
-
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
-                Data Engineering{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
-                  Production Incident Runbooks
-                </span>
-              </h1>
-
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed max-w-3xl">
-                Battle-tested emergency runbooks, triage procedures, and performance knobs for Apache Spark, dbt, Airflow, and Lakehouse platforms. Structured as Problem Scenario &rarr; Root Cause Triage &rarr; Hardened Solution with measurable production ROI.
-              </p>
-
-              {/* Quick Metrics Bar */}
-              <div className="pt-1 grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl">
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
-                  <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Incident Runbooks</span>
-                  <div className="mt-0.5 flex items-baseline gap-1">
-                    <span className="text-base sm:text-lg font-bold font-mono text-[var(--foreground)]">
-                      {cheatsheetData.length}
-                    </span>
-                    <span className="text-[10px] text-blue-500 dark:text-blue-400 font-medium">Battle-Tested</span>
-                  </div>
-                </div>
-
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
-                  <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Emergency Triage</span>
-                  <div className="mt-0.5 flex items-baseline gap-1">
-                    <span className="text-base sm:text-lg font-bold font-mono text-emerald-400">10+ Sev-1</span>
-                    <span className="text-[10px] text-[var(--muted-foreground)]">Runbooks</span>
-                  </div>
-                </div>
-
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
-                  <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Shuffle Reduction</span>
-                  <div className="mt-0.5 flex items-baseline gap-1">
-                    <span className="text-base sm:text-lg font-bold font-mono text-blue-400">80%-100%</span>
-                    <span className="text-[10px] text-[var(--muted-foreground)]">BHJ</span>
-                  </div>
-                </div>
-
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-2 sm:p-2.5 shadow-xs">
-                  <span className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">Core Domains</span>
-                  <div className="mt-0.5 flex items-baseline gap-1">
-                    <span className="text-base sm:text-lg font-bold font-mono text-cyan-400">
-                      {ALL_CATEGORIES.length}
-                    </span>
-                    <span className="text-[10px] text-[var(--muted-foreground)]">End-to-End</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Main Content Area */}
           <div className="space-y-3.5" id="main-content">

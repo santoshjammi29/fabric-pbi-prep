@@ -42,6 +42,8 @@ interface CategoryBarProps {
   onSelectCategory: (cat: string) => void;
   selectedImpact: string;
   onSelectImpact: (impact: string) => void;
+  selectedStretch?: "ALL" | "STANDARD" | "STRETCH";
+  onSelectStretch?: (stretch: "ALL" | "STANDARD" | "STRETCH") => void;
   selectedScenario: string;
   onSelectScenario: (scenario: string) => void;
   searchQuery: string;
@@ -58,6 +60,12 @@ const IMPACT_OPTIONS: { label: string; value: string }[] = [
   { label: "Quick Win", value: "Quick Win" },
 ];
 
+const STRETCH_OPTIONS: { label: string; value: "ALL" | "STANDARD" | "STRETCH" }[] = [
+  { label: "ALL", value: "ALL" },
+  { label: "STANDARD", value: "STANDARD" },
+  { label: "STRETCH", value: "STRETCH" },
+];
+
 export function CategoryBar({
   categories,
   categoryCounts,
@@ -65,6 +73,8 @@ export function CategoryBar({
   onSelectCategory,
   selectedImpact,
   onSelectImpact,
+  selectedStretch = "ALL",
+  onSelectStretch,
   selectedScenario,
   onSelectScenario,
   searchQuery,
@@ -73,11 +83,11 @@ export function CategoryBar({
   totalCount,
 }: CategoryBarProps) {
   return (
-    <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs">
-      {/* LINE 1: DOMAINS & EMERGENCY TRIAGE SCENARIO SLICERS */}
+    <div className="space-y-2 p-2 sm:p-2.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs">
+      {/* LINE 1: DOMAINS (TOPICS) SLICERS */}
       <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
         <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] shrink-0 mr-1 flex items-center gap-1">
-          <Filter size={11} /> Domains:
+          <Filter size={11} /> Topics:
         </span>
         <button
           type="button"
@@ -92,7 +102,7 @@ export function CategoryBar({
               : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
           )}
         >
-          All Domains ({totalCount})
+          All Topics ({totalCount})
         </button>
 
         {categories.map((cat) => {
@@ -118,37 +128,9 @@ export function CategoryBar({
             </button>
           );
         })}
-
-        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 shrink-0 mx-1 flex items-center gap-1">
-          <ShieldAlert size={11} /> Triage:
-        </span>
-
-        {EMERGENCY_SCENARIOS.filter((s) => s.id !== "ALL").map((scen) => {
-          const isActive = selectedScenario === scen.id;
-          const Icon = scen.icon;
-          return (
-            <button
-              key={scen.id}
-              type="button"
-              onClick={() => {
-                onSelectScenario(scen.id);
-                onSelectCategory("ALL");
-              }}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0",
-                isActive
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-xs"
-                  : "bg-[var(--surface-2)] border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-              )}
-            >
-              <Icon size={12} className="shrink-0" />
-              <span>{scen.label}</span>
-            </button>
-          );
-        })}
       </div>
 
-      {/* LINE 2: SEARCH FILTER + IMPACT SLICERS + RESULT COUNT BADGE */}
+      {/* LINE 2: SEARCH FILTER + DIFFICULTY / IMPACT + STRETCH SLICERS */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 border-t border-[var(--border)]">
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
@@ -157,7 +139,7 @@ export function CategoryBar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search runbooks by problem, exit code, symptom, mechanism (e.g. OOM, Kryo, Salting, Exit 137)..."
-            className="w-full pl-9 pr-12 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-9 pr-12 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
           />
           {searchQuery && (
             <button
@@ -170,16 +152,16 @@ export function CategoryBar({
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none">
-          {/* Impact Selector Pills */}
-          <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+        <div className="flex items-center gap-2 shrink-0 overflow-x-auto scrollbar-none">
+          {/* Difficulty / Impact Selector Pills */}
+          <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
             {IMPACT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => onSelectImpact(opt.value)}
                 className={cn(
-                  "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                  "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                   selectedImpact === opt.value
                     ? "bg-blue-600 text-white shadow-xs"
                     : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
@@ -189,6 +171,27 @@ export function CategoryBar({
               </button>
             ))}
           </div>
+
+          {/* Stretch Selector Pills */}
+          {onSelectStretch && (
+            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              {STRETCH_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => onSelectStretch(opt.value)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+                    selectedStretch === opt.value
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
             <strong className="text-[var(--foreground)]">{totalFiltered}</strong> / {totalCount} runbooks

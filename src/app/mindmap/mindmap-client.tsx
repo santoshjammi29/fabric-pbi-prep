@@ -26,17 +26,17 @@ export function MindmapClient({ concepts }: MindmapClientProps) {
       />
 
       {/* Hero Header */}
-      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-4 sm:p-5 overflow-hidden shadow-xs">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="relative rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs isolate">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
-              <GitBranch size={13} />
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-semibold">
+              <GitBranch size={11} />
               <span>Multi-Level Architectural Stretch</span>
             </div>
-            <h1 className="text-lg sm:text-2xl font-bold text-[var(--foreground)] tracking-tight">
+            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight break-words">
               Enterprise Data Platform Concepts Mind Map
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] max-w-3xl leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-relaxed break-words">
               Explore the entire repository of <strong>{concepts.length} architectural concepts</strong> mapped exclusively to their parent topics and subtopic pillars across 4 stretching depth levels.
             </p>
           </div>
@@ -44,14 +44,14 @@ export function MindmapClient({ concepts }: MindmapClientProps) {
           <div className="flex items-center gap-2 flex-wrap shrink-0">
             <Link
               href="/concepts"
-              className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors inline-flex items-center gap-1.5"
+              className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors inline-flex items-center gap-1.5"
             >
               <BookOpen size={13} />
               <span>Glossary List View</span>
             </Link>
             <Link
               href="/qa-prep"
-              className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors inline-flex items-center gap-1.5"
+              className="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors inline-flex items-center gap-1.5"
             >
               <HelpCircle size={13} />
               <span>Interview Q&amp;A Bank</span>

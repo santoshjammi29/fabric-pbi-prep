@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   ArrowRight,
   TrendingUp,
+  Flame,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HubSubnav } from "@/components/layout/hub-subnav";
@@ -61,7 +62,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTier, setSelectedTier] = useState<string>("ALL");
   const [selectedTech, setSelectedTech] = useState<string>("All");
-  const [selectedHub, setSelectedHub] = useState<string>("All Hubs");
+  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
@@ -71,7 +72,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     const qParam = searchParams.get("q") || searchParams.get("company") || searchParams.get("search");
     const tierParam = searchParams.get("tier");
     const techParam = searchParams.get("tech");
-    const hubParam = searchParams.get("hub");
+    const stretchParam = searchParams.get("stretch") as "ALL" | "STANDARD" | "STRETCH" | null;
 
     if (qParam !== null) {
       setSearchQuery(qParam);
@@ -82,8 +83,8 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     if (techParam) {
       setSelectedTech(techParam);
     }
-    if (hubParam) {
-      setSelectedHub(hubParam);
+    if (stretchParam && ["ALL", "STANDARD", "STRETCH"].includes(stretchParam)) {
+      setSelectedStretch(stretchParam);
     }
   }, [searchParams]);
 
@@ -101,6 +102,17 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
       }
     });
     return counts;
+  }, [initialProfiles]);
+
+  // Compute counts per stretch
+  const stretchCounts = useMemo(() => {
+    let standard = 0;
+    let stretch = 0;
+    initialProfiles.forEach((c) => {
+      if (c.tier === "Global Capability Center (GCC)") standard++;
+      else stretch++;
+    });
+    return { ALL: initialProfiles.length, STANDARD: standard, STRETCH: stretch };
   }, [initialProfiles]);
 
   const toggleExpand = useCallback((id: string) => {
@@ -124,34 +136,16 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
       // Tier filter
       if (selectedTier !== "ALL" && c.tier !== selectedTier) return false;
 
+      // Stretch filter (STANDARD = GCCs, STRETCH = BigTech / FinTech)
+      if (selectedStretch === "STANDARD" && c.tier !== "Global Capability Center (GCC)") return false;
+      if (selectedStretch === "STRETCH" && c.tier === "Global Capability Center (GCC)") return false;
+
       // Tech filter
       if (selectedTech !== "All") {
         const hasTech = c.stack.some((tech) =>
           tech.toLowerCase().includes(selectedTech.toLowerCase())
         );
         if (!hasTech) return false;
-      }
-
-      // Hub location filter
-      if (selectedHub !== "All Hubs") {
-        if (selectedHub === "US / Global") {
-          const isUSGlobal =
-            c.location.includes("CA") ||
-            c.location.includes("WA") ||
-            c.location.includes("NY") ||
-            c.location.includes("TX") ||
-            c.location.includes("Global") ||
-            c.location.includes("Remote");
-          if (!isUSGlobal) return false;
-        } else {
-          const matchesLoc =
-            c.location.toLowerCase().includes(selectedHub.toLowerCase()) ||
-            (c.hiringGCCLocations &&
-              c.hiringGCCLocations.some((loc) =>
-                loc.toLowerCase().includes(selectedHub.toLowerCase())
-              ));
-          if (!matchesLoc) return false;
-        }
       }
 
       // Search Query
@@ -186,7 +180,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
 
       return true;
     });
-  }, [selectedTier, selectedTech, selectedHub, searchQuery]);
+  }, [selectedTier, selectedStretch, selectedTech, searchQuery]);
 
   const displayedCompanies = useMemo(() => {
     return filteredCompanies.slice(0, visibleCount);
@@ -196,7 +190,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     setSearchQuery("");
     setSelectedTier("ALL");
     setSelectedTech("All");
-    setSelectedHub("All Hubs");
+    setSelectedStretch("ALL");
     setVisibleCount(ITEMS_PER_PAGE);
   }, []);
 
@@ -229,17 +223,17 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
       />
 
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 isolate shadow-xs">
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 isolate shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="space-y-1 max-w-3xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-              <Building2 size={12} />
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+              <Building2 size={11} />
               <span>Enterprise Hiring &amp; Compensation Intel</span>
             </div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
               Target Company Intel &amp; Architectural Rubrics
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               In-depth architectural dossiers across <strong className="text-[var(--foreground)]">156 verified enterprises</strong>.
               Review production tech stacks, verified Senior DE &amp; Principal Architect salary benchmarks (USD + INR),
               system design archetypes, and real interview prompts asked in hiring loops.
@@ -248,20 +242,20 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-3 gap-2 shrink-0 text-center">
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">156</div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400">156</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">
                 Companies
               </div>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base sm:text-lg font-bold text-emerald-500 dark:text-emerald-400">3 Tiers</div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-sm sm:text-base font-bold text-emerald-500 dark:text-emerald-400">3 Tiers</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">
                 50+ Per Tier
               </div>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base sm:text-lg font-bold text-cyan-500 dark:text-cyan-400">312+</div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-sm sm:text-base font-bold text-cyan-500 dark:text-cyan-400">312+</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium uppercase tracking-wider">
                 Design Qs
               </div>
@@ -285,18 +279,35 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
         hasActiveFilters={
           selectedTier !== "ALL" ||
           selectedTech !== "All" ||
-          selectedHub !== "All Hubs" ||
+          selectedStretch !== "ALL" ||
           searchQuery.trim().length > 0
         }
         onResetAll={handleResetFilters}
         levels={[
           {
-            id: "tier",
-            title: "Level 1: Enterprise Company Tier",
-            shortTitle: "Tier",
-            icon: <TrendingUp size={13} className="text-blue-500" />,
+            id: "tech",
+            title: "Level 1: Topics (Target Tech Stack)",
+            shortTitle: "Topics",
+            icon: <SlidersHorizontal size={13} className="text-blue-500 dark:text-blue-400" />,
             layout: "chips",
             accentColor: "blue",
+            selectedId: selectedTech,
+            onSelect: (tech) => {
+              setSelectedTech(tech);
+              setVisibleCount(ITEMS_PER_PAGE);
+            },
+            options: POPULAR_TECHS.map((tech) => ({
+              id: tech,
+              label: tech === "All" ? "All Tech Stacks" : tech,
+            })),
+          },
+          {
+            id: "tier",
+            title: "Level 2: Difficulty (Enterprise Tier)",
+            shortTitle: "Difficulty",
+            icon: <TrendingUp size={13} className="text-purple-400" />,
+            layout: "chips",
+            accentColor: "purple",
             selectedId: selectedTier,
             onSelect: (key) => {
               setSelectedTier(key);
@@ -322,60 +333,31 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
             ],
           },
           {
-            id: "tech",
-            title: "Level 2: Target Technology Stacks",
-            shortTitle: "Tech Stack",
-            icon: <SlidersHorizontal size={13} className="text-purple-400" />,
+            id: "stretch",
+            title: "Level 3: Stretch (Standard GCC vs Deep BigTech/FinTech)",
+            shortTitle: "Stretch",
+            icon: <Flame size={13} className="text-orange-400" />,
             layout: "chips",
-            accentColor: "purple",
-            selectedId: selectedTech,
-            onSelect: (tech) => {
-              setSelectedTech(tech);
+            accentColor: "amber",
+            selectedId: selectedStretch,
+            onSelect: (val) => {
+              setSelectedStretch(val as "ALL" | "STANDARD" | "STRETCH");
               setVisibleCount(ITEMS_PER_PAGE);
             },
-            options: POPULAR_TECHS.map((tech) => ({
-              id: tech,
-              label: tech === "All" ? "All Tech Stacks" : tech,
-            })),
-          },
-          {
-            id: "hub",
-            title: "Level 3: Global Capability Hub Locations",
-            shortTitle: "Hubs",
-            icon: <MapPin size={13} className="text-cyan-400" />,
-            layout: "chips",
-            accentColor: "cyan",
-            selectedId: selectedHub,
-            onSelect: (hub) => {
-              setSelectedHub(hub);
-              setVisibleCount(ITEMS_PER_PAGE);
-            },
-            options: TOP_HUBS.map((hub) => ({
-              id: hub,
-              label: hub,
-            })),
+            options: [
+              { id: "ALL", label: "ALL", count: stretchCounts.ALL },
+              { id: "STANDARD", label: "STANDARD", count: stretchCounts.STANDARD },
+              { id: "STRETCH", label: "STRETCH", count: stretchCounts.STRETCH },
+            ],
           },
         ]}
         activeFilters={[
-          ...(selectedTier !== "ALL"
-            ? [
-                {
-                  id: "tier",
-                  label: `Tier: ${selectedTier}`,
-                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
-                  onRemove: () => {
-                    setSelectedTier("ALL");
-                    setVisibleCount(ITEMS_PER_PAGE);
-                  },
-                },
-              ]
-            : []),
           ...(selectedTech !== "All"
             ? [
                 {
                   id: "tech",
-                  label: `Tech: ${selectedTech}`,
-                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  label: `Topic: ${selectedTech}`,
+                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
                   onRemove: () => {
                     setSelectedTech("All");
                     setVisibleCount(ITEMS_PER_PAGE);
@@ -383,14 +365,29 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                 },
               ]
             : []),
-          ...(selectedHub !== "All Hubs"
+          ...(selectedTier !== "ALL"
             ? [
                 {
-                  id: "hub",
-                  label: `Hub: ${selectedHub}`,
-                  color: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400",
+                  id: "tier",
+                  label: `Tier: ${selectedTier}`,
+                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
                   onRemove: () => {
-                    setSelectedHub("All Hubs");
+                    setSelectedTier("ALL");
+                    setVisibleCount(ITEMS_PER_PAGE);
+                  },
+                },
+              ]
+            : []),
+          ...(selectedStretch !== "ALL"
+            ? [
+                {
+                  id: "stretch",
+                  label: `Stretch: ${selectedStretch}`,
+                  color: selectedStretch === "STANDARD"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  onRemove: () => {
+                    setSelectedStretch("ALL");
                     setVisibleCount(ITEMS_PER_PAGE);
                   },
                 },
@@ -500,11 +497,11 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                 {company.systemDesignArchetype && (
                   <div className="p-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center gap-2 text-xs">
                     <Layers size={13} className="text-blue-500 dark:text-blue-400 shrink-0" />
-                    <div className="truncate">
+                    <div className="min-w-0">
                       <span className="text-[10px] uppercase font-bold text-[var(--muted-foreground)] mr-1">
                         System Design Archetype:
                       </span>
-                      <span className="font-semibold text-[var(--foreground)] text-[11px] sm:text-xs">
+                      <span className="font-semibold text-[var(--foreground)] text-[11px] sm:text-xs break-words">
                         {company.systemDesignArchetype}
                       </span>
                     </div>
@@ -562,14 +559,14 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                   {company.interviewFocus.map((focus, i) => (
                     <li key={i} className="flex items-start gap-1.5 leading-snug">
                       <span className="text-blue-500 dark:text-blue-400 font-bold shrink-0">•</span>
-                      <span>{focus}</span>
+                      <span className="break-words">{focus}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Production Scale Challenge */}
-              <div className="p-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[11px] leading-relaxed text-[var(--muted-foreground)]">
+              <div className="p-2 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[11px] leading-relaxed text-[var(--muted-foreground)] break-words">
                 <span className="font-bold text-[var(--foreground)]">Scale Challenge: </span>
                 {company.keyChallenges}
               </div>
@@ -621,7 +618,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                                 )}
                               </button>
                             </div>
-                            <p className="text-[11px] sm:text-xs text-[var(--foreground)] leading-relaxed italic">
+                            <p className="text-[11px] sm:text-xs text-[var(--foreground)] leading-relaxed italic break-words whitespace-normal">
                               &ldquo;{prompt}&rdquo;
                             </p>
                           </div>

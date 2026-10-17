@@ -171,17 +171,17 @@ export function StudioClient() {
   return (
     <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 isolate shadow-xs">
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 isolate shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-              <User size={12} />
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+              <User size={11} />
               <span>Personal Learning Studio</span>
             </div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
               My Progress &amp; Architect Studio
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               Track your daily review streak, active SM-2 retention levels, saved code templates, and
               manage offline JSON data backups.
             </p>
@@ -190,7 +190,7 @@ export function StudioClient() {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={exportBackupJSON}
-              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
               <Download size={13} />
               <span>Export JSON</span>
@@ -268,7 +268,7 @@ export function StudioClient() {
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 uppercase shrink-0">
                       {item.type}
                     </span>
-                    <span className="font-semibold text-[var(--foreground)] group-hover:text-blue-500 transition-colors truncate">
+                    <span className="font-semibold text-[var(--foreground)] group-hover:text-blue-500 transition-colors break-words">
                       {item.title}
                     </span>
                   </Link>

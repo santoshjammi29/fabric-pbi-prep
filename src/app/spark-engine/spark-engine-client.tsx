@@ -344,29 +344,29 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 shadow-xs isolate">
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-[10px] font-semibold text-red-400">
-              <Zap size={12} />
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-[10px] font-semibold text-red-400">
+              <Zap size={11} />
               <span>Step 3 · Distributed Engine Internals</span>
             </div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
               Apache Spark &amp; Tungsten Engine Hub
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               Deep-dive into Spark physical execution plans, memory management, Catalyst optimizers,
               live partition flow simulators, and the 32-level PySpark curriculum.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-base sm:text-lg font-bold text-red-400 leading-none">Spark 4.0</div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-red-400 leading-none">Spark 4.0</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Ready Engine</div>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-base sm:text-lg font-bold text-amber-400 leading-none">32</div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-amber-400 leading-none">32</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Curriculum Levels</div>
             </div>
           </div>
@@ -388,7 +388,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                 48 Cards &amp; Wall Posters
               </span>
             </div>
-            <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-1 mt-0.5">
+            <p className="text-[11px] text-[var(--muted-foreground)] break-words mt-0.5">
               Vector PDFs and 250-DPI posters covering Spark Core &amp; Architecture Internals, PySpark, Spark SQL, and JVM Memory Formulas.
             </p>
           </div>
@@ -444,7 +444,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 1 · Concepts</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">Spark Definitions</div>
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-500">Spark Definitions</div>
           </div>
         </Link>
 
@@ -457,7 +457,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 2 · Code</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">PySpark &amp; SQL Sheets</div>
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-500">PySpark &amp; SQL Sheets</div>
           </div>
         </Link>
 
@@ -470,7 +470,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 3 · Q&amp;A Prep</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">Spark Interview Bank</div>
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-500">Spark Interview Bank</div>
           </div>
         </Link>
 
@@ -483,7 +483,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400">Layer 4 · Architecture</div>
-            <div className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-blue-500">Cluster &amp; FinOps Specs</div>
+            <div className="text-xs font-bold text-[var(--foreground)] break-words group-hover:text-blue-500">Cluster &amp; FinOps Specs</div>
           </div>
         </Link>
       </div>
@@ -563,16 +563,16 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           </div>
 
           {/* Whiteboard Architecture Blueprints Showcase (Second Layout Style with Interactive Dark Mode) */}
-          <div className="p-3.5 sm:p-4.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                   <Layers size={13} /> Visual System Blueprints
                 </span>
-                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
+                <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5 break-words">
                   Databricks &amp; Spark Engine Architecture Blueprints
                 </h3>
-                <p className="text-xs text-[var(--muted-foreground)]">
+                <p className="text-xs text-[var(--muted-foreground)] break-words">
                   High-resolution digital whiteboard sketch diagrams explaining query optimization, medallion pipelines, and vectorized compute.
                 </p>
               </div>
@@ -804,15 +804,15 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
       {/* 3. TUNGSTEN MEMORY MAPPER VIEW */}
       {activeTab === "memory" && (
-        <div id="memory" className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-300">
+        <div id="memory" className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 animate-in fade-in duration-300">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
               <Calculator size={13} /> Tungsten &amp; Unified Memory
             </span>
-            <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
+            <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5 break-words">
               Live JVM Executor Memory Allocator
             </h3>
-            <p className="text-xs text-[var(--muted-foreground)]">
+            <p className="text-xs text-[var(--muted-foreground)] break-words">
               Spark dynamically shares JVM heap between Execution (shuffles/joins) and Storage (caching). Adjust the parameters below to compute pool splits.
             </p>
           </div>
@@ -1055,7 +1055,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                       </div>
                       <div className="min-w-0">
                         <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold uppercase">{item.category}</div>
-                        <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] truncate">
+                        <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] break-words">
                           {item.title}
                         </h4>
                       </div>
@@ -1068,7 +1068,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
                   <SmoothAccordion isOpen={isExpanded} innerClassName="px-3.5 py-3 space-y-2.5 text-xs sm:text-sm border-t border-[var(--border)] bg-[var(--surface-2)]/40">
                     {item.use_case && (
-                      <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs">
+                      <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-200 text-xs break-words whitespace-normal leading-relaxed">
                         <strong>Enterprise Scenario:</strong> {item.use_case}
                       </div>
                     )}
@@ -1083,7 +1083,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                         <span className="font-bold text-[var(--foreground)] text-xs">Execution Mechanics:</span>
                         <ul className="list-disc pl-5 space-y-0.5 text-xs text-[var(--muted-foreground)]">
                           {item.notes.map((n, i) => (
-                            <li key={i}>{n}</li>
+                            <li key={i} className="break-words whitespace-normal leading-relaxed">{n}</li>
                           ))}
                         </ul>
                       </div>
@@ -1098,13 +1098,13 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
       {/* 5. ARCHITECT'S LEXICON VIEW */}
       {activeTab === "lexicon" && (
-        <div id="lexicon" className="p-3.5 sm:p-4.5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 animate-in fade-in duration-300">
+        <div id="lexicon" className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 Core Terminology Encyclopedia
               </span>
-              <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)] mt-0.5 break-words">
                 The Architect&rsquo;s Spark Lexicon
               </h3>
             </div>
@@ -1152,8 +1152,8 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                     {term.badge}
                   </span>
                 </div>
-                <h4 className="text-sm font-bold text-[var(--foreground)]">{term.term}</h4>
-                <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{term.def}</p>
+                <h4 className="text-sm font-bold text-[var(--foreground)] break-words">{term.term}</h4>
+                <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">{term.def}</p>
               </div>
             ))}
           </div>

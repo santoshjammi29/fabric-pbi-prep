@@ -25,6 +25,7 @@ import {
   ChevronRight,
   ArrowRight,
   GitBranch,
+  Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -181,6 +182,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
+  const [selectedStretch, setSelectedStretch] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isReadAllMode, setIsReadAllMode] = useState(false);
   const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
@@ -286,6 +288,12 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
     if (selectedDifficulty !== "ALL") {
       result = result.filter((c) => c.difficulty === selectedDifficulty);
+    }
+
+    if (selectedStretch === "STANDARD") {
+      result = result.filter((c) => c.difficulty === "EASY" || c.difficulty === "MEDIUM");
+    } else if (selectedStretch === "STRETCH") {
+      result = result.filter((c) => c.difficulty === "HARD" || c.difficulty === "ARCHITECT");
     }
 
     if (deferredSearch.trim()) {
@@ -417,18 +425,20 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const hasActiveFilters =
     selectedCategory !== "ALL" ||
     selectedDifficulty !== "ALL" ||
+    selectedStretch !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetAllFilters = useCallback(() => {
     setSelectedCategory("ALL");
     setSelectedDifficulty("ALL");
+    setSelectedStretch("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     toast.info("Reset all filters");
   }, []);
 
   return (
-    <div className="space-y-4 pb-16">
+    <div className="space-y-3.5 pb-16 max-w-7xl mx-auto px-2 sm:px-4">
       <HubSubnav
         hubTitle="Foundations & Concepts"
         items={[
@@ -439,7 +449,76 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
         ]}
       />
 
-      {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
+      {/* Header Banner - Compact Reference Standard */}
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
+              <BookOpen size={12} />
+              <span>Core Architectural Definitions</span>
+            </div>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
+              Enterprise Data Platform Concepts Library
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
+              Master the foundational and architectural definitions across Microsoft Fabric, Azure Databricks, Apache Airflow, Delta Lake, and Modern Data Stack.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shrink-0 self-start md:self-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("list");
+                setIsStudyMode(false);
+              }}
+              className={cn(
+                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                activeView === "list" && !isStudyMode
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+            >
+              <BookOpen size={13} />
+              <span>Glossary List</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("mindmap");
+                setIsStudyMode(false);
+              }}
+              className={cn(
+                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                activeView === "mindmap"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+            >
+              <GitBranch size={13} />
+              <span>Mind Map</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveView("study");
+                setIsStudyMode(true);
+              }}
+              className={cn(
+                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                isStudyMode
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+              )}
+            >
+              <Sparkles size={13} />
+              <span>Flashcards</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── UNIFIED SEARCH & SIMPLE 3-SLICER FILTER BOX ─── */}
       {activeView !== "mindmap" && (
         <UnifiedSearchFilterBox
           searchQuery={searchQuery}
@@ -476,169 +555,115 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
               onExpandAll: handleExpandAll,
               onCollapseAll: handleCollapseAll,
             },
-            customActions: (
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveView("mindmap");
-                  setIsStudyMode(false);
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs whitespace-nowrap bg-[var(--surface-2)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              >
-                <GitBranch size={13} className="text-blue-400" />
-                <span>Mind Map</span>
-              </button>
-            ),
           }}
-        levels={[
-          {
-            id: "categories",
-            title: "Level 1: Concept Categories & Domains",
-            shortTitle: "Categories",
-            icon: <Filter size={13} className="text-blue-500" />,
-            layout: "chips",
-            accentColor: "blue",
-            selectedId: selectedCategory,
-            onSelect: (id) => setSelectedCategory(id),
-            options: [
-              {
-                id: "ALL",
-                label: "All Domains",
-                count: initialConcepts.length,
-              },
-              ...categories.map((cat) => ({
-                id: cat,
-                label: cat,
-                count: categoryCounts[cat] || 0,
-              })),
-            ],
-          },
-          {
-            id: "difficulty",
-            title: "Level 2: Difficulty Calibration",
-            shortTitle: "Difficulty",
-            icon: <Sparkles size={13} className="text-amber-400" />,
-            layout: "segmented",
-            selectedId: selectedDifficulty,
-            onSelect: (id) => setSelectedDifficulty(id),
-            options: [
-              { id: "ALL", label: "ALL" },
-              { id: "EASY", label: "EASY" },
-              { id: "MEDIUM", label: "MEDIUM" },
-              { id: "HARD", label: "HARD" },
-              { id: "ARCHITECT", label: "ARCH" },
-            ],
-          },
-        ]}
-        activeFilters={[
-          ...(isReadAllMode
-            ? [
+          levels={[
+            {
+              id: "topics",
+              title: "Topics & Concept Domains",
+              shortTitle: "Topics",
+              icon: <Filter size={13} className="text-blue-500" />,
+              layout: "chips",
+              accentColor: "blue",
+              selectedId: selectedCategory,
+              onSelect: (id) => setSelectedCategory(id),
+              options: [
                 {
-                  id: "readall",
-                  label: `Read All Mode Active (${filteredConcepts.length} Concepts)`,
-                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
-                  onRemove: handleCollapseAll,
+                  id: "ALL",
+                  label: "All Domains",
+                  count: initialConcepts.length,
                 },
-              ]
-            : []),
-          ...(selectedCategory !== "ALL"
-            ? [
-                {
-                  id: "category",
-                  label: `Category: ${selectedCategory}`,
-                  color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
-                  onRemove: () => setSelectedCategory("ALL"),
-                },
-              ]
-            : []),
-          ...(selectedDifficulty !== "ALL"
-            ? [
-                {
-                  id: "difficulty",
-                  label: `Difficulty: ${selectedDifficulty}`,
-                  color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
-                  onRemove: () => setSelectedDifficulty("ALL"),
-                },
-              ]
-            : []),
-          ...(searchQuery.trim().length > 0
-            ? [
-                {
-                  id: "search",
-                  label: `Search: "${searchQuery}"`,
-                  color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
-                  onRemove: () => setSearchQuery(""),
-                },
-              ]
-            : []),
-        ]}
-      />
-    )}
-
-    {/* Hero Header Summary & View Mode Switcher */}
-      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-0.5">
-            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
-              Enterprise Data Platform Concepts Library
-            </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
-              Master the foundational and architectural definitions across Microsoft Fabric, Azure Databricks, Apache Airflow, Delta Lake, and Modern Data Stack.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shrink-0 self-start sm:self-auto">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView("list");
-                setIsStudyMode(false);
-              }}
-              className={cn(
-                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
-                activeView === "list" && !isStudyMode
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <BookOpen size={13} />
-              <span>Glossary List</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView("mindmap");
-                setIsStudyMode(false);
-              }}
-              className={cn(
-                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
-                activeView === "mindmap"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <GitBranch size={13} />
-              <span>Multi-Level Mind Map</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveView("study");
-                setIsStudyMode(true);
-              }}
-              className={cn(
-                "px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
-                isStudyMode
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
-              )}
-            >
-              <Sparkles size={13} />
-              <span>Flashcards</span>
-            </button>
-          </div>
-        </div>
-      </div>
+                ...categories.map((cat) => ({
+                  id: cat,
+                  label: cat,
+                  count: categoryCounts[cat] || 0,
+                })),
+              ],
+            },
+            {
+              id: "difficulty",
+              title: "Difficulty Calibration",
+              shortTitle: "Difficulty",
+              icon: <Sparkles size={13} className="text-amber-400" />,
+              layout: "segmented",
+              selectedId: selectedDifficulty,
+              onSelect: (id) => setSelectedDifficulty(id),
+              options: [
+                { id: "ALL", label: "ALL" },
+                { id: "EASY", label: "EASY" },
+                { id: "MEDIUM", label: "MEDIUM" },
+                { id: "HARD", label: "HARD" },
+                { id: "ARCHITECT", label: "ARCH" },
+              ],
+            },
+            {
+              id: "stretch",
+              title: "Stretch & Depth Scope",
+              shortTitle: "Stretch",
+              icon: <Target size={13} className="text-purple-400" />,
+              layout: "segmented",
+              selectedId: selectedStretch,
+              onSelect: (id) => setSelectedStretch(id),
+              options: [
+                { id: "ALL", label: "ALL" },
+                { id: "STANDARD", label: "STANDARD" },
+                { id: "STRETCH", label: "STRETCH" },
+              ],
+            },
+          ]}
+          activeFilters={[
+            ...(isReadAllMode
+              ? [
+                  {
+                    id: "readall",
+                    label: `Read All Mode Active (${filteredConcepts.length} Concepts)`,
+                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-bold",
+                    onRemove: handleCollapseAll,
+                  },
+                ]
+              : []),
+            ...(selectedCategory !== "ALL"
+              ? [
+                  {
+                    id: "category",
+                    label: `Topic: ${selectedCategory}`,
+                    color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+                    onRemove: () => setSelectedCategory("ALL"),
+                  },
+                ]
+              : []),
+            ...(selectedDifficulty !== "ALL"
+              ? [
+                  {
+                    id: "difficulty",
+                    label: `Difficulty: ${selectedDifficulty}`,
+                    color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                    onRemove: () => setSelectedDifficulty("ALL"),
+                  },
+                ]
+              : []),
+            ...(selectedStretch !== "ALL"
+              ? [
+                  {
+                    id: "stretch",
+                    label: `Scope: ${selectedStretch}`,
+                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                    onRemove: () => setSelectedStretch("ALL"),
+                  },
+                ]
+              : []),
+            ...(searchQuery.trim().length > 0
+              ? [
+                  {
+                    id: "search",
+                    label: `Search: "${searchQuery}"`,
+                    color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                    onRemove: () => setSearchQuery(""),
+                  },
+                ]
+              : []),
+          ]}
+        />
+      )}
 
       {/* VIEW BRANCHING */}
       {activeView === "mindmap" ? (

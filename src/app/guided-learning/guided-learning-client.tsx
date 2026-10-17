@@ -154,6 +154,7 @@ function GuidedLearningContent() {
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedType, setSelectedType] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
+  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedStatus, setSelectedStatus] = useState<"ALL" | "TODO" | "MASTERED">("ALL");
   const [stageFilter, setStageFilter] = useState<string>("ALL");
   const [collapsedStages, setCollapsedStages] = useState<Record<string, boolean>>({});
@@ -258,6 +259,8 @@ function GuidedLearningContent() {
     return rawItems.filter((item) => {
       if (selectedType !== "ALL" && item.type !== selectedType) return false;
       if (selectedDifficulty !== "ALL" && item.difficulty !== selectedDifficulty) return false;
+      if (selectedStretch === "STANDARD" && !(item.difficulty === "EASY" || item.difficulty === "MEDIUM")) return false;
+      if (selectedStretch === "STRETCH" && !(item.difficulty === "HARD" || item.difficulty === "ARCHITECT")) return false;
       if (stageFilter !== "ALL" && item.difficulty !== stageFilter) return false;
 
       const isCompleted = completedIds.has(item.id);
@@ -273,7 +276,7 @@ function GuidedLearningContent() {
       }
       return true;
     });
-  }, [rawItems, selectedType, selectedDifficulty, stageFilter, selectedStatus, deferredSearch, completedIds]);
+  }, [rawItems, selectedType, selectedDifficulty, selectedStretch, stageFilter, selectedStatus, deferredSearch, completedIds]);
 
   // Group items by 4 stages with optional deterministic shuffle
   const itemsByStage = useMemo(() => {
@@ -449,23 +452,23 @@ function GuidedLearningContent() {
       />
 
       {/* ── TOP BANNER & TRACK MATRIX ─────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-4.5 shadow-xs isolate">
+      <section className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
         <div className="absolute -top-24 -right-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2.5">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-[10px] font-semibold text-purple-400">
               <GraduationCap size={12} className="text-purple-400" />
               <span className="uppercase tracking-wider font-mono">Senior DE Learning Tracks</span>
             </div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)] flex items-center gap-2">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] flex items-center gap-2 break-words">
               Guided Learning Journeys
-              <span className="text-[11px] font-normal text-[var(--muted-foreground)] px-2 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] hidden sm:inline">
+              <span className="text-[10px] font-normal text-[var(--muted-foreground)] px-2 py-0.5 rounded bg-[var(--surface-2)] border border-[var(--border)] hidden sm:inline">
                 {overviewStats.totalTopics} Tracks · {overviewStats.totalUniqueItems}+ Problems
               </span>
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-relaxed break-words">
               End-to-end engineered career tracks across distributed engines, lakehouses, orchestration, and enterprise modeling. Built for senior and staff data platform interviews.
             </p>
           </div>
@@ -1001,7 +1004,7 @@ function GuidedLearningContent() {
                 )}
               </div>
 
-              {/* Type Filter */}
+              {/* Type / Topics Filter */}
               <div className="flex items-center gap-1 shrink-0">
                 {[
                   { key: "ALL", label: "All Types" },
@@ -1013,7 +1016,7 @@ function GuidedLearningContent() {
                     key={item.key}
                     onClick={() => setSelectedType(item.key)}
                     className={cn(
-                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0",
+                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 cursor-pointer",
                       selectedType === item.key
                         ? "bg-[var(--surface-3)] text-[var(--foreground)] font-semibold border border-[var(--border)] shadow-xs"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -1033,7 +1036,7 @@ function GuidedLearningContent() {
                     key={diff}
                     onClick={() => setSelectedDifficulty(diff)}
                     className={cn(
-                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 uppercase",
+                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 uppercase cursor-pointer",
                       selectedDifficulty === diff
                         ? "bg-purple-600 text-white font-semibold shadow-xs"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
@@ -1046,24 +1049,20 @@ function GuidedLearningContent() {
 
               <div className="w-px h-3.5 bg-[var(--border)] mx-1 shrink-0" />
 
-              {/* Status Filter */}
+              {/* Stretch Filter */}
               <div className="flex items-center gap-1 shrink-0">
-                {[
-                  { key: "ALL", label: "All Status" },
-                  { key: "TODO", label: "To Master" },
-                  { key: "MASTERED", label: "Mastered" },
-                ].map((st) => (
+                {(["ALL", "STANDARD", "STRETCH"] as const).map((str) => (
                   <button
-                    key={st.key}
-                    onClick={() => setSelectedStatus(st.key as "ALL" | "TODO" | "MASTERED")}
+                    key={str}
+                    onClick={() => setSelectedStretch(str)}
                     className={cn(
-                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0",
-                      selectedStatus === st.key
-                        ? "bg-[var(--surface-3)] text-[var(--foreground)] font-semibold border border-[var(--border)]"
+                      "px-2 py-1 rounded text-[11px] font-medium transition-colors shrink-0 cursor-pointer",
+                      selectedStretch === str
+                        ? "bg-purple-600 text-white font-semibold shadow-xs"
                         : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
                     )}
                   >
-                    {st.label}
+                    {str}
                   </button>
                 ))}
               </div>

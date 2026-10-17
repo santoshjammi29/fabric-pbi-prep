@@ -86,6 +86,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
   const [activeLang, setActiveLang] = useState<LanguageKey>("pyspark");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevel, setSelectedLevel] = useState<string>("ALL");
+  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
@@ -261,6 +262,12 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       if (selectedLevel !== "ALL" && item.level !== selectedLevel) {
         return false;
       }
+      if (selectedStretch === "STANDARD" && !(item.level === "beginner" || item.level === "intermediate")) {
+        return false;
+      }
+      if (selectedStretch === "STRETCH" && !(item.level === "advanced" || item.level === "architect")) {
+        return false;
+      }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const titleMatch = item.title.toLowerCase().includes(q);
@@ -272,7 +279,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       }
       return true;
     });
-  }, [currentDataset, selectedLevel, searchQuery]);
+  }, [currentDataset, selectedLevel, selectedStretch, searchQuery]);
 
   const displayedItems = useMemo(() => {
     if (!isShuffled) return filteredItems;
@@ -289,10 +296,12 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
   const hasActiveCodeFilters =
     selectedLevel !== "ALL" ||
+    selectedStretch !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetCodeFilters = useCallback(() => {
     setSelectedLevel("ALL");
+    setSelectedStretch("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     toast.info("Reset code filters");
@@ -310,6 +319,32 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
           { label: "Python & Polars", href: "/code-practice?db=python", icon: FileCode2, badge: "Python" },
         ]}
       />
+
+      {/* Header Hub Banner Summary */}
+      <div className="relative rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <FileCode2 size={11} />
+                <span>Polyglot Code Hub</span>
+              </span>
+              <span className="text-[10px] text-[var(--muted-foreground)]">
+                Production Code Drills &amp; Syntaxes
+              </span>
+            </div>
+            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight break-words">
+              Hands-On Code Practice &amp; Polyglot Syntaxes
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-relaxed break-words">
+              Production-grade code patterns across 4 core languages. Optimized for window functions, incremental merges, vector operations, and low-latency analytics.
+            </p>
+          </div>
+          <div className="text-xs text-[var(--muted-foreground)] shrink-0 self-start sm:self-auto">
+            Showing <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> of {currentDataset.length} drills ({languageConfigs[activeLang].name})
+          </div>
+        </div>
+      </div>
 
       {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}
       <UnifiedSearchFilterBox
@@ -368,6 +403,20 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
               { id: "architect", label: "Architect" },
             ],
           },
+          {
+            id: "stretch",
+            title: "Level 3: Scope & Stretch",
+            shortTitle: "Stretch",
+            icon: <Sparkles size={13} className="text-purple-400" />,
+            layout: "segmented",
+            selectedId: selectedStretch,
+            onSelect: (stretch) => setSelectedStretch(stretch as "ALL" | "STANDARD" | "STRETCH"),
+            options: [
+              { id: "ALL", label: "ALL" },
+              { id: "STANDARD", label: "STANDARD" },
+              { id: "STRETCH", label: "STRETCH" },
+            ],
+          },
         ]}
         activeFilters={[
           ...(selectedLevel !== "ALL"
@@ -377,6 +426,16 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                   label: `Level: ${selectedLevel}`,
                   color: "bg-amber-500/10 border-amber-500/30 text-amber-400 capitalize",
                   onRemove: () => setSelectedLevel("ALL"),
+                },
+              ]
+            : []),
+          ...(selectedStretch !== "ALL"
+            ? [
+                {
+                  id: "stretch",
+                  label: `Stretch: ${selectedStretch}`,
+                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+                  onRemove: () => setSelectedStretch("ALL"),
                 },
               ]
             : []),
@@ -392,23 +451,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             : []),
         ]}
       />
-
-      {/* Header Hub Banner Summary */}
-      <div className="relative rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 overflow-hidden shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="space-y-0.5">
-            <h1 className="text-base sm:text-lg font-bold text-[var(--foreground)] tracking-tight">
-              Hands-On Code Practice &amp; Polyglot Syntaxes
-            </h1>
-            <p className="text-xs text-[var(--muted-foreground)] max-w-3xl leading-snug">
-              Production-grade code patterns across 4 core languages. Optimized for window functions, incremental merges, vector operations, and low-latency analytics.
-            </p>
-          </div>
-          <div className="text-xs text-[var(--muted-foreground)] shrink-0">
-            Showing <strong className="text-[var(--foreground)]">{displayedItems.length}</strong> of {currentDataset.length} templates ({languageConfigs[activeLang].name})
-          </div>
-        </div>
-      </div>
 
       {/* 4-Layer Integrated Domain Navigation */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -529,7 +571,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                           {item.level}
                         </span>
                       </div>
-                      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight">
+                      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight break-words whitespace-normal leading-snug">
                         {item.title}
                       </h3>
                     </div>
@@ -538,7 +580,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                       <button
                         onClick={(e) => toggleBookmark(item.id, e)}
                         className={cn(
-                          "p-1.5 rounded-lg transition-colors",
+                          "p-1.5 rounded-lg transition-colors cursor-pointer",
                           isBookmarked
                             ? "text-amber-400 bg-amber-400/10"
                             : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
@@ -550,7 +592,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
                       <button
                         onClick={(e) => copyCode(item.code, item.id, e)}
-                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors"
+                        className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] transition-colors cursor-pointer"
                         title="Copy Code"
                       >
                         {copiedId === item.id ? (
@@ -572,7 +614,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                     </div>
                   </div>
 
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words whitespace-normal">
                     {item.description}
                   </p>
                 </div>
@@ -583,11 +625,11 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                   {item.use_case && (
                     <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[var(--foreground)] flex items-start gap-2">
                       <Briefcase size={14} className="text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" />
-                      <div className="space-y-0.5">
+                      <div className="space-y-0.5 min-w-0">
                         <span className="font-bold text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400">
                           Enterprise Scenario:
                         </span>
-                        <p className="text-xs text-[var(--foreground)]/90 leading-relaxed">{item.use_case}</p>
+                        <p className="text-xs text-[var(--foreground)]/90 leading-relaxed break-words whitespace-normal">{item.use_case}</p>
                       </div>
                     </div>
                   )}
@@ -610,8 +652,8 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                       <ul className="space-y-1.5">
                         {item.notes.map((note, ni) => (
                           <li key={ni} className="flex items-start gap-2 text-[var(--muted-foreground)]">
-                            <span className="text-amber-400 font-bold">•</span>
-                            <span className="leading-snug">{note}</span>
+                            <span className="text-amber-400 font-bold shrink-0">•</span>
+                            <span className="leading-snug break-words whitespace-normal">{note}</span>
                           </li>
                         ))}
                       </ul>

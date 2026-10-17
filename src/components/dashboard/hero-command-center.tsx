@@ -189,29 +189,29 @@ export function HeroCommandCenter() {
   return (
     <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-300">
       {/* ── 1. FOCUSED, MOTIVATIONAL HERO BANNER ───────────────────────────── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate shadow-xs">
+      <section className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 isolate shadow-xs">
         {/* Ambient atmospheric lighting */}
         <div className="absolute top-0 right-0 -mt-16 -mr-16 w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.12)_0%,transparent_70%)] blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 -mb-20 w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.08)_0%,transparent_70%)] blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl space-y-3">
+        <div className="relative z-10 max-w-4xl space-y-2.5">
           {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/25 text-[11px] font-semibold text-blue-600 dark:text-blue-300 backdrop-blur-md">
-            <Sparkles size={12} className="text-blue-500 dark:text-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/25 text-[10px] font-semibold text-blue-600 dark:text-blue-300 backdrop-blur-md">
+            <Sparkles size={11} className="text-blue-500 dark:text-blue-400 animate-pulse" />
             <span className="tracking-wide">2026 ARCHITECT PREPARATION PLATFORM</span>
             <span className="w-1 h-1 rounded-full bg-blue-400" />
             <span className="text-[10px] text-blue-500/80 font-mono">6,570+ SCENARIOS</span>
           </div>
 
           {/* Main motivational title */}
-          <div className="space-y-1.5">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[var(--foreground)] leading-[1.2]">
+          <div className="space-y-1">
+            <h1 className="text-base sm:text-lg lg:text-xl font-extrabold tracking-tight text-[var(--foreground)] leading-snug break-words">
               Master the Modern Data Platform.
               <span className="block mt-0.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-400">
                 From Internal Mechanics to Principal Architecture.
               </span>
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed max-w-3xl">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed max-w-3xl break-words">
               An open, production-grade learning operating system for Data Engineers and Architects.
               Vetted curricula across Microsoft Fabric, Databricks Lakehouse, Apache Spark, and Distributed Systems.
             </p>
@@ -221,25 +221,25 @@ export function HeroCommandCenter() {
           <div className="flex flex-wrap items-center gap-2 pt-0.5">
             <Link
               href="/learning-paths"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
             >
-              <Compass size={15} />
+              <Compass size={14} />
               <span>Explore Career Curricula</span>
-              <ArrowRight size={13} />
+              <ArrowRight size={12} />
             </Link>
 
             <Link
               href="/guided-learning"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] hover:border-blue-500/40 text-[var(--foreground)] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--border)] hover:border-blue-500/40 text-[var(--foreground)] text-xs font-semibold transition-all cursor-pointer"
             >
-              <Compass size={15} className="text-blue-500 dark:text-blue-400" />
+              <Compass size={14} className="text-blue-500 dark:text-blue-400" />
               <span>Guided Tech Tracks</span>
             </Link>
 
             <button
               type="button"
               onClick={openSearch}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface-2)]/80 hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
               aria-label="Universal search across all topics, questions, architecture and concepts (Cmd/Ctrl+K)"
             >
               <Search size={13} />
@@ -322,7 +322,7 @@ export function HeroCommandCenter() {
                         <Icon size={16} className={pillar.iconColor} />
                       </div>
                       <div>
-                        <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] group-hover:text-blue-500 transition-colors">
+                        <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] group-hover:text-blue-500 transition-colors break-words">
                           {pillar.title}
                         </h3>
                         <span
@@ -338,7 +338,7 @@ export function HeroCommandCenter() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
                     {pillar.description}
                   </p>
 
@@ -347,10 +347,10 @@ export function HeroCommandCenter() {
                     {pillar.features.map((feature) => (
                       <div
                         key={feature}
-                        className="flex items-center gap-1.5 text-[11px] text-[var(--muted-foreground)] truncate"
+                        className="flex items-center gap-1.5 text-[11px] text-[var(--muted-foreground)]"
                       >
                         <span className="w-1 h-1 rounded-full bg-blue-500 shrink-0" />
-                        <span className="truncate">{feature}</span>
+                        <span className="break-words leading-tight">{feature}</span>
                       </div>
                     ))}
                   </div>

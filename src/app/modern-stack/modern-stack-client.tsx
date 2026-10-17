@@ -458,17 +458,17 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-1.5 max-w-4xl 2xl:max-w-6xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-              <Layers size={13} />
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 isolate shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-[10px] font-semibold text-purple-400">
+              <Layers size={11} />
               <span>Modern Data &amp; AI Stack · 2026 Reference Architecture</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
               Modern Data Engineering &amp; AI Lakehouse Hub
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               Open table formats (Delta UniForm &amp; Iceberg), metadata control planes (Polaris &amp; Unity Catalog),
               vectorized compute (Photon &amp; Polars), 6 live interactive simulators, {modernBlueprintsDb.length} production blueprints,
               and 20+ runnable Python/PySpark/SQL solutions.
@@ -476,18 +476,18 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
           </div>
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-base sm:text-lg font-bold text-cyan-400 leading-none">
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-cyan-400 leading-none">
                 {modernBlueprintsDb.length}
               </div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Blueprints</div>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-base sm:text-lg font-bold text-green-400 leading-none">6</div>
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-green-400 leading-none">6</div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Simulators</div>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-              <div className="text-base sm:text-lg font-bold text-purple-400 leading-none">
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-purple-400 leading-none">
                 {modernStackDb.length}
               </div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Q&amp;A Runbooks</div>
@@ -533,16 +533,16 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       {/* 1. OVERVIEW & CANVAS */}
       {/* ────────────────────────────────────────────────────────── */}
       {activeTab === "overview" && (
-        <div id="overview" className="space-y-4 animate-in fade-in duration-200">
+        <div id="overview" className="space-y-3 animate-in fade-in duration-200">
           {/* Interactive Stack Flow Canvas */}
-          <div className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4">
+          <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2">
+                <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2 break-words">
                   <Workflow size={16} className="text-purple-400" />
                   Enterprise Modern Data &amp; AI Stack Flow
                 </h3>
-                <p className="text-xs text-[var(--muted-foreground)]">
+                <p className="text-xs text-[var(--muted-foreground)] break-words">
                   Click any stage to inspect the technical architecture, SLAs, production pitfalls, and code implementation.
                 </p>
               </div>
@@ -572,10 +572,10 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                         0{idx + 1}
                       </span>
                     </div>
-                    <div className="font-bold text-xs text-[var(--foreground)] mt-2 truncate">
+                    <div className="font-bold text-xs text-[var(--foreground)] mt-2 break-words">
                       {stage.step}
                     </div>
-                    <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5 truncate">
+                    <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5 break-words">
                       {stage.tech.split("·")[0]}
                     </div>
                   </button>
@@ -587,13 +587,13 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
             {(() => {
               const cur = canvasStages[selectedCanvasStage];
               return (
-                <div className="p-4 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 space-y-3">
+                <div className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-[var(--border)]">
                     <div className="space-y-0.5">
                       <div className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">
                         Architecture Deep Dive
                       </div>
-                      <h4 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
+                      <h4 className="text-sm sm:text-base font-bold text-[var(--foreground)] break-words">
                         {cur.title}
                       </h4>
                     </div>
@@ -718,12 +718,12 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
           </div>
 
           {/* Architecture Trade-off Comparison Table */}
-          <div className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+          <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
+              <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] break-words">
                 Modern Lakehouse Architecture Trade-off Matrix
               </h3>
-              <p className="text-xs text-[var(--muted-foreground)]">
+              <p className="text-xs text-[var(--muted-foreground)] break-words">
                 Key architectural decisions when evaluating modern storage, catalog, and serving patterns.
               </p>
             </div>
@@ -1986,16 +1986,16 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
       {activeTab === "python" && (
         <div id="python" className="space-y-4 animate-in fade-in duration-200">
           {/* Section Intro */}
-          <div className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+          <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-                <TopicIcon topic="python" size={20} />
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+                <TopicIcon topic="python" size={18} />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)]">
+                <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] break-words">
                   Python for Modern Data Stacks &amp; Lakehouses
                 </h3>
-                <p className="text-xs text-[var(--muted-foreground)]">
+                <p className="text-xs text-[var(--muted-foreground)] break-words">
                   {modernStackDb.length} runnable Python, PySpark, and SQL implementations across distributed computing, open table formats, and AI-native pipelines.
                 </p>
               </div>
@@ -2099,10 +2099,10 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
                       ID: {q.id}
                     </span>
                   </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] leading-snug">
+                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] leading-snug break-words">
                     {q.question}
                   </h4>
-                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
                     {q.answer}
                   </p>
                 </div>

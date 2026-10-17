@@ -141,26 +141,26 @@ export function CheatCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight group-hover:text-blue-400 transition-colors leading-snug">
+      <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] tracking-tight group-hover:text-blue-400 transition-colors leading-snug break-words whitespace-normal">
         {cheat.title}
       </h3>
 
       {/* Production Metrics Pill */}
       {cheat.metrics && (
-        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start">
-          <Flame size={12} className="text-emerald-400 animate-pulse" />
-          <span>{cheat.metrics}</span>
+        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start break-words">
+          <Flame size={12} className="text-emerald-400 animate-pulse shrink-0" />
+          <span className="break-words">{cheat.metrics}</span>
         </div>
       )}
 
       {/* Problem Callout */}
-      <div className="mt-2 p-2.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] leading-relaxed">
+      <div className="mt-2 p-2.5 rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-xs text-[var(--foreground)] leading-relaxed break-words whitespace-normal">
         <span className="font-semibold text-rose-400 block mb-0.5">Problem / Challenge:</span>
         {cheat.problem}
       </div>
 
       {/* Solution Description */}
-      <div className="mt-2 text-xs text-[var(--foreground)] leading-relaxed">
+      <div className="mt-2 text-xs text-[var(--foreground)] leading-relaxed break-words whitespace-normal">
         <span className="font-semibold text-blue-400">Production Solution: </span>
         {cheat.solution}
       </div>
@@ -191,7 +191,7 @@ export function CheatCard({
             {/* The Why */}
             <div className="p-2.5 rounded-lg bg-blue-500/5 border border-blue-500/15">
               <span className="font-bold text-blue-400 block mb-0.5">The &quot;Why&quot; (Production ROI):</span>
-              <p className="text-[var(--foreground)] leading-relaxed">{cheat.whyItMatters}</p>
+              <p className="text-[var(--foreground)] leading-relaxed break-words whitespace-normal">{cheat.whyItMatters}</p>
             </div>
 
             {/* Anti-Pattern Gotcha */}
@@ -201,7 +201,7 @@ export function CheatCard({
                   <AlertTriangle size={12} />
                   <span>Production Anti-Pattern to Avoid:</span>
                 </div>
-                <p className="text-[var(--foreground)] leading-relaxed">{cheat.antiPattern}</p>
+                <p className="text-[var(--foreground)] leading-relaxed break-words whitespace-normal">{cheat.antiPattern}</p>
               </div>
             )}
           </div>

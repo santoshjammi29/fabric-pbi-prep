@@ -133,51 +133,42 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-5">
-      {/* Top Header Strip */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 mb-3 border-b border-[var(--border)]">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              Enterprise DataOps & Lifecycle Playbook
-            </span>
-            <span className="text-[10px] font-medium text-[var(--muted-foreground)]">
-              Big Data Architect Edition
-            </span>
+      {/* Compact Header Banner */}
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate mb-3">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
+              <Workflow size={11} />
+              <span>Enterprise DataOps &amp; Lifecycle Playbook · Big Data Architect Edition</span>
+            </div>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
+              Tool Connectivity, CI/CD Alternatives &amp; E2E Lifecycle
+            </h1>
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
+              Production-grade configs for ADF, Databricks, Airflow, dbt, SQL, and DevOps.
+              Defend end-to-end big data architectures with battle-tested talking points and code templates.
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
-            Tool Connectivity, CI/CD Alternatives & E2E Lifecycle
-          </h1>
-          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-0.5">
-            Production-grade configs for ADF, Databricks, Airflow, dbt, SQL, and DevOps.
-            Defend end-to-end big data architectures with battle-tested talking points and code templates.
-          </p>
-        </div>
 
-        {/* Global Stats Counter */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0 text-xs">
-          <div className="px-2.5 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
-            <div className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">
-              Configs
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-blue-400 leading-none">{initialData.connectivity.length}</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Configs</div>
             </div>
-            <div className="font-bold text-blue-400">{initialData.connectivity.length} Scenarios</div>
-          </div>
-          <div className="px-2.5 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
-            <div className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">
-              CI/CD Blueprints
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-purple-400 leading-none">{initialData.cicdAlternatives.length}</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">CI/CD Paths</div>
             </div>
-            <div className="font-bold text-purple-400">{initialData.cicdAlternatives.length} Paths</div>
-          </div>
-          <div className="px-2.5 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
-            <div className="text-[10px] text-[var(--muted-foreground)] uppercase font-semibold">
-              Lifecycle
+            <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
+              <div className="text-sm sm:text-base font-bold text-emerald-400 leading-none">{initialData.lifecycleStages.length}</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Stages</div>
             </div>
-            <div className="font-bold text-emerald-400">{initialData.lifecycleStages.length} Stages</div>
           </div>
         </div>
       </div>
 
       {/* DOUBLE-LINE TOP SLICERS & FILTERS DECK */}
-      <div className="space-y-2 p-2.5 sm:p-3 rounded-2xl bg-[var(--surface-1)] border-2 border-[var(--border)] shadow-xs mb-4">
+      <div className="space-y-2 p-2.5 sm:p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] shadow-xs mb-3">
         {/* LINE 1: PRIMARY TAB NAVIGATION */}
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
           <button
@@ -366,7 +357,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-sm font-bold text-[var(--foreground)] truncate">
+                          <h3 className="text-sm font-bold text-[var(--foreground)] break-words">
                             {item.sourceTool} <span className="text-blue-400">⟷</span> {item.targetTool}
                           </h3>
                           <span
@@ -385,7 +376,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                             {item.securityLevel}
                           </span>
                         </div>
-                        <p className="text-xs text-[var(--muted-foreground)] mt-0.5 line-clamp-1">
+                        <p className="text-xs text-[var(--muted-foreground)] mt-0.5 break-words">
                           {item.connectionProtocol}
                         </p>
                       </div>
@@ -408,7 +399,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                   {/* Expanded Body */}
                   {isOpen && (
                     <div className="p-3 sm:p-4 pt-1 sm:pt-2 border-t border-[var(--border)] bg-[var(--surface-1)] space-y-3.5">
-                      <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                      <p className="text-xs text-[var(--foreground)] leading-relaxed break-words">
                         {item.summary}
                       </p>
 
@@ -538,7 +529,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                         </div>
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-sm font-bold text-[var(--foreground)]">
+                            <h3 className="text-sm font-bold text-[var(--foreground)] break-words">
                               {item.name}
                             </h3>
                             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
@@ -581,7 +572,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                   {/* Expanded Body */}
                   {isOpen && (
                     <div className="p-3 sm:p-4 pt-1 sm:pt-2 border-t border-[var(--border)] bg-[var(--surface-1)] space-y-3.5">
-                      <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                      <p className="text-xs text-[var(--foreground)] leading-relaxed break-words">
                         {item.tradeOffSummary}
                       </p>
 
@@ -594,7 +585,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                           </div>
                           <ul className="space-y-1 text-[11px] text-[var(--muted-foreground)] list-disc pl-4">
                             {item.pros.map((pro, idx) => (
-                              <li key={idx} className="leading-snug text-[var(--foreground)]">
+                              <li key={idx} className="leading-snug text-[var(--foreground)] break-words">
                                 {pro}
                               </li>
                             ))}
@@ -608,7 +599,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                           </div>
                           <ul className="space-y-1 text-[11px] text-[var(--muted-foreground)] list-disc pl-4">
                             {item.cons.map((con, idx) => (
-                              <li key={idx} className="leading-snug text-[var(--foreground)]">
+                              <li key={idx} className="leading-snug text-[var(--foreground)] break-words">
                                 {con}
                               </li>
                             ))}
@@ -748,10 +739,10 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                     Primary Tools: {activeStage.primaryTools.join(", ")}
                   </span>
                 </div>
-                <h2 className="text-lg font-bold text-[var(--foreground)]">
+                <h2 className="text-base sm:text-lg font-bold text-[var(--foreground)] break-words">
                   {activeStage.stageName}
                 </h2>
-                <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                <p className="text-xs text-[var(--muted-foreground)] mt-0.5 break-words">
                   {activeStage.objective}
                 </p>
               </div>
@@ -789,7 +780,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                 </div>
                 <ul className="space-y-1.5 text-[11px] text-[var(--muted-foreground)] list-disc pl-4">
                   {activeStage.keyArchitecturalDecisions.map((dec, idx) => (
-                    <li key={idx} className="leading-snug text-[var(--foreground)]">
+                    <li key={idx} className="leading-snug text-[var(--foreground)] break-words">
                       {dec}
                     </li>
                   ))}
@@ -805,8 +796,8 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                 <div className="space-y-2">
                   {activeStage.concreteDeliverables.map((del, idx) => (
                     <div key={idx} className="p-2 rounded bg-[var(--surface-2)] border border-[var(--border)] text-[11px]">
-                      <div className="font-semibold text-emerald-400">{del.name}</div>
-                      <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5">
+                      <div className="font-semibold text-emerald-400 break-words">{del.name}</div>
+                      <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5 break-words">
                         {del.description}
                       </p>
                       <div className="flex items-center gap-1 flex-wrap mt-1">
@@ -864,7 +855,7 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
                   How to Defend This Stage in an Architectural System Design Interview
                 </span>
               </div>
-              <p className="text-xs text-[var(--foreground)] leading-relaxed italic pl-6">
+              <p className="text-xs text-[var(--foreground)] leading-relaxed italic pl-6 break-words whitespace-normal">
                 &ldquo;{activeStage.interviewExplanationScript}&rdquo;
               </p>
             </div>
@@ -909,16 +900,16 @@ export function DataOpsClient({ initialData }: DataOpsClientProps) {
           </div>
 
           {/* Whiteboard SVG Canvas */}
-          <div className="rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 overflow-x-auto shadow-inner">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-3 sm:p-4 overflow-x-auto shadow-inner">
             <div className="min-w-[950px] relative">
               {/* Title & Watermark */}
-              <div className="flex items-center justify-between mb-6 pb-3 border-b border-[var(--border)]">
+              <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-[var(--border)]">
                 <div>
-                  <h3 className="text-base font-bold text-[var(--foreground)] flex items-center gap-2">
+                  <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] flex items-center gap-2 break-words">
                     <Layers size={18} className="text-blue-500" />
                     End-to-End Enterprise Big Data Architecture: Ingestion ➔ Compute ➔ Governance ➔ Serving
                   </h3>
-                  <p className="text-xs text-[var(--muted-foreground)]">
+                  <p className="text-xs text-[var(--muted-foreground)] break-words">
                     Control Flow (Triggers & Dispatches via Dashed Arrows) vs Data Flow (ETL/ELT via Solid Arrows)
                   </p>
                 </div>
