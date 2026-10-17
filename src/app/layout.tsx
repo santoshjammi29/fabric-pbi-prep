@@ -15,6 +15,7 @@ import { Toaster } from "sonner";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { LazyMotion, domAnimation } from "framer-motion";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -187,6 +188,7 @@ export default function RootLayout({
               __html: `{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prerender": [{"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}]}`
             }}
           />
+          <Analytics />
           </TextSizeProvider>
         </ThemeProvider>
       </body>
