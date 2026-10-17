@@ -60,34 +60,34 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
         ]}
       />
 
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] p-3.5 sm:p-5 shadow-xs isolate">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* Header Banner - Compact Reference Style */}
+      <div className="relative overflow-hidden rounded-xl bg-[var(--surface-1)] border border-[var(--border)] p-3 sm:p-4 shadow-xs isolate">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="space-y-1 max-w-4xl 2xl:max-w-6xl">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
               <Compass size={12} />
               <span>Structured Career Curricula</span>
             </div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--foreground)]">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
               Senior Data Engineering Learning Paths
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] leading-snug">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               12 comprehensive, week-by-week architectural roadmaps from Microsoft Fabric DP-600 to
               32-Week Principal Lakehouse Mastery with capstone repositories and mock interview rubrics.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0 text-center">
-            <div className="px-3.5 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
-              <div className="text-base font-bold text-blue-400">12</div>
-              <div className="text-[10px] text-[var(--muted-foreground)] font-medium leading-none">Curricula Tracks</div>
+          <div className="flex items-center gap-2.5 shrink-0 text-center self-start md:self-auto">
+            <div className="px-3 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)]">
+              <div className="text-sm sm:text-base font-bold text-blue-400">12</div>
+              <div className="text-[10px] text-[var(--muted-foreground)] font-mono leading-none">Curricula Tracks</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Path Selector Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+      {/* Path Selector Cards Grid - Compact Design & Full Text Word Wrap */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5">
         {learningPathsDb.map((path) => {
           const isSelected = selectedPathId === path.id;
           const diffStyle = difficultyColors[path.difficulty] || difficultyColors.MEDIUM;
@@ -98,20 +98,20 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
               key={path.id}
               onClick={() => handleSelectPath(path.id)}
               className={cn(
-                "p-3 rounded-xl border text-left transition-all space-y-2.5 flex flex-col justify-between group",
+                "p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between group cursor-pointer",
                 isSelected
                   ? "bg-[var(--surface-2)] border-purple-500 ring-1 ring-purple-500/40 shadow-xs"
                   : "bg-[var(--surface-1)] border-[var(--border)] hover:border-purple-500/30 hover:bg-[var(--surface-2)]/80"
               )}
             >
               <div className="space-y-1.5 w-full">
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:border-purple-500/40 transition-colors shadow-xs">
-                    <TopicIcon topicKey={cleanKey} size={18} />
+                <div className="flex items-center justify-between gap-1.5">
+                  <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:border-purple-500/40 transition-colors shadow-xs">
+                    <TopicIcon topicKey={cleanKey} size={16} />
                   </div>
                   <span
                     className={cn(
-                      "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border",
+                      "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0",
                       diffStyle.bg,
                       diffStyle.text,
                       diffStyle.border
@@ -122,7 +122,7 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
                 </div>
                 <h3
                   className={cn(
-                    "text-xs sm:text-sm font-bold line-clamp-1",
+                    "text-xs sm:text-[13px] font-bold leading-snug break-words whitespace-normal text-left",
                     isSelected ? "text-purple-400" : "text-[var(--foreground)] group-hover:text-purple-400 transition-colors"
                   )}
                 >
@@ -130,12 +130,12 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
                 </h3>
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-[var(--muted-foreground)] pt-1.5 border-t border-[var(--border)] w-full">
-                <span className="flex items-center gap-1">
-                  <Calendar size={12} className="shrink-0 text-[var(--muted-foreground)]" />
+              <div className="flex items-center justify-between text-[10px] text-[var(--muted-foreground)] pt-1.5 mt-2 border-t border-[var(--border)] w-full">
+                <span className="flex items-center gap-1 font-medium">
+                  <Calendar size={11} className="shrink-0 text-[var(--muted-foreground)]" />
                   <span>{path.weeks} Weeks</span>
                 </span>
-                <span className="font-semibold text-purple-400 font-mono">
+                <span className="font-semibold text-purple-400 font-mono text-[10px]">
                   {path.examQsCount ? `${path.examQsCount} Q&As` : `${path.phases.length} Phases`}
                 </span>
               </div>
@@ -146,16 +146,16 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
 
       {/* Selected Path Deep Dive View */}
       {selectedPath && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-5 animate-in fade-in duration-200">
+        <div className="p-3.5 sm:p-5 rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-200 shadow-xs">
           {/* Path Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-[var(--border)]">
-            <div className="space-y-2 max-w-5xl 2xl:max-w-7xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 shadow-xs">
-                  <TopicIcon topicKey={selectedPath.id.replace("path-", "")} size={22} />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3.5 border-b border-[var(--border)]">
+            <div className="space-y-1.5 max-w-5xl 2xl:max-w-7xl">
+              <div className="flex items-start sm:items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0 shadow-xs">
+                  <TopicIcon topicKey={selectedPath.id.replace("path-", "")} size={20} />
                 </div>
                 <div className="space-y-0.5">
-                  <h2 className="text-lg sm:text-xl font-bold text-[var(--foreground)] tracking-tight">
+                  <h2 className="text-base sm:text-lg md:text-xl font-bold text-[var(--foreground)] tracking-tight break-words">
                     {selectedPath.title}
                   </h2>
                   <div className="flex flex-wrap items-center gap-2">
@@ -169,14 +169,14 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
                 {selectedPath.description}
               </p>
             </div>
 
-            <div className="px-3.5 py-2 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 shrink-0 text-center">
+            <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 shrink-0 text-left sm:text-right self-start sm:self-auto">
               <div className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Target Outcome</div>
-              <div className="text-xs font-bold text-purple-300 mt-0.5">{selectedPath.capstone}</div>
+              <div className="text-xs font-bold text-purple-300 mt-0.5 break-words">{selectedPath.capstone}</div>
             </div>
           </div>
 
@@ -189,54 +189,56 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
               {selectedPath.skills.map((skill) => (
                 <span
                   key={skill}
-                  className="px-2.5 py-0.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs font-medium text-purple-300 flex items-center gap-1"
+                  className="px-2 py-0.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs font-medium text-purple-300 flex items-center gap-1 break-words"
                 >
                   <CheckCircle2 size={11} className="text-emerald-400 shrink-0" />
-                  <span>{skill}</span>
+                  <span className="break-words">{skill}</span>
                 </span>
               ))}
             </div>
           </div>
 
           {/* Week-by-Week Phases Timeline */}
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--foreground)]">
               Phase-by-Phase Roadmap Timeline:
             </h4>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {selectedPath.phases.map((phase, pi) => (
                 <div
                   key={phase.name}
-                  className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2"
+                  className="p-3 sm:p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-6 h-6 rounded-md bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-md bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                         {pi + 1}
                       </span>
-                      <h5 className="text-xs sm:text-sm font-bold text-[var(--foreground)] tracking-tight">{phase.name}</h5>
+                      <h5 className="text-xs sm:text-sm font-bold text-[var(--foreground)] tracking-tight break-words">
+                        {phase.name}
+                      </h5>
                     </div>
                     <span className="text-[10px] font-semibold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20 shrink-0 self-start sm:self-auto font-mono">
                       {phase.weeks}
                     </span>
                   </div>
 
-                  <div className="space-y-1 pl-8.5">
+                  <div className="space-y-1 pl-7 sm:pl-7.5">
                     <div className="text-[10px] font-semibold text-[var(--muted-foreground)]">Topics Covered:</div>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-[var(--foreground)] opacity-90">
                       {phase.topics.map((t, ti) => (
                         <li key={ti} className="flex items-start gap-1.5">
                           <CheckCircle2 size={12} className="text-emerald-400 mt-0.5 shrink-0" />
-                          <span>{t}</span>
+                          <span className="break-words">{t}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="pt-1.5 border-t border-[var(--border)] pl-8.5 text-xs text-purple-300 font-medium flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-purple-400 uppercase font-mono">Milestone:</span>
-                    <span>{phase.milestone}</span>
+                  <div className="pt-1.5 border-t border-[var(--border)] pl-7 sm:pl-7.5 text-xs text-purple-300 font-medium flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold text-purple-400 uppercase font-mono shrink-0">Milestone:</span>
+                    <span className="break-words">{phase.milestone}</span>
                   </div>
                 </div>
               ))}
@@ -245,16 +247,18 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
 
           {/* Capstone Project Card */}
           {selectedPath.handsOn && (
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-500/30 space-y-2">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-2)] border border-purple-500/30 space-y-1.5">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-purple-400 uppercase tracking-wider">
-                <GitBranch size={14} /> <span>Hands-On Capstone Project</span>
+                <GitBranch size={13} /> <span>Hands-On Capstone Project</span>
               </div>
-              <h4 className="text-sm font-bold text-[var(--foreground)]">{selectedPath.handsOn.title}</h4>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] break-words">
+                {selectedPath.handsOn.title}
+              </h4>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
                 {selectedPath.handsOn.description}
               </p>
               <div className="pt-1">
-                <span className="text-xs font-mono text-purple-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10 inline-block">
+                <span className="text-xs font-mono text-purple-300 bg-[var(--surface-1)] px-2.5 py-1 rounded-lg border border-[var(--border)] inline-block break-all">
                   Repository: {selectedPath.handsOn.repo}
                 </span>
               </div>
