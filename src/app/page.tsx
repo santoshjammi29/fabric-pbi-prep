@@ -6,7 +6,7 @@ export const revalidate = 3600; // 1-hour ISR cache on edge
 
 export async function generateMetadata(): Promise<Metadata> {
   return generatePageMetadata({
-    title: "Lakehouse Architect | Enterprise Data Platform, Fabric & Databricks Prep",
+    title: "Enterprise Fabric, Databricks & Lakehouse Systems Prep",
     description: "Enterprise preparation platform for Lakehouse Architects and Lead Data Engineers. Master Microsoft Fabric (DP-600), Databricks, Apache Spark 4.0, Delta Lake, Unity Catalog, and High-Scale Lakehouse Systems.",
     path: "/",
     keywords: ["Lakehouse Architect", "Microsoft Fabric", "Databricks", "Delta Lake", "Apache Spark", "DP-600 Exam Prep", "Unity Catalog", "Data Engineering System Design"],
