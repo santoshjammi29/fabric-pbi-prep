@@ -3,7 +3,7 @@ import { architectureDiagrams } from "@/data/diagrams";
 import { GUIDED_TOPICS } from "@/data/guided-learning-topics";
 import { conceptsDb } from "@/data";
 
-const BASE_URL = "https://fabric-pbi-prep.vercel.app";
+const BASE_URL = "https://lakehouse-architect.vercel.app";
 
 /**
  * Dynamic Self-Updating Sitemap Engine

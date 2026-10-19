@@ -1,7 +1,7 @@
 # Design System & Editorial Guidelines
 
 > **Visual Language, Design Tokens, Component Primitives & Motion Specifications**  
-> Defining the quiet, data-dense, Apple- and Linear-inspired aesthetic of [`fabric-pbi-prep.vercel.app`](https://fabric-pbi-prep.vercel.app).
+> Defining the quiet, data-dense, Apple- and Linear-inspired aesthetic of [`lakehouse-architect.vercel.app`](https://lakehouse-architect.vercel.app).
 
 ---
 

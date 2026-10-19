@@ -34,15 +34,15 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "DataPlatform Architect | Enterprise Fabric, Databricks & Lakehouse Prep",
-    template: "%s | DataPlatform Architect",
+    default: "Lakehouse Architect | Enterprise Data Platform, Fabric & Databricks Prep",
+    template: "%s | Lakehouse Architect",
   },
   description:
-    "Enterprise interview preparation and system design portal for Microsoft Fabric, Databricks, Delta Lake, PySpark, and Modern Data Engineering. Master structured concepts, architecture blueprints, and 6,500+ architect drills.",
+    "Enterprise preparation platform and system design portal for Lakehouse Architects and Lead Data Engineers. Master Microsoft Fabric, Databricks, Delta Lake, PySpark, and High-Scale Lakehouse Systems.",
   openGraph: {
-    title: "DataPlatform Architect | Enterprise Fabric, Databricks & Lakehouse Prep",
+    title: "Lakehouse Architect | Enterprise Data Platform, Fabric & Databricks Prep",
     description:
-      "6,500+ architect-level Q&As across Fabric, Power BI, Databricks, Delta Lake, PySpark and System Design. Master the concepts that matter.",
+      "6,500+ architect-level Q&As and system design scenarios across Fabric, Databricks, Delta Lake, PySpark, and Lakehouse Architecture.",
     type: "website",
   },
   twitter: {
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "DataPlatform",
+    title: "Lakehouse",
   },
   formatDetection: {
     telephone: false,

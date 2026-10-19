@@ -88,14 +88,14 @@ function MobileHeaderInner() {
             {drawerOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <Link href="/" className="flex items-center gap-2.5 min-w-0" title="DataPlatform Architect">
+          <Link href="/" className="flex items-center gap-2.5 min-w-0" title="Lakehouse Architect">
             <BrandLogo size={28} className="rounded-lg shadow-xs" />
             <div className="min-w-0">
               <h2 className="text-xs sm:text-sm font-bold text-[var(--foreground)] leading-tight truncate">
-                DataPlatform
+                Lakehouse
               </h2>
               <span className="text-[9px] sm:text-[10px] font-medium text-[var(--muted-foreground)] block -mt-0.5">
-                Architect Prep
+                Architect Platform
               </span>
             </div>
           </Link>

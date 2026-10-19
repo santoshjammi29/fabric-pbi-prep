@@ -84,7 +84,7 @@ describe("Architecture & Systems Reorder, Word Wrap & Resizable Sidebar Tests", 
     render(<AllPagesFooter />);
 
     // High signal content remains
-    expect(screen.getByText("DataPlatform Architect Notes")).toBeDefined();
+    expect(screen.getByText("Lakehouse Architect Notes")).toBeDefined();
     expect(screen.getByText("2026 Edition")).toBeDefined();
     expect(screen.getByText("10,700+")).toBeDefined();
 

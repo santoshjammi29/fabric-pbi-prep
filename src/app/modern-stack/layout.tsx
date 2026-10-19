@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Enterprise production blueprints for Iceberg, Delta Lake UniForm, Debezium CDC, Vector Search RAG pipelines, and FinOps cost calculators.",
   path: "/modern-stack",
-  ogImage: "https://fabric-pbi-prep.vercel.app/diagrams/rag_vector_search_data_pipeline.webp",
+  ogImage: "https://lakehouse-architect.vercel.app/diagrams/rag_vector_search_data_pipeline.webp",
   keywords: [
     "Modern Data Stack Blueprints",
     "Delta UniForm Iceberg",

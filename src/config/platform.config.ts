@@ -10,12 +10,12 @@ import { StandardizedDomain, Difficulty } from "@/types";
 
 export const PLATFORM_CONFIG = {
   // Brand & Metadata
-  name: "DataPlatform Architect",
-  shortName: "DataPlatform",
+  name: "Lakehouse Architect",
+  shortName: "Lakehouse",
   tagline: "Enterprise Data Platform & Lakehouse Systems Architecture",
   description:
     "Comprehensive preparation platform for Principal Data Architects and Lead Engineers covering Microsoft Fabric, Databricks, Apache Spark, Delta Lake, Airflow, and Real-Time Lakehouse Systems.",
-  url: "https://fabric-pbi-prep.vercel.app",
+  url: "https://lakehouse-architect.vercel.app",
   author: "Santosh Jammi",
   githubRepo: "https://github.com/santoshjammi29/fabric-pbi-prep",
 

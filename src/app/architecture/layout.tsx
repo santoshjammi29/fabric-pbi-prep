@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Production-grade architecture diagrams, system design blueprints, and trade-off matrices for Microsoft Fabric, OneLake, Databricks Unity Catalog, Delta Lake, and Apache Airflow.",
   path: "/architecture",
-  ogImage: "https://fabric-pbi-prep.vercel.app/diagrams/fabric_onelake_architecture.webp",
+  ogImage: "https://lakehouse-architect.vercel.app/diagrams/fabric_onelake_architecture.webp",
   keywords: [
     "Lakehouse System Design",
     "Data Architecture Diagrams",

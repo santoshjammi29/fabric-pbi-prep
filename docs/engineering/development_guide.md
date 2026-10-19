@@ -1,4 +1,4 @@
-# Development, Testing, & Operations Guide: `fabric-pbi-prep`
+# Development, Testing, & Operations Guide: `lakehouse-architect`
 
 Welcome to the **fabric-pbi-prep** developer and contributor guide. This document details the modern Next.js 16 App Router architecture, Server-Side Data Access Layer (DAL), automated Vitest test suite, and release workflows.
 

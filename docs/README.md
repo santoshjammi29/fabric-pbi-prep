@@ -1,7 +1,7 @@
-# Central Documentation Hub: `fabric-pbi-prep`
+# Central Documentation Hub: `lakehouse-architect`
 
 > **Unified Enterprise Knowledge Architecture & Operational Guidelines**  
-> Comprehensive documentation library for [`https://fabric-pbi-prep.vercel.app`](https://fabric-pbi-prep.vercel.app).
+> Comprehensive documentation library for [`https://lakehouse-architect.vercel.app`](https://lakehouse-architect.vercel.app).
 
 ---
 

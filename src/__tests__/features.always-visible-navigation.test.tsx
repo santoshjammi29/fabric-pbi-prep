@@ -69,7 +69,7 @@ describe("Streamlined Navigation & Meaningful Bottom Page Notes", () => {
     render(<AllPagesFooter />);
 
     // High-signal platform notes and metrics
-    expect(screen.getByText("DataPlatform Architect Notes")).toBeDefined();
+    expect(screen.getByText("Lakehouse Architect Notes")).toBeDefined();
     expect(screen.getByText("2026 Edition")).toBeDefined();
     expect(screen.getByText("10,700+")).toBeDefined();
     expect(screen.getByText("Verified Assets")).toBeDefined();

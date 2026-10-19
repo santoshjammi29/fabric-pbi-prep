@@ -1,6 +1,6 @@
 /**
  * Comprehensive TypeScript Type Definitions
- * Source: Fabric & Flow / Microsoft Data Platform Architecture Prep (fabric-pbi-prep.vercel.app)
+ * Source: Lakehouse Architect (lakehouse-architect.vercel.app)
  */
 
 // ==========================================

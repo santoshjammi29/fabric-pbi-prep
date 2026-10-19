@@ -24,77 +24,79 @@ export function BrandLogo({
       width={size}
       height={size}
       className={cn("shrink-0 select-none", className)}
-      aria-label="DataPlatform Architect Logo"
+      aria-label="Lakehouse Architect Logo"
       role="img"
       {...props}
     >
       <defs>
         {/* Background Gradient */}
-        <linearGradient id="bl-bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#0E1726" />
-          <stop offset="50%" stopColor="#090D16" />
-          <stop offset="100%" stopColor="#03060C" />
+        <linearGradient id="bl-lh-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0B132B" />
+          <stop offset="50%" stopColor="#060913" />
+          <stop offset="100%" stopColor="#020408" />
         </linearGradient>
 
-        {/* Glassmorphic Border Glow */}
-        <linearGradient id="bl-borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.9" />
-          <stop offset="40%" stopColor="#0284C7" stopOpacity="0.3" />
-          <stop offset="70%" stopColor="#10B981" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#047857" stopOpacity="0.2" />
+        {/* Border Ring Glow */}
+        <linearGradient id="bl-lh-border" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.95" />
+          <stop offset="35%" stopColor="#38BDF8" stopOpacity="0.5" />
+          <stop offset="70%" stopColor="#10B981" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.6" />
         </linearGradient>
 
-        {/* Ambient Core Glow */}
-        <radialGradient id="bl-ambientNebula" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#0284C7" stopOpacity="0.4" />
-          <stop offset="45%" stopColor="#059669" stopOpacity="0.2" />
-          <stop offset="85%" stopColor="#000000" stopOpacity="0" />
-        </radialGradient>
-
-        {/* Lakehouse Arm 1: Azure Compute & Ingestion */}
-        <linearGradient id="bl-armAzure" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#0284C7" />
-          <stop offset="40%" stopColor="#0EA5E9" />
+        {/* Lakehouse Left Pillar (Cyan / Azure Ingestion) */}
+        <linearGradient id="bl-lh-pillar-left" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#0369A1" />
+          <stop offset="40%" stopColor="#0284C7" />
+          <stop offset="80%" stopColor="#0EA5E9" />
           <stop offset="100%" stopColor="#38BDF8" />
         </linearGradient>
 
-        {/* Lakehouse Arm 2: Emerald Curated & Direct Lake */}
-        <linearGradient id="bl-armEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+        {/* Lakehouse Right Pillar (Emerald / Mint Engine) */}
+        <linearGradient id="bl-lh-pillar-right" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#34D399" />
-          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="45%" stopColor="#10B981" />
+          <stop offset="85%" stopColor="#059669" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+
+        {/* Lakehouse Base Foundation (Cobalt / Indigo Storage) */}
+        <linearGradient id="bl-lh-base" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#1E40AF" />
+          <stop offset="45%" stopColor="#2563EB" />
+          <stop offset="75%" stopColor="#0284C7" />
           <stop offset="100%" stopColor="#059669" />
         </linearGradient>
 
-        {/* Lakehouse Arm 3: Cobalt Storage & ACID Delta Core */}
-        <linearGradient id="bl-armCobalt" x1="100%" y1="0%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="#047857" />
-          <stop offset="25%" stopColor="#0D9488" />
-          <stop offset="70%" stopColor="#2563EB" />
-          <stop offset="100%" stopColor="#1D4ED8" />
-        </linearGradient>
-
-        {/* 3D Bevel Highlights */}
-        <linearGradient id="bl-bevelLight" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.75" />
+        {/* Specular Bevel Highlights */}
+        <linearGradient id="bl-lh-bevel" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
           <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.05" />
         </linearGradient>
 
-        {/* Central Photon Spark */}
-        <radialGradient id="bl-photonSpark" cx="50%" cy="50%" r="50%">
+        {/* Photon Gold Core Glow */}
+        <radialGradient id="bl-lh-photon" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#FFFFFF" />
-          <stop offset="25%" stopColor="#E0F2FE" />
-          <stop offset="60%" stopColor="#38BDF8" />
-          <stop offset="100%" stopColor="#0284C7" stopOpacity="0" />
+          <stop offset="25%" stopColor="#FDE047" />
+          <stop offset="55%" stopColor="#F59E0B" />
+          <stop offset="85%" stopColor="#D97706" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#D97706" stopOpacity="0" />
         </radialGradient>
 
-        {/* Drop Shadow Filter */}
-        <filter id="bl-deltaShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="16" stdDeviation="20" floodColor="#000000" floodOpacity="0.7" />
-          <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#0284C7" floodOpacity="0.35" />
+        {/* Ambient Core Glow */}
+        <radialGradient id="bl-lh-nebula" cx="50%" cy="52%" r="48%">
+          <stop offset="0%" stopColor="#0284C7" stopOpacity="0.45" />
+          <stop offset="50%" stopColor="#059669" stopOpacity="0.25" />
+          <stop offset="90%" stopColor="#020408" stopOpacity="0" />
+        </radialGradient>
+
+        <filter id="bl-lh-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#000000" floodOpacity="0.8" />
+          <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#0284C7" floodOpacity="0.4" />
         </filter>
 
-        <filter id="bl-sparkGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+        <filter id="bl-lh-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="6" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -102,92 +104,67 @@ export function BrandLogo({
         </filter>
       </defs>
 
-      {/* Container Squircle Background */}
-      <rect width="512" height="512" rx="120" fill="url(#bl-bgGrad)" />
+      {/* Squircle Container */}
+      <rect width="512" height="512" rx="124" fill="url(#bl-lh-bg)" />
       <rect
-        x="5"
-        y="5"
-        width="502"
-        height="502"
-        rx="115"
+        x="6"
+        y="6"
+        width="500"
+        height="500"
+        rx="118"
         fill="none"
-        stroke="url(#bl-borderGrad)"
-        strokeWidth="4.5"
+        stroke="url(#bl-lh-border)"
+        strokeWidth="5"
       />
-      {showGlow && <circle cx="256" cy="256" r="195" fill="url(#bl-ambientNebula)" />}
+      {showGlow && <circle cx="256" cy="265" r="200" fill="url(#bl-lh-nebula)" />}
 
-      {/* Outer Tech Circuit Geometry */}
-      <g opacity="0.35" stroke="url(#bl-borderGrad)" strokeWidth="2" fill="none">
-        <polygon points="256,66 420,161 420,351 256,446 92,351 92,161" />
-        <line x1="256" y1="66" x2="256" y2="100" strokeDasharray="3,3" />
-        <line x1="420" y1="351" x2="390" y2="335" strokeDasharray="3,3" />
-        <line x1="92" y1="351" x2="122" y2="335" strokeDasharray="3,3" />
-        <circle cx="256" cy="66" r="5" fill="#38BDF8" />
-        <circle cx="420" cy="161" r="4" fill="#38BDF8" />
-        <circle cx="420" cy="351" r="5" fill="#10B981" />
-        <circle cx="256" cy="446" r="4" fill="#10B981" />
-        <circle cx="92" cy="351" r="5" fill="#2563EB" />
-        <circle cx="92" cy="161" r="4" fill="#38BDF8" />
+      {/* Subtle Architectural Blueprint Lattice */}
+      <g opacity="0.25" stroke="url(#bl-lh-border)" strokeWidth="1.8" fill="none">
+        <polygon points="256,62 428,161 428,360 256,459 84,360 84,161" />
+        <line x1="256" y1="62" x2="256" y2="459" strokeDasharray="4,4" />
+        <line x1="84" y1="260" x2="428" y2="260" strokeDasharray="4,4" />
+        <circle cx="256" cy="62" r="5" fill="#00F0FF" />
+        <circle cx="428" cy="161" r="4.5" fill="#38BDF8" />
+        <circle cx="428" cy="360" r="5" fill="#10B981" />
+        <circle cx="256" cy="459" r="4.5" fill="#3B82F6" />
+        <circle cx="84" cy="360" r="5" fill="#2563EB" />
+        <circle cx="84" cy="161" r="4.5" fill="#00F0FF" />
       </g>
 
-      {/* Master Interlocking Delta-Core Emblem */}
-      <g filter="url(#bl-deltaShadow)">
-        {/* Arm 1: Azure Compute & Ingestion */}
-        <path
-          d="M 256,86 L 296,155 L 204,314 L 156,314 L 106,400 L 66,331 Z"
-          fill="url(#bl-armAzure)"
-        />
-        <path d="M 256,86 L 296,155 L 284,155 L 256,106 Z" fill="url(#bl-bevelLight)" />
+      {/* The Architectural Lakehouse Delta Monolith */}
+      <g filter="url(#bl-lh-shadow)">
+        {/* Arm 1: Left Ingestion Pillar */}
+        <polygon points="256,76 304,152 208,322 152,322 96,416 54,342" fill="url(#bl-lh-pillar-left)" />
+        <polygon points="256,76 304,152 290,152 256,98" fill="url(#bl-lh-bevel)" />
 
-        {/* Arm 2: Emerald Analytics & Direct Lake */}
-        <path
-          d="M 256,86 L 446,400 L 386,400 L 310,270 L 256,176 L 256,86 Z"
-          fill="url(#bl-armEmerald)"
-        />
-        <path
-          d="M 256,86 L 446,400 L 432,400 L 256,106 Z"
-          fill="url(#bl-bevelLight)"
-          opacity="0.6"
-        />
+        {/* Arm 2: Right Engine Pillar */}
+        <polygon points="256,76 458,416 394,416 316,278 256,174 256,76" fill="url(#bl-lh-pillar-right)" />
+        <polygon points="256,76 458,416 442,416 256,98" fill="url(#bl-lh-bevel)" opacity="0.6" />
 
-        {/* Arm 3: Delta ACID & Foundation Layer */}
-        <path
-          d="M 446,400 L 386,400 L 356,348 L 176,348 L 146,400 L 106,400 L 176,280 L 236,280 L 204,334 L 348,334 L 386,400 Z"
-          fill="url(#bl-armCobalt)"
-        />
+        {/* Arm 3: Base Foundation Tier */}
+        <polygon points="458,416 394,416 362,360 178,360 146,416 96,416 172,286 236,286 200,344 354,344" fill="url(#bl-lh-base)" />
 
-        {/* Dynamic Continuous Prism Overlap Facet */}
-        <path d="M 256,86 L 282,132 L 256,176 L 230,132 Z" fill="#38BDF8" opacity="0.9" />
-        <path
-          d="M 106,400 L 156,314 L 204,314 L 176,364 L 124,364 Z"
-          fill="#1D4ED8"
-          opacity="0.95"
-        />
+        {/* Apex Keystone Prism Facet */}
+        <polygon points="256,76 288,128 256,174 224,128" fill="#38BDF8" opacity="0.95" />
+        <polygon points="256,76 288,128 256,110" fill="#FFFFFF" opacity="0.7" />
 
-        {/* Central Photon Spark */}
-        <circle cx="256" cy="276" r="32" fill="url(#bl-photonSpark)" filter="url(#bl-sparkGlow)" />
-        <polygon
-          points="256,242 278,276 256,310 234,276"
-          fill="#FFFFFF"
-          filter="url(#bl-sparkGlow)"
-        />
-        <circle cx="256" cy="276" r="4" fill="#0EA5E9" />
+        {/* Left Base Anchor Facet */}
+        <polygon points="96,416 152,322 202,322 174,374 116,374" fill="#1D4ED8" opacity="0.95" />
 
-        {/* Streaming Data Dots */}
-        <circle cx="256" cy="120" r="3" fill="#FFFFFF" opacity="0.9" />
-        <circle cx="340" cy="265" r="3.5" fill="#FFFFFF" opacity="0.9" />
-        <circle cx="270" cy="341" r="3" fill="#FFFFFF" opacity="0.9" />
-        <circle cx="170" cy="305" r="3" fill="#FFFFFF" opacity="0.9" />
+        {/* Central Gold Medallion & Photon Spark */}
+        <circle cx="256" cy="278" r="36" fill="url(#bl-lh-photon)" filter="url(#bl-lh-glow)" />
+        <polygon points="256,236 266,270 300,278 266,286 256,320 246,286 212,278 246,270" fill="#FFFFFF" filter="url(#bl-lh-glow)" />
+        <circle cx="256" cy="278" r="5" fill="#F59E0B" />
+
+        {/* Ingestion Stream Data Orbitals */}
+        <circle cx="256" cy="116" r="3.5" fill="#FFFFFF" opacity="0.95" />
+        <circle cx="348" cy="268" r="3.5" fill="#FFFFFF" opacity="0.95" />
+        <circle cx="272" cy="352" r="3.5" fill="#FFFFFF" opacity="0.95" />
+        <circle cx="166" cy="312" r="3.5" fill="#FFFFFF" opacity="0.95" />
       </g>
 
-      {/* Top Specular Sweep */}
-      <path
-        d="M 30,120 Q 30,30 120,30 Q 256,30 380,30"
-        stroke="url(#bl-bevelLight)"
-        strokeWidth="2"
-        fill="none"
-        opacity="0.4"
-      />
+      {/* Top-Left Subtle Glass Arc Highlight */}
+      <path d="M 32,130 Q 32,32 130,32 Q 256,32 384,32" stroke="url(#bl-lh-bevel)" strokeWidth="2.5" fill="none" opacity="0.45" />
     </svg>
   );
 }

@@ -1,7 +1,7 @@
 # Engineering & Operations Documentation
 
 > **Developer Quickstart, Architecture Specifications, Test Runbooks & Strategic Roadmap**  
-> Operational guidelines for building, testing, optimizing, and deploying [`fabric-pbi-prep.vercel.app`](https://fabric-pbi-prep.vercel.app).
+> Operational guidelines for building, testing, optimizing, and deploying [`lakehouse-architect.vercel.app`](https://lakehouse-architect.vercel.app).
 
 ---
 

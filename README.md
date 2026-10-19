@@ -1,21 +1,21 @@
-# Microsoft Data Platform & Lakehouse Architect Prep (`fabric-pbi-prep`)
+# Lakehouse Architect (`lakehouse-architect`)
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16_App_Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19_Server_Components-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x_Strict-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Tests-298_Passed_(32_Files)-green?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![Production Status](https://img.shields.io/badge/Production-Live_on_Vercel-success?style=flat-square&logo=vercel)](https://fabric-pbi-prep.vercel.app)
+[![Vitest](https://img.shields.io/badge/Tests-341_Passed-green?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Production Status](https://img.shields.io/badge/Production-Live_on_Vercel-success?style=flat-square&logo=vercel)](https://lakehouse-architect.vercel.app)
 
 > **Enterprise-Grade Cloud Educational Platform & Architecture Encyclopedia**  
 > Tailored for Principal Data Architects, Staff Data Engineers, and Lead Analytics Engineers mastering Microsoft Fabric, Databricks, Delta Lake, Apache Spark, Power BI, Azure Data Factory, and Modern Lakehouse Design.
 
-🌐 **Live Application**: [https://fabric-pbi-prep.vercel.app](https://fabric-pbi-prep.vercel.app)
+🌐 **Live Application**: [https://lakehouse-architect.vercel.app](https://lakehouse-architect.vercel.app)
 
 ---
 
 ## 🏛️ System Architecture
 
-`fabric-pbi-prep` is engineered with a **Zero-Bundle Data Architecture**, isolating all large datasets to server-side Data Access Layers (DAL) with React 19 `cache()` request deduplication, rendering 60 FPS client surfaces using `@tanstack/react-virtual` and hardware-accelerated HTML5 `<canvas>`:
+`lakehouse-architect` is engineered with a **Zero-Bundle Data Architecture**, isolating all large datasets to server-side Data Access Layers (DAL) with React 19 `cache()` request deduplication, rendering 60 FPS client surfaces using `@tanstack/react-virtual` and hardware-accelerated HTML5 `<canvas>`:
 
 ```
        ┌─────────────────────────────────────────────────────────────┐

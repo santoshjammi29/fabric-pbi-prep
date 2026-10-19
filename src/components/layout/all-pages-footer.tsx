@@ -19,7 +19,7 @@ function AllPagesFooterInner() {
             <div className="flex flex-wrap items-center gap-2.5">
               <BrandLogo size={28} className="rounded-lg shadow-xs" />
               <h3 className="font-bold text-sm sm:text-base text-[var(--foreground)] tracking-tight">
-                DataPlatform Architect Notes
+                Lakehouse Architect Notes
               </h3>
               <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 2026 Edition
@@ -70,7 +70,7 @@ function AllPagesFooterInner() {
 
         {/* Minimal Copyright */}
         <div className="pt-2 text-center sm:text-left text-[11px] text-[var(--muted-foreground)] border-t border-[var(--border)]">
-          <p>© 2026 DataPlatform Architect • All scenario data, diagrams, and curriculum assets engineered for enterprise cloud architecture mastery.</p>
+          <p>© 2026 Lakehouse Architect • All scenario data, diagrams, and curriculum assets engineered for enterprise cloud architecture mastery.</p>
         </div>
       </div>
     </footer>

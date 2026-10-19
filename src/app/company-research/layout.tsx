@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Architectural technology stack breakdowns, data platform footprints, and targeted interview preparation rubrics for Fortune 500 enterprises and GCC tech hubs.",
   path: "/company-research",
-  ogImage: "https://fabric-pbi-prep.vercel.app/diagrams/unity_catalog_architecture.webp",
+  ogImage: "https://lakehouse-architect.vercel.app/diagrams/unity_catalog_architecture.webp",
   keywords: [
     "Enterprise Tech Stack Dossiers",
     "GCC Data Architect Interview",

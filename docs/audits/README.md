@@ -1,7 +1,7 @@
 # Production Audits & Quality Assurance Reports
 
 > **Verified Performance Benchmarks, Accessibility Matrices & System Integrity Audits**  
-> Tracking global edge performance, zero-bundle compliance, WCAG 2.1 AA accessibility, and automated test coverage for [`fabric-pbi-prep.vercel.app`](https://fabric-pbi-prep.vercel.app).
+> Tracking global edge performance, zero-bundle compliance, WCAG 2.1 AA accessibility, and automated test coverage for [`lakehouse-architect.vercel.app`](https://lakehouse-architect.vercel.app).
 
 ---
 

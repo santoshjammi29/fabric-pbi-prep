@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const SITE_URL = "https://fabric-pbi-prep.vercel.app";
+const SITE_URL = "https://lakehouse-architect.vercel.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/diagrams/fabric_onelake_architecture.webp`;
 
 export interface PageMetadataOptions {
@@ -25,12 +25,13 @@ export function buildPageMetadata({
   type = "website",
 }: PageMetadataOptions): Metadata {
   const canonicalUrl = `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const fullTitle = `${title} | DataPlatform Architect`;
+  const fullTitle = `${title} | Lakehouse Architect`;
 
   return {
     title: fullTitle,
     description,
     keywords: [
+      "Lakehouse Architect",
       "Microsoft Fabric",
       "Power BI",
       "Azure Databricks",
@@ -48,7 +49,7 @@ export function buildPageMetadata({
       title: fullTitle,
       description,
       url: canonicalUrl,
-      siteName: "DataPlatform Architect",
+      siteName: "Lakehouse Architect",
       images: [
         {
           url: ogImage,
@@ -65,7 +66,7 @@ export function buildPageMetadata({
       title: fullTitle,
       description,
       images: [ogImage],
-      creator: "@fabric_pbi_prep",
+      creator: "@lakehouse_arch",
     },
     robots: {
       index: true,
@@ -114,7 +115,7 @@ export function generateCourseSchema(
     description: course.description,
     provider: {
       "@type": "Organization",
-      name: "DataPlatform Architect",
+      name: "Lakehouse Architect",
       sameAs: SITE_URL,
     },
     url: `${SITE_URL}${course.url.startsWith("/") ? course.url : `/${course.url}`}`,

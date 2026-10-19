@@ -2,7 +2,7 @@
 
 ## 1. Overview & Core Philosophy
 
-**DataPlatform Architect** (`fabric-pbi-prep.vercel.app`) is engineered for high-performance, real-time global access by thousands of concurrent engineers, architects, and interview candidates.
+**DataPlatform Architect** (`lakehouse-architect.vercel.app`) is engineered for high-performance, real-time global access by thousands of concurrent engineers, architects, and interview candidates.
 
 To guarantee zero latency worldwide and seamless future maintenance, the codebase adheres to four architectural invariants:
 

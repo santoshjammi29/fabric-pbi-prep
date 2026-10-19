@@ -139,7 +139,7 @@ function SidebarInner() {
         <Link
           href="/"
           className="flex items-center gap-2.5 sm:gap-3 min-w-0 group"
-          title="DataPlatform Architect - Home"
+          title="Lakehouse Architect - Home"
         >
           <BrandLogo
             size={collapsed ? 28 : 32}
@@ -148,10 +148,10 @@ function SidebarInner() {
           {!collapsed && (
             <div className="min-w-0 flex-1">
               <h1 className="text-sm font-bold text-[var(--foreground)] tracking-tight break-words leading-tight group-hover:text-blue-400 transition-colors">
-                DataPlatform
+                Lakehouse
               </h1>
               <span className="text-[10px] font-medium text-[var(--muted-foreground)] block -mt-0.5">
-                Architect Prep
+                Architect Platform
               </span>
             </div>
           )}

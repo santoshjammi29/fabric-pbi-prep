@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://fabric-pbi-prep.vercel.app";
+const BASE_URL = "https://lakehouse-architect.vercel.app";
 
 /**
  * Dynamic robots.txt generator

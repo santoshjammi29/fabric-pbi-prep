@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "DataPlatform Architect",
-    short_name: "DP Architect",
+    name: "Lakehouse Architect",
+    short_name: "Lakehouse",
     description:
       "Enterprise interview preparation and system design portal for Microsoft Fabric, Databricks, Delta Lake, and Distributed Lakehouse architectures.",
     start_url: "/",
