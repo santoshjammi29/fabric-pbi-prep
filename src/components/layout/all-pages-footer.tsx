@@ -69,8 +69,9 @@ function AllPagesFooterInner() {
 
 
         {/* Minimal Copyright */}
-        <div className="pt-2 text-center sm:text-left text-[11px] text-[var(--muted-foreground)] border-t border-[var(--border)]">
-          <p>© 2026 Lakehouse Architect • All scenario data, diagrams, and curriculum assets engineered for enterprise cloud architecture mastery.</p>
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[var(--muted-foreground)] border-t border-[var(--border)]">
+          <p>© 2026 Lakehouse Architect (<a href="https://lakehousearchitect.vercel.app" className="hover:text-blue-500 underline underline-offset-2">https://lakehousearchitect.vercel.app</a>) • Enterprise Data Platform Architecture &amp; System Design Portal.</p>
+          <span className="font-mono text-[10px] text-[var(--muted-foreground)] hidden sm:inline">https://lakehousearchitect.vercel.app</span>
         </div>
       </div>
     </footer>
