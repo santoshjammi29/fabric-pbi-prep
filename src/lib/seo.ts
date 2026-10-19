@@ -32,9 +32,11 @@ export function buildPageMetadata({
     .replace(/\s*\|\s*Fabric Prep.*$/i, "")
     .trim();
   const fullTitle = `${cleanTitle} | Lakehouse Architect`;
+  const isRoot = path === "/" || path === "";
+  const pageTitle = isRoot ? fullTitle : cleanTitle;
 
   return {
-    title: cleanTitle,
+    title: pageTitle,
     description,
     keywords: [
       "Lakehouse",
