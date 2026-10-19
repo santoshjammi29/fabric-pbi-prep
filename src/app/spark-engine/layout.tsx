@@ -2,18 +2,20 @@ import type { Metadata } from "next";
 import { buildPageMetadata, generateCourseSchema, generateHowToSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Apache Spark 4.0 Internals & Execution Engine Simulator",
+  title: "Apache Spark 4.0 Lakehouse Compute Engine & Execution Simulator",
   description:
-    "Interactive Spark 4.0 execution simulator, memory allocator geometry, shuffle stage mechanics, Tungsten whole-stage codegen, and Adaptive Query Execution (AQE).",
+    "Interactive Spark 4.0 execution simulator, memory allocator geometry, shuffle stage mechanics, Tungsten whole-stage codegen, and Adaptive Query Execution (AQE) for Lakehouse systems.",
   path: "/spark-engine",
   ogImage: "https://lakehousearchitect.vercel.app/diagrams/spark_shuffle_memory_execution.webp",
   keywords: [
+    "Lakehouse Compute Engine",
+    "Lakehouse Architecture",
     "Spark 4.0 Internals",
     "Spark Execution Simulator",
     "Tungsten Execution Engine",
     "AQE Adaptive Query Execution",
     "Spark Memory Management",
-    "Shuffle Skew Remediation",
+    "Delta Lake Spark",
   ],
 });
 

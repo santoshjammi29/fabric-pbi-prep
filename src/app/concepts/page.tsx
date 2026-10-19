@@ -11,11 +11,20 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const concepts = await getConceptsDAL();
   return buildPageMetadata({
-    title: `Core Architectural Concepts (${concepts.length} Topics)`,
+    title: `Lakehouse Concepts & Architecture Glossary (${concepts.length} Terms)`,
     description:
-      "Deep dive into Microsoft Fabric, Databricks, Apache Airflow, Delta Lake, and Data Vault architectural concepts with spaced repetition flashcards.",
+      `Master modern Lakehouse Architecture concepts, Delta Lake, Apache Iceberg, Unity Catalog, and Medallion patterns with ${concepts.length} architectural definitions and spaced repetition cards.`,
     path: "/concepts",
-    keywords: ["Fabric Concepts", "Databricks Terms", "Airflow Architecture", "Delta Lake Internals", "Data Engineering Lexicon"],
+    keywords: [
+      "Lakehouse Concepts",
+      "Lakehouse Architecture",
+      "Lakehouse Glossary",
+      "Data Lakehouse Terms",
+      "Delta Lake Internals",
+      "Medallion Architecture Concepts",
+      "Unity Catalog",
+      "Microsoft Fabric Concepts",
+    ],
   });
 }
 

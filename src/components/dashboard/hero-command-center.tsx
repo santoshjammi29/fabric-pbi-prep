@@ -206,15 +206,15 @@ export function HeroCommandCenter() {
 
           {/* Main motivational title */}
           <div className="space-y-1">
-            <h1 className="text-base sm:text-lg lg:text-xl font-extrabold tracking-tight text-[var(--foreground)] leading-snug break-words">
-              Master the Modern Data Platform.
+            <h1 className="text-base sm:text-lg lg:text-2xl font-extrabold tracking-tight text-[var(--foreground)] leading-snug break-words">
+              Lakehouse Architecture &amp; Systems Mastery
               <span className="block mt-0.5 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-400">
-                From Internal Mechanics to Principal Architecture.
+                Enterprise Blueprints, Medallion Patterns &amp; Principal Systems Practice
               </span>
             </h1>
-            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed max-w-3xl break-words">
-              An open, production-grade learning operating system for Data Engineers and Architects.
-              Vetted curricula across Microsoft Fabric, Databricks Lakehouse, Apache Spark, and Distributed Systems.
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed max-w-3xl break-words">
+              The premier open-access knowledge base for Lakehouse Architects and Lead Data Engineers.
+              Master modern Lakehouse Architecture, Medallion patterns, Microsoft Fabric OneLake, Databricks Delta Lake, Apache Spark 4.0, Iceberg, and distributed systems design.
             </p>
           </div>
 

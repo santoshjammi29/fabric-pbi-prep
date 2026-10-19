@@ -11,11 +11,14 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const allQuestions = await getUnifiedQuestionsDAL();
   return buildPageMetadata({
-    title: `6,500+ Architecture Interview Q&As`,
+    title: `Lakehouse Architect Interview Questions & Scenarios (${allQuestions.length}+ Q&As)`,
     description:
-      "Comprehensive bank of 6,500+ verified interview questions with deep architectural answers covering Microsoft Fabric, Databricks, PySpark, Delta Lake, and Lakehouse System Design.",
+      `Master Lakehouse Architecture interviews with ${allQuestions.length}+ verified questions with deep architectural answers covering Microsoft Fabric, Databricks, PySpark, Delta Lake, and Medallion System Design.`,
     path: "/qa-prep",
     keywords: [
+      "Lakehouse Architect Interview Questions",
+      "Lakehouse Architecture",
+      "Lakehouse Scenarios",
       "Data Engineer Interview Questions",
       "Fabric Interview Q&A",
       "Databricks Architecture Questions",

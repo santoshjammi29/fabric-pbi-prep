@@ -2,18 +2,19 @@ import type { Metadata } from "next";
 import { buildPageMetadata, generateCourseSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Multi-Level Concepts Mind Map | 660+ Concepts Linked to Topics",
+  title: "Lakehouse Architecture & Systems Mind Map: 660+ Interactive Nodes",
   description:
-    "Interactive multi-level stretching mind map linking 660+ enterprise data concepts across Microsoft Fabric, Databricks, Apache Spark, Delta Lake, Airflow, and Distributed Systems.",
+    "Interactive multi-level stretching mind map visualizing Lakehouse Architecture, Medallion layers, Delta Lake internals, Apache Spark, and distributed systems design across 660+ linked concepts.",
   path: "/mindmap",
   keywords: [
-    "Concepts Mind Map",
-    "Data Engineering Mindmap",
+    "Lakehouse Architecture Mind Map",
+    "Lakehouse Mindmap",
+    "Data Lakehouse Architecture",
+    "Delta Lake Topography",
+    "Medallion Architecture Tree",
+    "Spark Core Mindmap",
     "Fabric Concept Tree",
     "Databricks Architecture Map",
-    "Spark Core Mindmap",
-    "Delta Lake Topography",
-    "Distributed Systems Concepts",
   ],
 });
 

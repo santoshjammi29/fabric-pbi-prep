@@ -13,10 +13,19 @@ export const revalidate = 3600; // 1-hour ISR cache on edge
 export async function generateMetadata(): Promise<Metadata> {
   const archData = await getArchitectureDataDAL();
   return generatePageMetadata({
-    title: `Enterprise Architecture Hub (${archData.length} Scenarios & Blueprints)`,
-    description: `Master distributed systems, Lakehouse trade-offs, and enterprise data architecture with ${archData.length} production interview scenarios.`,
+    title: `Lakehouse Architecture Hub: ${archData.length} Enterprise Scenarios & Blueprints`,
+    description: `Master modern Lakehouse Architecture, Medallion patterns, Spark 4.0 execution, and distributed systems with ${archData.length} production scenarios and digital whiteboards.`,
     path: "/architecture",
-    keywords: ["Lakehouse Architecture", "Enterprise Blueprints", "Data Architect Scenarios", "Fabric vs Databricks"],
+    keywords: [
+      "Lakehouse Architecture",
+      "Lakehouse",
+      "Data Lakehouse",
+      "Medallion Architecture",
+      "Enterprise Blueprints",
+      "Data Architect Scenarios",
+      "Fabric vs Databricks",
+      "Delta Lake Architecture",
+    ],
   });
 }
 
