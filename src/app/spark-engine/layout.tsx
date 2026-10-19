@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Interactive Spark 4.0 execution simulator, memory allocator geometry, shuffle stage mechanics, Tungsten whole-stage codegen, and Adaptive Query Execution (AQE).",
   path: "/spark-engine",
-  ogImage: "https://lakehouse-architect.vercel.app/diagrams/spark_shuffle_memory_execution.webp",
+  ogImage: "https://lakehousearchitect.vercel.app/diagrams/spark_shuffle_memory_execution.webp",
   keywords: [
     "Spark 4.0 Internals",
     "Spark Execution Simulator",

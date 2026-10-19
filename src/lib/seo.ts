@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const SITE_URL = "https://lakehouse-architect.vercel.app";
+const SITE_URL = "https://lakehousearchitect.vercel.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/diagrams/fabric_onelake_architecture.webp`;
 
 export interface PageMetadataOptions {

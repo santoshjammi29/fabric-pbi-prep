@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Curated step-by-step learning paths connecting foundational concepts, interview questions, architectural whiteboards, and code practice across 9 critical data platform pillars.",
   path: "/guided-learning",
-  ogImage: "https://lakehouse-architect.vercel.app/diagrams/databricks_medallion_architecture.webp",
+  ogImage: "https://lakehousearchitect.vercel.app/diagrams/databricks_medallion_architecture.webp",
   keywords: [
     "Fabric Guided Learning",
     "Databricks Learning Path",

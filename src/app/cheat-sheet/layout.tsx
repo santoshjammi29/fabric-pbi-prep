@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "High-density production cheat sheet and debugging reference guide for Data Engineers and Architects. Spark performance knobs, Catalyst optimization flow, dbt bundling, and database wait triage.",
   path: "/cheat-sheet",
-  ogImage: "https://lakehouse-architect.vercel.app/diagrams/catalyst_photon_engine.webp",
+  ogImage: "https://lakehousearchitect.vercel.app/diagrams/catalyst_photon_engine.webp",
   keywords: [
     "PySpark Cheat Sheet",
     "Spark Optimization Knobs",

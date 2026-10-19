@@ -4,12 +4,12 @@
 [![React 19](https://img.shields.io/badge/React-19_Server_Components-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x_Strict-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Vitest](https://img.shields.io/badge/Tests-341_Passed-green?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![Production Status](https://img.shields.io/badge/Production-Live_on_Vercel-success?style=flat-square&logo=vercel)](https://lakehouse-architect.vercel.app)
+[![Production Status](https://img.shields.io/badge/Production-Live_on_Vercel-success?style=flat-square&logo=vercel)](https://lakehousearchitect.vercel.app)
 
 > **Enterprise-Grade Cloud Educational Platform & Architecture Encyclopedia**  
 > Tailored for Principal Data Architects, Staff Data Engineers, and Lead Analytics Engineers mastering Microsoft Fabric, Databricks, Delta Lake, Apache Spark, Power BI, Azure Data Factory, and Modern Lakehouse Design.
 
-🌐 **Live Application**: [https://lakehouse-architect.vercel.app](https://lakehouse-architect.vercel.app)
+🌐 **Live Application**: [https://lakehousearchitect.vercel.app](https://lakehousearchitect.vercel.app)
 
 ---
 

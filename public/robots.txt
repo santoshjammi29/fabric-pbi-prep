@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lakehouse-architect.vercel.app/sitemap.xml
+Sitemap: https://lakehousearchitect.vercel.app/sitemap.xml

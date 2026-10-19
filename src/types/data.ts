@@ -1,6 +1,6 @@
 /**
  * Comprehensive TypeScript Type Definitions
- * Source: Lakehouse Architect (lakehouse-architect.vercel.app)
+ * Source: Lakehouse Architect (lakehousearchitect.vercel.app)
  */
 
 // ==========================================

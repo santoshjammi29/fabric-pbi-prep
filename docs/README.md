@@ -1,7 +1,7 @@
 # Central Documentation Hub: `lakehouse-architect`
 
 > **Unified Enterprise Knowledge Architecture & Operational Guidelines**  
-> Comprehensive documentation library for [`https://lakehouse-architect.vercel.app`](https://lakehouse-architect.vercel.app).
+> Comprehensive documentation library for [`https://lakehousearchitect.vercel.app`](https://lakehousearchitect.vercel.app).
 
 ---
 

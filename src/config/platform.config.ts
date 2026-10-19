@@ -15,7 +15,7 @@ export const PLATFORM_CONFIG = {
   tagline: "Enterprise Data Platform & Lakehouse Systems Architecture",
   description:
     "Comprehensive preparation platform for Principal Data Architects and Lead Engineers covering Microsoft Fabric, Databricks, Apache Spark, Delta Lake, Airflow, and Real-Time Lakehouse Systems.",
-  url: "https://lakehouse-architect.vercel.app",
+  url: "https://lakehousearchitect.vercel.app",
   author: "Santosh Jammi",
   githubRepo: "https://github.com/santoshjammi29/fabric-pbi-prep",
 

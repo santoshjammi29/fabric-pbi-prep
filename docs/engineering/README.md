@@ -1,7 +1,7 @@
 # Engineering & Operations Documentation
 
 > **Developer Quickstart, Architecture Specifications, Test Runbooks & Strategic Roadmap**  
-> Operational guidelines for building, testing, optimizing, and deploying [`lakehouse-architect.vercel.app`](https://lakehouse-architect.vercel.app).
+> Operational guidelines for building, testing, optimizing, and deploying [`lakehousearchitect.vercel.app`](https://lakehousearchitect.vercel.app).
 
 ---
 
