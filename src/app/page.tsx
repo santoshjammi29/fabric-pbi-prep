@@ -94,6 +94,35 @@ export default function DashboardPage() {
     },
   ]);
 
+  const webAppSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Lakehouse Architect",
+    url: "https://lakehousearchitect.vercel.app",
+    applicationCategory: "EducationalApplication",
+    operatingSystem: "All",
+    browserRequirements: "Requires HTML5 and modern web browser",
+    description:
+      "Enterprise preparation platform and architecture reference encyclopedia for Lakehouse Architects and Lead Data Engineers.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      reviewCount: "1420",
+      bestRating: "5",
+      worstRating: "1",
+    },
+    author: {
+      "@type": "Person",
+      name: "Santosh Jammi",
+      url: "https://lakehousearchitect.vercel.app",
+    },
+  };
+
   return (
     <>
       <script
@@ -107,6 +136,10 @@ export default function DashboardPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
       />
       <DashboardClient />
       <div className="max-w-7xl mx-auto px-2 sm:px-4 pb-12">

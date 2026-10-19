@@ -26,8 +26,23 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "Applebot",
         allow: "/",
       },
+      {
+        userAgent: "GPTBot",
+        allow: "/",
+      },
+      {
+        userAgent: "PerplexityBot",
+        allow: "/",
+      },
+      {
+        userAgent: "ClaudeBot",
+        allow: "/",
+      },
     ],
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: [
+      `${BASE_URL}/sitemap.xml`,
+      `${BASE_URL}/feed.xml`,
+    ],
     host: BASE_URL,
   };
 }

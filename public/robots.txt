@@ -11,5 +11,15 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
-Sitemap: https://lakehousearchitect.vercel.app/sitemap.xml
+User-agent: GPTBot
+Allow: /
 
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Host: https://lakehousearchitect.vercel.app
+Sitemap: https://lakehousearchitect.vercel.app/sitemap.xml
+Sitemap: https://lakehousearchitect.vercel.app/feed.xml

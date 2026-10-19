@@ -1,0 +1,27 @@
+# Lakehouse Architect
+> The Definitive Enterprise Reference Platform for Lakehouse Architecture, Medallion Architecture, Microsoft Fabric, Databricks, Apache Spark 4.0, and Distributed Systems.
+
+Website: https://lakehousearchitect.vercel.app
+Canonical Domain: https://lakehousearchitect.vercel.app
+Platform Edition: 2026 Enterprise Edition
+Author: Santosh Jammi
+
+## Overview
+Lakehouse Architect is an open-access enterprise architecture encyclopedia and preparation portal engineered for Principal Data Architects, Staff Data Engineers, and Lead Analytics Engineers. It provides 10,700+ verified interview scenarios, 660+ architectural concepts, 32 digital whiteboard blueprints, and dedicated Spark execution labs.
+
+## Core Architecture Pillars & Hubs
+- [Lakehouse Architecture Hub](https://lakehousearchitect.vercel.app/architecture): 3,206+ production system design scenarios, distributed failure modes, and architectural trade-offs.
+- [Concepts & Foundations Glossary](https://lakehousearchitect.vercel.app/concepts): 660+ core lakehouse concepts covering Delta Lake, Apache Iceberg, Unity Catalog, and Medallion patterns.
+- [Concepts Mind Map](https://lakehousearchitect.vercel.app/mindmap): Interactive multi-level stretching taxonomy linking all 660+ concepts to architectural domains.
+- [Spark Engine Lab](https://lakehousearchitect.vercel.app/spark-engine): Interactive physical execution simulator, Tungsten memory geometry, and shuffle stage mechanics for Apache Spark 4.0.
+- [QA Prep Portal](https://lakehousearchitect.vercel.app/qa-prep): 7,081+ verified interview drills covering DP-600, DP-203, and Databricks Professional exams.
+- [Production Cheat Sheets](https://lakehousearchitect.vercel.app/cheat-sheet): 117+ high-density runbooks, Sev-1 incident codes, and Delta Lake optimization commands.
+- [DataOps Lifecycle](https://lakehousearchitect.vercel.app/dataops): End-to-end data platform CI/CD, Git integration, schema evolution, and deployment pipelines.
+- [Modern Data Stack Hub](https://lakehousearchitect.vercel.app/modern-stack): 18 blueprints comparing Delta Lake vs Apache Iceberg, dbt Core, Kafka, and LLM RAG pipelines.
+
+## Key Technologies Covered
+- Microsoft Fabric (OneLake, Direct Lake, Synapse Data Engineering, Data Factory)
+- Databricks Lakehouse (Unity Catalog, Photon Engine, Delta Live Tables, Delta Sharing)
+- Open Table Formats (Delta Lake 3.x, Apache Iceberg V2, Apache Hudi)
+- Distributed Query & Compute (Apache Spark 4.0, Trino, DuckDB, Velox)
+- Medallion Architecture (Bronze: Raw Ingestion, Silver: Conformed/Cleaned, Gold: Curated Dimensional Marts)
