@@ -130,7 +130,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "8umVlTGBWPcEsCNwh0nMyrl_ZThusWOd561vhZEluzU",
     yandex: process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION,
   },
 };
