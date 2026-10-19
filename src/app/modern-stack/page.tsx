@@ -9,7 +9,7 @@ export const revalidate = 3600; // 1-hour ISR cache on edge
 export async function generateMetadata(): Promise<Metadata> {
   const modernData = await getModernStackDAL();
   return generatePageMetadata({
-    title: `Modern Data Stack & AI Architecture (${modernData.blueprints.length} Blueprints) | Fabric Prep`,
+    title: `Modern Data Stack & AI Architecture (${modernData.blueprints.length} Blueprints)`,
     description: `Enterprise guide to modern Lakehouse architectures, Iceberg vs Delta, dbt Core, Kafka event streams, and LLM RAG pipelines.`,
     path: "/modern-stack",
     keywords: ["Modern Data Stack", "Apache Iceberg", "Delta Lake", "dbt Core", "Vector Databases", "GenAI RAG"],

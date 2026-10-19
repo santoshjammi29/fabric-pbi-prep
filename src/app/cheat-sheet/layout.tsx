@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { buildPageMetadata, generateHowToSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Data Engineering Production Cheat Sheet | Spark, dbt, Airflow & Lakehouse",
+  title: "Lakehouse Architecture & Engineering Production Cheat Sheet",
   description:
-    "High-density production cheat sheet and debugging reference guide for Data Engineers and Architects. Spark performance knobs, Catalyst optimization flow, dbt bundling, and database wait triage.",
+    "High-density production cheat sheet and debugging reference guide for Lakehouse Architects and Data Engineers. Spark performance knobs, Delta Lake triage, Catalyst optimization flow, and dbt bundling.",
   path: "/cheat-sheet",
   ogImage: "https://lakehousearchitect.vercel.app/diagrams/catalyst_photon_engine.webp",
   keywords: [

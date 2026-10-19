@@ -25,21 +25,31 @@ export function buildPageMetadata({
   type = "website",
 }: PageMetadataOptions): Metadata {
   const canonicalUrl = `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const fullTitle = `${title} | Lakehouse Architect`;
+  
+  // Clean raw title so Next.js root layout template ("%s | Lakehouse Architect") does not duplicate the suffix
+  const cleanTitle = title
+    .replace(/\s*\|\s*Lakehouse Architect.*$/i, "")
+    .replace(/\s*\|\s*Fabric Prep.*$/i, "")
+    .trim();
+  const fullTitle = `${cleanTitle} | Lakehouse Architect`;
 
   return {
-    title: fullTitle,
+    title: cleanTitle,
     description,
     keywords: [
+      "Lakehouse",
+      "Lakehouse Architecture",
       "Lakehouse Architect",
+      "Data Lakehouse",
+      "Medallion Architecture",
+      "Delta Lake",
+      "Apache Iceberg",
       "Microsoft Fabric",
       "Power BI",
       "Azure Databricks",
-      "Delta Lake",
       "Apache Spark",
       "Data Engineering Interview",
       "System Design",
-      "Lakehouse Architecture",
       ...keywords,
     ],
     alternates: {
@@ -55,7 +65,7 @@ export function buildPageMetadata({
           url: ogImage,
           width: 1200,
           height: 675,
-          alt: title,
+          alt: cleanTitle,
         },
       ],
       locale: "en_US",

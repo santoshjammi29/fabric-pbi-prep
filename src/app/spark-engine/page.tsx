@@ -9,7 +9,7 @@ export const revalidate = 3600; // 1-hour ISR cache on edge
 export async function generateMetadata(): Promise<Metadata> {
   const codeData = await getCodePracticeDataDAL();
   return generatePageMetadata({
-    title: `Apache Spark 4.0 Engine Architecture & Physical Execution Simulator | Fabric Prep`,
+    title: "Apache Spark 4.0 Engine Architecture & Physical Execution Simulator",
     description: `Interactive simulator of Apache Spark 4.0 execution plan, Catalyst Optimizer, Tungsten memory allocator, and shuffle mechanics.`,
     path: "/spark-engine",
     keywords: ["Spark 4.0 Internals", "Catalyst Optimizer", "Tungsten Memory", "Shuffle Simulator", "PySpark 4.0"],
