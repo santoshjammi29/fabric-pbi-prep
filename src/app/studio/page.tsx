@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { StudioClient } from "./studio-client";
 import { buildPageMetadata } from "@/lib/seo";
 
-// Incremental Static Regeneration (ISR)
-export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({

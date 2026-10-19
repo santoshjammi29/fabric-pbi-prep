@@ -8,7 +8,7 @@ import {
   generateTechArticleSchema,
 } from "@/lib/seo";
 
-export const revalidate = 3600; // 1-hour ISR cache on edge
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   return generatePageMetadata({

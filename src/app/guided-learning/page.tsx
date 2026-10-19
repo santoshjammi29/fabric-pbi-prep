@@ -5,8 +5,7 @@ import { buildPageMetadata, generateCourseSchema } from "@/lib/seo";
 import { GUIDED_TOPICS } from "@/data/guided-learning-topics";
 import { PLATFORM_CONFIG } from "@/config/platform.config";
 
-// Incremental Static Regeneration (ISR) - 1 hour edge cache
-export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({

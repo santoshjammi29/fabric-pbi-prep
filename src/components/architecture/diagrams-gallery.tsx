@@ -89,7 +89,7 @@ export function ArchitectureDiagramsGallery() {
     e.stopPropagation();
     const link = document.createElement("a");
     link.href = diagram.image;
-    link.download = `${diagram.id}.jpg`;
+    link.download = `${diagram.id}.webp`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

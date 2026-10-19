@@ -4,8 +4,7 @@ import { getConceptsDAL } from "@/lib/dal";
 import { MindmapClient } from "./mindmap-client";
 import { buildPageMetadata } from "@/lib/seo";
 
-// Incremental Static Regeneration (ISR) - revalidates once per hour
-export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   const concepts = await getConceptsDAL();

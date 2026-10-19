@@ -1189,7 +1189,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
                   onClick={() => {
                     const link = document.createElement("a");
                     link.href = activeModalDiagram.image;
-                    link.download = `${activeModalDiagram.id}.jpg`;
+                    link.download = `${activeModalDiagram.id}.webp`;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);

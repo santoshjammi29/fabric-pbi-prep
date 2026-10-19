@@ -1,0 +1,25 @@
+# Git & CI/CD
+.git
+.github
+
+# Agents & Documentation
+.agents
+docs
+scripts
+assets
+
+# Testing & Coverage
+__tests__
+coverage
+.vitest
+vitest.config.mts
+
+# Build caches & developer artifacts
+*.tsbuildinfo
+*.log
+*.py
+*.sh
+.DS_Store
+
+# Local Next.js cache
+.next/cache

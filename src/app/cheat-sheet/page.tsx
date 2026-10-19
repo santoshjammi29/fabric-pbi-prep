@@ -4,7 +4,7 @@ import { getCheatsheetDataDAL, getDatabricksCheatsheetDataDAL } from "@/lib/dal"
 import { CheatSheetClient } from "./cheat-sheet-client";
 import { generatePageMetadata, generateHowToSchema } from "@/lib/seo";
 
-export const revalidate = 3600; // 1-hour ISR cache on edge
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [data, databricksData] = await Promise.all([

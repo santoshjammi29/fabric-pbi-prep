@@ -4,7 +4,7 @@ import { getLearningPathsDAL } from "@/lib/dal";
 import { LearningPathsClient } from "./learning-paths-client";
 import { generatePageMetadata, generateCourseSchema } from "@/lib/seo";
 
-export const revalidate = 3600; // 1-hour ISR cache on edge
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   const paths = await getLearningPathsDAL();

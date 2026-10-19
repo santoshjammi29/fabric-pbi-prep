@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export async function GET() {
   const feedXml = `<?xml version="1.0" encoding="UTF-8" ?>

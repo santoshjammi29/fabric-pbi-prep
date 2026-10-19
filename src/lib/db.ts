@@ -60,7 +60,7 @@ async function fetchSupabaseTable<T>(table: string): Promise<T[] | null> {
         Authorization: `Bearer ${config.supabaseAnonKey}`,
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600, tags: [table] },
+      cache: "force-cache",
     });
     if (!res.ok) return null;
     return await res.json();
@@ -87,7 +87,7 @@ async function fetchMongoCollection<T>(collection: string): Promise<T[] | null> 
         database: process.env.MONGODB_DATABASE || "fabric_prep",
         collection,
       }),
-      next: { revalidate: 3600, tags: [collection] },
+      cache: "force-cache",
     });
     if (!res.ok) return null;
     const data = await res.json();

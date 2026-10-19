@@ -5,8 +5,7 @@ import { architectureDiagrams } from "@/data";
 import { ConceptsClient } from "./concepts-client";
 import { buildPageMetadata, generateCourseSchema, generateHowToSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
-// Incremental Static Regeneration (ISR) - revalidates once per hour
-export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   const concepts = await getConceptsDAL();

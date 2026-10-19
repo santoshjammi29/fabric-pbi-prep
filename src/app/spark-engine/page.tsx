@@ -4,7 +4,7 @@ import { getCodePracticeDataDAL } from "@/lib/dal";
 import { SparkEngineClient } from "./spark-engine-client";
 import { generatePageMetadata, generateCourseSchema } from "@/lib/seo";
 
-export const revalidate = 3600; // 1-hour ISR cache on edge
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   const codeData = await getCodePracticeDataDAL();
