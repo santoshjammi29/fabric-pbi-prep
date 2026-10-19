@@ -53,6 +53,28 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "fabric-pbi-prep.vercel.app",
+          },
+        ],
+        destination: "https://lakehousearchitect.vercel.app/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "lakehouse-architect.vercel.app",
+          },
+        ],
+        destination: "https://lakehousearchitect.vercel.app/:path*",
+        permanent: true,
+      },
+      {
         source: "/python",
         destination: "/guided-learning?topic=python",
         permanent: true,

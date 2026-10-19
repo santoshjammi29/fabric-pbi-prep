@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getUnifiedQuestionsDAL } from "@/lib/dal";
 import { architectureDiagrams } from "@/data";
 import { QaPrepClient } from "./qa-prep-client";
-import { buildPageMetadata, generateCourseSchema, generateFAQSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateFAQSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 // Incremental Static Regeneration (ISR) - revalidates once per hour
 export const revalidate = 3600;
@@ -41,6 +41,11 @@ export default async function QaPrepPage() {
     url: "/qa-prep",
   });
 
+  const breadcrumbJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Interview Q&A Hub", path: "/qa-prep" },
+  ]);
+
   return (
     <>
       <script
@@ -50,6 +55,10 @@ export default async function QaPrepPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--muted-foreground)]">Loading Interview Practice Hub...</div>}>
         <QaPrepClient initialQuestions={questions} diagrams={architectureDiagrams} />

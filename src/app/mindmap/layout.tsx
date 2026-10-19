@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildPageMetadata, generateCourseSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Multi-Level Concepts Mind Map | 660+ Concepts Linked to Topics",
@@ -28,11 +28,20 @@ export default function MindmapLayout({
     url: "/mindmap",
   });
 
+  const breadcrumbsJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Concepts Mind Map", path: "/mindmap" },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
       />
       {children}
     </>

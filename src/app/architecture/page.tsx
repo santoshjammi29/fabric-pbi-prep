@@ -13,7 +13,7 @@ export const revalidate = 3600; // 1-hour ISR cache on edge
 export async function generateMetadata(): Promise<Metadata> {
   const archData = await getArchitectureDataDAL();
   return generatePageMetadata({
-    title: `Enterprise Architecture Hub (${archData.length} Scenarios & Blueprints) | Fabric Prep`,
+    title: `Enterprise Architecture Hub (${archData.length} Scenarios & Blueprints)`,
     description: `Master distributed systems, Lakehouse trade-offs, and enterprise data architecture with ${archData.length} production interview scenarios.`,
     path: "/architecture",
     keywords: ["Lakehouse Architecture", "Enterprise Blueprints", "Data Architect Scenarios", "Fabric vs Databricks"],
@@ -32,11 +32,34 @@ export default async function ArchitecturePage() {
     `Comprehensive reference of ${archData.length} system blueprints, distributed runbooks, and whiteboards for data architects.`
   );
 
+  const breadcrumbsSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://lakehousearchitect.vercel.app",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Enterprise Architecture Hub",
+        item: "https://lakehousearchitect.vercel.app/architecture",
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsSchema) }}
       />
       <Suspense
         fallback={

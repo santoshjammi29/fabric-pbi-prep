@@ -1,4 +1,15 @@
 User-agent: *
 Allow: /
+Disallow: /api/progress
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
 
 Sitemap: https://lakehousearchitect.vercel.app/sitemap.xml
+

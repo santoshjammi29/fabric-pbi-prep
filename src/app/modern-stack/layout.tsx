@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildPageMetadata, generateCourseSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Modern Data Stack Blueprints & Interactive Simulators",
@@ -27,11 +27,20 @@ export default function ModernStackLayout({
     url: "/modern-stack",
   });
 
+  const breadcrumbsJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Modern Data Stack Blueprints", path: "/modern-stack" },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
       />
       {children}
     </>

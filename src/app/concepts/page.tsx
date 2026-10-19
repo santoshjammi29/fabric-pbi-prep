@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getConceptsDAL, getConceptsCategoriesDAL } from "@/lib/dal";
 import { architectureDiagrams } from "@/data";
 import { ConceptsClient } from "./concepts-client";
-import { buildPageMetadata, generateCourseSchema, generateHowToSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateHowToSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 // Incremental Static Regeneration (ISR) - revalidates once per hour
 export const revalidate = 3600;
@@ -41,6 +41,11 @@ export default async function ConceptsPage() {
     ],
   });
 
+  const breadcrumbJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Core Concepts & Foundations", path: "/concepts" },
+  ]);
+
   return (
     <>
       <script
@@ -50,6 +55,10 @@ export default async function ConceptsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--muted-foreground)]">Loading Concepts Library...</div>}>
         <ConceptsClient initialConcepts={concepts} categories={categories} diagrams={architectureDiagrams} />

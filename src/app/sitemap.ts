@@ -111,12 +111,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
-  // 4. Sample Core Concepts
-  const coreConceptRoutes: MetadataRoute.Sitemap = conceptsDb.slice(0, 100).map((concept) => ({
+  // 4. Complete Core Concepts Knowledge Graph (All 620+ Concepts)
+  const coreConceptRoutes: MetadataRoute.Sitemap = conceptsDb.map((concept) => ({
     url: `${BASE_URL}/concepts?tab=concepts&term=${encodeURIComponent(concept.term)}`,
     lastModified: now,
     changeFrequency: "weekly",
-    priority: 0.75,
+    priority: 0.8,
   }));
 
   return [...primaryRoutes, ...topicRoutes, ...diagramRoutes, ...coreConceptRoutes];

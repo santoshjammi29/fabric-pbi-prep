@@ -33,20 +33,75 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lakehousearchitect.vercel.app"),
   title: {
     default: "Lakehouse Architect | Enterprise Data Platform, Fabric & Databricks Prep",
     template: "%s | Lakehouse Architect",
   },
   description:
     "Enterprise preparation platform and system design portal for Lakehouse Architects and Lead Data Engineers. Master Microsoft Fabric, Databricks, Delta Lake, PySpark, and High-Scale Lakehouse Systems.",
+  keywords: [
+    "Lakehouse Architect",
+    "Microsoft Fabric",
+    "Azure Databricks",
+    "Delta Lake",
+    "Apache Spark",
+    "DP-600 Exam Prep",
+    "DP-203 Exam Prep",
+    "Data Platform Architecture",
+    "Data Engineering Interview",
+    "System Design",
+    "Medallion Architecture",
+    "Unity Catalog",
+    "OneLake",
+    "PySpark Optimization",
+    "dbt",
+    "Apache Airflow",
+  ],
+  authors: [{ name: "Santosh Jammi", url: "https://lakehousearchitect.vercel.app" }],
+  creator: "Santosh Jammi",
+  publisher: "Lakehouse Architect",
+  category: "technology",
+  classification: "Data Platform Engineering & Lakehouse Architecture Portal",
+  alternates: {
+    canonical: "https://lakehousearchitect.vercel.app",
+  },
   openGraph: {
     title: "Lakehouse Architect | Enterprise Data Platform, Fabric & Databricks Prep",
     description:
       "6,500+ architect-level Q&As and system design scenarios across Fabric, Databricks, Delta Lake, PySpark, and Lakehouse Architecture.",
+    url: "https://lakehousearchitect.vercel.app",
+    siteName: "Lakehouse Architect",
+    images: [
+      {
+        url: "/diagrams/fabric_onelake_architecture.webp",
+        width: 1200,
+        height: 675,
+        alt: "Lakehouse Architect - Enterprise Data Platform Systems & Architecture Prep",
+      },
+    ],
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
+    title: "Lakehouse Architect | Enterprise Data Platform, Fabric & Databricks Prep",
+    description:
+      "6,500+ architect-level Q&As and system design scenarios across Fabric, Databricks, Delta Lake, PySpark, and Lakehouse Architecture.",
+    site: "@lakehouse_arch",
+    creator: "@lakehouse_arch",
+    images: ["/diagrams/fabric_onelake_architecture.webp"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   icons: {
     icon: [
@@ -185,6 +240,51 @@ export default function RootLayout({
             strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prerender": [{"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}]}`
+            }}
+          />
+          {/* Global WebSite & Organization Structured Data for Google Rich Snippets */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@graph": [
+                  {
+                    "@type": "WebSite",
+                    "@id": "https://lakehousearchitect.vercel.app/#website",
+                    "url": "https://lakehousearchitect.vercel.app",
+                    "name": "Lakehouse Architect",
+                    "description": "Enterprise Data Platform & Lakehouse Systems Architecture Encyclopedia and Interview Preparation Platform",
+                    "publisher": {
+                      "@id": "https://lakehousearchitect.vercel.app/#organization",
+                    },
+                    "potentialAction": {
+                      "@type": "SearchAction",
+                      "target": {
+                        "@type": "EntryPoint",
+                        "urlTemplate": "https://lakehousearchitect.vercel.app/concepts?search={search_term_string}",
+                      },
+                      "query-input": "required name=search_term_string",
+                    },
+                    "inLanguage": "en-US",
+                  },
+                  {
+                    "@type": "Organization",
+                    "@id": "https://lakehousearchitect.vercel.app/#organization",
+                    "name": "Lakehouse Architect",
+                    "url": "https://lakehousearchitect.vercel.app",
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": "https://lakehousearchitect.vercel.app/icon-512.png",
+                      "width": 512,
+                      "height": 512,
+                    },
+                    "sameAs": [
+                      "https://github.com/santoshjammi29/fabric-pbi-prep",
+                    ],
+                  },
+                ],
+              }),
             }}
           />
           </TextSizeProvider>

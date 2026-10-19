@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildPageMetadata, generateCourseSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Tier-1 Enterprise & GCC Company Research Dossiers",
@@ -26,11 +26,20 @@ export default function CompanyResearchLayout({
     url: "/company-research",
   });
 
+  const breadcrumbsJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Company Intelligence Dossiers", path: "/company-research" },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
       />
       {children}
     </>

@@ -179,3 +179,59 @@ export function generateHowToSchema(
   };
 }
 
+/**
+ * JSON-LD BreadcrumbList Schema Generator for Google Rich Results
+ */
+export function generateBreadcrumbSchema(items: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path.startsWith("/") ? item.path : `/${item.path}`}`,
+    })),
+  };
+}
+
+/**
+ * JSON-LD TechArticle Schema Generator for Whitepaper / Blueprint deep dives
+ */
+export function generateTechArticleSchema(options: {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+  datePublished?: string;
+  dateModified?: string;
+  keywords?: string[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: options.title,
+    description: options.description,
+    url: `${SITE_URL}${options.path.startsWith("/") ? options.path : `/${options.path}`}`,
+    image: options.image || DEFAULT_OG_IMAGE,
+    datePublished: options.datePublished || "2026-01-01T00:00:00Z",
+    dateModified: options.dateModified || new Date().toISOString(),
+    author: {
+      "@type": "Person",
+      name: "Santosh Jammi",
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Lakehouse Architect",
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/icon-512.png`,
+      },
+    },
+    keywords: (options.keywords || []).join(", "),
+    inLanguage: "en-US",
+  };
+}
+

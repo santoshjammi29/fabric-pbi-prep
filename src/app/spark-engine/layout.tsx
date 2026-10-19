@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildPageMetadata, generateCourseSchema, generateHowToSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateHowToSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Apache Spark 4.0 Internals & Execution Engine Simulator",
@@ -38,6 +38,11 @@ export default function SparkEngineLayout({
     ],
   });
 
+  const breadcrumbsJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Apache Spark 4.0 Internals", path: "/spark-engine" },
+  ]);
+
   return (
     <>
       <script
@@ -47,6 +52,10 @@ export default function SparkEngineLayout({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
       />
       {children}
     </>

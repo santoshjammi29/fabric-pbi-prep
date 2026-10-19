@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildPageMetadata, generateCourseSchema } from "@/lib/seo";
+import { buildPageMetadata, generateCourseSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Architect Learning Paths & Interactive Decision Ledgers",
@@ -26,11 +26,20 @@ export default function LearningPathsLayout({
     url: "/learning-paths",
   });
 
+  const breadcrumbsJsonLd = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Architect Learning Paths", path: "/learning-paths" },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
       />
       {children}
     </>

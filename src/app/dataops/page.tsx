@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import { getDataOpsDataDAL } from "@/lib/dal";
 import { DataOpsClient } from "./dataops-client";
-import { generatePageMetadata, generateHowToSchema, generateCourseSchema } from "@/lib/seo";
+import { generatePageMetadata, generateHowToSchema, generateCourseSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const revalidate = 3600; // 1-hour ISR cache on edge
 
@@ -57,6 +57,11 @@ export default async function DataOpsPage() {
     "/dataops"
   );
 
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Enterprise DataOps & CI/CD", path: "/dataops" },
+  ]);
+
   return (
     <>
       <script
@@ -66,6 +71,10 @@ export default async function DataOpsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <Suspense
         fallback={
