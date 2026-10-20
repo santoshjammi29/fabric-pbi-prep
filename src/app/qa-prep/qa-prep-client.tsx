@@ -165,7 +165,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
-  const [selectedStretch, setSelectedStretch] = useState<string>("ALL");
   const [selectedDomain, setSelectedDomain] = useState<string>(initialDomain);
   const [selectedTech, setSelectedTech] = useState<TechEcosystemId>(
     TECH_ECOSYSTEMS.some((e) => e.id === initialTech) ? initialTech : "ALL"
@@ -264,7 +263,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     setSelectedArchetype("ALL");
     setSelectedDomain("ALL");
     setSelectedDifficulty("ALL");
-    setSelectedStretch("ALL");
     setSearchQuery("");
     toast.info("Cleared all filters");
   }, []);
@@ -283,14 +281,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
       result = result.filter((item) => item.difficulty === selectedDifficulty);
     }
 
-    // 3. Stretch & Depth Filter
-    if (selectedStretch === "STANDARD") {
-      result = result.filter((item) => item.difficulty === "EASY" || item.difficulty === "MEDIUM");
-    } else if (selectedStretch === "STRETCH") {
-      result = result.filter((item) => item.difficulty === "HARD" || item.difficulty === "ARCHITECT");
-    }
-
-    // 4. Scenario Archetype / Hotspot Filter (if passed via URL/bookmark)
+    // 3. Scenario Archetype / Hotspot Filter (if passed via URL/bookmark)
     if (selectedArchetype !== "ALL") {
       result = result.filter((item) =>
         matchScenarioArchetype(item, selectedArchetype, undefined, bookmarks)
@@ -540,20 +531,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               { id: "ARCHITECT", label: "ARCH" },
             ],
           },
-          {
-            id: "stretch",
-            title: "Stretch & Depth Scope",
-            shortTitle: "Stretch",
-            icon: <Target size={13} className="text-purple-400" />,
-            layout: "segmented",
-            selectedId: selectedStretch,
-            onSelect: (id) => setSelectedStretch(id),
-            options: [
-              { id: "ALL", label: "ALL" },
-              { id: "STANDARD", label: "STANDARD" },
-              { id: "STRETCH", label: "STRETCH" },
-            ],
-          },
         ]}
         activeFilters={[
           ...(isReadAllMode
@@ -583,16 +560,6 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
                   label: `Difficulty: ${selectedDifficulty}`,
                   color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
                   onRemove: () => setSelectedDifficulty("ALL"),
-                },
-              ]
-            : []),
-          ...(selectedStretch !== "ALL"
-            ? [
-                {
-                  id: "stretch",
-                  label: `Scope: ${selectedStretch}`,
-                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                  onRemove: () => setSelectedStretch("ALL"),
                 },
               ]
             : []),

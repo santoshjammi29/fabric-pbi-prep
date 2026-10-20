@@ -61,7 +61,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTier, setSelectedTier] = useState<string>("ALL");
   const [selectedTech, setSelectedTech] = useState<string>("All");
-  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
@@ -71,7 +70,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     const qParam = searchParams.get("q") || searchParams.get("company") || searchParams.get("search");
     const tierParam = searchParams.get("tier");
     const techParam = searchParams.get("tech");
-    const stretchParam = searchParams.get("stretch") as "ALL" | "STANDARD" | "STRETCH" | null;
 
     if (qParam !== null) {
       setSearchQuery(qParam);
@@ -81,9 +79,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     }
     if (techParam) {
       setSelectedTech(techParam);
-    }
-    if (stretchParam && ["ALL", "STANDARD", "STRETCH"].includes(stretchParam)) {
-      setSelectedStretch(stretchParam);
     }
   }, [searchParams]);
 
@@ -101,17 +96,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
       }
     });
     return counts;
-  }, [initialProfiles]);
-
-  // Compute counts per stretch
-  const stretchCounts = useMemo(() => {
-    let standard = 0;
-    let stretch = 0;
-    initialProfiles.forEach((c) => {
-      if (c.tier === "Global Capability Center (GCC)") standard++;
-      else stretch++;
-    });
-    return { ALL: initialProfiles.length, STANDARD: standard, STRETCH: stretch };
   }, [initialProfiles]);
 
   const toggleExpand = useCallback((id: string) => {
@@ -134,10 +118,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     return initialProfiles.filter((c) => {
       // Tier filter
       if (selectedTier !== "ALL" && c.tier !== selectedTier) return false;
-
-      // Stretch filter (STANDARD = GCCs, STRETCH = BigTech / FinTech)
-      if (selectedStretch === "STANDARD" && c.tier !== "Global Capability Center (GCC)") return false;
-      if (selectedStretch === "STRETCH" && c.tier === "Global Capability Center (GCC)") return false;
 
       // Tech filter
       if (selectedTech !== "All") {
@@ -179,7 +159,7 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
 
       return true;
     });
-  }, [selectedTier, selectedStretch, selectedTech, searchQuery]);
+  }, [selectedTier, selectedTech, searchQuery]);
 
   const displayedCompanies = useMemo(() => {
     return filteredCompanies.slice(0, visibleCount);
@@ -189,7 +169,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
     setSearchQuery("");
     setSelectedTier("ALL");
     setSelectedTech("All");
-    setSelectedStretch("ALL");
     setVisibleCount(ITEMS_PER_PAGE);
   }, []);
 
@@ -252,7 +231,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
         hasActiveFilters={
           selectedTier !== "ALL" ||
           selectedTech !== "All" ||
-          selectedStretch !== "ALL" ||
           searchQuery.trim().length > 0
         }
         onResetAll={handleResetFilters}
@@ -305,24 +283,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
               },
             ],
           },
-          {
-            id: "stretch",
-            title: "Level 3: Stretch (Standard GCC vs Deep BigTech/FinTech)",
-            shortTitle: "Stretch",
-            icon: <Flame size={13} className="text-orange-400" />,
-            layout: "chips",
-            accentColor: "amber",
-            selectedId: selectedStretch,
-            onSelect: (val) => {
-              setSelectedStretch(val as "ALL" | "STANDARD" | "STRETCH");
-              setVisibleCount(ITEMS_PER_PAGE);
-            },
-            options: [
-              { id: "ALL", label: "ALL", count: stretchCounts.ALL },
-              { id: "STANDARD", label: "STANDARD", count: stretchCounts.STANDARD },
-              { id: "STRETCH", label: "STRETCH", count: stretchCounts.STRETCH },
-            ],
-          },
         ]}
         activeFilters={[
           ...(selectedTech !== "All"
@@ -346,21 +306,6 @@ export function CompanyResearchClient({ initialProfiles }: { initialProfiles: Co
                   color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
                   onRemove: () => {
                     setSelectedTier("ALL");
-                    setVisibleCount(ITEMS_PER_PAGE);
-                  },
-                },
-              ]
-            : []),
-          ...(selectedStretch !== "ALL"
-            ? [
-                {
-                  id: "stretch",
-                  label: `Stretch: ${selectedStretch}`,
-                  color: selectedStretch === "STANDARD"
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                    : "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                  onRemove: () => {
-                    setSelectedStretch("ALL");
                     setVisibleCount(ITEMS_PER_PAGE);
                   },
                 },

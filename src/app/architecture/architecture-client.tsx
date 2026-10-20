@@ -475,7 +475,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
-  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isReadAllMode, setIsReadAllMode] = useState(false);
@@ -491,7 +490,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const [pySearch, setPySearch] = useState("");
   const deferredPySearch = useDeferredValue(pySearch);
   const [selectedPyLevel, setSelectedPyLevel] = useState<CodeLevel | "all">("all");
-  const [selectedPyStretch, setSelectedPyStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedPyDomain, setSelectedPyDomain] = useState<string>("all");
   const [selectedPyFramework, setSelectedPyFramework] = useState<FrameworkKey>("all");
   const [showPyBookmarksOnly, setShowPyBookmarksOnly] = useState(false);
@@ -656,12 +654,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       if (selectedDifficulty !== "ALL" && item.difficulty !== selectedDifficulty) {
         return false;
       }
-      if (selectedStretch === "STANDARD" && !(item.difficulty === "EASY" || item.difficulty === "MEDIUM")) {
-        return false;
-      }
-      if (selectedStretch === "STRETCH" && !(item.difficulty === "HARD" || item.difficulty === "ARCHITECT")) {
-        return false;
-      }
       if (selectedCategory !== "ALL" && item.category !== selectedCategory) {
         return false;
       }
@@ -675,7 +667,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
       return true;
     });
-  }, [deferredSearch, selectedDifficulty, selectedStretch, selectedCategory]);
+  }, [deferredSearch, selectedDifficulty, selectedCategory]);
 
   const displayedFilteredItems = useMemo(() => {
     if (!isShuffled) return filteredItems;
@@ -699,12 +691,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const filteredRunbooks = useMemo(() => {
     return pythonData.filter((item) => {
       if (selectedPyLevel !== "all" && item.level !== selectedPyLevel) return false;
-      if (selectedPyStretch === "STANDARD" && !(item.level === "beginner" || item.level === "intermediate")) {
-        return false;
-      }
-      if (selectedPyStretch === "STRETCH" && !(item.level === "advanced" || item.level === "architect")) {
-        return false;
-      }
       if (selectedPyDomain !== "all" && item.category !== selectedPyDomain) return false;
       if (selectedPyFramework !== "all") {
         const detected = detectFramework(item);
@@ -725,7 +711,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
       return true;
     });
-  }, [deferredPySearch, selectedPyLevel, selectedPyStretch, selectedPyDomain, selectedPyFramework, showPyBookmarksOnly, pyBookmarks]);
+  }, [deferredPySearch, selectedPyLevel, selectedPyDomain, selectedPyFramework, showPyBookmarksOnly, pyBookmarks]);
 
   const displayedFilteredRunbooks = useMemo(() => {
     if (!isShuffled) return filteredRunbooks;
@@ -930,13 +916,11 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const hasActiveScenarioFilters =
     selectedCategory !== "ALL" ||
     selectedDifficulty !== "ALL" ||
-    selectedStretch !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetScenarioFilters = useCallback(() => {
     setSelectedCategory("ALL");
     setSelectedDifficulty("ALL");
-    setSelectedStretch("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     setVisibleCount(initialBatch);
@@ -949,7 +933,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     selectedPyFramework !== "all" ||
     selectedPyDomain !== "all" ||
     selectedPyLevel !== "all" ||
-    selectedPyStretch !== "ALL" ||
     showPyBookmarksOnly ||
     pySearch.trim().length > 0;
 
@@ -957,7 +940,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
     setSelectedPyFramework("all");
     setSelectedPyDomain("all");
     setSelectedPyLevel("all");
-    setSelectedPyStretch("ALL");
     setShowPyBookmarksOnly(false);
     setPySearch("");
     setPyPage(1);
@@ -1117,19 +1099,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                   },
                 ]
               : []),
-            ...(selectedStretch !== "ALL"
-              ? [
-                  {
-                    id: "stretch",
-                    label: `Stretch: ${selectedStretch}`,
-                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                    onRemove: () => {
-                      setSelectedStretch("ALL");
-                      setVisibleCount(initialBatch);
-                    },
-                  },
-                ]
-              : []),
             ...(searchQuery.trim().length > 0
               ? [
                   {
@@ -1206,19 +1175,6 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                       setSelectedPyLevel("all");
                       setPyPage(1);
                       updateUrlParam("level", "all");
-                    },
-                  },
-                ]
-              : []),
-            ...(selectedPyStretch !== "ALL"
-              ? [
-                  {
-                    id: "stretch",
-                    label: `Stretch: ${selectedPyStretch}`,
-                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                    onRemove: () => {
-                      setSelectedPyStretch("ALL");
-                      setPyPage(1);
                     },
                   },
                 ]

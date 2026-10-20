@@ -52,7 +52,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedImpact, setSelectedImpact] = useState<string>("ALL");
-  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedScenario, setSelectedScenario] = useState<string>("ALL");
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
@@ -220,17 +219,9 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
         }
       }
 
-      // Stretch filter
-      if (selectedStretch === "STANDARD" && !(code.impact === "Quick Win" || code.impact === "High Impact")) {
-        return false;
-      }
-      if (selectedStretch === "STRETCH" && !(code.impact === "Critical" || code.impact === "Architect Level")) {
-        return false;
-      }
-
       return true;
     });
-  }, [cheatsheetData, searchQuery, selectedCategory, selectedImpact, selectedStretch, selectedScenario]);
+  }, [cheatsheetData, searchQuery, selectedCategory, selectedImpact, selectedScenario]);
 
   // Jump handler for the optimization flow diagram
   const handleJumpToCode = (targetId: string) => {
@@ -239,7 +230,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
     setSelectedCategory("ALL");
     setSelectedScenario("ALL");
     setSelectedImpact("ALL");
-    setSelectedStretch("ALL");
     setSearchQuery("");
     setTimeout(() => {
       const el = document.getElementById(targetId);
@@ -253,7 +243,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
     setSearchQuery("");
     setSelectedCategory("ALL");
     setSelectedImpact("ALL");
-    setSelectedStretch("ALL");
     setSelectedScenario("ALL");
     setHighlightedId(null);
   };
@@ -349,8 +338,6 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
               onSelectCategory={setSelectedCategory}
               selectedImpact={selectedImpact}
               onSelectImpact={setSelectedImpact}
-              selectedStretch={selectedStretch}
-              onSelectStretch={setSelectedStretch}
               selectedScenario={selectedScenario}
               onSelectScenario={setSelectedScenario}
               searchQuery={searchQuery}

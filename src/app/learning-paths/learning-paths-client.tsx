@@ -106,7 +106,7 @@ export function LearningPathsClient({ initialPaths }: { initialPaths: LearningPa
                 }
               }}
               className={cn(
-                "px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap",
+                "px-3 sm:px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
                 isActive
                   ? "bg-blue-600 text-white font-semibold shadow-xs"
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] font-medium"

@@ -42,8 +42,6 @@ interface CategoryBarProps {
   onSelectCategory: (cat: string) => void;
   selectedImpact: string;
   onSelectImpact: (impact: string) => void;
-  selectedStretch?: "ALL" | "STANDARD" | "STRETCH";
-  onSelectStretch?: (stretch: "ALL" | "STANDARD" | "STRETCH") => void;
   selectedScenario: string;
   onSelectScenario: (scenario: string) => void;
   searchQuery: string;
@@ -60,12 +58,6 @@ const IMPACT_OPTIONS: { label: string; value: string }[] = [
   { label: "Quick Win", value: "Quick Win" },
 ];
 
-const STRETCH_OPTIONS: { label: string; value: "ALL" | "STANDARD" | "STRETCH" }[] = [
-  { label: "ALL", value: "ALL" },
-  { label: "STANDARD", value: "STANDARD" },
-  { label: "STRETCH", value: "STRETCH" },
-];
-
 export function CategoryBar({
   categories,
   categoryCounts,
@@ -73,8 +65,6 @@ export function CategoryBar({
   onSelectCategory,
   selectedImpact,
   onSelectImpact,
-  selectedStretch = "ALL",
-  onSelectStretch,
   selectedScenario,
   onSelectScenario,
   searchQuery,
@@ -168,27 +158,6 @@ export function CategoryBar({
               </button>
             ))}
           </div>
-
-          {/* Stretch Selector Pills */}
-          {onSelectStretch && (
-            <div className="flex items-center gap-0.5 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shadow-xs">
-              {STRETCH_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => onSelectStretch(opt.value)}
-                  className={cn(
-                    "px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
-                    selectedStretch === opt.value
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          )}
 
           <span className="text-[11px] text-[var(--muted-foreground)] whitespace-nowrap pl-1 hidden lg:inline">
             <strong className="text-[var(--foreground)]">{totalFiltered}</strong> / {totalCount} runbooks

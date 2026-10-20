@@ -85,7 +85,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
   const [activeLang, setActiveLang] = useState<LanguageKey>("pyspark");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevel, setSelectedLevel] = useState<string>("ALL");
-  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
@@ -261,12 +260,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       if (selectedLevel !== "ALL" && item.level !== selectedLevel) {
         return false;
       }
-      if (selectedStretch === "STANDARD" && !(item.level === "beginner" || item.level === "intermediate")) {
-        return false;
-      }
-      if (selectedStretch === "STRETCH" && !(item.level === "advanced" || item.level === "architect")) {
-        return false;
-      }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const titleMatch = item.title.toLowerCase().includes(q);
@@ -278,7 +271,7 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
       }
       return true;
     });
-  }, [currentDataset, selectedLevel, selectedStretch, searchQuery]);
+  }, [currentDataset, selectedLevel, searchQuery]);
 
   const displayedItems = useMemo(() => {
     if (!isShuffled) return filteredItems;
@@ -295,12 +288,10 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
 
   const hasActiveCodeFilters =
     selectedLevel !== "ALL" ||
-    selectedStretch !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetCodeFilters = useCallback(() => {
     setSelectedLevel("ALL");
-    setSelectedStretch("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     toast.info("Reset code filters");
@@ -391,20 +382,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
               { id: "architect", label: "Architect" },
             ],
           },
-          {
-            id: "stretch",
-            title: "Level 3: Scope & Stretch",
-            shortTitle: "Stretch",
-            icon: <Sparkles size={13} className="text-purple-400" />,
-            layout: "segmented",
-            selectedId: selectedStretch,
-            onSelect: (stretch) => setSelectedStretch(stretch as "ALL" | "STANDARD" | "STRETCH"),
-            options: [
-              { id: "ALL", label: "ALL" },
-              { id: "STANDARD", label: "STANDARD" },
-              { id: "STRETCH", label: "STRETCH" },
-            ],
-          },
         ]}
         activeFilters={[
           ...(selectedLevel !== "ALL"
@@ -414,16 +391,6 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
                   label: `Level: ${selectedLevel}`,
                   color: "bg-amber-500/10 border-amber-500/30 text-amber-400 capitalize",
                   onRemove: () => setSelectedLevel("ALL"),
-                },
-              ]
-            : []),
-          ...(selectedStretch !== "ALL"
-            ? [
-                {
-                  id: "stretch",
-                  label: `Stretch: ${selectedStretch}`,
-                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                  onRemove: () => setSelectedStretch("ALL"),
                 },
               ]
             : []),

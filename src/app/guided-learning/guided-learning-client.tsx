@@ -153,7 +153,6 @@ function GuidedLearningContent() {
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedType, setSelectedType] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
-  const [selectedStretch, setSelectedStretch] = useState<"ALL" | "STANDARD" | "STRETCH">("ALL");
   const [selectedStatus, setSelectedStatus] = useState<"ALL" | "TODO" | "MASTERED">("ALL");
   const [stageFilter, setStageFilter] = useState<string>("ALL");
   const [collapsedStages, setCollapsedStages] = useState<Record<string, boolean>>({});
@@ -258,8 +257,6 @@ function GuidedLearningContent() {
     return rawItems.filter((item) => {
       if (selectedType !== "ALL" && item.type !== selectedType) return false;
       if (selectedDifficulty !== "ALL" && item.difficulty !== selectedDifficulty) return false;
-      if (selectedStretch === "STANDARD" && !(item.difficulty === "EASY" || item.difficulty === "MEDIUM")) return false;
-      if (selectedStretch === "STRETCH" && !(item.difficulty === "HARD" || item.difficulty === "ARCHITECT")) return false;
       if (stageFilter !== "ALL" && item.difficulty !== stageFilter) return false;
 
       const isCompleted = completedIds.has(item.id);
@@ -275,7 +272,7 @@ function GuidedLearningContent() {
       }
       return true;
     });
-  }, [rawItems, selectedType, selectedDifficulty, selectedStretch, stageFilter, selectedStatus, deferredSearch, completedIds]);
+  }, [rawItems, selectedType, selectedDifficulty, stageFilter, selectedStatus, deferredSearch, completedIds]);
 
   // Group items by 4 stages with optional deterministic shuffle
   const itemsByStage = useMemo(() => {
@@ -1038,24 +1035,6 @@ function GuidedLearningContent() {
                     )}
                   >
                     {diff.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Stretch Filter */}
-              <div className="flex items-center gap-1 p-0.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] shrink-0 shadow-xs">
-                {(["ALL", "STANDARD", "STRETCH"] as const).map((str) => (
-                  <button
-                    key={str}
-                    onClick={() => setSelectedStretch(str)}
-                    className={cn(
-                      "px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 cursor-pointer whitespace-nowrap",
-                      selectedStretch === str
-                        ? "bg-blue-600 text-white font-semibold shadow-xs"
-                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                    )}
-                  >
-                    {str === "ALL" ? "All Tracks" : str === "STANDARD" ? "Core" : "Stretch"}
                   </button>
                 ))}
               </div>

@@ -216,7 +216,6 @@ export function UnifiedSearchFilterBox({
     switch (upper) {
       case "EASY":
       case "BEGINNER":
-      case "STANDARD":
         return "bg-emerald-600 text-white border-emerald-500 shadow-xs font-bold";
       case "MEDIUM":
       case "INTERMEDIATE":
@@ -225,7 +224,6 @@ export function UnifiedSearchFilterBox({
       case "ADVANCED":
         return "bg-amber-600 text-white border-amber-500 shadow-xs font-bold";
       case "ARCHITECT":
-      case "STRETCH":
         return "bg-purple-600 text-white border-purple-500 shadow-xs font-bold";
       case "ALL":
       default:
@@ -261,7 +259,7 @@ export function UnifiedSearchFilterBox({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-20 py-2 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+            className="w-full pl-9 pr-20 py-1.5 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-xs sm:text-sm text-[var(--foreground)] placeholder-[var(--muted-foreground)] outline-none focus:ring-1 focus:ring-blue-500/30 transition-all font-medium"
             aria-label="Search items"
           />
 
@@ -418,18 +416,18 @@ export function UnifiedSearchFilterBox({
 
       {/* ─── COMPACT HORIZONTAL FILTER SLICERS (MATCHING USER PILL STYLE) ─── */}
       {isExpanded && levels.length > 0 && (
-        <div className="border-t border-[var(--border)] p-2.5 sm:p-3 space-y-2.5 bg-[var(--surface-1)]">
+        <div className="border-t border-[var(--border)] p-2 sm:p-2.5 space-y-2 bg-[var(--surface-1)]">
           {displayedLevels.map((level, levelIdx) => (
             <div
               key={level.id}
               className={cn(
-                "space-y-1.5",
-                levelIdx > 0 && "pt-2 border-t border-[var(--border)]/60"
+                "space-y-1",
+                levelIdx > 0 && "pt-1.5 border-t border-[var(--border)]/60"
               )}
             >
               {/* Level Header Label */}
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--foreground)]">
                   {level.icon}
                   <span className="tracking-wide">{level.title}</span>
                   <span className="text-[10px] font-normal text-[var(--muted-foreground)]">
@@ -453,7 +451,7 @@ export function UnifiedSearchFilterBox({
                 role="radiogroup"
                 aria-label={level.title}
                 className={cn(
-                  "flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-full shadow-xs",
+                  "flex items-center gap-1 p-0.5 sm:p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-full shadow-xs",
                   level.layout === "grid" ? "flex-wrap max-w-full" : "max-w-fit"
                 )}
               >
@@ -468,7 +466,7 @@ export function UnifiedSearchFilterBox({
                       onClick={() => level.onSelect(opt.id)}
                       title={opt.description || opt.label}
                       className={cn(
-                        "px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0",
+                        "px-3 sm:px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0",
                         isSelected
                           ? "bg-blue-600 text-white shadow-xs font-bold"
                           : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]/60 font-medium"
