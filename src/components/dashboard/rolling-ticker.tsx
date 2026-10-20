@@ -105,12 +105,12 @@ export function buildTickerItems(seed?: number): TickerItem[] {
   const rng = seed !== undefined ? createLCG(seed) : undefined;
   const raw: Omit<TickerItem, "color">[] = [];
 
-  // 1. Key Concepts (415 concepts in database) — sample 12
+  // 1. Key Concepts (660 concepts in database) — sample 12
   sampleItems(conceptsDb.filter((c) => c.term), 12, rng).forEach((c) =>
     raw.push({ label: c.term, href: `/concepts?term=${encodeURIComponent(c.term)}&id=${c.id}` })
   );
 
-  // 2. Enterprise Architecture Scenarios (3,098 scenarios in database) — sample 14
+  // 2. Enterprise Architecture Scenarios (3,206 scenarios in database) — sample 14
   sampleItems(architectureData.filter((a) => a.question), 14, rng).forEach((a) => {
     const label = a.question.length > 48 ? a.question.slice(0, 48).trim() + "…" : a.question;
     raw.push({ label, href: `/architecture?id=${a.id}&q=${encodeURIComponent(a.question.slice(0, 45))}` });
@@ -121,13 +121,13 @@ export function buildTickerItems(seed?: number): TickerItem[] {
     raw.push({ label: lp.title, href: `/learning-paths?id=${lp.id}` })
   );
 
-  // 4. Fabric & Power BI Q&A (3,072 questions in database) — sample 12
+  // 4. Fabric & Power BI Q&A (3,232 questions in database) — sample 12
   sampleItems(questionsDb.filter((q) => q.question), 12, rng).forEach((q) => {
     const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
     raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
   });
 
-  // 5. General Data Engineering Q&A (3,499 questions in database) — sample 10
+  // 5. General Data Engineering Q&A (3,615 questions in database) — sample 10
   sampleItems(questionsDeDb.filter((q) => q.question), 10, rng).forEach((q) => {
     const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
     raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
@@ -272,8 +272,8 @@ export function RollingTicker() {
           onClick={handleShuffle}
           disabled={isShuffling}
           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-purple-300 hover:bg-purple-500/15 border border-[var(--border)] hover:border-purple-500/40 text-[11px] font-medium transition-all duration-200 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 select-none"
-          title="Shuffle Topics (Draw fresh topics from 6,000+ database)"
-          aria-label="Shuffle topics from 6,000+ questions database"
+          title="Shuffle Topics (Draw fresh topics from 7,000+ database)"
+          aria-label="Shuffle topics from 7,000+ questions database"
         >
           <Shuffle
             size={12}

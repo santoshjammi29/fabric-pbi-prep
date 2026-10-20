@@ -61,7 +61,7 @@ const PILLARS: PillarItem[] = [
   {
     id: "architecture",
     title: "2. Architecture & Systems",
-    badge: "3,124+ Scenarios · Spark Lab",
+    badge: "3,206+ Scenarios · Spark Lab",
     badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
     icon: Layers,
     iconColor: "text-purple-400",
@@ -86,7 +86,7 @@ const PILLARS: PillarItem[] = [
   {
     id: "code",
     title: "3. Coding & Runbooks",
-    badge: "67 Runbooks · 128+ Drills",
+    badge: "69 Runbooks · 164 Drills",
     badgeColor: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
     icon: FileCode2,
     iconColor: "text-cyan-400",
@@ -135,7 +135,7 @@ const PILLARS: PillarItem[] = [
   {
     id: "interview",
     title: "5. Interview Drill Hub",
-    badge: "6,570+ Qs · 156 Targets",
+    badge: "7,080+ Qs · 156 Targets",
     badgeColor: "bg-orange-500/15 text-orange-400 border-orange-500/30",
     icon: MessageSquare,
     iconColor: "text-orange-400",
@@ -145,7 +145,7 @@ const PILLARS: PillarItem[] = [
     description:
       "Interactive SM-2 spaced repetition question drill, domain question banks, and verified Tier-1 GCC / BigTech hiring playbooks.",
     features: [
-      "6,570+ Vetted Interview Q&As",
+      "7,080+ Vetted Interview Q&As",
       "156+ Target Enterprise Profiles",
       "Interactive SM-2 Flashcards",
       "Architect Scenario Defenses",
@@ -253,12 +253,12 @@ export function HeroCommandCenter() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-2 border-t border-[var(--border)]/60 text-xs text-[var(--muted-foreground)]">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
-              <span><strong className="text-[var(--foreground)]">6,570+</strong> Questions</span>
+              <span><strong className="text-[var(--foreground)]">7,080+</strong> Questions</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-500 dark:text-emerald-400" />
-              <span><strong className="text-[var(--foreground)]">3,124+</strong> Scenarios</span>
+              <span><strong className="text-[var(--foreground)]">3,206+</strong> Scenarios</span>
             </div>
             <span className="hidden sm:inline text-[var(--border)]">•</span>
             <div className="flex items-center gap-1.5">

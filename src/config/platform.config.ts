@@ -46,19 +46,19 @@ export const PLATFORM_CONFIG = {
     qaPrep: {
       title: "Architecture Interview Q&A Hub",
       path: "/qa-prep",
-      badge: "6,500+ Questions",
+      badge: "7,080+ Questions",
       description: "Verified interview scenarios with architectural answers, trade-off rubrics, and continuous reading stream.",
     },
     concepts: {
       title: "Core Concepts & Foundations",
       path: "/concepts",
-      badge: "290+ Topics",
+      badge: "660+ Concepts",
       description: "Interactive architecture lexicon, engine mechanics, and spaced repetition flashcards.",
     },
     architecture: {
       title: "System Scenarios & Whiteboards",
       path: "/architecture",
-      badge: "2,500+ Scenarios",
+      badge: "3,206+ Scenarios",
       description: "Real-world data platform design challenges, 32 whiteboard blueprints, and distributed Python runbooks.",
     },
     guidedLearning: {

@@ -61,7 +61,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
       { label: "Cloud × Table Matrix", href: "/modern-stack", icon: Zap, pill: { text: "Matrix", variant: "easy" } },
-      { label: "Architecture Scenarios", href: "/architecture", icon: Layers, pill: { text: "3.1k+", variant: "architect" } },
+      { label: "Architecture Scenarios", href: "/architecture", icon: Layers, pill: { text: "3.2k+", variant: "architect" } },
       { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, pill: { text: "Spark", variant: "medium" } },
       { label: "DataOps & CI/CD", href: "/dataops", icon: Workflow, pill: { text: "E2E", variant: "info" } },
     ],
@@ -78,7 +78,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Interviews & Roadmaps",
     items: [
-      { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, pill: { text: "6.5k+", variant: "hard" } },
+      { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, pill: { text: "7.1k+", variant: "hard" } },
       { label: "Target Company Intel", href: "/company-research", icon: Briefcase, pill: { text: "156+", variant: "new" } },
       { label: "Guided Learning", href: "/guided-learning", icon: Route, pill: { text: "Tracks", variant: "info" } },
       { label: "Career Curricula", href: "/learning-paths", icon: GraduationCap, pill: { text: "Roadmap", variant: "info" } },
@@ -105,7 +105,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   { id: "modern-concepts", label: "Core Lakehouse Concepts", shortLabel: "Lakehouse Concepts", href: "/modern-stack?tab=concepts", category: "Concepts", categoryColor: "emerald", icon: Zap, badge: "FinOps" },
   
   // Architecture & Systems (Clubbed)
-  { id: "arch-scenarios", label: "System Scenarios", shortLabel: "Scenarios", href: "/architecture?tab=scenarios", category: "Architecture", categoryColor: "purple", icon: Layers, badge: "3.1k+" },
+  { id: "arch-scenarios", label: "System Scenarios", shortLabel: "Scenarios", href: "/architecture?tab=scenarios", category: "Architecture", categoryColor: "purple", icon: Layers, badge: "3.2k+" },
   { id: "spark-engine", label: "Spark Engine Lab", shortLabel: "Spark Lab", href: "/spark-engine", category: "Architecture", categoryColor: "purple", icon: Cpu, badge: "Lab" },
   { id: "modern-stack", label: "Modern Stack & FinOps", shortLabel: "Modern Stack", href: "/modern-stack", category: "Architecture", categoryColor: "purple", icon: Zap, badge: "FinOps" },
   { id: "modern-compat", label: "Cloud × Table Compatibility", shortLabel: "Cloud Matrix", href: "/modern-stack?tab=compatibility", category: "Architecture", categoryColor: "purple", icon: Zap, badge: "Matrix" },
@@ -128,7 +128,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   { id: "modern-blueprints", label: "Modern Stack Blueprints", shortLabel: "Stack Blueprints", href: "/modern-stack?tab=blueprints", category: "Images & Diagrams", categoryColor: "rose", icon: Cpu, badge: "Blueprints" },
   
   // Interview Drill Hub / Q&A (Clubbed)
-  { id: "qa-prep", label: "Question Drill Bank", shortLabel: "Q&A Drill Bank", href: "/qa-prep", category: "Q&A", categoryColor: "amber", icon: MessageSquare, badge: "6.5k+" },
+  { id: "qa-prep", label: "Question Drill Bank", shortLabel: "Q&A Drill Bank", href: "/qa-prep", category: "Q&A", categoryColor: "amber", icon: MessageSquare, badge: "7.1k+" },
   { id: "company-research", label: "Target Company Intel", shortLabel: "Company Intel", href: "/company-research", category: "Q&A", categoryColor: "amber", icon: Briefcase, badge: "Intel" },
   
   // Workspace

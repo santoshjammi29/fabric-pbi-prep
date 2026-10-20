@@ -714,6 +714,119 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       {/* ────────────────────────────────────────────────────────── */}
       {activeTab === "overview" && (
         <div id="overview" className="space-y-3 animate-in fade-in duration-200">
+          {/* Quick Launch Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div
+              onClick={() => handleTabChange("concepts")}
+              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">
+                <BookOpen size={16} />
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
+                {modernConceptsDb.length} Core Concepts
+              </h4>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                CAP theorem, PACELC, Deletion Vectors, Delta UniForm, and Liquid Clustering explained.
+              </p>
+            </div>
+
+            <div
+              onClick={() => handleTabChange("simulators")}
+              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center font-bold">
+                <Calculator size={16} />
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
+                6 Live Simulators
+              </h4>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                Calculate shuffles, tune partition skew, size Spark memory, and estimate RAG token costs.
+              </p>
+            </div>
+
+            <div
+              onClick={() => handleTabChange("matrix")}
+              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
+                <FileCode2 size={16} />
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
+                {modernCodeMatrix.length} Polyglot Matrix
+              </h4>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                Side-by-side code across Polars, PySpark, DuckDB, Snowflake, and BigQuery.
+              </p>
+            </div>
+
+            <div
+              onClick={() => handleTabChange("python")}
+              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+                <Code2 size={16} />
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
+                {modernStackDb.length} Python Q&amp;As
+              </h4>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                Production-grade Python and PySpark runbooks with readable syntax typography.
+              </p>
+            </div>
+          </div>
+
+          {/* Architecture Trade-off Comparison Table */}
+          <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
+            <div>
+              <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] break-words">
+                Modern Lakehouse Architecture Trade-off Matrix
+              </h3>
+              <p className="text-xs text-[var(--muted-foreground)] break-words">
+                Key architectural decisions when evaluating modern storage, catalog, and serving patterns.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left border-collapse min-w-[640px]">
+                <thead>
+                  <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                    <th className="py-2.5 px-3 font-semibold">Architectural Vector</th>
+                    <th className="py-2.5 px-3 font-semibold">Open Lakehouse (Delta/Iceberg)</th>
+                    <th className="py-2.5 px-3 font-semibold">Cloud DW (Snowflake/BigQuery)</th>
+                    <th className="py-2.5 px-3 font-semibold">Embedded / Hybrid (DuckDB)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Storage &amp; Format</td>
+                    <td className="py-2.5 px-3">Open Parquet in customer S3/ADLS with UniForm or Iceberg v2/v3</td>
+                    <td className="py-2.5 px-3">Proprietary micro-partition format or managed external Iceberg</td>
+                    <td className="py-2.5 px-3">Local single-file database or remote Parquet reading via HTTP range requests</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Catalog Governance</td>
+                    <td className="py-2.5 px-3">Unity Catalog OSS / Apache Polaris REST (vendor-neutral)</td>
+                    <td className="py-2.5 px-3">Snowflake / BigQuery native catalog with external REST links</td>
+                    <td className="py-2.5 px-3">MotherDuck cloud catalog or file-system paths</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Compute Cost Model</td>
+                    <td className="py-2.5 px-3">Serverless DBU or VM compute; zero storage markup</td>
+                    <td className="py-2.5 px-3">Credit-based warehouse compute + per-TB storage charges</td>
+                    <td className="py-2.5 px-3">Free local compute; low-cost serverless MotherDuck</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Best Suited For</td>
+                    <td className="py-2.5 px-3">Multi-engine enterprise lakehouses, large-scale Spark/AI ETL</td>
+                    <td className="py-2.5 px-3">Interactive BI, financial reporting, highly structured EDWs</td>
+                    <td className="py-2.5 px-3">Lightweight pipelines, local analytics, edge processing, serverless apps</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {/* Interactive Stack Flow Canvas */}
           <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -832,119 +945,6 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                 </div>
               );
             })()}
-          </div>
-
-          {/* Quick Launch Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div
-              onClick={() => handleTabChange("concepts")}
-              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">
-                <BookOpen size={16} />
-              </div>
-              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
-                {modernConceptsDb.length} Core Concepts
-              </h4>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-                CAP theorem, PACELC, Deletion Vectors, Delta UniForm, and Liquid Clustering explained.
-              </p>
-            </div>
-
-            <div
-              onClick={() => handleTabChange("simulators")}
-              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center font-bold">
-                <Calculator size={16} />
-              </div>
-              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
-                6 Live Simulators
-              </h4>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-                Calculate shuffles, tune partition skew, size Spark memory, and estimate RAG token costs.
-              </p>
-            </div>
-
-            <div
-              onClick={() => handleTabChange("matrix")}
-              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
-                <FileCode2 size={16} />
-              </div>
-              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
-                {modernCodeMatrix.length} Polyglot Matrix
-              </h4>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-                Side-by-side code across Polars, PySpark, DuckDB, Snowflake, and BigQuery.
-              </p>
-            </div>
-
-            <div
-              onClick={() => handleTabChange("python")}
-              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
-                <Code2 size={16} />
-              </div>
-              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
-                {modernStackDb.length} Python Q&amp;As
-              </h4>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-                Production-grade Python and PySpark runbooks with readable syntax typography.
-              </p>
-            </div>
-          </div>
-
-          {/* Architecture Trade-off Comparison Table */}
-          <div className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-[var(--foreground)] break-words">
-                Modern Lakehouse Architecture Trade-off Matrix
-              </h3>
-              <p className="text-xs text-[var(--muted-foreground)] break-words">
-                Key architectural decisions when evaluating modern storage, catalog, and serving patterns.
-              </p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left border-collapse min-w-[640px]">
-                <thead>
-                  <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
-                    <th className="py-2.5 px-3 font-semibold">Architectural Vector</th>
-                    <th className="py-2.5 px-3 font-semibold">Open Lakehouse (Delta/Iceberg)</th>
-                    <th className="py-2.5 px-3 font-semibold">Cloud DW (Snowflake/BigQuery)</th>
-                    <th className="py-2.5 px-3 font-semibold">Embedded / Hybrid (DuckDB)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
-                  <tr>
-                    <td className="py-2.5 px-3 font-semibold text-purple-300">Storage &amp; Format</td>
-                    <td className="py-2.5 px-3">Open Parquet in customer S3/ADLS with UniForm or Iceberg v2/v3</td>
-                    <td className="py-2.5 px-3">Proprietary micro-partition format or managed external Iceberg</td>
-                    <td className="py-2.5 px-3">Local single-file database or remote Parquet reading via HTTP range requests</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 font-semibold text-purple-300">Catalog Governance</td>
-                    <td className="py-2.5 px-3">Unity Catalog OSS / Apache Polaris REST (vendor-neutral)</td>
-                    <td className="py-2.5 px-3">Snowflake / BigQuery native catalog with external REST links</td>
-                    <td className="py-2.5 px-3">MotherDuck cloud catalog or file-system paths</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 font-semibold text-purple-300">Compute Cost Model</td>
-                    <td className="py-2.5 px-3">Serverless DBU or VM compute; zero storage markup</td>
-                    <td className="py-2.5 px-3">Credit-based warehouse compute + per-TB storage charges</td>
-                    <td className="py-2.5 px-3">Free local compute; low-cost serverless MotherDuck</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 font-semibold text-purple-300">Best Suited For</td>
-                    <td className="py-2.5 px-3">Multi-engine enterprise lakehouses, large-scale Spark/AI ETL</td>
-                    <td className="py-2.5 px-3">Interactive BI, financial reporting, highly structured EDWs</td>
-                    <td className="py-2.5 px-3">Lightweight pipelines, local analytics, edge processing, serverless apps</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
           </div>
         </div>
       )}

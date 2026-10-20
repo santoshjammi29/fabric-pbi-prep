@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return generatePageMetadata({
     title: `Production & Databricks Cheat Sheets (${totalItems} Recipes & Cards) | Spark, Delta & Fabric`,
-    description: `Enterprise architect reference guide: 67 incident runbooks + 48 Databricks coding language cards (Spark SQL, PySpark, Spark Core, Python SDK) with 5 print-ready vector PDFs and 250-DPI posters.`,
+    description: `Enterprise architect reference guide: ${data.length} incident runbooks + ${databricksData.cards.length} Databricks coding language cards (Spark SQL, PySpark, Spark Core, Python SDK) with 5 print-ready vector PDFs and 250-DPI posters.`,
     path: "/cheat-sheet",
     keywords: [
       "Databricks Cheat Sheet",

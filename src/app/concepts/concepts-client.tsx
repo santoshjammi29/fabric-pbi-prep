@@ -25,7 +25,6 @@ import {
   ChevronRight,
   ArrowRight,
   GitBranch,
-  Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -180,7 +179,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
-  const [selectedStretch, setSelectedStretch] = useState<string>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isReadAllMode, setIsReadAllMode] = useState(false);
   const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
@@ -275,12 +273,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
 
     if (selectedDifficulty !== "ALL") {
       result = result.filter((c) => c.difficulty === selectedDifficulty);
-    }
-
-    if (selectedStretch === "STANDARD") {
-      result = result.filter((c) => c.difficulty === "EASY" || c.difficulty === "MEDIUM");
-    } else if (selectedStretch === "STRETCH") {
-      result = result.filter((c) => c.difficulty === "HARD" || c.difficulty === "ARCHITECT");
     }
 
     if (deferredSearch.trim()) {
@@ -412,13 +404,11 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const hasActiveFilters =
     selectedCategory !== "ALL" ||
     selectedDifficulty !== "ALL" ||
-    selectedStretch !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetAllFilters = useCallback(() => {
     setSelectedCategory("ALL");
     setSelectedDifficulty("ALL");
-    setSelectedStretch("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     toast.info("Reset all filters");
@@ -467,7 +457,7 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
       <UnifiedSearchFilterBox
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Search 660+ concepts by term, keyword, or mechanism... (Press / to search)"
+        searchPlaceholder={`Search ${initialConcepts.length}+ concepts by term, keyword, or mechanism... (Press / to search)`}
         matchCount={filteredConcepts.length}
         totalCount={initialConcepts.length}
         countUnit="concepts"
@@ -534,20 +524,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
               { id: "ARCHITECT", label: "Architect" },
             ],
           },
-          {
-            id: "stretch",
-            title: "Stretch & Depth Scope",
-            shortTitle: "Stretch",
-            icon: <Target size={13} className="text-purple-400" />,
-            layout: "segmented",
-            selectedId: selectedStretch,
-            onSelect: (id) => setSelectedStretch(id),
-            options: [
-              { id: "ALL", label: "ALL" },
-              { id: "STANDARD", label: "Standard" },
-              { id: "STRETCH", label: "Stretch" },
-            ],
-          },
         ]}
         activeFilters={[
           ...(isReadAllMode
@@ -577,16 +553,6 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
                   label: `Difficulty: ${selectedDifficulty}`,
                   color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
                   onRemove: () => setSelectedDifficulty("ALL"),
-                },
-              ]
-            : []),
-          ...(selectedStretch !== "ALL"
-            ? [
-                {
-                  id: "stretch",
-                  label: `Scope: ${selectedStretch}`,
-                  color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
-                  onRemove: () => setSelectedStretch("ALL"),
                 },
               ]
             : []),

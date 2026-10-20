@@ -460,7 +460,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               <span>Production Interview Scenarios</span>
             </div>
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
-              6,500+ Senior Data Engineering &amp; Architect Q&amp;A
+              {initialQuestions.length.toLocaleString()}+ Senior Data Engineering &amp; Architect Q&amp;A
             </h1>
             <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, Delta Lake, Airflow, dbt, and Lakehouse architectures.
@@ -483,7 +483,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
       <UnifiedSearchFilterBox
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Search 6,500+ questions by keyword, mechanism, syntax... (Press / to search)"
+        searchPlaceholder={`Search ${initialQuestions.length.toLocaleString()}+ questions by keyword, mechanism, syntax... (Press / to search)`}
         matchCount={filteredQuestions.length}
         totalCount={initialQuestions.length}
         countUnit="Qs"

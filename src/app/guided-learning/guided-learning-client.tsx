@@ -579,7 +579,7 @@ function GuidedLearningContent() {
                     <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase tracking-wide">
                       Compute & Engine Deep Dive
                     </span>
-                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">1,039 items</span>
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">{getTopicSummaryStats("spark").total.toLocaleString()} items</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">
@@ -606,7 +606,7 @@ function GuidedLearningContent() {
                     <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 uppercase tracking-wide">
                       Orchestration & Transformation
                     </span>
-                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">852 items</span>
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">{getTopicSummaryStats("airflow").total.toLocaleString()} items</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">
@@ -633,7 +633,7 @@ function GuidedLearningContent() {
                     <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase tracking-wide">
                       Enterprise SaaS Lakehouse
                     </span>
-                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">436 items</span>
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)]">{getTopicSummaryStats("fabric").total.toLocaleString()} items</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shrink-0">

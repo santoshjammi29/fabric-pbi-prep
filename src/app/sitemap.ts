@@ -111,7 +111,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
-  // 4. Complete Core Concepts Knowledge Graph (All 620+ Concepts)
+  // 4. Complete Core Concepts Knowledge Graph (All 660+ Concepts)
   const coreConceptRoutes: MetadataRoute.Sitemap = conceptsDb.map((concept) => ({
     url: `${BASE_URL}/concepts?tab=concepts&term=${encodeURIComponent(concept.term)}`,
     lastModified: now,

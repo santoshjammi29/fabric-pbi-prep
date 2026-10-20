@@ -39,7 +39,7 @@ export default async function QaPrepPage() {
 
   const courseJsonLd = generateCourseSchema({
     name: "Enterprise Data Platform Technical Interview Preparation",
-    description: "6,500+ verified technical questions, trade-off rubrics, and deep architectural solutions.",
+    description: `${questions.length.toLocaleString()}+ verified technical questions, trade-off rubrics, and deep architectural solutions.`,
     url: "/qa-prep",
   });
 

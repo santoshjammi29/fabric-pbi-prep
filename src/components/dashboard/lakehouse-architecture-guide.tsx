@@ -169,7 +169,7 @@ export function LakehouseArchitectureGuide() {
               <span className="text-xs font-mono font-bold text-blue-500 uppercase tracking-wider">Deep Practice</span>
               <h4 className="text-sm font-bold text-[var(--foreground)]">Test Lakehouse System Design</h4>
               <p className="text-xs text-[var(--muted-foreground)]">
-                Dive into 3,124+ production scenarios, whiteboard blueprints, and failure-mode analysis.
+                Dive into 3,206+ production scenarios, whiteboard blueprints, and failure-mode analysis.
               </p>
             </div>
             <Link
@@ -394,7 +394,7 @@ export function LakehouseArchitectureGuide() {
             className="p-3 rounded-lg bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs space-y-1 block transition-all"
           >
             <div className="font-bold text-[var(--foreground)]">Architecture Hub</div>
-            <div className="text-[11px] text-[var(--muted-foreground)]">3,124+ System Scenarios</div>
+            <div className="text-[11px] text-[var(--muted-foreground)]">3,206+ System Scenarios</div>
           </Link>
           <Link
             href="/concepts"
@@ -415,7 +415,7 @@ export function LakehouseArchitectureGuide() {
             className="p-3 rounded-lg bg-[var(--surface-1)] hover:bg-[var(--surface-2)] border border-[var(--border)] text-xs space-y-1 block transition-all"
           >
             <div className="font-bold text-[var(--foreground)]">QA Prep Portal</div>
-            <div className="text-[11px] text-[var(--muted-foreground)]">10,700+ Interview Drills</div>
+            <div className="text-[11px] text-[var(--muted-foreground)]">7,080+ Interview Drills</div>
           </Link>
           <Link
             href="/mindmap"
