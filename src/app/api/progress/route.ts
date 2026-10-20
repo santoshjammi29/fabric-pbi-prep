@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       {
         success: true,
         data: data || null,
-        edgeRegion: process.env.VERCEL_REGION || "local-edge",
+        edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || "cloudflare-edge",
       },
       {
         headers: {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       {
         success: true,
         syncedAt: new Date().toISOString(),
-        edgeRegion: process.env.VERCEL_REGION || "global-edge",
+        edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || "cloudflare-edge",
       },
       {
         status: 200,

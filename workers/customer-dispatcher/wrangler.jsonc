@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "lakehouse-customer-dispatcher",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-20",
+  "workers_dev": true,
+  "dispatch_namespaces": [
+    {
+      "binding": "USER_WORKERS",
+      "namespace": "lakehouse-customer-workers"
+    }
+  ]
+}

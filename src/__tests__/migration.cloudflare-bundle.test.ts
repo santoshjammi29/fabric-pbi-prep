@@ -8,7 +8,7 @@ import {
 } from '@/schemas/content.schema';
 import { getArtifactUrl } from '@/lib/artifact-client';
 
-describe('Vercel-to-Cloudflare Migration Bundle Tests', () => {
+describe('Cloudflare Worker Migration Bundle Tests', () => {
   describe('Zod Content Schemas', () => {
     it('validates a correct QA item', () => {
       const sample = {

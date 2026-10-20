@@ -1,6 +1,6 @@
 /**
  * Comprehensive TypeScript Type Definitions
- * Source: Lakehouse Architect (lakehousearchitect.vercel.app)
+ * Source: Lakehouse Architect
  */
 
 // ==========================================
@@ -507,4 +507,3 @@ export interface DataOpsDataset {
   cicdAlternatives: CicdAlternativeItem[];
   lifecycleStages: ProjectLifecycleStage[];
 }
-

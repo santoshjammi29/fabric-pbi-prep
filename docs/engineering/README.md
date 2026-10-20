@@ -1,7 +1,7 @@
 # Engineering & Operations Documentation
 
 > **Developer Quickstart, Architecture Specifications, Test Runbooks & Strategic Roadmap**  
-> Operational guidelines for building, testing, optimizing, and deploying [`lakehousearchitect.vercel.app`](https://lakehousearchitect.vercel.app).
+> Operational guidelines for building, testing, optimizing, and deploying the Cloudflare Workers application.
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Document | Primary Scope | Operational Focus | Link |
 | :--- | :--- | :--- | :--- |
-| **Development & Operations Guide** | Project architecture, Server Data Layer, Vitest suite, Vercel | App Router folder layout, Zero-Bundle Data Mandate, 32 Vitest suites (298 tests), deployment lifecycle. | [`development_guide.md`](./development_guide.md) |
+| **Development & Operations Guide** | Project architecture, Server Data Layer, Vitest suite, Cloudflare Workers | App Router folder layout, Zero-Bundle Data Mandate, test suites, deployment lifecycle. | [`development_guide.md`](./development_guide.md) |
 | **Platform Engineering Roadmap** | Completed milestones & future architectural expansions | Databricks 100, 6 Delta Lake optimization levers, high-throughput in-process compute (Arrow Flight, DuckDB). | [`roadmap.md`](./roadmap.md) |
 
 ---
@@ -26,8 +26,8 @@ npm test -- --run
 # Run Next.js production build (verify zero TS or bundle errors)
 npm run build
 
-# Deploy to Vercel production
-npx vercel --prod --yes
+# Deploy generated R2 artifacts and the OpenNext Worker to Cloudflare
+npm run deploy:cf
 ```
 
 ---

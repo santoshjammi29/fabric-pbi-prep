@@ -3,13 +3,13 @@
 [![Next.js 16](https://img.shields.io/badge/Next.js-16_App_Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19_Server_Components-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x_Strict-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Tests-341_Passed-green?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![Production Status](https://img.shields.io/badge/Production-Live_on_Vercel-success?style=flat-square&logo=vercel)](https://lakehousearchitect.vercel.app)
+[![Vitest](https://img.shields.io/badge/Tests-355_Passed-green?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Deployment Target](https://img.shields.io/badge/Deployment-Cloudflare_Workers-orange?style=flat-square&logo=cloudflare)](https://developers.cloudflare.com/workers/)
 
 > **Enterprise-Grade Cloud Educational Platform & Architecture Encyclopedia**  
 > Tailored for Principal Data Architects, Staff Data Engineers, and Lead Analytics Engineers mastering Microsoft Fabric, Databricks, Delta Lake, Apache Spark, Power BI, Azure Data Factory, and Modern Lakehouse Design.
 
-🌐 **Live Application**: [https://lakehousearchitect.vercel.app](https://lakehousearchitect.vercel.app)
+> **Cloudflare migration status:** The Cloudflare Worker is configured but not yet published. Register a `workers.dev` subdomain for the Cloudflare account before deploying; until then, the existing production host remains unchanged.
 
 ---
 
@@ -19,8 +19,8 @@
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
-       │                   GLOBAL EDGE TIER (Vercel)                 │
-       │    middleware.ts (Edge Routing, SWR Cache-Control Headers)  │
+       │              GLOBAL EDGE TIER (Cloudflare Workers)          │
+       │      proxy.ts (Edge Routing, Cache-Control Headers)         │
        └──────────────────────────────┬──────────────────────────────┘
                                       │
               ┌───────────────────────┴───────────────────────┐
@@ -128,9 +128,11 @@ npm test -- --run
 # 4. Run production build (zero TypeScript or bundle errors)
 npm run build
 
-# 5. Production deployment to Vercel
-npx vercel --prod --yes
+# 5. Deploy the application and generated artifacts to Cloudflare
+npm run deploy:cf
 ```
+
+Before the first deployment, register the account's `workers.dev` subdomain from the Cloudflare dashboard. Wrangler cannot publish a `workers.dev` URL until this account-level setup is complete.
 
 ---
 
@@ -156,4 +158,3 @@ The complete documentation library is organized under [`docs/`](docs/README.md) 
 | **[Engineering & Operations](docs/engineering/README.md)** | Developer onboarding, testing & roadmap | [`development_guide.md`](docs/engineering/development_guide.md) (App Router DAL & Vitest Runbook) • [`roadmap.md`](docs/engineering/roadmap.md) (Platform Roadmap) |
 
 👉 **[Browse Full Documentation Hub (`docs/README.md`)](docs/README.md)**
-

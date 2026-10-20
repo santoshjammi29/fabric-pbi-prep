@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TextSizeProvider } from "@/components/providers/text-size-provider";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -170,6 +171,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-dvh overflow-x-clip bg-[var(--background)] text-[var(--foreground)]">
 
+        <AuthProvider>
         <ThemeProvider>
           <TextSizeProvider>
           <LazyMotion features={domAnimation}>
@@ -311,6 +313,7 @@ export default function RootLayout({
           />
           </TextSizeProvider>
         </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

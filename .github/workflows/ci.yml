@@ -57,11 +57,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Vitest Suite (106 tests)
+      - name: Generate artifacts required by integration tests
+        run: npm run content:shard
+
+      - name: Run Vitest Suite
         run: npm test
 
   # ──────────────────────────────────────────────────────────────────────────
-  # JOB 3: Production Build Verification (Next.js App Router)
+  # JOB 3: Production Build Verification (OpenNext on Cloudflare Workers)
   # ──────────────────────────────────────────────────────────────────────────
   build:
     name: Next.js Production Build
@@ -80,5 +83,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js Application
-        run: npm run build
+      - name: Build Cloudflare Worker
+        run: npm run build:cf

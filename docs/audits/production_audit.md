@@ -1,10 +1,12 @@
 # 🚀 Enterprise Production Audit Report: fabric-pbi-prep
 
-**System Status**: Globally Distributed & Production Ready  
-**Deployment Target**: [https://lakehousearchitect.vercel.app](https://lakehousearchitect.vercel.app)  
+**System Status**: Historical pre-Cloudflare assessment; not revalidated on Cloudflare
+**Historical Deployment Target**: [https://lakehousearchitect.vercel.app](https://lakehousearchitect.vercel.app)
 **Architecture Spec**: Zero-Bundle Server Components + Edge SWR DAL + HTML5 Canvas 60 FPS Engine + Web Workers  
 **Test Suite**: 32 / 32 test files passed (298 / 298 unit & integration tests)  
 **Date of Audit**: October 2026 (Updated to v1.1)  
+
+> This report records a historical Vercel-era assessment. Its deployment details, regional measurements, and production-readiness claims have not been re-measured or verified against the Cloudflare deployment.
 
 ---
 
@@ -14,8 +16,8 @@ The `lakehouse-architect` platform has undergone a total senior staff-engineer a
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
-       │                   GLOBAL EDGE TIER (Vercel)                 │
-       │    middleware.ts (Geo-IP Routing & SWR Headers Engine)       │
+       │                HISTORICAL GLOBAL EDGE TIER                  │
+       │       Vercel-era middleware and SWR header behavior          │
        └──────────────────────────────┬──────────────────────────────┘
                                       │
               ┌───────────────────────┴───────────────────────┐
@@ -155,4 +157,3 @@ npx tsx scripts/migrate_to_serverless_db.ts --provider=supabase
 ---
 
 [← Back to Audits Directory](./README.md) • [Documentation Hub](../README.md)
-

@@ -35,9 +35,6 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -47,3 +44,6 @@ next-env.d.ts
 .open-next
 .wrangler
 public/_artifacts
+
+# Vercel project metadata must remain local and untracked
+.vercel

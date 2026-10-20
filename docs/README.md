@@ -1,7 +1,7 @@
 # Central Documentation Hub: `lakehouse-architect`
 
 > **Unified Enterprise Knowledge Architecture & Operational Guidelines**  
-> Comprehensive documentation library for [`https://lakehousearchitect.vercel.app`](https://lakehousearchitect.vercel.app).
+> Comprehensive documentation library for the Lakehouse Architect application, deployed on Cloudflare Workers.
 
 ---
 
@@ -71,7 +71,7 @@ Developer onboarding, architecture rules, testing runbooks, and strategic planni
 
 | Document | Primary Focus | Operational Guide | Link |
 | :--- | :--- | :--- | :--- |
-| **Development & Operations Guide** | Next.js 16 App Router, DAL, Vitest suite, Vercel | Local setup, Zero-Bundle rule, 32 Vitest suites runbook | [`engineering/development_guide.md`](./engineering/development_guide.md) |
+| **Development & Operations Guide** | Next.js 16 App Router, DAL, Vitest suite, Cloudflare Workers | Local setup, Zero-Bundle rule, test runbook | [`engineering/development_guide.md`](./engineering/development_guide.md) |
 | **Platform Engineering Roadmap** | Completed milestones & v2.0+ planned expansions | Databricks 100, 6 Optimization Levers, Arrow Flight SQL | [`engineering/roadmap.md`](./engineering/roadmap.md) |
 
 👉 **[Explore Engineering Runbooks](./engineering/README.md)**

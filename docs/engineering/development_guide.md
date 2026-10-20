@@ -115,11 +115,10 @@ npm run build
 # 2. Automated test run
 npm test -- --run
 
-# 3. Deploy to Vercel production
-npx vercel --prod --yes
+# 3. Deploy generated R2 artifacts and the OpenNext Worker to Cloudflare
+npm run deploy:cf
 ```
 
 ---
 
 [← Back to Engineering Directory](./README.md) • [Documentation Hub](../README.md)
-

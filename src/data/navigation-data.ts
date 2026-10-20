@@ -21,6 +21,7 @@ import {
   GraduationCap,
   Briefcase,
   Zap,
+  Cloud,
 } from "lucide-react";
 
 export interface SubNavItem {
@@ -88,6 +89,7 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Workspace",
     items: [
       { label: "My Studio", href: "/studio", icon: User, pill: { text: "Personal", variant: "info" } },
+      { label: "Worker Deployments", href: "/deployments", icon: Cloud, pill: { text: "Isolated", variant: "new" } },
     ],
   },
 ];
@@ -133,6 +135,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   
   // Workspace
   { id: "studio", label: "My Studio", shortLabel: "My Studio", href: "/studio", category: "Workspace", categoryColor: "rose", icon: User, badge: "Personal" },
+  { id: "deployments", label: "Worker Deployments", shortLabel: "Deployments", href: "/deployments", category: "Workspace", categoryColor: "rose", icon: Cloud, badge: "Workers" },
 ];
 
 /**
