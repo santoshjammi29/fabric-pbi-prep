@@ -7,6 +7,7 @@ import {
   Search,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   ExternalLink,
   BookOpen,
   Sparkles,
@@ -268,6 +269,78 @@ export function ConceptsMindmapView({
   const totalVisibleConcepts = useMemo(() => {
     return filteredTree.reduce((sum, t) => sum + (t.matchingCount ?? 0), 0);
   }, [filteredTree]);
+
+  // Flat list of visible concepts for sequential focus navigation
+  const visibleConceptsList = useMemo(() => {
+    const list: Concept[] = [];
+    filteredTree.forEach((topic) => {
+      topic.subtopics.forEach((sub) => {
+        list.push(...sub.concepts);
+      });
+    });
+    // Fallback to all concepts if selected concept is not in current tree filter
+    if (selectedConcept && !list.some((c) => c.id === selectedConcept.id)) {
+      return concepts;
+    }
+    return list.length > 0 ? list : concepts;
+  }, [filteredTree, concepts, selectedConcept]);
+
+  const currentConceptIndex = useMemo(() => {
+    if (!selectedConcept) return -1;
+    return visibleConceptsList.findIndex((c) => c.id === selectedConcept.id);
+  }, [selectedConcept, visibleConceptsList]);
+
+  const hasPrevConcept = currentConceptIndex > 0;
+  const hasNextConcept =
+    currentConceptIndex >= 0 && currentConceptIndex < visibleConceptsList.length - 1;
+
+  const handlePrevConcept = useCallback(() => {
+    if (currentConceptIndex > 0) {
+      setSelectedConcept(visibleConceptsList[currentConceptIndex - 1]);
+    }
+  }, [currentConceptIndex, visibleConceptsList]);
+
+  const handleNextConcept = useCallback(() => {
+    if (
+      currentConceptIndex >= 0 &&
+      currentConceptIndex < visibleConceptsList.length - 1
+    ) {
+      setSelectedConcept(visibleConceptsList[currentConceptIndex + 1]);
+    }
+  }, [currentConceptIndex, visibleConceptsList]);
+
+  // Keyboard navigation when focus mode / modal is open
+  React.useEffect(() => {
+    if (!selectedConcept) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setSelectedConcept(null);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handlePrevConcept();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleNextConcept();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedConcept, handlePrevConcept, handleNextConcept]);
 
   return (
     <div className="space-y-4">
@@ -691,16 +764,20 @@ export function ConceptsMindmapView({
 
       {/* ─── CONCEPT DETAIL INSPECTOR DRAWER / MODAL ─── */}
       {selectedConcept && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setSelectedConcept(null)}
+        >
           <div
             className="w-full max-w-2xl rounded-2xl bg-[var(--surface-1)] border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="concept-modal-title"
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="p-4 sm:p-5 bg-[var(--surface-2)]/50 border-b border-[var(--border)] flex items-start justify-between gap-3">
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20">
                     {selectedConcept.category}
@@ -715,13 +792,52 @@ export function ConceptsMindmapView({
                   >
                     {selectedConcept.difficulty}
                   </span>
+                  {currentConceptIndex >= 0 && (
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)] px-2 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--border)]">
+                      {currentConceptIndex + 1} of {visibleConceptsList.length}
+                    </span>
+                  )}
                 </div>
                 <h3 id="concept-modal-title" className="text-base sm:text-xl font-bold text-[var(--foreground)] tracking-tight">
                   {selectedConcept.term}
                 </h3>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0">
+                {/* Prev / Next buttons in header */}
+                <div className="flex items-center rounded-xl bg-[var(--surface-2)] border border-[var(--border)] p-0.5">
+                  <button
+                    type="button"
+                    onClick={handlePrevConcept}
+                    disabled={!hasPrevConcept}
+                    className={cn(
+                      "p-1.5 rounded-lg text-[var(--muted-foreground)] transition-colors",
+                      hasPrevConcept
+                        ? "hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer"
+                        : "opacity-30 cursor-not-allowed"
+                    )}
+                    title="Previous Concept (ArrowLeft)"
+                    aria-label="Previous Concept"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextConcept}
+                    disabled={!hasNextConcept}
+                    className={cn(
+                      "p-1.5 rounded-lg text-[var(--muted-foreground)] transition-colors",
+                      hasNextConcept
+                        ? "hover:text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer"
+                        : "opacity-30 cursor-not-allowed"
+                    )}
+                    title="Next Concept (ArrowRight)"
+                    aria-label="Next Concept"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => handleBookmarkToggle(selectedConcept)}
@@ -793,9 +909,9 @@ export function ConceptsMindmapView({
               )}
             </div>
 
-            {/* Footer with Cross-Platform Links */}
+            {/* Footer with Cross-Platform Links and Navigation */}
             <div className="p-3.5 sm:p-4 bg-[var(--surface-2)]/50 border-t border-[var(--border)] flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href={`/qa-prep?q=${encodeURIComponent(selectedConcept.term)}`}
                   className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors inline-flex items-center gap-1.5"
@@ -812,13 +928,46 @@ export function ConceptsMindmapView({
                 </Link>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedConcept(null)}
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
-              >
-                Close (Esc)
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrevConcept}
+                  disabled={!hasPrevConcept}
+                  className={cn(
+                    "px-2.5 py-1.5 rounded-xl border border-[var(--border)] text-xs font-semibold inline-flex items-center gap-1 transition-colors",
+                    hasPrevConcept
+                      ? "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer"
+                      : "opacity-30 cursor-not-allowed text-[var(--muted-foreground)] bg-transparent"
+                  )}
+                  title="Previous Concept (ArrowLeft)"
+                >
+                  <ChevronLeft size={13} />
+                  <span>Prev</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextConcept}
+                  disabled={!hasNextConcept}
+                  className={cn(
+                    "px-2.5 py-1.5 rounded-xl border border-[var(--border)] text-xs font-semibold inline-flex items-center gap-1 transition-colors",
+                    hasNextConcept
+                      ? "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)] cursor-pointer"
+                      : "opacity-30 cursor-not-allowed text-[var(--muted-foreground)] bg-transparent"
+                  )}
+                  title="Next Concept (ArrowRight)"
+                >
+                  <span>Next</span>
+                  <ChevronRight size={13} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedConcept(null)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+                >
+                  Close (Esc)
+                </button>
+              </div>
             </div>
           </div>
         </div>

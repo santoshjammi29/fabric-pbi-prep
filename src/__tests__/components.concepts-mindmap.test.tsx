@@ -111,6 +111,53 @@ describe("ConceptsMindmapView Component", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
+  it("supports previous and next item navigation in focus mode via buttons and arrow keys", () => {
+    render(<ConceptsMindmapView concepts={mockConcepts} />);
+
+    // Click on OneLake (first concept in Fabric topic)
+    const onelakeNode = screen.getByText("OneLake");
+    fireEvent.click(onelakeNode);
+
+    // Dialog should be open with OneLake
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeDefined();
+    expect(screen.getByText(/1 of 4/i)).toBeDefined();
+
+    // The Previous buttons should be disabled on first item
+    const prevIconBtn = screen.getByRole("button", { name: "Previous Concept" });
+    expect((prevIconBtn as HTMLButtonElement).disabled).toBe(true);
+
+    // Click Next button in footer
+    const nextBtn = screen.getByRole("button", { name: "Next" });
+    expect((nextBtn as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.click(nextBtn);
+
+    // Should now show Direct Lake Mode (second concept)
+    expect(screen.getByText(/2 of 4/i)).toBeDefined();
+    expect(screen.getAllByRole("heading", { name: "Direct Lake Mode" }).length).toBeGreaterThan(0);
+
+    // Navigate to next via keyboard ArrowRight
+    fireEvent.keyDown(window, { key: "ArrowRight" });
+    // Should now show Catalyst Optimizer (third concept)
+    expect(screen.getByText(/3 of 4/i)).toBeDefined();
+    expect(screen.getAllByRole("heading", { name: "Catalyst Optimizer" }).length).toBeGreaterThan(0);
+
+    // Navigate back via keyboard ArrowLeft
+    fireEvent.keyDown(window, { key: "ArrowLeft" });
+    expect(screen.getByText(/2 of 4/i)).toBeDefined();
+    expect(screen.getAllByRole("heading", { name: "Direct Lake Mode" }).length).toBeGreaterThan(0);
+
+    // Navigate back to first via Prev button in footer
+    const prevBtn = screen.getByRole("button", { name: "Prev" });
+    fireEvent.click(prevBtn);
+    expect(screen.getByText(/1 of 4/i)).toBeDefined();
+    expect(screen.getAllByRole("heading", { name: "OneLake" }).length).toBeGreaterThan(0);
+
+    // Press Escape to close modal
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("toggles stretch depth to Topics Only", () => {
     render(<ConceptsMindmapView concepts={mockConcepts} />);
 
