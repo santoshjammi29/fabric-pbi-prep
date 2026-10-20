@@ -144,6 +144,7 @@ function SidebarInner() {
 
   const currentCollapsedWidth = isMobile ? COLLAPSED_WIDTH_MOBILE : COLLAPSED_WIDTH_DESKTOP;
   const currentWidth = collapsed ? currentCollapsedWidth : (isMobile ? Math.min(width, 280) : width);
+  const spacerWidth = (!collapsed && isMobile) ? currentCollapsedWidth : currentWidth;
 
   return (
     <>
@@ -156,18 +157,23 @@ function SidebarInner() {
         />
       )}
 
-      {/* Spacer to preserve document layout on small mobile screens when expanded as overlay */}
-      {!collapsed && isMobile && (
-        <div style={{ width: currentCollapsedWidth }} className="shrink-0 sm:hidden" aria-hidden="true" />
-      )}
+      {/* In-flow flex spacer ensuring the main content stays aligned beside the fixed sidebar */}
+      <div
+        style={{ width: spacerWidth }}
+        className={cn(
+          "shrink-0",
+          isDragging ? "transition-none" : "transition-[width] duration-200 ease-in-out"
+        )}
+        aria-hidden="true"
+      />
 
       <aside
         style={{ width: currentWidth }}
         className={cn(
-          "flex flex-col h-dvh sticky top-0 self-start border-r z-30 shrink-0",
+          "fixed top-0 bottom-0 left-0 z-30 flex flex-col h-dvh border-r shrink-0",
           "bg-[var(--surface-1)] border-[var(--border)]",
           isDragging ? "transition-none select-none" : "transition-[width] duration-200 ease-in-out",
-          !collapsed && isMobile && "fixed inset-y-0 left-0 z-40 shadow-2xl"
+          !collapsed && isMobile && "z-40 shadow-2xl"
         )}
       >
         {/* Brand & Resize Controls */}
@@ -377,10 +383,13 @@ export function Sidebar() {
   return (
     <Suspense
       fallback={
-        <aside
-          className="flex flex-col h-dvh sticky top-0 self-start border-r shrink-0 z-30 w-[56px] sm:w-[72px] lg:w-[285px] bg-[var(--surface-1)] border-[var(--border)]"
-          aria-hidden="true"
-        />
+        <>
+          <div className="w-[56px] sm:w-[72px] lg:w-[285px] shrink-0" aria-hidden="true" />
+          <aside
+            className="fixed top-0 bottom-0 left-0 z-30 flex flex-col h-dvh border-r shrink-0 w-[56px] sm:w-[72px] lg:w-[285px] bg-[var(--surface-1)] border-[var(--border)]"
+            aria-hidden="true"
+          />
+        </>
       }
     >
       <SidebarInner />

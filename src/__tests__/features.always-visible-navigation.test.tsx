@@ -98,10 +98,11 @@ describe("Streamlined Navigation & Meaningful Bottom Page Notes", () => {
     const aside = container.querySelector("aside");
     expect(aside).not.toBeNull();
 
-    // Verify aside uses sticky, top-0, self-start, and h-dvh to stay pinned until the bottom of the page
-    expect(aside?.className).toContain("sticky");
+    // Verify aside uses fixed, top-0, bottom-0, left-0, and h-dvh to stay pinned until the bottom of dynamic pages
+    expect(aside?.className).toContain("fixed");
     expect(aside?.className).toContain("top-0");
-    expect(aside?.className).toContain("self-start");
+    expect(aside?.className).toContain("bottom-0");
+    expect(aside?.className).toContain("left-0");
     expect(aside?.className).toContain("h-dvh");
     expect(aside?.className).toContain("border-r");
 
