@@ -7,6 +7,7 @@ import {
   getPlatformOverviewStats,
 } from '@/lib/guided-learning';
 import { GUIDED_TOPICS, GUIDED_DOMAINS } from '@/data/guided-learning-topics';
+import { architectureDiagrams } from '@/data/diagrams';
 
 describe('guided-learning data', () => {
   it('GUIDED_TOPICS has all expected keys', () => {
@@ -131,7 +132,7 @@ describe('guided-learning data', () => {
     const overview = getPlatformOverviewStats();
     expect(overview.totalTopics).toBe(GUIDED_TOPICS.length);
     expect(overview.totalUniqueItems).toBeGreaterThan(500);
-    expect(overview.totalWhiteboards).toBe(31);
+    expect(overview.totalWhiteboards).toBe(architectureDiagrams.length);
     expect(overview.domainsCount).toBeGreaterThanOrEqual(4);
   });
 });

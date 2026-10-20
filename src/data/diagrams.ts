@@ -519,5 +519,85 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
       "Zero-Downtime Serverless Deployment: Automated production deployment updates Serverless Workflows and Delta Live Tables pipelines with automated rollback upon smoke test failure."
     ],
     docLink: "https://docs.databricks.com/en/dev-tools/bundles/index.html"
+  },
+  {
+    id: "spark-savemode-architecture",
+    title: "Apache Spark SaveMode Handling & Storage Execution Architecture",
+    subtitle: "Internal Mechanics for Append, Overwrite, Ignore, and ErrorIfExists Modes Across File Formats",
+    category: "Storage Engine",
+    image: "/diagrams/spark_savemode_architecture_diagram.webp",
+    tags: ["Apache Spark", "SaveMode", "Append", "Overwrite", "Delta Lake", "Parquet", "Partition Overwrite", "Storage Mechanics"],
+    description: "Detailed digital whiteboard blueprint illustrating how Apache Spark's DataFrameWriter handles file writing across Append, Overwrite, Ignore, and ErrorIfExists modes, highlighting dynamic partition overwrites, metadata existence probes, and atomic commit semantics.",
+    keyPoints: [
+      "Append Mode: Directly writes new partition chunks without deleting existing files; safe for incremental stream/batch micro-batches.",
+      "Overwrite Mode: Governed by spark.sql.sources.partitionOverwriteMode (dynamic vs static); dynamic mode replaces only touched partitions rather than wiping the root directory.",
+      "Ignore Mode: Silently converts the write into a no-op if the target path or dataset exists, preventing accidental duplicates without throwing errors.",
+      "ErrorIfExists Mode: Spark's default mode; evaluates directory existence prior to execution and throws AnalysisException to guard against accidental overwrites."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#save-modes"
+  },
+  {
+    id: "spark-join-decision-tree",
+    title: "Apache Spark Join Strategy Selection Decision Tree",
+    subtitle: "How Catalyst & Adaptive Query Execution (AQE) Pick BHJ, SMJ, SHJ, BNLJ, or Cartesian Products",
+    category: "Compute & Optimization",
+    image: "/diagrams/spark_join_decision_tree.webp",
+    tags: ["Apache Spark", "Catalyst Optimizer", "Broadcast Hash Join", "Sort Merge Join", "Shuffle Hash Join", "AQE", "Join Performance"],
+    description: "Complete decision tree guiding Spark's selection of physical join strategies based on equi-join criteria, memory thresholds (spark.sql.autoBroadcastJoinThreshold), sortable keys, and runtime Adaptive Query Execution conversions.",
+    keyPoints: [
+      "Equi-Join Branching: Non-equi joins bypass hash/merge algorithms and fall back to Broadcast Nested Loop Join (BNLJ) or Cartesian Product.",
+      "Broadcast Hash Join (BHJ): Fastest join strategy with 0 network shuffle, broadcasting tables under 10MB to all executor memory pools.",
+      "Sort Merge Join (SMJ): Big data workhorse for orderable keys; streams pre-sorted partitions with linear scans and zero OOM risk.",
+      "AQE Dynamic Join Downgrade: Re-evaluates join strategy after initial shuffle stage; if filtered dataset is under 10MB, converts SMJ to BHJ at runtime."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/sql-performance-tuning.html#join-strategy-hints"
+  },
+  {
+    id: "delta-vs-iceberg-architecture",
+    title: "Delta Lake vs. Apache Iceberg Storage & Metadata Architecture",
+    subtitle: "Under-the-Hood Comparison of Commit Logs, Checkpoints, Manifest Trees, and Hidden Partitioning",
+    category: "Storage Engine",
+    image: "/diagrams/delta_lake_vs_iceberg_architecture.webp",
+    tags: ["Delta Lake", "Apache Iceberg", "Lakehouse", "ACID", "Table Formats", "Manifests", "Hidden Partitioning", "Time Travel"],
+    description: "Architectural comparison of the two dominant open lakehouse storage formats, contrasting Delta Lake's sequential JSON commit log and Parquet checkpoints with Apache Iceberg's hierarchical Avro manifest tree and hidden partition evolution.",
+    keyPoints: [
+      "Metadata Architecture: Delta Lake utilizes forward JSON logs with periodic 10-commit Parquet checkpoints; Iceberg uses a multi-tier tree of Snapshots, Manifest Lists, and Manifest Files.",
+      "Partition Evolution: Iceberg allows hidden partitioning and schema/partition evolution without rewriting historical data; Delta Lake organizes files by physical directory paths.",
+      "File Pruning Efficiency: Iceberg prunes entire manifest files using partition bounds before reading data file metadata; Delta reads column min/max statistics stored inside checkpoint Parquet files.",
+      "ACID & Snapshot Isolation: Both support Optimistic Concurrency Control (OCC), zero-copy time travel queries, and snapshot rollbacks."
+    ],
+    docLink: "https://iceberg.apache.org/docs/latest/spec/"
+  },
+  {
+    id: "spark-aqe-dynamic-optimization",
+    title: "Apache Spark Adaptive Query Execution (AQE) Architecture",
+    subtitle: "Dynamic Partition Coalescing, Join Strategy Switching, and Automatic Skew Join Balancing",
+    category: "Compute & Optimization",
+    image: "/diagrams/spark_aqe_architecture_diagram.webp",
+    tags: ["Apache Spark", "AQE", "Adaptive Query Execution", "Dynamic Coalescing", "Data Skew", "MapStatus", "Runtime Tuning"],
+    description: "Detailed visual guide to Spark 3.x Adaptive Query Execution (AQE), detailing how runtime stage statistics re-plan execution on the fly to eliminate small files, prevent shuffle skew, and convert joins dynamically.",
+    keyPoints: [
+      "Dynamic Partition Coalescing: Automatically groups 200 default shuffle partitions into balanced 64MB targets based on post-shuffle MapStatus file sizes.",
+      "Dynamic Join Switching: Converts conservative Sort Merge Joins to fast Broadcast Hash Joins if post-filter runtime table sizes fall under 10MB.",
+      "Dynamic Skew Join Handling: Detects skewed partitions exceeding 5x median size and splits them into sub-partitions while replicating opposite keys to prevent straggler tasks.",
+      "Enabled by Default: Standard in Spark 3.2+ via spark.sql.adaptive.enabled=true."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/sql-performance-tuning.html#adaptive-query-execution"
+  },
+  {
+    id: "spark-memory-management-spill",
+    title: "Apache Spark Memory Management & Shuffle Spilling Mechanics",
+    subtitle: "UnifiedMemoryManager Pools, Dynamic Borrowing, Eviction Rules & On-Disk Spill Protection",
+    category: "Compute & Optimization",
+    image: "/diagrams/spark_memory_management_spill_diagram.webp",
+    tags: ["Apache Spark", "Memory Management", "UnifiedMemoryManager", "Shuffle Spill", "Off-Heap", "Tungsten", "Garbage Collection"],
+    description: "Comprehensive blueprint of the Spark JVM Executor memory layout, breaking down Reserved Memory (300MB), User Memory (40%), and Unified Memory (60% split between Execution and Storage), alongside the 5-step disk spilling pipeline.",
+    keyPoints: [
+      "Reserved Memory: 300MB fixed allocation dedicated exclusively to Spark internal operations and fail-safe OOM protection.",
+      "Dynamic Borrowing Rules: Execution memory can evict Storage cached blocks when under pressure, but Storage CANNOT evict active Execution memory.",
+      "Disk Spilling Pipeline: Serializes in-memory shuffle buffers with LZ4 compression when threshold is exceeded, followed by multi-way on-disk merge scans.",
+      "Off-Heap Tungsten Memory: spark.memory.offHeap.enabled allows direct C-style raw memory management, completely bypassing JVM garbage collection pauses."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/tuning.html#memory-management-overview"
   }
 ];
