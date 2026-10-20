@@ -680,5 +680,21 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
       "SCD Type 6 (Hybrid 1 + 2 + 3): Combines row versioning, current-state column overwrite on all historical rows, and prior value columns for instant filtering without expensive joins."
     ],
     docLink: "https://docs.delta.io/latest/delta-update.html#slowly-changing-data-scd-type-2-with-delta-lake"
+  },
+  {
+    id: "fabric-onelake-direct-lake-architecture",
+    title: "Microsoft Fabric OneLake Shortcuts & Direct Lake Mode",
+    subtitle: "Zero-ETL Multi-Cloud Data Virtualization and Direct VertiPaq Lakehouse Querying",
+    category: "Fabric & Power BI",
+    image: "/diagrams/fabric_onelake_direct_lake_architecture.webp",
+    tags: ["Microsoft Fabric", "OneLake", "Shortcuts", "Direct Lake", "VertiPaq", "AWS S3", "ADLS Gen2", "Google Cloud Storage", "V-Order"],
+    description: "Detailed whiteboard blueprint illustrating Microsoft Fabric OneLake zero-copy shortcuts across AWS S3, Azure ADLS Gen2, and Google Cloud Storage into unified V-Order Delta Parquet tables, contrasted with Power BI Direct Lake mode loading column chunks into VertiPaq memory cache on demand.",
+    keyPoints: [
+      "Zero-Copy Multi-Cloud Shortcuts: Creates instant symbolic references to data in AWS S3, Google Cloud Storage, or ADLS Gen2 without data egress or ETL pipeline overhead.",
+      "Direct Lake Mode: VertiPaq in-memory engine pages Delta Parquet columns directly from OneLake storage into RAM on-demand, eliminating scheduled refreshes and DirectQuery latency.",
+      "V-Order Sorting Synergy: Fabric organizes Delta Parquet data using V-Order sorting to perfectly match VertiPaq's dictionary encoding, yielding maximum compression and query speed.",
+      "Seamless Fallback: If capacity limits or complex RLS rules exceed Direct Lake thresholds, the engine transparently falls back to DirectQuery mode without query failures."
+    ],
+    docLink: "https://learn.microsoft.com/en-us/fabric/onelake/onelake-shortcuts"
   }
 ];

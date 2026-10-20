@@ -47,6 +47,17 @@ const DIAGRAM_TO_TOPIC: Record<string, { topicKey: string; topicName: string }> 
   "purview-governance-catalog": { topicKey: "purview", topicName: "Purview Governance" },
   "rag-vector-search-data-pipeline": { topicKey: "spark", topicName: "AI & Vector RAG" },
   "unity-catalog-governance": { topicKey: "databricks", topicName: "Unity Catalog" },
+  "spark-savemode-architecture": { topicKey: "spark", topicName: "Spark SaveMode" },
+  "spark-join-decision-tree": { topicKey: "spark", topicName: "Spark Join Tree" },
+  "delta-vs-iceberg-architecture": { topicKey: "datalake", topicName: "Delta vs Iceberg" },
+  "spark-aqe-dynamic-optimization": { topicKey: "spark", topicName: "Spark AQE" },
+  "spark-memory-management-spill": { topicKey: "spark", topicName: "Spark Memory" },
+  "fabric-onelake-direct-lake-architecture": { topicKey: "fabric", topicName: "OneLake Direct Lake" },
+  "spark-streaming-state-store": { topicKey: "streaming", topicName: "Structured Streaming" },
+  "photon-engine-vs-jvm": { topicKey: "databricks", topicName: "Photon Engine" },
+  "spark-broadcast-accumulators": { topicKey: "spark", topicName: "Broadcast Variables" },
+  "lakehouse-acid-concurrency": { topicKey: "datalake", topicName: "ACID Concurrency" },
+  "scd-types-lakehouse": { topicKey: "modeling", topicName: "Slowly Changing Dimensions" },
 };
 
 const CATEGORIES = [
