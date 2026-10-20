@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { AllPagesNav } from "@/components/layout/all-pages-nav";
 import { AllPagesFooter } from "@/components/layout/all-pages-footer";
@@ -91,5 +91,41 @@ describe("Streamlined Navigation & Meaningful Bottom Page Notes", () => {
 
     // Default fallback when tab is not set on /architecture
     expect(isSubHrefActive("/architecture", new URLSearchParams(), "/architecture?tab=scenarios")).toBe(true);
+  });
+
+  it("ensures left navigation stays until the end of the page across all layouts version of displays", () => {
+    const { container } = render(<Sidebar />);
+    const aside = container.querySelector("aside");
+    expect(aside).not.toBeNull();
+
+    // Verify aside uses sticky, top-0, self-start, and h-dvh to stay pinned until the bottom of the page
+    expect(aside?.className).toContain("sticky");
+    expect(aside?.className).toContain("top-0");
+    expect(aside?.className).toContain("self-start");
+    expect(aside?.className).toContain("h-dvh");
+    expect(aside?.className).toContain("border-r");
+
+    // Verify aside is NOT hidden on smaller screens (previously 'hidden lg:flex', now 'flex')
+    expect(aside?.className).toContain("flex");
+    expect(aside?.className).not.toContain("hidden lg:flex");
+  });
+
+  it("verifies left navigation maintains responsive collapsed and expanded modes", () => {
+    const { container } = render(<Sidebar />);
+    const aside = container.querySelector("aside");
+    expect(aside).not.toBeNull();
+
+    // In desktop/default mode, width is 285px
+    expect(aside?.style.width).toBe("285px");
+
+    // Clicking collapse toggles to 72px rail mode
+    const collapseBtn = screen.getByRole("button", { name: /collapse sidebar/i });
+    fireEvent.click(collapseBtn);
+    expect(aside?.style.width).toBe("72px");
+
+    // Clicking expand toggles back to 285px
+    const expandBtn = screen.getByRole("button", { name: /expand sidebar/i });
+    fireEvent.click(expandBtn);
+    expect(aside?.style.width).toBe("285px");
   });
 });

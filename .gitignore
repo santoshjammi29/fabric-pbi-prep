@@ -41,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# cloudflare & build artifacts
+.build-artifacts
+.open-next
+.wrangler
+public/_artifacts

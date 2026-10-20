@@ -168,7 +168,7 @@ export default function RootLayout({
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
         `}} />
       </head>
-      <body className="min-h-dvh overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
+      <body className="min-h-dvh overflow-x-clip bg-[var(--background)] text-[var(--foreground)]">
 
         <ThemeProvider>
           <TextSizeProvider>

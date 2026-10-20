@@ -22,6 +22,8 @@ const pillVariants: Record<string, string> = {
 const DEFAULT_WIDTH = 285;
 const MIN_WIDTH = 220;
 const MAX_WIDTH = 520;
+const COLLAPSED_WIDTH_DESKTOP = 72;
+const COLLAPSED_WIDTH_MOBILE = 56;
 
 function SidebarInner() {
   const pathname = usePathname();
@@ -30,11 +32,29 @@ function SidebarInner() {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [isDragging, setIsDragging] = useState(false);
   const [showWidthMenu, setShowWidthMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
     const savedCollapsed = localStorage.getItem("sidebar-collapsed");
-    if (savedCollapsed === "true") setCollapsed(true);
+    if (savedCollapsed === "true") {
+      setCollapsed(true);
+    } else if (savedCollapsed === "false") {
+      setCollapsed(false);
+    } else {
+      // If user hasn't explicitly set preference:
+      // On screens < 1024px (tablet & mobile), default to compact collapsed rail
+      // On desktop (>= 1024px), default to expanded
+      if (window.innerWidth < 1024) {
+        setCollapsed(true);
+      }
+    }
 
     const savedWidth = localStorage.getItem("sidebar-width");
     if (savedWidth) {
@@ -43,6 +63,8 @@ function SidebarInner() {
         setWidth(num);
       }
     }
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Close width menu on outside click
@@ -120,42 +142,61 @@ function SidebarInner() {
     return pathname === item.href || pathname.startsWith(item.href + "/");
   };
 
+  const currentCollapsedWidth = isMobile ? COLLAPSED_WIDTH_MOBILE : COLLAPSED_WIDTH_DESKTOP;
+  const currentWidth = collapsed ? currentCollapsedWidth : (isMobile ? Math.min(width, 280) : width);
+
   return (
-    <aside
-      style={{ width: collapsed ? 72 : width }}
-      className={cn(
-        "hidden lg:flex flex-col h-dvh sticky top-0 border-r relative",
-        "bg-[var(--surface-1)] border-[var(--border)]",
-        isDragging ? "transition-none select-none" : "transition-[width] duration-200 ease-in-out"
+    <>
+      {/* Mobile backdrop when expanded on small mobile screens (<640px) */}
+      {!collapsed && isMobile && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-35 sm:hidden"
+          onClick={toggleCollapsed}
+          aria-hidden="true"
+        />
       )}
-    >
-      {/* Brand & Resize Controls */}
-      <div
+
+      {/* Spacer to preserve document layout on small mobile screens when expanded as overlay */}
+      {!collapsed && isMobile && (
+        <div style={{ width: currentCollapsedWidth }} className="shrink-0 sm:hidden" aria-hidden="true" />
+      )}
+
+      <aside
+        style={{ width: currentWidth }}
         className={cn(
-          "flex items-center h-16 px-3 sm:px-4 border-b border-[var(--border)] shrink-0",
-          collapsed ? "flex-col justify-center gap-1 py-2 h-auto" : "justify-between"
+          "flex flex-col h-dvh sticky top-0 self-start border-r z-30 shrink-0",
+          "bg-[var(--surface-1)] border-[var(--border)]",
+          isDragging ? "transition-none select-none" : "transition-[width] duration-200 ease-in-out",
+          !collapsed && isMobile && "fixed inset-y-0 left-0 z-40 shadow-2xl"
         )}
       >
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 sm:gap-3 min-w-0 group"
-          title="Lakehouse Architect - Home"
-        >
-          <BrandLogo
-            size={collapsed ? 28 : 32}
-            className="transition-transform duration-200 group-hover:scale-105 shrink-0"
-          />
-          {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <h1 className="text-sm font-bold text-[var(--foreground)] tracking-tight break-words leading-tight group-hover:text-blue-400 transition-colors">
-                Lakehouse
-              </h1>
-              <span className="text-[10px] font-medium text-[var(--muted-foreground)] block -mt-0.5">
-                Architect Platform
-              </span>
-            </div>
+        {/* Brand & Resize Controls */}
+        <div
+          className={cn(
+            "flex items-center h-14 sm:h-16 px-2 sm:px-4 border-b border-[var(--border)] shrink-0",
+            collapsed ? "flex-col justify-center gap-1 py-2 h-auto" : "justify-between"
           )}
-        </Link>
+        >
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 sm:gap-3 min-w-0 group"
+            title="Lakehouse Architect - Home"
+          >
+            <BrandLogo
+              size={collapsed ? (isMobile ? 24 : 28) : 32}
+              className="transition-transform duration-200 group-hover:scale-105 shrink-0"
+            />
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm font-bold text-[var(--foreground)] tracking-tight break-words leading-tight group-hover:text-blue-400 transition-colors">
+                  Lakehouse
+                </h1>
+                <span className="text-[10px] font-medium text-[var(--muted-foreground)] block -mt-0.5">
+                  Architect Platform
+                </span>
+              </div>
+            )}
+          </Link>
 
         {/* Action Controls: Width Preset Menu & Collapse Button */}
         <div className={cn("flex items-center gap-1", collapsed && "flex-col")}>
@@ -237,16 +278,16 @@ function SidebarInner() {
       </div>
 
       {/* Navigation Tree — Always Visible on All Layouts with Full Word Wrap */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 scrollbar-none">
+      <nav className="flex-1 overflow-y-auto py-2.5 sm:py-3 px-1 sm:px-2 scrollbar-none">
         {NAV_GROUPS.map((group, gi) => (
-          <div key={gi} className={cn(gi > 0 && "mt-3.5")}>
+          <div key={gi} className={cn(gi > 0 && "mt-3 sm:mt-3.5")}>
             {group.title && !collapsed && (
               <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted-foreground)] break-words whitespace-normal leading-tight">
                 {group.title}
               </div>
             )}
             {group.title && collapsed && gi > 0 && (
-              <div className="mx-3 mb-2 border-t border-[var(--border)]" />
+              <div className="mx-2 sm:mx-3 mb-2 border-t border-[var(--border)]" />
             )}
             <ul className="space-y-0.5">
               {group.items.map((item) => {
@@ -256,13 +297,18 @@ function SidebarInner() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={() => {
+                        if (isMobile && !collapsed) {
+                          toggleCollapsed();
+                        }
+                      }}
                       className={cn(
                         "flex items-start gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150",
                         "hover:bg-[var(--surface-3)]",
                         active
                           ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold shadow-[inset_2px_0_0_rgb(59,130,246)]"
                           : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
-                        collapsed && "justify-center px-0 items-center"
+                        collapsed && "justify-center px-0 py-2.5 items-center"
                       )}
                       title={collapsed ? item.label : undefined}
                     >
@@ -294,7 +340,7 @@ function SidebarInner() {
       </nav>
 
       {/* Footer — Text Size & Theme switchers */}
-      <div className={cn("p-3 border-t border-[var(--border)] shrink-0", collapsed ? "space-y-2" : "space-y-2.5")}>
+      <div className={cn("p-2 sm:p-3 border-t border-[var(--border)] shrink-0", collapsed ? "space-y-1.5 sm:space-y-2" : "space-y-2.5")}>
         <TextSizeController collapsed={collapsed} direction="up" align="start" />
         <ThemeSwitcher collapsed={collapsed} direction="up" align="start" />
       </div>
@@ -309,8 +355,8 @@ function SidebarInner() {
           onMouseDown={handleMouseDown}
           onDoubleClick={() => setWidth(DEFAULT_WIDTH)}
           className={cn(
-            "absolute top-0 -right-1 w-2.5 h-full cursor-col-resize z-40 select-none",
-            "hover:bg-blue-500/25 active:bg-blue-500/40 transition-colors group flex items-center justify-center",
+            "absolute top-0 -right-1 w-2.5 h-full cursor-col-resize z-40 select-none hidden lg:flex items-center justify-center",
+            "hover:bg-blue-500/25 active:bg-blue-500/40 transition-colors group",
             isDragging && "bg-blue-500/35"
           )}
         >
@@ -323,6 +369,7 @@ function SidebarInner() {
         </div>
       )}
     </aside>
+    </>
   );
 }
 
@@ -331,7 +378,7 @@ export function Sidebar() {
     <Suspense
       fallback={
         <aside
-          className="hidden lg:flex flex-col h-dvh sticky top-0 border-r w-[285px] bg-[var(--surface-1)] border-[var(--border)]"
+          className="flex flex-col h-dvh sticky top-0 self-start border-r shrink-0 z-30 w-[56px] sm:w-[72px] lg:w-[285px] bg-[var(--surface-1)] border-[var(--border)]"
           aria-hidden="true"
         />
       }

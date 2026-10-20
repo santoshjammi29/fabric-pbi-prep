@@ -1,0 +1,96 @@
+name: Deploy to Cloudflare (OpenNext & R2)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-shard:
+    name: 1. Validate & Shard Content
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Validate Content Schemas
+        run: npm run content:validate
+
+      - name: Generate Artifact Shards & Search Index
+        run: npm run content:shard
+
+      - name: Upload Shard Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-artifacts
+          path: .build-artifacts/r2/
+          retention-days: 1
+
+  deploy-r2-and-worker:
+    name: 2. Deploy R2 & OpenNext Worker
+    needs: validate-and-shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Download Shard Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: r2-artifacts
+          path: .build-artifacts/r2/
+
+      - name: Sync Artifacts to Cloudflare R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "Syncing generated shards and search index to lakehouse-artifacts bucket..."
+            # Sync shards and search index to R2
+            find .build-artifacts/r2 -type f | while read -r file; do
+              key="${file#.build-artifacts/r2/}"
+              echo "Uploading $key to R2..."
+              npx wrangler r2 object put "lakehouse-artifacts/$key" --file="$file" --remote
+            done
+          else
+            echo "CLOUDFLARE_API_TOKEN not configured; skipping remote R2 sync."
+          fi
+
+      - name: Build OpenNext Cloudflare Worker
+        run: npm run build:worker
+
+      - name: Deploy Worker to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            npx opennextjs-cloudflare deploy
+          else
+            echo "CLOUDFLARE_API_TOKEN not configured; dry-run build successful."
+          fi

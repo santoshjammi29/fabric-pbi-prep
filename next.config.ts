@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+initOpenNextCloudflareForDev();
 
 // Optional bundle analyzer wrapper
 const withBundleAnalyzer = bundleAnalyzer({
@@ -15,10 +18,27 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "framer-motion", "sonner", "@tanstack/react-virtual"],
   },
   images: {
+    unoptimized: true,
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.lakehousearchitect.com",
+      },
+    ],
+  },
+  outputFileTracingExcludes: {
+    "*": [
+      "./content/**/*",
+      "./scripts/**/*",
+      "./.build-artifacts/**/*",
+      "./.git/**/*",
+      "./node_modules/@swc/core-linux-x64-gnu/**/*",
+      "./node_modules/@swc/core-linux-x64-musl/**/*",
+    ],
   },
   async headers() {
     return [
