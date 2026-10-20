@@ -599,5 +599,86 @@ export const architectureDiagrams: ArchitectureDiagramItem[] = [
       "Off-Heap Tungsten Memory: spark.memory.offHeap.enabled allows direct C-style raw memory management, completely bypassing JVM garbage collection pauses."
     ],
     docLink: "https://spark.apache.org/docs/latest/tuning.html#memory-management-overview"
+  },
+  {
+    id: "spark-streaming-state-store",
+    title: "Spark Structured Streaming State Store & Watermarking Mechanics",
+    subtitle: "Stateful Stream-to-Stream Joins, Windowed Aggregations, RocksDB vs HDFS, and Late Data Evictions",
+    category: "Compute & Optimization",
+    image: "/diagrams/spark_streaming_state_store.webp",
+    tags: ["Apache Spark", "Structured Streaming", "State Store", "RocksDB", "Watermark", "Event Time", "Append Mode", "Update Mode"],
+    description: "Detailed whiteboard blueprint of Spark Structured Streaming stateful execution, demonstrating event-time watermark calculations (max(event_time) - delayThreshold), late data drop decisions, HDFS in-memory vs RocksDB off-heap C++ state store architectures, and output modes.",
+    keyPoints: [
+      "Watermark Threshold: Evaluates event time against maximum observed timestamp minus delay; records older than the watermark are dropped immediately to bound state store size.",
+      "RocksDB vs HDFS StateStore: HDFS backed store holds state in Java heap maps risking heavy GC pauses; RocksDB maintains state off-heap in C++ SST files, handling billions of state keys with constant memory.",
+      "Output Mode Semantics: Append emits only finalized windows; Update emits changed records per micro-batch; Complete re-emits entire aggregated tables.",
+      "Stream-to-Stream Joins: Mandatory watermark on both input streams ensures state store buffers do not grow unbounded while waiting for matching keys."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#watermarking"
+  },
+  {
+    id: "photon-engine-vs-jvm",
+    title: "Databricks Photon Native C++ Engine vs. Classic Spark JVM",
+    subtitle: "Vectorized Columnar Execution, CPU Cache Locality, SIMD AVX-512, and JNI Fallback Boundaries",
+    category: "Compute & Optimization",
+    image: "/diagrams/photon_engine_vs_jvm.webp",
+    tags: ["Databricks", "Photon", "C++", "Vectorized Execution", "SIMD", "CPU Cache", "JVM GC", "Catalyst Optimizer"],
+    description: "Architectural comparison contrasting Classic Spark Tungsten whole-stage Java bytecode generation with Databricks Photon native C++ vectorized execution, detailing CPU cache lines, off-heap memory, and the automatic JNI fallback bridge.",
+    keyPoints: [
+      "Vectorized Batch Execution: Photon processes batches of ~1024 columnar tuples at a time directly in modern CPU SIMD registers (AVX-512), avoiding row-at-a-time volcano iterator overhead.",
+      "Zero-GC Native Memory: Allocates execution buffers directly off-heap in C++, eliminating JVM garbage collection pauses and object boxing/unboxing.",
+      "Cache Locality: Columnar data arrays fit directly into L1/L2/L3 CPU hardware caches for maximum instructions per cycle (IPC).",
+      "Seamless JNI Fallback: Catalyst query planner routes supported operators to native Photon while gracefully delegating unsupported operations (custom Java/Python UDFs) back to classic JVM."
+    ],
+    docLink: "https://docs.databricks.com/en/runtime/photon.html"
+  },
+  {
+    id: "spark-broadcast-accumulators",
+    title: "Apache Spark Broadcast Variables vs. Accumulators Architecture",
+    subtitle: "TorrentBroadcast Peer-to-Peer Chunking vs. Write-Only Task Heartbeat Rollups",
+    category: "Compute & Optimization",
+    image: "/diagrams/spark_broadcast_accumulators.webp",
+    tags: ["Apache Spark", "Broadcast Variables", "Accumulators", "TorrentBroadcast", "BlockManager", "Distributed Memory", "Driver"],
+    description: "In-depth guide to Spark's two distributed shared variable constructs: read-only Broadcast Variables leveraging BitTorrent-style P2P chunking across executors, and write-only Accumulators aggregating task metrics back to the driver.",
+    keyPoints: [
+      "TorrentBroadcast P2P Protocol: Driver splits serialized broadcast data into 4MB chunks; executors download chunks from each other simultaneously, preventing driver network saturation.",
+      "Single JVM Deserialization: Broadcast data is deserialized exactly once per executor and cached in BlockManager memory, shared across all executor CPU task slots.",
+      "Accumulator Write-Only Rule: Worker tasks can only increment/add to accumulators; reading accumulator values is strictly restricted to the driver node.",
+      "Lazy Evaluation Gotcha: Accumulators inside transformations (e.g. .map()) can duplicate counts if tasks are re-executed; use only inside actions (e.g. .foreach()) for accurate counting."
+    ],
+    docLink: "https://spark.apache.org/docs/latest/rdd-programming-guide.html#broadcast-variables"
+  },
+  {
+    id: "lakehouse-acid-concurrency",
+    title: "Lakehouse ACID Concurrency & Write Conflict Resolution Matrix",
+    subtitle: "Optimistic Concurrency Control (OCC) Protocols and Conflict Rules Across Delta Lake & Apache Iceberg",
+    category: "Storage Engine",
+    image: "/diagrams/lakehouse_acid_concurrency.webp",
+    tags: ["Delta Lake", "Apache Iceberg", "ACID", "Concurrency", "OCC", "Write Conflict Matrix", "Atomic Commits"],
+    description: "Comprehensive blueprint illustrating the 4-phase Optimistic Concurrency Control (OCC) commit lifecycle and a complete 2D Write Conflict Resolution Matrix across concurrent Appends, Updates, Deletes, Overwrites, and Compactions.",
+    keyPoints: [
+      "4-Phase OCC Protocol: 1. Record snapshot read version; 2. Execute write into staging files; 3. Attempt atomic commit rename; 4. Mutual exclusion validation check against concurrent commits.",
+      "Append Concurrency: Concurrent Appends never conflict because they generate independent Parquet files and commit atomically.",
+      "Update vs. Update Conflicts: Concurrent Updates or Deletes conflict and throw ConcurrentModificationException only if they touch overlapping data partitions or files.",
+      "Compaction / OPTIMIZE Safety: Bin-packing and clustering operations preserve table state and auto-rebase without aborting concurrent append transactions."
+    ],
+    docLink: "https://docs.delta.io/latest/concurrency-control.html"
+  },
+  {
+    id: "scd-types-lakehouse",
+    title: "Slowly Changing Dimensions (SCD Types 1, 2, 3, 4, 6) in Modern Lakehouses",
+    subtitle: "Row Overwrites, Full Versioning with Valid_From/Valid_To, Split Tables, and Hybrid Dimension Modeling",
+    category: "Data Modeling & Architecture",
+    image: "/diagrams/scd_types_lakehouse.webp",
+    tags: ["Data Modeling", "Dimensional Modeling", "SCD", "SCD Type 2", "Delta MERGE", "dbt Snapshot", "Surrogate Keys", "Kimball"],
+    description: "Visual architectural guide to all five major Slowly Changing Dimension strategies, contrasting Type 1 direct overwrite, Type 2 row versioning with timestamps and current flags, Type 3 prior-value columns, Type 4 split history tables, and Type 6 hybrid models.",
+    keyPoints: [
+      "SCD Type 1 (Direct Overwrite): Overwrites attribute values in place with zero audit trail; best for non-historical corrections and typo fixes.",
+      "SCD Type 2 (Golden Standard): Closes previous record (Valid_To = current_date, Is_Current = False) and inserts a new active row; natively executed via Delta MERGE or dbt snapshots.",
+      "SCD Type 3 (Previous Value Column): Adds explicit previous-attribute columns; simple but strictly limited to tracking a single past change.",
+      "SCD Type 4 (Split Current & History): Maintains a compact current table for fast OLAP lookups alongside an append-only historical audit log table.",
+      "SCD Type 6 (Hybrid 1 + 2 + 3): Combines row versioning, current-state column overwrite on all historical rows, and prior value columns for instant filtering without expensive joins."
+    ],
+    docLink: "https://docs.delta.io/latest/delta-update.html#slowly-changing-data-scd-type-2-with-delta-lake"
   }
 ];
