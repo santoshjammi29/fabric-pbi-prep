@@ -89,7 +89,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const index = await getSearchIndex();
-    const results = index.search(query, {\n      boost: { title: 4, term: 4, question: 3, tags: 2, category: 1.5 },\n      fuzzy: 0.2,\n      prefix: true,\n    }).map((result: any) => {
+    const results = index.search(query, {
+      boost: { title: 4, term: 4, question: 3, tags: 2, category: 1.5 },
+      fuzzy: 0.2,
+      prefix: true,
+    }).map((result: any) => {
       const stored = result as StoredSearchDocument & { score: number };
       return {
         id: stored.id,
