@@ -7,15 +7,18 @@ function addApplicationHeaders(request: NextRequest) {
 
   const country = request.headers.get("cf-ipcountry") || "US";
   const city = request.headers.get("cf-ipcity") || "Global";
-  const region = request.headers.get("cf-region-code") || "Edge";
+  const region = request.headers.get("cf-region") || request.headers.get("cf-region-code") || "Edge";
+
+  const cfRay = request.headers.get("cf-ray");
+  const edgeNode =
+    process.env.CF_REGION ||
+    (cfRay ? `cf-${cfRay.split("-").pop()?.toLowerCase() || "edge"}` : undefined) ||
+    `${country.toLowerCase()}-cloudflare-edge`;
 
   response.headers.set("x-geo-country", country);
   response.headers.set("x-geo-city", city);
   response.headers.set("x-geo-region", region);
-  response.headers.set(
-    "x-edge-node",
-    request.headers.get("cf-ray")?.split("-").pop() || `${country.toLowerCase()}-cloudflare-edge`,
-  );
+  response.headers.set("x-edge-node", edgeNode);
 
   const { pathname } = request.nextUrl;
   if (pathname.startsWith("/api/concepts") || pathname.startsWith("/api/questions")) {
@@ -24,7 +27,7 @@ function addApplicationHeaders(request: NextRequest) {
       "public, s-maxage=3600, stale-while-revalidate=86400, max-age=60",
     );
     response.headers.set("CDN-Cache-Control", "public, s-maxage=86400");
-    response.headers.set("CDN-Cache-Control", "public, s-maxage=86400");
+    response.headers.set("Cloudflare-CDN-Cache-Control", "public, s-maxage=86400");
   }
 
   response.headers.set("X-Content-Type-Options", "nosniff");

@@ -62,6 +62,7 @@ const difficultyColors: Record<Difficulty, { bg: string; text: string; border: s
 interface QaPrepClientProps {
   initialQuestions: UnifiedQuestion[];
   diagrams?: ArchitectureDiagramItem[];
+  totalQuestionCount?: number;
 }
 
 function getQuestionMatchingDiagram(q: UnifiedQuestion, diagrams: ArchitectureDiagramItem[]): ArchitectureDiagramItem | undefined {
@@ -155,12 +156,19 @@ function getQuestionMatchingDiagram(q: UnifiedQuestion, diagrams: ArchitectureDi
   return undefined;
 }
 
-export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientProps) {
+export function QaPrepClient({
+  initialQuestions,
+  diagrams = [],
+  totalQuestionCount,
+}: QaPrepClientProps) {
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") || searchParams.get("search") || "";
   const initialDomain = searchParams.get("domain") || searchParams.get("category") || "ALL";
   const initialTech = (searchParams.get("tech") || searchParams.get("ecosystem") || "ALL").toUpperCase() as TechEcosystemId;
   const initialArchetype = (searchParams.get("archetype") || searchParams.get("scenario") || "ALL").toUpperCase() as ScenarioArchetypeId;
+
+  const [questions, setQuestions] = useState<UnifiedQuestion[]>(initialQuestions);
+  const totalCount = Math.max(totalQuestionCount || 0, questions.length);
 
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const deferredSearch = useDeferredValue(searchQuery);
@@ -198,10 +206,75 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     } catch {}
   }, []);
 
+  // Progressive background loading of remaining QA questions from R2 shards
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadMoreQuestions() {
+      if (questions.length >= (totalQuestionCount || 6000)) return;
+
+      try {
+        const { fetchArtifactManifest, jsonFetcher, getArtifactUrl } = await import("@/lib/artifact-client");
+        const manifest = await fetchArtifactManifest();
+        const shards = manifest?.collections?.qa?.shards || [];
+        if (shards.length === 0) return;
+
+        const existingIds = new Set(initialQuestions.map((q) => q.id));
+        const accumulated: UnifiedQuestion[] = [...initialQuestions];
+
+        for (let i = 0; i < shards.length; i += 4) {
+          if (isCancelled) return;
+          const chunk = shards.slice(i, i + 4);
+          const results = await Promise.all(
+            chunk.map(async (shardMeta) => {
+              try {
+                const items = await jsonFetcher<any[]>(getArtifactUrl(shardMeta.key));
+                return Array.isArray(items) ? items : [];
+              } catch {
+                return [];
+              }
+            })
+          );
+
+          for (const items of results) {
+            for (const item of items) {
+              if (item && item.id && !existingIds.has(item.id)) {
+                existingIds.add(item.id);
+                accumulated.push({
+                  ...item,
+                  sourceDb: item.sourceDb || "fabric_pbi",
+                  sourceLabel: item.sourceLabel || "Fabric & PBI",
+                });
+              }
+            }
+          }
+
+          if (!isCancelled) {
+            setQuestions([...accumulated]);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not background load QA shards:", err);
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      if ("requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(() => loadMoreQuestions(), { timeout: 1500 });
+      } else {
+        setTimeout(loadMoreQuestions, 300);
+      }
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [totalQuestionCount, initialQuestions]);
+
   // Pre-calculate filter counts for real-time badges
   const { techCounts, archetypeCounts } = useMemo(() => {
-    return computeFilterCounts(initialQuestions, bookmarks);
-  }, [initialQuestions, bookmarks]);
+    return computeFilterCounts(questions, bookmarks);
+  }, [questions, bookmarks]);
 
   // Synchronize URL search parameters
   useEffect(() => {
@@ -233,7 +306,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
     }
 
     if (cardParam) {
-      const target = initialQuestions.find((item) => item.id === cardParam);
+      const target = questions.find((item) => item.id === cardParam);
       if (target) {
         setExpandedIds((prev) => new Set([...prev, target.id]));
         if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
@@ -245,7 +318,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
         }, 250);
       }
     }
-  }, [searchParams, initialQuestions]);
+  }, [searchParams, questions]);
 
   const handleShuffle = useCallback(() => {
     setIsShuffled(true);
@@ -269,7 +342,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
 
   // Multi-dimensional filtering logic
   const filteredQuestions = useMemo(() => {
-    let result = initialQuestions;
+    let result = questions;
 
     // 1. Tech Ecosystem Filter (Topics)
     if (selectedTech !== "ALL") {
@@ -317,7 +390,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
 
     return result;
   }, [
-    initialQuestions,
+    questions,
     selectedTech,
     selectedArchetype,
     selectedDomain,
@@ -451,7 +524,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               <span>Production Interview Scenarios</span>
             </div>
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--foreground)] break-words">
-              {initialQuestions.length.toLocaleString()}+ Senior Data Engineering &amp; Architect Q&amp;A
+              {totalCount.toLocaleString()}+ Senior Data Engineering &amp; Architect Q&amp;A
             </h1>
             <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
               Real-world technical questions with deep architectural answers, code implementations, and trade-off rubrics across Microsoft Fabric, Databricks, Spark, Delta Lake, Airflow, dbt, and Lakehouse architectures.
@@ -474,9 +547,9 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
       <UnifiedSearchFilterBox
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder={`Search ${initialQuestions.length.toLocaleString()}+ questions by keyword, mechanism, syntax... (Press / to search)`}
+        searchPlaceholder={`Search ${totalCount.toLocaleString()}+ questions by keyword, mechanism, syntax... (Press / to search)`}
         matchCount={filteredQuestions.length}
-        totalCount={initialQuestions.length}
+        totalCount={totalCount}
         countUnit="Qs"
         themeAccent="blue"
         hasActiveFilters={hasActiveFilters}
@@ -512,7 +585,7 @@ export function QaPrepClient({ initialQuestions, diagrams = [] }: QaPrepClientPr
               label: eco.label,
               shortLabel: eco.shortLabel,
               description: eco.description,
-              count: eco.id === "ALL" ? initialQuestions.length : techCounts[eco.id] || 0,
+              count: eco.id === "ALL" ? totalCount : techCounts[eco.id] || 0,
             })),
           },
           {

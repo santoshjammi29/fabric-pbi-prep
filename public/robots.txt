@@ -20,6 +20,6 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-Host: https://lakehousearchitect.vercel.app
-Sitemap: https://lakehousearchitect.vercel.app/sitemap.xml
-Sitemap: https://lakehousearchitect.vercel.app/feed.xml
+Host: https://lakehousearchitect.com
+Sitemap: https://lakehousearchitect.com/sitemap.xml
+Sitemap: https://lakehousearchitect.com/feed.xml

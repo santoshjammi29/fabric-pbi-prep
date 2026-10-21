@@ -98,7 +98,7 @@ export default function DashboardPage() {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Lakehouse Architect",
-    url: "https://lakehousearchitect.vercel.app",
+    url: "https://lakehousearchitect.com",
     applicationCategory: "EducationalApplication",
     operatingSystem: "All",
     browserRequirements: "Requires HTML5 and modern web browser",
@@ -119,7 +119,7 @@ export default function DashboardPage() {
     author: {
       "@type": "Person",
       name: "Santosh Jammi",
-      url: "https://lakehousearchitect.vercel.app",
+      url: "https://lakehousearchitect.com",
     },
   };
 

@@ -27,7 +27,7 @@
     }
   ],
   "vars": {
-    "NEXT_PUBLIC_CDN_URL": "https://cdn.lakehousearchitect.com",
+    "NEXT_PUBLIC_CDN_URL": "",
     "ARTIFACT_VERSION": "v2026.10"
   }
 }

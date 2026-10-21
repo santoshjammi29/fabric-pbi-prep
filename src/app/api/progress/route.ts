@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       {
         success: true,
         data: data || null,
-        edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || "cloudflare-edge",
+        edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || process.env.CF_REGION || "cloudflare-edge",
       },
       {
         headers: {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       {
         success: true,
         syncedAt: new Date().toISOString(),
-        edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || "cloudflare-edge",
+        edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || process.env.CF_REGION || "cloudflare-edge",
       },
       {
         status: 200,

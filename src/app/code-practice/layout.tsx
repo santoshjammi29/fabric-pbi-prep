@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Interactive production code sheets for PySpark 3.5/4.0, Spark SQL, T-SQL / Fabric Warehouse, and Advanced Python Data Engineering patterns.",
   path: "/code-practice",
-  ogImage: "https://lakehousearchitect.vercel.app/diagrams/spark_shuffle_memory_execution.webp",
+  ogImage: "https://lakehousearchitect.com/diagrams/spark_shuffle_memory_execution.webp",
   keywords: [
     "PySpark Code Sheet",
     "Spark SQL Interview Queries",

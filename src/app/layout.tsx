@@ -34,7 +34,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lakehousearchitect.vercel.app"),
+  metadataBase: new URL("https://lakehousearchitect.com"),
   title: {
     default: "Lakehouse Architect | Modern Lakehouse Architecture & Systems Guide",
     template: "%s | Lakehouse Architect",
@@ -64,19 +64,19 @@ export const metadata: Metadata = {
     "dbt",
     "Apache Airflow",
   ],
-  authors: [{ name: "Santosh Jammi", url: "https://lakehousearchitect.vercel.app" }],
+  authors: [{ name: "Santosh Jammi", url: "https://lakehousearchitect.com" }],
   creator: "Santosh Jammi",
   publisher: "Lakehouse Architect",
   category: "technology",
   classification: "Data Platform Engineering & Lakehouse Architecture Portal",
   alternates: {
-    canonical: "https://lakehousearchitect.vercel.app",
+    canonical: "https://lakehousearchitect.com",
   },
   openGraph: {
     title: "Lakehouse Architect | Modern Lakehouse Architecture & Systems Guide",
     description:
       "The definitive enterprise reference platform for Lakehouse Architecture. Master Medallion Architecture, Microsoft Fabric OneLake, Databricks Delta Lake, Apache Iceberg, and Apache Spark 4.0 with 10,700+ verified scenarios.",
-    url: "https://lakehousearchitect.vercel.app",
+    url: "https://lakehousearchitect.com",
     siteName: "Lakehouse Architect",
     images: [
       {
@@ -262,18 +262,18 @@ export default function RootLayout({
                 "@graph": [
                   {
                     "@type": "WebSite",
-                    "@id": "https://lakehousearchitect.vercel.app/#website",
-                    "url": "https://lakehousearchitect.vercel.app",
+                    "@id": "https://lakehousearchitect.com/#website",
+                    "url": "https://lakehousearchitect.com",
                     "name": "Lakehouse Architect",
                     "description": "Enterprise Data Platform & Lakehouse Systems Architecture Encyclopedia and Interview Preparation Platform",
                     "publisher": {
-                      "@id": "https://lakehousearchitect.vercel.app/#organization",
+                      "@id": "https://lakehousearchitect.com/#organization",
                     },
                     "potentialAction": {
                       "@type": "SearchAction",
                       "target": {
                         "@type": "EntryPoint",
-                        "urlTemplate": "https://lakehousearchitect.vercel.app/concepts?search={search_term_string}",
+                        "urlTemplate": "https://lakehousearchitect.com/concepts?search={search_term_string}",
                       },
                       "query-input": "required name=search_term_string",
                     },
@@ -281,13 +281,13 @@ export default function RootLayout({
                   },
                   {
                     "@type": "Organization",
-                    "@id": "https://lakehousearchitect.vercel.app/#organization",
+                    "@id": "https://lakehousearchitect.com/#organization",
                     "name": "Lakehouse Architect",
-                    "url": "https://lakehousearchitect.vercel.app",
+                    "url": "https://lakehousearchitect.com",
                     "description": "Enterprise authority on Lakehouse Architecture, Medallion Architecture, Delta Lake, Apache Iceberg, and Cloud Data Platforms.",
                     "logo": {
                       "@type": "ImageObject",
-                      "url": "https://lakehousearchitect.vercel.app/icon-512.png",
+                      "url": "https://lakehousearchitect.com/icon-512.png",
                       "width": 512,
                       "height": 512,
                     },

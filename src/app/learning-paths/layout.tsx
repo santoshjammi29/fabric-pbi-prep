@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "End-to-end curriculums for Associate, Lead, and Principal Architects with real-world architecture decision record (ADR) ledgers.",
   path: "/learning-paths",
-  ogImage: "https://lakehousearchitect.vercel.app/diagrams/kimball_dimensional_star_schema.webp",
+  ogImage: "https://lakehousearchitect.com/diagrams/kimball_dimensional_star_schema.webp",
   keywords: [
     "Data Architect Roadmap",
     "Architecture Decision Records ADR",

@@ -28,10 +28,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function QaPrepPage() {
-  const questions = await getUnifiedQuestionsDAL();
+  const allQuestions = await getUnifiedQuestionsDAL();
+  const totalCount = allQuestions.length;
+  const initialQuestions = allQuestions.slice(0, 30);
 
   // Generate FAQ JSON-LD schema for Google Rich Results using top 20 questions
-  const sampleFaqs = questions.slice(0, 20).map((q) => ({
+  const sampleFaqs = initialQuestions.slice(0, 20).map((q) => ({
     question: q.question,
     answer: q.answer,
   }));
@@ -39,7 +41,7 @@ export default async function QaPrepPage() {
 
   const courseJsonLd = generateCourseSchema({
     name: "Enterprise Data Platform Technical Interview Preparation",
-    description: `${questions.length.toLocaleString()}+ verified technical questions, trade-off rubrics, and deep architectural solutions.`,
+    description: `${totalCount.toLocaleString()}+ verified technical questions, trade-off rubrics, and deep architectural solutions.`,
     url: "/qa-prep",
   });
 
@@ -63,7 +65,11 @@ export default async function QaPrepPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--muted-foreground)]">Loading Interview Practice Hub...</div>}>
-        <QaPrepClient initialQuestions={questions} diagrams={architectureDiagrams} />
+        <QaPrepClient
+          initialQuestions={initialQuestions}
+          totalQuestionCount={totalCount}
+          diagrams={architectureDiagrams}
+        />
       </Suspense>
     </>
   );

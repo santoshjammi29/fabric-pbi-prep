@@ -54,14 +54,22 @@ function loadQaItems(): any[] {
           seen.add(q.id);
           items.push({
             id: q.id,
-            domain: q.domain || q.category || 'General Data Engineering',
-            topic: q.category || q.niche || 'General',
-            difficulty: q.difficulty || 'Senior',
             question: q.question || '',
             answer: q.answer || '',
-            rubricPoints: q.rubricPoints || [],
+            difficulty: q.difficulty || 'Senior',
+            category: q.category || q.topic || 'General',
+            categoryLabel: q.categoryLabel || q.category || 'General',
+            niche: q.niche || q.topic || '',
+            domain: q.domain || q.category || 'General Data Engineering',
+            subdomain: q.subdomain || q.niche || '',
+            source: q.source || 'Core Architect',
+            sourceDb: q.sourceDb || 'fabric_pbi',
+            sourceLabel: q.sourceLabel || 'Fabric & PBI',
+            code: q.code || '',
             tags: Array.isArray(q.tags) ? q.tags : (q.niche ? [q.niche] : []),
+            rubricPoints: q.rubricPoints || [],
             companyTargets: q.companyTargets || [],
+            topic: q.category || q.niche || 'General',
           });
         }
       }
@@ -90,9 +98,14 @@ function loadScenarioItems(): any[] {
         seen.add(s.id);
         items.push({
           id: s.id,
-          title: s.question || s.title || `Scenario ${s.id}`,
+          source: s.source || 'Architecture Hub',
           category: s.category || s.niche || 'General Architecture',
-          difficulty: s.difficulty || 'Principal',
+          niche: s.niche || s.category || '',
+          difficulty: s.difficulty || 'ARCHITECT',
+          question: s.question || s.title || s.problemStatement || '',
+          answer: s.answer || s.architectureSolution || '',
+          // Compatibility aliases
+          title: s.question || s.title || `Scenario ${s.id}`,
           problemStatement: s.question || s.problemStatement || '',
           constraints: s.constraints || [],
           architectureSolution: s.answer || s.architectureSolution || '',
@@ -126,6 +139,9 @@ function loadConceptItems(): any[] {
           id: c.id,
           term: c.term || '',
           category: c.category || 'General',
+          difficulty: c.difficulty || 'Senior',
+          definition: c.definition || c.summary || '',
+          explanation: c.explanation || c.internals || '',
           parentId: c.parentId ?? null,
           summary: c.definition || c.summary || '',
           internals: c.explanation || c.internals || '',

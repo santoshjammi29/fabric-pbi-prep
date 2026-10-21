@@ -1,6 +1,6 @@
 /**
  * Comprehensive TypeScript Type Definitions
- * Source: Lakehouse Architect
+ * Source: Lakehouse Architect (lakehousearchitect.com)
  */
 
 // ==========================================

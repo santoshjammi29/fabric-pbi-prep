@@ -36,9 +36,12 @@ export default async function ArchitecturePage() {
     getModernStackDAL(),
   ]);
 
+  const totalCount = archData.length;
+  const initialArchitecture = archData.slice(0, 30);
+
   const courseSchema = generateCourseSchema(
     "Enterprise Data Lakehouse Architecture Hub",
-    `Comprehensive reference of ${archData.length} system blueprints, distributed runbooks, and whiteboards for data architects.`
+    `Comprehensive reference of ${totalCount} system blueprints, distributed runbooks, and whiteboards for data architects.`
   );
 
   const breadcrumbsSchema = {
@@ -49,13 +52,13 @@ export default async function ArchitecturePage() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://lakehousearchitect.vercel.app",
+        item: "https://lakehousearchitect.com",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Enterprise Architecture Hub",
-        item: "https://lakehousearchitect.vercel.app/architecture",
+        item: "https://lakehousearchitect.com/architecture",
       },
     ],
   };
@@ -78,7 +81,8 @@ export default async function ArchitecturePage() {
         }
       >
         <ArchitectureClient
-          initialArchitecture={archData}
+          initialArchitecture={initialArchitecture}
+          totalCount={totalCount}
           initialPython={codeData.python}
           initialMatrix={modernData.matrix}
           initialModernStack={modernData.stack}

@@ -455,15 +455,20 @@ export interface ArchitectureClientProps {
   initialPython: CodeSheetItem[];
   initialMatrix: ModernCodeMatrix[];
   initialModernStack: ModernStackQuestion[];
+  totalCount?: number;
 }
 
 function ArchitectureHubContent(props: ArchitectureClientProps) {
   const {
-    initialArchitecture: architectureData,
+    initialArchitecture,
     initialPython: pythonData,
     initialMatrix: modernCodeMatrix,
     initialModernStack: modernStackDb,
+    totalCount: serverTotalCount,
   } = props;
+
+  const [architectureData, setArchitectureData] = useState<ArchitectureQuestion[]>(initialArchitecture);
+  const totalScenariosCount = Math.max(serverTotalCount || 0, architectureData.length);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -526,6 +531,76 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       if (savedPy) setPyBookmarks(JSON.parse(savedPy));
     } catch {}
   }, []);
+
+  // Progressive background loading of remaining scenarios from R2 shards
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadMoreScenarios() {
+      if (architectureData.length >= (serverTotalCount || 3000)) return;
+
+      try {
+        const { fetchArtifactManifest, jsonFetcher, getArtifactUrl } = await import("@/lib/artifact-client");
+        const manifest = await fetchArtifactManifest();
+        const shards = manifest?.collections?.scenarios?.shards || [];
+        if (shards.length === 0) return;
+
+        const existingIds = new Set(initialArchitecture.map((a) => a.id));
+        const accumulated: ArchitectureQuestion[] = [...initialArchitecture];
+
+        // Fetch in batches of 4 concurrent shards
+        for (let i = 0; i < shards.length; i += 4) {
+          if (isCancelled) return;
+          const chunk = shards.slice(i, i + 4);
+          const results = await Promise.all(
+            chunk.map(async (shardMeta) => {
+              try {
+                const items = await jsonFetcher<any[]>(getArtifactUrl(shardMeta.key));
+                return Array.isArray(items) ? items : [];
+              } catch {
+                return [];
+              }
+            })
+          );
+
+          for (const items of results) {
+            for (const item of items) {
+              if (item && item.id && !existingIds.has(item.id)) {
+                existingIds.add(item.id);
+                accumulated.push({
+                  id: item.id,
+                  source: item.source || "Architecture Hub",
+                  category: item.category || "General Architecture",
+                  niche: item.niche || item.category || "",
+                  difficulty: item.difficulty || "ARCHITECT",
+                  question: item.question || item.title || item.problemStatement || "",
+                  answer: item.answer || item.architectureSolution || "",
+                });
+              }
+            }
+          }
+
+          if (!isCancelled) {
+            setArchitectureData([...accumulated]);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not background load scenario shards:", err);
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      if ("requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(() => loadMoreScenarios(), { timeout: 1500 });
+      } else {
+        setTimeout(loadMoreScenarios, 300);
+      }
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [serverTotalCount, initialArchitecture]);
 
   const tabParam = searchParams.get("tab") as ArchHubTab | null;
 
@@ -951,7 +1026,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       {/* 1. TOP MODULE NAVIGATION TABS - Styled after media_1792228927376_5ece2e88.png */}
       <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs">
         {[
-          { id: "scenarios", label: "System Blueprints", count: architectureData.length, iconComponent: Layers, iconColor: "text-purple-400" },
+          { id: "scenarios", label: "System Blueprints", count: totalScenariosCount, iconComponent: Layers, iconColor: "text-purple-400" },
           { id: "diagrams", label: "Whiteboard Diagrams", count: architectureDiagrams.length, iconComponent: Sparkles, iconColor: "text-purple-400" },
           { id: "python", label: "Python Architecture & Runbooks", count: pythonData.length, topicKey: "python" },
           { id: "polyglot", label: "Cross-Engine Polyglot Matrix", count: modernCodeMatrix.length, iconComponent: Code2, iconColor: "text-amber-400" },
@@ -1038,7 +1113,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
           }}
           searchPlaceholder="Search 3,080+ architecture blueprints (e.g., Vitess, Spanner TrueTime, Little's Law)... (Press / to search)"
           matchCount={filteredItems.length}
-          totalCount={architectureData.length}
+          totalCount={totalScenariosCount}
           countUnit="scenarios"
           themeAccent="purple"
           hasActiveFilters={hasActiveScenarioFilters}

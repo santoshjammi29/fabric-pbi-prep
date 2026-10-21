@@ -73,11 +73,11 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
 
     const robotsContent = fs.readFileSync(robotsPath, 'utf8');
     expect(robotsContent).toContain('User-agent: *');
-    expect(robotsContent).toContain('Sitemap: https://lakehousearchitect.vercel.app/sitemap.xml');
+    expect(robotsContent).toContain('Sitemap: https://lakehousearchitect.com/sitemap.xml');
 
     const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
-    expect(sitemapContent).toContain('<loc>https://lakehousearchitect.vercel.app/guided-learning</loc>');
-    expect(sitemapContent).toContain('<loc>https://lakehousearchitect.vercel.app/architecture</loc>');
+    expect(sitemapContent).toContain('<loc>https://lakehousearchitect.com/guided-learning</loc>');
+    expect(sitemapContent).toContain('<loc>https://lakehousearchitect.com/architecture</loc>');
     expect(sitemapContent).toContain('<lastmod>2026-09-11</lastmod>');
   });
 });
