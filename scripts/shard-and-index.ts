@@ -13,7 +13,7 @@ function ensureDir(dir: string) {
 }
 
 function hashContent(content: string): string {
-  return crypto.createHash('sha256').update(content).digest('hex').slice(0, 10);
+  return crypto.createHash('sha256').update(content).digest('hex');
 }
 
 function readJsonFolder<T>(subpath: string): T[] {
@@ -208,7 +208,7 @@ function run() {
   console.log(`Loaded items: ${qaItems.length} QA, ${scenarioItems.length} Scenarios, ${conceptItems.length} Concepts`);
 
   const manifest = {
-    version: process.env.ARTIFACT_VERSION || 'v2026.10',
+    version: process.env.GITHUB_SHA?.slice(0, 12) || process.env.ARTIFACT_VERSION || 'local',
     generatedAt: new Date().toISOString(),
     collections: {
       qa: shardCollection('qa', qaItems, 'domain'),
