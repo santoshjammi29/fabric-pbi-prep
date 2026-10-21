@@ -41,10 +41,19 @@ jobs:
             echo "::warning::CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not set in GitHub repository secrets. Skipping remote Cloudflare deployment. Build verification will proceed."
           fi
 
-      - name: Validate content and build Cloudflare Worker
+      - name: Build, publish artifacts, and deploy
+        if: steps.check-creds.outputs.configured == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy:cf
+
+      - name: Validate and build without deployment credentials
+        if: steps.check-creds.outputs.configured != 'true'
         run: npm run build:cf
 
-      - name: Upload R2 artifacts and deploy
+      # Deployment credentials are required for remote R2 upload and Worker deploy.
+      # Do not run a second build after build:cf.
         if: steps.check-creds.outputs.configured == 'true'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
