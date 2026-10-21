@@ -1,57 +1,41 @@
-import {
-  conceptsDb,
-  architectureData,
-  pysparkData,
-  sparksqlData,
-  mssqlData,
-  pythonData,
-  learningPathsDb,
-  cheatsheetData,
-  databricksCheatsheetData,
-  modernBlueprintsDb,
-  companyProfiles,
-  getUnifiedQuestions,
-} from "@/data";
+import type {
+  Concept,
+  CodeSheetItem,
+  CheatCode,
+  DatabricksSuiteData,
+  ModernBlueprint,
+  CompanyProfile,
+  LearningPath,
+} from "@/types/data";
+
+import dataConceptsJson from "@/data/json/data_concepts.json";
+import dataCheatsheetJson from "@/data/json/data_cheatsheet.json";
+import databricksCheatsheetsJson from "@/data/json/databricks_cheatsheets.json";
+import dataPathsJson from "@/data/json/data_paths.json";
+import companyProfilesJson from "@/data/json/company_profiles.json";
+import dataPysparkJson from "@/data/json/data_pyspark.json";
+import dataSparksqlJson from "@/data/json/data_sparksql.json";
+import dataMssqlJson from "@/data/json/data_mssql.json";
+import dataPythonJson from "@/data/json/data_python.json";
+import modernBlueprintsJson from "@/data/json/modern_blueprints.json";
+import { INITIAL_QA_ITEMS, INITIAL_SCENARIO_ITEMS } from "@/data/initial-data";
+
+const conceptsDb = dataConceptsJson as unknown as Concept[];
+const cheatsheetData = dataCheatsheetJson as CheatCode[];
+const databricksCheatsheetData = databricksCheatsheetsJson as DatabricksSuiteData;
+const learningPathsDb = dataPathsJson as LearningPath[];
+const companyProfiles = companyProfilesJson as CompanyProfile[];
+const pysparkData = dataPysparkJson as CodeSheetItem[];
+const sparksqlData = dataSparksqlJson as CodeSheetItem[];
+const mssqlData = dataMssqlJson as CodeSheetItem[];
+const pythonData = dataPythonJson as CodeSheetItem[];
+const modernBlueprintsDb = modernBlueprintsJson as ModernBlueprint[];
+const architectureData = INITIAL_SCENARIO_ITEMS;
+const getUnifiedQuestions = () => INITIAL_QA_ITEMS;
 import { GUIDED_TOPICS, GuidedTopic } from "@/data/guided-learning-topics";
 import { architectureDiagrams } from "@/data/diagrams";
-
-export type SearchCategory =
-  | "All"
-  | "Guided Track"
-  | "Concepts"
-  | "Q&A Prep"
-  | "Architecture"
-  | "Code Practice"
-  | "Cheat Sheets"
-  | "Blueprints"
-  | "Companies"
-  | "Learning Paths"
-  | "Simulators"
-  | "Navigation"
-  | "Theme"
-  | "Text Size";
-
-export interface SearchResultItem {
-  id: string;
-  title: string;
-  category: SearchCategory;
-  page: string;
-  href: string;
-  badge?: string;
-  snippet?: string;
-  score: number;
-  iconType?: string;
-}
-
-export interface TopicIdentification {
-  key: string;
-  label: string;
-  icon: string;
-  domain: string;
-  href: string;
-  description: string;
-  executiveSummary: string;
-}
+export * from "./search-types";
+import type { SearchCategory, SearchResultItem, TopicIdentification } from "./search-types";
 
 export interface SearchResponse {
   query: string;
@@ -169,29 +153,6 @@ export const TOPIC_SYNONYMS: Record<string, string[]> = {
     "databricks dabs devops pipeline", "databricks master architecture"
   ],
 };
-
-export const SUGGESTED_SEARCH_KEYWORDS = [
-  "Catalyst Optimizer",
-  "Delta Lake ACID",
-  "Fabric OneLake",
-  "Direct Lake VertiPaq",
-  "Apache Airflow DAGs",
-  "dbt Semantic Layer",
-  "Liquid Clustering",
-  "Unity Catalog",
-  "Kafka CDC Debezium",
-  "Kimball Star Schema",
-  "Data Vault 2.0",
-  "Adaptive Query Execution (AQE)",
-  "Photon Engine",
-  "Vector Search RAG",
-  "Microsoft Purview",
-  "Spark Shuffle Memory",
-  "ADF Self-Hosted IR",
-  "Apache Iceberg",
-  "Medallion Architecture",
-  "Lakehouse FinOps",
-];
 
 const STOP_WORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "for", "from",

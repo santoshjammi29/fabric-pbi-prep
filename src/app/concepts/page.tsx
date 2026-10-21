@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getConceptsDAL, getConceptsCategoriesDAL } from "@/lib/dal";
-import { architectureDiagrams } from "@/data";
+import { architectureDiagrams } from "@/data/diagrams";
 import { ConceptsClient } from "./concepts-client";
 import { buildPageMetadata, generateCourseSchema, generateHowToSchema, generateBreadcrumbSchema } from "@/lib/seo";
 

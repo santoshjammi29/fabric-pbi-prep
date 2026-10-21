@@ -35,7 +35,8 @@ import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 import { useTextSize, TEXT_SIZE_OPTIONS } from "@/components/providers/text-size-provider";
-import { executePortalSearch, TopicIdentification, SearchResultItem, SUGGESTED_SEARCH_KEYWORDS } from "@/lib/search-engine";
+import type { TopicIdentification, SearchResultItem } from "@/lib/search-types";
+import { SUGGESTED_SEARCH_KEYWORDS } from "@/lib/search-types";
 
 export type CommandCategory =
   | "Navigation"
@@ -240,10 +241,12 @@ export function CommandPalette() {
 
     // In testing or synchronous environments, execute portal search directly
     if (typeof window === "undefined" || process.env.NODE_ENV === "test") {
-      const searchRes = executePortalSearch(q, 40);
-      setIdentifiedTopics(searchRes.identifiedTopics);
-      setPageCounts(searchRes.pageCounts);
-      setRemoteResults(searchRes.items.map(mapSearchResultToCommandItem));
+      import("@/lib/search-engine").then(({ executePortalSearch }) => {
+        const searchRes = executePortalSearch(q, 40);
+        setIdentifiedTopics(searchRes.identifiedTopics);
+        setPageCounts(searchRes.pageCounts);
+        setRemoteResults(searchRes.items.map(mapSearchResultToCommandItem));
+      }).catch(() => {});
       return;
     }
 
@@ -262,12 +265,17 @@ export function CommandPalette() {
             setRemoteResults(data.items.map(mapSearchResultToCommandItem));
           }
         })
-        .catch(() => {
+        .catch(async () => {
           // Fallback to local synchronous engine if fetch fails
-          const fallback = executePortalSearch(q, 40);
-          setIdentifiedTopics(fallback.identifiedTopics);
-          setPageCounts(fallback.pageCounts);
-          setRemoteResults(fallback.items.map(mapSearchResultToCommandItem));
+          try {
+            const { executePortalSearch } = await import("@/lib/search-engine");
+            const fallback = executePortalSearch(q, 40);
+            setIdentifiedTopics(fallback.identifiedTopics);
+            setPageCounts(fallback.pageCounts);
+            setRemoteResults(fallback.items.map(mapSearchResultToCommandItem));
+          } catch {
+            // silent
+          }
         })
         .finally(() => {
           setIsLoading(false);

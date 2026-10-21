@@ -41,7 +41,7 @@ import {
   LearningItem,
 } from "@/lib/guided-learning";
 import { GUIDED_TOPICS, GUIDED_DOMAINS } from "@/data/guided-learning-topics";
-import { ArchitectureDiagramItem } from "@/data";
+import type { ArchitectureDiagramItem } from "@/data/diagrams";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import dynamic from "next/dynamic";
 

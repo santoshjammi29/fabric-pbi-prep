@@ -9,6 +9,18 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+// Mock ticker-items to return minimal valid data (fast tests, zero JSON loading)
+vi.mock('@/data/ticker-items', () => ({
+  STATIC_TICKER_ITEMS: [
+    { label: 'Delta Lake', href: '/concepts?term=Delta%20Lake&id=spark-delta-lake', color: 'rgba(99,102,241,0.18)|#a5b4fc' },
+    { label: 'Fabric DP-600', href: '/learning-paths?id=lp1', color: 'rgba(59,130,246,0.18)|#93c5fd' },
+    { label: 'Apache Spark', href: '/concepts?term=Apache%20Spark', color: 'rgba(6,182,212,0.18)|#67e8f9' },
+    { label: 'Medallion Architecture', href: '/concepts?term=Medallion%20Architecture', color: 'rgba(20,184,166,0.18)|#5eead4' },
+    { label: 'Lakehouse Q&A', href: '/qa-prep?id=q1&q=Lakehouse', color: 'rgba(239,68,68,0.18)|#fca5a5' },
+    { label: 'Medallion Design', href: '/architecture?id=a1&q=Medallion', color: 'rgba(168,85,247,0.18)|#d8b4fe' },
+  ],
+}))
+
 // Mock all data imports to return minimal valid data (fast tests, no JSON loading)
 vi.mock('@/data', () => ({
   conceptsDb: [

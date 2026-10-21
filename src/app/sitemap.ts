@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
 import { architectureDiagrams } from "@/data/diagrams";
 import { GUIDED_TOPICS } from "@/data/guided-learning-topics";
-import { conceptsDb } from "@/data";
+import dataConceptsJson from "@/data/json/data_concepts.json";
+const conceptsDb = dataConceptsJson as Array<{ term: string }>;
 
 const BASE_URL = "https://lakehousearchitect.com";
 

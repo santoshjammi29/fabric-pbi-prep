@@ -4,7 +4,8 @@ import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
-import { learningPathsDb } from "@/data";
+import dataPathsJson from "@/data/json/data_paths.json";
+const learningPathsDb = dataPathsJson as Array<{ id: string; slug?: string; title: string }>;
 import { EXPERIENCE_TIERS, ExperienceTier } from "@/lib/user-progress";
 
 interface Crumb {

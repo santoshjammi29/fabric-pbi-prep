@@ -1,20 +1,19 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import {
-  getArchitectureDataDAL,
   getCodePracticeDataDAL,
   getModernStackDAL,
 } from "@/lib/dal";
+import { TOTAL_SCENARIO_COUNT, INITIAL_SCENARIO_ITEMS } from "@/data/initial-data";
 import { ArchitectureClient } from "./architecture-client";
 import { generatePageMetadata, generateCourseSchema } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const archData = await getArchitectureDataDAL();
   return generatePageMetadata({
-    title: `Lakehouse Architecture Hub: ${archData.length} Enterprise Scenarios & Blueprints`,
-    description: `Master modern Lakehouse Architecture, Medallion patterns, Spark 4.0 execution, and distributed systems with ${archData.length} production scenarios and digital whiteboards.`,
+    title: `Lakehouse Architecture Hub: ${TOTAL_SCENARIO_COUNT} Enterprise Scenarios & Blueprints`,
+    description: `Master modern Lakehouse Architecture, Medallion patterns, Spark 4.0 execution, and distributed systems with ${TOTAL_SCENARIO_COUNT} production scenarios and digital whiteboards.`,
     path: "/architecture",
     keywords: [
       "Lakehouse Architecture",
@@ -30,14 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ArchitecturePage() {
-  const [archData, codeData, modernData] = await Promise.all([
-    getArchitectureDataDAL(),
+  const [codeData, modernData] = await Promise.all([
     getCodePracticeDataDAL(),
     getModernStackDAL(),
   ]);
 
-  const totalCount = archData.length;
-  const initialArchitecture = archData.slice(0, 30);
+  const totalCount = TOTAL_SCENARIO_COUNT;
+  const initialArchitecture = INITIAL_SCENARIO_ITEMS;
 
   const courseSchema = generateCourseSchema(
     "Enterprise Data Lakehouse Architecture Hub",

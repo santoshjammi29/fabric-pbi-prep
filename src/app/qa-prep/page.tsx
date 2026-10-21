@@ -1,18 +1,17 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getUnifiedQuestionsDAL } from "@/lib/dal";
-import { architectureDiagrams } from "@/data";
+import { TOTAL_QA_COUNT, INITIAL_QA_ITEMS } from "@/data/initial-data";
+import { architectureDiagrams } from "@/data/diagrams";
 import { QaPrepClient } from "./qa-prep-client";
 import { buildPageMetadata, generateCourseSchema, generateFAQSchema, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const allQuestions = await getUnifiedQuestionsDAL();
   return buildPageMetadata({
-    title: `Lakehouse Architect Interview Questions & Scenarios (${allQuestions.length}+ Q&As)`,
+    title: `Lakehouse Architect Interview Questions & Scenarios (${TOTAL_QA_COUNT}+ Q&As)`,
     description:
-      `Master Lakehouse Architecture interviews with ${allQuestions.length}+ verified questions with deep architectural answers covering Microsoft Fabric, Databricks, PySpark, Delta Lake, and Medallion System Design.`,
+      `Master Lakehouse Architecture interviews with ${TOTAL_QA_COUNT}+ verified questions with deep architectural answers covering Microsoft Fabric, Databricks, PySpark, Delta Lake, and Medallion System Design.`,
     path: "/qa-prep",
     keywords: [
       "Lakehouse Architect Interview Questions",
@@ -28,9 +27,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function QaPrepPage() {
-  const allQuestions = await getUnifiedQuestionsDAL();
-  const totalCount = allQuestions.length;
-  const initialQuestions = allQuestions.slice(0, 30);
+  const totalCount = TOTAL_QA_COUNT;
+  const initialQuestions = INITIAL_QA_ITEMS;
 
   // Generate FAQ JSON-LD schema for Google Rich Results using top 20 questions
   const sampleFaqs = initialQuestions.slice(0, 20).map((q) => ({

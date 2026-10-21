@@ -1,13 +1,6 @@
-import {
-  conceptsDb,
-  questionsDb,
-  questionsDeDb,
-  architectureData,
-  normalizeDifficulty,
-  architectureDiagrams,
-  ArchitectureDiagramItem
-} from '@/data';
+import { architectureDiagrams, type ArchitectureDiagramItem } from '@/data/diagrams';
 import { GUIDED_TOPICS } from '@/data/guided-learning-topics';
+import guidedTopicsCache from '@/data/guided-topics-cache.json';
 
 // Unified item type for the learning journey
 export interface LearningItem {
@@ -37,122 +30,12 @@ export interface TopicSummaryStats {
   relatedDiagrams?: ArchitectureDiagramItem[];
 }
 
-const difficultyOrder: Record<'EASY' | 'MEDIUM' | 'HARD' | 'ARCHITECT', number> = {
-  EASY: 1,
-  MEDIUM: 2,
-  HARD: 3,
-  ARCHITECT: 4,
-};
-
-const itemsCache = new Map<string, LearningItem[]>();
 const countsCache = new Map<string, { concepts: number; qa: number; arch: number; total: number }>();
 const summaryCache = new Map<string, TopicSummaryStats>();
 
 export function getTopicItems(topicKey: string): LearningItem[] {
-  if (itemsCache.has(topicKey)) {
-    return itemsCache.get(topicKey)!;
-  }
-
-  const topic = GUIDED_TOPICS.find((t) => t.key === topicKey);
-  if (!topic) return [];
-
-  const items: LearningItem[] = [];
-  const seenIds = new Set<string>();
-
-  // 1. Filter conceptsDb where category matches conceptCategories (exact)
-  conceptsDb.forEach((concept) => {
-    if (topic.conceptCategories.includes(concept.category)) {
-      if (!seenIds.has(concept.id)) {
-        seenIds.add(concept.id);
-        items.push({
-          id: concept.id,
-          type: 'concept',
-          difficulty: normalizeDifficulty(concept.difficulty),
-          title: concept.term,
-          body: concept.definition + (concept.explanation ? `\n\n${concept.explanation}` : ''),
-          keyPoints: concept.keyPoints,
-          category: concept.category,
-          sourceLabel: 'Key Concepts',
-          sourceHref: `/concepts?tab=concepts&category=${encodeURIComponent(concept.category)}&term=${encodeURIComponent(concept.term)}`,
-        });
-      }
-    }
-  });
-
-  // 2. Filter questionsDb
-  questionsDb.forEach((q) => {
-    const cat = (q.category || '').toUpperCase();
-    if (topic.questionCategories.some((tc) => cat === tc || cat.includes(tc))) {
-      if (!seenIds.has(q.id)) {
-        seenIds.add(q.id);
-        items.push({
-          id: q.id,
-          type: 'qa',
-          difficulty: normalizeDifficulty(q.difficulty),
-          title: q.question,
-          body: q.answer,
-          category: q.category,
-          niche: q.niche,
-          sourceLabel: 'Q&A Prep',
-          sourceHref: `/qa-prep?category=${encodeURIComponent(q.category)}&card=${q.id}`,
-        });
-      }
-    }
-  });
-
-  // 3. Filter questionsDeDb using deKeywords
-  questionsDeDb.forEach((q) => {
-    const cat = (q.category || '').toUpperCase();
-    if (topic.deKeywords.length > 0 && topic.deKeywords.some((dk) => cat.includes(dk))) {
-      if (!seenIds.has(q.id)) {
-        seenIds.add(q.id);
-        items.push({
-          id: q.id,
-          type: 'qa',
-          difficulty: normalizeDifficulty(q.difficulty),
-          title: q.question,
-          body: q.answer,
-          category: q.category,
-          niche: q.niche,
-          sourceLabel: 'Q&A Prep',
-          sourceHref: `/qa-prep?category=${encodeURIComponent(q.category)}&card=${q.id}`,
-        });
-      }
-    }
-  });
-
-  // 4. Filter architectureData using archKeywords
-  architectureData.forEach((arch) => {
-    const cat = (arch.category || '').toUpperCase();
-    if (topic.archKeywords.some((ak) => cat.includes(ak))) {
-      if (!seenIds.has(arch.id)) {
-        seenIds.add(arch.id);
-        items.push({
-          id: arch.id,
-          type: 'architecture',
-          difficulty: normalizeDifficulty(arch.difficulty),
-          title: arch.question,
-          body: arch.answer,
-          category: arch.category,
-          niche: arch.niche,
-          sourceLabel: 'Architecture Hub',
-          sourceHref: `/architecture?category=${encodeURIComponent(arch.category)}&card=${arch.id}`,
-        });
-      }
-    }
-  });
-
-  // 5. Sort: concepts first, then qa, then architecture. Within each, EASY→ARCHITECT.
-  const sorted = items.sort((a, b) => {
-    const typeOrder = { concept: 1, qa: 2, architecture: 3 };
-    if (typeOrder[a.type] !== typeOrder[b.type]) {
-      return typeOrder[a.type] - typeOrder[b.type];
-    }
-    return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-  });
-
-  itemsCache.set(topicKey, sorted);
-  return sorted;
+  const items = (guidedTopicsCache as Record<string, LearningItem[]>)[topicKey];
+  return items || [];
 }
 
 export function getTopicCounts(topicKey: string): { concepts: number; qa: number; arch: number; total: number } {

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { architectureDiagrams, ArchitectureDiagramItem } from "@/data";
+import { architectureDiagrams, type ArchitectureDiagramItem } from "@/data/diagrams";
 import { useDiagramTheme } from "@/lib/diagram-theme";
 import { WhiteboardCard } from "./whiteboard-card";
 import { WhiteboardThemeToggle } from "./whiteboard-theme-toggle";

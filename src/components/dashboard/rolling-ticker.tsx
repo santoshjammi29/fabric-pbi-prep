@@ -5,29 +5,12 @@ import Link from "next/link";
 import { Shuffle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import {
-  conceptsDb,
-  questionsDb,
-  questionsDeDb,
-  architectureData,
-  pysparkData,
-  sparksqlData,
-  mssqlData,
-  pythonData,
-  learningPathsDb,
-  modernBlueprintsDb,
-  modernConceptsDb,
-} from "@/data";
+import { STATIC_TICKER_ITEMS, TickerItem } from "@/data/ticker-items";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-interface TickerItem {
-  label: string;
-  href: string;
-  color: string; // subtle Apple-style tint
-}
+export { STATIC_TICKER_ITEMS as buildTickerItems };
+export type { TickerItem };
 
 /* ─── Apple-inspired restrained colour palette ───────────────────────── */
-// Soft, muted pill colours — like iOS tag chips. No garish rainbows.
 const APPLE_COLORS: { pill: string; text: string }[] = [
   { pill: "rgba(99,102,241,0.18)",  text: "#a5b4fc" }, // indigo
   { pill: "rgba(59,130,246,0.18)",  text: "#93c5fd" }, // blue
@@ -43,165 +26,14 @@ const APPLE_COLORS: { pill: string; text: string }[] = [
   { pill: "rgba(14,165,233,0.18)",  text: "#7dd3fc" }, // sky
 ];
 
-/* ─── Pseudo-random number generator for deterministic SSR ─────────── */
-function createLCG(seed: number) {
-  let s = Math.abs(seed) % 2147483647;
-  if (s <= 0) s = 1234567;
-  return function next() {
-    s = (s * 16807) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-
-/* ─── High-performance random sample across arbitrary array sizes ───── */
-function sampleItems<T>(arr: T[], count: number, rng?: () => number): T[] {
-  if (!arr || arr.length === 0) return [];
-  if (arr.length <= count) return [...arr];
-
-  const total = arr.length;
-  const pickedIndices = new Set<number>();
-  const result: T[] = [];
-
-  const targetCount = Math.min(count, total);
-  let attempts = 0;
-  const maxAttempts = targetCount * 12;
-
-  while (result.length < targetCount && attempts < maxAttempts) {
-    attempts++;
-    const r = rng ? rng() : Math.random();
-    const idx = Math.floor(r * total);
-    if (!pickedIndices.has(idx)) {
-      pickedIndices.add(idx);
-      result.push(arr[idx]);
-    }
-  }
-
-  // Fallback if needed
-  if (result.length < targetCount) {
-    for (let i = 0; i < total && result.length < targetCount; i++) {
-      if (!pickedIndices.has(i)) {
-        pickedIndices.add(i);
-        result.push(arr[i]);
-      }
-    }
-  }
-
-  return result;
-}
-
-/* ─── Shuffle array with optional RNG ───────────────────────────────── */
-function _shuffleArray<T>(arr: T[], rng?: () => number): T[] {
+/* ─── Fast shuffle array ─────────────────────────────────────────────── */
+function shuffleItems(arr: TickerItem[]): TickerItem[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
-    const r = rng ? rng() : Math.random();
-    const j = Math.floor(r * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
-  return a;
-}
-
-/* ─── Build a diverse unique item pool drawn across 6k+ database sorted by relevance ───────── */
-export function buildTickerItems(seed?: number): TickerItem[] {
-  const rng = seed !== undefined ? createLCG(seed) : undefined;
-  const raw: Omit<TickerItem, "color">[] = [];
-
-  // 1. Key Concepts (660 concepts in database) — sample 12
-  sampleItems(conceptsDb.filter((c) => c.term), 12, rng).forEach((c) =>
-    raw.push({ label: c.term, href: `/concepts?term=${encodeURIComponent(c.term)}&id=${c.id}` })
-  );
-
-  // 2. Enterprise Architecture Scenarios (3,206 scenarios in database) — sample 14
-  sampleItems(architectureData.filter((a) => a.question), 14, rng).forEach((a) => {
-    const label = a.question.length > 48 ? a.question.slice(0, 48).trim() + "…" : a.question;
-    raw.push({ label, href: `/architecture?id=${a.id}&q=${encodeURIComponent(a.question.slice(0, 45))}` });
-  });
-
-  // 3. Learning Paths (12 curricula)
-  sampleItems(learningPathsDb.filter((lp) => lp.title), 4, rng).forEach((lp) =>
-    raw.push({ label: lp.title, href: `/learning-paths?id=${lp.id}` })
-  );
-
-  // 4. Fabric & Power BI Q&A (3,232 questions in database) — sample 12
-  sampleItems(questionsDb.filter((q) => q.question), 12, rng).forEach((q) => {
-    const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
-    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
-  });
-
-  // 5. General Data Engineering Q&A (3,615 questions in database) — sample 10
-  sampleItems(questionsDeDb.filter((q) => q.question), 10, rng).forEach((q) => {
-    const label = q.question.length > 48 ? q.question.slice(0, 48).trim() + "…" : q.question;
-    raw.push({ label, href: `/qa-prep?id=${q.id}&q=${encodeURIComponent(q.question.slice(0, 45))}` });
-  });
-
-  // 6. Polyglot Code Sheets (PySpark, Spark SQL, T-SQL, Python)
-  sampleItems(pysparkData.filter((p) => p.title), 2, rng).forEach((p) =>
-    raw.push({ label: `PySpark · ${p.title}`, href: `/code-practice?db=pyspark&id=${p.id}&q=${encodeURIComponent(p.title)}` })
-  );
-  sampleItems(sparksqlData.filter((s) => s.title), 2, rng).forEach((s) =>
-    raw.push({ label: `Spark SQL · ${s.title}`, href: `/code-practice?db=sparksql&id=${s.id}&q=${encodeURIComponent(s.title)}` })
-  );
-  sampleItems(mssqlData.filter((m) => m.title), 2, rng).forEach((m) =>
-    raw.push({ label: `T-SQL · ${m.title}`, href: `/code-practice?db=mssql&id=${m.id}&q=${encodeURIComponent(m.title)}` })
-  );
-  sampleItems(pythonData.filter((p) => p.title), 2, rng).forEach((p) =>
-    raw.push({ label: `Python · ${p.title}`, href: `/code-practice?db=python&id=${p.id}&q=${encodeURIComponent(p.title)}` })
-  );
-
-  // 7. Architectural Blueprints & Modern Concepts
-  sampleItems(modernBlueprintsDb.filter((b) => b.title), 2, rng).forEach((b) =>
-    raw.push({ label: b.title, href: `/modern-stack?tab=blueprints#bp-${b.id}` })
-  );
-  sampleItems(modernConceptsDb.filter((m) => m.title), 2, rng).forEach((m) =>
-    raw.push({ label: m.title, href: `/modern-stack?tab=concepts#${m.id}` })
-  );
-
-  // 8. Learning Paths
-  sampleItems(learningPathsDb.filter((lp) => lp.title), 3, rng).forEach((lp) =>
-    raw.push({ label: lp.title, href: `/learning-paths?id=${lp.id}` })
-  );
-
-  // 9. Spotlights
-  const spotlights: Omit<TickerItem, "color">[] = [
-    { label: "Spark Engine Simulator",       href: "/spark-engine" },
-    { label: "Company Research Hub",         href: "/company-research" },
-    { label: "Career Learning Paths",        href: "/learning-paths" },
-    { label: "Medallion Architecture",       href: "/concepts?term=Medallion%20Architecture&id=lakehouse-medallion-architecture" },
-    { label: "Delta Lake Deep Dive",         href: "/concepts?term=Delta%20Lake&id=spark-delta-lake" },
-    { label: "Microsoft Fabric Lakehouse",   href: "/concepts?term=Microsoft%20Fabric&id=fabric-onelake-overview" },
-    { label: "Real-Time Streaming Design",   href: "/architecture?id=arch-databricks-lakehouse-easy-3&q=Change%20Data%20Feed" },
-    { label: "Unity Catalog Setup",          href: "/concepts?term=Unity%20Catalog&id=spark-unity-catalog" },
-  ];
-  sampleItems(spotlights, 3, rng).forEach((sp) => raw.push(sp));
-
-  // Deduplicate items strictly by normalized label and destination href
-  const seenLabels = new Set<string>();
-  const seenHrefs = new Set<string>();
-  const uniqueItems: Omit<TickerItem, "color">[] = [];
-
-  for (const item of raw) {
-    const normLabel = item.label.toLowerCase().trim();
-    const normHref = item.href.toLowerCase().trim();
-    if (!seenLabels.has(normLabel) && !seenHrefs.has(normHref)) {
-      seenLabels.add(normLabel);
-      seenHrefs.add(normHref);
-      uniqueItems.push(item);
-    }
-  }
-
-  // Sort by domain relevance (Key Concepts -> Architecture -> Curricula -> Modern Stack -> Code -> Q&A)
-  const getRelevance = (item: Omit<TickerItem, "color">): number => {
-    if (item.href.startsWith("/concepts")) return 100;
-    if (item.href.startsWith("/architecture")) return 90;
-    if (item.href.startsWith("/learning-paths")) return 80;
-    if (item.href.startsWith("/spark-engine")) return 75;
-    if (item.href.startsWith("/modern-stack")) return 70;
-    if (item.href.startsWith("/code-practice")) return 60;
-    return 50;
-  };
-
-  const sorted = uniqueItems.sort((a, b) => getRelevance(b) - getRelevance(a)).slice(0, 50);
-
-  return sorted.map((item, idx) => ({
+  return a.map((item, idx) => ({
     ...item,
     color: APPLE_COLORS[idx % APPLE_COLORS.length].pill + "|" + APPLE_COLORS[idx % APPLE_COLORS.length].text,
   }));
@@ -219,8 +51,6 @@ function Sep() {
 }
 
 /* ─── Main Component ─────────────────────────────────────────────────── */
-const STATIC_TICKER_ITEMS = buildTickerItems(20260913);
-
 export function RollingTicker() {
   const [items, setItems] = useState<TickerItem[]>(STATIC_TICKER_ITEMS);
   const [isShuffling, setIsShuffling] = useState(false);
@@ -237,10 +67,8 @@ export function RollingTicker() {
 
   const handleShuffle = useCallback(() => {
     setIsShuffling(true);
-    // Draw fresh random sample from 6,000+ database with deduplication and relevance sorting
-    const fresh = buildTickerItems();
-    setItems(fresh);
-    toast.success("Shuffled live topics from 6,000+ question database", {
+    setItems(shuffleItems(STATIC_TICKER_ITEMS));
+    toast.success("Shuffled live topics from enterprise curriculum", {
       duration: 1800,
     });
     if (shuffleTimerRef.current) clearTimeout(shuffleTimerRef.current);

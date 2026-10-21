@@ -5,28 +5,45 @@
  * 1. Supabase REST (PostgREST) via edge fetch
  * 2. MongoDB Atlas Data API via edge fetch
  * 3. Seeded Server-Side Fallback Cache (for offline dev and zero-credential environments)
+ *
+ * All datasets are strictly decoupled to keep Cloudflare Worker isolate memory < 10MB.
  */
 
-import {
-  conceptsDb,
-  architectureData,
-  pysparkData,
-  sparksqlData,
-  mssqlData,
-  pythonData,
-  learningPathsDb,
-  cheatsheetData,
-  databricksCheatsheetData,
-  modernStackDb,
-  modernBlueprintsDb,
-  modernCodeMatrix,
-  modernCostPlaybooks,
-  modernConceptsDb,
-  modernSubdomains,
-  companyProfiles,
-  getUnifiedQuestions,
-  dataOpsData,
-} from "@/data";
+import type {
+  Concept,
+  ArchitectureQuestion,
+  LearningPath,
+  CheatCode,
+  UnifiedQuestion,
+  CompanyProfile,
+  DatabricksSuiteData,
+  DataOpsDataset,
+  CodeSheetItem,
+  ModernStackQuestion,
+  ModernBlueprint,
+  ModernCodeMatrix,
+  ModernCostPlaybook,
+  ModernConcept,
+  ModernSubdomain,
+} from "@/types/data";
+
+import dataConceptsJson from "@/data/json/data_concepts.json";
+import dataCheatsheetJson from "@/data/json/data_cheatsheet.json";
+import databricksCheatsheetsJson from "@/data/json/databricks_cheatsheets.json";
+import dataPathsJson from "@/data/json/data_paths.json";
+import companyProfilesJson from "@/data/json/company_profiles.json";
+import dataPysparkJson from "@/data/json/data_pyspark.json";
+import dataSparksqlJson from "@/data/json/data_sparksql.json";
+import dataMssqlJson from "@/data/json/data_mssql.json";
+import dataPythonJson from "@/data/json/data_python.json";
+import modernStackJson from "@/data/json/modern_stack.json";
+import modernBlueprintsJson from "@/data/json/modern_blueprints.json";
+import modernCodeMatrixJson from "@/data/json/modern_code_matrix.json";
+import modernCostPlaybooksJson from "@/data/json/modern_cost_playbooks.json";
+import modernConceptsJson from "@/data/json/modern_concepts.json";
+import modernSubdomainsJson from "@/data/json/modern_subdomains.json";
+import { dataOpsData } from "@/data/dataops-data";
+import { INITIAL_QA_ITEMS, INITIAL_SCENARIO_ITEMS } from "@/data/initial-data";
 
 export interface DatabaseConfig {
   provider: "supabase" | "mongodb" | "in-memory";
@@ -101,105 +118,110 @@ async function fetchMongoCollection<T>(collection: string): Promise<T[] | null> 
 export const serverlessDb = {
   getProviderName: () => config.provider,
 
-  // Concepts
-  async getConcepts() {
+  // Concepts (805 KB)
+  async getConcepts(): Promise<Concept[]> {
     if (config.provider === "supabase") {
-      const data = await fetchSupabaseTable<any>("concepts");
+      const data = await fetchSupabaseTable<Concept>("concepts");
       if (data && data.length > 0) return data;
     }
     if (config.provider === "mongodb") {
-      const data = await fetchMongoCollection<any>("concepts");
+      const data = await fetchMongoCollection<Concept>("concepts");
       if (data && data.length > 0) return data;
     }
-    return conceptsDb;
+    return dataConceptsJson as unknown as Concept[];
   },
 
-  // Questions
-  async getUnifiedQuestions() {
+  // Questions (Lean initial set for sub-10ms SSR, R2 shards for remaining)
+  async getUnifiedQuestions(): Promise<UnifiedQuestion[]> {
     if (config.provider === "supabase") {
-      const data = await fetchSupabaseTable<any>("questions");
+      const data = await fetchSupabaseTable<UnifiedQuestion>("questions");
       if (data && data.length > 0) return data;
     }
     if (config.provider === "mongodb") {
-      const data = await fetchMongoCollection<any>("questions");
+      const data = await fetchMongoCollection<UnifiedQuestion>("questions");
       if (data && data.length > 0) return data;
     }
-    return getUnifiedQuestions();
+    return INITIAL_QA_ITEMS;
   },
 
-  // Architecture Scenarios
-  async getArchitectureData() {
+  // Architecture Scenarios (Lean initial set for sub-10ms SSR, R2 shards for remaining)
+  async getArchitectureData(): Promise<ArchitectureQuestion[]> {
     if (config.provider === "supabase") {
-      const data = await fetchSupabaseTable<any>("architecture_scenarios");
+      const data = await fetchSupabaseTable<ArchitectureQuestion>("architecture_scenarios");
       if (data && data.length > 0) return data;
     }
     if (config.provider === "mongodb") {
-      const data = await fetchMongoCollection<any>("architecture_scenarios");
+      const data = await fetchMongoCollection<ArchitectureQuestion>("architecture_scenarios");
       if (data && data.length > 0) return data;
     }
-    return architectureData;
+    return INITIAL_SCENARIO_ITEMS;
   },
 
-  // Cheatsheets
-  async getCheatsheetData() {
+  // Cheatsheets (133 KB)
+  async getCheatsheetData(): Promise<CheatCode[]> {
     if (config.provider === "supabase") {
-      const data = await fetchSupabaseTable<any>("cheatsheets");
+      const data = await fetchSupabaseTable<CheatCode>("cheatsheets");
       if (data && data.length > 0) return data;
     }
     if (config.provider === "mongodb") {
-      const data = await fetchMongoCollection<any>("cheatsheets");
+      const data = await fetchMongoCollection<CheatCode>("cheatsheets");
       if (data && data.length > 0) return data;
     }
-    return cheatsheetData;
+    return dataCheatsheetJson as CheatCode[];
   },
 
-  // Databricks Architecture & Coding Cheat Sheets
-  async getDatabricksCheatsheetData() {
-    return databricksCheatsheetData;
+  // Databricks Architecture & Coding Cheat Sheets (179 KB)
+  async getDatabricksCheatsheetData(): Promise<DatabricksSuiteData> {
+    return databricksCheatsheetsJson as DatabricksSuiteData;
   },
 
-  // Learning Paths
-  async getLearningPaths() {
+  // Learning Paths (29 KB)
+  async getLearningPaths(): Promise<LearningPath[]> {
     if (config.provider === "supabase") {
-      const data = await fetchSupabaseTable<any>("learning_paths");
+      const data = await fetchSupabaseTable<LearningPath>("learning_paths");
       if (data && data.length > 0) return data;
     }
     if (config.provider === "mongodb") {
-      const data = await fetchMongoCollection<any>("learning_paths");
+      const data = await fetchMongoCollection<LearningPath>("learning_paths");
       if (data && data.length > 0) return data;
     }
-    return learningPathsDb;
+    return dataPathsJson as LearningPath[];
   },
 
-  // Modern Stack
+  // Modern Stack (<100 KB total)
   async getModernStack() {
     return {
-      stack: modernStackDb,
-      blueprints: modernBlueprintsDb,
-      matrix: modernCodeMatrix,
-      costPlaybooks: modernCostPlaybooks,
-      concepts: modernConceptsDb,
-      subdomains: modernSubdomains,
+      stack: modernStackJson as ModernStackQuestion[],
+      blueprints: modernBlueprintsJson as ModernBlueprint[],
+      matrix: modernCodeMatrixJson as ModernCodeMatrix[],
+      costPlaybooks: modernCostPlaybooksJson as ModernCostPlaybook[],
+      concepts: modernConceptsJson as ModernConcept[],
+      subdomains: modernSubdomainsJson as ModernSubdomain[],
     };
   },
 
-  // Code Practice
-  async getCodePractice() {
+  // Code Practice (<500 KB total)
+  async getCodePractice(): Promise<{
+    pyspark: CodeSheetItem[];
+    sparksql: CodeSheetItem[];
+    mssql: CodeSheetItem[];
+    python: CodeSheetItem[];
+  }> {
     return {
-      pyspark: pysparkData,
-      sparksql: sparksqlData,
-      mssql: mssqlData,
-      python: pythonData,
+      pyspark: dataPysparkJson as CodeSheetItem[],
+      sparksql: dataSparksqlJson as CodeSheetItem[],
+      mssql: dataMssqlJson as CodeSheetItem[],
+      python: dataPythonJson as CodeSheetItem[],
     };
   },
 
-  // Companies
-  async getCompanyProfiles() {
-    return companyProfiles;
+  // Companies (226 KB)
+  async getCompanyProfiles(): Promise<CompanyProfile[]> {
+    return companyProfilesJson as CompanyProfile[];
   },
 
-  // DataOps, Connectivity & CI/CD Lifecycle
-  async getDataOpsData() {
+  // DataOps, Connectivity & CI/CD Lifecycle (<50 KB)
+  async getDataOpsData(): Promise<DataOpsDataset> {
     return dataOpsData;
   },
 };
