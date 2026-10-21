@@ -299,7 +299,7 @@ function run() {
     { items: dataPythonJson as any[], label: 'Python' },
   ];
   codeGroups.forEach(({ items, label }) => items.forEach((item) => addDoc({
-    id: `code-${item.id}`, type: 'code', title: `${item.title} (${label})`,
+    id: `code-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${item.id}`, type: 'code', title: `${item.title} (${label})`,
     category: 'Code Practice', page: 'Code Practice', href: '/code-practice',
     domain: item.category || label, difficulty: item.level, badge: item.level || 'PROD',
     tags: [label, item.level, item.use_case].filter(Boolean),
