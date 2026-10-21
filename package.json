@@ -16,7 +16,7 @@
     "dev:customer-dispatcher": "wrangler dev --config workers/customer-dispatcher/wrangler.jsonc",
     "deploy:customer-dispatcher": "wrangler deploy --config workers/customer-dispatcher/wrangler.jsonc",
     "preview": "opennextjs-cloudflare build && npm run r2:sync:local && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "npm run deploy:cf",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
     "lint": "eslint",
