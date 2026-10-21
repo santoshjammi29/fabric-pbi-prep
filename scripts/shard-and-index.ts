@@ -2,6 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import MiniSearch from 'minisearch';
+import dataConceptsJson from '../src/data/json/data_concepts.json';
+import dataCheatsheetJson from '../src/data/json/data_cheatsheet.json';
+import databricksCheatsheetsJson from '../src/data/json/databricks_cheatsheets.json';
+import dataPathsJson from '../src/data/json/data_paths.json';
+import companyProfilesJson from '../src/data/json/company_profiles.json';
+import dataPysparkJson from '../src/data/json/data_pyspark.json';
+import dataSparksqlJson from '../src/data/json/data_sparksql.json';
+import dataMssqlJson from '../src/data/json/data_mssql.json';
+import dataPythonJson from '../src/data/json/data_python.json';
+import modernBlueprintsJson from '../src/data/json/modern_blueprints.json';
+import { GUIDED_TOPICS } from '../src/data/guided-learning-topics';
+import { architectureDiagrams } from '../src/data/diagrams';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content');
 const DATA_JSON_DIR = path.join(process.cwd(), 'src', 'data', 'json');
@@ -219,47 +231,139 @@ function run() {
 
   console.log('Building MiniSearch inverted search index...');
   const miniSearch = new MiniSearch({
-    fields: ['title', 'question', 'term', 'summary', 'tags', 'domain'],
-    storeFields: ['id', 'title', 'type', 'href', 'domain', 'difficulty'],
-    searchOptions: { boost: { title: 3, term: 3, question: 2, tags: 1.5 }, fuzzy: 0.2, prefix: true },
+    fields: ['title', 'question', 'term', 'summary', 'tags', 'domain', 'body', 'category'],
+    storeFields: [
+      'id', 'title', 'type', 'href', 'domain', 'difficulty', 'category', 'page',
+      'badge', 'snippet', 'iconType', 'topicKey', 'topicLabel', 'topicIcon',
+      'topicDescription', 'topicExecutiveSummary'
+    ],
+    searchOptions: { boost: { title: 4, term: 4, question: 3, tags: 2, category: 1.5 }, fuzzy: 0.2, prefix: true },
   });
 
   const searchDocs: any[] = [];
-  qaItems.forEach((q) =>
+  const addDoc = (doc: Record<string, any>) => {
+    const title = String(doc.title || '');
+    const body = String(doc.body || doc.summary || doc.description || '');
     searchDocs.push({
-      id: `qa:${q.id}`,
-      title: q.question,
-      question: q.question,
-      domain: q.domain,
-      difficulty: q.difficulty,
-      tags: Array.isArray(q.tags) ? q.tags.join(' ') : '',
-      type: 'qa',
-      href: `/qa-prep?id=${q.id}`,
-    })
-  );
-  scenarioItems.forEach((s) =>
-    searchDocs.push({
-      id: `sc:${s.id}`,
-      title: s.title,
-      summary: s.problemStatement,
-      domain: s.category,
-      difficulty: s.difficulty,
-      type: 'scenario',
-      href: `/architecture?tab=scenarios&id=${s.id}`,
-    })
-  );
-  conceptItems.forEach((c) =>
-    searchDocs.push({
-      id: `concept:${c.id}`,
-      title: c.term,
-      term: c.term,
-      summary: c.summary,
-      domain: c.category,
-      difficulty: 'Senior',
-      type: 'concept',
-      href: `/concepts?term=${encodeURIComponent(c.term)}`,
-    })
-  );
+      ...doc,
+      title,
+      summary: String(doc.summary || ''),
+      body,
+      tags: Array.isArray(doc.tags) ? doc.tags.join(' ') : String(doc.tags || ''),
+      domain: String(doc.domain || ''),
+      category: String(doc.category || ''),
+      snippet: String(doc.snippet || body).replace(/\\s+/g, ' ').trim().slice(0, 220),
+    });
+  };
+
+  GUIDED_TOPICS.forEach((topic) => addDoc({
+    id: `topic-${topic.key}`, type: 'topic', title: topic.label,
+    category: 'Guided Track', page: 'Guided Learning', href: `/guided-learning?topic=${topic.key}`,
+    domain: topic.domain, tags: [topic.key, topic.domain], body: `${topic.description} ${topic.executiveSummary}`,
+    badge: `Track · ${topic.domain}`, iconType: 'sparkles',
+    topicKey: topic.key, topicLabel: topic.label, topicIcon: topic.icon,
+    topicDescription: topic.description, topicExecutiveSummary: topic.executiveSummary,
+  }));
+
+  qaItems.forEach((q) => addDoc({
+    id: `qa-${q.id}`, type: 'qa', title: q.question, question: q.question,
+    category: 'Q&A Prep', page: 'Q&A Prep Hub',
+    href: `/qa-prep?category=${encodeURIComponent(q.category || 'ALL')}&card=${encodeURIComponent(q.id)}`,
+    domain: q.domain || q.category, difficulty: q.difficulty, badge: q.difficulty,
+    tags: [q.category, q.niche, q.domain, q.sourceLabel].filter(Boolean),
+    body: q.answer || '', iconType: 'message',
+  }));
+
+  scenarioItems.forEach((item) => addDoc({
+    id: `arch-${item.id}`, type: 'scenario', title: item.question || item.title || `Scenario ${item.id}`,
+    category: 'Architecture', page: 'Architecture Hub',
+    href: `/architecture?category=${encodeURIComponent(item.category || 'ALL')}&card=${encodeURIComponent(item.id)}`,
+    domain: item.category, difficulty: item.difficulty, badge: item.difficulty,
+    tags: [item.niche, item.source].filter(Boolean), body: item.answer || item.problemStatement || '',
+    iconType: 'cpu',
+  }));
+
+  conceptItems.forEach((item) => addDoc({
+    id: `concept-${item.id}`, type: 'concept', title: item.term,
+    category: 'Concepts', page: 'Key Concepts',
+    href: `/concepts?tab=concepts&category=${encodeURIComponent(item.category)}&term=${encodeURIComponent(item.term)}`,
+    domain: item.category, difficulty: item.difficulty, badge: item.difficulty,
+    tags: item.keyPoints || item.relatedTerms || [], body: `${item.definition || ''} ${item.explanation || ''}`,
+    iconType: 'book',
+  }));
+
+  const codeGroups = [
+    { items: dataPysparkJson as any[], label: 'PySpark' },
+    { items: dataSparksqlJson as any[], label: 'SparkSQL' },
+    { items: dataMssqlJson as any[], label: 'Advanced SQL' },
+    { items: dataPythonJson as any[], label: 'Python' },
+  ];
+  codeGroups.forEach(({ items, label }) => items.forEach((item) => addDoc({
+    id: `code-${item.id}`, type: 'code', title: `${item.title} (${label})`,
+    category: 'Code Practice', page: 'Code Practice', href: '/code-practice',
+    domain: item.category || label, difficulty: item.level, badge: item.level || 'PROD',
+    tags: [label, item.level, item.use_case].filter(Boolean),
+    body: `${item.description || ''} ${item.code || ''}`, iconType: 'terminal',
+  })));
+
+  (dataCheatsheetJson as any[]).forEach((item) => addDoc({
+    id: `cheat-${item.id}`, type: 'cheat', title: `${item.title} — ${item.category}`,
+    category: 'Cheat Sheets', page: 'Cheat Sheets', href: `/cheat-sheet?id=${item.id}`,
+    domain: item.category, badge: item.impact || 'PROD',
+    tags: item.tags || [], body: `${item.problem || ''} ${item.solution || ''} ${item.whyItMatters || ''}`,
+    iconType: 'terminal',
+  }));
+
+  const dbxCards = (databricksCheatsheetsJson as any)?.cards || [];
+  dbxCards.forEach((item: any) => addDoc({
+    id: `dbx-cheat-${item.id}`, type: 'cheat', title: `${item.title} (Databricks)`,
+    category: 'Cheat Sheets', page: 'Cheat Sheets', href: '/cheat-sheet',
+    domain: item.domainTitle || 'Databricks', badge: item.tag || 'PROD',
+    tags: [item.domain, item.tag, 'databricks'].filter(Boolean), body: `${item.title || ''} ${item.tag || ''}`,
+    iconType: 'terminal',
+  }));
+
+  (modernBlueprintsJson as any[]).forEach((item) => addDoc({
+    id: `bp-${item.id}`, type: 'blueprint', title: item.title,
+    category: 'Blueprints', page: 'Modern Stack', href: '/modern-stack#blueprints',
+    domain: item.category, badge: item.category,
+    tags: item.tags || [], body: `${item.category || ''} ${item.costEstimate || ''}`, iconType: 'cpu',
+  }));
+
+  architectureDiagrams.forEach((item: any) => addDoc({
+    id: `diagram-${item.id}`, type: 'diagram', title: `${item.title} (Whiteboard)`,
+    category: 'Blueprints', page: 'Architecture', href: `/architecture#${item.id}`,
+    domain: item.category, badge: 'Whiteboard',
+    tags: [...(item.tags || []), 'whiteboard', 'diagram', 'blueprint', 'architecture'],
+    body: `${item.subtitle || ''} ${item.description || ''} ${(item.keyPoints || []).join(' ')}`,
+    iconType: 'layout',
+  }));
+
+  const simulators = [
+    { id: 'sim-shuffle', title: 'Simulator: Spark Shuffle & Partition Estimator', href: '/modern-stack#simulators', description: 'Interactive partition and memory calculation for large Apache Spark shuffle stages.', tags: ['spark', 'shuffle', 'partition', 'memory', 'estimator', 'calculator'] },
+    { id: 'sim-delta', title: 'Simulator: Iceberg vs Delta Decision Tree', href: '/modern-stack#simulators', description: 'Decision engine for choosing between Apache Iceberg and Delta Lake table formats.', tags: ['iceberg', 'delta', 'decision', 'tree', 'lakehouse', 'table format', 'simulator'] },
+    { id: 'sim-cost', title: 'Simulator: Serverless Cloud Cost Calculator', href: '/modern-stack#simulators', description: 'Cloud compute and storage cost estimation across Azure, AWS, and GCP data workloads.', tags: ['cost', 'calculator', 'serverless', 'cloud', 'finops', 'simulator'] },
+    { id: 'sim-spark-engine', title: 'Spark Engine & Execution Simulator', href: '/spark-engine', description: 'Visual runtime simulator for Catalyst optimizer, Tungsten off-heap memory, and AQE execution.', tags: ['spark', 'engine', 'simulator', 'catalyst', 'tungsten', 'aqe', 'photon'] },
+  ];
+  simulators.forEach((item) => addDoc({
+    ...item, type: 'simulator', category: 'Simulators', page: item.id === 'sim-spark-engine' ? 'Spark Engine' : 'Modern Stack',
+    badge: item.id === 'sim-spark-engine' ? 'Engine' : 'Interactive Tool', body: item.description, iconType: 'calculator',
+  }));
+
+  (dataPathsJson as any[]).forEach((item) => addDoc({
+    id: `path-${item.id}`, type: 'path', title: `${item.title} (${item.weeks} Weeks)`,
+    category: 'Learning Paths', page: 'Learning Paths', href: `/learning-paths?id=${item.id}`,
+    domain: 'Learning Paths', badge: `${item.weeks}w`, tags: item.skills || [],
+    body: item.description || '', iconType: 'compass',
+  }));
+
+  (companyProfilesJson as any[]).forEach((item) => addDoc({
+    id: `company-${item.id}`, type: 'company', title: `${item.name} — GCC Tech Profile`,
+    category: 'Companies', page: 'Company Research', href: '/company-research',
+    domain: item.tier || 'Enterprise GCC', badge: item.tier || 'GCC',
+    tags: [...(item.stack || []), ...(item.interviewFocus || []), item.location || ''].filter(Boolean),
+    body: `${item.keyChallenges || ''} ${item.location || ''}`, iconType: 'building',
+  }));
 
   miniSearch.addAll(searchDocs);
   const searchJson = JSON.stringify(miniSearch.toJSON());
