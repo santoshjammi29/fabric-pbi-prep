@@ -12,7 +12,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const cspPolicy = [
   "default-src 'self'",
-  "script-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://cdn.lakehousearchitect.com https://img.clerk.com https://challenges.cloudflare.com",
   "font-src 'self' data:",
