@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://lakehousearchitect.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
 
 /**
  * Dynamic robots.txt generator
@@ -26,17 +26,18 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "Applebot",
         allow: "/",
       },
+      // Block aggressive / unauthorized AI scrapers
       {
-        userAgent: "GPTBot",
-        allow: "/",
-      },
-      {
-        userAgent: "PerplexityBot",
-        allow: "/",
-      },
-      {
-        userAgent: "ClaudeBot",
-        allow: "/",
+        userAgent: [
+          "Bytespider",
+          "CCBot",
+          "Diffbot",
+          "Amazonbot",
+          "FacebookBot",
+          "ImagesiftBot",
+          "Omgilibot",
+        ],
+        disallow: ["/"],
       },
     ],
     sitemap: [

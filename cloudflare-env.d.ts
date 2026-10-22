@@ -42,5 +42,6 @@ interface CloudflareEnv {
   NEXT_PUBLIC_CDN_URL: string;
   NEXT_PUBLIC_SITE_URL: string;
   CLOUDFLARE_ACCOUNT_ID: string;
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: string;
   ARTIFACT_VERSION: string;
 }

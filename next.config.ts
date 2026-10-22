@@ -112,6 +112,11 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/security.txt",
+        destination: "/.well-known/security.txt",
+        permanent: true,
+      },
+      {
         source: "/python",
         destination: "/guided-learning?topic=python",
         permanent: true,
