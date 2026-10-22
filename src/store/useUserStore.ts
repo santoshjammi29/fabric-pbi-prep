@@ -110,9 +110,19 @@ function queueEdgeProgressSync(state: UserStoreState) {
         userId = "usr_" + Math.random().toString(36).substring(2, 11);
         localStorage.setItem("dataprep_user_id", userId);
       }
+      let userToken = localStorage.getItem("dataprep_user_token");
+      if (!userToken) {
+        userToken = typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : "tok_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+        localStorage.setItem("dataprep_user_token", userToken);
+      }
       fetch("/api/progress", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userToken}`,
+        },
         body: JSON.stringify({
           userId,
           progress: {

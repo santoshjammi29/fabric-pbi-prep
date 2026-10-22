@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://lakehousearchitect.com";
 
 /**
  * Dynamic robots.txt generator

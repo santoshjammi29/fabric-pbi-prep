@@ -34,6 +34,10 @@ function addApplicationHeaders(request: NextRequest) {
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://cdn.lakehousearchitect.com https://img.clerk.com https://challenges.cloudflare.com; font-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com https://*.upstash.io https://*.supabase.co; frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev; object-src 'none'; base-uri 'self'; form-action 'self';"
+  );
 
   return response;
 }

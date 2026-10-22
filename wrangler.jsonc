@@ -4,7 +4,7 @@
   "name": "lakehouse-architect",
   "compatibility_date": "2026-10-20",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  "workers_dev": false,
   "minify": true,
   "assets": {
     "directory": ".open-next/assets",
@@ -28,6 +28,14 @@
   ],
   "routes": [
     {
+      "pattern": "lakehousearchitect.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.lakehousearchitect.com",
+      "custom_domain": true
+    },
+    {
       "pattern": "moderndataengineer.uk",
       "custom_domain": true
     },
@@ -37,10 +45,9 @@
     }
   ],
   "vars": {
-    "NEXT_PUBLIC_SITE_URL": "https://moderndataengineer.uk",
+    "NEXT_PUBLIC_SITE_URL": "https://lakehousearchitect.com",
     "NEXT_PUBLIC_CDN_URL": "",
     "ARTIFACT_VERSION": "v2026.10",
-    "CLOUDFLARE_ACCOUNT_ID": "635bafdcd995f6f5dde3ac3d69b3ccc1",
     "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAFgJ82U17SKQAtZs"
   }
 }

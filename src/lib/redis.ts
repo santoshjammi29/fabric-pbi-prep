@@ -6,8 +6,18 @@ import { Redis } from "@upstash/redis";
  * across global edge regions with sub-100ms latency.
  */
 
-// In-memory fallback map for environments without remote Upstash credentials
+// Bounded LRU in-memory fallback store to prevent memory leaks and isolate OOMs
+const MAX_FALLBACK_ENTRIES = 500;
 const globalMemoryCache = new Map<string, { value: any; expiresAt?: number }>();
+
+function pruneExpiredEntries(): void {
+  const now = Date.now();
+  for (const [key, item] of globalMemoryCache.entries()) {
+    if (item.expiresAt && now > item.expiresAt) {
+      globalMemoryCache.delete(key);
+    }
+  }
+}
 
 class FallbackEdgeStore {
   async get<T = any>(key: string): Promise<T | null> {
@@ -17,11 +27,35 @@ class FallbackEdgeStore {
       globalMemoryCache.delete(key);
       return null;
     }
+    // Refresh LRU order on hit
+    globalMemoryCache.delete(key);
+    globalMemoryCache.set(key, item);
     return item.value as T;
   }
 
   async set(key: string, value: any, options?: { ex?: number }): Promise<"OK"> {
     const expiresAt = options?.ex ? Date.now() + options.ex * 1000 : undefined;
+
+    // Remove existing key to refresh position
+    if (globalMemoryCache.has(key)) {
+      globalMemoryCache.delete(key);
+    }
+
+    // Periodically prune expired entries if nearing capacity
+    if (globalMemoryCache.size >= MAX_FALLBACK_ENTRIES) {
+      pruneExpiredEntries();
+    }
+
+    // Evict oldest entry (LRU) if still at or over capacity
+    while (globalMemoryCache.size >= MAX_FALLBACK_ENTRIES) {
+      const oldestKey = globalMemoryCache.keys().next().value;
+      if (oldestKey !== undefined) {
+        globalMemoryCache.delete(oldestKey);
+      } else {
+        break;
+      }
+    }
+
     globalMemoryCache.set(key, { value, expiresAt });
     return "OK";
   }

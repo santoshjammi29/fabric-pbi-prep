@@ -6,7 +6,8 @@
  * 2. MongoDB Atlas Data API via edge fetch
  * 3. Seeded Server-Side Fallback Cache (for offline dev and zero-credential environments)
  *
- * All datasets are strictly decoupled to keep Cloudflare Worker isolate memory < 10MB.
+ * All datasets are strictly lazy-loaded on demand via dynamic imports
+ * to keep Cloudflare Worker isolate startup memory < 10MB (eliminating OOM 1102).
  */
 
 import type {
@@ -28,22 +29,6 @@ import type {
   ModernSubdomain,
 } from "@/types/data";
 
-import dataConceptsJson from "@/data/json/data_concepts.json";
-import dataCheatsheetJson from "@/data/json/data_cheatsheet.json";
-import databricksCheatsheetsJson from "@/data/json/databricks_cheatsheets.json";
-import databricks100Json from "@/data/json/databricks_100.json";
-import dataPathsJson from "@/data/json/data_paths.json";
-import companyProfilesJson from "@/data/json/company_profiles.json";
-import dataPysparkJson from "@/data/json/data_pyspark.json";
-import dataSparksqlJson from "@/data/json/data_sparksql.json";
-import dataMssqlJson from "@/data/json/data_mssql.json";
-import dataPythonJson from "@/data/json/data_python.json";
-import modernStackJson from "@/data/json/modern_stack.json";
-import modernBlueprintsJson from "@/data/json/modern_blueprints.json";
-import modernCodeMatrixJson from "@/data/json/modern_code_matrix.json";
-import modernCostPlaybooksJson from "@/data/json/modern_cost_playbooks.json";
-import modernConceptsJson from "@/data/json/modern_concepts.json";
-import modernSubdomainsJson from "@/data/json/modern_subdomains.json";
 import { dataOpsData } from "@/data/dataops-data";
 import { INITIAL_QA_ITEMS, INITIAL_SCENARIO_ITEMS } from "@/data/initial-data";
 
@@ -120,7 +105,7 @@ async function fetchMongoCollection<T>(collection: string): Promise<T[] | null> 
 export const serverlessDb = {
   getProviderName: () => config.provider,
 
-  // Concepts (805 KB)
+  // Concepts (805 KB) - Lazy loaded
   async getConcepts(): Promise<Concept[]> {
     if (config.provider === "supabase") {
       const data = await fetchSupabaseTable<Concept>("concepts");
@@ -130,7 +115,8 @@ export const serverlessDb = {
       const data = await fetchMongoCollection<Concept>("concepts");
       if (data && data.length > 0) return data;
     }
-    return dataConceptsJson as unknown as Concept[];
+    const mod = await import("@/data/json/data_concepts.json");
+    return mod.default as unknown as Concept[];
   },
 
   // Questions (Lean initial set for sub-10ms SSR, R2 shards for remaining)
@@ -159,7 +145,7 @@ export const serverlessDb = {
     return INITIAL_SCENARIO_ITEMS;
   },
 
-  // Cheatsheets (133 KB)
+  // Cheatsheets (133 KB) - Lazy loaded
   async getCheatsheetData(): Promise<CheatCode[]> {
     if (config.provider === "supabase") {
       const data = await fetchSupabaseTable<CheatCode>("cheatsheets");
@@ -169,20 +155,23 @@ export const serverlessDb = {
       const data = await fetchMongoCollection<CheatCode>("cheatsheets");
       if (data && data.length > 0) return data;
     }
-    return dataCheatsheetJson as CheatCode[];
+    const mod = await import("@/data/json/data_cheatsheet.json");
+    return mod.default as unknown as CheatCode[];
   },
 
-  // Databricks Architecture & Coding Cheat Sheets (179 KB)
+  // Databricks Architecture & Coding Cheat Sheets (179 KB) - Lazy loaded
   async getDatabricksCheatsheetData(): Promise<DatabricksSuiteData> {
-    return databricksCheatsheetsJson as DatabricksSuiteData;
+    const mod = await import("@/data/json/databricks_cheatsheets.json");
+    return mod.default as unknown as DatabricksSuiteData;
   },
 
-  // Databricks 100 Coding & Operation Guides (135 KB)
+  // Databricks 100 Coding & Operation Guides (135 KB) - Lazy loaded
   async getDatabricks100Data(): Promise<Databricks100Concept[]> {
-    return databricks100Json as Databricks100Concept[];
+    const mod = await import("@/data/json/databricks_100.json");
+    return mod.default as unknown as Databricks100Concept[];
   },
 
-  // Learning Paths (29 KB)
+  // Learning Paths (29 KB) - Lazy loaded
   async getLearningPaths(): Promise<LearningPath[]> {
     if (config.provider === "supabase") {
       const data = await fetchSupabaseTable<LearningPath>("learning_paths");
@@ -192,39 +181,64 @@ export const serverlessDb = {
       const data = await fetchMongoCollection<LearningPath>("learning_paths");
       if (data && data.length > 0) return data;
     }
-    return dataPathsJson as LearningPath[];
+    const mod = await import("@/data/json/data_paths.json");
+    return mod.default as unknown as LearningPath[];
   },
 
-  // Modern Stack (<100 KB total)
+  // Modern Stack (<100 KB total) - Lazy loaded
   async getModernStack() {
+    const [
+      stackMod,
+      blueprintsMod,
+      matrixMod,
+      costPlaybooksMod,
+      conceptsMod,
+      subdomainsMod,
+    ] = await Promise.all([
+      import("@/data/json/modern_stack.json"),
+      import("@/data/json/modern_blueprints.json"),
+      import("@/data/json/modern_code_matrix.json"),
+      import("@/data/json/modern_cost_playbooks.json"),
+      import("@/data/json/modern_concepts.json"),
+      import("@/data/json/modern_subdomains.json"),
+    ]);
+
     return {
-      stack: modernStackJson as ModernStackQuestion[],
-      blueprints: modernBlueprintsJson as ModernBlueprint[],
-      matrix: modernCodeMatrixJson as ModernCodeMatrix[],
-      costPlaybooks: modernCostPlaybooksJson as ModernCostPlaybook[],
-      concepts: modernConceptsJson as ModernConcept[],
-      subdomains: modernSubdomainsJson as ModernSubdomain[],
+      stack: stackMod.default as unknown as ModernStackQuestion[],
+      blueprints: blueprintsMod.default as unknown as ModernBlueprint[],
+      matrix: matrixMod.default as unknown as ModernCodeMatrix[],
+      costPlaybooks: costPlaybooksMod.default as unknown as ModernCostPlaybook[],
+      concepts: conceptsMod.default as unknown as ModernConcept[],
+      subdomains: subdomainsMod.default as unknown as ModernSubdomain[],
     };
   },
 
-  // Code Practice (<500 KB total)
+  // Code Practice (<500 KB total) - Lazy loaded
   async getCodePractice(): Promise<{
     pyspark: CodeSheetItem[];
     sparksql: CodeSheetItem[];
     mssql: CodeSheetItem[];
     python: CodeSheetItem[];
   }> {
+    const [pysparkMod, sparksqlMod, mssqlMod, pythonMod] = await Promise.all([
+      import("@/data/json/data_pyspark.json"),
+      import("@/data/json/data_sparksql.json"),
+      import("@/data/json/data_mssql.json"),
+      import("@/data/json/data_python.json"),
+    ]);
+
     return {
-      pyspark: dataPysparkJson as CodeSheetItem[],
-      sparksql: dataSparksqlJson as CodeSheetItem[],
-      mssql: dataMssqlJson as CodeSheetItem[],
-      python: dataPythonJson as CodeSheetItem[],
+      pyspark: pysparkMod.default as unknown as CodeSheetItem[],
+      sparksql: sparksqlMod.default as unknown as CodeSheetItem[],
+      mssql: mssqlMod.default as unknown as CodeSheetItem[],
+      python: pythonMod.default as unknown as CodeSheetItem[],
     };
   },
 
-  // Companies (226 KB)
+  // Companies (226 KB) - Lazy loaded
   async getCompanyProfiles(): Promise<CompanyProfile[]> {
-    return companyProfilesJson as CompanyProfile[];
+    const mod = await import("@/data/json/company_profiles.json");
+    return mod.default as unknown as CompanyProfile[];
   },
 
   // DataOps, Connectivity & CI/CD Lifecycle (<50 KB)

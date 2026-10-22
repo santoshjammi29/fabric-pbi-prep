@@ -1,17 +1,15 @@
 import { MetadataRoute } from "next";
 import { architectureDiagrams } from "@/data/diagrams";
 import { GUIDED_TOPICS } from "@/data/guided-learning-topics";
-import dataConceptsJson from "@/data/json/data_concepts.json";
-const conceptsDb = dataConceptsJson as Array<{ term: string }>;
 
-const BASE_URL = "https://lakehousearchitect.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://lakehousearchitect.com";
 
 /**
  * Dynamic Self-Updating Sitemap Engine
  * Automatically expands as new questions, concepts, whiteboards,
  * and guided learning tracks are published.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // 1. Primary Hub Routes
@@ -89,6 +87,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${BASE_URL}/code-practice/databricks`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: `${BASE_URL}/company-research`,
       lastModified: now,
       changeFrequency: "monthly",
@@ -112,7 +116,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
-  // 4. Complete Core Concepts Knowledge Graph (All 660+ Concepts)
+  // 4. Complete Core Concepts Knowledge Graph (Lazy imported)
+  const conceptsMod = await import("@/data/json/data_concepts.json");
+  const conceptsDb = (conceptsMod.default || conceptsMod) as Array<{ term: string }>;
+
   const coreConceptRoutes: MetadataRoute.Sitemap = conceptsDb.map((concept) => ({
     url: `${BASE_URL}/concepts?tab=concepts&term=${encodeURIComponent(concept.term)}`,
     lastModified: now,

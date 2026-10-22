@@ -64,20 +64,19 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
     expect(matched.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('validates public/robots.txt and public/sitemap.xml exist with required content', () => {
-    const robotsPath = path.join(process.cwd(), 'public', 'robots.txt');
-    const sitemapPath = path.join(process.cwd(), 'public', 'sitemap.xml');
+  it('validates dynamic robots.ts and sitemap.ts route generators produce required metadata', async () => {
+    const robotsModule = await import('@/app/robots');
+    const sitemapModule = await import('@/app/sitemap');
 
-    expect(fs.existsSync(robotsPath)).toBe(true);
-    expect(fs.existsSync(sitemapPath)).toBe(true);
+    const robotsResult = robotsModule.default();
+    expect(robotsResult.host).toBe('https://lakehousearchitect.com');
+    expect(robotsResult.sitemap).toContain('https://lakehousearchitect.com/sitemap.xml');
 
-    const robotsContent = fs.readFileSync(robotsPath, 'utf8');
-    expect(robotsContent).toContain('User-agent: *');
-    expect(robotsContent).toContain('Sitemap: https://lakehousearchitect.com/sitemap.xml');
-
-    const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
-    expect(sitemapContent).toContain('<loc>https://lakehousearchitect.com/guided-learning</loc>');
-    expect(sitemapContent).toContain('<loc>https://lakehousearchitect.com/architecture</loc>');
-    expect(sitemapContent).toContain('<lastmod>2026-09-11</lastmod>');
+    const sitemapResult = await sitemapModule.default();
+    const urls = sitemapResult.map((entry) => entry.url);
+    expect(urls).toContain('https://lakehousearchitect.com/guided-learning');
+    expect(urls).toContain('https://lakehousearchitect.com/architecture');
+    expect(urls).toContain('https://lakehousearchitect.com/');
+    expect(sitemapResult.length).toBeGreaterThanOrEqual(10);
   });
 });

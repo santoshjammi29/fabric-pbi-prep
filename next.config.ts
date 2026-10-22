@@ -10,6 +10,19 @@ const withBundleAnalyzer = bundleAnalyzer({
   openAnalyzer: false,
 });
 
+const cspPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://cdn.lakehousearchitect.com https://img.clerk.com https://challenges.cloudflare.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com https://*.upstash.io https://*.supabase.co",
+  "frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
@@ -18,7 +31,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "framer-motion", "sonner", "@tanstack/react-virtual"],
   },
   images: {
-    unoptimized: true,
+    unoptimized: false,
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -48,6 +61,7 @@ const nextConfig: NextConfig = {
           { key: "X-DNS-Prefetch-Control", value: "on" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
           { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Content-Security-Policy", value: cspPolicy },
         ],
       },
       {
@@ -87,7 +101,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/api/(.*)",
+        source: "/api/((?!customer-workers|progress).*)",
         headers: [
           { key: "Cache-Control", value: "public, s-maxage=3600, stale-while-revalidate=86400" },
         ],
@@ -98,10 +112,38 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "private, no-store, max-age=0" },
         ],
       },
+      {
+        source: "/api/progress",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
+        ],
+      },
     ];
   },
   async redirects() {
     return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "moderndataengineer.uk",
+          },
+        ],
+        destination: "https://lakehousearchitect.com/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.moderndataengineer.uk",
+          },
+        ],
+        destination: "https://lakehousearchitect.com/:path*",
+        permanent: true,
+      },
       {
         source: "/:path*",
         has: [
@@ -146,28 +188,38 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: "/python",
-        destination: "/guided-learning?topic=python",
-        permanent: true,
-      },
-      {
-        source: "/diagnostic",
-        destination: "/learning-paths",
-        permanent: true,
-      },
-      {
-        source: "/data-engineering-mindmap",
-        destination: "/mindmap",
+        source: "/chrome-devtools",
+        destination: "/concepts",
         permanent: false,
       },
       {
-        source: "/de-mindmap",
-        destination: "/mindmap",
-        permanent: false,
+        source: "/concepts/glossary",
+        destination: "/concepts",
+        permanent: true,
       },
       {
-        source: "/cheatsheet",
-        destination: "/cheat-sheet",
+        source: "/concepts/overview",
+        destination: "/concepts",
+        permanent: true,
+      },
+      {
+        source: "/concepts/mindmap",
+        destination: "/concepts?tab=mindmap",
+        permanent: true,
+      },
+      {
+        source: "/concepts/all",
+        destination: "/concepts?tab=concepts",
+        permanent: true,
+      },
+      {
+        source: "/mindmap",
+        destination: "/concepts?tab=mindmap",
+        permanent: true,
+      },
+      {
+        source: "/prep",
+        destination: "/qa-prep",
         permanent: true,
       },
       {
@@ -176,28 +228,33 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/blueprints",
+        destination: "/architecture?tab=diagrams",
+        permanent: true,
+      },
+      {
         source: "/scenarios",
         destination: "/architecture?tab=scenarios",
         permanent: true,
       },
       {
-        source: "/diagrams",
-        destination: "/architecture?tab=diagrams",
+        source: "/system-design",
+        destination: "/architecture?tab=scenarios",
         permanent: true,
       },
       {
-        source: "/questions",
-        destination: "/qa-prep",
+        source: "/runbooks",
+        destination: "/cheat-sheet",
         permanent: true,
       },
       {
-        source: "/spark",
-        destination: "/spark-engine",
+        source: "/lifecycle",
+        destination: "/dataops",
         permanent: true,
       },
       {
-        source: "/gcc",
-        destination: "/company-research",
+        source: "/ci-cd",
+        destination: "/dataops",
         permanent: true,
       },
     ];

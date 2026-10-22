@@ -2,6 +2,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+const ALLOWED_ORIGINS = new Set([
+  'https://lakehousearchitect.com',
+  'https://www.lakehousearchitect.com',
+  'https://moderndataengineer.uk',
+  'https://www.moderndataengineer.uk',
+]);
+
+function setCorsHeaders(headers: Headers, request: Request | NextRequest) {
+  const origin = request.headers.get('origin');
+  if (!origin) return;
+
+  const isLocalhost =
+    process.env.NODE_ENV !== 'production' &&
+    /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+  if (ALLOWED_ORIGINS.has(origin) || isLocalhost) {
+    headers.set('Access-Control-Allow-Origin', origin);
+    headers.set('Vary', 'Origin');
+    headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+}
+
+export async function OPTIONS(request: NextRequest) {
+  const headers = new Headers();
+  setCorsHeaders(headers, request);
+  return new NextResponse(null, { status: 204, headers });
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
@@ -21,7 +50,7 @@ export async function GET(
         const headers = new Headers();
         object.writeHttpMetadata(headers);
         headers.set('etag', object.httpEtag);
-        headers.set('Access-Control-Allow-Origin', '*');
+        setCorsHeaders(headers, request);
 
         if (objectKey.endsWith('manifest.json')) {
           headers.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
@@ -46,7 +75,7 @@ export async function GET(
     if (fs.existsSync(localPath) && fs.statSync(localPath).isFile()) {
       const fileBuffer = fs.readFileSync(localPath);
       const headers = new Headers();
-      headers.set('Access-Control-Allow-Origin', '*');
+      setCorsHeaders(headers, request);
 
       if (objectKey.endsWith('.json')) {
         headers.set('Content-Type', 'application/json; charset=utf-8');
