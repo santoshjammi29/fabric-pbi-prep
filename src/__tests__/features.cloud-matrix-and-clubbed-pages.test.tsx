@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { ModernStackClient } from "@/app/modern-stack/modern-stack-client";
 import {
   NAV_GROUPS,
   ALL_FLAT_PAGES_AND_SUBPAGES,
@@ -184,6 +185,40 @@ describe("Cloud × Table Matrix First & Consolidated Clubbed Pages Verification"
       expect(screen.getByText("Guided Learning")).toBeDefined();
       expect(screen.getByText("Career Curricula")).toBeDefined();
       expect(screen.getByText("My Studio")).toBeDefined();
+    });
+  });
+
+  describe("8. Subtab Navigation without unwanted scroll jumps", () => {
+    it("switches subtabs without invoking window or element scroll", () => {
+      const scrollIntoViewMock = vi.fn();
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+      const replaceStateSpy = vi.spyOn(window.history, "replaceState");
+
+      render(
+        <ModernStackClient
+          initialModernStack={{
+            stack: [],
+            blueprints: [],
+            matrix: [],
+            costPlaybooks: [],
+            concepts: [],
+            subdomains: [],
+          }}
+          initialPython={[]}
+        />
+      );
+
+      const overviewBtn = screen.getByRole("button", { name: /Hub Overview/i });
+      fireEvent.click(overviewBtn);
+
+      // Verify URL updated with ?tab=overview and no hash
+      expect(replaceStateSpy).toHaveBeenCalled();
+      const lastCallUrl = replaceStateSpy.mock.calls[replaceStateSpy.mock.calls.length - 1][2] as string;
+      expect(lastCallUrl).toContain("tab=overview");
+      expect(lastCallUrl).not.toContain("#overview");
+
+      // Verify scrollIntoView was NEVER called during tab click
+      expect(scrollIntoViewMock).not.toHaveBeenCalled();
     });
   });
 });

@@ -106,7 +106,6 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
   const pysparkData = initialPyspark;
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<SparkSubtab>("architecture");
-  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const simTimersRef = useRef<NodeJS.Timeout[]>([]);
 
   const clearSimTimers = useCallback(() => {
@@ -148,7 +147,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       url.searchParams.set("tab", tabId);
-      url.hash = tabId;
+      url.hash = "";
       window.history.replaceState(null, "", url.toString());
     }
     const tabLabels: Record<SparkSubtab, string> = {
@@ -160,7 +159,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
     };
     recordLastTopic({
       title: tabLabels[tabId] || "Spark Engine Hub",
-      href: `/spark-engine?tab=${tabId}#${tabId}`,
+      href: `/spark-engine?tab=${tabId}`,
       category: "Spark Engine Hub",
       progress: 50,
     });
@@ -196,11 +195,6 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
       if (target && validTabs.includes(target as SparkSubtab)) {
         setActiveTab(target as SparkSubtab);
-        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-        scrollTimerRef.current = setTimeout(() => {
-          const el = document.getElementById(target);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 50);
       }
 
       if (queryFlow && ["narrow", "wide", "broadcast", "aggregation"].includes(queryFlow)) {
@@ -214,7 +208,6 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
     return () => {
       window.removeEventListener("hashchange", syncTabFromLocation);
       window.removeEventListener("popstate", syncTabFromLocation);
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
       clearSimTimers();
     };
   }, [clearSimTimers]);
@@ -234,11 +227,6 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
 
     if (queryTab && validTabs.includes(queryTab as SparkSubtab)) {
       setActiveTab(queryTab as SparkSubtab);
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-      scrollTimerRef.current = setTimeout(() => {
-        const el = document.getElementById(queryTab);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 50);
     }
 
     if (queryFlow && ["narrow", "wide", "broadcast", "aggregation"].includes(queryFlow)) {
@@ -494,6 +482,7 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
           return (
             <button
               key={tab.id}
+              type="button"
               onClick={() => handleTabChange(tab.id as SparkSubtab)}
               className={cn(
                 "flex items-center gap-1.5 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",

@@ -82,14 +82,13 @@ export function ModernStackClient(props: ModernStackClientProps) {
   const pythonData = props.initialPython;
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<ModernSubtab>("compatibility");
-  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleTabChange = useCallback((tabId: ModernSubtab) => {
     setActiveTab(tabId);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       url.searchParams.set("tab", tabId);
-      url.hash = tabId;
+      url.hash = "";
       window.history.replaceState(null, "", url.toString());
     }
   }, []);
@@ -99,7 +98,6 @@ export function ModernStackClient(props: ModernStackClientProps) {
       const hash = window.location.hash.replace("#", "").toLowerCase();
       const params = new URLSearchParams(window.location.search);
       const queryTab = params.get("tab")?.toLowerCase();
-      const target = hash || queryTab;
 
       const validTabs: ModernSubtab[] = [
         "compatibility",
@@ -120,14 +118,6 @@ export function ModernStackClient(props: ModernStackClientProps) {
       } else if (!queryTab && !hash) {
         setActiveTab("compatibility");
       }
-
-      if (hash) {
-        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-        scrollTimerRef.current = setTimeout(() => {
-          const el = document.getElementById(hash);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }, 200);
-      }
     };
 
     syncTabFromLocation();
@@ -136,7 +126,6 @@ export function ModernStackClient(props: ModernStackClientProps) {
     return () => {
       window.removeEventListener("hashchange", syncTabFromLocation);
       window.removeEventListener("popstate", syncTabFromLocation);
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
     };
   }, []);
 
@@ -157,11 +146,6 @@ export function ModernStackClient(props: ModernStackClientProps) {
 
     if (queryTab && validTabs.includes(queryTab as ModernSubtab)) {
       setActiveTab(queryTab as ModernSubtab);
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-      scrollTimerRef.current = setTimeout(() => {
-        const el = document.getElementById(queryTab);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }, 150);
     } else if (!queryTab) {
       setActiveTab("compatibility");
     }
@@ -515,6 +499,7 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
           return (
             <button
               key={tab.id}
+              type="button"
               onClick={() => handleTabChange(tab.id as ModernSubtab)}
               className={cn(
                 "flex items-center gap-1.5 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer",
