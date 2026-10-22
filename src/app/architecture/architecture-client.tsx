@@ -40,6 +40,11 @@ import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-bo
 import { architectureDiagrams } from "@/data/diagrams";
 import { ArchitectureDiagramsGallery } from "@/components/architecture/diagrams-gallery";
 import {
+  KeywordFilterBar,
+  ARCH_KEYWORDS,
+  type ArchKeywordGroup,
+} from "@/components/architecture/keyword-filter-bar";
+import {
   ArchitectureQuestion,
   Difficulty,
   CodeSheetItem,
@@ -481,6 +486,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const deferredSearch = useDeferredValue(searchQuery);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [selectedKeyword, setSelectedKeyword] = useState<string>("ALL");
+  const [selectedKeywordGroup, setSelectedKeywordGroup] = useState<ArchKeywordGroup>("ALL");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isReadAllMode, setIsReadAllMode] = useState(false);
   const [collapsedInReadMode, setCollapsedInReadMode] = useState<Set<string>>(new Set());
@@ -630,6 +637,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       const catParam = params.get("category");
       const diffParam = params.get("difficulty");
       const levelParam = params.get("level");
+      const kwParam = params.get("keyword") || params.get("kw");
 
       if (qParam) {
         setSearchQuery(qParam);
@@ -637,6 +645,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
       if (catParam) setSelectedCategory(catParam);
       if (diffParam) setSelectedDifficulty(diffParam);
+      if (kwParam) setSelectedKeyword(kwParam);
       if (levelParam && ["all", "beginner", "intermediate", "advanced", "architect"].includes(levelParam)) {
         setSelectedPyLevel(levelParam as CodeLevel);
       }
@@ -733,6 +742,19 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       if (selectedCategory !== "ALL" && item.category !== selectedCategory) {
         return false;
       }
+      if (selectedKeyword !== "ALL") {
+        const kwObj = ARCH_KEYWORDS.find((k) => k.id === selectedKeyword);
+        if (kwObj) {
+          const q = kwObj.query.toLowerCase();
+          const inQuestion = item.question.toLowerCase().includes(q);
+          const inAnswer = item.answer?.toLowerCase().includes(q) ?? false;
+          const inCategory = item.category?.toLowerCase().includes(q) ?? false;
+          const inNiche = item.niche?.toLowerCase().includes(q) ?? false;
+          if (!inQuestion && !inAnswer && !inCategory && !inNiche) {
+            return false;
+          }
+        }
+      }
       if (deferredSearch.trim()) {
         const q = deferredSearch.toLowerCase();
         const inQuestion = item.question.toLowerCase().includes(q);
@@ -743,7 +765,7 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
       }
       return true;
     });
-  }, [deferredSearch, selectedDifficulty, selectedCategory]);
+  }, [deferredSearch, selectedDifficulty, selectedCategory, selectedKeyword]);
 
   const displayedFilteredItems = useMemo(() => {
     if (!isShuffled) return filteredItems;
@@ -992,18 +1014,31 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
   const hasActiveScenarioFilters =
     selectedCategory !== "ALL" ||
     selectedDifficulty !== "ALL" ||
+    selectedKeyword !== "ALL" ||
     searchQuery.trim().length > 0;
 
   const handleResetScenarioFilters = useCallback(() => {
     setSelectedCategory("ALL");
     setSelectedDifficulty("ALL");
+    setSelectedKeyword("ALL");
+    setSelectedKeywordGroup("ALL");
     setSearchQuery("");
     setIsShuffled(false);
     setVisibleCount(initialBatch);
     updateUrlParam("category", "ALL");
     updateUrlParam("difficulty", "ALL");
+    updateUrlParam("keyword", "ALL");
     toast.info("Reset all scenario filters");
   }, [initialBatch, updateUrlParam]);
+
+  const handleKeywordChange = useCallback(
+    (kwId: string) => {
+      setSelectedKeyword(kwId);
+      setVisibleCount(initialBatch);
+      updateUrlParam("keyword", kwId);
+    },
+    [initialBatch, updateUrlParam]
+  );
 
   const hasActivePyFilters =
     selectedPyFramework !== "all" ||
@@ -1161,6 +1196,20 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
                   },
                 ]
               : []),
+            ...(selectedKeyword !== "ALL"
+              ? [
+                  {
+                    id: "keyword",
+                    label: `Keyword: ${ARCH_KEYWORDS.find((k) => k.id === selectedKeyword)?.label || selectedKeyword}`,
+                    color: "bg-purple-500/10 border-purple-500/30 text-purple-400 font-semibold",
+                    onRemove: () => {
+                      setSelectedKeyword("ALL");
+                      setVisibleCount(initialBatch);
+                      updateUrlParam("keyword", "ALL");
+                    },
+                  },
+                ]
+              : []),
             ...(selectedDifficulty !== "ALL"
               ? [
                   {
@@ -1287,7 +1336,14 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
 
       {/* 3. SYSTEM SCENARIOS VIEW */}
       {activeTab === "scenarios" && (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="space-y-4 animate-in fade-in duration-300">
+          {/* Keyword Filters Section (36 Architectural Focus Areas) */}
+          <KeywordFilterBar
+            selectedKeyword={selectedKeyword}
+            onSelectKeyword={handleKeywordChange}
+            selectedGroup={selectedKeywordGroup}
+            onSelectGroup={setSelectedKeywordGroup}
+          />
 
           {/* Results Meta */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted-foreground)] px-1">
