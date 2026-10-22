@@ -28,14 +28,6 @@
   ],
   "routes": [
     {
-      "pattern": "lakehousearchitect.com",
-      "custom_domain": true
-    },
-    {
-      "pattern": "www.lakehousearchitect.com",
-      "custom_domain": true
-    },
-    {
       "pattern": "moderndataengineer.uk",
       "custom_domain": true
     },
@@ -45,7 +37,7 @@
     }
   ],
   "vars": {
-    "NEXT_PUBLIC_SITE_URL": "https://lakehousearchitect.com",
+    "NEXT_PUBLIC_SITE_URL": "https://moderndataengineer.uk",
     "NEXT_PUBLIC_CDN_URL": "",
     "ARTIFACT_VERSION": "v2026.10",
     "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAFgJ82U17SKQAtZs"
