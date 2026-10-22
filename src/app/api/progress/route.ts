@@ -92,25 +92,25 @@ export async function GET(request: Request) {
       );
     }
 
-    // Backwards-compatibility check: if record was saved in legacy format (raw progress object)
+    // Enforce strict ownership verification on all stored records
     const isObjectRecord = typeof rawRecord === "object" && rawRecord !== null;
-    const isLegacyFormat =
-      !isObjectRecord ||
-      !("data" in (rawRecord as Record<string, any>) &&
-        ("ownerTokenHash" in (rawRecord as Record<string, any>) || "clerkUserId" in (rawRecord as Record<string, any>)));
-    if (isLegacyFormat) {
+    const hasValidOwnership =
+      isObjectRecord &&
+      "data" in (rawRecord as Record<string, any>) &&
+      Boolean(
+        (rawRecord as Record<string, any>).ownerTokenHash ||
+        (rawRecord as Record<string, any>).clerkUserId
+      );
+
+    // If an unverified legacy record exists in cache without ownership bounds,
+    // deny unauthenticated read access completely to prevent bypass vulnerabilities.
+    if (!hasValidOwnership) {
       return NextResponse.json(
         {
-          success: true,
-          data: rawRecord,
-          edgeRegion: request.headers.get("cf-ray")?.split("-").pop() || process.env.CF_REGION || "edge",
+          success: false,
+          error: "Forbidden: Unverified progress record requires owner authentication update.",
         },
-        {
-          headers: {
-            "Cache-Control": "private, no-cache, no-store, must-revalidate",
-            "X-Edge-Sync-Latency": "<100ms",
-          },
-        }
+        { status: 403 }
       );
     }
 

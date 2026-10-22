@@ -2,13 +2,33 @@ import { NextResponse } from "next/server";
 import { queryQuestionsDAL } from "@/lib/dal";
 import { Difficulty } from "@/types/data";
 
+const MAX_LIMIT = 100;
+const DEFAULT_LIMIT = 25;
+const MAX_QUERY_LENGTH = 160;
+
+const VALID_DIFFICULTIES = new Set(["ALL", "BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT"]);
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const q = searchParams.get("q") || "";
-  const difficulty = (searchParams.get("difficulty")?.toUpperCase() || "ALL") as Difficulty | "ALL";
-  const domain = searchParams.get("domain") || "ALL";
-  const page = parseInt(searchParams.get("page") || "1", 10);
-  const limit = parseInt(searchParams.get("limit") || "25", 10);
+
+  // 1. Sanitize and clamp query text
+  const rawQ = searchParams.get("q") || "";
+  const q = rawQ.trim().slice(0, MAX_QUERY_LENGTH);
+
+  // 2. Validate difficulty
+  const rawDiff = (searchParams.get("difficulty") || "ALL").toUpperCase();
+  const difficulty = (VALID_DIFFICULTIES.has(rawDiff) ? rawDiff : "ALL") as Difficulty | "ALL";
+
+  // 3. Sanitize domain
+  const rawDomain = (searchParams.get("domain") || "ALL").trim().slice(0, 64);
+  const domain = rawDomain || "ALL";
+
+  // 4. Strict numerical clamping for pagination to prevent Worker Isolate DoS (NEW-BUG-03)
+  const rawPage = parseInt(searchParams.get("page") || "1", 10);
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? Math.min(rawPage, 10000) : 1;
+
+  const rawLimit = parseInt(searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, MAX_LIMIT) : DEFAULT_LIMIT;
 
   const result = await queryQuestionsDAL({
     query: q,

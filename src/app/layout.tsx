@@ -160,11 +160,7 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} dark antialiased bg-[var(--background)] text-[var(--foreground)]`}
     >
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');var c=document.documentElement.classList;c.remove('dark','light','grey','e-ink');if(t==='light'){c.add('light');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f8f8fc';}else if(t==='grey'){c.add('grey');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#18191c';}else if(t==='e-ink'){c.add('e-ink');document.documentElement.style.colorScheme='light';document.documentElement.style.backgroundColor='#f7f6f2';}else{c.add('dark');document.documentElement.style.colorScheme='dark';document.documentElement.style.backgroundColor='#0A0A0B';}var s=localStorage.getItem('fabric_text_size');c.remove('text-size-sm','text-size-base','text-size-lg','text-size-xl','text-size-2xl');if(s&&['sm','base','lg','xl','2xl'].indexOf(s)!==-1){c.add('text-size-'+s);var pct={sm:'90%',base:'100%',lg:'110%',xl:'120%','2xl':'130%'}[s];if(pct)document.documentElement.style.setProperty('--text-scale',pct);}else{c.add('text-size-base');}}catch(e){}})();`,
-          }}
-        />
+        <script src="/theme-init.js" />
         <style dangerouslySetInnerHTML={{ __html: `
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
         `}} />

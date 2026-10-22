@@ -57,4 +57,35 @@ describe("Artifacts API CORS Restrictions (BUG-17)", () => {
     expect(response.headers.get("Access-Control-Allow-Origin")).toBe("https://lakehousearchitect.com");
     expect(response.headers.get("Access-Control-Allow-Methods")).toContain("GET");
   });
+
+  it("blocks path traversal attacks attempting to escape base dir (NEW-BUG-04)", async () => {
+    // 1. Direct parent directory traversal attempt
+    const traversalReq1 = new NextRequest(
+      new Request("http://localhost:3000/api/artifacts/../../package.json")
+    );
+    const res1 = await GET(traversalReq1, {
+      params: Promise.resolve({ path: ["..", "..", "package.json"] }),
+    });
+    expect(res1.status).toBe(400);
+    const body1 = await res1.json();
+    expect(body1.error).toContain("Path traversal");
+
+    // 2. Encoded dot-dot-slash attempt
+    const traversalReq2 = new NextRequest(
+      new Request("http://localhost:3000/api/artifacts/%2e%2e/%2e%2e/package.json")
+    );
+    const res2 = await GET(traversalReq2, {
+      params: Promise.resolve({ path: ["%2e%2e", "%2e%2e", "package.json"] }),
+    });
+    expect(res2.status).toBe(400);
+
+    // 3. Absolute path injection attempt
+    const traversalReq3 = new NextRequest(
+      new Request("http://localhost:3000/api/artifacts/etc/passwd")
+    );
+    const res3 = await GET(traversalReq3, {
+      params: Promise.resolve({ path: ["..", "etc", "passwd"] }),
+    });
+    expect(res3.status).toBe(400);
+  });
 });

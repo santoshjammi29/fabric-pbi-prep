@@ -153,4 +153,25 @@ describe("API Progress Security & Tamper Protection (BUG-03 / BUG-04)", () => {
     const verifyData = await verifyRes.json();
     expect(verifyData.data.xp).toBe(1000);
   });
+
+  it("prevents legacy format record auth bypass (NEW-BUG-01)", async () => {
+    // Simulate an unverified legacy record planted in cache without ownership fields
+    await edgeCache.set("user_progress:usr_alice", {
+      xp: 9999,
+      tier: "Hacked",
+    });
+
+    // Attacker tries to read it using an arbitrary token
+    const attackerReq = new Request("http://localhost:3000/api/progress?userId=usr_alice", {
+      headers: {
+        "Authorization": "Bearer any_attacker_token",
+      },
+    });
+
+    const response = await GET(attackerReq);
+    expect(response.status).toBe(403);
+    const body = await response.json();
+    expect(body.success).toBe(false);
+    expect(body.error).toContain("Unverified progress record requires owner authentication");
+  });
 });

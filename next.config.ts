@@ -12,7 +12,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const cspPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com",
+  "script-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://cdn.lakehousearchitect.com https://img.clerk.com https://challenges.cloudflare.com",
   "font-src 'self' data:",
@@ -152,7 +152,7 @@ const nextConfig: NextConfig = {
             value: "fabric-pbi-prep.vercel.app",
           },
         ],
-        destination: "https://lakehousearchitect.com/:path*",
+        destination: "https://moderndataengineer.uk/:path*",
         permanent: true,
       },
       {
@@ -163,7 +163,7 @@ const nextConfig: NextConfig = {
             value: "lakehouse-architect.vercel.app",
           },
         ],
-        destination: "https://lakehousearchitect.com/:path*",
+        destination: "https://moderndataengineer.uk/:path*",
         permanent: true,
       },
       {
@@ -174,7 +174,7 @@ const nextConfig: NextConfig = {
             value: "lakehousearchitect.vercel.app",
           },
         ],
-        destination: "https://lakehousearchitect.com/:path*",
+        destination: "https://moderndataengineer.uk/:path*",
         permanent: true,
       },
       {
