@@ -337,6 +337,40 @@ function SidebarInner() {
                         </>
                       )}
                     </Link>
+                    {/* Sub-navigation items when parent is active */}
+                    {active && !collapsed && item.subItems && item.subItems.length > 0 && (
+                      <ul className="ml-6 pl-2.5 border-l border-[var(--border)] my-1 space-y-0.5">
+                        {item.subItems.map((sub) => {
+                          const isSubActive = isSubHrefActive(pathname, searchParams, sub.href);
+                          return (
+                            <li key={sub.href}>
+                              <Link
+                                href={sub.href}
+                                scroll={false}
+                                onClick={() => {
+                                  if (isMobile && !collapsed) {
+                                    toggleCollapsed();
+                                  }
+                                }}
+                                className={cn(
+                                  "flex items-center justify-between px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150",
+                                  isSubActive
+                                    ? "bg-blue-600/10 text-blue-500 font-semibold"
+                                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-3)]"
+                                )}
+                              >
+                                <span>{sub.label}</span>
+                                {sub.badge && (
+                                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[var(--surface-3)] text-[var(--muted-foreground)]">
+                                    {sub.badge}
+                                  </span>
+                                )}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}

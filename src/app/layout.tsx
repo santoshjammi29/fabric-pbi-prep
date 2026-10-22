@@ -250,7 +250,14 @@ export default function RootLayout({
             type="speculationrules" 
             strategy="afterInteractive"
             dangerouslySetInnerHTML={{
-              __html: `{"prefetch": [{"where": {"href_matches": "/*"}, "eagerness": "moderate"}], "prerender": [{"urls": ["/concepts", "/qa-prep", "/guided-learning", "/architecture"]}]}`
+              __html: JSON.stringify({
+                prefetch: [
+                  {
+                    where: { href_matches: "/*" },
+                    eagerness: "conservative"
+                  }
+                ]
+              })
             }}
           />
           {/* Global WebSite & Organization Structured Data for Google Rich Snippets */}

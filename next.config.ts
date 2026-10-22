@@ -63,6 +63,30 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/api/artifacts/manifest.json",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=60, s-maxage=120, stale-while-revalidate=300" },
+        ],
+      },
+      {
+        source: "/api/artifacts/shards/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/api/artifacts/blueprints/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/api/artifacts/cheat-sheets/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
         source: "/api/(.*)",
         headers: [
           { key: "Cache-Control", value: "public, s-maxage=3600, stale-while-revalidate=86400" },
@@ -114,6 +138,11 @@ const nextConfig: NextConfig = {
       {
         source: "/security.txt",
         destination: "/.well-known/security.txt",
+        permanent: true,
+      },
+      {
+        source: "/learn",
+        destination: "/guided-learning",
         permanent: true,
       },
       {

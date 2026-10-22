@@ -61,10 +61,42 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Platform",
     items: [
       { label: "Home Dashboard", href: "/", icon: Home },
-      { label: "Cloud × Table Matrix", href: "/modern-stack", icon: Zap, pill: { text: "Matrix", variant: "easy" } },
-      { label: "Architecture Scenarios", href: "/architecture", icon: Layers, pill: { text: "3.2k+", variant: "architect" } },
+      {
+        label: "Cloud × Table Matrix",
+        href: "/modern-stack",
+        icon: Zap,
+        pill: { text: "Matrix", variant: "easy" },
+        subItems: [
+          { label: "Cloud Matrix", href: "/modern-stack?tab=compatibility" },
+          { label: "FinOps Playbooks", href: "/modern-stack?tab=cost" },
+          { label: "Modern Blueprints", href: "/modern-stack?tab=blueprints" },
+          { label: "Polyglot Matrix", href: "/modern-stack?tab=matrix" },
+        ],
+      },
+      {
+        label: "Architecture Scenarios",
+        href: "/architecture",
+        icon: Layers,
+        pill: { text: "3.2k+", variant: "architect" },
+        subItems: [
+          { label: "System Blueprints", href: "/architecture?tab=scenarios", badge: "3.2k" },
+          { label: "Whiteboard Diagrams", href: "/architecture?tab=diagrams", badge: "32" },
+          { label: "Python Runbooks", href: "/architecture?tab=python", badge: "42" },
+        ],
+      },
       { label: "Spark Engine Lab", href: "/spark-engine", icon: Cpu, pill: { text: "Spark", variant: "medium" } },
-      { label: "DataOps & CI/CD", href: "/dataops", icon: Workflow, pill: { text: "E2E", variant: "info" } },
+      {
+        label: "DataOps & CI/CD",
+        href: "/dataops",
+        icon: Workflow,
+        pill: { text: "E2E", variant: "info" },
+        subItems: [
+          { label: "Tool Connectivity", href: "/dataops?tab=connectivity" },
+          { label: "CI/CD Pipelines", href: "/dataops?tab=cicd" },
+          { label: "Lifecycle Playbook", href: "/dataops?tab=lifecycle" },
+          { label: "Architecture Flow", href: "/dataops?tab=diagram" },
+        ],
+      },
     ],
   },
   {
@@ -72,8 +104,28 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Concepts Glossary", href: "/concepts", icon: BookOpen, pill: { text: "660+", variant: "easy" } },
       { label: "Concepts Mind Map", href: "/mindmap", icon: GitBranch, pill: { text: "Tree", variant: "info" } },
-      { label: "Code Practice", href: "/code-practice", icon: Code2, pill: { text: "Drills", variant: "medium" } },
-      { label: "Cheat Sheets", href: "/cheat-sheet", icon: FileCode2, pill: { text: "Sheets", variant: "medium" } },
+      {
+        label: "Code Practice",
+        href: "/code-practice",
+        icon: Code2,
+        pill: { text: "Drills", variant: "medium" },
+        subItems: [
+          { label: "PySpark Drills", href: "/code-practice?db=pyspark", badge: "43" },
+          { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", badge: "44" },
+          { label: "T-SQL Drills", href: "/code-practice?db=mssql", badge: "35" },
+          { label: "Python & Polars", href: "/code-practice?db=python", badge: "42" },
+        ],
+      },
+      {
+        label: "Cheat Sheets",
+        href: "/cheat-sheet",
+        icon: FileCode2,
+        pill: { text: "Sheets", variant: "medium" },
+        subItems: [
+          { label: "Production Runbooks", href: "/cheat-sheet?tab=runbooks", badge: "69" },
+          { label: "Databricks Suites", href: "/cheat-sheet?tab=databricks", badge: "48" },
+        ],
+      },
     ],
   },
   {
@@ -81,7 +133,16 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Question Drill Bank", href: "/qa-prep", icon: MessageSquare, pill: { text: "7.1k+", variant: "hard" } },
       { label: "Target Company Intel", href: "/company-research", icon: Briefcase, pill: { text: "156+", variant: "new" } },
-      { label: "Guided Learning", href: "/guided-learning", icon: Route, pill: { text: "Tracks", variant: "info" } },
+      {
+        label: "Guided Learning",
+        href: "/guided-learning",
+        icon: Route,
+        pill: { text: "Tracks", variant: "info" },
+        subItems: [
+          { label: "Topic Tracks", href: "/guided-learning" },
+          { label: "Career Curricula", href: "/learning-paths" },
+        ],
+      },
       { label: "Career Curricula", href: "/learning-paths", icon: GraduationCap, pill: { text: "Roadmap", variant: "info" } },
     ],
   },
@@ -99,6 +160,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   
   // Learning Journey
   { id: "guided-learning", label: "Guided Topic Tracks", shortLabel: "Topic Tracks", href: "/guided-learning", category: "Journey", categoryColor: "indigo", icon: Route, badge: "Path" },
+  { id: "learn", label: "Learning Portal", shortLabel: "Learn", href: "/learn", category: "Journey", categoryColor: "indigo", icon: Route, badge: "Learn" },
   { id: "learning-paths", label: "Career Curricula", shortLabel: "Career Paths", href: "/learning-paths", category: "Journey", categoryColor: "indigo", icon: GraduationCap, badge: "Curricula" },
   
   // Concepts & Foundations (Clubbed)

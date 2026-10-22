@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.2 — Procedural Navigation Hierarchy, Zero-Egress Client Caching & Cloudflare Deployment Optimization (2026-10-22)
+
+### 🧭 5-Phase Procedural Navigation Hierarchy & Sidebar Subpage Expansion
+- **Structured Procedural Information Architecture**: Reorganized main hubs into a natural chronological learning journey:
+  1. **Foundations & Tracks**: `/` (Home), `/guided-learning` & `/learn`, `/concepts` (660 terms), `/mindmap`.
+  2. **Architecture & Systems**: `/architecture` (3.2k scenarios), `/spark-engine`, `/modern-stack`.
+  3. **Hands-On Coding & Ops**: `/code-practice`, `/cheat-sheet`, `/dataops`.
+  4. **Interview Mastery & Careers**: `/qa-prep` (7.1k questions), `/company-research` (156 GCCs), `/learning-paths`.
+  5. **Workspace & Operations**: `/studio`, `/deployments`.
+- **Nested Subpage Rail Navigation (`src/components/layout/sidebar.tsx`)**: Active hubs automatically reveal their sub-tabs right inside the left navigation rail, enabling instant zero-reload navigation across scenarios, diagrams, runbooks, and engine practice.
+- **Universal `/learn` Route**: Added a permanent redirect from `/learn` to `/guided-learning` in `next.config.ts` and cataloged it in `ALL_FLAT_PAGES_AND_SUBPAGES`.
+
+### ⚡ Zero-Egress Client Caching & Cloudflare Cache Optimization
+- **Speculation Rules De-bloating (`src/app/layout.tsx`)**: Removed the aggressive Speculation Rules `prerender` directive that forced Chromium browsers to background-render and download all 50+ JSON shards (~10MB) on every page visit. Switched to `conservative` hover prefetch.
+- **Persistent IndexedDB Cache Layer (`src/lib/artifact-client.ts`)**: Integrated `idb` (`lakehouse-artifacts-cache-v1`) with in-memory caching. Shards for Q&A (35 shards) and Architecture (17 shards) are fetched once over the network and loaded from local IndexedDB in <3ms on all subsequent visits, switching tabs, or page reloads with **0 bytes of network transfer**.
+- **Granular Cloudflare Cache-Control Headers (`next.config.ts`)**: Differentiated `manifest.json` (`s-maxage=120, stale-while-revalidate=300` for rapid release discovery) from immutable data shards and blueprint WebPs (`max-age=31536000, immutable`), eliminating cache contention and stale data issues.
+
+### 🚀 Resilient & Lightweight Cloudflare Deployment Pipeline
+- **Idempotent R2 Synchronization (`scripts/sync-r2-artifacts.ts`)**: Added automated SHA-256 hash tracking (`.last-synced-hash`). Routine builds now skip all 142 remote object uploads in ~0.1s when data has not changed, preventing deployment timeouts, rate limits, and network aborts.
+- **Fast-Track Deployment Scripts (`package.json`)**:
+  - `npm run deploy:quick`: Builds and deploys the OpenNext Cloudflare worker in ~35 seconds without touching R2 or running heavy content sharding.
+  - `npm run deploy:code`: Fast-track worker deploy directly from existing build artifacts.
+  - `npm run r2:sync:remote:force`: Explicit command to force re-upload all artifacts when desired.
+
+---
+
 ## v1.1 — Databricks 100 Mastery, 6 Delta Lake Optimization Levers & Taxonomy Expansion (2026-10-15)
 
 ### 🚀 Databricks 100 Structured Mastery Challenge

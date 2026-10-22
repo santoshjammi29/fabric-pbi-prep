@@ -1,10 +1,12 @@
 import { execFile } from "node:child_process";
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync, statSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { promisify } from "node:util";
 
 const artifactRoot = path.resolve(".build-artifacts/r2");
 const bucketName = "lakehouse-artifacts";
+const hashFilePath = path.join(artifactRoot, ".last-synced-hash");
 const run = promisify(execFile);
 
 function listFiles(directory: string): string[] {
@@ -46,12 +48,32 @@ async function uploadArtifacts() {
     throw new Error(`No generated artifacts found in ${artifactRoot}. Run "npm run content:shard" first.`);
   }
 
-  // Publish immutable content first. The manifest is the pointer to the current
-  // release, so it must not become visible before every referenced object exists.
   const manifestFiles = files.filter((file) => path.basename(file) === "manifest.json");
   if (manifestFiles.length !== 1) {
     throw new Error(`Expected exactly one manifest.json; found ${manifestFiles.length}.`);
   }
+
+  const manifestPath = manifestFiles[0];
+  const currentManifestHash = crypto
+    .createHash("sha256")
+    .update(readFileSync(manifestPath))
+    .digest("hex");
+
+  const isForce = process.argv.includes("--force");
+  if (!isForce && existsSync(hashFilePath)) {
+    try {
+      const lastHash = readFileSync(hashFilePath, "utf-8").trim();
+      if (lastHash === currentManifestHash) {
+        console.log(
+          `⚡ R2 artifacts are already up-to-date (manifest hash: ${currentManifestHash.slice(0, 12)}). Skipping upload. Use --force to re-upload.`
+        );
+        return;
+      }
+    } catch {}
+  }
+
+  // Publish immutable content first. The manifest is the pointer to the current
+  // release, so it must not become visible before every referenced object exists.
   const contentFiles = files.filter((file) => !manifestFiles.includes(file));
 
   let nextFileIndex = 0;
@@ -63,7 +85,12 @@ async function uploadArtifacts() {
   };
 
   await Promise.all(Array.from({ length: Math.min(6, contentFiles.length) }, uploadNext));
-  await putObject(manifestFiles[0]);
+  await putObject(manifestPath);
+
+  try {
+    writeFileSync(hashFilePath, currentManifestHash, "utf-8");
+  } catch {}
+
   console.log(`Uploaded ${contentFiles.length} content objects and published manifest to ${bucketName}.`);
 }
 

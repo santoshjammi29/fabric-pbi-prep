@@ -13,7 +13,7 @@
 
 ## 🏛️ System Architecture
 
-Built on a **Zero-Bundle Data Architecture**: massive data catalogs stay strictly server-side within React 19 `cache()` Data Access Layers (DAL), serving zero-bundle lightweight JSON payloads to 60 FPS virtualized client surfaces (`@tanstack/react-virtual` + HTML5 `<canvas>`):
+Built on a **Zero-Bundle, Zero-Egress Architecture**: massive data catalogs stay strictly server-side within React 19 `cache()` Data Access Layers (DAL), serving zero-bundle lightweight JSON payloads to 60 FPS virtualized client surfaces (`@tanstack/react-virtual` + HTML5 `<canvas>`). Large dataset shards are persistently cached in the browser's IndexedDB (`idb`), guaranteeing **0 bytes of repeat network egress** across tab switches and page reloads:
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
@@ -26,9 +26,10 @@ Built on a **Zero-Bundle Data Architecture**: massive data catalogs stay strictl
 ┌───────────────────────────┐                   ┌───────────────────────────┐
 │     SERVER DATA LAYER     │                   │   CLIENT BROWSING ENGINE  │
 │  - React 19 cache() DAL   │                   │  - 0 KB Raw JSON Bundled  │
-│  - Sharded R2 Artifacts   │                   │  - TanStack Virtual DOM   │
-│  - Edge SWR API Routes    │                   │  - HTML5 Canvas 60 FPS    │
-│  - Dynamic MinSearch Index│                   │  - Local Progress Sync    │
+│  - Sharded R2 Artifacts   │                   │  - Persistent IndexedDB   │
+│  - Edge SWR API Routes    │                   │  - TanStack Virtual DOM   │
+│  - Dynamic MinSearch Index│                   │  - Zero-Egress Tab Switch │
+│  - Idempotent R2 Syncing  │                   │  - Local Progress Sync    │
 └───────────────────────────┘                   └───────────────────────────┘
 ```
 
@@ -102,8 +103,11 @@ npm test
 # 4. Production build & Cloudflare Workers bundle
 npm run build:cf
 
-# 5. Deploy to Cloudflare Workers with R2 storage artifacts
+# 5. Full production deployment to Cloudflare with idempotent R2 sync
 npm run deploy:cf
+
+# 6. Fast-track code-only deployment (~35 seconds, skips R2 uploads)
+npm run deploy:quick
 ```
 
 ---

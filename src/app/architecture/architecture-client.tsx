@@ -555,7 +555,8 @@ function ArchitectureHubContent(props: ArchitectureClientProps) {
           const results = await Promise.all(
             chunk.map(async (shardMeta) => {
               try {
-                const items = await jsonFetcher<any[]>(getArtifactUrl(shardMeta.key));
+                const cacheKey = `scenarios:${shardMeta.index}:${shardMeta.hash || shardMeta.key}`;
+                const items = await jsonFetcher<any[]>(getArtifactUrl(shardMeta.key), cacheKey);
                 return Array.isArray(items) ? items : [];
               } catch {
                 return [];
