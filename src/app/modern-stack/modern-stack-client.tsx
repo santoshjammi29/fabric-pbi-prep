@@ -701,20 +701,21 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
         <div id="overview" className="space-y-3 animate-in fade-in duration-200">
           {/* Quick Launch Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div
-              onClick={() => handleTabChange("concepts")}
-              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group"
+            <Link
+              href="/concepts?category=MODERN%20LAKEHOUSE"
+              className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] hover:border-purple-500/40 cursor-pointer transition-all space-y-2 group block"
             >
               <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">
                 <BookOpen size={16} />
               </div>
-              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
-                {modernConceptsDb.length} Core Concepts
+              <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] group-hover:text-purple-300 transition-colors flex items-center gap-1.5">
+                Central Concepts Hub (679+)
+                <ExternalLink size={12} className="opacity-70" />
               </h4>
               <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-                CAP theorem, PACELC, Deletion Vectors, Delta UniForm, and Liquid Clustering explained.
+                All 20 Modern Lakehouse concepts merged under single roof with 679+ topics & mind map.
               </p>
-            </div>
+            </Link>
 
             <div
               onClick={() => handleTabChange("simulators")}
@@ -939,6 +940,38 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       {/* ────────────────────────────────────────────────────────── */}
       {activeTab === "concepts" && (
         <div id="concepts" className="space-y-4 animate-in fade-in duration-200">
+          {/* Single-Roof Concepts Consolidation Alert Banner */}
+          <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="p-2 rounded-lg bg-purple-500/20 text-purple-400 shrink-0">
+                <BookOpen size={16} />
+              </span>
+              <div>
+                <div className="font-semibold text-purple-200">
+                  All Concepts Merged Under Single Roof: /concepts
+                </div>
+                <div className="text-[11px] text-purple-300/80">
+                  These 20 Modern Lakehouse concepts are now permanently merged into the 679-concept central glossary, 14-pillar interactive mind map, and flashcards.
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href="/concepts?category=MODERN%20LAKEHOUSE"
+                className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-[11px] transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                <span>Central Concepts Hub</span>
+                <ArrowRight size={12} />
+              </Link>
+              <Link
+                href="/concepts?view=mindmap"
+                className="px-3 py-1.5 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--foreground)] border border-[var(--border)] font-medium text-[11px] transition-colors flex items-center gap-1.5"
+              >
+                <span>Mind Map</span>
+                <ArrowRight size={12} />
+              </Link>
+            </div>
+          </div>
           {/* Controls Bar */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
             <div className="relative flex-1">

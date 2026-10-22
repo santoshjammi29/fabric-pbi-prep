@@ -50,6 +50,27 @@ export function MindmapClient({ concepts }: MindmapClientProps) {
         </div>
       </div>
 
+      {/* Single Roof Notification Banner */}
+      <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300">
+        <div className="flex items-center gap-2">
+          <BookOpen size={14} className="text-blue-400 shrink-0" />
+          <span>
+            <strong>Unified Under One Roof:</strong> This interactive mind map is integrated directly into the master{" "}
+            <Link href="/concepts?view=mindmap" className="underline font-semibold hover:text-white transition-colors">
+              Concepts Hub
+            </Link>{" "}
+            alongside all {concepts.length} definitions, glossary cards, and flashcards.
+          </span>
+        </div>
+        <Link
+          href="/concepts?view=mindmap"
+          className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] shrink-0 inline-flex items-center gap-1 transition-colors"
+        >
+          <span>Open in Concepts Hub</span>
+          <ArrowRight size={11} />
+        </Link>
+      </div>
+
       {/* Integrated Multi-Level Stretching Mind Map */}
       <ConceptsMindmapView concepts={concepts} />
     </div>

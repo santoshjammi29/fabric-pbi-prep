@@ -34,6 +34,9 @@ import dynamic from "next/dynamic";
 import { recordLastTopic } from "@/lib/user-progress";
 import { TopicIcon } from "@/components/ui/topic-icon";
 import { UnifiedSearchFilterBox } from "@/components/ui/unified-search-filter-box";
+import { ConceptsMindmapView } from "@/components/concepts/concepts-mindmap-view";
+
+export type ConceptViewMode = "glossary" | "mindmap" | "study";
 
 const SmoothAccordion = dynamic(
   () => import("@/components/ui/smooth-accordion").then((mod) => mod.SmoothAccordion),
@@ -187,14 +190,31 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
-  // Study Mode State
+  // Unified View Mode State (Glossary, Mindmap, Study)
   const initialViewParam = searchParams.get("view");
-  const [isStudyMode, setIsStudyMode] = useState(initialViewParam === "study");
+  const [viewMode, setViewMode] = useState<ConceptViewMode>(
+    initialViewParam === "mindmap" ? "mindmap" : initialViewParam === "study" ? "study" : "glossary"
+  );
+  const isStudyMode = viewMode === "study";
   const [studyIndex, setStudyIndex] = useState(0);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
 
   const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleViewChange = useCallback((mode: ConceptViewMode) => {
+    setViewMode(mode);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (mode === "glossary") {
+        url.searchParams.delete("view");
+      } else {
+        url.searchParams.set("view", mode);
+      }
+      url.hash = "";
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, []);
 
   const handleShuffle = useCallback(() => {
     setIsShuffled(true);
@@ -224,9 +244,11 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
     const cardParam = searchParams.get("card") || searchParams.get("id");
     const viewParam = searchParams.get("view");
     if (viewParam === "study") {
-      setIsStudyMode(true);
-    } else if (viewParam === "list") {
-      setIsStudyMode(false);
+      setViewMode("study");
+    } else if (viewParam === "mindmap") {
+      setViewMode("mindmap");
+    } else if (viewParam === "list" || viewParam === "glossary" || !viewParam) {
+      setViewMode("glossary");
     }
 
     if (termParam !== null) {
@@ -453,29 +475,90 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
         </div>
       </div>
 
-      {/* ─── UNIFIED SEARCH & SIMPLE COMPACT FILTER BOX ─── */}
-      <UnifiedSearchFilterBox
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={`Search ${initialConcepts.length}+ concepts by term, keyword, or mechanism... (Press / to search)`}
-        matchCount={filteredConcepts.length}
-        totalCount={initialConcepts.length}
-        countUnit="concepts"
-        themeAccent="blue"
-        hasActiveFilters={hasActiveFilters}
-        onResetAll={handleResetAllFilters}
-        actions={{
-          readAll: {
-            isActive: isReadAllMode,
-            onToggle: toggleReadAllMode,
-            shortcut: "⇧E",
-            count: filteredConcepts.length,
-          },
-          studyMode: {
-            isActive: isStudyMode,
-            onToggle: () => setIsStudyMode(!isStudyMode),
-            label: isStudyMode ? "Exit Flashcards" : "Flashcards",
-          },
+      {/* ─── UNIFIED VIEW MODE SWITCHER (Single Roof) ─── */}
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] overflow-x-auto scrollbar-none max-w-fit shadow-xs">
+        <button
+          type="button"
+          onClick={() => handleViewChange("glossary")}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+            viewMode === "glossary"
+              ? "bg-blue-600 text-white shadow-xs font-semibold"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          )}
+        >
+          <BookOpen size={13} />
+          <span>Glossary &amp; Cards ({initialConcepts.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleViewChange("mindmap")}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+            viewMode === "mindmap"
+              ? "bg-blue-600 text-white shadow-xs font-semibold"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          )}
+        >
+          <GitBranch size={13} />
+          <span>Multi-Level Mind Map (14 Pillars)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleViewChange("study")}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap",
+            viewMode === "study"
+              ? "bg-blue-600 text-white shadow-xs font-semibold"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          )}
+        >
+          <Sparkles size={13} />
+          <span>Flashcard Study Mode</span>
+        </button>
+      </div>
+
+      {/* ─── MIND MAP VIEW (Single Roof Integration) ─── */}
+      {viewMode === "mindmap" && (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          <ConceptsMindmapView
+            concepts={initialConcepts}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+        </div>
+      )}
+
+      {/* ─── GLOSSARY & FLASHCARD VIEWS ─── */}
+      {viewMode !== "mindmap" && (
+        <>
+          {/* ─── UNIFIED SEARCH & SIMPLE COMPACT FILTER BOX ─── */}
+          <UnifiedSearchFilterBox
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={`Search ${initialConcepts.length}+ concepts by term, keyword, or mechanism... (Press / to search)`}
+            matchCount={filteredConcepts.length}
+            totalCount={initialConcepts.length}
+            countUnit="concepts"
+            themeAccent="blue"
+            hasActiveFilters={hasActiveFilters}
+            onResetAll={handleResetAllFilters}
+            actions={{
+              readAll: {
+                isActive: isReadAllMode,
+                onToggle: toggleReadAllMode,
+                shortcut: "⇧E",
+                count: filteredConcepts.length,
+              },
+              studyMode: {
+                isActive: isStudyMode,
+                onToggle: () => handleViewChange(viewMode === "study" ? "glossary" : "study"),
+                label: isStudyMode ? "Exit Flashcards" : "Flashcards",
+              },
           shuffle: {
             isShuffled,
             onShuffle: handleShuffle,
@@ -815,6 +898,8 @@ export function ConceptsClient({ initialConcepts, categories, diagrams = [] }: C
             </div>
           )}
         </div>
+      )}
+        </>
       )}
     </div>
   );

@@ -451,6 +451,42 @@ export const TOPIC_PILLARS_CONFIG: Array<{
       },
     ],
   },
+  {
+    id: "modern-lakehouse",
+    categoryKey: "MODERN LAKEHOUSE",
+    title: "Modern Lakehouse & AI Systems",
+    shortTitle: "Modern Lakehouse",
+    icon: "lakehouse",
+    badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+    colorHex: "#06b6d4",
+    description: "Cutting-edge open table formats, in-process compute engines, vector retrieval, and serverless FinOps architectures.",
+    subtopics: [
+      {
+        id: "mod-dist-sys",
+        title: "Distributed Systems & Consistency Models",
+        description: "CAP vs PACELC trade-offs, ScyllaDB thread-per-core C++ engines, and Cosmos DB operational HTAP.",
+        match: ["cap", "pacelc", "scylladb", "seastar", "cosmos", "htap", "consistency", "partition"],
+      },
+      {
+        id: "mod-storage-formats",
+        title: "Modern Table Formats & Storage Primitives",
+        description: "Apache Iceberg hidden partitioning, Delta Deletion Vectors, and Parquet vectorized SIMD decoding.",
+        match: ["iceberg", "deletion vectors", "parquet", "vectorized", "manifest", "roaring bitmap", "simd"],
+      },
+      {
+        id: "mod-compute-engines",
+        title: "Vectorized Compute & In-Process Engines",
+        description: "Databricks Photon C++, Spark 4.0 AQE dynamic coalescing, and DuckDB/Polars Arrow zero-copy analytics.",
+        match: ["photon", "aqe", "duckdb", "polars", "arrow", "serverless", "coalescing"],
+      },
+      {
+        id: "mod-governance-ai",
+        title: "Data Contracts, FinOps & AI Protocols",
+        description: "Unity Catalog 3-level ABAC, Data Mesh ODCS contracts, Model Context Protocol (MCP), and HNSW vector search.",
+        match: ["unity catalog", "abac", "contract", "mesh", "mcp", "hnsw", "vector", "finops", "lineage", "asset bundle", "dab"],
+      },
+    ],
+  },
 ];
 
 /**
