@@ -40,5 +40,7 @@ interface CloudflareEnv {
   NEXT_INC_CACHE_R2_BUCKET: R2Bucket;
   ARTIFACTS_BUCKET: R2Bucket;
   NEXT_PUBLIC_CDN_URL: string;
+  NEXT_PUBLIC_SITE_URL: string;
+  CLOUDFLARE_ACCOUNT_ID: string;
   ARTIFACT_VERSION: string;
 }

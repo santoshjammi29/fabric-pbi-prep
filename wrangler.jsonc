@@ -26,8 +26,20 @@
       "bucket_name": "lakehouse-artifacts"
     }
   ],
+  "routes": [
+    {
+      "pattern": "moderndataengineer.uk",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.moderndataengineer.uk",
+      "custom_domain": true
+    }
+  ],
   "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://moderndataengineer.uk",
     "NEXT_PUBLIC_CDN_URL": "",
-    "ARTIFACT_VERSION": "v2026.10"
+    "ARTIFACT_VERSION": "v2026.10",
+    "CLOUDFLARE_ACCOUNT_ID": "635bafdcd995f6f5dde3ac3d69b3ccc1"
   }
 }

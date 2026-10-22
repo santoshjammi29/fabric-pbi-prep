@@ -9,6 +9,7 @@ const run = promisify(execFile);
 
 function listFiles(directory: string): string[] {
   return readdirSync(directory).flatMap((entry) => {
+    if (entry.startsWith(".")) return [];
     const absolutePath = path.join(directory, entry);
     return statSync(absolutePath).isDirectory()
       ? listFiles(absolutePath)
@@ -16,18 +17,26 @@ function listFiles(directory: string): string[] {
   });
 }
 
-async function putObject(file: string): Promise<void> {
+async function putObject(file: string, maxAttempts = 3): Promise<void> {
   const key = path.relative(artifactRoot, file).split(path.sep).join("/");
-  try {
-    await run(
-      "npx",
-      ["wrangler", "r2", "object", "put", `${bucketName}/${key}`, `--file=${file}`, "--remote"],
-      { maxBuffer: 1024 * 1024 },
-    );
-    console.log(`Uploaded ${key}`);
-  } catch (error) {
-    const details = error as NodeJS.ErrnoException & { stderr?: string };
-    throw new Error(`Failed to upload ${key}: ${details.stderr || details.message}`);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await run(
+        "npx",
+        ["wrangler", "r2", "object", "put", `${bucketName}/${key}`, `--file=${file}`, "--remote"],
+        { maxBuffer: 1024 * 1024, env: process.env },
+      );
+      console.log(`Uploaded ${key}`);
+      return;
+    } catch (error) {
+      const details = error as NodeJS.ErrnoException & { stderr?: string };
+      const message = details.stderr || details.message;
+      if (attempt === maxAttempts) {
+        throw new Error(`Failed to upload ${key} after ${maxAttempts} attempts: ${message}`);
+      }
+      console.warn(`[attempt ${attempt}/${maxAttempts} failed for ${key}]: ${message}. Retrying in ${attempt * 1000}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+    }
   }
 }
 
