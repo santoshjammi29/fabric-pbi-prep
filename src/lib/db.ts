@@ -19,6 +19,7 @@ import type {
   DatabricksSuiteData,
   DataOpsDataset,
   CodeSheetItem,
+  Databricks100Concept,
   ModernStackQuestion,
   ModernBlueprint,
   ModernCodeMatrix,
@@ -30,6 +31,7 @@ import type {
 import dataConceptsJson from "@/data/json/data_concepts.json";
 import dataCheatsheetJson from "@/data/json/data_cheatsheet.json";
 import databricksCheatsheetsJson from "@/data/json/databricks_cheatsheets.json";
+import databricks100Json from "@/data/json/databricks_100.json";
 import dataPathsJson from "@/data/json/data_paths.json";
 import companyProfilesJson from "@/data/json/company_profiles.json";
 import dataPysparkJson from "@/data/json/data_pyspark.json";
@@ -173,6 +175,11 @@ export const serverlessDb = {
   // Databricks Architecture & Coding Cheat Sheets (179 KB)
   async getDatabricksCheatsheetData(): Promise<DatabricksSuiteData> {
     return databricksCheatsheetsJson as DatabricksSuiteData;
+  },
+
+  // Databricks 100 Coding & Operation Guides (135 KB)
+  async getDatabricks100Data(): Promise<Databricks100Concept[]> {
+    return databricks100Json as Databricks100Concept[];
   },
 
   // Learning Paths (29 KB)

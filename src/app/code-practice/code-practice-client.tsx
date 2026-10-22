@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { m, AnimatePresence } from "framer-motion";
 import {
   FileCode2,
@@ -21,6 +21,8 @@ import {
   Terminal,
   Zap,
   Sparkles,
+  Flame,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -105,16 +107,21 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
   const scrollTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const copyTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const dbParam = searchParams.get("db")?.toLowerCase() as LanguageKey | null;
+  const dbParam = searchParams.get("db")?.toLowerCase();
 
   // Reactively sync activeLang whenever searchParams ?db= changes
   useEffect(() => {
-    const validLangs: LanguageKey[] = ["pyspark", "sparksql", "mssql", "python"];
-    if (dbParam && validLangs.includes(dbParam)) {
-      setActiveLang(dbParam);
+    if (dbParam === "databricks") {
+      router.push("/code-practice/databricks");
+      return;
     }
-  }, [dbParam]);
+    const validLangs: LanguageKey[] = ["pyspark", "sparksql", "mssql", "python"];
+    if (dbParam && validLangs.includes(dbParam as LanguageKey)) {
+      setActiveLang(dbParam as LanguageKey);
+    }
+  }, [dbParam, router]);
 
   // Synchronize language tab and item target from URL search parameter (?db=, ?id=, ?q=) or hash (#...)
   useEffect(() => {
@@ -323,6 +330,33 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             Showing <strong className="text-[var(--foreground)]">{filteredItems.length}</strong> of {currentDataset.length} drills ({languageConfigs[activeLang].name})
           </div>
         </div>
+      </div>
+
+      {/* Databricks Dedicated Coding Subpage Banner */}
+      <div className="p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-red-950/30 via-red-900/10 to-[var(--surface-1)] border border-red-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="p-2 rounded-lg bg-red-500/20 text-red-400 shrink-0">
+            <Flame size={16} />
+          </span>
+          <div>
+            <div className="font-semibold text-red-200 flex items-center gap-1.5">
+              <span>Databricks Polyglot Coding Hub Subpage</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-red-500/30 text-red-200">
+                148+ Ops &amp; DBFS
+              </span>
+            </div>
+            <div className="text-[11px] text-red-300/80">
+              Dedicated subpage for all Databricks coding, Spark SQL, PySpark, DBFS &amp; Volumes, Catalyst optimization, and production memory triage (OOM, Spill, Skew).
+            </div>
+          </div>
+        </div>
+        <Link
+          href="/code-practice/databricks"
+          className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium text-xs transition-colors flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+        >
+          <span>Open Databricks Coding Subpage</span>
+          <ArrowRight size={13} />
+        </Link>
       </div>
 
       {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}

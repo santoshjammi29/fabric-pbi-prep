@@ -296,11 +296,37 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
       {/* View Branching */}
       {activeTab === "databricks" ? (
         /* --- DATABRICKS ARCHITECTURE & CODING VIEW --- */
-        <DatabricksCheatsheetView
-          data={databricksData}
-          initialDomain={searchParams.get("domain") || undefined}
-          initialCardId={searchParams.get("card") || undefined}
-        />
+        <div className="space-y-4">
+          {/* Consolidated Subpage Banner */}
+          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="p-2 rounded-lg bg-red-500/20 text-red-400 shrink-0">
+                <Flame size={16} />
+              </span>
+              <div>
+                <div className="font-semibold text-red-200">
+                  All Databricks Coding Consolidated Under Single Subpage: /code-practice/databricks
+                </div>
+                <div className="text-[11px] text-red-300/80">
+                  All Databricks coding sheets, DBFS operations, transformations, Catalyst optimizations, and memory bottleneck playbooks now live in the dedicated Databricks Coding subpage under Code Practice.
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/code-practice/databricks"
+              className="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium text-xs transition-colors flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+            >
+              <span>Go to Databricks Coding Subpage</span>
+              <ArrowRight size={13} />
+            </Link>
+          </div>
+
+          <DatabricksCheatsheetView
+            data={databricksData}
+            initialDomain={searchParams.get("domain") || undefined}
+            initialCardId={searchParams.get("card") || undefined}
+          />
+        </div>
       ) : (
         <div className="space-y-3 sm:space-y-3.5">
           {/* Compact Header Hub Banner */}

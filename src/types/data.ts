@@ -409,6 +409,21 @@ export interface DatabricksSuiteData {
   cards: DatabricksCheatCard[];
 }
 
+export interface Databricks100Concept {
+  id: string;
+  num: number;
+  day: number;
+  concept: string;
+  category: string;
+  categoryId: number;
+  difficulty: "EASY" | "MEDIUM" | "HARD" | "ARCHITECT";
+  summary: string;
+  explanation: string;
+  keyPoints: string[];
+  codeSnippet: string;
+  certificationMapping?: string;
+}
+
 // ==========================================
 // 13. Company Intelligence Profiles
 // ==========================================

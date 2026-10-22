@@ -195,6 +195,7 @@ export function CommandPalette() {
       { id: "nav-qa", title: "Q&A Prep Hub (7,080+ Questions)", category: "Navigation", page: "Q&A Prep", icon: MessageSquare, href: "/qa-prep", badge: "SM-2" },
       { id: "nav-arch", title: "Architecture Hub (3,206+ Scenarios)", category: "Navigation", page: "Architecture Hub", icon: Cpu, href: "/architecture", badge: "Architect" },
       { id: "nav-code", title: "Code Practice (PySpark, SQL, Python)", category: "Navigation", page: "Code Practice", icon: FileCode2, href: "/code-practice", badge: "Polyglot" },
+      { id: "nav-code-dbx", title: "Databricks Coding Hub (148+ Ops, DBFS & Memory Triage)", category: "Code Practice", page: "Code Practice", icon: Flame, href: "/code-practice/databricks", badge: "DBX", keywords: ["databricks", "dbfs", "spark", "sql", "pyspark", "oom", "bottleneck", "d100", "spill", "skew", "volumes"] },
       { id: "nav-spark", title: "Spark Engine & Simulator", category: "Navigation", page: "Spark Engine", icon: Zap, href: "/spark-engine", badge: "Internals" },
       { id: "nav-cheatsheet", title: "Production Cheat Sheet (Spark, dbt, Airflow, SQL)", category: "Navigation", page: "Cheat Sheets", icon: Terminal, href: "/cheat-sheet", badge: "PROD" },
       { id: "nav-modern", title: "Modern Data Stack & AI Architecture", category: "Navigation", page: "Modern Stack", icon: Layers, href: "/modern-stack", badge: "Hard" },

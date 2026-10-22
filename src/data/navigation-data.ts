@@ -114,6 +114,7 @@ export const NAV_GROUPS: NavGroup[] = [
           { label: "Spark SQL Drills", href: "/code-practice?db=sparksql", badge: "44" },
           { label: "T-SQL Drills", href: "/code-practice?db=mssql", badge: "35" },
           { label: "Python & Polars", href: "/code-practice?db=python", badge: "42" },
+          { label: "Databricks Coding", href: "/code-practice/databricks", badge: "148" },
         ],
       },
       {
@@ -184,6 +185,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   { id: "code-sparksql", label: "Spark SQL Drills", shortLabel: "Spark SQL", href: "/code-practice?db=sparksql", category: "Coding", categoryColor: "cyan", icon: Database, badge: "SQL" },
   { id: "code-mssql", label: "T-SQL Drills", shortLabel: "T-SQL", href: "/code-practice?db=mssql", category: "Coding", categoryColor: "cyan", icon: Database, badge: "MSSQL" },
   { id: "code-python", label: "Python & Polars", shortLabel: "Python & Polars", href: "/code-practice?db=python", category: "Coding", categoryColor: "cyan", icon: Code2, badge: "Polars" },
+  { id: "code-databricks", label: "Databricks Coding Hub", shortLabel: "Databricks", href: "/code-practice/databricks", category: "Coding", categoryColor: "cyan", icon: Terminal, badge: "DBX" },
   { id: "code-matrix", label: "Polyglot Code Matrix", shortLabel: "Polyglot Matrix", href: "/modern-stack?tab=matrix", category: "Coding", categoryColor: "cyan", icon: FileCode2, badge: "Matrix" },
   
   // Visual Blueprints & Diagrams (Clubbed)

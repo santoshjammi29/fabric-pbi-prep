@@ -9,6 +9,7 @@ import {
   Difficulty,
   DataOpsDataset,
   DatabricksSuiteData,
+  Databricks100Concept,
 } from "@/types/data";
 
 /**
@@ -110,6 +111,18 @@ export const getCheatsheetDataDAL = cache(async (): Promise<CheatCode[]> => {
 
 export const getDatabricksCheatsheetDataDAL = cache(async (): Promise<DatabricksSuiteData> => {
   return await serverlessDb.getDatabricksCheatsheetData();
+});
+
+export const getDatabricks100DataDAL = cache(async (): Promise<Databricks100Concept[]> => {
+  return await serverlessDb.getDatabricks100Data();
+});
+
+export const getDatabricksCodingHubDAL = cache(async () => {
+  const [suite, operations] = await Promise.all([
+    serverlessDb.getDatabricksCheatsheetData(),
+    serverlessDb.getDatabricks100Data(),
+  ]);
+  return { suite, operations };
 });
 
 // --- 6. MODERN STACK & BLUEPRINTS ---
