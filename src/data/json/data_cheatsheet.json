@@ -1573,5 +1573,163 @@
       "Metadata",
       "Data Quality"
     ]
+  },
+  {
+    "id": "triage-driver-oom-collect",
+    "title": "Triage: Driver Out Of Memory (OOM) via .collect()",
+    "category": "Spark Core",
+    "categorySlug": "spark-core",
+    "impact": "Critical",
+    "effort": "Low Effort",
+    "problem": "Pipeline crashes with 'java.lang.OutOfMemoryError: Java heap space' on the Spark Driver node during wide queries or report exports.",
+    "solution": "Eliminate driver-side materialization (.collect(), .toPandas()). Use distributed writes directly to Delta Lake, limit result sets with .take(N), or switch to PySpark Pandas API (pandas_on_spark) which executes distributed across workers.",
+    "codeSnippet": "# ❌ ANTI-PATTERN: Pulling 20M rows to driver JVM\n# df.collect() \n# df.toPandas()\n\n# ✅ REMEDIATION 1: Write directly to distributed Delta table\ndf.write.format(\"delta\").mode(\"overwrite\").saveAsTable(\"prod.gold.summary\")\n\n# ✅ REMEDIATION 2: Safe bounded preview\nsample_rows = df.limit(500).toPandas()\n\n# ✅ REMEDIATION 3: Distributed Pandas API\nimport pyspark.pandas as ps\nps_df = ps.read_table(\"prod.silver.orders\")\nresult = ps_df.groupby(\"country\").revenue.sum() # Executes on workers, not driver",
+    "language": "python",
+    "whyItMatters": "The driver node is designed strictly for task orchestration and Catalyst query planning. Collecting distributed partitions forces gigabytes of deserialized JVM objects into driver heap, inevitably crashing the entire cluster.",
+    "metrics": "Eliminates 100% of driver crash terminations, saves driver scaling costs",
+    "antiPattern": "Calling df.collect() or df.toPandas() on unaggregated multi-million row datasets.",
+    "tags": [
+      "Driver OOM",
+      "PySpark",
+      "Memory",
+      "Production Failure",
+      "Triage"
+    ]
+  },
+  {
+    "id": "triage-executor-sigkill-137",
+    "title": "Triage: Executor Container Killed (Exit Code 137 / YARN)",
+    "category": "Spark Core",
+    "categorySlug": "spark-core",
+    "impact": "Critical",
+    "effort": "Medium Effort",
+    "problem": "Executors terminate abruptly with 'Container killed by YARN for exceeding memory limits' or 'Exit code 137'. Tasks fail repeatedly until job aborts.",
+    "solution": "Increase spark.executor.memoryOverhead to 20-30% of executor memory to accommodate off-heap Python daemon memory, Arrow serialization buffers, and RocksDB state. Reduce executor core count (e.g., from 8 to 4) to decrease concurrent task memory contention.",
+    "codeSnippet": "# Cluster Spark Configuration (Set in Cluster UI or job JSON):\n# 1. Allocate 25% off-heap buffer for Python/Arrow/C++ allocations\nspark.executor.memoryOverhead 4096m\nspark.executor.memory 16g\n\n# 2. Limit tasks per executor to avoid memory contention\nspark.executor.cores 4\n\n# 3. Restrict Arrow batch size to prevent burst allocations in Python workers\nspark.conf.set(\"spark.sql.execution.arrow.maxRecordsPerBatch\", \"5000\")",
+    "language": "python",
+    "whyItMatters": "YARN / Kubernetes NodeManager actively monitors total container memory (JVM heap + off-heap). When Python workers or native C++ allocations exceed memoryOverhead, the kernel fires SIGKILL 137 immediately.",
+    "metrics": "Zero container terminations, stable memory overhead ceilings",
+    "antiPattern": "Allocating 16+ cores per executor with default 384MB memoryOverhead, causing rapid container eviction under heavy Python transformations.",
+    "tags": [
+      "Executor OOM",
+      "Exit Code 137",
+      "Memory Overhead",
+      "YARN",
+      "Triage"
+    ]
+  },
+  {
+    "id": "triage-join-data-skew-aqe",
+    "title": "Triage: Severe Join Data Skew & Straggler Tasks",
+    "category": "Spark Core",
+    "categorySlug": "spark-core",
+    "impact": "High Impact",
+    "effort": "Low Effort",
+    "problem": "Stage reaches 199/200 tasks in 15 seconds, but the final task runs for 45 minutes on a single CPU core because one key (e.g. country = 'US' or store_id = NULL) holds 80%+ of total data.",
+    "solution": "Enable Adaptive Query Execution (AQE) skew join optimization to split oversized partitions automatically. For extreme skew that exceeds AQE thresholds, apply two-phase random salt keying to distribute the hot key across multiple workers.",
+    "codeSnippet": "# 1. Enable AQE automated skew join handling\nspark.conf.set(\"spark.sql.adaptive.enabled\", \"true\")\nspark.conf.set(\"spark.sql.adaptive.skewJoin.enabled\", \"true\")\nspark.conf.set(\"spark.sql.adaptive.skewJoin.skewedPartitionFactor\", \"3\")\nspark.conf.set(\"spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes\", \"67108864\") # 64 MB\n\n# 2. Or apply explicit broadcast hint if joined dimension is < 200MB\n# joined_df = large_fact.hint(\"broadcast\", small_dim).join(small_dim, \"store_id\")",
+    "language": "python",
+    "whyItMatters": "Data skew is the #1 cause of pipeline latency bottlenecks. A single skewed partition can delay a multi-terabyte job by hours, keeping dozens of idle worker nodes burning cloud compute budget.",
+    "metrics": "80-95% reduction in stage runtime, uniform task duration distribution",
+    "antiPattern": "Leaving default AQE settings off and ignoring skewed join keys, letting 1 core bottleneck a 64-core cluster.",
+    "tags": [
+      "Data Skew",
+      "AQE",
+      "Stragglers",
+      "Shuffle",
+      "Performance"
+    ]
+  },
+  {
+    "id": "triage-tungsten-disk-spill",
+    "title": "Triage: Tungsten Memory vs Disk Spill Elimination",
+    "category": "Spark Core",
+    "categorySlug": "spark-core",
+    "impact": "High Impact",
+    "effort": "Medium Effort",
+    "problem": "Spark UI stage details show massive 'Spill (Memory): 120 GB' and 'Spill (Disk): 35 GB'. Tasks spend 70%+ of execution time serializing and writing intermediate sort buffers to disk.",
+    "solution": "Increase spark.sql.shuffle.partitions so that individual partition data slices fit cleanly within executor execution memory slots. Ensure a minimum of 4 GB RAM per executor core. Eliminate unpartitioned window functions.",
+    "codeSnippet": "# 1. Calculate optimal shuffle partition count:\n# Target partition size = ~128 MB to 200 MB\n# E.g. For a 120 GB dataset: 120,000 MB / 150 MB = 800 partitions\nspark.conf.set(\"spark.sql.shuffle.partitions\", \"800\")\n\n# 2. Enable adaptive coalesce to automatically shrink post-shuffle partitions\nspark.conf.set(\"spark.sql.adaptive.coalescePartitions.enabled\", \"true\")\nspark.conf.set(\"spark.sql.adaptive.advisoryPartitionSizeInBytes\", \"134217728\") # 128 MB\n\n# ❌ BAD: Window.orderBy(\"date\") -> Unpartitioned window shuffles all data to 1 task\n# ✅ GOOD: Window.partitionBy(\"customer_id\").orderBy(\"date\")",
+    "language": "python",
+    "whyItMatters": "Disk spill incurs massive I/O serialization, compression, and disk write penalties. Eliminating disk spill often speeds up Spark shuffle stages by 3x to 5x.",
+    "metrics": "3x-5x faster shuffle stages, 0 GB disk spill",
+    "antiPattern": "Using the default 200 shuffle partitions for 500GB+ tables, guaranteeing severe memory exhaustion and multi-gigabyte disk spills.",
+    "tags": [
+      "Disk Spill",
+      "Tungsten",
+      "Shuffle Partitions",
+      "Memory",
+      "Spark UI"
+    ]
+  },
+  {
+    "id": "triage-small-file-fragmentation",
+    "title": "Triage: Delta Lake Small File Metadata Degradation",
+    "category": "SQL & Storage",
+    "categorySlug": "storage-formats",
+    "impact": "High Impact",
+    "effort": "Low Effort",
+    "problem": "Queries against Delta tables take minutes just in query planning. Directory contains 100,000+ tiny 50KB Parquet files generated by frequent micro-batch streaming appends.",
+    "solution": "Enable Delta Lake Auto-Compaction and Optimized Writes. Schedule regular OPTIMIZE jobs to bin-pack files into 128MB chunks. Run VACUUM to remove obsolete file revisions.",
+    "codeSnippet": "-- 1. Set Table Properties for Automated Write Hygiene\nALTER TABLE prod_catalog.silver.telemetry_events SET TBLPROPERTIES (\n    'delta.autoOptimize.optimizeWrites' = 'true',\n    'delta.autoOptimize.autoCompact' = 'true',\n    'delta.targetFileSize' = '134217728' -- 128 MB target\n);\n\n-- 2. Execute on-demand bin-packing compaction\nOPTIMIZE prod_catalog.silver.telemetry_events;\n\n-- 3. Clean up unreferenced tombstoned files older than 7 days\nVACUUM prod_catalog.silver.telemetry_events RETAIN 168 HOURS;",
+    "notes": [
+      "Small files overload cloud object storage listing APIs (S3/ADLS) and create immense metadata trees in the driver.",
+      "Target file size of 128MB balances read scan performance with write compaction overhead."
+    ],
+    "language": "sql",
+    "whyItMatters": "The small file problem causes exponential query degradation. Compacting 100,000 files into 500 files improves query scan speeds by up to 20x.",
+    "metrics": "20x faster file scan & metadata resolution",
+    "antiPattern": "Appending streaming batches every 5 seconds to a Delta table without autoCompact or periodic OPTIMIZE.",
+    "tags": [
+      "Small Files",
+      "Delta Lake",
+      "OPTIMIZE",
+      "VACUUM",
+      "Storage"
+    ]
+  },
+  {
+    "id": "triage-concurrent-append-occ",
+    "title": "Triage: Optimistic Concurrency Control (OCC) Conflicts",
+    "category": "SQL & Storage",
+    "categorySlug": "storage-formats",
+    "impact": "High Impact",
+    "effort": "Medium Effort",
+    "problem": "Concurrent batch or streaming jobs writing to the same Delta table fail intermittently with 'ConcurrentAppendException' or 'ConcurrentTransactionException'.",
+    "solution": "Switch Delta isolation level from WriteSerializable to SnapshotIsolation if transactions do not have blind read-write dependencies. Migrate to Liquid Clustering (CLUSTER BY) or ensure writes target disjoint physical partitions.",
+    "codeSnippet": "-- 1. Configure Snapshot Isolation for high-concurrency append tables\nALTER TABLE prod_catalog.silver.orders SET TBLPROPERTIES (\n    'delta.isolationLevel' = 'SnapshotIsolation'\n);\n\n-- 2. Migrate from static partitions to Liquid Clustering to isolate write sets\nALTER TABLE prod_catalog.silver.orders CLUSTER BY (store_id, order_date);\n\n-- 3. In PySpark, add partition predicates to MERGE conditions to restrict file locks\n# delta_table.merge(source, \"target.order_date = source.order_date AND target.id = source.id\")",
+    "language": "sql",
+    "whyItMatters": "Under WriteSerializable isolation, Delta checks if concurrent commits added files that match the reader query. SnapshotIsolation permits concurrent appends without collision, eliminating false transaction aborts.",
+    "metrics": "Zero OCC collision aborts, 100% concurrent write success",
+    "antiPattern": "Running concurrent write jobs against the same table under WriteSerializable without partition predicates.",
+    "tags": [
+      "OCC",
+      "ConcurrentAppendException",
+      "Delta Lake",
+      "Concurrency",
+      "Triage"
+    ]
+  },
+  {
+    "id": "triage-broadcast-join-timeout",
+    "title": "Triage: Broadcast Exchange Timeout (300 Seconds)",
+    "category": "Spark Core",
+    "categorySlug": "spark-core",
+    "impact": "High Impact",
+    "effort": "Low Effort",
+    "problem": "Join stage fails with 'TimeoutException: Futures timed out after [300 seconds]' during BroadcastExchangeExec.",
+    "solution": "The driver timed out while collecting and broadcasting a table that was larger than estimated. Increase spark.sql.broadcastTimeout or disable auto-broadcast (autoBroadcastJoinThreshold = -1) to fall back to robust SortMergeJoin.",
+    "codeSnippet": "# 1. Increase broadcast timeout for high-latency cloud networks\nspark.conf.set(\"spark.sql.broadcastTimeout\", \"600\") # 10 minutes\n\n# 2. Or disable broadcast join if table statistics are corrupted or table > 200MB\nspark.conf.set(\"spark.sql.autoBroadcastJoinThreshold\", \"-1\") # Disables BHJ, forces SMJ\n\n# 3. Ensure table statistics are up to date\n# spark.sql(\"ANALYZE TABLE prod_catalog.silver.stores COMPUTE STATISTICS FOR ALL COLUMNS\")",
+    "language": "python",
+    "whyItMatters": "When table statistics are missing, Spark Catalyst may incorrectly estimate a multi-gigabyte table as small enough to broadcast. The driver stalls collecting the dataset, eventually timing out after 300 seconds.",
+    "metrics": "Prevents catastrophic job termination, enforces deterministic join planning",
+    "antiPattern": "Hardcoding F.broadcast(df) on tables whose row count grows dynamically in production without size guards.",
+    "tags": [
+      "Broadcast Timeout",
+      "BHJ",
+      "SortMergeJoin",
+      "Catalyst",
+      "Triage"
+    ]
   }
 ]

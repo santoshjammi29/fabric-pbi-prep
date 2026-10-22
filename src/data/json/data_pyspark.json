@@ -633,5 +633,125 @@
       "Run benchmark suites across 20-50 business questions to measure deterministic Text-to-SQL accuracy."
     ],
     "use_case": "Empowering business executives and non-technical stakeholders to ask self-service natural language questions against curated Lakehouse gold marts."
+  },
+  {
+    "id": "py-dbutils-fs-volumes-api",
+    "title": "DBUtils File System & Unity Catalog Volumes API",
+    "level": "intermediate",
+    "category": "DBFS & File Systems",
+    "description": "Programmatic file operations using dbutils.fs across DBFS and Unity Catalog Volumes (/Volumes/catalog/schema/volume/). Covers listing, recursive copying, moving, and safe directory creation without legacy mount dependencies.",
+    "code": "# 1. List directory files with metadata in Unity Catalog Volume\nfiles = dbutils.fs.ls(\"/Volumes/prod_catalog/raw_data/landing_zone/\")\nfor f in files:\n    print(f\"File: {f.name} | Size: {f.size / (1024*1024):.2f} MB | Path: {f.path}\")\n\n# 2. Copy files recursively between landing and staging\ndbutils.fs.cp(\n    \"/Volumes/prod_catalog/raw_data/landing_zone/2026/\",\n    \"/Volumes/prod_catalog/raw_data/staging/\",\n    recurse=True\n)\n\n# 3. Atomically move/rename processed file\ndbutils.fs.mv(\n    \"/Volumes/prod_catalog/raw_data/staging/inbound.csv\",\n    \"/Volumes/prod_catalog/raw_data/archive/inbound_20261022.csv\"\n)\n\n# 4. Create directory structure\ndbutils.fs.mkdirs(\"/Volumes/prod_catalog/raw_data/checkpoints/orders_stream/\")\n\n# 5. Read preview bytes directly into Python\ncontent_preview = dbutils.fs.head(\"/Volumes/prod_catalog/raw_data/landing_zone/sample.json\", maxBytes=1024)\nprint(content_preview)",
+    "notes": [
+      "Unity Catalog Volumes are the modern replacement for legacy DBFS mounts (/mnt/).",
+      "Volumes support standard POSIX file APIs via /Volumes/ paths in Python, Bash, and C libraries.",
+      "dbutils.fs.rm(path, recurse=True) permanently deletes directories; use with extreme caution in production.",
+      "Use dbutils.fs.head() for fast schema and header inspection without spinning up large Spark reader jobs."
+    ],
+    "use_case": "Standardizing ingestion pipelines to interact with Unity Catalog Volumes rather than deprecated DBFS mount points, ensuring strict audit compliance and fine-grained access control."
+  },
+  {
+    "id": "py-dbutils-widgets-orchestration",
+    "title": "Parameterized Notebooks with Widgets & JSON Exit",
+    "level": "intermediate",
+    "category": "Orchestration & Workflow",
+    "description": "Parameterizing Databricks notebooks using dbutils.widgets and returning structured JSON payloads to parent orchestrators using dbutils.notebook.exit. Essential for building modular Databricks workflow DAGs.",
+    "code": "# ------------------------------------------------------------------------------\n# IN CHILD NOTEBOOK: Parameter definition & payload return\n# ------------------------------------------------------------------------------\n# 1. Define interactive widgets with defaults\ndbutils.widgets.text(\"batch_date\", \"2026-10-22\", \"1. Ingestion Date (YYYY-MM-DD)\")\ndbutils.widgets.dropdown(\"environment\", \"prod\", [\"dev\", \"staging\", \"prod\"], \"2. Environment\")\n\n# 2. Retrieve parameter values safely\nbatch_date = dbutils.widgets.get(\"batch_date\")\nenv = dbutils.widgets.get(\"environment\")\n\n# 3. Execute business logic\nrecords_processed = 250000\n\n# 4. Exit notebook and pass structured metadata to caller\nimport json\nresult_payload = {\n    \"status\": \"SUCCESS\",\n    \"batch_date\": batch_date,\n    \"records_processed\": records_processed,\n    \"execution_duration_sec\": 42.5\n}\ndbutils.notebook.exit(json.dumps(result_payload))\n\n# ------------------------------------------------------------------------------\n# IN PARENT NOTEBOOK: Chaining execution & parsing results\n# ------------------------------------------------------------------------------\n# raw_res = dbutils.notebook.run(\"./child_pipeline\", timeout_seconds=1800, arguments={\"batch_date\": \"2026-10-22\"})\n# summary = json.loads(raw_res)\n# print(f\"Processed {summary['records_processed']} records in {summary['execution_duration_sec']}s\")",
+    "notes": [
+      "dbutils.notebook.exit() only accepts string payloads; always serialize Python dictionaries via json.dumps().",
+      "dbutils.notebook.run() spawns an ephemeral execution context that shares cluster compute but has isolated local namespace.",
+      "Widgets can be bound directly to Databricks Workflow job parameters in the UI or via databricks.yml asset bundles.",
+      "dbutils.widgets.removeAll() cleans up widget definitions when authoring interactive templates."
+    ],
+    "use_case": "Orchestrating multi-hop Medallion architecture pipelines where bronze, silver, and gold stages run as modular notebooks passing status payloads and record counts."
+  },
+  {
+    "id": "py-dbutils-secrets-keyvault",
+    "title": "Zero-Plaintext Credential Management via dbutils.secrets",
+    "level": "intermediate",
+    "category": "Security & Governance",
+    "description": "Securely retrieving API keys, database connection strings, and certificates from Azure Key Vault or AWS Secrets Manager scopes without exposing plaintext credentials in notebooks, logs, or version control.",
+    "code": "# 1. Inspect available scopes for the cluster identity\nscopes = dbutils.secrets.listScopes()\nprint(\"Available Scopes:\", [s.name for s in scopes])\n\n# 2. Fetch secret securely (Databricks automatically masks value as [REDACTED] in all stdout)\ndb_password = dbutils.secrets.get(scope=\"azure-keyvault-prod\", key=\"finance-sql-password\")\nclient_secret = dbutils.secrets.get(scope=\"azure-keyvault-prod\", key=\"aad-sp-secret\")\n\n# 3. Inject secret into JDBC or Cloud Connector options\njdbc_url = \"jdbc:sqlserver://eu-finance-db.database.windows.net:1433;databaseName=LedgerDW\"\n\nfact_ledger_df = (\n    spark.read.format(\"jdbc\")\n    .option(\"url\", jdbc_url)\n    .option(\"dbtable\", \"dbo.FactGeneralLedger\")\n    .option(\"user\", \"svc_databricks_reader\")\n    .option(\"password\", db_password)  # Zero plaintext exposure in code or logs\n    .option(\"driver\", \"com.microsoft.sqlserver.jdbc.SQLServerDriver\")\n    .option(\"fetchsize\", \"10000\")\n    .load()\n)",
+    "notes": [
+      "Databricks runtime actively redacts secrets fetched via dbutils.secrets.get() from output cells and driver logs.",
+      "Never print secrets or write them to temporary files on disk to prevent accidental leaks.",
+      "Link Azure Key Vault to Databricks Secret Scopes via the #secrets/createScope URL in the Databricks workspace.",
+      "Combine with Unity Catalog Service Principals for end-to-end passwordless OAuth connectivity where possible."
+    ],
+    "use_case": "Ingesting confidential enterprise financial balances from on-premises or cloud SQL Server databases into bronze Delta lakehouse tables without storing database passwords in Git."
+  },
+  {
+    "id": "py-autoloader-rescued-data",
+    "title": "Production Auto Loader Streaming with Rescued Data",
+    "level": "advanced",
+    "category": "Streaming & Ingestion",
+    "description": "Ingesting high-volume file streams using Databricks Auto Loader (cloudFiles) with dynamic schema evolution and a dedicated _rescued_data column to prevent pipeline breakage from corrupted or schema-deviant records.",
+    "code": "from pyspark.sql import functions as F\n\n# 1. Configure Auto Loader stream with schema evolution & rescue mechanism\nraw_stream = (\n    spark.readStream\n    .format(\"cloudFiles\")\n    .option(\"cloudFiles.format\", \"json\")\n    .option(\"cloudFiles.schemaLocation\", \"/Volumes/prod_catalog/checkpoints/orders_schema/\")\n    .option(\"cloudFiles.inferColumnTypes\", \"true\")\n    .option(\"cloudFiles.schemaEvolutionMode\", \"addNewColumns\")\n    .option(\"cloudFiles.rescuedDataColumn\", \"_rescued_data\")\n    .option(\"cloudFiles.maxFilesPerTrigger\", 500)  # Rate limiting backpressure\n    .load(\"/Volumes/prod_catalog/landing/raw_orders/\")\n)\n\n# 2. Add audit timestamp and monitor corrupted records\naudited_stream = (\n    raw_stream\n    .withColumn(\"ingestion_ts\", F.current_timestamp())\n    .withColumn(\"is_corrupted\", F.col(\"_rescued_data\").isNotNull())\n)\n\n# 3. Write micro-batch to Bronze Delta Lake table with checkpointing\nquery = (\n    audited_stream\n    .writeStream\n    .format(\"delta\")\n    .outputMode(\"append\")\n    .option(\"checkpointLocation\", \"/Volumes/prod_catalog/checkpoints/orders_delta_write/\")\n    .trigger(availableNow=True)  # Incremental batch trigger\n    .toTable(\"prod_catalog.bronze.orders_raw\")\n)",
+    "notes": [
+      "Auto Loader automatically discovers new files as they arrive in cloud object storage via incremental directory listing or SNS/SQS event notifications.",
+      "The _rescued_data column captures values with type mismatches or unparsed tokens, preventing pipeline termination.",
+      "trigger(availableNow=True) processes all available data in multiple micro-batches then stops the cluster, saving compute costs vs continuous streaming.",
+      "Always store checkpoints on durable, separate cloud storage to guarantee exactly-once processing across pipeline restarts."
+    ],
+    "use_case": "Building production landing-zone pipelines that ingest millions of semi-structured supplier JSON files daily into Bronze Delta tables without failing on unanticipated schema changes."
+  },
+  {
+    "id": "py-delta-table-merge-scd2",
+    "title": "Programmatic DeltaTable MERGE (SCD Type 2 & Deletions)",
+    "level": "advanced",
+    "category": "Delta Lake Features",
+    "description": "Executing programmatic Delta Lake merge operations using DeltaTable.forName() in PySpark. Demonstrates multi-branch conditional updates, soft deletions, and inserts with predicate pruning for high performance.",
+    "code": "from delta.tables import DeltaTable\nfrom pyspark.sql import functions as F\n\n# 1. Reference target Delta Lake table\ndelta_target = DeltaTable.forName(spark, \"prod_catalog.silver.customer_dim\")\n\n# 2. Incoming batch with updates, inserts, and soft-delete flags\nupdates_df = spark.read.table(\"prod_catalog.staging.customer_updates\")\n\n# 3. Execute atomic MERGE INTO\n(\n    delta_target.alias(\"target\")\n    .merge(\n        updates_df.alias(\"source\"),\n        # Primary key match condition\n        \"target.customer_id = source.customer_id\"\n    )\n    # Branch 1: Soft-delete when flagged by upstream system\n    .whenMatchedUpdate(\n        condition=\"source.is_deleted = true\",\n        set={\n            \"is_active\": F.lit(False),\n            \"updated_at\": F.current_timestamp()\n        }\n    )\n    # Branch 2: Update existing active records when source has newer timestamp\n    .whenMatchedUpdate(\n        condition=\"source.update_timestamp > target.updated_at\",\n        set={\n            \"email\": \"source.email\",\n            \"phone\": \"source.phone\",\n            \"tier\": \"source.tier\",\n            \"updated_at\": \"source.update_timestamp\"\n        }\n    )\n    # Branch 3: Insert new customer records\n    .whenNotMatchedInsert(\n        values={\n            \"customer_id\": \"source.customer_id\",\n            \"email\": \"source.email\",\n            \"phone\": \"source.phone\",\n            \"tier\": \"source.tier\",\n            \"is_active\": F.lit(True),\n            \"created_at\": F.current_timestamp(),\n            \"updated_at\": \"source.update_timestamp\"\n        }\n    )\n    .execute()\n)",
+    "notes": [
+      "DeltaTable.merge() executes atomically under Optimistic Concurrency Control.",
+      "Including partition columns in the merge condition enables partition pruning, skipping 90%+ of Parquet file scans.",
+      "Delta Lake 2.0+ supports multiple whenMatched and whenNotMatched clauses for complex conditional routing.",
+      "Avoid full table scans by ensuring target table has statistics computed and Liquid Clustering enabled on join keys."
+    ],
+    "use_case": "Synchronizing customer master records from Salesforce and CRM systems into Silver dimension tables with audit tracking, soft-deletes, and timestamp fencing."
+  },
+  {
+    "id": "py-higher-order-array-transforms",
+    "title": "Higher-Order Functions on Complex Nested Arrays",
+    "level": "intermediate",
+    "category": "Complex Data Types",
+    "description": "Transforming, filtering, and aggregating complex nested arrays in-place using PySpark higher-order functions (transform, filter, aggregate). Eliminates expensive explode and re-group shuffles.",
+    "code": "from pyspark.sql import functions as F\n\n# Sample orders with nested array of line item structs\norders_df = spark.table(\"prod_catalog.silver.orders\")\n\n# 1. Transform: Apply 15% discount to all line item prices in-place\ndiscounted_df = orders_df.withColumn(\n    \"discounted_items\",\n    F.transform(\n        \"line_items\",\n        lambda item: F.struct(\n            item.item_id.alias(\"item_id\"),\n            item.quantity.alias(\"quantity\"),\n            F.round(item.unit_price * 0.85, 2).alias(\"unit_price\")\n        )\n    )\n)\n\n# 2. Filter: Keep only line items where item quantity > 3\nbulk_orders_df = discounted_df.withColumn(\n    \"bulk_items\",\n    F.filter(\"line_items\", lambda item: item.quantity > 3)\n)\n\n# 3. Aggregate: Calculate total order weight by summing array items\nweighted_orders_df = bulk_orders_df.withColumn(\n    \"total_order_weight_kg\",\n    F.aggregate(\n        \"line_items\",\n        F.lit(0.0), # Initial accumulator value\n        lambda acc, item: acc + (item.quantity * item.unit_weight_kg)\n    )\n)\n\n# 4. Check if any line item contains specific hazardous SKU\nhazardous_df = weighted_orders_df.withColumn(\n    \"has_hazardous_materials\",\n    F.exists(\"line_items\", lambda item: item.is_hazardous == True)\n)",
+    "notes": [
+      "Higher-order functions execute within Catalyst expression trees without unpacking arrays into separate rows.",
+      "Replacing explode() + groupBy() with transform() and aggregate() avoids multi-gigabyte shuffle spills.",
+      "Works seamlessly with deeply nested JSON structures, telemetry packets, and eCommerce shopping carts.",
+      "F.exists() short-circuits evaluation as soon as the first matching element is encountered in the array."
+    ],
+    "use_case": "Processing complex eCommerce shopping carts containing hundreds of nested line items, computing shipping weights and category discounts with zero shuffle serialization."
+  },
+  {
+    "id": "py-two-phase-key-salting",
+    "title": "Two-Phase Key Salting for Severe Join Skew Remediation",
+    "level": "expert",
+    "category": "Performance Tuning & Optimization",
+    "description": "Resolving catastrophic join skew where a single key (e.g., country_code = 'US' or store_id = 'ONLINE') contains 80%+ of total records, stalling worker nodes on straggler tasks. Uses randomized two-phase salting.",
+    "code": "from pyspark.sql import functions as F\n\nSALT_FACTOR = 16  # Distribute skewed key across 16 parallel tasks\n\nfact_transactions = spark.table(\"prod_catalog.silver.transactions\")\ndim_stores = spark.table(\"prod_catalog.silver.dim_stores\")\n\n# Step 1: Add randomized salt [0..15] to large fact table\nsalted_fact = fact_transactions.withColumn(\n    \"salt_id\",\n    F.floor(F.rand() * SALT_FACTOR)\n).withColumn(\n    \"salted_join_key\",\n    F.concat(F.col(\"store_id\"), F.lit(\"_\"), F.col(\"salt_id\"))\n)\n\n# Step 2: Replicate dimension table records across all 16 salt IDs [0..15]\nsalt_table = spark.range(0, SALT_FACTOR).withColumnRenamed(\"id\", \"salt_id\")\nreplicated_dim = dim_stores.crossJoin(salt_table).withColumn(\n    \"salted_join_key\",\n    F.concat(F.col(\"store_id\"), F.lit(\"_\"), F.col(\"salt_id\"))\n)\n\n# Step 3: Perform balanced inner join on the salted key\nbalanced_joined_df = (\n    salted_fact.join(replicated_dim, on=\"salted_join_key\", how=\"inner\")\n    .drop(\"salted_join_key\", \"salt_id\")\n)\n\n# Step 4: Validate execution plan: tasks finish uniformly without stragglers\nbalanced_joined_df.write.format(\"delta\").mode(\"overwrite\").saveAsTable(\"prod_catalog.gold.balanced_sales\")",
+    "notes": [
+      "Salting breaks monolithic partitions into multiple smaller, evenly distributed shuffle buckets.",
+      "Only apply salting to the specific skewed key; salting already uniform keys introduces unnecessary cross-join overhead.",
+      "Ensure Adaptive Query Execution (AQE) skew join is enabled (spark.sql.adaptive.skewJoin.enabled = true) as first line of defense.",
+      "Replicating small dimension tables by 16x is trivial in memory compared to the cost of a 4-hour stuck shuffle stage."
+    ],
+    "use_case": "Joining a 2-billion-row retail transactions dataset with store metadata where the e-commerce flagship store represents 85% of volume, preventing executor OOM and task stragglers."
+  },
+  {
+    "id": "py-structured-streaming-watermark",
+    "title": "Stateful Streaming Deduplication with Watermarking",
+    "level": "expert",
+    "category": "Structured Streaming",
+    "description": "Managing streaming state stores with event-time watermarking to execute stateful streaming deduplication without unbounded memory bloat. Configured with RocksDB state store for mission-critical reliability.",
+    "code": "from pyspark.sql import functions as F\n\n# 1. Enable RocksDB state store to avoid Java heap memory limits on high-state streams\nspark.conf.set(\n    \"spark.sql.streaming.stateStore.providerClass\",\n    \"org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider\"\n)\n\n# 2. Read real-time telemetry stream from Azure Event Hubs / Kafka\ntelemetry_stream = (\n    spark.readStream\n    .format(\"delta\")\n    .table(\"prod_catalog.bronze.iot_telemetry_raw\")\n)\n\n# 3. Define 2-hour watermark and deduplicate on device_id + event_time\ndeduplicated_stream = (\n    telemetry_stream\n    .withWatermark(\"event_timestamp\", \"2 hours\")\n    .dropDuplicates([\"device_id\", \"event_timestamp\"])\n)\n\n# 4. Windowed stateful aggregation: 10-minute tumbling windows\nwindowed_metrics = (\n    deduplicated_stream\n    .groupBy(\n        F.window(\"event_timestamp\", \"10 minutes\"),\n        \"device_type\"\n    )\n    .agg(\n        F.avg(\"temperature\").alias(\"avg_temp\"),\n        F.max(\"vibration\").alias(\"max_vibration\"),\n        F.count(\"event_id\").alias(\"reading_count\")\n    )\n)\n\n# 5. Output to Silver Delta table with checkpointing\nquery = (\n    windowed_metrics\n    .writeStream\n    .format(\"delta\")\n    .outputMode(\"append\")\n    .option(\"checkpointLocation\", \"/Volumes/prod_catalog/checkpoints/iot_silver_state/\")\n    .trigger(processingTime=\"1 minute\")\n    .toTable(\"prod_catalog.silver.iot_aggregated_metrics\")\n)",
+    "notes": [
+      "Watermarking tells the state store when late data can be safely dropped and state purged from disk/memory.",
+      "Default HDFS-backed state store keeps state in JVM heap; RocksDB offloads state to local SSD, supporting tens of millions of active keys.",
+      "dropDuplicates with a watermark requires the watermark column to be present in the deduplication key set.",
+      "Append output mode only emits rows once the window falls behind the active watermark threshold."
+    ],
+    "use_case": "Processing continuous streams of 50,000 IoT sensor events per second, filtering out redundant retry packets and computing 10-minute metrics with zero JVM heap exhaustion."
   }
 ]
