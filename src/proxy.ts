@@ -59,11 +59,6 @@ async function addApplicationHeaders(request: NextRequest): Promise<NextResponse
     }
   }
 
-  // 2. Cryptographic Nonce generation for strict CSP
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
-
   const country = request.headers.get("cf-ipcountry") || "US";
   const city = request.headers.get("cf-ipcity") || "Global";
   const region = request.headers.get("cf-region") || request.headers.get("cf-region-code") || "Edge";
@@ -74,11 +69,10 @@ async function addApplicationHeaders(request: NextRequest): Promise<NextResponse
     (cfRay ? `cf-${cfRay.split("-").pop()?.toLowerCase() || "edge"}` : undefined) ||
     `${country.toLowerCase()}-cloudflare-edge`;
 
-  const isDev = process.env.NODE_ENV === "development";
   const cspPolicy = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com https://clerk.moderndataengineer.uk https://*.clerk.accounts.dev https://*.clerk.com${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://clerk.moderndataengineer.uk https://*.clerk.accounts.dev https://*.clerk.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://moderndataengineer.uk https://www.moderndataengineer.uk https://cdn.lakehousearchitect.com https://img.clerk.com https://challenges.cloudflare.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     "connect-src 'self' https://challenges.cloudflare.com https://clerk.moderndataengineer.uk https://*.clerk.accounts.dev https://*.clerk.com https://*.upstash.io https://*.upstash.com https://*.supabase.co",
@@ -89,19 +83,12 @@ async function addApplicationHeaders(request: NextRequest): Promise<NextResponse
     "form-action 'self'",
   ].join("; ");
 
-  requestHeaders.set("Content-Security-Policy", cspPolicy);
-
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  const response = NextResponse.next();
 
   response.headers.set("x-geo-country", country);
   response.headers.set("x-geo-city", city);
   response.headers.set("x-geo-region", region);
   response.headers.set("x-edge-node", edgeNode);
-  response.headers.set("x-nonce", nonce);
 
   if (pathname.startsWith("/api/concepts") || pathname.startsWith("/api/questions")) {
     response.headers.set(
