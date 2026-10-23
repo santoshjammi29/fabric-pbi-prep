@@ -14,8 +14,9 @@ import subprocess
 import fitz  # PyMuPDF
 from PIL import Image
 
-WORKSPACE_DIR = "/Users/santosh/Documents/antigravity/hopeful-bardeen"
-OUTPUT_DIR = os.path.join(WORKSPACE_DIR, "cheatsheets")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKSPACE_DIR = os.path.dirname(SCRIPT_DIR)
+OUTPUT_DIR = os.path.join(WORKSPACE_DIR, "public", "cheatsheets")
 HTML_DIR = os.path.join(OUTPUT_DIR, "html")
 PDF_DIR = os.path.join(OUTPUT_DIR, "pdf")
 IMG_DIR = os.path.join(OUTPUT_DIR, "images")
@@ -24,7 +25,20 @@ os.makedirs(HTML_DIR, exist_ok=True)
 os.makedirs(PDF_DIR, exist_ok=True)
 os.makedirs(IMG_DIR, exist_ok=True)
 
-CHROME_BIN = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+def find_chrome():
+    candidates = [
+        os.environ.get("CHROME_BIN"),
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/usr/bin/google-chrome",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser",
+    ]
+    for c in candidates:
+        if c and os.path.exists(c):
+            return c
+    return "google-chrome"
+
+CHROME_BIN = find_chrome()
 
 def get_base_css(theme_color="#ff3621", title_color="#38bdf8"):
     return f"""
@@ -2472,6 +2486,60 @@ def main():
 
     compile_pdf(master_html_file, master_pdf_file)
     render_images(master_pdf_file, "databricks_master", dpi=250)
+
+    # Generate Incident Runbooks PDF
+    print("\n" + "=" * 70)
+    print("GENERATING INCIDENT RUNBOOKS A4 PDF & THUMBNAIL")
+    print("=" * 70)
+    runbooks_html = os.path.join(HTML_DIR, "incident_runbooks.html")
+    runbooks_pdf = os.path.join(PDF_DIR, "incident_runbooks.pdf")
+    if os.path.exists(runbooks_html):
+        compile_pdf(runbooks_html, runbooks_pdf)
+        try:
+            rb_doc = fitz.open(runbooks_pdf)
+            rb_pix = rb_doc[0].get_pixmap(dpi=250)
+            rb_img_path = os.path.join(IMG_DIR, "incident_runbooks_page_1.png")
+            rb_pix.save(rb_img_path)
+            print(f"  ✓ Rendered Runbooks Thumbnail: incident_runbooks_page_1.png ({rb_doc.page_count} pages)")
+        except Exception as e:
+            print(f"  ⚠️ Warning rendering runbook image: {e}")
+
+    # Generate All-in-One Enterprise Master Reference PDF
+    print("\n" + "=" * 70)
+    print("GENERATING ALL-IN-ONE ENTERPRISE MASTER REFERENCE PDF")
+    print("=" * 70)
+    complete_master_pdf = os.path.join(PDF_DIR, "lakehouse_enterprise_master_reference.pdf")
+    try:
+        combined_doc = fitz.open()
+        if os.path.exists(master_pdf_file):
+            combined_doc.insert_pdf(fitz.open(master_pdf_file))
+        if os.path.exists(runbooks_pdf):
+            combined_doc.insert_pdf(fitz.open(runbooks_pdf))
+        combined_doc.save(complete_master_pdf)
+        print(f"  ✓ Created Enterprise Master Reference PDF: {os.path.basename(complete_master_pdf)} ({combined_doc.page_count} Pages, {os.path.getsize(complete_master_pdf)/1024:.1f} KB)")
+    except Exception as e:
+        print(f"  ⚠️ Warning creating combined master PDF: {e}")
+
+    # Copy files to public/_artifacts/cheat-sheets and .build-artifacts/r2/cheat-sheets
+    import shutil
+    sync_targets = [
+        os.path.join(WORKSPACE_DIR, "public", "_artifacts", "cheat-sheets"),
+        os.path.join(WORKSPACE_DIR, ".build-artifacts", "r2", "cheat-sheets"),
+    ]
+    for target in sync_targets:
+        try:
+            os.makedirs(os.path.join(target, "pdf"), exist_ok=True)
+            os.makedirs(os.path.join(target, "html"), exist_ok=True)
+            os.makedirs(os.path.join(target, "images"), exist_ok=True)
+            for f in os.listdir(PDF_DIR):
+                shutil.copy2(os.path.join(PDF_DIR, f), os.path.join(target, "pdf", f))
+            for f in os.listdir(HTML_DIR):
+                shutil.copy2(os.path.join(HTML_DIR, f), os.path.join(target, "html", f))
+            for f in os.listdir(IMG_DIR):
+                shutil.copy2(os.path.join(IMG_DIR, f), os.path.join(target, "images", f))
+            print(f"  ✓ Synchronized cheatsheet assets to: {target}")
+        except Exception as e:
+            print(f"  ⚠️ Warning syncing to {target}: {e}")
 
     # Generate Hub Index HTML
     generate_index_html()

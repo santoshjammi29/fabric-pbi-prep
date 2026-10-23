@@ -477,13 +477,12 @@ export function DatabricksCodingClient({
           {/* Action Downloads & Links */}
           <div className="flex flex-row lg:flex-col items-center lg:items-end gap-2 shrink-0">
             <a
-              href="/cheatsheets/pdf/databricks_master_cheatsheet.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/api/download/pdf/databricks_master_cheatsheet.pdf"
+              download="databricks_master_cheatsheet.pdf"
               className="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition-all flex items-center gap-2 shadow-xs cursor-pointer"
             >
               <Download size={14} />
-              <span>Download Master PDF (5.1 MB)</span>
+              <span>Download Master PDF (8 Pages)</span>
             </a>
 
             <div className="flex items-center gap-1.5">

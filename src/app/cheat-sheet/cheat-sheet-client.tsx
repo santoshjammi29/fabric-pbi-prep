@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Terminal,
@@ -46,12 +46,24 @@ interface CheatSheetContentProps {
 function CheatSheetContent({ initialData, databricksData }: CheatSheetContentProps) {
   const cheatsheetData = initialData;
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<"databricks" | "runbooks" | "pdf_hub">(() => {
     const tab = searchParams.get("tab");
     if (tab === "pdf_hub" || tab === "pdfs") return "pdf_hub";
     return tab === "databricks" ? "databricks" : "runbooks";
   });
+
+  const handleTabChange = (newTab: "databricks" | "runbooks" | "pdf_hub") => {
+    setActiveTab(newTab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", newTab);
+    if (newTab !== "databricks") {
+      params.delete("domain");
+      params.delete("card");
+    }
+    router.replace(`/cheat-sheet?${params.toString()}`, { scroll: false });
+  };
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -266,7 +278,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
       <div className="flex items-center gap-1 p-1 rounded-full bg-[var(--surface-2)] border border-[var(--border)] max-w-fit shadow-xs">
         <button
           type="button"
-          onClick={() => setActiveTab("runbooks")}
+          onClick={() => handleTabChange("runbooks")}
           className={cn(
             "flex items-center gap-1.5 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap",
             activeTab === "runbooks"
@@ -283,7 +295,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
 
         <button
           type="button"
-          onClick={() => setActiveTab("databricks")}
+          onClick={() => handleTabChange("databricks")}
           className={cn(
             "flex items-center gap-1.5 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap",
             activeTab === "databricks"
@@ -300,7 +312,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
 
         <button
           type="button"
-          onClick={() => setActiveTab("pdf_hub")}
+          onClick={() => handleTabChange("pdf_hub")}
           className={cn(
             "flex items-center gap-1.5 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap",
             activeTab === "pdf_hub"
@@ -311,7 +323,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
           <FileText size={13} className={activeTab === "pdf_hub" ? "text-white" : "text-purple-400"} />
           <span>A4 PDF Documents Hub</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full font-mono bg-purple-500/20 text-purple-200">
-            6 A4 Suites
+            7 A4 Suites
           </span>
         </button>
       </div>
@@ -429,7 +441,7 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
               <div className="flex items-center gap-2 shrink-0 flex-wrap w-full md:w-auto">
                 <button
                   type="button"
-                  onClick={() => setActiveTab("databricks")}
+                  onClick={() => handleTabChange("databricks")}
                   className="px-3.5 py-1.5 rounded-lg bg-[#FF3621] hover:bg-[#e0301d] text-white text-xs font-semibold transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>Explore 48 Cards</span>
@@ -437,19 +449,27 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("pdf_hub")}
+                  onClick={() => handleTabChange("pdf_hub")}
                   className="px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-xs font-semibold text-purple-300 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <FileText size={13} className="text-purple-400" />
-                  <span>A4 PDF Hub (All 6 Suites)</span>
+                  <span>A4 PDF Hub (All 7 Suites)</span>
                 </button>
                 <a
-                  href="/cheatsheets/pdf/databricks_master_cheatsheet.pdf"
-                  download
+                  href="/api/download/pdf/lakehouse_enterprise_master_reference.pdf"
+                  download="lakehouse_enterprise_master_reference.pdf"
+                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-xs font-semibold text-white transition-colors flex items-center gap-1.5 shadow-xs"
+                >
+                  <Download size={13} className="text-white" />
+                  <span>Enterprise Master (47p)</span>
+                </a>
+                <a
+                  href="/api/download/pdf/databricks_master_cheatsheet.pdf"
+                  download="databricks_master_cheatsheet.pdf"
                   className="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors flex items-center gap-1.5"
                 >
                   <Download size={13} className="text-red-400" />
-                  <span>Master PDF (8 Pages)</span>
+                  <span>Coding PDF (8p)</span>
                 </a>
               </div>
             </div>

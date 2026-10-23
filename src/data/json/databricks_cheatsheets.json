@@ -7,6 +7,12 @@
     "size": "2.1 MB",
     "pages": 8
   },
+  "enterpriseMasterPdf": {
+    "title": "Complete Lakehouse Architecture & Runbooks Enterprise Reference (47 Pages)",
+    "url": "/cheatsheets/pdf/lakehouse_enterprise_master_reference.pdf",
+    "size": "2.6 MB",
+    "pages": 47
+  },
   "interactiveHub": {
     "url": "/cheatsheets/html/index.html",
     "title": "Interactive Digital Cheat Sheet Hub"

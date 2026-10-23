@@ -381,8 +381,8 @@ export function SparkEngineClient({ initialPyspark }: SparkEngineClientProps) {
             Spark Core Cheat Sheet &rarr;
           </Link>
           <a
-            href="/cheatsheets/pdf/databricks_spark_core_cheatsheet.pdf"
-            download
+            href="/api/download/pdf/databricks_spark_core_cheatsheet.pdf"
+            download="databricks_spark_core_cheatsheet.pdf"
             className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-xs font-semibold text-[var(--foreground)] transition-colors"
           >
             <Download size={13} className="text-red-400" />

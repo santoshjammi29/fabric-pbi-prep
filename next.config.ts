@@ -242,6 +242,36 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/cheatsheets",
+        destination: "/cheat-sheet",
+        permanent: true,
+      },
+      {
+        source: "/cheatsheet",
+        destination: "/cheat-sheet",
+        permanent: true,
+      },
+      {
+        source: "/cheat-sheets",
+        destination: "/cheat-sheet",
+        permanent: true,
+      },
+      {
+        source: "/pdf",
+        destination: "/cheat-sheet?tab=pdf_hub",
+        permanent: true,
+      },
+      {
+        source: "/pdfs",
+        destination: "/cheat-sheet?tab=pdf_hub",
+        permanent: true,
+      },
+      {
+        source: "/downloads",
+        destination: "/cheat-sheet?tab=pdf_hub",
+        permanent: true,
+      },
+      {
         source: "/lifecycle",
         destination: "/dataops",
         permanent: true,

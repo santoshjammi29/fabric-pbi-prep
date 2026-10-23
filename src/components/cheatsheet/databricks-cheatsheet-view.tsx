@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Flame,
   Search,
@@ -48,12 +49,29 @@ export function DatabricksCheatsheetView({
   initialDomain,
   initialCardId,
 }: DatabricksCheatsheetViewProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [selectedDomain, setSelectedDomain] = useState<DatabricksDomainId | "ALL">(
     (initialDomain as DatabricksDomainId) || "ALL"
   );
   const [selectedPage, setSelectedPage] = useState<number | "ALL">("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(initialCardId || null);
+
+  const handleDomainSelect = (domId: DatabricksDomainId | "ALL") => {
+    setSelectedDomain(domId);
+    setSelectedPage("ALL");
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "databricks");
+    if (domId === "ALL") {
+      params.delete("domain");
+    } else {
+      params.set("domain", domId);
+    }
+    params.delete("card");
+    router.replace(`/cheat-sheet?${params.toString()}`, { scroll: false });
+  };
 
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
@@ -189,8 +207,8 @@ export function DatabricksCheatsheetView({
           {/* Master Downloads & Standalone Hub CTA */}
           <div className="flex flex-col sm:flex-row md:flex-col items-stretch gap-2 shrink-0">
             <a
-              href={data.masterPdf.url}
-              download
+              href="/api/download/pdf/databricks_master_cheatsheet.pdf"
+              download="databricks_master_cheatsheet.pdf"
               className="flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 active:scale-98 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
             >
               <Download size={14} />
@@ -224,10 +242,7 @@ export function DatabricksCheatsheetView({
         {/* All Cards pill */}
         <button
           type="button"
-          onClick={() => {
-            setSelectedDomain("ALL");
-            setSelectedPage("ALL");
-          }}
+          onClick={() => handleDomainSelect("ALL")}
           className={cn(
             "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer",
             selectedDomain === "ALL"
@@ -247,10 +262,7 @@ export function DatabricksCheatsheetView({
             <button
               key={dom.id}
               type="button"
-              onClick={() => {
-                setSelectedDomain(dom.id);
-                setSelectedPage("ALL");
-              }}
+              onClick={() => handleDomainSelect(dom.id)}
               className={cn(
                 "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer",
                 isActive
@@ -340,8 +352,8 @@ export function DatabricksCheatsheetView({
 
             {/* Download PDF button */}
             <a
-              href={activeDomainMeta.pdf}
-              download
+              href={`/api/download/pdf/${activeDomainMeta.pdf.split('/').pop()}`}
+              download={activeDomainMeta.pdf.split('/').pop()}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
             >
               <Download size={13} className="text-sky-400" />

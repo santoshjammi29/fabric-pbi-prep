@@ -402,6 +402,12 @@ export interface DatabricksSuiteData {
     size: string;
     pages: number;
   };
+  enterpriseMasterPdf?: {
+    title: string;
+    url: string;
+    size: string;
+    pages: number;
+  };
   interactiveHub: {
     url: string;
     title: string;

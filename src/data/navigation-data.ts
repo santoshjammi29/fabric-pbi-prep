@@ -3,6 +3,7 @@ import {
   Home,
   BookOpen,
   FileCode2,
+  FileText,
   Layers,
   MessageSquare,
   Compass,
@@ -123,9 +124,9 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: FileCode2,
         pill: { text: "Sheets", variant: "medium" },
         subItems: [
-          { label: "Production Runbooks", href: "/cheat-sheet?tab=runbooks", badge: "69" },
+          { label: "Production Runbooks", href: "/cheat-sheet?tab=runbooks", badge: "76" },
           { label: "Databricks Suites", href: "/cheat-sheet?tab=databricks", badge: "48" },
-          { label: "A4 PDF Reference Hub", href: "/cheat-sheet?tab=pdf_hub", badge: "A4" },
+          { label: "A4 PDF Reference Hub", href: "/cheat-sheet?tab=pdf_hub", badge: "7 Suites" },
         ],
       },
     ],
@@ -182,6 +183,7 @@ export const ALL_FLAT_PAGES_AND_SUBPAGES: FlatNavPage[] = [
   // Coding & Runbooks (Clubbed)
   { id: "cheat-sheet", label: "Production Cheat Sheet", shortLabel: "Cheat Sheet", href: "/cheat-sheet", category: "Coding", categoryColor: "cyan", icon: FileCode2, badge: "Runbooks" },
   { id: "dbx-cheat-sheet", label: "Databricks Cheat Sheets", shortLabel: "DBX Sheets", href: "/cheat-sheet?tab=databricks", category: "Coding", categoryColor: "cyan", icon: Terminal, badge: "DBX" },
+  { id: "pdf-hub", label: "A4 PDF Reference Hub", shortLabel: "PDF Hub", href: "/cheat-sheet?tab=pdf_hub", category: "Coding", categoryColor: "cyan", icon: FileText, badge: "7 Suites" },
   { id: "code-pyspark", label: "PySpark Drills", shortLabel: "PySpark", href: "/code-practice?db=pyspark", category: "Coding", categoryColor: "cyan", icon: Code2, badge: "Python" },
   { id: "code-sparksql", label: "Spark SQL Drills", shortLabel: "Spark SQL", href: "/code-practice?db=sparksql", category: "Coding", categoryColor: "cyan", icon: Database, badge: "SQL" },
   { id: "code-mssql", label: "T-SQL Drills", shortLabel: "T-SQL", href: "/code-practice?db=mssql", category: "Coding", categoryColor: "cyan", icon: Database, badge: "MSSQL" },
