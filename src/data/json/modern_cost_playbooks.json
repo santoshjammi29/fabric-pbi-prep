@@ -70,5 +70,23 @@
     "savings": "Prevents 100% Interactive Reporting Outages & SKU Burst Penalties",
     "summary": "Microsoft Fabric capacities (F64, F128) use a 24-hour rolling smoothing algorithm for background jobs (Spark, Data Factory) and 5-minute smoothing for interactive visuals (Power BI Direct Lake). When heavy batch notebooks burst to 400% capacity, Fabric schedules CU debt that throttles interactive dashboards hours later. Scheduling Spark batch jobs during non-peak windows with dedicated capacity reservation isolates executive reporting from background ETL spikes.",
     "code": "-- Fabric Capacity Metrics App Alerting Query\nSELECT TimeStamp, CapacityId, OperationName, ItemType,\n       TotalCU_s, InteractiveCU_s, BackgroundCU_s, ThrottlingStatus\nFROM fabric_monitoring.capacity_metrics\nWHERE ThrottlingStatus IN ('InteractiveDelay', 'InteractiveReject')\nORDER BY TimeStamp DESC;"
+  },
+  {
+    "title": "Power BI Direct Lake Memory Eviction & Cold Parquet Reloads",
+    "savings": "60% Capacity CU Savings & Zero DirectQuery Fallback",
+    "summary": "When Power BI Direct Lake semantic models exceed SKU memory limits or encounter unsupported DAX expressions (e.g., complex parent-child hierarchies or unoptimized many-to-many relationships), queries silently fall back to DirectQuery mode, which exhausts Fabric Capacity Units (CUs) by firing hundreds of ad-hoc SQL queries against OneLake. Enforcing strict dimensional star schemas, pre-calculating complex measures in Spark/Delta Gold tables, and tuning table framing prevents silent fallback and guarantees pure VertiPaq in-memory performance.",
+    "code": "-- Detect Power BI Direct Lake fallback to DirectQuery\nSELECT OperationName, ItemName, WorkspaceName, Duration_ms, ExecutionMode\nFROM fabric_monitoring.semantic_model_executions\nWHERE ExecutionMode = 'DirectQuery' -- Flagged fallback\n  AND Timestamp >= CURRENT_TIMESTAMP - INTERVAL '24 HOURS'\nORDER BY Duration_ms DESC;"
+  },
+  {
+    "title": "Snowflake Dynamic Tables Target Lag Optimization",
+    "savings": "70% - 80% Credit Reduction on Historical Reporting",
+    "summary": "Setting all Snowflake Dynamic Tables to TARGET_LAG = '1 minute' forces continuous warehouse wakeups and micro-batch commit overhead even when underlying source data changes infrequently or downstream consumers only refresh daily. Downsampling target lag to '1 hour' or '1 day' on summary marts—or synchronizing refresh triggers to upstream ETL completions via TARGET_LAG = DOWNSTREAM—reduces warehouse runtime from 720 hours/month to under 40 hours/month without impacting SLA.",
+    "code": "-- Alter Dynamic Table from high-cost 1-minute lag to downstream synchronization\nALTER DYNAMIC TABLE gold.daily_executive_metrics SET \n  TARGET_LAG = '1 hour', \n  WAREHOUSE = reporting_wh;\n\n-- Inspect compute consumption across Dynamic Tables\nSELECT name, target_lag, refresh_trigger, text, last_refresh_duration_seconds\nFROM snowflake.account_usage.dynamic_table_refresh_history\nWHERE start_time >= CURRENT_DATE - 7\nORDER BY last_refresh_duration_seconds DESC;"
+  },
+  {
+    "title": "BigQuery BigLake Multi-Cloud Zero-Copy Federation & Metadata Cache",
+    "savings": "85% Egress Cost Reduction & Sub-Second Query Acceleration",
+    "summary": "Querying petabyte-scale data lakes residing in AWS S3 or Azure ADLS Gen2 from BigQuery traditionally required expensive cross-cloud network transfers and high egress bandwidth charges. BigQuery BigLake establishes a secure, zero-copy connection using BigQuery Omni and federated external tables. Enabling metadata caching on BigLake tables caches Parquet file partition schemas and row group statistics locally in BigQuery, accelerating query planning by 10x and cutting scan fees on unchanged files.",
+    "code": "-- Configure BigLake External Table with automated metadata caching\nCREATE EXTERNAL TABLE `analytics.s3_lake_orders`\nWITH CONNECTION `us-east-1.aws_s3_connection`\nOPTIONS (\n  format = 'PARQUET',\n  uris = ['s3://corp-lake-bucket/silver/orders/*.parquet'],\n  enable_refresh = TRUE,\n  refresh_interval_minutes = 30,\n  max_staleness = INTERVAL 1 HOUR\n);"
   }
 ]

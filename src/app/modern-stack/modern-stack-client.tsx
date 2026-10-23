@@ -58,6 +58,301 @@ type ModernSubtab =
   | "compatibility"
   | "python";
 
+export interface EngineCompatRecord {
+  id: string;
+  name: string;
+  category: "lakehouse" | "distributed" | "embedded" | "realtime";
+  categoryLabel: string;
+  deltaLake: { status: "native" | "read" | "stage" | "none"; label: string; badge: string };
+  iceberg: { status: "native" | "uniform" | "shortcut" | "read" | "none"; label: string; badge: string };
+  hudi: { status: "native" | "read" | "none"; label: string; badge: string };
+  catalog: string;
+  catalogStandards: string[];
+  capabilities2026: string[];
+  spec: {
+    summary: string;
+    strengths: string;
+    pitfalls: string;
+    code: string;
+    codeLang: string;
+    codeFilename: string;
+  };
+}
+
+export const ENGINES_COMPATIBILITY_2026: EngineCompatRecord[] = [
+  {
+    id: "databricks",
+    name: "Databricks",
+    category: "lakehouse",
+    categoryLabel: "Cloud Lakehouse",
+    deltaLake: { status: "native", label: "Native (_delta_log)", badge: "Delta 4.0 Native" },
+    iceberg: { status: "uniform", label: "UniForm / Read", badge: "Zero-Copy UniForm" },
+    hudi: { status: "read", label: "Read Support", badge: "COW/MOR Read" },
+    catalog: "Unity Catalog (OSS)",
+    catalogStandards: ["Unity Catalog OSS", "Apache Polaris REST"],
+    capabilities2026: ["Delta 4.0 UniForm", "Liquid Clustering", "Deletion Vectors", "Serverless DBSQL Photon"],
+    spec: {
+      summary: "First-class native Delta Lake platform with bi-directional UniForm metadata generation, enabling Iceberg and Hudi readers to read Delta Parquet files without data replication.",
+      strengths: "Sub-5 second Serverless SQL cold-starts with C++ Photon vectorized execution, automated Liquid Clustering, centralized governance with Unity Catalog OSS.",
+      pitfalls: "Vendor lock-in if using proprietary features without UniForm; DBU costs can escalate without 2-minute serverless auto-stop.",
+      code: `-- Databricks SQL: Enable Delta UniForm with Iceberg metadata generation
+ALTER TABLE silver.fact_sales SET TBLPROPERTIES (
+  'delta.universalFormat.enabledFormats' = 'iceberg',
+  'delta.enableDeletionVectors' = 'true',
+  'delta.autoOptimize.autoCompact' = 'true'
+);
+OPTIMIZE silver.fact_sales CLUSTER BY (customer_id, order_date);`,
+      codeLang: "sql",
+      codeFilename: "databricks_uniform.sql"
+    }
+  },
+  {
+    id: "snowflake",
+    name: "Snowflake",
+    category: "lakehouse",
+    categoryLabel: "Cloud Lakehouse",
+    deltaLake: { status: "stage", label: "External Stage", badge: "Parquet Stage" },
+    iceberg: { status: "native", label: "Native Iceberg Table", badge: "Iceberg v2 Native" },
+    hudi: { status: "none", label: "None", badge: "Parquet Stage Only" },
+    catalog: "Apache Polaris / S3",
+    catalogStandards: ["Apache Polaris REST", "Snowflake Internal"],
+    capabilities2026: ["Iceberg Tables v2", "Polaris REST", "Dynamic Tables", "Cortex AI Vectors"],
+    spec: {
+      summary: "Full support for Native Iceberg Tables on external cloud storage (S3/ADLS/GCS) governed via Apache Polaris REST Catalog or Snowflake managed catalog.",
+      strengths: "Clean SQL interface, native Iceberg table read/write, automated lifecycle management via Polaris REST, zero warehouse maintenance.",
+      pitfalls: "Warehouse compute credit costs can be high on long-running unclustered scans; requires External Volume setup in cloud storage.",
+      code: `-- Snowflake: Create Native Iceberg Table linked to Apache Polaris REST Catalog
+CREATE OR REPLACE ICEBERG TABLE silver_orders
+  EXTERNAL_VOLUME = 'my_s3_ext_vol'
+  CATALOG = 'polaris_catalog_integration'
+  CATALOG_TABLE_NAME = 'silver.orders';
+SELECT * FROM silver_orders WHERE order_date >= '2026-01-01';`,
+      codeLang: "sql",
+      codeFilename: "snowflake_polaris_iceberg.sql"
+    }
+  },
+  {
+    id: "fabric",
+    name: "Microsoft Fabric",
+    category: "lakehouse",
+    categoryLabel: "Cloud Lakehouse",
+    deltaLake: { status: "native", label: "OneLake Native", badge: "OneLake Default" },
+    iceberg: { status: "shortcut", label: "Iceberg Shortcut", badge: "Zero-Copy Shortcut" },
+    hudi: { status: "read", label: "Parquet Shortcut", badge: "External Parquet" },
+    catalog: "OneLake Metastore",
+    catalogStandards: ["OneLake Metastore", "Microsoft Purview"],
+    capabilities2026: ["Power BI Direct Lake", "OneLake Shortcuts", "V-Order Parquet", "Capacity Smoothing"],
+    spec: {
+      summary: "Single SaaS lakehouse layer storing data as Delta Parquet with V-Order sorting in OneLake, powering Power BI Direct Lake mode with in-memory VertiPaq performance.",
+      strengths: "Sub-second Power BI Direct Lake mode with in-memory VertiPaq paging; unified OneLake shortcuts across ADLS, S3, and Dataverse.",
+      pitfalls: "Direct Lake falls back to slower DirectQuery if DAX measures or relationships exceed SKU limits; capacity throttling on bursting jobs.",
+      code: `# Fabric Spark Notebook: Writing V-Order optimized Delta tables for Direct Lake
+spark.conf.set("spark.sql.parquet.vorder.enabled", "true")
+(df.write.format("delta")
+   .mode("overwrite")
+   .option("overwriteSchema", "true")
+   .save("abfss://workspace@onelake.dfs.fabric.microsoft.com/lakehouse/Tables/fact_sales"))`,
+      codeLang: "python",
+      codeFilename: "fabric_direct_lake_write.py"
+    }
+  },
+  {
+    id: "bigquery",
+    name: "Google BigQuery",
+    category: "lakehouse",
+    categoryLabel: "Cloud Lakehouse",
+    deltaLake: { status: "native", label: "BigLake Delta", badge: "BigLake Storage" },
+    iceberg: { status: "native", label: "BigLake Iceberg", badge: "Iceberg v2/v3 Native" },
+    hudi: { status: "read", label: "Manifest Scan", badge: "Manifest External" },
+    catalog: "BigLake Metastore",
+    catalogStandards: ["BigLake Metastore", "Dataproc Metastore"],
+    capabilities2026: ["BigLake Multi-Cloud", "Omni Pushdown", "Metadata Caching", "ScaNN Vector Search"],
+    spec: {
+      summary: "BigLake abstraction layer provides zero-copy fine-grained security and query pushdown over Apache Iceberg and Delta Lake tables across Google Cloud, AWS S3, and Azure.",
+      strengths: "Serverless SQL without cluster provisioning; BigLake multi-cloud federation across AWS S3 and Azure ADLS Gen2 without egress duplication.",
+      pitfalls: "On-demand model ($6.25/TB) can be unpredictable on ad-hoc petabyte scans without slot reservations and query limits.",
+      code: `-- BigQuery: Create BigLake Apache Iceberg table over S3/GCS with metadata cache
+CREATE EXTERNAL TABLE \`project.lake.iceberg_orders\`
+WITH CONNECTION \`us-central1.gcs_lake_conn\`
+OPTIONS (
+  format = 'ICEBERG',
+  uris = ['gs://my-lakehouse/iceberg/metadata/v12.metadata.json'],
+  enable_refresh = TRUE,
+  refresh_interval_minutes = 30
+);`,
+      codeLang: "sql",
+      codeFilename: "bigquery_biglake_iceberg.sql"
+    }
+  },
+  {
+    id: "duckdb",
+    name: "DuckDB",
+    category: "embedded",
+    categoryLabel: "Embedded / In-Memory",
+    deltaLake: { status: "native", label: "delta extension", badge: "Vectorized Extension" },
+    iceberg: { status: "native", label: "iceberg extension", badge: "Iceberg v2/v3 Extension" },
+    hudi: { status: "read", label: "Direct Parquet", badge: "HTTPFS Range Scan" },
+    catalog: "MotherDuck / In-Memory",
+    catalogStandards: ["MotherDuck Cloud", "Local Catalog"],
+    capabilities2026: ["DuckDB 1.x In-Process", "Arrow C Data Interface", "HTTPFS Range Pushdown", "MotherDuck"],
+    spec: {
+      summary: "Embedded columnar analytics engine that queries Delta Lake and Apache Iceberg tables directly from local disk or remote S3/GCS via vectorized extensions without JVM overhead.",
+      strengths: "Instant startup (<10ms), zero cloud cluster overhead, runs in-process or in WebAssembly (Wasm), seamless Apache Arrow memory exchange.",
+      pitfalls: "Single-node memory ceiling (though out-of-core streaming helps); not designed as a multi-user concurrent transactional OLTP database.",
+      code: `-- DuckDB: Querying remote Delta and Iceberg tables directly from SQL
+INSTALL delta; LOAD delta;
+INSTALL iceberg; LOAD iceberg;
+INSTALL httpfs; LOAD httpfs;
+
+SELECT region, SUM(amount) as total_revenue
+FROM delta_scan('s3://prod-lake/silver/orders')
+WHERE order_date >= '2026-01-01'
+GROUP BY region;`,
+      codeLang: "sql",
+      codeFilename: "duckdb_lakehouse_query.sql"
+    }
+  },
+  {
+    id: "athena",
+    name: "AWS Athena / EMR",
+    category: "distributed",
+    categoryLabel: "Distributed Query",
+    deltaLake: { status: "native", label: "Delta Connector", badge: "Glue Delta Catalog" },
+    iceberg: { status: "native", label: "Athena v3 Native", badge: "Engine v3 Native" },
+    hudi: { status: "native", label: "Native Hudi", badge: "COW/MOR Native" },
+    catalog: "AWS Glue Data Catalog",
+    catalogStandards: ["AWS Glue Data Catalog", "Lake Formation"],
+    capabilities2026: ["Athena Engine v3", "Glue Automated Compaction", "Lake Formation Governance", "EMR Serverless"],
+    spec: {
+      summary: "Serverless interactive query service built on Trino, featuring deep native support for Apache Iceberg v2/v3 with positional deletes and automated Glue table optimization.",
+      strengths: "Fully serverless SQL over S3; deep integration with AWS Glue, Lake Formation fine-grained IAM, and automated table optimization.",
+      pitfalls: "Per-query pricing ($5/TB scanned) requires strict partition pruning; query start latency (1-3s) higher than in-memory engines.",
+      code: `-- AWS Athena: Native Apache Iceberg table creation with partition transform
+CREATE TABLE glue_catalog.silver.telemetry_events (
+  device_id STRING, event_time TIMESTAMP, metric_val DOUBLE
+)
+LOCATION 's3://my-lake-bucket/silver/telemetry/'
+TBLPROPERTIES (
+  'table_type' = 'ICEBERG',
+  'format' = 'PARQUET',
+  'write_compression' = 'ZSTD'
+);`,
+      codeLang: "sql",
+      codeFilename: "athena_iceberg_create.sql"
+    }
+  },
+  {
+    id: "trino",
+    name: "Trino / Starburst",
+    category: "distributed",
+    categoryLabel: "Distributed Query",
+    deltaLake: { status: "native", label: "Delta Connector", badge: "ACID Write & DV" },
+    iceberg: { status: "native", label: "Iceberg Connector", badge: "Iceberg v2/v3 Full" },
+    hudi: { status: "native", label: "Hudi Connector", badge: "Native MOR/COW" },
+    catalog: "Hive / Glue / Polaris",
+    catalogStandards: ["Apache Polaris REST", "AWS Glue", "Hive Metastore"],
+    capabilities2026: ["Iceberg Stored Procedures", "Dynamic Filtering", "Vectorized Spill to Disk", "Cross-Catalog Federation"],
+    spec: {
+      summary: "High-concurrency distributed MPP SQL query engine capable of performing full ACID reads, writes, and table maintenance procedures across Iceberg and Delta Lake.",
+      strengths: "Vendor-neutral open source engine; exceptional high-concurrency federated queries across Lakehouse, RDBMS, and object stores.",
+      pitfalls: "Requires dedicated cluster operations or Starburst Galaxy SaaS; memory tuning required for large unpruned shuffles.",
+      code: `-- Trino SQL: Run maintenance compaction procedure on Iceberg table
+ALTER TABLE iceberg.silver.sales_transactions
+EXECUTE optimize(file_size_threshold => '128MB');
+
+-- Expire snapshots older than 7 days
+ALTER TABLE iceberg.silver.sales_transactions
+EXECUTE expire_snapshots(retention_threshold => '7d');`,
+      codeLang: "sql",
+      codeFilename: "trino_iceberg_optimize.sql"
+    }
+  },
+  {
+    id: "flink",
+    name: "Apache Flink",
+    category: "realtime",
+    categoryLabel: "Real-Time & Streaming",
+    deltaLake: { status: "read", label: "Flink-Delta Sink", badge: "Streaming Sink" },
+    iceberg: { status: "native", label: "Native Streaming Sink", badge: "Iceberg v2/v3 Sink" },
+    hudi: { status: "native", label: "Flink-Hudi Pipeline", badge: "Streaming MOR Ingest" },
+    catalog: "Polaris / REST / Hive",
+    catalogStandards: ["Iceberg REST Catalog", "Apache Polaris", "Hive Metastore"],
+    capabilities2026: ["Streaming CDC Upserts", "Dynamic Tables", "Continuous Checkpoint Compaction", "Event-Time Watermarks"],
+    spec: {
+      summary: "The industry standard for real-time stateful stream processing, offering first-class streaming ingestion, changelog CDC commits, and continuous dynamic tables for Apache Iceberg and Hudi.",
+      strengths: "Sub-second streaming writes directly into open table formats; true event-driven streaming without high micro-batch latency.",
+      pitfalls: "Small file accumulation if commit intervals are set too low (<30s); state backend tuning (RocksDB) essential for large watermarks.",
+      code: `-- Flink SQL: Streaming CDC ingestion into Apache Iceberg table
+CREATE CATALOG polaris_catalog WITH (
+  'type' = 'iceberg',
+  'catalog-type' = 'rest',
+  'uri' = 'https://polaris.corp.internal/api/catalog'
+);
+
+INSERT INTO polaris_catalog.silver.cdc_orders
+SELECT order_id, customer_id, amount, event_time
+FROM kafka_raw_orders;`,
+      codeLang: "sql",
+      codeFilename: "flink_streaming_lakehouse.sql"
+    }
+  },
+  {
+    id: "starrocks",
+    name: "StarRocks / ClickHouse",
+    category: "realtime",
+    categoryLabel: "Real-Time & Streaming",
+    deltaLake: { status: "read", label: "External Delta Scan", badge: "SIMD Vectorized" },
+    iceberg: { status: "native", label: "Native Iceberg Cache", badge: "Native Direct Cache" },
+    hudi: { status: "read", label: "Vectorized MOR Scan", badge: "Vectorized MOR" },
+    catalog: "Polaris / Glue / Hive",
+    catalogStandards: ["Apache Polaris REST", "AWS Glue", "Hive Metastore"],
+    capabilities2026: ["SIMD Vectorized C++", "Sub-100ms OLAP", "Local NVMe SSD Cache", "Materialized Views"],
+    spec: {
+      summary: "Next-generation vectorized sub-second analytical engines that mount remote Lakehouse Parquet files directly into local NVMe caches for ultra-fast customer-facing dashboard queries.",
+      strengths: "Blazing fast interactive query performance (sub-100ms) over Parquet data lake files via C++ SIMD vectorization and local NVMe caching.",
+      pitfalls: "Not suited for multi-step heavy batch transformations or ML training; optimal as a serving-layer accelerator.",
+      code: `-- StarRocks: External Iceberg Catalog with automated NVMe disk cache
+CREATE EXTERNAL CATALOG iceberg_lakehouse
+PROPERTIES (
+  "type" = "iceberg",
+  "iceberg.catalog.type" = "rest",
+  "iceberg.catalog.uri" = "https://polaris.corp.internal/api/catalog"
+);
+
+SELECT region, COUNT(DISTINCT customer_id), SUM(revenue)
+FROM iceberg_lakehouse.silver.fact_orders
+WHERE order_date >= '2026-03-01'
+GROUP BY region;`,
+      codeLang: "sql",
+      codeFilename: "starrocks_iceberg_query.sql"
+    }
+  },
+  {
+    id: "dremio",
+    name: "Dremio",
+    category: "distributed",
+    categoryLabel: "Distributed Query",
+    deltaLake: { status: "read", label: "Zero-Copy Delta", badge: "Parquet Pushdown" },
+    iceberg: { status: "native", label: "Iceberg REST Engine", badge: "Iceberg REST Native" },
+    hudi: { status: "read", label: "Read Support", badge: "Hudi Read" },
+    catalog: "Dremio Arctic / Polaris",
+    catalogStandards: ["Dremio Arctic (Nessie)", "Apache Polaris REST"],
+    capabilities2026: ["Data Reflections Acceleration", "Git-for-Data Branching", "Sub-second BI", "Semantic Layer"],
+    spec: {
+      summary: "Open Lakehouse data fabric engine providing high-speed SQL queries directly over Apache Iceberg with automated Data Reflection acceleration and Git-for-data branching (Nessie / Polaris).",
+      strengths: "Apache Arrow Flight high-throughput transport, Git-for-data table branching (Nessie), transparent Data Reflections acceleration.",
+      pitfalls: "Reflections require ongoing maintenance and compute refresh; smaller community compared to Trino.",
+      code: `-- Dremio: Querying Apache Iceberg with automated Data Reflection acceleration
+SELECT 
+    d_year, d_moy, SUM(ss_net_paid) AS total_sales
+FROM arctic_lakehouse.gold.fact_sales
+GROUP BY d_year, d_moy;`,
+      codeLang: "sql",
+      codeFilename: "dremio_reflection_query.sql"
+    }
+  }
+];
+
 export interface ModernStackClientProps {
   initialModernStack: {
     stack: any[];
@@ -404,14 +699,95 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
   }, [blueprintCategory, blueprintSearch]);
 
   // ──────────────────────────────────────────────────────────
-  // 5. MATRIX: ENGINE SELECTOR
+  // 5. MATRIX: ENGINE SELECTOR & PATTERN SEARCH
   // ──────────────────────────────────────────────────────────
   const [matrixEngineFilter, setMatrixEngineFilter] = useState<
-    "side_by_side" | "python" | "pyspark" | "duckdb" | "sparksql" | "snowflake" | "bigquery"
+    "side_by_side" | "python" | "pyspark" | "duckdb" | "sparksql" | "snowflake" | "bigquery" | "trino" | "scala"
   >("side_by_side");
+  const [matrixSearch, setMatrixSearch] = useState<string>("");
+
+  const filteredCodeMatrix = useMemo(() => {
+    return modernCodeMatrix.filter((item) => {
+      const q = matrixSearch.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        item.topic.toLowerCase().includes(q) ||
+        (item.python && item.python.toLowerCase().includes(q)) ||
+        (item.pyspark && item.pyspark.toLowerCase().includes(q)) ||
+        (item.duckdb && item.duckdb.toLowerCase().includes(q)) ||
+        (item.snowflake && item.snowflake.toLowerCase().includes(q)) ||
+        (item.bigquery && item.bigquery.toLowerCase().includes(q)) ||
+        (item.trino && item.trino.toLowerCase().includes(q)) ||
+        (item.scala && item.scala.toLowerCase().includes(q))
+      );
+    });
+  }, [modernCodeMatrix, matrixSearch]);
 
   // ──────────────────────────────────────────────────────────
-  // 6. PYTHON QUESTIONS: SEARCH & CATEGORY
+  // 6. FINOPS PLAYBOOKS SEARCH & CATEGORY
+  // ──────────────────────────────────────────────────────────
+  const [costSearch, setCostSearch] = useState<string>("");
+  const [costCategoryFilter, setCostCategoryFilter] = useState<string>("all");
+
+  const filteredCostPlaybooks = useMemo(() => {
+    return modernCostPlaybooks.filter((item) => {
+      const q = costSearch.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        item.title.toLowerCase().includes(q) ||
+        item.summary.toLowerCase().includes(q) ||
+        item.savings.toLowerCase().includes(q) ||
+        item.code.toLowerCase().includes(q);
+
+      const matchesCat =
+        costCategoryFilter === "all" ||
+        (costCategoryFilter === "compute" &&
+          (item.title.toLowerCase().includes("cluster") ||
+            item.title.toLowerCase().includes("warehouse") ||
+            item.title.toLowerCase().includes("auto-suspend") ||
+            item.title.toLowerCase().includes("idle") ||
+            item.title.toLowerCase().includes("qas"))) ||
+        (costCategoryFilter === "storage" &&
+          (item.title.toLowerCase().includes("storage") ||
+            item.title.toLowerCase().includes("tiering") ||
+            item.title.toLowerCase().includes("vacuum") ||
+            item.title.toLowerCase().includes("compression") ||
+            item.title.toLowerCase().includes("zstd") ||
+            item.title.toLowerCase().includes("deletion vectors"))) ||
+        (costCategoryFilter === "fabric" && item.title.toLowerCase().includes("fabric")) ||
+        (costCategoryFilter === "snowflake" && item.title.toLowerCase().includes("snowflake")) ||
+        (costCategoryFilter === "bigquery" && item.title.toLowerCase().includes("bigquery"));
+
+      return matchesSearch && matchesCat;
+    });
+  }, [modernCostPlaybooks, costSearch, costCategoryFilter]);
+
+  // ──────────────────────────────────────────────────────────
+  // 7. COMPATIBILITY MATRIX FILTER & SEARCH
+  // ──────────────────────────────────────────────────────────
+  const [compatCategory, setCompatCategory] = useState<string>("all");
+  const [compatSearch, setCompatSearch] = useState<string>("");
+  const [selectedEngineId, setSelectedEngineId] = useState<string | null>(null);
+
+  const filteredEngines = useMemo(() => {
+    return ENGINES_COMPATIBILITY_2026.filter((e) => {
+      const matchCat = compatCategory === "all" || e.category === compatCategory;
+      const q = compatSearch.toLowerCase().trim();
+      const matchSearch =
+        !q ||
+        e.name.toLowerCase().includes(q) ||
+        e.categoryLabel.toLowerCase().includes(q) ||
+        e.catalog.toLowerCase().includes(q) ||
+        e.deltaLake.label.toLowerCase().includes(q) ||
+        e.iceberg.label.toLowerCase().includes(q) ||
+        e.hudi.label.toLowerCase().includes(q) ||
+        e.capabilities2026.some((c) => c.toLowerCase().includes(q));
+      return matchCat && matchSearch;
+    });
+  }, [compatCategory, compatSearch]);
+
+  // ──────────────────────────────────────────────────────────
+  // 8. PYTHON QUESTIONS: SEARCH & CATEGORY
   // ──────────────────────────────────────────────────────────
   const [pythonQSearch, setPythonQSearch] = useState("");
   const [pythonCategory, setPythonCategory] = useState<string>("all");
@@ -448,16 +824,16 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
               Modern Data Engineering &amp; AI Lakehouse Hub
             </h1>
             <p className="text-xs text-[var(--muted-foreground)] leading-relaxed break-words">
-              Open table formats (Delta UniForm &amp; Iceberg), metadata control planes (Polaris &amp; Unity Catalog),
+              Open table formats (Delta UniForm &amp; Iceberg v3), metadata control planes (Polaris REST &amp; Unity Catalog OSS),
               vectorized compute (Photon &amp; Polars), 6 live interactive simulators, {modernBlueprintsDb.length} production blueprints,
-              and 20+ runnable Python/PySpark/SQL solutions.
+              {modernCodeMatrix.length} polyglot matrix translations, and {modernCostPlaybooks.length} FinOps playbooks.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <div className="px-2.5 py-1 rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-center">
               <div className="text-sm sm:text-base font-bold text-blue-400 leading-none">
-                8 Engines
+                10 Engines
               </div>
               <div className="text-[10px] text-[var(--muted-foreground)] font-medium mt-0.5">Matrix First</div>
             </div>
@@ -521,11 +897,12 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       {activeTab === "compatibility" && (
         <div
           id="compatibility"
-          className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3.5 overflow-x-auto animate-in fade-in duration-200"
+          className="p-3 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-4 animate-in fade-in duration-200"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-[var(--border)]">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400 mb-1">
+          {/* Top Header & 2026 Standards Badges */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-[var(--border)]">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
                 <Table size={11} />
                 <span>2026 Lakehouse Cross-Engine Compatibility Matrix</span>
               </div>
@@ -533,164 +910,287 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                 Cloud Engine × Table Format Compatibility Matrix (2026 Standards)
               </h3>
               <p className="text-xs text-[var(--muted-foreground)] break-words">
-                Native write, metadata translation (UniForm / Polaris), and zero-copy cross-engine read support.
+                Native ACID write, bi-directional metadata synchronization (Delta UniForm &amp; Iceberg v3), REST catalogs (Polaris &amp; Unity Catalog OSS), and zero-copy cross-engine read support.
               </p>
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
+
+            <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
               <span className="text-[10px] px-2 py-0.5 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 font-medium">
-                7 Engines Analyzed
+                10 Engines Analyzed
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
+                Delta UniForm
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium">
+                Iceberg v3 Deletes
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">
-                Zero-Copy Read
+                Polaris &amp; UC OSS
               </span>
             </div>
           </div>
-          <table className="w-full text-xs text-left border-collapse min-w-[640px]">
-            <thead>
-              <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
-                <th className="py-2.5 px-3 font-semibold break-words">Engine / Service</th>
-                <th className="py-2.5 px-3 font-semibold break-words">Delta Lake</th>
-                <th className="py-2.5 px-3 font-semibold break-words">Apache Iceberg</th>
-                <th className="py-2.5 px-3 font-semibold break-words">Apache Hudi</th>
-                <th className="py-2.5 px-3 font-semibold break-words">Metadata Catalog</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">Databricks</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Native (_delta_log)
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> UniForm / Read
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
-                    <AlertTriangle size={13} className="shrink-0" /> Read Support
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">Unity Catalog (OSS)</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">Snowflake</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
-                    <AlertTriangle size={13} className="shrink-0" /> External Stage
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Native Iceberg Table
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-slate-500 font-medium break-words">
-                    <XCircle size={13} className="shrink-0" /> None
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">Apache Polaris / S3</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">Microsoft Fabric</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> OneLake Native
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Iceberg Shortcut
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
-                    <AlertTriangle size={13} className="shrink-0" /> Parquet Shortcut
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">OneLake Metastore</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">Google BigQuery</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> BigLake Delta
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> BigLake Iceberg
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
-                    <AlertTriangle size={13} className="shrink-0" /> Manifest
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">BigLake Metastore</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">DuckDB</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> delta extension
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> iceberg extension
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-yellow-400 font-medium break-words">
-                    <AlertTriangle size={13} className="shrink-0" /> Direct Parquet
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">MotherDuck / In-Memory</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">AWS Athena / EMR</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Athena Delta Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Athena v3 Native
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Native Hudi
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">AWS Glue Data Catalog</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-bold break-words">Trino</td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Native Delta Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Native Iceberg Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3">
-                  <span className="inline-flex items-center gap-1 text-green-400 font-medium break-words">
-                    <CheckCircle2 size={13} className="shrink-0" /> Native Hudi Connector
-                  </span>
-                </td>
-                <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">Hive / Glue / Polaris</td>
-              </tr>
-            </tbody>
-          </table>
+
+          {/* Filter Bar: Engine Categories & Live Search */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-2.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+            <div className="relative flex-1">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+              <input
+                type="text"
+                placeholder="Search engines, formats, catalogs, or 2026 capabilities..."
+                value={compatSearch}
+                onChange={(e) => setCompatSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-1)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+              {[
+                { id: "all", label: "All Engines (10)" },
+                { id: "lakehouse", label: "Cloud Lakehouse (4)" },
+                { id: "distributed", label: "Distributed Query (3)" },
+                { id: "realtime", label: "Real-Time & Streaming (2)" },
+                { id: "embedded", label: "Embedded (1)" },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCompatCategory(cat.id)}
+                  className={cn(
+                    "px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer",
+                    compatCategory === cat.id
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "bg-[var(--surface-1)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  )}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Compatibility Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left border-collapse min-w-[780px]">
+              <thead>
+                <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                  <th className="py-2.5 px-3 font-semibold break-words">Engine / Service</th>
+                  <th className="py-2.5 px-3 font-semibold break-words">Delta Lake</th>
+                  <th className="py-2.5 px-3 font-semibold break-words">Apache Iceberg</th>
+                  <th className="py-2.5 px-3 font-semibold break-words">Apache Hudi</th>
+                  <th className="py-2.5 px-3 font-semibold break-words">Metadata Catalog</th>
+                  <th className="py-2.5 px-3 font-semibold break-words">2026 Key Capabilities</th>
+                  <th className="py-2.5 px-3 font-semibold text-right">Specs</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
+                {filteredEngines.map((engine) => {
+                  const isSelected = selectedEngineId === engine.id;
+                  return (
+                    <React.Fragment key={engine.id}>
+                      <tr
+                        onClick={() => setSelectedEngineId(isSelected ? null : engine.id)}
+                        className={cn(
+                          "transition-colors cursor-pointer group",
+                          isSelected
+                            ? "bg-blue-600/10"
+                            : "hover:bg-[var(--surface-2)]"
+                        )}
+                      >
+                        <td className="py-2.5 px-3 font-bold break-words">
+                          <div className="flex flex-col">
+                            <span className="text-[13px] text-[var(--foreground)] group-hover:text-blue-400 transition-colors">
+                              {engine.name}
+                            </span>
+                            <span className="text-[10px] text-[var(--muted-foreground)] font-normal">
+                              {engine.categoryLabel}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Delta Lake Support */}
+                        <td className="py-2.5 px-3">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="inline-flex items-center gap-1 font-medium break-words text-green-400">
+                              {engine.deltaLake.status === "native" && <CheckCircle2 size={13} className="shrink-0" />}
+                              {engine.deltaLake.status === "stage" && <AlertTriangle size={13} className="shrink-0 text-yellow-400" />}
+                              {engine.deltaLake.status === "read" && <CheckCircle2 size={13} className="shrink-0 text-emerald-400" />}
+                              {engine.deltaLake.status === "none" && <XCircle size={13} className="shrink-0 text-slate-500" />}
+                              <span className={engine.deltaLake.status === "stage" ? "text-yellow-400" : engine.deltaLake.status === "none" ? "text-slate-500" : "text-green-400"}>
+                                {engine.deltaLake.label}
+                              </span>
+                            </span>
+                            <span className="text-[9px] text-[var(--muted-foreground)]">
+                              {engine.deltaLake.badge}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Apache Iceberg Support */}
+                        <td className="py-2.5 px-3">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="inline-flex items-center gap-1 font-medium break-words text-green-400">
+                              {engine.iceberg.status === "native" && <CheckCircle2 size={13} className="shrink-0" />}
+                              {engine.iceberg.status === "uniform" && <CheckCircle2 size={13} className="shrink-0 text-blue-400" />}
+                              {engine.iceberg.status === "shortcut" && <CheckCircle2 size={13} className="shrink-0 text-cyan-400" />}
+                              {engine.iceberg.status === "read" && <CheckCircle2 size={13} className="shrink-0 text-emerald-400" />}
+                              {engine.iceberg.status === "none" && <XCircle size={13} className="shrink-0 text-slate-500" />}
+                              <span className={engine.iceberg.status === "uniform" ? "text-blue-400" : engine.iceberg.status === "shortcut" ? "text-cyan-400" : engine.iceberg.status === "none" ? "text-slate-500" : "text-green-400"}>
+                                {engine.iceberg.label}
+                              </span>
+                            </span>
+                            <span className="text-[9px] text-[var(--muted-foreground)]">
+                              {engine.iceberg.badge}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Apache Hudi Support */}
+                        <td className="py-2.5 px-3">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="inline-flex items-center gap-1 font-medium break-words">
+                              {engine.hudi.status === "native" && <CheckCircle2 size={13} className="shrink-0 text-green-400" />}
+                              {engine.hudi.status === "read" && <AlertTriangle size={13} className="shrink-0 text-yellow-400" />}
+                              {engine.hudi.status === "none" && <XCircle size={13} className="shrink-0 text-slate-500" />}
+                              <span className={engine.hudi.status === "native" ? "text-green-400" : engine.hudi.status === "read" ? "text-yellow-400" : "text-slate-500"}>
+                                {engine.hudi.label}
+                              </span>
+                            </span>
+                            <span className="text-[9px] text-[var(--muted-foreground)]">
+                              {engine.hudi.badge}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Metadata Catalog */}
+                        <td className="py-2.5 px-3 text-[var(--muted-foreground)] break-words">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-medium text-[var(--foreground)]">{engine.catalog}</span>
+                            <div className="flex flex-wrap gap-1">
+                              {engine.catalogStandards.map((std) => (
+                                <span key={std} className="text-[9px] px-1 py-0.2 rounded bg-[var(--surface-2)] text-[var(--muted-foreground)] font-mono">
+                                  {std}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* 2026 Capabilities Chips */}
+                        <td className="py-2.5 px-3">
+                          <div className="flex flex-wrap gap-1 max-w-[240px]">
+                            {engine.capabilities2026.slice(0, 3).map((cap) => (
+                              <span
+                                key={cap}
+                                className="text-[9px] px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-300 border border-blue-500/20 whitespace-nowrap"
+                              >
+                                {cap}
+                              </span>
+                            ))}
+                            {engine.capabilities2026.length > 3 && (
+                              <span className="text-[9px] text-[var(--muted-foreground)] self-center">
+                                +{engine.capabilities2026.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Inspect Button */}
+                        <td className="py-2.5 px-3 text-right">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedEngineId(isSelected ? null : engine.id);
+                            }}
+                            className={cn(
+                              "px-2 py-1 rounded-md text-[11px] font-semibold transition-all inline-flex items-center gap-1",
+                              isSelected
+                                ? "bg-blue-600 text-white shadow-xs"
+                                : "bg-[var(--surface-2)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                            )}
+                          >
+                            <span>{isSelected ? "Close" : "Inspect"}</span>
+                            <ChevronDown
+                              size={12}
+                              className={cn("transition-transform duration-200", isSelected && "rotate-180")}
+                            />
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Expandable Engine Technical Specification Drawer */}
+                      {isSelected && (
+                        <tr className="bg-[var(--surface-2)]/80 border-b border-[var(--border)]">
+                          <td colSpan={7} className="p-3.5 space-y-3">
+                            <div className="p-3.5 rounded-xl bg-[var(--surface-1)] border border-blue-500/30 space-y-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[var(--border)]">
+                                <div>
+                                  <div className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider">
+                                    2026 Architecture Deep Dive &amp; Configuration
+                                  </div>
+                                  <h4 className="text-xs sm:text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+                                    <span>{engine.name} ({engine.categoryLabel})</span>
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                                      2026 Verified
+                                    </span>
+                                  </h4>
+                                </div>
+                                <div className="text-xs text-[var(--muted-foreground)]">
+                                  Primary Catalog: <strong className="text-[var(--foreground)]">{engine.catalog}</strong>
+                                </div>
+                              </div>
+
+                              <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                                {engine.spec.summary}
+                              </p>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                                <div className="p-2.5 rounded-lg bg-[var(--surface-2)] border border-emerald-500/20 space-y-1">
+                                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
+                                    Architecture Strengths
+                                  </span>
+                                  <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+                                    {engine.spec.strengths}
+                                  </p>
+                                </div>
+                                <div className="p-2.5 rounded-lg bg-[var(--surface-2)] border border-orange-500/20 space-y-1">
+                                  <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider block">
+                                    Production Pitfalls &amp; FinOps Warnings
+                                  </span>
+                                  <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+                                    {engine.spec.pitfalls}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Production Code Snippet */}
+                              <div className="space-y-1.5 pt-1">
+                                <div className="text-[11px] font-mono text-blue-300 font-semibold flex items-center gap-1.5">
+                                  <Terminal size={12} />
+                                  <span>Production Configuration / DDL Snippet</span>
+                                </div>
+                                <CodeBlock
+                                  code={engine.spec.code}
+                                  language={engine.spec.codeLang}
+                                  filename={engine.spec.codeFilename}
+                                  showLineNumbers={false}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {filteredEngines.length === 0 && (
+            <div className="p-8 text-center text-xs text-[var(--muted-foreground)] rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+              No engines found matching your filter criteria.
+            </div>
+          )}
         </div>
       )}
 
@@ -786,27 +1286,51 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                 <tbody className="divide-y divide-[var(--border)] text-[var(--foreground)]">
                   <tr>
                     <td className="py-2.5 px-3 font-semibold text-purple-300">Storage &amp; Format</td>
-                    <td className="py-2.5 px-3">Open Parquet in customer S3/ADLS with UniForm or Iceberg v2/v3</td>
-                    <td className="py-2.5 px-3">Proprietary micro-partition format or managed external Iceberg</td>
+                    <td className="py-2.5 px-3">Open Parquet in customer S3/ADLS with Delta UniForm or Iceberg v2/v3 metadata</td>
+                    <td className="py-2.5 px-3">Proprietary micro-partition format or managed external Iceberg tables</td>
                     <td className="py-2.5 px-3">Local single-file database or remote Parquet reading via HTTP range requests</td>
                   </tr>
                   <tr>
                     <td className="py-2.5 px-3 font-semibold text-purple-300">Catalog Governance</td>
-                    <td className="py-2.5 px-3">Unity Catalog OSS / Apache Polaris REST (vendor-neutral)</td>
-                    <td className="py-2.5 px-3">Snowflake / BigQuery native catalog with external REST links</td>
-                    <td className="py-2.5 px-3">MotherDuck cloud catalog or file-system paths</td>
+                    <td className="py-2.5 px-3">Unity Catalog OSS / Apache Polaris REST (vendor-neutral open standard)</td>
+                    <td className="py-2.5 px-3">Snowflake / BigQuery native catalog with external REST federated links</td>
+                    <td className="py-2.5 px-3">MotherDuck cloud catalog or in-process local file paths</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Compute &amp; Engine</td>
+                    <td className="py-2.5 px-3">Serverless Photon C++ SIMD, Apache Spark 3.5/4.0, and Polars streaming</td>
+                    <td className="py-2.5 px-3">Multi-cluster elastic virtual warehouses, Dynamic Tables, and Serverless SQL</td>
+                    <td className="py-2.5 px-3">In-process vectorized C++ execution with zero JVM garbage collection</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Row Mutations &amp; Deletions</td>
+                    <td className="py-2.5 px-3">Delta Deletion Vectors (bitmap) &amp; Iceberg Position Deletes without file rewrites</td>
+                    <td className="py-2.5 px-3">Micro-partition partition rewrites or managed Iceberg position delete files</td>
+                    <td className="py-2.5 px-3">In-memory append-only upsert (ON CONFLICT) or sorted Parquet export</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Zero-Copy Interoperability</td>
+                    <td className="py-2.5 px-3">Direct Lake VertiPaq in Fabric, bi-directional Delta UniForm &amp; Iceberg sync</td>
+                    <td className="py-2.5 px-3">BigLake Omni multi-cloud scan, Snowflake Iceberg External Volumes</td>
+                    <td className="py-2.5 px-3">Apache Arrow C Data Interface zero-copy memory exchange with Polars/Pandas</td>
                   </tr>
                   <tr>
                     <td className="py-2.5 px-3 font-semibold text-purple-300">Compute Cost Model</td>
-                    <td className="py-2.5 px-3">Serverless DBU or VM compute; zero storage markup</td>
-                    <td className="py-2.5 px-3">Credit-based warehouse compute + per-TB storage charges</td>
-                    <td className="py-2.5 px-3">Free local compute; low-cost serverless MotherDuck</td>
+                    <td className="py-2.5 px-3">Serverless DBU or VM compute; zero storage markup on customer cloud bucket</td>
+                    <td className="py-2.5 px-3">Credit-based warehouse compute + per-TB storage / on-demand scan charges</td>
+                    <td className="py-2.5 px-3">Free local compute; low-cost serverless MotherDuck cloud tier</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 px-3 font-semibold text-purple-300">Best Suited For</td>
-                    <td className="py-2.5 px-3">Multi-engine enterprise lakehouses, large-scale Spark/AI ETL</td>
-                    <td className="py-2.5 px-3">Interactive BI, financial reporting, highly structured EDWs</td>
-                    <td className="py-2.5 px-3">Lightweight pipelines, local analytics, edge processing, serverless apps</td>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Best Suited Workloads</td>
+                    <td className="py-2.5 px-3">Multi-engine enterprise lakehouses, petabyte ETL, streaming CDC, GenAI RAG</td>
+                    <td className="py-2.5 px-3">Interactive BI, financial reporting, highly structured EDWs, SQL-first teams</td>
+                    <td className="py-2.5 px-3">Sub-500GB pipelines, local analytics, edge processing, serverless apps</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2.5 px-3 font-semibold text-purple-300">Primary Anti-Patterns</td>
+                    <td className="py-2.5 px-3">High-frequency single-row OLTP transactions without batching/micro-batching</td>
+                    <td className="py-2.5 px-3">Unbounded ad-hoc full-table scans on on-demand pricing without query limits</td>
+                    <td className="py-2.5 px-3">Multi-terabyte distributed shuffles requiring multi-node coordination</td>
                   </tr>
                 </tbody>
               </table>
@@ -1771,46 +2295,62 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
       {/* ────────────────────────────────────────────────────────── */}
       {activeTab === "matrix" && (
         <div id="matrix" className="space-y-4 animate-in fade-in duration-200">
-          {/* Mode Selector */}
+          {/* Header & Mode Selector */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
             <div>
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] flex items-center gap-1.5">
                 <FileCode2 size={15} className="text-purple-400" />
-                Polyglot Engine Translation Matrix ({modernCodeMatrix.length} Core Patterns)
+                Polyglot Engine Translation Matrix ({filteredCodeMatrix.length} of {modernCodeMatrix.length} Core Patterns)
               </h3>
               <p className="text-xs text-[var(--muted-foreground)]">
                 Compare idiomatic implementations across modern distributed and single-node engines.
               </p>
             </div>
-            <div className="flex items-center gap-1 overflow-x-auto scrollbar-none self-start sm:self-auto">
-              {[
-                { id: "side_by_side", label: "Side-by-Side" },
-                { id: "python", label: "Polars (Python)" },
-                { id: "pyspark", label: "PySpark" },
-                { id: "duckdb", label: "DuckDB" },
-                { id: "sparksql", label: "Spark SQL" },
-                { id: "snowflake", label: "Snowflake" },
-                { id: "bigquery", label: "BigQuery" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setMatrixEngineFilter(tab.id as typeof matrixEngineFilter)}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
-                    matrixEngineFilter === tab.id
-                      ? "bg-blue-600 text-white shadow-xs font-semibold"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)]"
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
+
+            {/* Pattern Search Box */}
+            <div className="relative w-full sm:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+              <input
+                type="text"
+                placeholder="Search patterns (e.g. time travel, cdc, join)..."
+                value={matrixSearch}
+                onChange={(e) => setMatrixSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
+              />
             </div>
+          </div>
+
+          {/* Engine Filter Pills */}
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+            {[
+              { id: "side_by_side", label: "Side-by-Side (3-Engine)" },
+              { id: "python", label: "Polars (Python)" },
+              { id: "pyspark", label: "PySpark" },
+              { id: "duckdb", label: "DuckDB" },
+              { id: "sparksql", label: "Spark SQL" },
+              { id: "snowflake", label: "Snowflake" },
+              { id: "bigquery", label: "BigQuery" },
+              { id: "trino", label: "Trino" },
+              { id: "scala", label: "Scala Spark" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setMatrixEngineFilter(tab.id as typeof matrixEngineFilter)}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
+                  matrixEngineFilter === tab.id
+                    ? "bg-blue-600 text-white shadow-xs font-semibold"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-1)]"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Matrix Cards */}
           <div className="space-y-3">
-            {modernCodeMatrix.map((item, idx) => (
+            {filteredCodeMatrix.map((item, idx) => (
               <div
                 key={idx}
                 className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-3"
@@ -1856,8 +2396,20 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
                     </div>
                     <CodeBlock
                       code={(item as any)[matrixEngineFilter] || item.python}
-                      language={matrixEngineFilter === "python" || matrixEngineFilter === "pyspark" ? "python" : "sql"}
-                      filename={`${item.topic.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.${matrixEngineFilter === "python" || matrixEngineFilter === "pyspark" ? "py" : "sql"}`}
+                      language={
+                        matrixEngineFilter === "python" || matrixEngineFilter === "pyspark"
+                          ? "python"
+                          : matrixEngineFilter === "scala"
+                          ? "scala"
+                          : "sql"
+                      }
+                      filename={`${item.topic.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.${
+                        matrixEngineFilter === "python" || matrixEngineFilter === "pyspark"
+                          ? "py"
+                          : matrixEngineFilter === "scala"
+                          ? "scala"
+                          : "sql"
+                      }`}
                       badge={matrixEngineFilter.toUpperCase()}
                       showLineNumbers
                     />
@@ -1866,6 +2418,12 @@ CREATE OR REPLACE RESOURCE MONITOR monthly_cap
               </div>
             ))}
           </div>
+
+          {filteredCodeMatrix.length === 0 && (
+            <div className="p-8 text-center text-xs text-[var(--muted-foreground)] rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+              No code matrix patterns found matching your search.
+            </div>
+          )}
         </div>
       )}
 
@@ -1941,6 +2499,51 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
                 codeLang: "python",
                 codeFilename: "semantic_chunker.py",
               },
+              {
+                title: "GraphRAG & Lakehouse Knowledge Graph Triples",
+                badge: "Graph Intelligence Standard",
+                desc: "Extracts entity-relation-entity triples (Subject-Predicate-Object) from unstructured lakehouse text using LLM pipelines, storing graphs in Parquet alongside vector embeddings for multi-hop reasoning.",
+                code: `# Python: Extracting Graph Triples and registering in Lakehouse
+import json
+from dataclasses import dataclass
+
+@dataclass
+class KnowledgeTriple:
+    subject: str
+    predicate: str
+    object: str
+    confidence: float
+
+# Spark / Polars ingestion pipeline stores triples as columnar table
+triples = [
+    KnowledgeTriple("Delta Lake", "supports_format", "Apache Iceberg UniForm", 0.99),
+    KnowledgeTriple("Apache Polaris", "implements_standard", "Iceberg REST Catalog", 1.0),
+    KnowledgeTriple("Fabric OneLake", "enables_mode", "Power BI Direct Lake", 0.98),
+]`,
+                codeLang: "python",
+                codeFilename: "graphrag_triples_pipeline.py",
+              },
+              {
+                title: "Agentic SQL Self-Correction & AST Guardrail Loop",
+                badge: "Autonomous Tool Validation",
+                desc: "Autonomous AI coding agents validate generated SQL queries against catalog schema ASTs before executing on production warehouses, intercepting schema mismatches and injection attacks.",
+                code: `# Python: Validating Agent SQL against Catalog Metadata AST
+import sqlglot
+from sqlglot.expressions import Table, Column
+
+def validate_agent_sql(sql_str: str, allowed_tables: set[str]) -> bool:
+    try:
+        expression = sqlglot.parse_one(sql_str, read="duckdb")
+        for table in expression.find_all(Table):
+            if table.name.lower() not in allowed_tables:
+                raise PermissionError(f"Table '{table.name}' unauthorized for AI Agent.")
+        return True
+    except Exception as e:
+        print(f"AST Validation Failed: {e}")
+        return False`,
+                codeLang: "python",
+                codeFilename: "agentic_sql_guardrail.py",
+              },
             ].map((item, idx) => (
               <div
                 key={idx}
@@ -1973,20 +2576,59 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
       {/* ────────────────────────────────────────────────────────── */}
       {activeTab === "cost" && (
         <div id="cost" className="space-y-4 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+          {/* Header & Search */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
             <div>
               <h3 className="text-xs sm:text-sm font-bold text-[var(--foreground)] flex items-center gap-1.5">
                 <Flame size={15} className="text-orange-400" />
-                FinOps &amp; Cloud Cost Engineering Playbooks ({modernCostPlaybooks.length} Strategies)
+                FinOps &amp; Cloud Cost Engineering Playbooks ({filteredCostPlaybooks.length} of {modernCostPlaybooks.length} Strategies)
               </h3>
               <p className="text-xs text-[var(--muted-foreground)]">
                 Quantifiable cloud compute and storage reduction techniques with production automation code.
               </p>
             </div>
+
+            {/* Cost Playbook Search */}
+            <div className="relative w-full sm:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+              <input
+                type="text"
+                placeholder="Search FinOps strategies (e.g. DBU, lag, tiering)..."
+                value={costSearch}
+                onChange={(e) => setCostSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[var(--surface-2)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
+              />
+            </div>
           </div>
 
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+            {[
+              { id: "all", label: "All Strategies (15)" },
+              { id: "compute", label: "Compute & Auto-Stop" },
+              { id: "storage", label: "Storage & Tiering" },
+              { id: "fabric", label: "Fabric & Capacity" },
+              { id: "snowflake", label: "Snowflake QAS & Dynamic" },
+              { id: "bigquery", label: "BigQuery Editions & BigLake" },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCostCategoryFilter(cat.id)}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
+                  costCategoryFilter === cat.id
+                    ? "bg-orange-600 text-white shadow-xs font-semibold"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface-1)]"
+                )}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Playbook Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {modernCostPlaybooks.map((item, idx) => (
+            {filteredCostPlaybooks.map((item, idx) => (
               <div
                 key={idx}
                 className="p-3.5 sm:p-4 rounded-xl bg-[var(--surface-1)] border border-[var(--border)] space-y-2.5 flex flex-col justify-between"
@@ -2010,6 +2652,12 @@ def chunk_sql_script(raw_sql: str) -> list[str]:
               </div>
             ))}
           </div>
+
+          {filteredCostPlaybooks.length === 0 && (
+            <div className="p-8 text-center text-xs text-[var(--muted-foreground)] rounded-xl bg-[var(--surface-1)] border border-[var(--border)]">
+              No FinOps playbooks found matching your search.
+            </div>
+          )}
         </div>
       )}
 

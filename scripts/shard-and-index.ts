@@ -12,6 +12,8 @@ import dataSparksqlJson from '../src/data/json/data_sparksql.json';
 import dataMssqlJson from '../src/data/json/data_mssql.json';
 import dataPythonJson from '../src/data/json/data_python.json';
 import modernBlueprintsJson from '../src/data/json/modern_blueprints.json';
+import modernCodeMatrixJson from '../src/data/json/modern_code_matrix.json';
+import modernCostPlaybooksJson from '../src/data/json/modern_cost_playbooks.json';
 import { GUIDED_TOPICS } from '../src/data/guided-learning-topics';
 import { architectureDiagrams } from '../src/data/diagrams';
 
@@ -328,6 +330,34 @@ function run() {
     category: 'Blueprints', page: 'Modern Stack', href: '/modern-stack#blueprints',
     domain: item.category, badge: item.category,
     tags: item.tags || [], body: `${item.category || ''} ${item.costEstimate || ''}`, iconType: 'cpu',
+  }));
+
+  (modernCodeMatrixJson as any[]).forEach((item, idx) => addDoc({
+    id: `matrix-pattern-${idx + 1}`,
+    type: 'matrix',
+    title: `${item.topic} (Polyglot Matrix)`,
+    category: 'Code Practice',
+    page: 'Modern Stack',
+    href: '/modern-stack?tab=matrix',
+    domain: 'Polyglot Matrix',
+    badge: 'Matrix',
+    tags: [item.topic, 'polars', 'pyspark', 'duckdb', 'snowflake', 'bigquery', 'trino', 'delta', 'iceberg'],
+    body: `${item.topic} comparative implementation across Polars, PySpark, DuckDB, Snowflake, BigQuery, and Trino.`,
+    iconType: 'terminal',
+  }));
+
+  (modernCostPlaybooksJson as any[]).forEach((item, idx) => addDoc({
+    id: `cost-playbook-${idx + 1}`,
+    type: 'finops',
+    title: `${item.title} (FinOps)`,
+    category: 'Architecture',
+    page: 'Modern Stack',
+    href: '/modern-stack?tab=cost',
+    domain: 'FinOps Playbooks',
+    badge: item.savings.split('(')[0].trim(),
+    tags: [item.title, 'finops', 'cost reduction', 'cloud storage', 'compute optimization', 'dbu', 'warehouse'],
+    body: `${item.summary} ${item.savings}`,
+    iconType: 'flame',
   }));
 
   architectureDiagrams.forEach((item: any) => addDoc({
