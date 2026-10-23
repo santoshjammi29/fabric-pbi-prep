@@ -294,8 +294,8 @@ export function CommandPalette() {
       return;
     }
 
-    // In testing or synchronous environments, execute portal search directly
-    if (typeof window === "undefined" || process.env.NODE_ENV === "test") {
+    // In testing environments, execute portal search directly
+    if (process.env.NODE_ENV === "test") {
       import("@/lib/search-engine").then(({ executePortalSearch }) => {
         const searchRes = executePortalSearch(q, 40);
         setIdentifiedTopics(searchRes.identifiedTopics);
@@ -306,7 +306,7 @@ export function CommandPalette() {
       return;
     }
 
-    // Client Debounced Fetch with Local Fallback
+    // Client Debounced Fetch
     setIsLoading(true);
     const timer = setTimeout(() => {
       fetch(`/api/search?q=${encodeURIComponent(q)}&limit=40`)
@@ -322,18 +322,8 @@ export function CommandPalette() {
             setRemoteResults(data.items.map(mapSearchResultToCommandItem));
           }
         })
-        .catch(async () => {
-          // Fallback to local synchronous engine if fetch fails
-          try {
-            const { executePortalSearch } = await import("@/lib/search-engine");
-            const fallback = executePortalSearch(q, 40);
-            setIdentifiedTopics(fallback.identifiedTopics);
-            setPageCounts(fallback.pageCounts);
-            setNavigationalJump(fallback.navigationalJump || null);
-            setRemoteResults(fallback.items.map(mapSearchResultToCommandItem));
-          } catch {
-            // silent
-          }
+        .catch(() => {
+          setRemoteResults([]);
         })
         .finally(() => {
           setIsLoading(false);

@@ -1,30 +1,5 @@
-import type {
-  Concept,
-  CodeSheetItem,
-  CheatCode,
-  DatabricksSuiteData,
-  ModernBlueprint,
-  CompanyProfile,
-  LearningPath,
-} from "@/types/data";
-
-import dataConceptsJson from "@/data/json/data_concepts.json";
-import dataArchitectureJson from "@/data/json/data_architecture.json";
-import qaCleanedJson from "@/data/json/questions_unified_cleaned.json";
-import questionsJson from "@/data/json/questions.json";
-import dataDeJson from "@/data/json/data_de.json";
-import dataCheatsheetJson from "@/data/json/data_cheatsheet.json";
-import databricksCheatsheetsJson from "@/data/json/databricks_cheatsheets.json";
-import databricks100Json from "@/data/json/databricks_100.json";
-import dataPathsJson from "@/data/json/data_paths.json";
-import companyProfilesJson from "@/data/json/company_profiles.json";
-import dataPysparkJson from "@/data/json/data_pyspark.json";
-import dataSparksqlJson from "@/data/json/data_sparksql.json";
-import dataMssqlJson from "@/data/json/data_mssql.json";
-import dataPythonJson from "@/data/json/data_python.json";
-import modernBlueprintsJson from "@/data/json/modern_blueprints.json";
+import searchCatalogJson from "@/data/json/search_catalog.json";
 import { GUIDED_TOPICS, GuidedTopic } from "@/data/guided-learning-topics";
-import { architectureDiagrams } from "@/data/diagrams";
 
 export * from "./search-types";
 import type { SearchCategory, SearchResultItem, TopicIdentification, NavigationalJump } from "./search-types";
@@ -407,9 +382,9 @@ export function identifyTopicsFromTokens(tokens: string[]): TopicIdentification[
 }
 
 /**
- * Internal Search Document Structure for the BM25 Inverted Index
+ * Internal Search Document Structure for the Google-Grade BM25F Search Catalog
  */
-interface IndexDocument {
+export interface CatalogItem {
   id: string;
   title: string;
   category: SearchCategory;
@@ -418,372 +393,63 @@ interface IndexDocument {
   badge?: string;
   snippet: string;
   keywords: string;
-  authority: number;
   iconType: string;
-  titleTokens: string[];
-  kwTokens: string[];
-  snipTokens: string[];
+  priority: number;
 }
 
-interface PostingEntry {
-  docIdx: number;
-  tfTitle: number;
-  tfKw: number;
-  tfSnip: number;
+export type CatalogTuple = [
+  string, // 0: id
+  string, // 1: title
+  string, // 2: tLow
+  number, // 3: catIdx
+  number, // 4: pageIdx
+  number, // 5: iconIdx
+  string, // 6: href
+  string, // 7: badge
+  string, // 8: snippet
+  string, // 9: kLow
+  number  // 10: priority
+];
+
+interface CatalogPayload {
+  categories: string[];
+  pages: string[];
+  icons: string[];
+  docs: CatalogTuple[];
 }
 
-class InvertedSearchIndex {
-  public docs: IndexDocument[] = [];
-  public postings: Map<string, PostingEntry[]> = new Map();
-  public vocab: string[] = [];
-  private isInitialized = false;
+const catalogPayload = searchCatalogJson as unknown as CatalogPayload;
+
+function matchesWordWithTypo(text: string, tok: string): boolean {
+  let start = 0;
+  for (let i = 0; i <= text.length; i++) {
+    const isDelim =
+      i === text.length ||
+      text.charCodeAt(i) <= 32 ||
+      text.charCodeAt(i) === 44 ||
+      text.charCodeAt(i) === 45 ||
+      text.charCodeAt(i) === 58 ||
+      text.charCodeAt(i) === 47;
+    if (isDelim) {
+      const len = i - start;
+      if (len >= 4 && Math.abs(len - tok.length) <= 1) {
+        const word = text.slice(start, i);
+        if (levenshteinDistance(tok, word) <= 1) return true;
+      }
+      start = i + 1;
+    }
+  }
+  return false;
+}
+
+export class InvertedSearchIndex {
+  public docs: CatalogTuple[] = catalogPayload.docs || [];
+  public categories: string[] = catalogPayload.categories || [];
+  public pages: string[] = catalogPayload.pages || [];
+  public icons: string[] = catalogPayload.icons || [];
 
   public init() {
-    if (this.isInitialized) return;
-    this.buildIndex();
-    this.isInitialized = true;
-  }
-
-  private addDoc(
-    id: string,
-    title: string,
-    category: SearchCategory,
-    page: string,
-    href: string,
-    badge: string | undefined,
-    snippet: string,
-    keywords: string,
-    authority: number,
-    iconType: string
-  ) {
-    const docIdx = this.docs.length;
-    const titleTokens = tokenizeQuery(title);
-    const kwTokens = tokenizeQuery(keywords);
-    const snipTokens = tokenizeQuery(snippet);
-
-    const doc: IndexDocument = {
-      id,
-      title,
-      category,
-      page,
-      href,
-      badge,
-      snippet,
-      keywords,
-      authority,
-      iconType,
-      titleTokens,
-      kwTokens,
-      snipTokens,
-    };
-    this.docs.push(doc);
-
-    // Compute Term Frequencies
-    const tfTitleMap = new Map<string, number>();
-    for (const t of titleTokens) {
-      const stem = stemToken(t);
-      tfTitleMap.set(t, (tfTitleMap.get(t) || 0) + 1);
-      if (stem !== t) tfTitleMap.set(stem, (tfTitleMap.get(stem) || 0) + 1);
-    }
-
-    const tfKwMap = new Map<string, number>();
-    for (const t of kwTokens) {
-      const stem = stemToken(t);
-      tfKwMap.set(t, (tfKwMap.get(t) || 0) + 1);
-      if (stem !== t) tfKwMap.set(stem, (tfKwMap.get(stem) || 0) + 1);
-    }
-
-    const tfSnipMap = new Map<string, number>();
-    for (const t of snipTokens) {
-      const stem = stemToken(t);
-      tfSnipMap.set(t, (tfSnipMap.get(t) || 0) + 1);
-      if (stem !== t) tfSnipMap.set(stem, (tfSnipMap.get(stem) || 0) + 1);
-    }
-
-    const allTerms = new Set([...tfTitleMap.keys(), ...tfKwMap.keys(), ...tfSnipMap.keys()]);
-    for (const term of allTerms) {
-      let list = this.postings.get(term);
-      if (!list) {
-        list = [];
-        this.postings.set(term, list);
-      }
-      list.push({
-        docIdx,
-        tfTitle: tfTitleMap.get(term) || 0,
-        tfKw: tfKwMap.get(term) || 0,
-        tfSnip: tfSnipMap.get(term) || 0,
-      });
-    }
-  }
-
-  private buildIndex() {
-    // 1. Guided Learning Topics
-    for (const topic of GUIDED_TOPICS) {
-      this.addDoc(
-        `topic-${topic.key}`,
-        `Guided Learning: ${topic.label} Track`,
-        "Guided Track",
-        "Guided Learning",
-        `/guided-learning?topic=${topic.key}`,
-        `Track · ${topic.domain}`,
-        topic.description,
-        `${topic.key} ${topic.domain} ${topic.executiveSummary} ${(TOPIC_SYNONYMS[topic.key] || []).join(" ")}`,
-        1.3,
-        "sparkles"
-      );
-    }
-
-    // 2. Concepts (dataConceptsJson)
-    for (const c of (dataConceptsJson as unknown as Concept[])) {
-      this.addDoc(
-        `concept-${c.id}`,
-        `${c.term} (${c.category})`,
-        "Concepts",
-        "Key Concepts",
-        `/concepts?tab=concepts&category=${encodeURIComponent(c.category)}&term=${encodeURIComponent(c.term)}`,
-        c.difficulty || "Core",
-        c.definition || "",
-        [c.category, ...(c.keyPoints || []), ...(c.relatedTerms || [])].join(" "),
-        1.8,
-        "book"
-      );
-    }
-
-    // 3. Architecture Scenarios (dataArchitectureJson - 3,206 items)
-    for (const a of (dataArchitectureJson as any[])) {
-      const qText = a.question || a.title || `Scenario ${a.id}`;
-      const ansText = a.answer || a.architectureSolution || "";
-      this.addDoc(
-        `arch-${a.id}`,
-        qText,
-        "Architecture",
-        "Architecture Hub",
-        `/architecture?category=${encodeURIComponent(a.category || "ALL")}&card=${encodeURIComponent(a.id)}`,
-        a.difficulty || "ARCHITECT",
-        ansText.slice(0, 160),
-        [a.category, a.niche, a.source].filter(Boolean).join(" "),
-        1.5,
-        "cpu"
-      );
-    }
-
-    // 4. Q&A Prep Questions (6,829 unique items across cleaned + candidate datasets)
-    const seenQa = new Set<string>();
-    const allQaDatasets = [qaCleanedJson as any[], questionsJson as any[], dataDeJson as any[]];
-    for (const dataset of allQaDatasets) {
-      for (const q of dataset) {
-        if (!q || !q.id || seenQa.has(q.id)) continue;
-        seenQa.add(q.id);
-        const ans = q.answer || "";
-        this.addDoc(
-          `qa-${q.id}`,
-          q.question,
-          "Q&A Prep",
-          "Q&A Prep Hub",
-          `/qa-prep?category=${encodeURIComponent(q.category || "ALL")}&card=${encodeURIComponent(q.id)}`,
-          q.difficulty || "Senior",
-          ans.slice(0, 160),
-          [q.category, q.categoryLabel, q.niche, q.domain, q.sourceLabel].filter(Boolean).join(" "),
-          1.4,
-          "message"
-        );
-      }
-    }
-
-    // 5. Code Practice (pyspark, sparksql, mssql, python)
-    const codeSets = [
-      { items: dataPysparkJson as CodeSheetItem[], name: "PySpark" },
-      { items: dataSparksqlJson as CodeSheetItem[], name: "SparkSQL" },
-      { items: dataMssqlJson as CodeSheetItem[], name: "Advanced SQL" },
-      { items: dataPythonJson as CodeSheetItem[], name: "Python" },
-    ];
-    for (const set of codeSets) {
-      for (const item of set.items) {
-        this.addDoc(
-          `code-${set.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${item.id}`,
-          `${item.title} (${set.name})`,
-          "Code Practice",
-          "Code Practice",
-          `/code-practice`,
-          item.level || "PROD",
-          item.description || item.use_case || "",
-          [set.name, item.category, item.level, item.use_case].filter(Boolean).join(" "),
-          1.4,
-          "terminal"
-        );
-      }
-    }
-
-    // 6. Cheatsheets & Databricks 100
-    for (const c of (dataCheatsheetJson as CheatCode[])) {
-      this.addDoc(
-        `cheat-${c.id}`,
-        `${c.title} — ${c.category}`,
-        "Cheat Sheets",
-        "Cheat Sheets",
-        `/cheat-sheet?id=${c.id}`,
-        c.impact || "PROD",
-        c.problem || c.solution || "",
-        [c.category, ...(c.tags || []), c.whyItMatters].filter(Boolean).join(" "),
-        1.5,
-        "terminal"
-      );
-    }
-
-    if (Array.isArray((databricksCheatsheetsJson as any)?.cards)) {
-      for (const card of (databricksCheatsheetsJson as any).cards) {
-        this.addDoc(
-          `dbx-cheat-${card.id}`,
-          `${card.title} (Databricks)`,
-          "Cheat Sheets",
-          "Cheat Sheets",
-          `/cheat-sheet`,
-          card.tag || "PROD",
-          card.description || card.tag || "",
-          [card.domain, card.domainTitle, card.tag, "databricks"].filter(Boolean).join(" "),
-          1.4,
-          "terminal"
-        );
-      }
-    }
-
-    for (const d100 of (databricks100Json as any[])) {
-      this.addDoc(
-        `dbx100-${d100.id}`,
-        `Day ${d100.day}: ${d100.concept} (Databricks 100)`,
-        "Code Practice",
-        "Databricks Coding",
-        `/code-practice/databricks`,
-        d100.difficulty || "PROD",
-        d100.summary || "",
-        [d100.category, ...(d100.keyPoints || []), "databricks 100"].filter(Boolean).join(" "),
-        1.5,
-        "flame"
-      );
-    }
-
-    // 7. Modern Blueprints & Whiteboard Architecture Diagrams
-    for (const b of (modernBlueprintsJson as ModernBlueprint[])) {
-      this.addDoc(
-        `bp-${b.id}`,
-        b.title,
-        "Blueprints",
-        "Modern Stack",
-        `/modern-stack#blueprints`,
-        b.category,
-        `Blueprint: ${b.category} (${b.costEstimate || "Serverless"})`,
-        [b.category, ...(b.tags || [])].join(" "),
-        1.6,
-        "cpu"
-      );
-    }
-
-    for (const diag of architectureDiagrams) {
-      this.addDoc(
-        `diagram-${diag.id}`,
-        `${diag.title} (Whiteboard)`,
-        "Blueprints",
-        "Architecture",
-        `/architecture#${diag.id}`,
-        "Whiteboard",
-        diag.subtitle || diag.description || "",
-        [...(diag.tags || []), diag.category, "whiteboard", "diagram", "blueprint", "architecture", ...(diag.keyPoints || [])].join(" "),
-        1.7,
-        "layout"
-      );
-    }
-
-    // 8. Simulators
-    const simulators = [
-      {
-        id: "sim-shuffle",
-        title: "Simulator: Spark Shuffle & Partition Estimator",
-        category: "Simulators" as SearchCategory,
-        page: "Modern Stack",
-        href: "/modern-stack#simulators",
-        badge: "Interactive Tool",
-        snippet: "Interactive partition and memory calculation for large Apache Spark shuffle stages.",
-        keywords: "spark shuffle partition memory estimator calculator tuning spill oom",
-      },
-      {
-        id: "sim-delta",
-        title: "Simulator: Iceberg vs Delta Decision Tree",
-        category: "Simulators" as SearchCategory,
-        page: "Modern Stack",
-        href: "/modern-stack#simulators",
-        badge: "Interactive Tool",
-        snippet: "Decision engine for choosing between Apache Iceberg and Delta Lake table formats.",
-        keywords: "iceberg delta lakehouse table format decision tree simulator comparison",
-      },
-      {
-        id: "sim-cost",
-        title: "Simulator: Serverless Cloud Cost Calculator",
-        category: "Simulators" as SearchCategory,
-        page: "Modern Stack",
-        href: "/modern-stack#simulators",
-        badge: "Interactive Tool",
-        snippet: "Cloud compute and storage cost estimation across Azure, AWS, and GCP data workloads.",
-        keywords: "cost calculator serverless cloud finops simulator pricing azure aws gcp",
-      },
-      {
-        id: "sim-spark-engine",
-        title: "Spark Engine & Execution Simulator",
-        category: "Simulators" as SearchCategory,
-        page: "Spark Engine",
-        href: "/spark-engine",
-        badge: "Engine",
-        snippet: "Visual runtime simulator for Catalyst optimizer, Tungsten off-heap memory, and AQE execution.",
-        keywords: "spark engine simulator catalyst tungsten aqe photon stages tasks memory",
-      },
-    ];
-    for (const sim of simulators) {
-      this.addDoc(
-        sim.id,
-        sim.title,
-        sim.category,
-        sim.page,
-        sim.href,
-        sim.badge,
-        sim.snippet,
-        sim.keywords,
-        1.7,
-        "calculator"
-      );
-    }
-
-    // 9. Learning Paths
-    for (const p of (dataPathsJson as LearningPath[])) {
-      this.addDoc(
-        `path-${p.id}`,
-        `${p.title} (${p.weeks} Weeks)`,
-        "Learning Paths",
-        "Learning Paths",
-        `/learning-paths?id=${p.id}`,
-        `${p.weeks}w`,
-        p.description || "",
-        (p.skills || []).join(" "),
-        1.3,
-        "compass"
-      );
-    }
-
-    // 10. Company Profiles
-    for (const cp of (companyProfilesJson as CompanyProfile[])) {
-      this.addDoc(
-        `company-${cp.id}`,
-        `${cp.name} — GCC Tech Profile`,
-        "Companies",
-        "Company Research",
-        `/company-research`,
-        cp.tier || "GCC",
-        cp.keyChallenges || `Location: ${cp.location}`,
-        [...(cp.stack || []), ...(cp.interviewFocus || []), cp.location || ""].join(" "),
-        1.3,
-        "building"
-      );
-    }
-
-    this.vocab = Array.from(this.postings.keys());
+    // Zero-overhead initialization
   }
 
   /**
@@ -805,151 +471,169 @@ class InvertedSearchIndex {
     const fullQueryLower = trimmed.toLowerCase();
     const primaryTopicKey = identifiedTopics.length > 0 ? identifiedTopics[0].key.toLowerCase() : null;
 
-    const candidateScores = new Map<number, number>();
-    const docMatchedTokens = new Map<number, Set<string>>();
+    const scoredCandidates: Array<{ idx: number; score: number }> = [];
+    const stemmedTokens = expandedTokens.map(stemToken);
+    const docs = this.docs;
+    const categories = this.categories;
+    const isFilter = Boolean(categoryFilter && categoryFilter !== "All");
+    const targetCatLower = categoryFilter ? categoryFilter.toLowerCase() : "";
 
-    const totalDocs = this.docs.length;
-    const k1 = 1.2;
+    for (let i = 0; i < docs.length; i++) {
+      const d = docs[i];
+      const cat = categories[d[3]];
 
-    for (const token of expandedTokens) {
-      const stem = stemToken(token);
-      let list = this.postings.get(token) || this.postings.get(stem);
-
-      // Typo tolerance: if no exact match and token >= 4 chars, search vocabulary with Levenshtein distance <= 1
-      if (!list && token.length >= 4) {
-        for (const vocabWord of this.vocab) {
-          if (Math.abs(vocabWord.length - token.length) <= 1 && levenshteinDistance(token, vocabWord) <= 1) {
-            list = this.postings.get(vocabWord);
-            if (list) break;
-          }
-        }
-      }
-
-      if (!list || list.length === 0) continue;
-
-      // IDF (Inverse Document Frequency)
-      const docFreq = list.length;
-      const idf = Math.log(1 + (totalDocs - docFreq + 0.5) / (docFreq + 0.5));
-
-      for (const entry of list) {
-        const { docIdx, tfTitle, tfKw, tfSnip } = entry;
-
-        // BM25F weighted term frequency
-        const weightedTF = tfTitle * 10.0 + tfKw * 5.0 + tfSnip * 1.5;
-        const termScore = idf * ((weightedTF * (k1 + 1)) / (weightedTF + k1));
-
-        candidateScores.set(docIdx, (candidateScores.get(docIdx) || 0) + termScore);
-
-        let matchedSet = docMatchedTokens.get(docIdx);
-        if (!matchedSet) {
-          matchedSet = new Set<string>();
-          docMatchedTokens.set(docIdx, matchedSet);
-        }
-        matchedSet.add(token);
-      }
-    }
-
-    // Ensure the primary identified topic track is evaluated even if not all query tokens matched it
-    if (primaryTopicKey) {
-      const topicDocIdx = this.docs.findIndex(
-        (d) => d.category === "Guided Track" && d.id === `topic-${primaryTopicKey}`
-      );
-      if (topicDocIdx !== -1 && !candidateScores.has(topicDocIdx)) {
-        candidateScores.set(topicDocIdx, 15);
-      }
-    }
-
-    const scoredItems: SearchResultItem[] = [];
-    let guidedTrackIncludedCount = 0;
-
-    for (const [docIdx, bm25Score] of candidateScores.entries()) {
-      const doc = this.docs[docIdx];
-
-      if (categoryFilter && categoryFilter !== "All" && doc.category.toLowerCase() !== categoryFilter.toLowerCase()) {
+      if (isFilter && cat.toLowerCase() !== targetCatLower) {
         continue;
       }
 
-      const matchedTokens = docMatchedTokens.get(docIdx) || new Set<string>();
-      const matchCoverage = matchedTokens.size / rawTokens.length;
+      const id = d[0];
+      const tLow = d[2];
+      const kLow = d[9];
+      const isPrimaryTopic = Boolean(primaryTopicKey && cat === "Guided Track" && id === `topic-${primaryTopicKey}`);
+
+      // Fast pre-filter for queries with 3+ tokens
+      if (rawTokens.length >= 3 && !isPrimaryTopic) {
+        let hasHit = false;
+        for (let rIdx = 0; rIdx < rawTokens.length; rIdx++) {
+          const r = rawTokens[rIdx];
+          if (tLow.includes(r) || kLow.includes(r)) {
+            hasHit = true;
+            break;
+          }
+        }
+        if (!hasHit) continue;
+      }
+
+      let score = 0;
+      let hitCount = 0;
+
+      // 1. Exact phrase bonus (Google-style highest boost)
+      if (fullQueryLower.length > 2) {
+        if (tLow.includes(fullQueryLower)) score += 500;
+        else if (kLow.includes(fullQueryLower)) score += 200;
+      }
+
+      // Primary identified topic track discovery boost
+      if (isPrimaryTopic) {
+        score += 550;
+      }
+
+      // 2. Token BM25F field matching
+      for (let tIdx = 0; tIdx < expandedTokens.length; tIdx++) {
+        const tok = expandedTokens[tIdx];
+        let tokenHit = false;
+
+        if (tLow.includes(tok)) {
+          score += 40;
+          tokenHit = true;
+        } else {
+          const stem = stemmedTokens[tIdx];
+          if (stem !== tok && tLow.includes(stem)) {
+            score += 30;
+            tokenHit = true;
+          }
+        }
+
+        if (kLow.includes(tok)) {
+          score += 20;
+          tokenHit = true;
+        } else {
+          const stem = stemmedTokens[tIdx];
+          if (stem !== tok && kLow.includes(stem)) {
+            score += 15;
+            tokenHit = true;
+          }
+        }
+
+        // Typo tolerance: zero-allocation scan
+        if (!tokenHit && tok.length >= 4 && rawTokens.length <= 2) {
+          if (matchesWordWithTypo(tLow, tok)) {
+            score += 35;
+            tokenHit = true;
+          }
+        }
+
+        if (tokenHit) hitCount++;
+      }
+
+      if (score === 0) continue;
 
       // Multi-word rigor: for queries with 2+ tokens, require at least 50% match coverage (unless primary topic)
-      const isPrimaryTopic = primaryTopicKey && doc.category === "Guided Track" && doc.id === `topic-${primaryTopicKey}`;
+      const matchCoverage = hitCount / rawTokens.length;
       if (rawTokens.length >= 2 && matchCoverage < 0.5 && !isPrimaryTopic) {
         continue;
       }
 
-      let finalScore = bm25Score * doc.authority;
-      const titleLower = doc.title.toLowerCase();
-
-      // 1. Exact Full Phrase Bonus (Google-style highest priority)
-      if (fullQueryLower.length > 2 && titleLower.includes(fullQueryLower)) {
-        finalScore += 500;
-      } else if (doc.keywords.toLowerCase().includes(fullQueryLower)) {
-        finalScore += 200;
-      } else if (doc.snippet.toLowerCase().includes(fullQueryLower)) {
-        finalScore += 90;
-      }
-
-      // Primary identified topic track discovery boost (Google-style Knowledge Track)
-      if (isPrimaryTopic) {
-        finalScore += 260;
-      }
-
-      // 2. All tokens in title bonus
-      const allInTitle = rawTokens.every((t) => titleLower.includes(t) || titleLower.includes(stemToken(t)));
+      // 3. All tokens in title bonus
+      const allInTitle = rawTokens.every((t) => tLow.includes(t) || tLow.includes(stemToken(t)));
       if (allInTitle) {
-        finalScore += 120;
+        score += 120;
       }
 
-      // 3. Proximity bonus for multi-word queries
+      // 4. Proximity bonus for multi-word queries
       if (rawTokens.length >= 2 && allInTitle) {
-        const firstIdx = titleLower.indexOf(rawTokens[0]);
-        const lastIdx = titleLower.indexOf(rawTokens[rawTokens.length - 1]);
+        const firstIdx = tLow.indexOf(rawTokens[0]);
+        const lastIdx = tLow.indexOf(rawTokens[rawTokens.length - 1]);
         if (firstIdx !== -1 && lastIdx !== -1) {
           const span = Math.abs(lastIdx - firstIdx);
-          if (span < 40) finalScore += 80;
+          if (span < 40) score += 80;
         }
       }
 
-      // Dynamic KWIC snippet generation
-      let snippet = doc.snippet;
-      if (doc.snippet && rawTokens.length > 0) {
-        const snipLower = doc.snippet.toLowerCase();
+      // Multi-token co-occurrence boost
+      if (hitCount === rawTokens.length) {
+        score *= 1.5;
+      }
+
+      score *= d[10]; // priority
+
+      scoredCandidates.push({ idx: i, score });
+    }
+
+    scoredCandidates.sort((a, b) => b.score - a.score);
+
+    // Cap Guided Track at maximum 1 in the top items list to prevent crowding
+    const filteredResults: SearchResultItem[] = [];
+    let guidedTrackIncludedCount = 0;
+
+    for (let cIdx = 0; cIdx < scoredCandidates.length; cIdx++) {
+      const { idx, score } = scoredCandidates[cIdx];
+      const d = docs[idx];
+      const cat = categories[d[3]] as SearchCategory;
+
+      if (cat === "Guided Track") {
+        if (guidedTrackIncludedCount >= 1) continue;
+        guidedTrackIncludedCount++;
+      }
+
+      // Dynamic KWIC snippet generation on top candidate items
+      let snippet = d[8];
+      if (snippet && rawTokens.length > 0) {
+        const snipLower = snippet.toLowerCase();
         const hitToken = rawTokens.find((t) => snipLower.includes(t));
         if (hitToken) {
           const hitIdx = snipLower.indexOf(hitToken);
           const start = Math.max(0, hitIdx - 35);
-          const end = Math.min(doc.snippet.length, hitIdx + 110);
-          snippet = (start > 0 ? "..." : "") + doc.snippet.slice(start, end).trim() + (end < doc.snippet.length ? "..." : "");
+          const end = Math.min(snippet.length, hitIdx + 110);
+          snippet = (start > 0 ? "..." : "") + snippet.slice(start, end).trim() + (end < snippet.length ? "..." : "");
         }
       }
 
-      scoredItems.push({
-        id: doc.id,
-        title: doc.title,
-        category: doc.category,
-        page: doc.page,
-        href: doc.href,
-        badge: doc.badge,
+      filteredResults.push({
+        id: d[0],
+        title: d[1],
+        category: cat,
+        page: this.pages[d[4]],
+        href: d[6],
+        badge: d[7],
         snippet,
-        score: Math.round(finalScore * 10) / 10,
-        iconType: doc.iconType,
+        score: Math.round(score * 10) / 10,
+        iconType: this.icons[d[5]],
       });
-    }
 
-    // Sort by highest relevance score
-    scoredItems.sort((a, b) => b.score - a.score);
-
-    // Diversify results:
-    // Ensure Guided Track does not crowd out specific concepts/questions/scenarios.
-    // Cap Guided Track at maximum 1 in the top items list.
-    const filteredResults: SearchResultItem[] = [];
-    for (const item of scoredItems) {
-      if (item.category === "Guided Track") {
-        if (guidedTrackIncludedCount >= 1) continue;
-        guidedTrackIncludedCount++;
+      if (filteredResults.length >= maxResults * 2) {
+        break;
       }
-      filteredResults.push(item);
     }
 
     return filteredResults.slice(0, maxResults);

@@ -373,6 +373,42 @@ function run() {
   ensureDir(path.join(R2_OUT_DIR, 'index'));
   fs.writeFileSync(path.join(R2_OUT_DIR, searchKey), searchJson);
 
+  // Write lightweight pre-compiled catalog for edge search engine
+  const catalogPath = path.join(DATA_JSON_DIR, 'search_catalog.json');
+  const categories = Array.from(new Set(searchDocs.map((d) => d.category)));
+  const pages = Array.from(new Set(searchDocs.map((d) => d.page)));
+  const icons = Array.from(new Set(searchDocs.map((d) => d.iconType || 'file')));
+
+  const docs = searchDocs.map((d) => {
+    const rawSnippet = String(d.snippet || d.summary || d.body || '').replace(/\s+/g, ' ').trim();
+    const snippet = rawSnippet.slice(0, 90);
+    const kwSet = new Set(
+      `${d.category || ''} ${d.domain || ''} ${Array.isArray(d.tags) ? d.tags.join(' ') : d.tags || ''}`
+        .toLowerCase()
+        .split(/[\s,+/_\-:]+/)
+        .filter((w) => w.length > 2)
+    );
+    const keywords = Array.from(kwSet).slice(0, 15).join(' ');
+
+    return [
+      d.id,
+      d.title,
+      d.title.toLowerCase(),
+      categories.indexOf(d.category),
+      pages.indexOf(d.page),
+      icons.indexOf(d.iconType || 'file'),
+      d.href,
+      d.badge || d.difficulty || 'Core',
+      snippet,
+      keywords,
+      d.type === 'topic' ? 1.3 : d.type === 'concept' ? 1.8 : d.type === 'scenario' ? 1.5 : 1.4,
+    ];
+  });
+
+  const catalogPayload = { categories, pages, icons, docs };
+  fs.writeFileSync(catalogPath, JSON.stringify(catalogPayload));
+  console.log(`✓ Generated lightweight search catalog (${docs.length} items, ${(Buffer.byteLength(JSON.stringify(catalogPayload)) / 1024 / 1024).toFixed(2)} MB) at ${catalogPath}`);
+
   const finalManifest = { ...manifest, searchIndexKey: searchKey };
   fs.writeFileSync(path.join(R2_OUT_DIR, 'manifest.json'), JSON.stringify(finalManifest, null, 2));
 
