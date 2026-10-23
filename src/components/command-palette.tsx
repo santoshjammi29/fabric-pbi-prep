@@ -35,8 +35,60 @@ import { cn } from "@/lib/utils";
 import { KbdShortcut } from "@/components/ui/kbd-shortcut";
 import { THEME_OPTIONS } from "@/components/ui/theme-switcher";
 import { useTextSize, TEXT_SIZE_OPTIONS } from "@/components/providers/text-size-provider";
-import type { TopicIdentification, SearchResultItem } from "@/lib/search-types";
+import type { TopicIdentification, SearchResultItem, NavigationalJump } from "@/lib/search-types";
 import { SUGGESTED_SEARCH_KEYWORDS } from "@/lib/search-types";
+
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  if (!query || !text) return <>{text}</>;
+  const tokens = query
+    .toLowerCase()
+    .split(/[\s,+/_\-:]+/)
+    .map((t) => t.trim())
+    .filter((t) => t.length > 1);
+
+  if (tokens.length === 0) return <>{text}</>;
+
+  let parts: string[] = [text];
+  let regex: RegExp | null = null;
+  try {
+    const escaped = tokens.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+    regex = new RegExp(`(${escaped})`, "gi");
+    parts = text.split(regex);
+  } catch {
+    return <>{text}</>;
+  }
+
+  if (!regex) return <>{text}</>;
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark
+            key={i}
+            className="bg-purple-500/25 text-purple-200 font-semibold px-0.5 rounded"
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
+const QUICK_NAV_HUBS = [
+  { label: "Guided Tracks", href: "/guided-learning", icon: Sparkles, badge: "13 Tracks" },
+  { label: "Key Concepts", href: "/concepts", icon: BookOpen, badge: "670+ Terms" },
+  { label: "Q&A Prep Hub", href: "/qa-prep", icon: MessageSquare, badge: "7.1k+ Drills" },
+  { label: "Architecture Hub", href: "/architecture", icon: Cpu, badge: "3.2k+ Scenarios" },
+  { label: "Databricks Hub", href: "/code-practice/databricks", icon: Flame, badge: "148+ Ops" },
+  { label: "Spark Simulator", href: "/spark-engine", icon: Zap, badge: "Engine" },
+  { label: "Modern Stack", href: "/modern-stack", icon: Layers, badge: "Blueprints" },
+  { label: "Cheat Sheets", href: "/cheat-sheet", icon: Terminal, badge: "PROD" },
+  { label: "Mind Map", href: "/mindmap", icon: Compass, badge: "Tree" },
+];
 
 export type CommandCategory =
   | "Navigation"
@@ -101,6 +153,7 @@ export function CommandPalette() {
   const [identifiedTopics, setIdentifiedTopics] = useState<TopicIdentification[]>([]);
   const [remoteResults, setRemoteResults] = useState<CommandItem[]>([]);
   const [pageCounts, setPageCounts] = useState<Record<string, number>>({});
+  const [navigationalJump, setNavigationalJump] = useState<NavigationalJump | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -236,6 +289,7 @@ export function CommandPalette() {
       setRemoteResults([]);
       setIdentifiedTopics([]);
       setPageCounts({});
+      setNavigationalJump(null);
       setIsLoading(false);
       return;
     }
@@ -246,6 +300,7 @@ export function CommandPalette() {
         const searchRes = executePortalSearch(q, 40);
         setIdentifiedTopics(searchRes.identifiedTopics);
         setPageCounts(searchRes.pageCounts);
+        setNavigationalJump(searchRes.navigationalJump || null);
         setRemoteResults(searchRes.items.map(mapSearchResultToCommandItem));
       }).catch(() => {});
       return;
@@ -263,6 +318,7 @@ export function CommandPalette() {
           if (Array.isArray(data?.items)) {
             setIdentifiedTopics(data.identifiedTopics || []);
             setPageCounts(data.pageCounts || {});
+            setNavigationalJump(data.navigationalJump || null);
             setRemoteResults(data.items.map(mapSearchResultToCommandItem));
           }
         })
@@ -273,6 +329,7 @@ export function CommandPalette() {
             const fallback = executePortalSearch(q, 40);
             setIdentifiedTopics(fallback.identifiedTopics);
             setPageCounts(fallback.pageCounts);
+            setNavigationalJump(fallback.navigationalJump || null);
             setRemoteResults(fallback.items.map(mapSearchResultToCommandItem));
           } catch {
             // silent
@@ -477,9 +534,9 @@ export function CommandPalette() {
           </span>
         </div>
 
-        {/* Suggested Quick Keywords when Query is Empty */}
+        {/* Suggested Quick Keywords & Nav Hubs when Query is Empty */}
         {!query && (
-          <div className="px-4 py-2 bg-[var(--surface-2)]/60 border-b border-[var(--border)] space-y-1.5">
+          <div className="px-4 py-2.5 bg-[var(--surface-2)]/60 border-b border-[var(--border)] space-y-2">
             <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
               <Sparkles size={11} className="text-blue-400" />
               <span>Popular Architecture &amp; Concept Keywords:</span>
@@ -496,6 +553,64 @@ export function CommandPalette() {
                 </button>
               ))}
             </div>
+
+            <div className="pt-1 flex items-center gap-1.5 flex-wrap border-t border-[var(--border)]/40">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] mr-1">
+                Quick Jump:
+              </span>
+              {QUICK_NAV_HUBS.map((hub) => {
+                const Icon = hub.icon;
+                return (
+                  <button
+                    key={hub.href}
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      router.push(hub.href);
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[var(--surface-1)] hover:bg-purple-600/15 hover:text-purple-300 text-[var(--muted-foreground)] border border-[var(--border)] transition-colors cursor-pointer"
+                  >
+                    <Icon size={10} className="text-purple-400" />
+                    <span>{hub.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Instant Navigational Jump Card (Google-style Top Knowledge Card) */}
+        {navigationalJump && query && (
+          <div className="mx-3 my-2 p-2.5 rounded-xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-blue-950/40 border border-blue-500/30 flex items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="p-1.5 rounded-lg bg-blue-500/20 text-blue-300 shrink-0">
+                <Zap size={16} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-blue-200">
+                    {navigationalJump.title}
+                  </span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-blue-900/60 text-blue-300 border border-blue-500/30">
+                    {navigationalJump.badge}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[var(--muted-foreground)] truncate mt-0.5">
+                  {navigationalJump.description}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                router.push(navigationalJump.href);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
+            >
+              <span>Jump</span>
+              <ChevronRight size={13} />
+            </button>
           </div>
         )}
 
@@ -606,7 +721,7 @@ export function CommandPalette() {
                     <div className="min-w-0 flex-1 pr-2">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-sm truncate text-[var(--foreground)] group-hover:text-purple-300 transition-colors">
-                          {item.title}
+                          <HighlightMatch text={item.title} query={query} />
                         </span>
                         {item.page && (
                           <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--surface-3)] text-[var(--muted-foreground)] border border-[var(--border)] shrink-0">
@@ -617,7 +732,7 @@ export function CommandPalette() {
 
                       {item.snippet && (
                         <p className="text-xs text-[var(--muted-foreground)] line-clamp-1 mt-0.5">
-                          {item.snippet}
+                          <HighlightMatch text={item.snippet} query={query} />
                         </p>
                       )}
                     </div>

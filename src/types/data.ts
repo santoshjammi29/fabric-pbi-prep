@@ -105,6 +105,7 @@ export interface Concept {
   definition: string;
   explanation: string;
   keyPoints: string[];
+  relatedTerms?: string[];
 }
 
 // ==========================================

@@ -10,19 +10,6 @@ const withBundleAnalyzer = bundleAnalyzer({
   openAnalyzer: false,
 });
 
-const cspPolicy = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://cdn.lakehousearchitect.com https://img.clerk.com https://challenges.cloudflare.com",
-  "font-src 'self' data:",
-  "connect-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.com https://*.upstash.io https://*.supabase.co",
-  "frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-].join("; ");
-
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
@@ -61,7 +48,9 @@ const nextConfig: NextConfig = {
           { key: "X-DNS-Prefetch-Control", value: "on" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Content-Security-Policy", value: cspPolicy },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
         ],
       },
       {

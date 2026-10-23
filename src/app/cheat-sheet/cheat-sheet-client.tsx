@@ -18,6 +18,7 @@ import {
   ShieldAlert,
   FileCode2,
   Download,
+  FileText,
 } from "lucide-react";
 import type { CheatCode, CheatCodeCategory, DatabricksSuiteData } from "@/types/data";
 import { CheatCard } from "@/components/cheatsheet/cheat-card";
@@ -25,6 +26,7 @@ import { OptimizationFlow } from "@/components/cheatsheet/optimization-flow";
 import { CategoryBar } from "@/components/cheatsheet/category-bar";
 import { QuickJumpTOC } from "@/components/cheatsheet/quick-jump-toc";
 import { DatabricksCheatsheetView } from "@/components/cheatsheet/databricks-cheatsheet-view";
+import { PdfDownloadsHub } from "@/components/cheatsheet/pdf-downloads-hub";
 import { cn } from "@/lib/utils";
 
 const ALL_CATEGORIES: CheatCodeCategory[] = [
@@ -45,8 +47,10 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
   const cheatsheetData = initialData;
   const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<"databricks" | "runbooks">(() => {
-    return searchParams.get("tab") === "databricks" ? "databricks" : "runbooks";
+  const [activeTab, setActiveTab] = useState<"databricks" | "runbooks" | "pdf_hub">(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "pdf_hub" || tab === "pdfs") return "pdf_hub";
+    return tab === "databricks" ? "databricks" : "runbooks";
   });
 
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -60,6 +64,8 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
     const tabParam = searchParams.get("tab");
     if (tabParam === "databricks") {
       setActiveTab("databricks");
+    } else if (tabParam === "pdf_hub" || tabParam === "pdfs") {
+      setActiveTab("pdf_hub");
     } else if (tabParam === "runbooks") {
       setActiveTab("runbooks");
     }
@@ -291,10 +297,30 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
             {databricksData.cards.length} Cards &amp; PDFs
           </span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("pdf_hub")}
+          className={cn(
+            "flex items-center gap-1.5 px-4 sm:px-5 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap",
+            activeTab === "pdf_hub"
+              ? "bg-purple-600 text-white shadow-xs"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          )}
+        >
+          <FileText size={13} className={activeTab === "pdf_hub" ? "text-white" : "text-purple-400"} />
+          <span>A4 PDF Documents Hub</span>
+          <span className="text-[10px] px-1.5 py-0.2 rounded-full font-mono bg-purple-500/20 text-purple-200">
+            6 A4 Suites
+          </span>
+        </button>
       </div>
 
       {/* View Branching */}
-      {activeTab === "databricks" ? (
+      {activeTab === "pdf_hub" ? (
+        /* --- ALL A4 CODING BLOCK PDFS UNDER SINGLE ROOF --- */
+        <PdfDownloadsHub />
+      ) : activeTab === "databricks" ? (
         /* --- DATABRICKS ARCHITECTURE & CODING VIEW --- */
         <div className="space-y-4">
           {/* Consolidated Subpage Banner */}
@@ -408,6 +434,14 @@ function CheatSheetContent({ initialData, databricksData }: CheatSheetContentPro
                 >
                   <span>Explore 48 Cards</span>
                   <ArrowRight size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("pdf_hub")}
+                  className="px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-xs font-semibold text-purple-300 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText size={13} className="text-purple-400" />
+                  <span>A4 PDF Hub (All 6 Suites)</span>
                 </button>
                 <a
                   href="/cheatsheets/pdf/databricks_master_cheatsheet.pdf"

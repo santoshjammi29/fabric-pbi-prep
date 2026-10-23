@@ -9,6 +9,7 @@ export interface UserData {
 }
 
 export interface UserStoreState {
+  isInitialized: boolean;
   experienceTier: ExperienceTier;
   bookmarks: string[];
   lastTopic: LastTopicData;
@@ -98,8 +99,15 @@ function getInitialLegacyData(): Partial<UserStoreState> {
   }
 }
 
+function generateSecureId(prefix: string): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `${prefix}_${crypto.randomUUID()}`;
+  }
+  return `${prefix}_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`;
+}
+
 // Debounced Edge Sync for global low-latency state persistence
-let edgeSyncTimeout: any = null;
+let edgeSyncTimeout: ReturnType<typeof setTimeout> | null = null;
 function queueEdgeProgressSync(state: UserStoreState) {
   if (typeof window === "undefined" || process.env.NODE_ENV === "test") return;
   if (edgeSyncTimeout) clearTimeout(edgeSyncTimeout);
@@ -107,15 +115,22 @@ function queueEdgeProgressSync(state: UserStoreState) {
     try {
       let userId = localStorage.getItem("dataprep_user_id");
       if (!userId) {
-        userId = "usr_" + Math.random().toString(36).substring(2, 11);
+        userId = generateSecureId("usr");
         localStorage.setItem("dataprep_user_id", userId);
       }
-      let userToken = localStorage.getItem("dataprep_user_token");
+      let userToken: string | null = null;
+      if (typeof sessionStorage !== "undefined") {
+        try {
+          userToken = sessionStorage.getItem("dataprep_user_token");
+        } catch {}
+      }
       if (!userToken) {
-        userToken = typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : "tok_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
-        localStorage.setItem("dataprep_user_token", userToken);
+        userToken = generateSecureId("tok");
+        if (typeof sessionStorage !== "undefined") {
+          try {
+            sessionStorage.setItem("dataprep_user_token", userToken);
+          } catch {}
+        }
       }
       fetch("/api/progress", {
         method: "POST",
@@ -142,12 +157,13 @@ function queueEdgeProgressSync(state: UserStoreState) {
 export const useUserStore = create<UserStoreState>()(
   persist(
     (set, get) => ({
+      isInitialized: false,
       experienceTier: DEFAULT_TIER,
       bookmarks: [],
       lastTopic: DEFAULT_TOPIC,
       userData: {
-        xp: 650,
-        reviewedCount: 42,
+        xp: 0,
+        reviewedCount: 0,
         lastActive: new Date().toISOString(),
       },
       decisionLedger: {},
@@ -271,6 +287,7 @@ export const useUserStore = create<UserStoreState>()(
 
       resetProgress: () => {
         set({
+          isInitialized: true,
           experienceTier: DEFAULT_TIER,
           bookmarks: [],
           lastTopic: DEFAULT_TOPIC,
@@ -284,6 +301,9 @@ export const useUserStore = create<UserStoreState>()(
             localStorage.removeItem("dataprep_userdata");
             localStorage.removeItem("dataprep_last_topic");
             localStorage.removeItem("dataprep_experience_tier");
+            if (typeof sessionStorage !== "undefined") {
+              sessionStorage.removeItem("dataprep_user_token");
+            }
           } catch {}
         }
       },
@@ -301,8 +321,9 @@ export const useUserStore = create<UserStoreState>()(
         if (legacy.bookmarks && legacy.bookmarks.length > 0 && state.bookmarks.length === 0) {
           state.bookmarks = legacy.bookmarks;
         }
-        if (legacy.userData && state.userData.xp === 650 && state.userData.reviewedCount === 42) {
+        if (legacy.userData && !state.isInitialized) {
           state.userData = legacy.userData;
+          state.isInitialized = true;
         }
         if (legacy.lastTopic && state.lastTopic.title === DEFAULT_TOPIC.title) {
           state.lastTopic = legacy.lastTopic;

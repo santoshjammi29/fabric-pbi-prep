@@ -105,6 +105,7 @@ const PILLARS: PillarItem[] = [
     secondaryLinks: [
       { label: "Production Cheat Sheet", href: "/cheat-sheet" },
       { label: "Databricks Cheat Sheets", href: "/cheat-sheet?tab=databricks" },
+      { label: "A4 PDF Library", href: "/cheat-sheet?tab=pdf_hub" },
       { label: "PySpark Drills", href: "/code-practice?db=pyspark" },
     ],
   },

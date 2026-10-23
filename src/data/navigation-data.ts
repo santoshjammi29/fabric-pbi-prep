@@ -125,6 +125,7 @@ export const NAV_GROUPS: NavGroup[] = [
         subItems: [
           { label: "Production Runbooks", href: "/cheat-sheet?tab=runbooks", badge: "69" },
           { label: "Databricks Suites", href: "/cheat-sheet?tab=databricks", badge: "48" },
+          { label: "A4 PDF Reference Hub", href: "/cheat-sheet?tab=pdf_hub", badge: "A4" },
         ],
       },
     ],

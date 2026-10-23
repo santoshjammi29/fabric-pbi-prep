@@ -32,9 +32,9 @@
   "dependencies": {
     "@clerk/nextjs": "^7.9.17",
     "@opennextjs/cloudflare": "^1.20.12",
-    "@tanstack/react-query": "^5.102.8",
     "@tanstack/react-virtual": "^3.14.14",
     "@types/prismjs": "^1.26.6",
+    "@upstash/ratelimit": "^2.2.0",
     "@upstash/redis": "^1.39.0",
     "clsx": "^2.1.1",
     "framer-motion": "^13.1.1",

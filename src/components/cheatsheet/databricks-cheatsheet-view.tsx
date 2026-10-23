@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Eye,
+  FileText,
 } from "lucide-react";
 import type {
   DatabricksSuiteData,
@@ -197,15 +198,13 @@ export function DatabricksCheatsheetView({
             </a>
 
             <div className="flex items-center gap-2">
-              <a
-                href={data.interactiveHub.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
+              <Link
+                href="/cheat-sheet?tab=pdf_hub"
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs font-semibold border border-purple-500/30 transition-colors"
               >
-                <span>Standalone Hub</span>
-                <ExternalLink size={12} className="text-slate-400" />
-              </a>
+                <FileText size={12} className="text-purple-400" />
+                <span>PDF Hub</span>
+              </Link>
 
               <button
                 type="button"

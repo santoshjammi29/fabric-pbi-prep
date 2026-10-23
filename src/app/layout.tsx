@@ -160,7 +160,20 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} dark antialiased bg-[var(--background)] text-[var(--foreground)]`}
     >
       <head>
-        <script src="/theme-init.js" />
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
+        <script
+          type="speculationrules"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              prefetch: [
+                {
+                  where: { href_matches: "/*" },
+                  eagerness: "conservative",
+                },
+              ],
+            }),
+          }}
+        />
         <style dangerouslySetInnerHTML={{ __html: `
           body { background-color: var(--background, #0A0A0B); color: var(--foreground, #f0f0f5); }
         `}} />
@@ -241,21 +254,6 @@ export default function RootLayout({
             }}
           />
           </LazyMotion>
-          <Script 
-            id="speculation-rules" 
-            type="speculationrules" 
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                prefetch: [
-                  {
-                    where: { href_matches: "/*" },
-                    eagerness: "conservative"
-                  }
-                ]
-              })
-            }}
-          />
           {/* Global WebSite & Organization Structured Data for Google Rich Snippets */}
           <script
             type="application/ld+json"

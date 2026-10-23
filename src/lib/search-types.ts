@@ -36,6 +36,15 @@ export interface TopicIdentification {
   executiveSummary: string;
 }
 
+export interface NavigationalJump {
+  title: string;
+  description: string;
+  href: string;
+  page: string;
+  badge: string;
+  iconType: string;
+}
+
 export const SUGGESTED_SEARCH_KEYWORDS = [
   "Catalyst Optimizer",
   "Delta Lake ACID",

@@ -23,6 +23,7 @@ import {
   Sparkles,
   Flame,
   ArrowRight,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -350,13 +351,22 @@ export function CodePracticeClient({ initialData }: CodePracticeClientProps) {
             </div>
           </div>
         </div>
-        <Link
-          href="/code-practice/databricks"
-          className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium text-xs transition-colors flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
-        >
-          <span>Open Databricks Coding Subpage</span>
-          <ArrowRight size={13} />
-        </Link>
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <Link
+            href="/code-practice/databricks"
+            className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium text-xs transition-colors flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+          >
+            <span>Databricks Subpage</span>
+            <ArrowRight size={13} />
+          </Link>
+          <Link
+            href="/cheat-sheet?tab=pdf_hub"
+            className="px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 font-medium text-xs transition-colors flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+          >
+            <FileText size={13} className="text-purple-400" />
+            <span>A4 PDF Hub</span>
+          </Link>
+        </div>
       </div>
 
       {/* ─── UNIFIED SEARCH & MULTI-LEVEL FILTER BOX ─── */}

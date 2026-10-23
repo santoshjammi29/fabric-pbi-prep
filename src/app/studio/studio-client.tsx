@@ -26,10 +26,10 @@ interface StudioUserData {
 
 export function StudioClient() {
   const [userData, setUserData] = useState<StudioUserData>({
-    streak: 3,
-    xp: 650,
+    streak: 0,
+    xp: 0,
     bookmarks: [],
-    reviewedCount: 42,
+    reviewedCount: 0,
     lastActive: new Date().toISOString(),
   });
 

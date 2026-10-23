@@ -11,6 +11,7 @@ import {
   Eye,
   RotateCcw,
   Type,
+  Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -234,6 +235,193 @@ export function CodeBlock({
     toast.info("Restored original code template");
   }, [initialCode]);
 
+  const handleExportA4Pdf = useCallback(() => {
+    try {
+      const printWindow = window.open("", "_blank", "width=850,height=900");
+      if (!printWindow) {
+        toast.error("Popup blocked! Please allow popups to export A4 PDF.");
+        return;
+      }
+
+      const escapedLines = activeCode
+        .split("\n")
+        .map((line, idx) => {
+          const lineNum = idx + 1;
+          const escapedContent = line
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          return `<tr><td class="line-no">${lineNum}</td><td class="code-line">${escapedContent || "&nbsp;"}</td></tr>`;
+        })
+        .join("");
+
+      const title = displayFilename || `${langConfig.label} Snippet`;
+      const dateStr = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+
+      const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${title} - A4 Reference</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm 12mm 15mm 12mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #ffffff;
+      color: #0f172a;
+      line-height: 1.5;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .a4-container {
+      width: 100%;
+      max-width: 186mm;
+      margin: 0 auto;
+    }
+    .header {
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header-left h1 {
+      font-size: 15pt;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    .header-left .meta {
+      font-size: 8.5pt;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      font-size: 7.5pt;
+      font-weight: 600;
+      border-radius: 4px;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+      text-transform: uppercase;
+    }
+    .header-right {
+      text-align: right;
+      font-size: 8pt;
+      color: #64748b;
+    }
+    .code-table-container {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    table.code-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, "Courier New", monospace;
+      font-size: 9pt;
+      line-height: 1.6;
+    }
+    td.line-no {
+      width: 36px;
+      min-width: 36px;
+      max-width: 36px;
+      text-align: right;
+      padding: 1px 8px 1px 4px;
+      color: #94a3b8;
+      background: #f1f5f9;
+      border-right: 1px solid #e2e8f0;
+      user-select: none;
+      vertical-align: top;
+      font-size: 8pt;
+    }
+    td.code-line {
+      padding: 1px 8px;
+      color: #1e293b;
+      white-space: pre-wrap;
+      word-break: break-all;
+      vertical-align: top;
+    }
+    .footer {
+      margin-top: 12px;
+      padding-top: 6px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="a4-container">
+    <div class="header">
+      <div class="header-left">
+        <span class="badge">${badge || langConfig.label}</span>
+        <h1 style="margin-top: 4px;">${title}</h1>
+        <div class="meta">
+          Enterprise Data Platform Reference · ${activeCode.split("\n").length} lines · Language: ${langConfig.label}
+        </div>
+      </div>
+      <div class="header-right">
+        <div><strong>Format:</strong> ISO 216 Standard A4</div>
+        <div><strong>Exported:</strong> ${dateStr}</div>
+      </div>
+    </div>
+
+    <div class="code-table-container">
+      <table class="code-table">
+        <tbody>
+          ${escapedLines}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <span>Lakehouse Architecture & Systems Engineering · Verified Code Playbook</span>
+      <span>Page 1 of 1 · Print-Ready A4</span>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        window.focus();
+        window.print();
+      }, 250);
+    });
+  </script>
+</body>
+</html>`;
+
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      toast.success("Opening A4 Print Dialog — Select 'Save as PDF' to save your A4 PDF");
+    } catch {
+      toast.error("Failed to generate A4 PDF document");
+    }
+  }, [activeCode, displayFilename, langConfig, badge]);
+
   // Handle Tab key in editor mode to indent 2 spaces instead of leaving textarea
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -418,6 +606,18 @@ export function CodeBlock({
                 <span className="text-[10px]">Copy</span>
               </>
             )}
+          </button>
+
+          {/* Export / Print as A4 PDF */}
+          <button
+            type="button"
+            onClick={handleExportA4Pdf}
+            aria-label="Export code as A4 PDF"
+            title="Export / Print code block formatted for standard A4 PDF"
+            className="h-6 flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/10 hover:bg-purple-500/20 active:scale-95 text-purple-700 dark:text-purple-300 text-xs font-semibold border border-purple-500/30 shadow-xs transition-all touch-manipulation cursor-pointer"
+          >
+            <Printer size={11} className="text-purple-600 dark:text-purple-400" />
+            <span className="text-[10px]">A4 PDF</span>
           </button>
         </div>
       </div>

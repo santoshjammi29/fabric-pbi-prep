@@ -271,7 +271,7 @@ function run() {
     href: `/qa-prep?category=${encodeURIComponent(q.category || 'ALL')}&card=${encodeURIComponent(q.id)}`,
     domain: q.domain || q.category, difficulty: q.difficulty, badge: q.difficulty,
     tags: [q.category, q.niche, q.domain, q.sourceLabel].filter(Boolean),
-    body: q.answer || '', iconType: 'message',
+    body: (q.answer || '').slice(0, 300), iconType: 'message',
   }));
 
   scenarioItems.forEach((item) => addDoc({
@@ -279,7 +279,7 @@ function run() {
     category: 'Architecture', page: 'Architecture Hub',
     href: `/architecture?category=${encodeURIComponent(item.category || 'ALL')}&card=${encodeURIComponent(item.id)}`,
     domain: item.category, difficulty: item.difficulty, badge: item.difficulty,
-    tags: [item.niche, item.source].filter(Boolean), body: item.answer || item.problemStatement || '',
+    tags: [item.niche, item.source].filter(Boolean), body: (item.answer || item.problemStatement || '').slice(0, 300),
     iconType: 'cpu',
   }));
 
@@ -288,7 +288,7 @@ function run() {
     category: 'Concepts', page: 'Key Concepts',
     href: `/concepts?tab=concepts&category=${encodeURIComponent(item.category)}&term=${encodeURIComponent(item.term)}`,
     domain: item.category, difficulty: item.difficulty, badge: item.difficulty,
-    tags: item.keyPoints || item.relatedTerms || [], body: `${item.definition || ''} ${item.explanation || ''}`,
+    tags: item.keyPoints || item.relatedTerms || [], body: `${item.definition || ''} ${item.explanation || ''}`.slice(0, 300),
     iconType: 'book',
   }));
 

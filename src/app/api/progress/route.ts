@@ -48,6 +48,7 @@ async function getClerkUserId(): Promise<string | null> {
 }
 
 export async function GET(request: Request) {
+  const startTime = Date.now();
   const { searchParams } = new URL(request.url);
   const requestedUserId = searchParams.get("userId");
 
@@ -149,13 +150,14 @@ export async function GET(request: Request) {
       {
         headers: {
           "Cache-Control": "private, no-cache, no-store, must-revalidate",
-          "X-Edge-Sync-Latency": "<100ms",
+          "X-Edge-Sync-Latency": `${Date.now() - startTime}ms`,
         },
       }
     );
   } catch (error: any) {
+    console.error("[progress/GET] Internal error:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -233,13 +235,14 @@ export async function POST(request: Request) {
         status: 200,
         headers: {
           "Cache-Control": "private, no-cache, no-store, must-revalidate",
-          "X-Edge-Sync-Latency": "<100ms",
+          "X-Edge-Sync-Latency": `${Date.now() - startTime}ms`,
         },
       }
     );
   } catch (error: any) {
+    console.error("[progress/GET] Internal error:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

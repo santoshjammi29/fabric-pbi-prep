@@ -10,6 +10,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, items: [] });
     }
 
+    const MAX_IDS = 50;
+    if (ids.length > MAX_IDS) {
+      return NextResponse.json(
+        { success: false, error: `Maximum ${MAX_IDS} IDs per request` },
+        { status: 400 }
+      );
+    }
+    if (ids.some((id) => typeof id !== "string")) {
+      return NextResponse.json(
+        { success: false, error: "All IDs must be strings" },
+        { status: 400 }
+      );
+    }
+
     const idSet = new Set(ids.filter((x): x is string => typeof x === "string"));
     const resolved: Array<{ id: string; title: string; type: string; href: string }> = [];
 
@@ -70,8 +84,9 @@ export async function POST(request: Request) {
       }
     );
   } catch (error: any) {
+    console.error("[bookmarks/resolve] Internal error:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
