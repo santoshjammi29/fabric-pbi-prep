@@ -42,6 +42,8 @@ export default async function ArchitecturePage() {
     `Comprehensive reference of ${totalCount} system blueprints, distributed runbooks, and whiteboards for data architects.`
   );
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
+
   const breadcrumbsSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -50,13 +52,13 @@ export default async function ArchitecturePage() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://lakehousearchitect.com",
+        item: siteUrl,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Enterprise Architecture Hub",
-        item: "https://lakehousearchitect.com/architecture",
+        item: `${siteUrl}/architecture`,
       },
     ],
   };

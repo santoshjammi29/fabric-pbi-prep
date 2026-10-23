@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Security Policy & Responsible Disclosure | Modern Data Engineer",
-  description: "Security policy, vulnerability reporting guidelines, and responsible disclosure terms for lakehousearchitect.com.",
+  description: "Security policy, vulnerability reporting guidelines, and responsible disclosure terms for moderndataengineer.uk.",
 };
 
 export default function SecurityPage() {
@@ -44,7 +44,7 @@ export default function SecurityPage() {
           </p>
           <div className="bg-slate-950/80 border border-slate-800/80 rounded-lg p-4 font-mono text-xs text-slate-300 space-y-1">
             <p className="text-slate-500"># Standard security.txt endpoint</p>
-            <p>Canonical: https://lakehousearchitect.com/.well-known/security.txt</p>
+            <p>Canonical: https://moderndataengineer.uk/.well-known/security.txt</p>
             <p>Contact: mailto:santu.jammi@gmail.com</p>
             <p>Preferred-Languages: en</p>
           </div>

@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { architectureDiagrams } from "@/data/diagrams";
 import { GUIDED_TOPICS } from "@/data/guided-learning-topics";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://lakehousearchitect.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
 
 /**
  * Dynamic Self-Updating Sitemap Engine

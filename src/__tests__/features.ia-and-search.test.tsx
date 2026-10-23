@@ -67,16 +67,17 @@ describe('Professional Reference Portal IA & Search Indexing', () => {
   it('validates dynamic robots.ts and sitemap.ts route generators produce required metadata', async () => {
     const robotsModule = await import('@/app/robots');
     const sitemapModule = await import('@/app/sitemap');
+    const expectedBase = process.env.NEXT_PUBLIC_SITE_URL || 'https://moderndataengineer.uk';
 
     const robotsResult = robotsModule.default();
-    expect(robotsResult.host).toBe('https://lakehousearchitect.com');
-    expect(robotsResult.sitemap).toContain('https://lakehousearchitect.com/sitemap.xml');
+    expect(robotsResult.host).toBe(expectedBase);
+    expect(robotsResult.sitemap).toContain(`${expectedBase}/sitemap.xml`);
 
     const sitemapResult = await sitemapModule.default();
     const urls = sitemapResult.map((entry) => entry.url);
-    expect(urls).toContain('https://lakehousearchitect.com/guided-learning');
-    expect(urls).toContain('https://lakehousearchitect.com/architecture');
-    expect(urls).toContain('https://lakehousearchitect.com/');
+    expect(urls).toContain(`${expectedBase}/guided-learning`);
+    expect(urls).toContain(`${expectedBase}/architecture`);
+    expect(urls).toContain(`${expectedBase}/`);
     expect(sitemapResult.length).toBeGreaterThanOrEqual(10);
   });
 });

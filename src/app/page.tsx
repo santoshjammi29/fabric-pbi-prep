@@ -94,11 +94,13 @@ export default function DashboardPage() {
     },
   ]);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
+
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Lakehouse Architect",
-    url: "https://lakehousearchitect.com",
+    url: siteUrl,
     applicationCategory: "EducationalApplication",
     operatingSystem: "All",
     browserRequirements: "Requires HTML5 and modern web browser",
@@ -119,7 +121,7 @@ export default function DashboardPage() {
     author: {
       "@type": "Person",
       name: "Santosh Jammi",
-      url: "https://lakehousearchitect.com",
+      url: siteUrl,
     },
   };
 

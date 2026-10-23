@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Architectural technology stack breakdowns, data platform footprints, and targeted interview preparation rubrics for Fortune 500 enterprises and GCC tech hubs.",
   path: "/company-research",
-  ogImage: "https://lakehousearchitect.com/diagrams/unity_catalog_architecture.webp",
+  ogImage: "/diagrams/unity_catalog_architecture.webp",
   keywords: [
     "Enterprise Tech Stack Dossiers",
     "GCC Data Architect Interview",

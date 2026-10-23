@@ -7,8 +7,8 @@ const SECURITY_TXT = `# Security Policy & Vulnerability Disclosure
 Contact: mailto:santu.jammi@gmail.com
 Expires: 2027-10-22T08:00:00.000Z
 Preferred-Languages: en
-Canonical: https://lakehousearchitect.com/.well-known/security.txt
-Policy: https://lakehousearchitect.com/security
+Canonical: https://moderndataengineer.uk/.well-known/security.txt
+Policy: https://moderndataengineer.uk/security
 `;
 
 export async function GET() {

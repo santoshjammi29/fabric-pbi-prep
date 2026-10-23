@@ -33,8 +33,10 @@ const jetbrainsMono = JetBrains_Mono({
   preload: true,
 });
 
+const CANONICAL_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lakehousearchitect.com"),
+  metadataBase: new URL(CANONICAL_SITE_URL),
   title: {
     default: "Lakehouse Architect | Modern Lakehouse Architecture & Systems Guide",
     template: "%s | Lakehouse Architect",
@@ -64,19 +66,19 @@ export const metadata: Metadata = {
     "dbt",
     "Apache Airflow",
   ],
-  authors: [{ name: "Santosh Jammi", url: "https://lakehousearchitect.com" }],
+  authors: [{ name: "Santosh Jammi", url: CANONICAL_SITE_URL }],
   creator: "Santosh Jammi",
   publisher: "Lakehouse Architect",
   category: "technology",
   classification: "Data Platform Engineering & Lakehouse Architecture Portal",
   alternates: {
-    canonical: "https://lakehousearchitect.com",
+    canonical: CANONICAL_SITE_URL,
   },
   openGraph: {
     title: "Lakehouse Architect | Modern Lakehouse Architecture & Systems Guide",
     description:
       "The definitive enterprise reference platform for Lakehouse Architecture. Master Medallion Architecture, Microsoft Fabric OneLake, Databricks Delta Lake, Apache Iceberg, and Apache Spark 4.0 with 10,700+ verified scenarios.",
-    url: "https://lakehousearchitect.com",
+    url: CANONICAL_SITE_URL,
     siteName: "Lakehouse Architect",
     images: [
       {
@@ -263,18 +265,18 @@ export default function RootLayout({
                 "@graph": [
                   {
                     "@type": "WebSite",
-                    "@id": "https://lakehousearchitect.com/#website",
-                    "url": "https://lakehousearchitect.com",
+                    "@id": `${CANONICAL_SITE_URL}/#website`,
+                    "url": CANONICAL_SITE_URL,
                     "name": "Lakehouse Architect",
                     "description": "Enterprise Data Platform & Lakehouse Systems Architecture Encyclopedia and Interview Preparation Platform",
                     "publisher": {
-                      "@id": "https://lakehousearchitect.com/#organization",
+                      "@id": `${CANONICAL_SITE_URL}/#organization`,
                     },
                     "potentialAction": {
                       "@type": "SearchAction",
                       "target": {
                         "@type": "EntryPoint",
-                        "urlTemplate": "https://lakehousearchitect.com/concepts?search={search_term_string}",
+                        "urlTemplate": `${CANONICAL_SITE_URL}/concepts?search={search_term_string}`,
                       },
                       "query-input": "required name=search_term_string",
                     },
@@ -282,13 +284,13 @@ export default function RootLayout({
                   },
                   {
                     "@type": "Organization",
-                    "@id": "https://lakehousearchitect.com/#organization",
+                    "@id": `${CANONICAL_SITE_URL}/#organization`,
                     "name": "Lakehouse Architect",
-                    "url": "https://lakehousearchitect.com",
+                    "url": CANONICAL_SITE_URL,
                     "description": "Enterprise authority on Lakehouse Architecture, Medallion Architecture, Delta Lake, Apache Iceberg, and Cloud Data Platforms.",
                     "logo": {
                       "@type": "ImageObject",
-                      "url": "https://lakehousearchitect.com/icon-512.png",
+                      "url": `${CANONICAL_SITE_URL}/icon-512.png`,
                       "width": 512,
                       "height": 512,
                     },

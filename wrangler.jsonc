@@ -6,6 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
   "minify": true,
+  "upload_source_maps": false,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -38,7 +39,7 @@
   ],
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "https://moderndataengineer.uk",
-    "NEXT_PUBLIC_CDN_URL": "",
+    "NEXT_PUBLIC_CDN_URL": "https://assets.moderndataengineer.uk",
     "ARTIFACT_VERSION": "v2026.10",
     "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAFgJ82U17SKQAtZs"
   }

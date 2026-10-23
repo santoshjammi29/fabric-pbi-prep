@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const SITE_URL = "https://lakehousearchitect.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://moderndataengineer.uk";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/diagrams/fabric_onelake_architecture.webp`;
 
 export interface PageMetadataOptions {
@@ -25,6 +25,9 @@ export function buildPageMetadata({
   type = "website",
 }: PageMetadataOptions): Metadata {
   const canonicalUrl = `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const fullOgImage = ogImage.startsWith("http")
+    ? ogImage
+    : `${SITE_URL}${ogImage.startsWith("/") ? ogImage : `/${ogImage}`}`;
   
   // Clean raw title so Next.js root layout template ("%s | Lakehouse Architect") does not duplicate the suffix
   const cleanTitle = title
@@ -64,7 +67,7 @@ export function buildPageMetadata({
       siteName: "Lakehouse Architect",
       images: [
         {
-          url: ogImage,
+          url: fullOgImage,
           width: 1200,
           height: 675,
           alt: cleanTitle,
@@ -77,7 +80,7 @@ export function buildPageMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: [ogImage],
+      images: [fullOgImage],
       creator: "@lakehouse_arch",
     },
     robots: {

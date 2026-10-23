@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  productionBrowserSourceMaps: false,
+  webpack: (config) => {
+    config.devtool = false;
+    return config;
+  },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "sonner", "@tanstack/react-virtual"],
   },
