@@ -164,6 +164,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const startTime = Date.now();
   try {
     const rawBody = await request.json();
     const parseResult = progressSchema.safeParse(rawBody);
@@ -240,7 +241,7 @@ export async function POST(request: Request) {
       }
     );
   } catch (error: any) {
-    console.error("[progress/GET] Internal error:", error);
+    console.error("[progress/POST] Internal error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

@@ -20,13 +20,17 @@ const eslintConfig = defineConfig([
     "scripts/**",
   ]),
   {
+    plugins: {
+      "react-hooks": nextVitals[0].plugins["react-hooks"],
+      "@typescript-eslint": nextTs[0].plugins["@typescript-eslint"],
+    },
     rules: {
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/immutability": "off",
-      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/exhaustive-deps": "warn",
       "react/no-unescaped-entities": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-explicit-any": "warn",
     }
   }
 ]);

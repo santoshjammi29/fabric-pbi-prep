@@ -228,6 +228,23 @@ export async function GET() {
   }
 }
 
+const BLOCKED_PATTERNS = [
+  /\beval\s*\(/,
+  /new\s+Function\s*\(/,
+  /WebAssembly\s*\./,
+  /importScripts\s*\(/,
+  /\bprocess\.env\b/,
+];
+
+function validateWorkerSource(source: string): { valid: boolean; reason?: string } {
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(source)) {
+      return { valid: false, reason: `Blocked code pattern detected: ${pattern.source}` };
+    }
+  }
+  return { valid: true };
+}
+
 export async function POST(request: Request) {
   let userId: string | null;
   try {
@@ -270,6 +287,12 @@ export async function POST(request: Request) {
     return json({ error: `Worker source must be ${MAX_WORKER_SOURCE_BYTES / 1024} KB or smaller.` }, 413);
   }
 
+  const validation = validateWorkerSource(parsed.data.source);
+  if (!validation.valid) {
+    console.warn("[customer-workers] Blocked dangerous code in source:", validation.reason, { userId, name });
+    return json({ error: validation.reason }, 422);
+  }
+
   try {
     const config = getCloudflareConfig();
     const workerName = getWorkerScriptName(userId, name);
@@ -301,7 +324,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Unable to deploy customer Worker", error);
     return json({
-      error: error instanceof Error ? error.message : "Unable to deploy Worker.",
+      error: "Unable to deploy Worker. Please review configuration and retry.",
     }, error instanceof PlatformConfigurationError ? 503 : 502);
   }
 }
